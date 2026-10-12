@@ -12,7 +12,7 @@ import { tmpdir } from 'node:os'
 import { isAbsolute, join, relative, sep } from 'node:path'
 import { promisify } from 'node:util'
 
-import { startAuv } from '@auv-js/sdk/node'
+import { AuvDaemonStartError, startAuv } from '@auv-js/sdk/node'
 
 import * as v from 'valibot'
 
@@ -60,6 +60,9 @@ export function createComputerUseRuntime(options: { binaryPath: string, storeRoo
     }
     catch (error) {
       await cleanupSocket()
+      // Electron serializes the message but drops the SDK's separate startup output.
+      if (error instanceof AuvDaemonStartError && error.output.trim())
+        throw new Error(`${error.message}\n${error.output.trim()}`, { cause: error })
       throw error
     }
   }

@@ -46,6 +46,20 @@ Máy hiện có `libleptonica.so.6` và chương trình chưa khởi động đ�
 Cần bản thư viện tương thích hoặc bản AUV được biên dịch cho hệ thống này.
 Không coi công cụ desktop là hoạt động chỉ vì ứng dụng liệt kê được tên công cụ.
 
+Nếu đã có Rust và các thư viện phát triển, biên dịch AUV đúng phiên bản SDK đang dùng:
+
+```bash
+cargo install --git https://github.com/moeru-ai/auv --tag v0.0.28 auv-cli --bin auv --locked --root "$PWD/.cache/auv"
+"$PWD/.cache/auv/bin/auv" --version
+"$PWD/.cache/auv/bin/auv" doctor
+AUV_BINARY_PATH="$PWD/.cache/auv/bin/auv" mise exec -- pnpm dev:tamagotchi
+```
+
+Chạy các lệnh từ thư mục dự án. Xem [yêu cầu build AUV](https://github.com/moeru-ai/auv/tree/v0.0.28#install-with-cargo).
+`AUV_BINARY_PATH` phải là đường dẫn tuyệt đối. Bỏ biến này để dùng bản AUV đi kèm.
+Angela giữ chi tiết lỗi khởi động native trong phản hồi công cụ để bạn thấy thư viện đang thiếu.
+Phiên kiểm tra hiện tại không tải được source vì mạng terminal bị chặn, nên bản build riêng chưa được xác minh.
+
 Sau khi AUV chạy được, kiểm tra quan sát cửa sổ và ảnh màn hình trước.
 Khả năng đưa chuột/bàn phím vào ứng dụng còn phụ thuộc quyền và hỗ trợ của phiên Wayland.
 
