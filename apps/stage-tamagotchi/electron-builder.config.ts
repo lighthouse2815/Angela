@@ -42,7 +42,7 @@ else {
 
 export default {
   appId: 'ai.moeru.airi',
-  productName: 'AIRI',
+  productName: 'Angela',
   directories: {
     output: 'dist',
     buildResources: 'build',
@@ -134,8 +134,8 @@ export default {
     // This prevents cross-arch lookups such as arm64 clients reading x64 metadata.
     publish: {
       provider: 'github',
-      owner: 'moeru-ai',
-      repo: 'airi',
+      owner: 'lighthouse2815',
+      repo: 'Angela',
       channel: 'latest-${arch}',
     },
   },
@@ -156,8 +156,8 @@ export default {
     // to architecture-specific update feeds on macOS (for example: `latest-x64-mac.yml`, `latest-arm64-mac.yml`).
     publish: {
       provider: 'github',
-      owner: 'moeru-ai',
-      repo: 'airi',
+      owner: 'lighthouse2815',
+      repo: 'Angela',
       // NOTICE: `channel: 'latest-${arch}'` matters because electron-builder expands
       // `${arch}` before it writes any publish metadata, and electron-updater later
       // reuses that expanded channel string when deciding which `*.yml` file to fetch.
@@ -251,13 +251,13 @@ export default {
     // NOTICE: Same channel rule as Windows/macOS. Keep `${arch}` to avoid x64/arm64 feed collisions on Linux.
     publish: {
       provider: 'github',
-      owner: 'moeru-ai',
-      repo: 'airi',
+      owner: 'lighthouse2815',
+      repo: 'Angela',
       channel: 'latest-${arch}',
     },
     category: 'Utility',
-    synopsis: 'AI VTuber/Waifu chatbot app inspired by Neuro-sama.',
-    description: 'AIRI is an AI VTuber/Waifu chatbot supporting Live2D/VRM avatars, featuring human-like interactions and modular stage-based rendering.',
+    synopsis: 'AI companion for conversation and learning.',
+    description: 'Angela is an AI companion for conversation, learning, voice interaction, and desktop assistance.',
     executableName: 'airi',
     artifactName: '${productName}-${version}-linux-${arch}.${ext}',
     icon: 'build/icons/icon.png',

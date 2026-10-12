@@ -12,7 +12,7 @@ dialogs:
   onboarding:
     official:
       title: AIRI Official Provider
-    title: Welcome to AIRI!
+    title: Welcome to Angela!
     description: Let's set up your first AI provider to get started.
     selectProvider: Choose an AI Provider
     configureProvider: Configure {provider}

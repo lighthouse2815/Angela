@@ -11,7 +11,7 @@ dialogs:
   onboarding:
     official:
       title: Nhà cung cấp chính thức của AIRI
-    title: Chào mừng đến với AIRI!
+    title: Chào mừng đến với Angela!
     description: Hãy thiết lập nhà cung cấp AI đầu tiên để bắt đầu.
     selectProvider: Chọn nhà cung cấp AI
     configureProvider: Cấu hình {provider}
