@@ -21,6 +21,7 @@ import { isLinux } from 'std-env'
 
 import devIcon from '../../resources/icon-dev.png?asset'
 
+import { configureDataPaths } from './app/data-paths'
 import { openDebugger, setupDebugger } from './app/debugger'
 import { nullFileLoggerHandle, setupFileLogger } from './app/file-logger'
 import { resolveIsWayland } from './app/ozone'
@@ -82,10 +83,7 @@ setupDebugger()
 
 const log = useLogg('main').useGlobalConfig()
 
-const appUserDataPath = env.APP_USER_DATA_PATH?.trim()
-if (appUserDataPath) {
-  app.setPath('userData', appUserDataPath)
-}
+configureDataPaths(app, env.APP_USER_DATA_PATH)
 
 // Thanks to [@blurymind](https://github.com/blurymind),
 //
