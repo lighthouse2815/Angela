@@ -6,6 +6,7 @@ import { defineInvokeHandler } from '@moeru/eventa'
 import { createContext } from '@moeru/eventa/adapters/electron/main'
 import { sherpawModelArtifactUrl, sherpawModels } from '@proj-airi/provider-inference/sherpaw-transcription/models'
 import { ModelAssetRepository } from '@proj-airi/stage-shared/model-assets'
+import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
 import { app, BrowserWindow, ipcMain, protocol } from 'electron'
 
 import {
@@ -20,7 +21,7 @@ import { FileModelAssetStorage } from './model-asset-storage'
 
 // The renderer gets mirror URLs from the Vite plugin, but main owns desktop downloads.
 // The build defines the same endpoint for main, so both processes resolve one source.
-const models: ModelAsset[] = Object.values(sherpawModels).map(model => ({
+const models: ModelAsset[] = [...Object.values(sherpawModels), kwsModel].map(model => ({
   id: model.id,
   revision: model.revision,
   source: 'remote',

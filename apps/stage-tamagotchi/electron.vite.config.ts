@@ -23,6 +23,7 @@ import { defineConfig } from 'electron-vite'
 const stageUIAssetsRoot = resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src', 'assets'))
 const sharedCacheDir = resolve(join(import.meta.dirname, '..', '..', '.cache'))
 const sherpawModels = [paraformerBilingualZhEn, zipformerMultilingual, xAsrBilingualZhEnInt8]
+const localWakeWordModels = env.SHERPAW_BUNDLE_KWS === 'false' ? [] : [kwsModel]
 /** Main downloads remote Sherpaw models. It must use the endpoint that the renderer plugin uses. */
 const sherpawModelEndpoint = resolveModelEndpoint()
 
@@ -273,12 +274,11 @@ export default defineConfig({
         fullInstall: true,
       }),
 
-      // Main downloads remote transcription models. Every build bundles the small wake word model,
-      // and development serves it from the cache, because main's model asset service does not serve it.
+      // API-only builds can defer wake word downloads to the main process until first use.
       Sherpaw({
         models: [...sherpawModels, kwsModel],
-        developmentModels: [kwsModel],
-        bundledModels: env.SHERPAW_BUNDLE_MODELS === 'true' ? [xAsrBilingualZhEnInt8, kwsModel] : [kwsModel],
+        developmentModels: localWakeWordModels,
+        bundledModels: env.SHERPAW_BUNDLE_MODELS === 'true' ? [xAsrBilingualZhEnInt8, ...localWakeWordModels] : localWakeWordModels,
         cacheDir: sharedCacheDir,
         endpoint: sherpawModelEndpoint,
       }),

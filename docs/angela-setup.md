@@ -6,6 +6,32 @@ Nếu dùng mise, chạy `mise exec -- pnpm dev:tamagotchi` từ thư mục dự
 Lệnh này dùng pnpm được ghim trong `.tool-versions`.
 Bản web chạy bằng `mise exec -- pnpm dev:web`.
 
+Nếu muốn dùng API trước và tải mô hình nhận diện từ gọi sau, chạy:
+
+```bash
+SHERPAW_BUNDLE_KWS=false mise exec -- pnpm dev:tamagotchi
+```
+
+Build cùng cấu hình bằng:
+
+```bash
+NODE_OPTIONS=--max-old-space-size=4096 SHERPAW_BUNDLE_KWS=false mise exec -- pnpm -F @proj-airi/stage-tamagotchi build
+```
+
+Mô hình từ gọi vẫn có trong ứng dụng và tải vào thư mục dữ liệu khi dùng lần đầu.
+Nếu tải thất bại, ứng dụng báo lỗi và cho phép thử lại. Chat và giọng nói qua API không cần mô hình này.
+Bỏ `SHERPAW_BUNDLE_KWS` để tiếp tục đóng gói mô hình từ gọi như mặc định.
+Tài nguyên avatar và binary Electron vẫn cần tải trước hoặc có sẵn trong cache.
+
+Sau khi build xong, mở bản desktop bằng:
+
+```bash
+mise exec -- pnpm -F @proj-airi/stage-tamagotchi start
+```
+
+Lệnh `start` tự cài binary Electron nếu chưa có. Lần tải đầu cần kết nối tới GitHub.
+Nếu Wayland gặp lỗi hiển thị, thử script `start:xwayland` của cùng package.
+
 ## OpenAI
 
 Mở Cài đặt → Nhà cung cấp, thêm OpenAI và nhập API key trong ứng dụng.

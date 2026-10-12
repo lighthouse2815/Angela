@@ -20,8 +20,10 @@ The main process serves bundled model files through this protocol.
 Renderer `fetch()` cannot read the same files through `file://`.
 
 The plugin also exposes the keyword spotting pack `kwsModel` from `stage-ui/src/libs/voice/kws-model-info.ts`. The plugin needs only the pack ID, repository, revision, and artifact directory.
-Electron and Pocket bundle this pack in every build and read it from the repository cache in development. It is about 13 MB.
-The Electron main process does not download this pack, because every desktop build contains it.
+By default, Electron and Pocket bundle this pack and read it from the repository cache in development. It is about 13 MB.
+Desktop can set `SHERPAW_BUNDLE_KWS=false` to keep the pack remote in development and production.
+The Electron main process installs remote keyword packs in user data through the same repository as transcription packs.
+This profile starts API chat without a build-time keyword pack download. The default still bundles the pack.
 Web exposes its pinned remote URL. The renderer model asset repository installs it in OPFS when wake word detection first prepares.
 Its status, cancellation, Data settings entry, and `clear()` follow the transcription models.
 
@@ -82,9 +84,11 @@ The profile table describes transcription models. The keyword spotting pack foll
 | --- | --- | --- |
 | Web | OPFS install from the pinned remote URL | OPFS install from the pinned remote URL |
 | Desktop | Repository cache through Vite | Application package |
+| Desktop with `SHERPAW_BUNDLE_KWS=false` | Install in user data on first use | Install in user data on first use |
 | Pocket | Repository cache through Vite | Application package |
 
-CI jobs that do not package a desktop release do not download production transcription models. Desktop and Pocket builds download the keyword spotting pack.
+CI jobs that do not package a desktop release do not download production transcription models.
+Desktop builds download the keyword spotting pack unless `SHERPAW_BUNDLE_KWS=false`. Pocket builds always download it.
 Downloads use the model ID and pinned revision as the storage key.
 
 ## Failure behavior
