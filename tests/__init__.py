@@ -1,2 +1,0 @@
-"""Angela test suite."""
-
