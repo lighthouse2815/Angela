@@ -277,7 +277,7 @@ function isPrereleaseVersion(version: string) {
 }
 
 /**
- * Preserves the updater IPC contract when the storefront owns application updates.
+ * Preserves updater IPC when this runtime does not use release updates.
  *
  * No method reaches Electron Updater or a release feed, while preference reads and
  * subscriptions remain available to existing renderer consumers.
@@ -306,7 +306,8 @@ function createDisabledAutoUpdater(options: AutoUpdaterOptions): AutoUpdater {
 }
 
 export function setupAutoUpdater(options: AutoUpdaterOptions = {}): AutoUpdater {
-  if (options.enabled === false)
+  // Source runs are updated with Git. Explicit development feeds exercise the release updater.
+  if (options.enabled === false || (is.dev && !getUpdateServerOverride()))
     return createDisabledAutoUpdater(options)
 
   const semaphore = new Semaphore(1)
