@@ -328,7 +328,7 @@ describe('checkLocales', () => {
 
     const table = await readFile(summary, 'utf8')
     const row = table.split('\n').find(line => line.includes('providers.anthropic')) ?? ''
-    expect(row).toContain("{'\\|'}")
+    expect(row).toContain('{\'\\|\'}')
     // Five columns hold six delimiters. An escaped pipe adds none.
     expect(row.replace(/\\\|/g, '').split('|')).toHaveLength(7)
   })

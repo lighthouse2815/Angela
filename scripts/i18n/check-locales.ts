@@ -70,7 +70,7 @@ function choiceSeparatorWarning(value: string): string | undefined {
   if (!text.includes('|') || PLURAL_SELECTOR.test(text))
     return undefined
 
-  return "A choice separator renders its first form unless a {count} or a number at the call site selects another. Write a literal pipe as {'|'}."
+  return 'A choice separator renders its first form unless a {count} or a number at the call site selects another. Write a literal pipe as {\'|\'}.'
 }
 
 function flatten(value: unknown, prefix: string, into: Map<string, string>) {
