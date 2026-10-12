@@ -3,7 +3,7 @@
   "type": "module",
   "version": "0.12.0-beta.5",
   "private": true,
-  "description": "LLM powered virtual character",
+  "description": "Angela — AI companion for conversation and learning",
   "author": {
     "name": "Moeru AI",
     "email": "airi@moeru.ai",
@@ -229,5 +229,6 @@
   "build": {
     "appId": "ai.moeru.airi",
     "extends": "electron-builder.config.ts"
-  }
+  },
+  "productName": "Angela"
 }

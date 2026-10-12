@@ -533,7 +533,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
    * find the edits of the user.
    */
   const builtInCard = computed(() => newAiriCard({
-    name: 'ReLU',
+    name: 'Angela',
     version: '1.0.0',
     description: t('base.prompt.prefix'),
     extensions: {

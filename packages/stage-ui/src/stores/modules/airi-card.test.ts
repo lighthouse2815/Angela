@@ -188,7 +188,7 @@ describe('airi-card store', () => {
   it('preserves ambiguous old default speech settings', async () => {
     const cardStore = useAiriCardStore()
     cardStore.cards.set('default', {
-      name: 'ReLU',
+      name: 'Angela',
       version: '1.0.0',
       description: 'Built-in card from before provider defaults loaded.',
       extensions: {
@@ -578,7 +578,7 @@ describe('airi-card store', () => {
 
     expect(cardStore.cards.has(cardId)).toBe(false)
     expect(cardStore.activeCardId).toBe('default')
-    expect(cardStore.activeCard?.name).toBe('ReLU')
+    expect(cardStore.activeCard?.name).toBe('Angela')
   })
 
   it('keeps the built-in fallback card when deletion is requested directly', async () => {
@@ -612,7 +612,7 @@ describe('airi-card store', () => {
     await cardStore.initialize()
 
     expect(cardStore.activeCardId).toBe('default')
-    expect(cardStore.activeCard?.name).toBe('ReLU')
+    expect(cardStore.activeCard?.name).toBe('Angela')
   })
 
   describe('applySynchronizedCards', () => {
@@ -743,7 +743,7 @@ describe('airi-card store', () => {
         const { rejected } = cardStore.applySynchronizedCards({ ...noChanges, upserts: { default: { '/systemPrompt': 'Be kind' } } })
 
         expect(rejected).toEqual([])
-        expect(cardStore.cards.get('default')).toMatchObject({ name: 'ReLU', description: builtInDescription, systemPrompt: 'Be kind' })
+        expect(cardStore.cards.get('default')).toMatchObject({ name: 'Angela', description: builtInDescription, systemPrompt: 'Be kind' })
       })
 
       it('goes back to the built-in part when the remote edit is gone', async () => {
