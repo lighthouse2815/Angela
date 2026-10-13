@@ -16,6 +16,8 @@ import OnboardingDialog from './onboarding.vue'
 import StepProviderConfiguration from './step-provider-configuration.vue'
 
 import { useAuthStore } from '../../../../stores/auth'
+import { useAiriCardStore } from '../../../../stores/modules/airi-card'
+import { useSpeechStore } from '../../../../stores/modules/speech'
 import { useProviderConfigStore } from '../../../../stores/providers/config'
 import { useProviderStore } from '../../../../stores/providers/provider'
 
@@ -38,22 +40,26 @@ function createSyncedContext(namespace: string, leadership: LeadershipMode) {
   pinia.use(runtime.plugin)
   let providerStore: ReturnType<typeof useProviderStore> | undefined
   let providerConfigStore: ReturnType<typeof useProviderConfigStore> | undefined
+  let cardStore: ReturnType<typeof useAiriCardStore> | undefined
   const app = createApp({
     setup() {
       providerStore = useProviderStore()
       providerConfigStore = useProviderConfigStore()
+      cardStore = useAiriCardStore()
+      useSpeechStore()
       return () => null
     },
   })
   app
     .use(createI18n({ legacy: false, locale: 'en', messages: { en } }))
     .use(pinia)
+    .use(PiniaColada)
     .mount(document.createElement('div'))
-  if (!providerStore || !providerConfigStore)
+  if (!providerStore || !providerConfigStore || !cardStore)
     throw new Error('Provider stores did not initialize')
 
   syncedContexts.push({ app, pinia, runtime })
-  return { pinia, providerConfigStore, providerStore, runtime }
+  return { cardStore, pinia, providerConfigStore, providerStore, runtime }
 }
 
 function createTestI18n() {
@@ -118,15 +124,18 @@ it('publishes the onboarding login click on the leader', async () => {
 //
 // The desktop onboarding window is a sync follower; this test drives the real
 // dialog there and asserts the save reaches the leader and localStorage.
-it('persists configured credentials through the leader and loads the model list', async () => {
+it('persists credentials and the character chat selection through the leader', async () => {
   const namespace = `onboarding-dialog:${crypto.randomUUID()}`
   const leader = createSyncedContext(namespace, 'leader-only')
+  const onConfigured = vi.fn(() => leader.cardStore.getModules('default').consciousness)
   await expect.poll(() => leader.runtime.isLeader()).toBe(true)
+  await leader.cardStore.initialize()
 
   const follower = createSyncedContext(namespace, 'follower-only')
   await expect.poll(() => follower.runtime.getLeaderId()).toBe(leader.runtime.participantId)
 
   const screen = await render(OnboardingDialog, {
+    props: { onConfigured },
     global: { plugins: [follower.pinia, PiniaColada, createTestI18n()] },
   })
 
@@ -167,6 +176,21 @@ it('persists configured credentials through the leader and loads the model list'
     { timeout: 10_000 },
   ).toContain('grok-4.6')
   await expect.element(screen.getByText('grok-4.6')).toBeInTheDocument()
+
+  // ROOT CAUSE:
+  // Onboarding changed runtime refs, but session chat reads card modules.
+  // Saving must update the character before the dialog reports completion.
+  await screen.getByText('grok-4.6').click()
+  await screen.getByRole('button', { name: 'Save and continue' }).click()
+  await expect.poll(() => onConfigured.mock.calls.length).toBe(1)
+
+  const selection = { provider: providerId, model: 'grok-4.6' }
+  expect(onConfigured.mock.results[0].value).toEqual(selection)
+  await expect.poll(() => leader.cardStore.getModules('default').consciousness).toEqual(selection)
+  await expect.poll(() => follower.cardStore.getModules('default').consciousness).toEqual(selection)
+  await leader.cardStore.activateCard('default')
+  expect(leader.cardStore.getModules('default').consciousness).toEqual(selection)
+  expect(JSON.parse(localStorage.getItem('airi-cards') ?? '[]')[0][1].extensions.airi.modules.consciousness).toEqual(selection)
 })
 
 // ROOT CAUSE:

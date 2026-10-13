@@ -51,9 +51,8 @@ Nếu bước kiểm tra trả về lỗi 404 rằng Gemini 2.5 Flash không cò
 tắt tùy chọn gửi "ping" đến mô hình đầu tiên rồi thử lại để kiểm tra key và tải danh sách mô hình.
 Sau đó chọn Gemini 3.8 Flash. Không dùng nút "Vẫn tiếp tục" để bỏ qua lỗi key không hợp lệ.
 
-Nếu chat báo "No chat provider or model configured for this character" sau thiết lập ban đầu,
-mở Cài đặt → Module → Ý thức, chọn lại mô hình để lưu lựa chọn vào nhân vật Angela.
-Nếu mục đó đang được chọn, chọn tạm mô hình khác rồi chọn lại Gemini 3.8 Flash.
+Hoàn tất thiết lập sẽ lưu nhà cung cấp và mô hình vào nhân vật đang chọn.
+Để đổi lựa chọn sau đó, mở Cài đặt → Module → Ý thức.
 
 Gemini 3.8 Flash có free tier với hạn mức theo project.
 Nếu gặp lỗi 429, kiểm tra quota trong AI Studio và thử lại theo thời gian Google báo.
