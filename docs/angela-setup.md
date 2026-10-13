@@ -41,18 +41,26 @@ Angela đã tích hợp Google Gemini. Không cần thêm thư viện hoặc s�
 3. Nhập key trực tiếp vào ô API Key. Không gửi key vào chat hoặc lưu trong source.
 4. Giữ Base URL là `https://generativelanguage.googleapis.com/v1beta/openai/`.
 5. Chọn Tiếp để kiểm tra cấu hình và tải danh sách mô hình.
-6. Chọn `gemini-2.5-flash`, rồi hoàn tất thiết lập.
+6. Chọn `gemini-3.8-flash`, rồi hoàn tất thiết lập. Danh sách có thể hiển thị ID với tiền tố `models/`; dùng mục Gemini 3.8 Flash.
 
 Nếu đã bỏ qua thiết lập ban đầu, thêm Google Gemini trong Cài đặt → Nhà cung cấp.
 Sau đó chọn Google Gemini và mô hình trong Mô-đun → Ý thức.
 Chat Gemini không tự cấu hình các mô-đun Nghe và Giọng nói.
 
-Gemini 2.5 Flash có free tier với hạn mức theo project.
+Nếu bước kiểm tra trả về lỗi 404 rằng Gemini 2.5 Flash không còn dành cho người dùng mới,
+tắt tùy chọn gửi "ping" đến mô hình đầu tiên rồi thử lại để kiểm tra key và tải danh sách mô hình.
+Sau đó chọn Gemini 3.8 Flash. Không dùng nút "Vẫn tiếp tục" để bỏ qua lỗi key không hợp lệ.
+
+Nếu chat báo "No chat provider or model configured for this character" sau thiết lập ban đầu,
+mở Cài đặt → Module → Ý thức, chọn lại mô hình để lưu lựa chọn vào nhân vật Angela.
+Nếu mục đó đang được chọn, chọn tạm mô hình khác rồi chọn lại Gemini 3.8 Flash.
+
+Gemini 3.8 Flash có free tier với hạn mức theo project.
 Nếu gặp lỗi 429, kiểm tra quota trong AI Studio và thử lại theo thời gian Google báo.
 Free tier có chính sách sử dụng nội dung để cải thiện sản phẩm. Đọc điều khoản trước khi gửi dữ liệu riêng tư.
 
 Nguồn: [tạo API key](https://ai.google.dev/gemini-api/docs/api-key),
-[giá và free tier](https://ai.google.dev/gemini-api/docs/pricing#gemini-2.5-flash),
+[giá và free tier](https://ai.google.dev/gemini-api/docs/pricing#gemini-3.8-flash),
 [hạn mức](https://ai.google.dev/gemini-api/docs/rate-limits).
 
 ## OpenAI (tùy chọn có trả phí)
