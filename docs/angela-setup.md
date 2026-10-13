@@ -96,4 +96,6 @@ Bản đóng gói dùng hồ sơ `AIRI`, bản phát triển dùng `@proj-airi/s
 `APP_USER_DATA_PATH` vẫn chọn được hồ sơ riêng, gồm dữ liệu ứng dụng và phiên Chromium.
 
 Nguồn cập nhật đã trỏ đến repository Angela. Repository hiện private và updater chưa có cơ chế xác thực cho release private.
-Cập nhật tự động chưa hoạt động với cấu hình này. Cần nguồn phát hành truy cập được trước khi dùng tính năng cập nhật.
+Bản chạy từ mã nguồn không kiểm tra release khi mở. Cập nhật bản này qua Git rồi build lại.
+`UPDATE_SERVER_URL` vẫn bật updater trong chế độ phát triển để thử máy chủ cập nhật riêng.
+Bản đóng gói chưa cập nhật được từ release private. Cần nguồn phát hành truy cập được trước khi dùng tính năng này.
