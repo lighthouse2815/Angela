@@ -904,7 +904,7 @@ pages:
       learning:
         enable: Bật trí nhớ học tập
         enable-description: Dùng ghi nhớ đã lưu và nhớ thông tin học tập hữu ích khi chat. Tắt tính năng vẫn giữ các ghi nhớ.
-        description: Ghi nhớ lưu trên máy và tách theo nhân vật. 20 ghi nhớ cập nhật gần nhất đi cùng yêu cầu gửi nhà cung cấp AI.
+        description: Ghi nhớ lưu trên máy và tách theo nhân vật. Tối đa 20 ghi nhớ đi cùng yêu cầu AI, ưu tiên mục đến hạn ôn.
         character: 'Trí nhớ học tập của {name}'
         empty: Chưa có ghi nhớ học tập. Hãy kể Angela bạn đang học gì hoặc thêm ghi nhớ bên dưới.
         category: Loại ghi nhớ
@@ -916,6 +916,20 @@ pages:
         cancel: Hủy chỉnh sửa
         edit: Sửa
         delete: Xóa
+        review:
+          schedule: Lịch ôn tập
+          summary: 'Đã ôn {reviewed}/{total} ghi nhớ có lịch. Đến hạn: {due}.'
+          count: 'Đã ôn {count} lần'
+          due: Đến hạn ôn tập
+          next: 'Lần ôn tiếp theo: {date}'
+          complete: Đánh dấu đã ôn
+          intervals:
+            0: Không lên lịch ôn
+            1: Mỗi ngày
+            3: Mỗi 3 ngày
+            7: Mỗi 7 ngày
+            14: Mỗi 14 ngày
+            30: Mỗi 30 ngày
         categories:
           topic: Môn đang học
           goal: Mục tiêu học tập
@@ -925,6 +939,7 @@ pages:
           missing: Ghi nhớ này không còn tồn tại. Chọn ghi nhớ khác.
           limit: Nhân vật này đã có 50 ghi nhớ. Sửa hoặc xóa ghi nhớ cũ trước khi thêm.
           storage: Không lưu được thay đổi trên máy. Thử lại.
+          unscheduled: Ghi nhớ này chưa có lịch ôn. Chọn chu kỳ ôn trước.
     memory-short-term:
       description: Cài đặt và quản lý trí nhớ ngắn hạn
       title: Trí nhớ ngắn hạn

@@ -22,6 +22,27 @@ afterEach(() => {
 })
 
 it.each([
+  ['en', 'Review schedule', 'Every 7 days', 'Mark reviewed', 'Ready to review', 'Reviewed once'],
+  ['vi', 'Lịch ôn tập', 'Mỗi 7 ngày', 'Đánh dấu đã ôn', 'Đến hạn ôn tập', 'Đã ôn 1 lần'],
+])('schedules and records a review in %s', async (locale, scheduleLabel, intervalLabel, reviewLabel, dueLabel, countLabel) => {
+  localStorage.clear()
+  const pinia = createPinia()
+  stores.push(pinia)
+  const store = useLearningMemoryStore(pinia)
+  await store.save('default', 'topic', 'Python loops')
+  const view = render(LearningMemory, {
+    global: { plugins: [pinia, createI18n({ legacy: false, locale, messages: { en, vi: viLocale } })] },
+  })
+  await view.getByRole('combobox', { name: scheduleLabel, exact: true }).click()
+  await view.getByRole('option', { name: intervalLabel, exact: true }).click()
+  await expect.element(view.getByText(dueLabel, { exact: true })).toBeVisible()
+  await view.getByRole('button', { name: reviewLabel, exact: true }).click()
+  await expect.element(view.getByText(dueLabel, { exact: true })).not.toBeInTheDocument()
+  await expect.element(view.getByText(countLabel, { exact: true })).toBeVisible()
+  expect(store.forCharacter('default')[0].review?.count).toBe(1)
+})
+
+it.each([
   ['en', 'Memory text', 'Save memory', 'Edit', 'Delete', 'Enable learning memory'],
   ['vi', 'Nội dung ghi nhớ', 'Lưu ghi nhớ', 'Sửa', 'Xóa', 'Bật trí nhớ học tập'],
 ])('manages learning memories in %s and scopes the list to the selected character', async (locale, contentLabel, saveLabel, editLabel, deleteLabel, enabledLabel) => {

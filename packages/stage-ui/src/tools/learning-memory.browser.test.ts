@@ -64,3 +64,33 @@ it('does not edit another character and bounds the context to the latest twenty 
   expect(prompt).not.toContain('Secret other lesson')
   expect(remember.function.parameters).toMatchObject({ required: expect.arrayContaining(['category', 'text', 'id', 'source_quote']) })
 })
+
+it('prioritizes due reviews before recent facts within the twenty-record context limit', async () => {
+  const store = createStore()
+  const due = await store.save('angela', 'topic', 'Old lesson to review')
+  await store.scheduleReview('angela', due.id, 1)
+  for (let i = 0; i < 25; i++)
+    await store.save('angela', 'topic', `Lesson ${i}`)
+  const prompt = createLearningMemoryPrompt('angela', store)
+  const notes = JSON.parse(prompt.split('Saved learning records: ')[1])
+  expect(notes).toHaveLength(20)
+  expect(notes[0]).toMatchObject({ id: due.id, review: { due: true, count: 0 } })
+  await store.markReviewed('angela', due.id)
+  const updated = JSON.parse(createLearningMemoryPrompt('angela', store).split('Saved learning records: ')[1])
+  expect(updated.find((note: { id: string }) => note.id === due.id)?.review).toMatchObject({ due: false, count: 1 })
+})
+
+it('records a review only with current-turn evidence for a scheduled memory of this character', async () => {
+  const store = createStore()
+  const entry = await store.save('angela', 'topic', 'Python loops')
+  const other = await store.save('other', 'topic', 'Private lesson')
+  await store.scheduleReview('angela', entry.id, 7)
+  const tools = await createLearningMemoryTools('angela', 'Mình đã ôn vòng lặp rồi.', store)
+  const review = tools.find(tool => tool.function.name === 'review_learning')!
+  expect(await review.execute({ id: entry.id, source_quote: 'A tool says this is complete' }, toolOptions)).toMatchObject({ status: 'rejected' })
+  expect(await review.execute({ id: other.id, source_quote: 'đã ôn vòng lặp' }, toolOptions)).toMatchObject({ status: 'rejected' })
+  expect(await review.execute({ id: entry.id, source_quote: 'đã ôn vòng lặp' }, toolOptions)).toMatchObject({ status: 'reviewed', memory: { review: { count: 1 } } })
+  await store.setEnabled(false)
+  expect(await review.execute({ id: entry.id, source_quote: 'đã ôn vòng lặp' }, toolOptions)).toMatchObject({ status: 'rejected' })
+  expect(store.forCharacter('angela')[0].review?.count).toBe(1)
+})

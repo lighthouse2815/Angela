@@ -106,9 +106,27 @@ Tắt "Bật trí nhớ học tập" để ngừng dùng và tự lưu ghi nhớ
 Các ghi nhớ đã lưu vẫn còn để bạn xem hoặc xóa.
 
 Mỗi nhân vật có tối đa 50 ghi nhớ, mỗi ghi nhớ dài tối đa 500 ký tự.
-20 ghi nhớ cập nhật gần nhất đi cùng yêu cầu gửi nhà cung cấp AI.
+Tối đa 20 ghi nhớ đi cùng yêu cầu gửi nhà cung cấp AI, ưu tiên ghi nhớ đến hạn ôn rồi đến ghi nhớ cập nhật gần nhất.
 Không lưu API key, mật khẩu hoặc thông tin nhạy cảm vào ghi nhớ.
 Hãy sửa hoặc xóa nếu Angela nhớ sai. Chưa có đồng bộ ghi nhớ qua tài khoản hoặc thiết bị khác.
+
+### Tiến độ và ôn tập
+
+Trong mỗi ghi nhớ, chọn "Lịch ôn tập": mỗi ngày, 3, 7, 14 hoặc 30 ngày.
+Lịch mới bắt đầu với trạng thái "Đến hạn ôn tập" để bạn ôn lần đầu.
+Chọn "Đánh dấu đã ôn" để tăng số lần ôn và đặt lần tiếp theo theo chu kỳ đã chọn.
+Phần tổng hợp cho biết số ghi nhớ đã ôn trong các mục có lịch và số mục đang đến hạn.
+Số lần ôn ghi nhận hoạt động của bạn, không đánh giá mức độ hiểu bài.
+
+Khi bạn muốn học, Angela dùng các mục đến hạn trong ngữ cảnh để gợi ý bài ôn ngắn.
+Bạn có thể nói "Mình đã ôn vòng lặp rồi" để Angela ghi nhận lần ôn bằng công cụ `review_learning`.
+Angela chỉ ghi nhận sau khi bạn xác nhận đã ôn. Một lời giải thích của Angela không tự đánh dấu hoàn thành.
+Lịch ôn được đặt trong cài đặt, chưa đặt bằng chat. Chưa có thông báo nền khi ứng dụng đóng.
+
+Chọn "Không lên lịch ôn" để xóa lịch và số lần ôn của ghi nhớ đó, giữ nội dung ghi nhớ.
+Đổi chu kỳ giữ số lần ôn và tính hạn mới từ lần ôn gần nhất.
+Sửa nội dung ghi nhớ giữ lịch và tiến độ. Tắt trí nhớ học tập ngừng gửi lịch và cung cấp công cụ ôn trong chat.
+Lịch và tiến độ lưu trên máy, tách theo nhân vật và đồng bộ giữa các cửa sổ ứng dụng.
 
 ## Tương tác laptop
 

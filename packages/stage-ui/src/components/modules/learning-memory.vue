@@ -1,19 +1,26 @@
 <script setup lang="ts">
-import type { LearningCategory, LearningMemory } from '../../stores/modules/learning-memory'
+import type { LearningCategory, LearningMemory, ReviewInterval } from '../../stores/modules/learning-memory'
 
 import { errorMessageFrom } from '@moeru/std'
 import { Button, FieldCheckbox, FieldInput, FieldSelect, GhostButton, SettingsCard } from '@proj-airi/ui'
+import { useNow } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useAiriCardStore } from '../../stores/modules/airi-card'
 import { useLearningMemoryStore } from '../../stores/modules/learning-memory'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
+const dateFormat = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium', timeStyle: 'short' }))
 const store = useLearningMemoryStore()
 const cards = useAiriCardStore()
 const characterId = computed(() => cards.activeCardId)
 const entries = computed(() => store.forCharacter(characterId.value))
+const now = useNow({ interval: 60000 })
+const scheduled = computed(() => entries.value.filter(entry => entry.review))
+const dueCount = computed(() => scheduled.value.filter(entry => entry.review!.nextReviewAt <= now.value.getTime()).length)
+const reviewedCount = computed(() => scheduled.value.filter(entry => entry.review!.count > 0).length)
+const reviewOptions = computed(() => ([0, 1, 3, 7, 14, 30] as const).map(value => ({ value, label: t(`settings.pages.modules.memory-long-term.learning.review.intervals.${value}`) })))
 const categoryOptions = computed(() => (['topic', 'goal', 'difficulty', 'preference'] as const).map(value => ({ value, label: t(`settings.pages.modules.memory-long-term.learning.categories.${value}`) })))
 const category = ref<LearningCategory>('topic')
 const text = ref('')
@@ -21,6 +28,10 @@ const editingId = ref<string>()
 const busy = ref(false)
 const error = ref('')
 const valid = computed(() => !!text.value.trim() && text.value.trim().length <= 500)
+
+watch(entries, () => {
+  now.value = new Date()
+})
 
 function resetEditor() {
   editingId.value = undefined
@@ -40,7 +51,39 @@ function edit(entry: LearningMemory) {
 
 function showError(cause: unknown) {
   const code = errorMessageFrom(cause)
-  error.value = t(`settings.pages.modules.memory-long-term.learning.errors.${code === 'missing' || code === 'limit' ? code : 'storage'}`)
+  error.value = t(`settings.pages.modules.memory-long-term.learning.errors.${code === 'missing' || code === 'limit' || code === 'unscheduled' ? code : 'storage'}`)
+}
+
+async function scheduleReview(entry: LearningMemory, interval: ReviewInterval | undefined) {
+  if (busy.value || interval === undefined)
+    return
+  busy.value = true
+  error.value = ''
+  try {
+    await store.scheduleReview(entry.characterId, entry.id, interval)
+  }
+  catch (cause) {
+    showError(cause)
+  }
+  finally {
+    busy.value = false
+  }
+}
+
+async function markReviewed(entry: LearningMemory) {
+  if (busy.value)
+    return
+  busy.value = true
+  error.value = ''
+  try {
+    await store.markReviewed(entry.characterId, entry.id)
+  }
+  catch (cause) {
+    showError(cause)
+  }
+  finally {
+    busy.value = false
+  }
 }
 
 async function save() {
@@ -106,6 +149,9 @@ async function setEnabled(value: boolean) {
     <h2 :class="['text-lg font-semibold']">
       {{ t('settings.pages.modules.memory-long-term.learning.character', { name: cards.activeCard?.name || characterId }) }}
     </h2>
+    <p v-if="scheduled.length" role="status" :class="['text-sm text-neutral-500 dark:text-neutral-400']">
+      {{ t('settings.pages.modules.memory-long-term.learning.review.summary', { reviewed: reviewedCount, total: scheduled.length, due: dueCount }) }}
+    </p>
     <p v-if="!entries.length" :class="['text-sm text-neutral-500 dark:text-neutral-400']">
       {{ t('settings.pages.modules.memory-long-term.learning.empty') }}
     </p>
@@ -118,7 +164,27 @@ async function setEnabled(value: boolean) {
         <p :class="['whitespace-pre-wrap break-words']">
           {{ entry.text }}
         </p>
-        <div :class="['mt-2 flex gap-2']">
+        <FieldSelect
+          :model-value="entry.review?.intervalDays ?? 0" :options="reviewOptions" :disabled="busy"
+          :label="t('settings.pages.modules.memory-long-term.learning.review.schedule')"
+          :class="['mt-3']"
+          @update:model-value="scheduleReview(entry, $event)"
+        />
+        <div v-if="entry.review" :class="['mt-2 text-sm text-neutral-500 dark:text-neutral-400']">
+          <p>
+            {{ t('settings.pages.modules.memory-long-term.learning.review.count', { count: entry.review.count }, entry.review.count) }}
+          </p>
+          <p v-if="entry.review.nextReviewAt <= now.getTime()">
+            {{ t('settings.pages.modules.memory-long-term.learning.review.due') }}
+          </p>
+          <p v-else>
+            {{ t('settings.pages.modules.memory-long-term.learning.review.next', { date: dateFormat.format(entry.review.nextReviewAt) }) }}
+          </p>
+        </div>
+        <div :class="['mt-2 flex flex-wrap gap-2']">
+          <GhostButton v-if="entry.review" :disabled="busy" @click="markReviewed(entry)">
+            {{ t('settings.pages.modules.memory-long-term.learning.review.complete') }}
+          </GhostButton>
           <GhostButton :disabled="busy" @click="edit(entry)">
             {{ t('settings.pages.modules.memory-long-term.learning.edit') }}
           </GhostButton>
@@ -128,6 +194,9 @@ async function setEnabled(value: boolean) {
         </div>
       </li>
     </ul>
+    <p v-if="error" role="alert" :class="['text-sm text-red-500']">
+      {{ error }}
+    </p>
     <form :class="['flex flex-col gap-4']" @submit.prevent="save">
       <h3 :class="['text-base font-medium']">
         {{ t(`settings.pages.modules.memory-long-term.learning.${editingId ? 'editing' : 'add'}`) }}
@@ -143,9 +212,6 @@ async function setEnabled(value: boolean) {
       />
       <p :class="['text-xs text-neutral-500 dark:text-neutral-400']">
         {{ text.length }}/500
-      </p>
-      <p v-if="error" role="alert" :class="['text-sm text-red-500']">
-        {{ error }}
       </p>
       <div :class="['flex gap-2']">
         <Button type="submit" color="primary" variant="primary" :disabled="!valid || busy" :loading="busy">

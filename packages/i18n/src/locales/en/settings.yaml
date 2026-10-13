@@ -959,7 +959,7 @@ pages:
       learning:
         enable: Enable learning memory
         enable-description: Use saved learning facts and remember useful facts during chat. Turning this off keeps saved records.
-        description: Records stay on this device and belong to one character. The latest 20 records accompany requests to your AI provider.
+        description: Records stay on this device and belong to one character. Up to 20 records accompany AI requests, with due reviews first.
         character: 'Learning memory for {name}'
         empty: No learning memories yet. Tell Angela what you are studying, or add a note below.
         category: Category
@@ -971,6 +971,20 @@ pages:
         cancel: Cancel editing
         edit: Edit
         delete: Delete
+        review:
+          schedule: Review schedule
+          summary: 'Reviewed {reviewed} of {total} scheduled memories. Due now: {due}.'
+          count: 'Reviewed once | Reviewed {count} times'
+          due: Ready to review
+          next: 'Next review: {date}'
+          complete: Mark reviewed
+          intervals:
+            0: No review schedule
+            1: Every day
+            3: Every 3 days
+            7: Every 7 days
+            14: Every 14 days
+            30: Every 30 days
         categories:
           topic: Learning topic
           goal: Learning goal
@@ -980,6 +994,7 @@ pages:
           missing: This memory no longer exists. Choose another record.
           limit: This character has 50 memories. Edit or delete an existing record before adding another.
           storage: Could not save the change on this device. Try again.
+          unscheduled: This memory has no review schedule. Choose a review interval first.
     memory-short-term:
       description: Short-term memory specific settings and management
       title: Short-Term Memory
