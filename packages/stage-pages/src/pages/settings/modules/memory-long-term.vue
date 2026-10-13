@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { WIP } from '@proj-airi/stage-ui/components'
+import { LearningMemory } from '@proj-airi/stage-ui/components'
 </script>
 
 <template>
-  <WIP />
+  <LearningMemory />
 </template>
 
 <route lang="yaml">

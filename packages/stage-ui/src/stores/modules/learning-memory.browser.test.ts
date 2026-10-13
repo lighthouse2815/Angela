@@ -21,6 +21,7 @@ function createContext(namespace?: string, leadership?: LeadershipMode) {
 
 beforeEach(() => localStorage.clear())
 afterEach(() => {
+  vi.restoreAllMocks()
   for (const { pinia, runtime } of contexts.splice(0)) {
     runtime?.dispose()
     disposePinia(pinia)
@@ -66,6 +67,22 @@ it('rejects empty or excessive text and enforces the character storage limit', a
   expect(store.forCharacter('angela')).toHaveLength(50)
   await store.save('other', 'topic', 'Another character')
   expect(store.forCharacter('other')).toHaveLength(1)
+})
+
+it('does not publish a memory or toggle when durable storage rejects the edit', async () => {
+  const { store } = createContext()
+  const original = await store.save('angela', 'topic', 'Python')
+  const writes = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+    throw new DOMException('Storage is full', 'QuotaExceededError')
+  })
+  await expect(store.save('angela', 'goal', 'A new goal')).rejects.toThrow('Storage is full')
+  expect(store.forCharacter('angela')).toEqual([original])
+  await expect(store.forget('angela', original.id)).rejects.toThrow('Storage is full')
+  expect(store.forCharacter('angela')).toEqual([original])
+  await expect(store.setEnabled(false)).rejects.toThrow('Storage is full')
+  expect(store.enabled).toBe(true)
+  writes.mockRestore()
+  expect(createContext().store.forCharacter('angela')).toEqual([original])
 })
 
 it('persists follower edits through the leader without echoing snapshots or storage writes', async () => {

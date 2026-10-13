@@ -94,6 +94,22 @@ Nhân vật mặc định của bản cài mới là Angela.
 Các thẻ nhân vật bạn đã tạo hoặc chỉnh sửa vẫn được giữ.
 Nếu đã có dữ liệu AIRI, bạn có thể tạo một thẻ Angela trong cài đặt nhân vật.
 
+## Trí nhớ học tập
+
+Angela có thể lưu môn đang học, mục tiêu, chỗ còn vướng và cách giải thích bạn thích.
+Ví dụ: "Mình đang học Python, chưa hiểu vòng lặp. Nhớ giúp mình nhé."
+Angela chỉ xác nhận đã nhớ sau khi công cụ lưu thành công.
+
+Mở Cài đặt → Module → Trí nhớ dài hạn để xem, thêm, sửa hoặc xóa ghi nhớ.
+Ghi nhớ tách theo nhân vật và lưu trên máy, giữ lại sau khi đóng ứng dụng.
+Tắt "Bật trí nhớ học tập" để ngừng dùng và tự lưu ghi nhớ trong chat.
+Các ghi nhớ đã lưu vẫn còn để bạn xem hoặc xóa.
+
+Mỗi nhân vật có tối đa 50 ghi nhớ, mỗi ghi nhớ dài tối đa 500 ký tự.
+20 ghi nhớ cập nhật gần nhất đi cùng yêu cầu gửi nhà cung cấp AI.
+Không lưu API key, mật khẩu hoặc thông tin nhạy cảm vào ghi nhớ.
+Hãy sửa hoặc xóa nếu Angela nhớ sai. Chưa có đồng bộ ghi nhớ qua tài khoản hoặc thiết bị khác.
+
 ## Tương tác laptop
 
 Bản desktop đã tích hợp AUV qua công cụ `computer_use` và `computer_use_read_image`.

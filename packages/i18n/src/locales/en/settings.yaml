@@ -956,6 +956,30 @@ pages:
     memory-long-term:
       description: Long-term memory specific settings and management
       title: Long-Term Memory
+      learning:
+        enable: Enable learning memory
+        enable-description: Use saved learning facts and remember useful facts during chat. Turning this off keeps saved records.
+        description: Records stay on this device and belong to one character. The latest 20 records accompany requests to your AI provider.
+        character: 'Learning memory for {name}'
+        empty: No learning memories yet. Tell Angela what you are studying, or add a note below.
+        category: Category
+        content: Memory text
+        placeholder: I am learning Python and prefer short explanations with examples.
+        add: Add a learning memory
+        editing: Edit learning memory
+        save: Save memory
+        cancel: Cancel editing
+        edit: Edit
+        delete: Delete
+        categories:
+          topic: Learning topic
+          goal: Learning goal
+          difficulty: Difficulty
+          preference: Explanation preference
+        errors:
+          missing: This memory no longer exists. Choose another record.
+          limit: This character has 50 memories. Edit or delete an existing record before adding another.
+          storage: Could not save the change on this device. Try again.
     memory-short-term:
       description: Short-term memory specific settings and management
       title: Short-Term Memory

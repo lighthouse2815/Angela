@@ -901,6 +901,30 @@ pages:
     memory-long-term:
       description: Cài đặt và quản lý trí nhớ dài hạn
       title: Trí nhớ dài hạn
+      learning:
+        enable: Bật trí nhớ học tập
+        enable-description: Dùng ghi nhớ đã lưu và nhớ thông tin học tập hữu ích khi chat. Tắt tính năng vẫn giữ các ghi nhớ.
+        description: Ghi nhớ lưu trên máy và tách theo nhân vật. 20 ghi nhớ cập nhật gần nhất đi cùng yêu cầu gửi nhà cung cấp AI.
+        character: 'Trí nhớ học tập của {name}'
+        empty: Chưa có ghi nhớ học tập. Hãy kể Angela bạn đang học gì hoặc thêm ghi nhớ bên dưới.
+        category: Loại ghi nhớ
+        content: Nội dung ghi nhớ
+        placeholder: Mình đang học Python và thích giải thích ngắn gọn kèm ví dụ.
+        add: Thêm ghi nhớ học tập
+        editing: Sửa ghi nhớ học tập
+        save: Lưu ghi nhớ
+        cancel: Hủy chỉnh sửa
+        edit: Sửa
+        delete: Xóa
+        categories:
+          topic: Môn đang học
+          goal: Mục tiêu học tập
+          difficulty: Chỗ còn vướng
+          preference: Cách giải thích yêu thích
+        errors:
+          missing: Ghi nhớ này không còn tồn tại. Chọn ghi nhớ khác.
+          limit: Nhân vật này đã có 50 ghi nhớ. Sửa hoặc xóa ghi nhớ cũ trước khi thêm.
+          storage: Không lưu được thay đổi trên máy. Thử lại.
     memory-short-term:
       description: Cài đặt và quản lý trí nhớ ngắn hạn
       title: Trí nhớ ngắn hạn
