@@ -36,13 +36,28 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const detailsOpen = shallowRef(false)
 
+const providerErrorSummary = computed(() => {
+  const content = props.message.content.trim()
+  if (content.startsWith('Remote sent 429 response:')) {
+    const key = /generativelanguage\.googleapis\.com|ai\.google\.dev/u.test(content)
+      ? 'stage.chat.provider-errors.gemini-limit'
+      : 'stage.chat.provider-errors.rate-limit'
+    return t(key)
+  }
+  if (/^Remote sent (?:502|503|504) response:/u.test(content))
+    return t('stage.chat.provider-errors.unavailable')
+  return ''
+})
+
 const summary = computed(() => {
+  if (providerErrorSummary.value)
+    return providerErrorSummary.value
   const firstLine = props.message.content.trim().split(/\r?\n/u, 1)[0]
   const payloadStart = firstLine.indexOf(': {')
   const text = payloadStart >= 0 ? firstLine.slice(0, payloadStart) : firstLine
   return text.length > 160 ? `${text.slice(0, 157)}…` : text
 })
-const hasDetails = computed(() => props.message.content.length > 240 || props.message.content.split(/\r?\n/u).length > 4)
+const hasDetails = computed(() => !!providerErrorSummary.value || props.message.content.length > 240 || props.message.content.split(/\r?\n/u).length > 4)
 
 const boxClasses = computed(() => {
   if (props.surface === 'opaque')

@@ -41,7 +41,7 @@ Angela đã tích hợp Google Gemini. Không cần thêm thư viện hoặc s�
 3. Nhập key trực tiếp vào ô API Key. Không gửi key vào chat hoặc lưu trong source.
 4. Giữ Base URL là `https://generativelanguage.googleapis.com/v1beta/openai/`.
 5. Chọn Tiếp để kiểm tra cấu hình và tải danh sách mô hình.
-6. Chọn `gemini-3.8-flash`, rồi hoàn tất thiết lập. Danh sách có thể hiển thị ID với tiền tố `models/`; dùng mục Gemini 3.8 Flash.
+6. Chọn `gemini-3.1-flash-lite`, rồi hoàn tất thiết lập. Danh sách có thể hiển thị ID với tiền tố `models/`; dùng mục Gemini 3.1 Flash Lite.
 
 Nếu đã bỏ qua thiết lập ban đầu, thêm Google Gemini trong Cài đặt → Nhà cung cấp.
 Sau đó chọn Google Gemini và mô hình trong Mô-đun → Ý thức.
@@ -49,17 +49,23 @@ Chat Gemini không tự cấu hình các mô-đun Nghe và Giọng nói.
 
 Nếu bước kiểm tra trả về lỗi 404 rằng Gemini 2.5 Flash không còn dành cho người dùng mới,
 tắt tùy chọn gửi "ping" đến mô hình đầu tiên rồi thử lại để kiểm tra key và tải danh sách mô hình.
-Sau đó chọn Gemini 3.8 Flash. Không dùng nút "Vẫn tiếp tục" để bỏ qua lỗi key không hợp lệ.
+Sau đó chọn Gemini 3.1 Flash Lite. Không dùng nút "Vẫn tiếp tục" để bỏ qua lỗi key không hợp lệ.
 
 Hoàn tất thiết lập sẽ lưu nhà cung cấp và mô hình vào nhân vật đang chọn.
 Để đổi lựa chọn sau đó, mở Cài đặt → Module → Ý thức.
 
-Gemini 3.8 Flash có free tier với hạn mức theo project.
+Gemini 3.1 Flash-Lite và Gemini 3.8 Flash có free tier với hạn mức theo project.
 Nếu gặp lỗi 429, kiểm tra quota trong AI Studio và thử lại theo thời gian Google báo.
 Free tier có chính sách sử dụng nội dung để cải thiện sản phẩm. Đọc điều khoản trước khi gửi dữ liệu riêng tư.
 
+Nếu gặp lỗi 503 hoặc chờ phản hồi quá lâu, thử lại sau hoặc đổi mô hình trong Module → Ý thức.
+Angela hiển thị hướng dẫn cho lỗi quota và dịch vụ quá tải, giữ lỗi gốc trong "Hiện chi tiết".
+Trong lần kiểm tra ngày 13/10/2026, Gemini 3.8 Flash trả lỗi 503 rồi chờ khoảng 180 giây ở lần thử lại.
+Gemini 3.1 Flash Lite trả lời cùng loại tin nhắn ngắn trong khoảng 3,4 giây.
+Thời gian thực tế phụ thuộc tải dịch vụ, hạn mức và nội dung yêu cầu.
+
 Nguồn: [tạo API key](https://ai.google.dev/gemini-api/docs/api-key),
-[giá và free tier](https://ai.google.dev/gemini-api/docs/pricing#gemini-3.8-flash),
+[giá và free tier](https://ai.google.dev/gemini-api/docs/pricing#gemini-3.1-flash-lite),
 [hạn mức](https://ai.google.dev/gemini-api/docs/rate-limits).
 
 ## OpenAI (tùy chọn có trả phí)

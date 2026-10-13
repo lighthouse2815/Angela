@@ -19,6 +19,10 @@ mobile-tools:
   close-view: Save and close view controls
   hearing: Hearing
 chat:
+  provider-errors:
+    gemini-limit: Gemini reached its rate or usage limit. Check your quota in Google AI Studio before retrying.
+    rate-limit: The AI provider reached its rate or usage limit. Wait before retrying, or choose another model.
+    unavailable: The AI provider is temporarily unavailable. Retry shortly or choose another model.
   provider-configuration:
     title: Chat provider isn't configured
     description: Choose and validate a provider in Settings before sending a message.

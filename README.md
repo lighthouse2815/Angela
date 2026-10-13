@@ -21,7 +21,7 @@ pnpm dev:web
 ## AI và giọng nói
 
 Để bắt đầu với free tier, thêm Google Gemini và nhập API key từ Google AI Studio.
-Trong mô-đun Ý thức, chọn Google Gemini và `gemini-3.8-flash`.
+Trong mô-đun Ý thức, chọn Google Gemini và `gemini-3.1-flash-lite` để bắt đầu trò chuyện.
 Free tier có hạn mức. Xem [thiết lập Gemini](./docs/angela-setup.md#google-gemini) trước khi dùng.
 Không ghi API key vào mã nguồn hoặc gửi key trong cuộc trò chuyện.
 

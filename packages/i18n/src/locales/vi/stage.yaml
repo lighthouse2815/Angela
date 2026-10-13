@@ -1,4 +1,8 @@
 chat:
+  provider-errors:
+    gemini-limit: Gemini đã đạt giới hạn tốc độ hoặc hạn mức sử dụng. Kiểm tra quota trong Google AI Studio trước khi thử lại.
+    rate-limit: Nhà cung cấp AI đã đạt giới hạn tốc độ hoặc hạn mức sử dụng. Chờ trước khi thử lại hoặc chọn mô hình khác.
+    unavailable: Nhà cung cấp AI đang tạm thời không khả dụng. Thử lại sau hoặc chọn mô hình khác.
   actions:
     retry: Thử lại
     reply: Trả lời
