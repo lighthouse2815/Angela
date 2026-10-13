@@ -6,6 +6,47 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { streamFrom } from './llm-service'
 
+it('executes Gemini tool calls without indices and retains their replay metadata', async () => {
+  const requests: { messages: Array<{ tool_calls?: unknown }> }[] = []
+  const calls = ['remember', 'forget'].map((name, index) => ({
+    id: `call-${index}`,
+    type: 'function',
+    function: { name, arguments: '{}' },
+    extra_content: { google: { thought_signature: `signature-${index}` } },
+  }))
+  const fetch: typeof globalThis.fetch = async (_url, init) => {
+    requests.push(JSON.parse(String(init?.body)))
+    const chunks = requests.length === 1
+      ? [
+          { choices: [{ index: 0, delta: { tool_calls: calls } }] },
+          { choices: [{ index: 0, delta: {}, finish_reason: 'stop' }] },
+        ]
+      : [{ choices: [{ index: 0, delta: { content: 'Saved.' }, finish_reason: 'stop' }] }]
+    return new Response(`${chunks.map(chunk => `data: ${JSON.stringify(chunk)}\n\n`).join('')}data: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } })
+  }
+  const remember = vi.fn(() => 'saved')
+  const forget = vi.fn(() => 'deleted')
+  let generatedTurn: AssistantTurn | undefined
+  await streamFrom({
+    model: 'gemini',
+    chatProvider: { generation: model => ({ protocol: 'chat-completions', config: { model, baseURL: 'https://example.test/v1/', fetch } }) },
+    conversation: { turns: [] },
+    options: {
+      tools: [
+        { type: 'function', function: { name: 'remember', parameters: { type: 'object', properties: {} } }, execute: remember },
+        { type: 'function', function: { name: 'forget', parameters: { type: 'object', properties: {} } }, execute: forget },
+      ],
+      onGeneratedTurn: (turn) => { generatedTurn = turn },
+    },
+  })
+  expect(remember).toHaveBeenCalledOnce()
+  expect(forget).toHaveBeenCalledOnce()
+  expect(requests).toHaveLength(2)
+  expect(requests[1].messages[0].tool_calls).toEqual(calls)
+  expect(generatedTurn?.rounds.map(round => round.toolInvocations.length)).toEqual([2, 0])
+  expect(generatedTurn?.rounds[1].content).toEqual([{ type: 'text', text: 'Saved.' }])
+})
+
 // https://github.com/moeru-ai/airi/pull/2477
 it('records real Chat SDK rounds and keeps failed tool results on their invocation', async () => {
   const requests: { messages: unknown[] }[] = []

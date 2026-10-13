@@ -1,0 +1,15 @@
+diff --git a/dist/index.js b/dist/index.js
+index ec6e01b0defd49370f75ed50d975aa6da8c03faf..0d79f1428a7ab6f139344a69dd89a947d17a3b3e 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -115,8 +115,8 @@ const streamText = (options) => {
+             pushText(choice.delta.refusal);
+           }
+         } else {
+-          for (const toolCall of choice.delta.tool_calls) {
+-            const { index } = toolCall;
++          for (const [position, toolCall] of choice.delta.tool_calls.entries()) {
++            const index = toolCall.index ?? position;
+             if (!tool_calls.at(index)) {
+               tool_calls[index] = {
+                 ...toolCall,

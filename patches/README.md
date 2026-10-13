@@ -1,5 +1,11 @@
 # Dependency patches
 
+## @xsai/stream-text 0.5.1
+
+Gemini's OpenAI-compatible stream can omit `index` on complete function calls. The SDK stored these calls on an undefined array key and silently skipped execution. This patch uses each call's position when the index is absent, while keeping explicit indices and Google replay metadata unchanged.
+
+The regression in `packages/core-agent/src/runtime/chat-completions.test.ts` uses the real SDK with two unindexed calls and a `stop` finish reason. It checks that both tools execute once and their metadata reaches the next request. Remove this patch when an upstream release passes that regression.
+
 ## @xsai-ext/responses 0.5.1
 
 This patch fixes behavior in the published SDK. AIRI's protocol and billing code remain in workspace packages.
