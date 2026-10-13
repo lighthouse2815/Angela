@@ -20,14 +20,18 @@ pnpm dev:web
 
 ## AI và giọng nói
 
-Trong cài đặt nhà cung cấp, thêm OpenAI và nhập API key của bạn.
+Để bắt đầu với free tier, thêm Google Gemini và nhập API key từ Google AI Studio.
+Trong mô-đun Ý thức, chọn Google Gemini và `gemini-2.5-flash`.
+Free tier có hạn mức. Xem [thiết lập Gemini](./docs/angela-setup.md#google-gemini) trước khi dùng.
 Không ghi API key vào mã nguồn hoặc gửi key trong cuộc trò chuyện.
+
+Nếu dùng OpenAI có trả phí, các lựa chọn sau vẫn có sẵn:
 
 - Chat và vision: OpenAI, mô hình `gpt-5.4-mini`.
 - Nhận dạng giọng nói: OpenAI Audio Transcription, mô hình `gpt-4o-mini-transcribe`.
 - Phát giọng nói AI: OpenAI Audio Speech, mô hình `gpt-4o-mini-tts`, giọng `coral`.
 
-Chọn các nhà cung cấp này trong mô-đun Ý thức, Thị giác, Nghe và Giọng nói.
+Chọn nhà cung cấp tương ứng trong mô-đun Ý thức, Thị giác, Nghe và Giọng nói.
 Các lựa chọn khác vẫn có sẵn. Một API key hợp lệ và quyền dùng mô hình là cần thiết để gọi API.
 
 ## Tương tác laptop

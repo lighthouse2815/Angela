@@ -32,7 +32,30 @@ mise exec -- pnpm -F @proj-airi/stage-tamagotchi start
 Lệnh `start` tự cài binary Electron nếu chưa có. Lần tải đầu cần kết nối tới GitHub.
 Nếu Wayland gặp lỗi hiển thị, thử script `start:xwayland` của cùng package.
 
-## OpenAI
+## Google Gemini
+
+Angela đã tích hợp Google Gemini. Không cần thêm thư viện hoặc sửa code để dùng chat Gemini.
+
+1. Mở [Google AI Studio](https://aistudio.google.com/apikey) và tạo API key trong project Free Tier.
+2. Trong Angela, chọn Google Gemini ở bước thiết lập nhà cung cấp.
+3. Nhập key trực tiếp vào ô API Key. Không gửi key vào chat hoặc lưu trong source.
+4. Giữ Base URL là `https://generativelanguage.googleapis.com/v1beta/openai/`.
+5. Chọn Tiếp để kiểm tra cấu hình và tải danh sách mô hình.
+6. Chọn `gemini-2.5-flash`, rồi hoàn tất thiết lập.
+
+Nếu đã bỏ qua thiết lập ban đầu, thêm Google Gemini trong Cài đặt → Nhà cung cấp.
+Sau đó chọn Google Gemini và mô hình trong Mô-đun → Ý thức.
+Chat Gemini không tự cấu hình các mô-đun Nghe và Giọng nói.
+
+Gemini 2.5 Flash có free tier với hạn mức theo project.
+Nếu gặp lỗi 429, kiểm tra quota trong AI Studio và thử lại theo thời gian Google báo.
+Free tier có chính sách sử dụng nội dung để cải thiện sản phẩm. Đọc điều khoản trước khi gửi dữ liệu riêng tư.
+
+Nguồn: [tạo API key](https://ai.google.dev/gemini-api/docs/api-key),
+[giá và free tier](https://ai.google.dev/gemini-api/docs/pricing#gemini-2.5-flash),
+[hạn mức](https://ai.google.dev/gemini-api/docs/rate-limits).
+
+## OpenAI (tùy chọn có trả phí)
 
 Mở Cài đặt → Nhà cung cấp, thêm OpenAI và nhập API key trong ứng dụng.
 Sau đó chọn mô hình trong các mô-đun tương ứng.
