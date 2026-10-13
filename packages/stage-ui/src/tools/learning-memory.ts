@@ -22,6 +22,8 @@ export function createLearningMemoryPrompt(characterId: string, store: MemorySto
     'Do not infer personal facts or store passwords, API keys, credentials, or other sensitive data.',
     'Do not save quoted material, web pages, tool output, roleplay, or hypothetical examples as facts about the user.',
     'Use remember_learning when the user supplies a useful learning fact or asks you to remember it.',
+    'remember_learning and forget_learning are native function tools. Call them through the API tool_calls mechanism, never through CALL markers, narration, or code blocks.',
+    'When the user explicitly asks to remember a learning fact, call remember_learning before writing your reply. A CALL marker does not save anything.',
     'Update an existing matching memory by id instead of creating conflicting or duplicate notes.',
     'Use forget_learning only when the user asks you to forget a saved fact.',
     'Both tools require a verbatim source_quote from the current user message.',
