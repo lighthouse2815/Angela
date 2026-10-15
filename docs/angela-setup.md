@@ -131,33 +131,84 @@ Lịch và tiến độ lưu trên máy, tách theo nhân vật và đồng bộ
 ## Tương tác laptop
 
 Bản desktop đã tích hợp AUV qua công cụ `computer_use` và `computer_use_read_image`.
-Kiểm tra chương trình native trước khi giao tác vụ trên laptop:
+Kiểm tra binary đi kèm trước khi giao tác vụ trên laptop:
 
 ```bash
-pnpm -F @proj-airi/stage-tamagotchi exec auv --help
+mise exec -- pnpm -F @proj-airi/stage-tamagotchi exec auv --help
 ```
 
-Trên máy Arch Linux/Wayland hiện tại, bản AUV `0.0.28` cần `liblept.so.5`.
-Máy hiện có `libleptonica.so.6` và chương trình chưa khởi động được.
-Cần bản thư viện tương thích hoặc bản AUV được biên dịch cho hệ thống này.
-Không coi công cụ desktop là hoạt động chỉ vì ứng dụng liệt kê được tên công cụ.
-
-Nếu đã có Rust và các thư viện phát triển, biên dịch AUV đúng phiên bản SDK đang dùng:
+Binary AUV đi kèm có thể thiếu thư viện native trên một số bản Linux.
+Trên Arch Linux, bản `0.0.28` yêu cầu `liblept.so.5`, còn hệ thống dùng `libleptonica.so.6`.
+Nếu gặp lỗi này, build AUV với thư viện của máy:
 
 ```bash
-cargo install --git https://github.com/moeru-ai/auv --tag v0.0.28 auv-cli --bin auv --locked --root "$PWD/.cache/auv"
-"$PWD/.cache/auv/bin/auv" --version
-"$PWD/.cache/auv/bin/auv" doctor
-AUV_BINARY_PATH="$PWD/.cache/auv/bin/auv" mise exec -- pnpm dev:tamagotchi
+mise exec -- pnpm -F @proj-airi/stage-tamagotchi setup:computer-use
+mise exec -- pnpm dev:tamagotchi
 ```
 
-Chạy các lệnh từ thư mục dự án. Xem [yêu cầu build AUV](https://github.com/moeru-ai/auv/tree/v0.0.28#install-with-cargo).
-`AUV_BINARY_PATH` phải là đường dẫn tuyệt đối. Bỏ biến này để dùng bản AUV đi kèm.
-Angela giữ chi tiết lỗi khởi động native trong phản hồi công cụ để bạn thấy thư viện đang thiếu.
-Phiên kiểm tra hiện tại không tải được source vì mạng terminal bị chặn, nên bản build riêng chưa được xác minh.
+Chạy từ thư mục gốc repository. Cần Rust và [thư viện phát triển của AUV](https://github.com/moeru-ai/auv/tree/v0.0.28#install-with-cargo).
+Script lấy phiên bản từ package AUV đã cài, build source cùng tag và giữ lockfile của upstream.
+Build dùng chế độ debug và một tiến trình biên dịch để giảm tải cho laptop.
+Binary nằm trong `.cache/auv/<phiên-bản>/bin/`, ngoài Git.
+
+Nếu build báo thiếu trường `data` hoặc `size` của `spa_pod_builder`, kiểm tra phiên bản Clang.
+Bindgen trong AUV `0.0.28` gặp [lỗi với LLVM 22 trở lên](https://github.com/rust-lang/rust-bindgen/issues/3264).
+Dùng libclang tương thích trong môi trường Python riêng:
+
+```bash
+python3 -m venv .cache/auv-build-tools
+.cache/auv-build-tools/bin/python -m pip install libclang==18.1.1
+AUV_LIBCLANG_PATH="$(.cache/auv-build-tools/bin/python -c 'from clang import cindex; print(cindex.Config.library_path)')"
+LIBCLANG_PATH="$AUV_LIBCLANG_PATH" BINDGEN_EXTRA_CLANG_ARGS="-resource-dir=$(clang -print-resource-dir)" mise exec -- pnpm -F @proj-airi/stage-tamagotchi setup:computer-use
+```
+
+Các công cụ này nằm trong cache, không thay Clang của hệ thống hoặc dependency ứng dụng.
+Chỉ bước build cần biến môi trường trên. Ứng dụng dùng binary đã build khi khởi động.
+Khi upstream cập nhật Bindgen tương thích, bỏ bộ công cụ riêng và build lại.
+
+Bản phát triển tự chọn binary này. Bản đóng gói tiếp tục dùng binary đi kèm.
+`AUV_BINARY_PATH` vẫn chọn binary riêng và có ưu tiên cao nhất. Giá trị phải là đường dẫn tuyệt đối.
+Nếu chưa build cục bộ, bản phát triển dùng binary đi kèm.
+
+Với phiên bản hiện tại, kiểm tra khả năng native bằng:
+
+```bash
+./.cache/auv/0.0.28/bin/auv --version
+./.cache/auv/0.0.28/bin/auv doctor --json
+```
+
+Để kiểm tra CLI thật qua daemon riêng, chạy:
+
+```bash
+AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AIRI_COMPUTER_USE_LIVE=1 mise exec -- pnpm exec vitest run --config apps/stage-tamagotchi/vitest.node.config.ts apps/stage-tamagotchi/src/main/services/airi/computer-use/runtime.test.ts
+```
+
+Kiểm thử gọi trợ giúp và một tham số sai. Kiểm thử không đưa chuột hoặc bàn phím vào ứng dụng.
+Angela giữ chi tiết lỗi native trong phản hồi công cụ.
+Tên công cụ xuất hiện trong chat không chứng minh thao tác desktop hoạt động.
 
 Sau khi AUV chạy được, kiểm tra quan sát cửa sổ và ảnh màn hình trước.
 Khả năng đưa chuột/bàn phím vào ứng dụng còn phụ thuộc quyền và hỗ trợ của phiên Wayland.
+
+### Kết quả kiểm tra trên máy phát triển
+
+Ngày 16/10/2026, trên Arch Linux/Niri Wayland:
+
+| Kiểm tra | Kết quả |
+| --- | --- |
+| Build AUV `0.0.28` với libclang riêng | Thành công, liên kết `libleptonica.so.6` của hệ thống |
+| CLI qua daemon riêng | Thành công, giữ nguyên chi tiết lỗi lệnh |
+| Đăng ký định danh Portal bằng `auv doctor --portal-setup` | Thành công, không cấp quyền chuột/bàn phím |
+| Liệt kê display | Thành công |
+| Chụp display | Có ảnh desktop thật 2560 × 1440 qua Portal Screenshot |
+| Screencast | Timeout, AUV dùng Screenshot dự phòng |
+| Liệt kê cửa sổ qua AT-SPI | Trả danh sách rỗng, chưa xác minh được cửa sổ |
+| Nhập chữ vào cửa sổ thử nghiệm | Thất bại trước khi gửi phím, không có ký tự nào được nhập |
+
+Log Portal báo thiếu interface `org.freedesktop.impl.portal.RemoteDesktop` ở backend được chọn.
+Interface xuất hiện ở Portal frontend không chứng minh backend điều khiển đang hoạt động.
+Cần cấu hình backend RemoteDesktop tương thích với compositor trước khi kiểm tra lại chuột/bàn phím.
+Không tự cấp quyền `/dev/uinput` hoặc đổi cấu hình desktop để bỏ qua lỗi này.
 
 ## Dữ liệu và cập nhật
 

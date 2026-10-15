@@ -16,7 +16,7 @@ describe('computer use runtime', () => {
   beforeEach(async () => {
     directory = await mkdtemp(join(tmpdir(), 'airi-cu-test-'))
     await mkdir(join(directory, 'store'))
-    runtime = createComputerUseRuntime({ binaryPath: binaryPath(), storeRoot: join(directory, 'store') })
+    runtime = createComputerUseRuntime({ binaryPath: process.env.AUV_BINARY_PATH?.trim() || binaryPath(), storeRoot: join(directory, 'store') })
   })
   afterEach(async () => {
     await runtime.dispose()
@@ -57,7 +57,7 @@ describe('computer use runtime', () => {
     await expect(runtime.run({ argv: ['invoke', '--help'] })).rejects.toThrow('stopped')
   })
 
-  it.runIf(process.env.AIRI_COMPUTER_USE_LIVE === '1')('runs the bundled CLI through a private daemon and preserves failures', async () => {
+  it.runIf(process.env.AIRI_COMPUTER_USE_LIVE === '1')('runs the selected CLI through a private daemon and preserves failures', async () => {
     const help = await runtime.run({ argv: ['invoke', '--help'] })
     expect(help.exitCode).toBe(0)
     expect(help.output).toContain('window.list')

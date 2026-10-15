@@ -31,7 +31,7 @@ With **Use the vision model for tool images** on, the vision model reads the scr
 The chat model then gets a text description. It has the visible text and layout, but no pixel positions.
 Use AUV commands such as `screen.findText` to get coordinates.
 
-Electron starts the matching AUV SDK and CLI 0.0.16 on demand, over a private Unix socket or Windows named pipe.
+Electron starts the matching AUV SDK and CLI on demand, over a private Unix socket or Windows named pipe.
 It serializes commands across windows, stores artifacts under the app's user-data directory, and stops the daemon during app shutdown.
 The CLI runs without a shell. Model arguments cannot change the device, endpoint, run, or storage root.
 Nonzero exits retain AUV output and failure details as tool errors. A zero exit code does not prove that the intended UI change occurred.
@@ -39,6 +39,28 @@ Nonzero exits retain AUV output and failure details as tool errors. A zero exit 
 On macOS, grant Accessibility and Screen Recording permissions to the launching app when the OS requests them.
 Some application actions also need Automation permission. If `app.probePermissions` reports missing screen-recording permission, a capture can contain only the desktop background despite exit code zero. Available commands depend on the OS and AUV backend.
 Use this feature for local native applications. It does not expose a remote-device gateway or replace the separate `services/computer-use-mcp` service.
+
+### Native development build
+
+If the bundled Linux CLI reports a missing shared library, build against the system libraries:
+
+```sh
+pnpm -F @proj-airi/stage-tamagotchi setup:computer-use
+pnpm dev:tamagotchi
+```
+
+Run these commands from the repository root. Install Rust and the [native build dependencies](https://github.com/moeru-ai/auv/tree/v0.0.28#install-with-cargo) first.
+The setup script builds the installed CLI version from its matching Git tag with the upstream lockfile.
+It uses debug mode and one compiler process to limit memory use.
+With LLVM 22 or later, follow the [isolated libclang setup](../../docs/angela-setup.md#tương-tác-laptop) for the upstream Bindgen incompatibility.
+
+Executable selection follows this order:
+
+1. `AUV_BINARY_PATH`, when set to an absolute path.
+2. `.cache/auv/<installed-cli-version>/bin/auv` for development, when the file exists. Windows uses `auv.exe`.
+3. The bundled CLI. Packaged applications use its executable outside ASAR.
+
+The cache stays outside Git. A CLI upgrade selects a new cache directory and requires another native build.
 
 The desktop package includes the platform CLI as an optional dependency and unpacks its executable from ASAR.
 Do not omit optional dependencies when building an installer. Windows ARM64 and Linux musl do not have a matching CLI in this version.
@@ -51,6 +73,6 @@ Run the focused runtime tests:
 pnpm -F @proj-airi/stage-tamagotchi exec vitest run src/main/services/airi/computer-use/runtime.test.ts
 ```
 
-Set `AIRI_COMPUTER_USE_LIVE=1` to include the bundled CLI/private-daemon test.
+Set `AIRI_COMPUTER_USE_LIVE=1` to include the CLI/private-daemon test. Set `AUV_BINARY_PATH` to test a native development build.
 It invokes help and an invalid argument, without injecting desktop input.
 For renderer verification, launch with `APP_REMOTE_DEBUG=true` and an unused `APP_REMOTE_DEBUG_PORT`, then attach `agent-browser` to the chat CDP target.
