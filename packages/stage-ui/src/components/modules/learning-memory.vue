@@ -2,6 +2,7 @@
 import type { LearningCategory, LearningMemory, ReviewInterval } from '../../stores/modules/learning-memory'
 
 import { errorMessageFrom } from '@moeru/std'
+import { isStageTamagotchi } from '@proj-airi/stage-shared'
 import { Button, FieldCheckbox, FieldInput, FieldSelect, GhostButton, SettingsCard } from '@proj-airi/ui'
 import { useNow } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
@@ -132,6 +133,20 @@ async function setEnabled(value: boolean) {
     busy.value = false
   }
 }
+
+async function setRemindersEnabled(value: boolean) {
+  busy.value = true
+  error.value = ''
+  try {
+    await store.setReviewRemindersEnabled(value)
+  }
+  catch (cause) {
+    showError(cause)
+  }
+  finally {
+    busy.value = false
+  }
+}
 </script>
 
 <template>
@@ -146,6 +161,14 @@ async function setEnabled(value: boolean) {
     <p :class="['text-sm text-neutral-500 dark:text-neutral-400']">
       {{ t('settings.pages.modules.memory-long-term.learning.description') }}
     </p>
+    <FieldCheckbox
+      v-if="isStageTamagotchi()"
+      :model-value="store.reviewRemindersEnabled"
+      :disabled="busy || !store.enabled"
+      :label="t('settings.pages.modules.memory-long-term.learning.review.notifications.enable')"
+      :description="t('settings.pages.modules.memory-long-term.learning.review.notifications.description')"
+      @update:model-value="setRemindersEnabled"
+    />
     <h2 :class="['text-lg font-semibold']">
       {{ t('settings.pages.modules.memory-long-term.learning.character', { name: cards.activeCard?.name || characterId }) }}
     </h2>

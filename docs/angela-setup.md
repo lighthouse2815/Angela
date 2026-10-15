@@ -138,6 +138,28 @@ Gửi "Bỏ lịch ôn Python" để xóa lịch, giữ nội dung ghi nhớ.
 Chỉ xác nhận đặt hoặc bỏ lịch sau khi công cụ trả về thành công.
 Chưa có thông báo nền khi ứng dụng đóng.
 
+### Thông báo nhắc ôn trên desktop
+
+Trong Trí nhớ dài hạn, bật "Bật thông báo nhắc ôn trên desktop".
+Tùy chọn mặc định tắt và không tự bật khi đặt lịch qua chat.
+Angela kiểm tra lịch của nhân vật đang chọn mỗi phút khi ứng dụng đang chạy.
+Nếu có nhiều mục đến hạn, Angela gộp chúng trong một thông báo.
+Thông báo chỉ hiện số mục đến hạn, không chứa nội dung ghi nhớ.
+Nhấn thông báo để mở chat và hỏi "Mình cần ôn gì?".
+
+Mỗi lần đến hạn được nhắc một lần. Trạng thái đã gửi lưu trên máy.
+Mở lại ứng dụng hoặc mở thêm cửa sổ không gửi lại thông báo đã ghi nhận cho cùng lần đến hạn.
+Thông báo không tự đánh dấu đã ôn hoặc tăng số lần ôn.
+Khi bạn xác nhận đã ôn, lịch mới được tính theo chu kỳ đã chọn.
+Nếu hệ điều hành không nhận thông báo, lần kiểm tra sau có thể thử lại.
+Kiểm tra cài đặt thông báo của hệ điều hành nếu không thấy nhắc ôn.
+Tắt thông báo hoặc trí nhớ học tập để ngừng nhắc. Lịch và tiến độ vẫn được giữ.
+
+Kiểm tra ngày 16/10/2026 trên Niri Wayland đã xác nhận thông báo native và giữ trạng thái đã gửi sau khi tải lại cửa sổ.
+Gemini 3.1 Flash Lite đã chạy luồng đọc tài liệu mẫu, lưu ghi chú có nguồn và đặt lịch ôn 3 ngày.
+Hủy lịch qua chat giữ lại ghi nhớ và không tăng số lần ôn.
+Kiểm thử dùng thư mục chọn cố định trong hồ sơ riêng. Nội dung đọc và ghi chú được đối chiếu với tệp thật.
+
 Chọn "Không lên lịch ôn" để xóa lịch và số lần ôn của ghi nhớ đó, giữ nội dung ghi nhớ.
 Đổi chu kỳ giữ số lần ôn và tính hạn mới từ lần ôn gần nhất.
 Sửa nội dung ghi nhớ giữ lịch và tiến độ. Tắt trí nhớ học tập ngừng gửi lịch và cung cấp công cụ ôn trong chat.

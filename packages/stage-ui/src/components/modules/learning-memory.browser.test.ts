@@ -2,7 +2,7 @@ import en from '@proj-airi/i18n/locales/en'
 import viLocale from '@proj-airi/i18n/locales/vi'
 
 import { createPinia, disposePinia } from 'pinia'
-import { afterEach, expect, it } from 'vitest'
+import { afterEach, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-vue'
 import { createI18n } from 'vue-i18n'
 
@@ -16,9 +16,41 @@ import 'virtual:uno.css'
 
 const stores: ReturnType<typeof createPinia>[] = []
 afterEach(() => {
+  vi.unstubAllEnvs()
   for (const pinia of stores.splice(0))
     disposePinia(pinia)
   localStorage.clear()
+})
+
+it.each([
+  ['en', 'Enable desktop review reminders'],
+  ['vi', 'Bật thông báo nhắc ôn trên desktop'],
+])('offers desktop reminder opt-in in %s', async (locale, label) => {
+  vi.stubEnv('RUNTIME_ENVIRONMENT', 'electron')
+  localStorage.clear()
+  const pinia = createPinia()
+  stores.push(pinia)
+  const view = render(LearningMemory, {
+    global: { plugins: [pinia, createI18n({ legacy: false, locale, messages: { en, vi: viLocale } })] },
+  })
+  const store = useLearningMemoryStore(pinia)
+  const toggle = view.getByRole('switch', { name: new RegExp(`^${label}`) })
+  await expect.element(toggle).not.toBeChecked()
+  await toggle.click()
+  expect(store.reviewRemindersEnabled).toBe(true)
+  await store.setEnabled(false)
+  await expect.element(toggle).toBeDisabled()
+})
+
+it('does not offer native reminder settings on the web', async () => {
+  vi.stubEnv('RUNTIME_ENVIRONMENT', 'browser')
+  localStorage.clear()
+  const pinia = createPinia()
+  stores.push(pinia)
+  const view = render(LearningMemory, {
+    global: { plugins: [pinia, createI18n({ legacy: false, locale: 'en', messages: { en } })] },
+  })
+  await expect.element(view.getByRole('switch', { name: /^Enable desktop review reminders/ })).not.toBeInTheDocument()
 })
 
 it.each([

@@ -196,3 +196,54 @@ it('routes deferred first reviews through the leader without resetting progress 
   expect(createContext().store.forCharacter('angela')[0].review?.nextReviewAt).toBe(now + 259200000)
   expect(writes.mock.calls.filter(([key]) => key === 'angela/learning-memory/entries')).toHaveLength(1)
 })
+
+it('persists reminder opt-in and delivery receipts without changing progress or recency', async () => {
+  const { store } = createContext()
+  expect(store.reviewRemindersEnabled).toBe(false)
+  const entry = await store.save('angela', 'topic', 'Python loops')
+  const scheduled = await store.scheduleReview('angela', entry.id, 3)
+  const dueAt = scheduled.review!.nextReviewAt
+  expect(await store.markReviewNotified('angela', entry.id, dueAt)).toBe(false)
+  await store.setReviewRemindersEnabled(true)
+  const writes = vi.spyOn(Storage.prototype, 'setItem')
+  expect(await store.markReviewNotified('angela', entry.id, dueAt)).toBe(true)
+  expect(await store.markReviewNotified('angela', entry.id, dueAt)).toBe(true)
+  expect(writes).toHaveBeenCalledOnce()
+  const restored = createContext().store
+  expect(restored.reviewRemindersEnabled).toBe(true)
+  expect(restored.forCharacter('angela')[0].review?.notifiedFor).toBe(dueAt)
+  expect(restored.forCharacter('angela')[0].review?.count).toBe(0)
+  expect(restored.forCharacter('angela')[0].review?.lastReviewedAt).toBeUndefined()
+  expect(restored.forCharacter('angela')[0].updatedAt).toBe(scheduled.updatedAt)
+})
+
+it('rejects stale, future, disabled, deleted, and other-character notification receipts', async () => {
+  const { store } = createContext()
+  await store.setReviewRemindersEnabled(true)
+  const entry = await store.save('angela', 'topic', 'Python')
+  const scheduled = await store.scheduleReview('angela', entry.id, 1)
+  const dueAt = scheduled.review!.nextReviewAt
+  expect(await store.markReviewNotified('other', entry.id, dueAt)).toBe(false)
+  await store.scheduleReview('angela', entry.id, 3, 'after-interval')
+  expect(await store.markReviewNotified('angela', entry.id, dueAt)).toBe(false)
+  expect(await store.markReviewNotified('angela', entry.id, store.forCharacter('angela')[0].review!.nextReviewAt)).toBe(false)
+  await store.setEnabled(false)
+  expect(await store.markReviewNotified('angela', entry.id, dueAt)).toBe(false)
+  await store.setEnabled(true)
+  await store.forget('angela', entry.id)
+  expect(await store.markReviewNotified('angela', entry.id, dueAt)).toBe(false)
+})
+
+it('keeps failed reminder settings and receipts out of replicated state', async () => {
+  const { store } = createContext()
+  await store.setReviewRemindersEnabled(true)
+  const entry = await store.save('angela', 'topic', 'Python')
+  const scheduled = await store.scheduleReview('angela', entry.id, 1)
+  vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+    throw new DOMException('Storage is full', 'QuotaExceededError')
+  })
+  await expect(store.setReviewRemindersEnabled(false)).rejects.toThrow('Storage is full')
+  expect(store.reviewRemindersEnabled).toBe(true)
+  await expect(store.markReviewNotified('angela', entry.id, scheduled.review!.nextReviewAt)).rejects.toThrow('Storage is full')
+  expect(store.forCharacter('angela')[0].review?.notifiedFor).toBeUndefined()
+})

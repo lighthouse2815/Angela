@@ -978,6 +978,11 @@ pages:
           due: Ready to review
           next: 'Next review: {date}'
           complete: Mark reviewed
+          notifications:
+            enable: Enable desktop review reminders
+            description: Show reminders while Angela is running. Only the selected character is checked. Each due review is notified once.
+            title: Time to review
+            body: 'Learning reviews due: {count}. Open Angela to study.'
           intervals:
             0: No review schedule
             1: Every day

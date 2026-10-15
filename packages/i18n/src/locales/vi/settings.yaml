@@ -923,6 +923,11 @@ pages:
           due: Đến hạn ôn tập
           next: 'Lần ôn tiếp theo: {date}'
           complete: Đánh dấu đã ôn
+          notifications:
+            enable: Bật thông báo nhắc ôn trên desktop
+            description: Nhắc ôn khi Angela đang chạy. Chỉ kiểm tra nhân vật đang chọn. Mỗi lần đến hạn được nhắc một lần.
+            title: Đến giờ ôn tập
+            body: 'Có {count} ghi nhớ đến hạn ôn. Mở Angela để bắt đầu.'
           intervals:
             0: Không lên lịch ôn
             1: Mỗi ngày

@@ -33,6 +33,9 @@ Learning memory tools use the current session character and require a quote from
 New chat schedules defer the first review by one interval. Existing settings schedules keep their immediate first review.
 Repeated schedules preserve progress and due dates. Scheduling does not mark a review complete.
 Unsupported clock times and intervals require clarification. Successful tool results follow durable storage writes.
+Desktop reminders are opt-in. Only the elected main renderer checks the selected character, once per minute.
+Native receipts identify the exact due date. Persistent receipts prevent duplicate reminders after reload and do not change review progress.
+Rescheduling, disabling memory, and removing a record invalidate pending receipts.
 
 ## Startup progress
 

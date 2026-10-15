@@ -84,7 +84,25 @@ Successful results include the saved relative path and UTF-8 byte count.
 Folder changes wait for active file operations. Clearing access preserves saved notes.
 These tools use Electron IPC and Node filesystem APIs. They do not require AUV or desktop input permissions.
 
+## Learning review reminders
+
+Enable desktop review reminders in Long-Term Memory settings. The option defaults to off.
+The main renderer checks the selected character every minute while the app runs.
+Electron main accepts delivery requests only from that renderer and groups due records into one native notification.
+The notification contains a count, without learning content. Clicking opens Chat.
+Main groups duplicate requests and retains successful receipts across renderer leadership changes.
+The learning store persists successful receipts for each due date. Reloads do not repeat a recorded reminder.
+Failed and unconfirmed deliveries remain retryable. Notifications do not complete reviews or run after the app exits.
+
 ## Verification
+
+Run the review store, settings, native delivery, and renderer timer tests from the repository root:
+
+```sh
+pnpm exec vitest run --config packages/stage-ui/vitest.config.ts --project browser learning-memory
+pnpm exec vitest run --config apps/stage-tamagotchi/vitest.node.config.ts learning-reviews
+pnpm exec vitest run --config apps/stage-tamagotchi/vitest.config.ts --project browser use-learning-review-reminders
+```
 
 Run the focused runtime tests:
 

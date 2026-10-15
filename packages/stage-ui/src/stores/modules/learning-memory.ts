@@ -3,7 +3,7 @@ import type { InferOutput } from 'valibot'
 
 import { nanoid } from 'nanoid'
 import { defineStore } from 'pinia'
-import { array, integer, maxLength, minLength, minValue, number, object, optional, parse, picklist, pipe, safeParse, string, trim } from 'valibot'
+import { array, finite, integer, maxLength, minLength, minValue, number, object, optional, parse, picklist, pipe, safeParse, string, trim } from 'valibot'
 import { shallowRef } from 'vue'
 
 export const learningCategorySchema = picklist(['topic', 'goal', 'difficulty', 'preference'])
@@ -21,6 +21,7 @@ const memorySchema = object({
     count: pipe(number(), integer(), minValue(0)),
     lastReviewedAt: optional(number()),
     nextReviewAt: number(),
+    notifiedFor: optional(number()),
   })),
 })
 
@@ -31,6 +32,7 @@ export type ReviewInterval = InferOutput<typeof reviewIntervalSchema>
 
 const storageKey = 'angela/learning-memory/entries'
 const enabledKey = 'angela/learning-memory/enabled'
+const remindersKey = 'angela/learning-memory/review-reminders'
 
 function loadMemories(): LearningMemory[] {
   if (typeof localStorage === 'undefined')
@@ -53,6 +55,7 @@ function loadMemories(): LearningMemory[] {
 export const useLearningMemoryStore = defineStore('learning-memory', () => {
   const memories = shallowRef<LearningMemory[]>(loadMemories())
   const enabled = shallowRef(typeof localStorage === 'undefined' || localStorage.getItem(enabledKey) !== 'false')
+  const reviewRemindersEnabled = shallowRef(typeof localStorage !== 'undefined' && localStorage.getItem(remindersKey) === 'true')
 
   function forCharacter(characterId: string) {
     return memories.value.filter(memory => memory.characterId === characterId).toReversed().toSorted((a, b) => b.updatedAt - a.updatedAt)
@@ -144,10 +147,28 @@ export const useLearningMemoryStore = defineStore('learning-memory', () => {
     enabled.value = value
   }
 
-  return { memories, enabled, forCharacter, save, forget, scheduleReview, markReviewed, setEnabled }
+  async function setReviewRemindersEnabled(value: boolean) {
+    localStorage.setItem(remindersKey, String(value))
+    reviewRemindersEnabled.value = value
+  }
+
+  /** Persists delivery only for the current due date. Delivery never changes learning progress or recency. */
+  async function markReviewNotified(characterId: string, id: string, dueAt: number) {
+    parse(pipe(number(), finite()), dueAt)
+    const current = memories.value.find(memory => memory.id === id && memory.characterId === characterId)
+    if (!enabled.value || !reviewRemindersEnabled.value || dueAt > Date.now() || !current?.review || current.review.nextReviewAt !== dueAt)
+      return false
+    if (current.review.notifiedFor === dueAt)
+      return true
+    const entry: LearningMemory = { ...current, review: { ...current.review, notifiedFor: dueAt } }
+    persist(memories.value.map(memory => memory.id === id ? entry : memory))
+    return true
+  }
+
+  return { memories, enabled, reviewRemindersEnabled, forCharacter, save, forget, scheduleReview, markReviewed, markReviewNotified, setEnabled, setReviewRemindersEnabled }
 }, {
   synced: {
     state: true,
-    actions: ['save', 'forget', 'scheduleReview', 'markReviewed', 'setEnabled'],
+    actions: ['save', 'forget', 'scheduleReview', 'markReviewed', 'markReviewNotified', 'setEnabled', 'setReviewRemindersEnabled'],
   },
 })

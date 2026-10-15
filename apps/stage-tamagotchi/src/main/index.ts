@@ -40,6 +40,7 @@ import { setupGodotStageManager } from './services/airi/godot-stage'
 import { setupHomeAssistant } from './services/airi/home-assistant'
 import { setupBuiltInServer } from './services/airi/http-server'
 import { IOTraceRecordingService } from './services/airi/io-trace-recording'
+import { setupLearningReviewNotifications } from './services/airi/learning-reviews'
 import { setupMcpManager } from './services/airi/mcp-servers'
 import { setupExtensionHost } from './services/airi/plugins'
 import { setupStudyWorkspace } from './services/airi/study-workspace'
@@ -312,6 +313,16 @@ app.whenReady().then(async () => {
     }),
   })
 
+  // Register before the main renderer starts checking persisted review schedules.
+  const learningReviews = injeca.provide('services:learning-reviews', {
+    dependsOn: { i18n, chatWindow },
+    build: ({ dependsOn }) => setupLearningReviewNotifications(createContext(ipcMain).context, {
+      getOwnerId: () => userFacingMainWindow?.isDestroyed() === false ? userFacingMainWindow.webContents.id : undefined,
+      i18n: dependsOn.i18n,
+      openChat: () => dependsOn.chatWindow.open(),
+    }),
+  })
+
   const spotlightWindow = injeca.provide('windows:spotlight', {
     dependsOn: { serverChannel, i18n, chatWindow, globalShortcut, appConfig },
     build: ({ dependsOn }) => setupSpotlightWindowManager(dependsOn),
@@ -343,7 +354,7 @@ app.whenReady().then(async () => {
   })
 
   const mainWindow = injeca.provide('windows:main', {
-    dependsOn: { editorWindow, settingsWindow, chatWindow, widgetsManager, noticeWindow, beatSync, autoUpdater, serverChannel, godotStageManager, mcpManager, i18n, onboardingWindowManager, inlayWindow, appleSpeechTranscription, appleVision, ioTraceRecording, globalShortcut },
+    dependsOn: { editorWindow, settingsWindow, chatWindow, widgetsManager, noticeWindow, beatSync, autoUpdater, serverChannel, godotStageManager, mcpManager, i18n, onboardingWindowManager, inlayWindow, appleSpeechTranscription, appleVision, ioTraceRecording, globalShortcut, learningReviews },
     build: async ({ dependsOn }) => setupMainWindow({
       ...dependsOn,
       onWindowCreated: (window) => {
