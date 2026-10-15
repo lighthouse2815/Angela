@@ -326,6 +326,12 @@ b, strong { font-weight: 700; }
 .presenter-controls > button { display: flex; align-items: center; gap: 7px; color: #a2b4c4; font-size: 10px; min-height: 38px; }
 .presenter-controls > button[aria-pressed='true'] { color: #c4f3d5; }
 .presenter-controls > button > span { font-size: 9px; }
+.music-controls { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+#music-toggle { display: flex; align-items: center; gap: 7px; min-height: 38px; color: #a2b4c4; font-size: 9px; }
+#music-toggle[aria-pressed='true'] { color: var(--mint); }
+#music-toggle svg { width: 17px; height: 17px; }
+.music-volume { display: flex; align-items: center; }
+#music-volume { width: 58px; height: 30px; margin: 0; accent-color: var(--mint); cursor: pointer; }
 #fullscreen svg { height: 17px; width: 17px; }
 .nav-ctrl { display: flex; gap: 8px; }
 .arrowbtn { display: grid; place-items: center; width: 42px; height: 38px; font-size: 19px; border-radius: 6px; border: 1px solid #3b5063; color: #d5e1e7; }
@@ -628,6 +634,8 @@ b, strong { font-weight: 700; }
   .topbar { padding-inline: 20px; }
   .bottom-ui { padding-inline: 20px; }
   .presenter-controls { gap: 17px; }
+  .music-volume, #music-toggle > span { display: none; }
+  #music-toggle { justify-content: center; width: 32px; }
   #notes-toggle > span { display: none; }
   .arrowbtn { width: 39px; height: 38px; }
   #slide-picker { padding: 22px; max-height: 88dvh; }

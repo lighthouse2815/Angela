@@ -6,8 +6,8 @@ Toàn bộ slide dùng nền xanh đậm, chữ sáng và điểm nhấn xanh ng
 
 - `public/index.html`: nội dung slide và ghi chú thuyết trình.
 - `public/pitch.css`: giao diện, bố cục responsive và định dạng in.
-- `public/pitch.js`: điều hướng, mục lục, ghi chú và tình huống minh họa.
-- `public/assets/`: hình Angela và phông chữ dùng tại máy.
+- `public/pitch.js`: điều hướng, mục lục, ghi chú, nhạc nền và tình huống minh họa.
+- `public/assets/`: hình Angela, icon, phông chữ và nhạc nền dùng tại máy.
 
 ## Xem tại máy
 
@@ -48,6 +48,17 @@ Bản in và PDF hiển thị đầy đủ nội dung, không có chuyển độ
 
 Hội thoại mẫu và giọng đọc trên trang chỉ minh họa ý tưởng.
 Hội thoại dùng câu trả lời soạn sẵn. Giọng đọc dùng tính năng có sẵn của trình duyệt.
+
+## Nhạc nền
+
+Bản pitch dùng “Doki Doki Literature Club! (Main Theme)” của Team Salvato, từ file MP3 người dùng cung cấp.
+File nằm tại `public/assets/doki-doki-main-theme.mp3`.
+Nhạc bắt đầu ở lần bấm hoặc chuyển slide bằng bàn phím đầu tiên, với âm lượng 18%.
+Nhạc phát liên tục qua các slide và tự lặp khi hết bài.
+Nút **Nhạc nền** ở thanh dưới cùng dùng để tạm dừng hoặc phát tiếp.
+Thanh âm lượng nằm cạnh nút trên màn hình lớn. Điện thoại dùng nút bật hoặc tạm dừng.
+Khi phát lời chào mẫu, âm lượng nhạc giảm còn một phần tư và trở lại sau lời chào.
+Nếu trình duyệt chặn phát nhạc, bấm **Nhạc nền** để bắt đầu.
 
 ## Hình ảnh và phông chữ
 

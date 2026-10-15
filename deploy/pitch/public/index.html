@@ -137,8 +137,16 @@ print(factorial(3))</code></pre><div class="terminal-result"><span>KẾT QUẢ D
   <footer class="bottom-ui">
     <div class="slide-location"><span class="counter"><strong id="slide-current">01</strong><span>/</span><span id="slide-total">20</span></span><span id="section-label">MỞ ĐẦU</span></div>
     <div class="progress-wrap" id="progress-dots" aria-label="Chọn slide"></div>
-    <div class="presenter-controls"><button id="notes-toggle" aria-label="Hiện ghi chú thuyết trình" aria-pressed="false" title="Ghi chú thuyết trình (N)">N<span>Ghi chú</span></button><button id="fullscreen" aria-label="Bật toàn màn hình" title="Toàn màn hình (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button><div class="nav-ctrl"><button class="arrowbtn" id="prev" aria-label="Slide trước" title="Slide trước (←)">←</button><button class="arrowbtn next" id="next" aria-label="Slide sau" title="Slide sau (→)">→</button></div></div>
+    <div class="presenter-controls">
+      <div class="music-controls" id="music-controls" role="group" aria-label="Nhạc nền">
+        <button id="music-toggle" aria-label="Bật nhạc nền" aria-pressed="false" title="Doki Doki Literature Club! — Team Salvato"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="./assets/icons.svg#volume-x"/></svg><span>Nhạc nền</span></button>
+        <label class="music-volume"><span class="sr-only">Âm lượng nhạc nền</span><input id="music-volume" type="range" min="0" max="100" step="1" value="18" aria-valuetext="18%"></label>
+      </div>
+      <button id="notes-toggle" aria-label="Hiện ghi chú thuyết trình" aria-pressed="false" title="Ghi chú thuyết trình (N)">N<span>Ghi chú</span></button><button id="fullscreen" aria-label="Bật toàn màn hình" title="Toàn màn hình (F)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/></svg></button><div class="nav-ctrl"><button class="arrowbtn" id="prev" aria-label="Slide trước" title="Slide trước (←)">←</button><button class="arrowbtn next" id="next" aria-label="Slide sau" title="Slide sau (→)">→</button></div>
+    </div>
   </footer>
+  <audio id="background-music" src="./assets/doki-doki-main-theme.mp3" loop preload="metadata"></audio>
+  <p class="sr-only" id="music-status" role="status"></p>
   <div class="progress-line" aria-hidden="true"><div id="progress-fill"></div></div>
   <p class="sr-only" id="slide-announcement" aria-live="polite"></p>
   <dialog id="slide-picker" aria-labelledby="picker-title"><div class="picker-heading"><div><span class="eyebrow">ANGELA / 20 SLIDE</span><h2 id="picker-title">Mạch câu chuyện</h2></div><button class="icon-button" id="close-picker" aria-label="Đóng mục lục">×</button></div><div id="picker-grid"></div><div class="picker-help">← → Chuyển slide <span>F Toàn màn hình</span><span>N Ghi chú</span><button id="print-deck">In / Lưu PDF ↗</button></div></dialog>

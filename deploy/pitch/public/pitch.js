@@ -6,9 +6,55 @@ const notesToggle = document.getElementById('notes-toggle')
 const voiceOrb = document.getElementById('voice-orb')
 const voiceTrigger = document.getElementById('voice-trigger')
 const voiceStatus = document.getElementById('voice-status')
+const backgroundMusic = document.getElementById('background-music')
+const musicToggle = document.getElementById('music-toggle')
+const musicVolume = document.getElementById('music-volume')
+const musicStatus = document.getElementById('music-status')
 const speechSupported = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
 let current = -1
+let musicRequested = false
+
+function updateMusicVolume() {
+  backgroundMusic.volume = Number(musicVolume.value) / 100 * (voiceOrb.classList.contains('speaking') ? 0.25 : 1)
+  musicVolume.setAttribute('aria-valuetext', `${musicVolume.value}%`)
+}
+
+function updateMusicState() {
+  const playing = !backgroundMusic.paused
+  musicToggle.setAttribute('aria-pressed', String(playing))
+  musicToggle.setAttribute('aria-label', playing ? 'Tạm dừng nhạc nền' : 'Bật nhạc nền')
+  musicToggle.querySelector('use').setAttribute('href', `./assets/icons.svg#volume-${playing ? '2' : 'x'}`)
+}
+
+function startMusic() {
+  musicRequested = true
+  musicStatus.textContent = ''
+  backgroundMusic.play().catch((error) => {
+    if (error.name !== 'AbortError')
+      musicStatus.textContent = 'Chưa phát được nhạc nền. Bấm nút Nhạc nền để thử lại.'
+  })
+}
+
+musicToggle.addEventListener('click', () => {
+  musicRequested = true
+  if (backgroundMusic.paused)
+    startMusic()
+  else
+    backgroundMusic.pause()
+})
+musicVolume.addEventListener('input', updateMusicVolume)
+backgroundMusic.addEventListener('play', updateMusicState)
+backgroundMusic.addEventListener('pause', updateMusicState)
+backgroundMusic.addEventListener('error', () => {
+  updateMusicState()
+  musicStatus.textContent = 'Không tải được nhạc nền. Kiểm tra kết nối rồi tải lại trang.'
+})
+document.addEventListener('click', (event) => {
+  if (!musicRequested && !event.target.closest('#music-controls'))
+    startMusic()
+})
+updateMusicVolume()
 
 slides.forEach((slide, index) => {
   const reveals = slide.querySelectorAll(`
@@ -124,10 +170,12 @@ document.getElementById('print-deck').addEventListener('click', () => {
   window.print()
 })
 document.addEventListener('keydown', (event) => {
-  if (picker.open || event.ctrlKey || event.metaKey || event.altKey)
+  if (picker.open || event.ctrlKey || event.metaKey || event.altKey || event.target.closest('input, select, textarea'))
     return
   if (event.key === ' ' && event.target.closest('button, a'))
     return
+  if (!musicRequested && ['ArrowRight', 'ArrowDown', 'ArrowLeft', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '].includes(event.key))
+    startMusic()
   if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(event.key)) {
     event.preventDefault()
     goTo(current + 1)
@@ -221,6 +269,7 @@ document.querySelectorAll('[data-demo]').forEach((button) => {
 function setSpeaking(speaking) {
   voiceOrb.classList.toggle('speaking', speaking)
   voiceTrigger.textContent = speaking ? 'Dừng lời chào ■' : 'Nghe lời chào ↗'
+  updateMusicVolume()
 }
 
 // The voice sample uses the browser voice, separate from the application's voice providers.
