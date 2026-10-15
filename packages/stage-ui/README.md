@@ -26,6 +26,14 @@ The session list displays and sorts by the latest valid user or assistant messag
 Sessions without dated conversation messages use their creation time. Loading messages updates the list from the stored history.
 Saving or synchronizing a session does not change its displayed activity time unless its messages change.
 
+## Learning reviews
+
+Learning memory tools use the current session character and require a quote from the submitted user message.
+`schedule_learning_review` sets intervals of 1, 3, 7, 14, or 30 days. An interval of 0 removes the schedule.
+New chat schedules defer the first review by one interval. Existing settings schedules keep their immediate first review.
+Repeated schedules preserve progress and due dates. Scheduling does not mark a review complete.
+Unsupported clock times and intervals require clarification. Successful tool results follow durable storage writes.
+
 ## Startup progress
 
 `useStartupResourcesStore` records each resource as queued, loading, ready, failed, or skipped.

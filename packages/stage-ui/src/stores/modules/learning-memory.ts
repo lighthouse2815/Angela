@@ -93,22 +93,25 @@ export const useLearningMemoryStore = defineStore('learning-memory', () => {
     return true
   }
 
-  async function scheduleReview(characterId: string, id: string, intervalDays: ReviewInterval) {
+  /** New schedules start due by default. Chat can defer the first review without recording completion. */
+  async function scheduleReview(characterId: string, id: string, intervalDays: ReviewInterval, firstReview: 'now' | 'after-interval' = 'now') {
     const interval = parse(reviewIntervalSchema, intervalDays)
+    const start = parse(picklist(['now', 'after-interval']), firstReview)
     const current = memories.value.find(memory => memory.id === id && memory.characterId === characterId)
     if (!current)
       throw new Error('missing')
     if ((current.review?.intervalDays ?? 0) === interval)
-      return { ...current }
+      return structuredClone(current)
     const now = Date.now()
+    const firstDueAt = start === 'after-interval' ? now + interval * 86400000 : now
     const review = interval === 0
       ? undefined
       : {
           intervalDays: interval,
           count: current.review?.count ?? 0,
           lastReviewedAt: current.review?.lastReviewedAt,
-          // New schedules start due. A changed interval runs from the last completed review.
-          nextReviewAt: current.review?.lastReviewedAt === undefined ? now : current.review.lastReviewedAt + interval * 86400000,
+          // A changed interval runs from the last completed review, when one exists.
+          nextReviewAt: current.review?.lastReviewedAt === undefined ? firstDueAt : current.review.lastReviewedAt + interval * 86400000,
         }
     const entry: LearningMemory = { ...current, review, updatedAt: now }
     persist(memories.value.map(memory => memory.id === id ? entry : memory))

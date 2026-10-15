@@ -176,3 +176,23 @@ it('routes review progress through the leader without duplicate writes', async (
   expect(createContext().store.forCharacter('angela')[0].review?.count).toBe(1)
   expect(writes.mock.calls.filter(([key]) => key === 'angela/learning-memory/entries')).toHaveLength(2)
 })
+
+it('routes deferred first reviews through the leader without resetting progress or duplicate storage writes', async () => {
+  const namespace = `learning-chat-reviews:${crypto.randomUUID()}`
+  const leader = createContext(namespace, 'leader-only')
+  await expect.poll(() => leader.runtime?.isLeader()).toBe(true)
+  const follower = createContext(namespace, 'follower-only')
+  await expect.poll(() => follower.runtime?.getLeaderId()).toBe(leader.runtime?.participantId)
+  const entry = await follower.store.save('angela', 'topic', 'Python')
+  const now = Date.now()
+  vi.spyOn(Date, 'now').mockReturnValue(now)
+  const writes = vi.spyOn(Storage.prototype, 'setItem')
+  await follower.store.scheduleReview('angela', entry.id, 3, 'after-interval')
+  await expect.poll(() => follower.store.forCharacter('angela')[0].review?.nextReviewAt).toBe(now + 259200000)
+  expect(leader.store.forCharacter('angela')[0].review?.count).toBe(0)
+  expect(leader.store.forCharacter('angela')[0].review?.lastReviewedAt).toBeUndefined()
+  vi.mocked(Date.now).mockReturnValue(now + 60000)
+  await follower.store.scheduleReview('angela', entry.id, 3, 'after-interval')
+  expect(createContext().store.forCharacter('angela')[0].review?.nextReviewAt).toBe(now + 259200000)
+  expect(writes.mock.calls.filter(([key]) => key === 'angela/learning-memory/entries')).toHaveLength(1)
+})

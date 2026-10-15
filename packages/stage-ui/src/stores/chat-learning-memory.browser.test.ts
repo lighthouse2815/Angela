@@ -69,12 +69,14 @@ it('injects remembered learning facts into session chat and removes them when me
     const options = stream.mock.calls[0][3]
     const tools = typeof options?.tools === 'function' ? await options.tools() : options?.tools
     expect(tools?.map(tool => tool.function.name)).toContain('remember_learning')
+    expect(tools?.map(tool => tool.function.name)).toContain('schedule_learning_review')
     await memory.setEnabled(false)
     await chat.send({ sessionId, messageId: 'learning-2', text: 'Memory is disabled now.' })
     expect(JSON.stringify(stream.mock.calls[1][2])).not.toContain('Needs help with Python loops')
     const disabledOptions = stream.mock.calls[1][3]
     const disabledTools = typeof disabledOptions?.tools === 'function' ? await disabledOptions.tools() : disabledOptions?.tools
     expect(disabledTools?.map(tool => tool.function.name)).not.toContain('remember_learning')
+    expect(disabledTools?.map(tool => tool.function.name)).not.toContain('schedule_learning_review')
   }
   finally {
     await sessions.deleteSession(sessionId)

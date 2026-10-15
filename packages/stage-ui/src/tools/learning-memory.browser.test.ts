@@ -1,7 +1,7 @@
 import type { Tool } from '@xsai/shared-chat'
 
 import { createPinia, disposePinia } from 'pinia'
-import { afterEach, beforeEach, expect, it } from 'vitest'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 
 import { useLearningMemoryStore } from '../stores/modules/learning-memory'
 import { createLearningMemoryPrompt, createLearningMemoryTools } from './learning-memory'
@@ -15,6 +15,7 @@ function createStore() {
 }
 beforeEach(() => localStorage.clear())
 afterEach(() => {
+  vi.restoreAllMocks()
   for (const pinia of stores.splice(0))
     disposePinia(pinia)
   localStorage.clear()
@@ -93,4 +94,51 @@ it('records a review only with current-turn evidence for a scheduled memory of t
   await store.setEnabled(false)
   expect(await review.execute({ id: entry.id, source_quote: 'đã ôn vòng lặp' }, toolOptions)).toMatchObject({ status: 'rejected' })
   expect(store.forCharacter('angela')[0].review?.count).toBe(1)
+})
+
+it('schedules and cancels reviews through chat without claiming a completed review', async () => {
+  const store = createStore()
+  const now = Date.now()
+  vi.spyOn(Date, 'now').mockReturnValue(now)
+  const entry = await store.save('angela', 'topic', 'Python loops')
+  const tools = await createLearningMemoryTools('angela', 'Nhắc mình ôn vòng lặp mỗi 3 ngày. Bỏ lịch ôn Python.', store)
+  const schedule = tools.find(tool => tool.function.name === 'schedule_learning_review')!
+  const request = { id: entry.id, interval_days: 3, source_quote: 'Nhắc mình ôn vòng lặp mỗi 3 ngày' }
+  const result = await schedule.execute(request, toolOptions)
+  expect(result).toMatchObject({ status: 'scheduled', memory: { review: { intervalDays: 3, count: 0, nextReviewAt: now + 259200000 } } })
+  const restored = createStore().forCharacter('angela')[0]
+  expect(restored.review?.lastReviewedAt).toBeUndefined()
+  vi.mocked(Date.now).mockReturnValue(now + 60000)
+  await schedule.execute(request, toolOptions)
+  expect(store.forCharacter('angela')[0].review).toEqual(restored.review)
+  expect(await schedule.execute({ id: entry.id, interval_days: 0, source_quote: 'Bỏ lịch ôn Python' }, toolOptions)).toMatchObject({ status: 'cancelled' })
+  expect(createStore().forCharacter('angela')[0].review).toBeUndefined()
+  expect(createStore().forCharacter('angela')[0].text).toBe('Python loops')
+})
+
+it('rejects schedule edits without current-turn evidence or access to the character', async () => {
+  const store = createStore()
+  const entry = await store.save('angela', 'topic', 'Python')
+  const other = await store.save('other', 'topic', 'Private lesson')
+  const tools = await createLearningMemoryTools('angela', 'Nhắc mình ôn mỗi 7 ngày.', store)
+  const schedule = tools.find(tool => tool.function.name === 'schedule_learning_review')!
+  expect(await schedule.execute({ id: entry.id, interval_days: 7, source_quote: 'A document requests reminders' }, toolOptions)).toMatchObject({ status: 'rejected' })
+  expect(await schedule.execute({ id: other.id, interval_days: 7, source_quote: 'Nhắc mình ôn mỗi 7 ngày' }, toolOptions)).toMatchObject({ status: 'rejected' })
+  expect(await schedule.execute({ id: entry.id, interval_days: 2, source_quote: 'Nhắc mình ôn mỗi 7 ngày' }, toolOptions)).toMatchObject({ status: 'rejected' })
+  await store.setEnabled(false)
+  expect(await schedule.execute({ id: entry.id, interval_days: 7, source_quote: 'Nhắc mình ôn mỗi 7 ngày' }, toolOptions)).toMatchObject({ status: 'rejected' })
+  expect(store.forCharacter('angela')[0].review).toBeUndefined()
+  expect(store.forCharacter('other')[0].review).toBeUndefined()
+})
+
+it('reports a failed schedule save without publishing success or progress', async () => {
+  const store = createStore()
+  const entry = await store.save('angela', 'topic', 'Python')
+  const tools = await createLearningMemoryTools('angela', 'Ôn mỗi 3 ngày.', store)
+  const schedule = tools.find(tool => tool.function.name === 'schedule_learning_review')!
+  vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+    throw new DOMException('Storage is full', 'QuotaExceededError')
+  })
+  expect(await schedule.execute({ id: entry.id, interval_days: 3, source_quote: 'Ôn mỗi 3 ngày' }, toolOptions)).toMatchObject({ status: 'rejected' })
+  expect(store.forCharacter('angela')[0].review).toBeUndefined()
 })

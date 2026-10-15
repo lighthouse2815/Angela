@@ -128,7 +128,15 @@ Số lần ôn ghi nhận hoạt động của bạn, không đánh giá mức �
 Khi bạn muốn học, Angela dùng các mục đến hạn trong ngữ cảnh để gợi ý bài ôn ngắn.
 Bạn có thể nói "Mình đã ôn vòng lặp rồi" để Angela ghi nhận lần ôn bằng công cụ `review_learning`.
 Angela chỉ ghi nhận sau khi bạn xác nhận đã ôn. Một lời giải thích của Angela không tự đánh dấu hoàn thành.
-Lịch ôn được đặt trong cài đặt, chưa đặt bằng chat. Chưa có thông báo nền khi ứng dụng đóng.
+Bạn có thể đặt lịch bằng chat: "Cứ 3 ngày nhắc mình ôn vòng lặp Python."
+Angela dùng công cụ `schedule_learning_review` để đặt lịch cho ghi nhớ của nhân vật trong cuộc trò chuyện.
+Nếu chưa có ghi nhớ, Angela cần lưu mục tiêu học tập bạn vừa nêu trước khi đặt lịch.
+Hỗ trợ chu kỳ 1, 3, 7, 14 hoặc 30 ngày. Chưa hỗ trợ giờ cụ thể hoặc chu kỳ khác.
+Lịch mới đặt qua chat bắt đầu sau một chu kỳ, không tự ghi nhận đã ôn.
+Đặt lại cùng chu kỳ giữ ngày đến hạn và tiến độ hiện tại.
+Gửi "Bỏ lịch ôn Python" để xóa lịch, giữ nội dung ghi nhớ.
+Chỉ xác nhận đặt hoặc bỏ lịch sau khi công cụ trả về thành công.
+Chưa có thông báo nền khi ứng dụng đóng.
 
 Chọn "Không lên lịch ôn" để xóa lịch và số lần ôn của ghi nhớ đó, giữ nội dung ghi nhớ.
 Đổi chu kỳ giữ số lần ôn và tính hạn mới từ lần ôn gần nhất.
