@@ -22,7 +22,7 @@ The selection is local to the composer. A new composer starts with it on. While 
 Turn it off before sending messages that must not receive computer-use tools.
 
 Only the current selection grants access, including retries and tool reruns. Historical messages do not grant access.
-The selected request receives `computer_use` and `computer_use_read_image`.
+The selected request receives `computer_use`, `computer_use_read_image`, and the learning directory tools described below.
 The first tool accepts AUV arguments, such as `["invoke", "window.list"]`.
 Use `["invoke", "--help"]` and command-specific help to discover supported operations.
 The image tool returns a screenshot as model image content. It accepts only PNG and JPEG artifacts inside the app's computer-use store.
@@ -65,12 +65,37 @@ The cache stays outside Git. A CLI upgrade selects a new cache directory and req
 The desktop package includes the platform CLI as an optional dependency and unpacks its executable from ASAR.
 Do not omit optional dependencies when building an installer. Windows ARM64 and Linux musl do not have a matching CLI in this version.
 
+## Learning directory
+
+With **Use computer** on, ask Angela to read a learning document and save a Markdown summary.
+`study_workspace_directory` opens the native folder picker. Only that picker grants directory access.
+Its `status` action inspects the selection. Its `clear` action revokes access and invalidates a pending picker.
+The selection is shared across desktop windows and expires when the app exits.
+
+`study_workspace_list` lists subdirectories and supported documents. Listings contain at most 200 entries and scan at most 1,000 entries.
+`study_workspace_read` reads UTF-8 `.md`, `.markdown`, and `.txt` files up to 256 KiB.
+Both tools accept relative paths within the selected directory. Hidden paths and symbolic links are refused.
+Document text goes to the selected chat provider as reference material. It is not a source of tool instructions or personal memories.
+PDF, Word, and image documents are unsupported.
+
+`study_workspace_save_note` creates new Markdown files under `Angela Notes` within that directory.
+Notes contain at most 128 KiB. Existing files are never overwritten.
+Successful results include the saved relative path and UTF-8 byte count.
+Folder changes wait for active file operations. Clearing access preserves saved notes.
+These tools use Electron IPC and Node filesystem APIs. They do not require AUV or desktop input permissions.
+
 ## Verification
 
 Run the focused runtime tests:
 
 ```sh
 pnpm -F @proj-airi/stage-tamagotchi exec vitest run src/main/services/airi/computer-use/runtime.test.ts
+```
+
+For learning directory access, IPC, and request selection, run from the repository root:
+
+```sh
+pnpm exec vitest run --config apps/stage-tamagotchi/vitest.node.config.ts apps/stage-tamagotchi/src/main/services/airi/study-workspace apps/stage-tamagotchi/src/renderer/stores/tools/built-in.test.ts
 ```
 
 Set `AIRI_COMPUTER_USE_LIVE=1` to include the CLI/private-daemon test. Set `AUV_BINARY_PATH` to test a native development build.

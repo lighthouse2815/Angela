@@ -42,6 +42,7 @@ import { setupBuiltInServer } from './services/airi/http-server'
 import { IOTraceRecordingService } from './services/airi/io-trace-recording'
 import { setupMcpManager } from './services/airi/mcp-servers'
 import { setupExtensionHost } from './services/airi/plugins'
+import { setupStudyWorkspace } from './services/airi/study-workspace'
 import { setupArtistryBridge } from './services/airi/widgets/artistry-bridge'
 import { setupAutoUpdater } from './services/electron/auto-updater'
 import { setupSherpawModelAssetsProtocol } from './services/electron/bundled-sherpaw-assets'
@@ -382,6 +383,7 @@ app.whenReady().then(async () => {
     callback: async (deps) => {
       const { context } = createContext(ipcMain)
       setupComputerUse(context)
+      setupStudyWorkspace(context)
       setupHomeAssistant(context)
       await setupArtistryBridge({
         widgetsManager: deps.widgetsWindow,

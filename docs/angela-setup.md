@@ -30,6 +30,13 @@ mise exec -- pnpm -F @proj-airi/stage-tamagotchi start
 ```
 
 Lệnh `start` tự cài binary Electron nếu chưa có. Lần tải đầu cần kết nối tới GitHub.
+Lệnh này cũng build lại ứng dụng trước khi mở.
+Nếu đã build, mở trực tiếp bằng:
+
+```bash
+mise exec -- pnpm -F @proj-airi/stage-tamagotchi run start --skipBuild
+```
+
 Nếu Wayland gặp lỗi hiển thị, thử script `start:xwayland` của cùng package.
 
 ## Google Gemini
@@ -127,6 +134,37 @@ Chọn "Không lên lịch ôn" để xóa lịch và số lần ôn của ghi n
 Đổi chu kỳ giữ số lần ôn và tính hạn mới từ lần ôn gần nhất.
 Sửa nội dung ghi nhớ giữ lịch và tiến độ. Tắt trí nhớ học tập ngừng gửi lịch và cung cấp công cụ ôn trong chat.
 Lịch và tiến độ lưu trên máy, tách theo nhân vật và đồng bộ giữa các cửa sổ ứng dụng.
+
+## Đọc tài liệu và lưu ghi chú
+
+Bản desktop có công cụ đọc tài liệu trong một thư mục bạn chọn.
+Tính năng này dùng cùng tùy chọn **Use computer** trong ô chat.
+Để bắt đầu:
+
+1. Chọn mô hình chat có hỗ trợ gọi công cụ.
+2. Bật **Use computer**.
+3. Gửi: "Chọn thư mục học Python, đọc tài liệu và giải thích vòng lặp cho mình."
+4. Chọn thư mục trong hộp thoại hệ thống.
+5. Gửi: "Lưu phần cần ôn vào ghi chú Markdown, kèm đường dẫn tài liệu nguồn."
+
+Angela liệt kê thư mục con và đọc tệp `.md`, `.markdown`, `.txt` có mã hóa UTF-8.
+Mỗi tài liệu tối đa 256 KiB. PDF, Word và ảnh chưa được hỗ trợ.
+Tệp ẩn, đường dẫn ra ngoài thư mục và liên kết tượng trưng bị từ chối.
+Nội dung tài liệu được gửi đến nhà cung cấp AI đang chọn khi công cụ đọc được gọi.
+
+Ghi chú nằm trong thư mục con `Angela Notes`. Mỗi ghi chú tối đa 128 KiB.
+Công cụ chỉ tạo tệp `.md` mới, không ghi đè tài liệu hoặc ghi chú đã có.
+Nếu tên đã tồn tại, yêu cầu Angela chọn tên mới.
+
+Quyền thư mục dùng chung giữa các cửa sổ desktop trong phiên hiện tại.
+Khi đóng Angela, bạn cần chọn lại thư mục ở phiên sau.
+Gửi "Bỏ quyền thư mục học hiện tại" để gọi thao tác `clear`.
+Tắt **Use computer** để ngừng cung cấp công cụ tài liệu cho yêu cầu tiếp theo.
+Ghi chú đã lưu vẫn còn trên ổ đĩa.
+
+Các công cụ gồm `study_workspace_directory`, `study_workspace_list`, `study_workspace_read` và `study_workspace_save_note`.
+Chúng hoạt động độc lập với AUV và không cần quyền `/dev/uinput`.
+Trí nhớ và lịch ôn vẫn dùng mô-đun Trí nhớ dài hạn đã có.
 
 ## Tương tác laptop
 
