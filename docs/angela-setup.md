@@ -203,12 +203,37 @@ Ngày 16/10/2026, trên Arch Linux/Niri Wayland:
 | Chụp display | Có ảnh desktop thật 2560 × 1440 qua Portal Screenshot |
 | Screencast | Timeout, AUV dùng Screenshot dự phòng |
 | Liệt kê cửa sổ qua AT-SPI | Trả danh sách rỗng, chưa xác minh được cửa sổ |
-| Nhập chữ vào cửa sổ thử nghiệm | Thất bại trước khi gửi phím, không có ký tự nào được nhập |
+| Nhập chữ qua Portal | Thất bại trước khi gửi phím, không có ký tự nào được nhập |
+| Nhập chữ qua uinput với quyền tạm thời | Thành công, ô nhập nhận đúng `angela-test-1610` |
 
 Log Portal báo thiếu interface `org.freedesktop.impl.portal.RemoteDesktop` ở backend được chọn.
 Interface xuất hiện ở Portal frontend không chứng minh backend điều khiển đang hoạt động.
-Cần cấu hình backend RemoteDesktop tương thích với compositor trước khi kiểm tra lại chuột/bàn phím.
-Không tự cấp quyền `/dev/uinput` hoặc đổi cấu hình desktop để bỏ qua lỗi này.
+[Niri chưa hỗ trợ RemoteDesktop](https://github.com/niri-wm/niri/issues/390).
+AUV có sẵn backend `uinput`, không cần thêm công cụ điều khiển khác.
+Kiểm thử đã đối chiếu nội dung ô nhập trong cửa sổ Electron riêng.
+Chưa kiểm chứng thao tác chuột hoặc nhập tiếng Việt qua backend này.
+
+### Chạy với uinput trên Linux
+
+Chế độ này cần quyền đọc/ghi `/dev/uinput` cho tài khoản chạy Angela.
+Sau khi đồng ý cấp quyền tạm thời, chạy:
+
+```bash
+pkexec setfacl -m "u:$(id -u):rw" /dev/uinput
+mise exec -- pnpm -F @proj-airi/stage-tamagotchi dev:uinput
+```
+
+Nếu đã build desktop, dùng `start:uinput` thay cho `dev:uinput`.
+Nếu môi trường đặt `ELECTRON_RUN_AS_NODE=1`, bỏ biến đó trước khi chạy Electron.
+Các lệnh khởi động không tự nâng quyền hoặc sửa quyền thiết bị.
+Quyền này cho phép gửi sự kiện vào ứng dụng đang có focus.
+Khi kiểm thử xong, thu hồi quyền:
+
+```bash
+pkexec setfacl -x "u:$(id -u)" /dev/uinput
+```
+
+Không có thay đổi group hoặc quy tắc udev vĩnh viễn.
 
 ## Dữ liệu và cập nhật
 
