@@ -67,6 +67,8 @@ Nếu trình duyệt chặn phát nhạc, bấm **Nhạc nền** để bắt đ�
 Mỗi slide có lời thuyết minh trong ghi chú. Chữ trong ảnh không sửa trực tiếp được.
 Hiệu ứng và âm thanh nằm trong bản HTML và video.
 
+[`Angela_Thuyet_Trinh.pdf`](./Angela_Thuyet_Trinh.pdf) là bản PDF 20 trang, chuyển từ PowerPoint bằng LibreOffice.
+
 ## Video thuyết trình
 
 [`video/angela-pitch-vi.mp4`](./video/angela-pitch-vi.mp4) là bản MP4 ngang 1920 × 1080, 30 khung hình mỗi giây.
