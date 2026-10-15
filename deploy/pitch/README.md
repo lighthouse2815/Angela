@@ -37,6 +37,10 @@ Bản in dùng khổ ngang 16:9 và ẩn các nút điều khiển.
 Slide chuyển theo chiều tiến hoặc lùi. Tiêu đề xuất hiện trước các ý chính.
 Hình Angela, sơ đồ và lộ trình có hiệu ứng mở đầu riêng.
 Các hiệu ứng tự chạy khi mở slide, không cần bấm thêm để hiện nội dung.
+Nền có ánh sáng và lưới mờ. Các nhóm nội dung dùng icon Lucide và đường nhấn đồng bộ.
+Hình Angela chuyển động nhẹ và phản hồi theo chuột trên máy tính.
+Sơ đồ có tín hiệu di chuyển, lộ trình có đường chạy và khung ghi nhớ có ánh sáng lướt qua.
+Các hiệu ứng liên tục chỉ chạy trên slide đang mở và tạm dừng khi đổi tab.
 
 Trang dùng CSS Animation có sẵn của trình duyệt, không cần thư viện bổ sung.
 Khi thiết bị bật giảm chuyển động, trang tắt các hiệu ứng.
@@ -50,6 +54,8 @@ Hội thoại dùng câu trả lời soạn sẵn. Giọng đọc dùng tính n�
 Hình `public/assets/angela-study.png` tạo bằng công cụ imagegen tích hợp, dựa trên nhân vật trong bản pitch gốc.
 Prompt được lưu tại [`imagegen-prompt.txt`](./imagegen-prompt.txt).
 Manrope được tải từ Google Fonts và lưu trong `public/assets/fonts/`, kèm giấy phép OFL.
+Icon Lucide lấy từ bộ Iconify có sẵn trong dự án, lưu tại `public/assets/icons.svg`.
+Giấy phép icon nằm tại `public/assets/lucide-license.txt`.
 
 ## Cập nhật nội dung
 

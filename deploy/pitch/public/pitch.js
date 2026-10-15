@@ -57,6 +57,7 @@ slides.forEach((slide, index) => {
 function goTo(index) {
   if (index < 0 || index >= slides.length || index === current)
     return
+  resetArtwork()
   const previous = slides[current]
   document.getElementById('stage').dataset.direction = index > current ? 'forward' : 'backward'
   current = index
@@ -153,6 +154,39 @@ document.addEventListener('keydown', (event) => {
 let touchX = 0
 let touchY = 0
 const stage = document.getElementById('stage')
+const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)')
+let pointerFrame = 0
+
+function resetArtwork() {
+  cancelAnimationFrame(pointerFrame)
+  for (const property of ['--art-yaw', '--art-pitch', '--light-x', '--light-y'])
+    stage.style.removeProperty(property)
+}
+
+stage.addEventListener('pointermove', (event) => {
+  if (!finePointer.matches || reducedMotion.matches || document.hidden || picker.open)
+    return
+  cancelAnimationFrame(pointerFrame)
+  pointerFrame = requestAnimationFrame(() => {
+    const bounds = stage.getBoundingClientRect()
+    const x = (event.clientX - bounds.left) / bounds.width
+    const y = (event.clientY - bounds.top) / bounds.height
+    stage.style.setProperty('--art-yaw', `${(x - 0.5) * 4}deg`)
+    stage.style.setProperty('--art-pitch', `${(0.5 - y) * 3}deg`)
+    stage.style.setProperty('--light-x', `${25 + x * 50}%`)
+    stage.style.setProperty('--light-y', `${20 + y * 50}%`)
+  })
+})
+stage.addEventListener('pointerleave', resetArtwork)
+reducedMotion.addEventListener('change', resetArtwork)
+finePointer.addEventListener('change', resetArtwork)
+document.addEventListener('visibilitychange', () => {
+  document.documentElement.toggleAttribute('data-motion-paused', document.hidden)
+  if (document.hidden)
+    resetArtwork()
+})
+window.addEventListener('beforeprint', resetArtwork)
+
 stage.addEventListener('touchstart', (event) => {
   touchX = event.changedTouches[0].screenX
   touchY = event.changedTouches[0].screenY
