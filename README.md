@@ -42,6 +42,8 @@ Xem [thiết lập và kiểm tra](./docs/angela-setup.md) trước khi dùng c�
 
 ## Nguồn mã
 
+Bản pitch hackathon gồm 20 slide nằm tại [`deploy/pitch`](./deploy/pitch/README.md).
+
 Angela dựa trên [AIRI](https://github.com/moeru-ai/airi).
 Giữ nguyên [LICENSE](./LICENSE) và ghi nhận tác giả của nền mã gốc.
 [Tài liệu AIRI gốc](./docs/AIRI_README.md) mô tả các tính năng được giữ lại.
