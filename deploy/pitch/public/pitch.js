@@ -7,9 +7,35 @@ const voiceOrb = document.getElementById('voice-orb')
 const voiceTrigger = document.getElementById('voice-trigger')
 const voiceStatus = document.getElementById('voice-status')
 const speechSupported = 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window
-let current = 0
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+let current = -1
 
 slides.forEach((slide, index) => {
+  const reveals = slide.querySelectorAll(`
+    .eyebrow, h1, h2, .cover-statement, .cover-copy > .intro, .lead,
+    .text-button, .cover-bottom, .reason-list article, .problem-track article,
+    .audience-main, .audience-side article, .opportunity-from, .opportunity-to,
+    .capabilities article, .learning-steps li, .demo-window, .simple-points p,
+    .memory-board, .interaction-grid article, .terminal, .value-points article,
+    .status-columns article, .architecture-entry, .architecture-core,
+    .architecture-services > div, .challenge-grid article, .solution-table article,
+    .roadmap article, .evaluation-grid article, .future-path article,
+    .future-principle, .bottom-caption, .value-footer, .challenge-question,
+    .closing-ask, .closing-actions
+  `)
+  let order = 0
+  reveals.forEach((element) => {
+    if (element.parentElement.closest('[data-reveal]'))
+      return
+    element.dataset.reveal = ''
+    element.style.setProperty('--reveal-delay', `${Math.min(order * 65, 455)}ms`)
+    order++
+  })
+  slide.addEventListener('animationend', (event) => {
+    if (event.target === slide && event.animationName === 'slide-depart')
+      slide.classList.remove('leaving')
+  })
+
   const dot = document.createElement('button')
   dot.className = 'progress-dot'
   dot.title = `Slide ${index + 1}: ${slide.getAttribute('aria-label')}`
@@ -29,11 +55,14 @@ slides.forEach((slide, index) => {
 })
 
 function goTo(index) {
-  if (index < 0 || index >= slides.length)
+  if (index < 0 || index >= slides.length || index === current)
     return
+  const previous = slides[current]
+  document.getElementById('stage').dataset.direction = index > current ? 'forward' : 'backward'
   current = index
   slides.forEach((slide, position) => {
     const active = position === current
+    slide.classList.remove('leaving')
     slide.classList.toggle('active', active)
     slide.inert = !active
     slide.setAttribute('aria-hidden', String(!active))
@@ -41,6 +70,8 @@ function goTo(index) {
     dotsBox.children[position].setAttribute('aria-current', String(active))
     pickerGrid.children[position].setAttribute('aria-current', String(active))
   })
+  if (previous && !reducedMotion.matches)
+    previous.classList.add('leaving')
   slides[current].scrollTop = 0
   document.getElementById('slide-current').textContent = String(current + 1).padStart(2, '0')
   document.getElementById('slide-total').textContent = String(slides.length).padStart(2, '0')
@@ -60,6 +91,10 @@ function goTo(index) {
     setSpeaking(false)
   }
 }
+
+reducedMotion.addEventListener('change', () => {
+  document.querySelectorAll('.slide.leaving').forEach(slide => slide.classList.remove('leaving'))
+})
 
 function toggleNotes() {
   const open = document.body.classList.toggle('notes-open')

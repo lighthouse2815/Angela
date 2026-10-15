@@ -31,6 +31,16 @@ Trong mục lục, chọn **In / Lưu PDF** để xuất slide bằng trình duy
 Bản in dùng khổ ngang 16:9 và ẩn các nút điều khiển.
 Điện thoại hỗ trợ vuốt ngang chuyển slide và cuộn dọc để đọc.
 
+## Chuyển động khi trình bày
+
+Slide chuyển theo chiều tiến hoặc lùi. Tiêu đề xuất hiện trước các ý chính.
+Hình Angela, sơ đồ và lộ trình có hiệu ứng mở đầu riêng.
+Các hiệu ứng tự chạy khi mở slide, không cần bấm thêm để hiện nội dung.
+
+Trang dùng CSS Animation có sẵn của trình duyệt, không cần thư viện bổ sung.
+Khi thiết bị bật giảm chuyển động, trang tắt các hiệu ứng.
+Bản in và PDF hiển thị đầy đủ nội dung, không có chuyển động.
+
 Hội thoại mẫu và giọng đọc trên trang chỉ minh họa ý tưởng.
 Hội thoại dùng câu trả lời soạn sẵn. Giọng đọc dùng tính năng có sẵn của trình duyệt.
 
