@@ -2,6 +2,7 @@
 
 Bản thuyết trình ý tưởng gồm 20 slide, phát triển từ `Angela_Hackathon_Pitch_20_Slides.html`.
 Nội dung đi từ lý do chọn đề tài đến giải pháp, thách thức, lộ trình và tương lai phát triển.
+Toàn bộ slide dùng nền xanh đậm, chữ sáng và điểm nhấn xanh ngọc, san hô.
 
 - `public/index.html`: nội dung slide và ghi chú thuyết trình.
 - `public/pitch.css`: giao diện, bố cục responsive và định dạng in.
