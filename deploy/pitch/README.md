@@ -1,8 +1,12 @@
 # Angela Hackathon Pitch
 
-Bản trình bày gồm 20 slide, lấy từ `Angela_Hackathon_Pitch_20_Slides.html`.
-File `public/index.html` chứa nội dung, hình ảnh và JavaScript.
-File `public/pitch.css` định dạng giao diện.
+Bản thuyết trình ý tưởng gồm 20 slide, phát triển từ `Angela_Hackathon_Pitch_20_Slides.html`.
+Nội dung đi từ lý do chọn đề tài đến giải pháp, thách thức, lộ trình và tương lai phát triển.
+
+- `public/index.html`: nội dung slide và ghi chú thuyết trình.
+- `public/pitch.css`: giao diện, bố cục responsive và định dạng in.
+- `public/pitch.js`: điều hướng, mục lục, ghi chú và tình huống minh họa.
+- `public/assets/`: hình Angela và phông chữ dùng tại máy.
 
 ## Xem tại máy
 
@@ -13,7 +17,28 @@ python3 -m http.server 8080 --directory deploy/pitch/public
 ```
 
 Mở <http://localhost:8080>.
-Dùng phím mũi tên để chuyển slide và phím `F` để mở toàn màn hình.
+
+| Phím | Thao tác |
+| --- | --- |
+| `←` / `→`, `Page Up` / `Page Down` | Chuyển slide |
+| `Home` / `End` | Về đầu / cuối |
+| `F` | Bật / tắt toàn màn hình |
+| `N` | Hiện / ẩn ghi chú của slide đang mở |
+| `O` | Mở mục lục |
+| `Esc` | Đóng mục lục hoặc thoát toàn màn hình |
+
+Trong mục lục, chọn **In / Lưu PDF** để xuất slide bằng trình duyệt.
+Bản in dùng khổ ngang 16:9 và ẩn các nút điều khiển.
+Điện thoại hỗ trợ vuốt ngang chuyển slide và cuộn dọc để đọc.
+
+Hội thoại mẫu và giọng đọc trên trang chỉ minh họa ý tưởng.
+Hội thoại dùng câu trả lời soạn sẵn. Giọng đọc dùng tính năng có sẵn của trình duyệt.
+
+## Hình ảnh và phông chữ
+
+Hình `public/assets/angela-study.png` tạo bằng công cụ imagegen tích hợp, dựa trên nhân vật trong bản pitch gốc.
+Prompt được lưu tại [`imagegen-prompt.txt`](./imagegen-prompt.txt).
+Manrope được tải từ Google Fonts và lưu trong `public/assets/fonts/`, kèm giấy phép OFL.
 
 ## Cập nhật nội dung
 
