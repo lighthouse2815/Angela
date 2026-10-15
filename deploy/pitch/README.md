@@ -1,7 +1,8 @@
 # Angela Hackathon Pitch
 
 Bản trình bày gồm 20 slide, lấy từ `Angela_Hackathon_Pitch_20_Slides.html`.
-File `public/index.html` chứa toàn bộ hình ảnh, CSS và JavaScript của bản gốc.
+File `public/index.html` chứa nội dung, hình ảnh và JavaScript.
+File `public/pitch.css` định dạng giao diện.
 
 ## Xem tại máy
 
@@ -16,7 +17,8 @@ Dùng phím mũi tên để chuyển slide và phím `F` để mở toàn màn h
 
 ## Cập nhật nội dung
 
-Sửa `deploy/pitch/public/index.html`, tạo commit rồi push lên GitHub.
+Sửa nội dung trong `deploy/pitch/public/index.html` hoặc giao diện trong `deploy/pitch/public/pitch.css`.
+Sau đó tạo commit rồi push lên GitHub.
 Trang tĩnh này không cần cài dependency hoặc build ứng dụng Angela.
 
 ## Cloudflare Pages
