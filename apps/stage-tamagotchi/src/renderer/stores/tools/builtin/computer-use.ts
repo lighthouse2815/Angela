@@ -4,7 +4,7 @@ import { defineInvoke } from '@moeru/eventa'
 import { createContext } from '@moeru/eventa/adapters/electron/renderer'
 import { rawTool } from '@xsai/tool'
 
-import { computerUseReadImage, computerUseRun } from '../../../../shared/eventa/computer-use'
+import { computerUsePasteText, computerUseReadImage, computerUseRun } from '../../../../shared/eventa/computer-use'
 
 /** Creates desktop-only tools. IPC clients are local to the elected renderer executor. */
 export async function computerUseTools(): Promise<Tool[]> {
@@ -13,6 +13,7 @@ export async function computerUseTools(): Promise<Tool[]> {
     const { context } = createContext(window.electron.ipcRenderer)
     return {
       run: defineInvoke(context, computerUseRun),
+      pasteText: defineInvoke(context, computerUsePasteText),
       readImage: defineInvoke(context, computerUseReadImage),
     }
   }
@@ -23,7 +24,7 @@ export async function computerUseTools(): Promise<Tool[]> {
   return [
     rawTool({
       name: 'computer_use',
-      description: 'Control native desktop apps, inspect windows, capture screenshots, and use keyboard or mouse input. On macOS, call app.probePermissions before visual tasks. If screen_recording is missing, ask the user to grant permission; captures can contain only a blank background. Start with argv ["invoke", "--help"], then inspect command help. Pass each CLI argument separately. Use explicit window targets when available. Preserve failure_details and verified metadata: exitCode 0 does not prove the intended UI effect. Use computer_use_read_image to view screenshot artifact paths. This tool acts on the local computer.',
+      description: 'Control native desktop apps, inspect windows, capture screenshots, and use keyboard or mouse input. On macOS, call app.probePermissions before visual tasks. If screen_recording is missing, ask the user to grant permission; captures can contain only a blank background. Start with argv ["invoke", "--help"], then inspect command help. Pass each CLI argument separately. Use explicit window targets when available. For Vietnamese or Unicode text, use computer_use_paste_text after focusing the input. Preserve failure_details and verified metadata: exitCode 0 does not prove the intended UI effect. Use computer_use_read_image to view screenshot artifact paths. This tool acts on the local computer.',
       parameters: {
         type: 'object',
         properties: {
@@ -34,6 +35,22 @@ export async function computerUseTools(): Promise<Tool[]> {
       },
       execute: async (input) => {
         const result = await client().run(input as { argv: string[] })
+        if (result.exitCode !== 0)
+          throw new Error(JSON.stringify(result))
+        return JSON.stringify(result)
+      },
+    }),
+    rawTool({
+      name: 'computer_use_paste_text',
+      description: 'Paste literal text, including Vietnamese, into the currently focused desktop control. Focus the intended input first. On Linux uinput, uses Electron clipboard and Ctrl+V without the RemoteDesktop portal. Refuses non-text clipboard formats. Restores the prior text unless the user copies something during delivery. Other backends use AUV input.pasteText. Delivery does not prove the control received the text. Inspect the resulting UI before claiming success.',
+      parameters: {
+        type: 'object',
+        properties: { text: { type: 'string', minLength: 1, maxLength: 16384, description: 'Literal text to paste into the focused control.' } },
+        required: ['text'],
+        additionalProperties: false,
+      },
+      execute: async (input) => {
+        const result = await client().pasteText(input as { text: string })
         if (result.exitCode !== 0)
           throw new Error(JSON.stringify(result))
         return JSON.stringify(result)

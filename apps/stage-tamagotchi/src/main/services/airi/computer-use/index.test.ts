@@ -13,7 +13,7 @@ import { AuvDaemonStartError, startAuv } from '@auv-js/sdk/node'
 import { createContext, defineInvoke } from '@moeru/eventa'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { computerUseRun } from '../../../../shared/eventa/computer-use'
+import { computerUsePasteText, computerUseRun } from '../../../../shared/eventa/computer-use'
 import { emitAppBeforeQuit } from '../../../libs/bootkit/lifecycle'
 import { setupComputerUse } from './index'
 
@@ -23,7 +23,16 @@ const appMock = vi.hoisted(() => ({
   getAppPath: vi.fn(),
 }))
 
-vi.mock('electron', () => ({ app: appMock }))
+const clipboardMock = vi.hoisted(() => {
+  let value = 'previous clipboard'
+  return {
+    availableFormats: vi.fn(() => ['text/plain']),
+    readText: vi.fn(() => value),
+    writeText: vi.fn((text: string) => { value = text }),
+    clear: vi.fn(),
+  }
+})
+vi.mock('electron', () => ({ app: appMock, clipboard: clipboardMock }))
 vi.mock('@auv-js/sdk/node', async (importOriginal) => {
   const original = await importOriginal<typeof import('@auv-js/sdk/node')>()
   return { ...original, startAuv: vi.fn() }
@@ -35,6 +44,7 @@ let localExecutable: string
 beforeEach(async () => {
   vi.clearAllMocks()
   vi.stubEnv('AUV_BINARY_PATH', '')
+  vi.stubEnv('AUV_LINUX_INPUT_BACKEND', '')
   appMock.isPackaged = true
   directory = await mkdtemp(join(tmpdir(), 'angela-auv-selection-'))
   localExecutable = join(directory, '.cache', 'auv', cliPackage.version, 'bin', process.platform === 'win32' ? 'auv.exe' : 'auv')
@@ -120,5 +130,31 @@ describe('computer use executable selection and startup errors', () => {
     await writeFile(localExecutable, '')
     await expect(invokeComputerUse()({ argv: ['invoke', '--help'] })).rejects.toThrow()
     expect(startAuv).toHaveBeenCalledWith(expect.objectContaining({ binaryPath: binaryPath() }))
+  })
+})
+
+describe('computer use paste IPC', () => {
+  it('validates text before starting the native backend', async () => {
+    const context = createContext<ElectronMainContextExtensions, ElectronMainEmitOptions>()
+    setupComputerUse(context)
+    await expect(defineInvoke(context, computerUsePasteText)({ text: '' })).rejects.toThrow()
+    expect(startAuv).not.toHaveBeenCalled()
+  })
+
+  it.runIf(process.platform === 'linux')('selects Electron clipboard for uinput and restores it on startup failure', async () => {
+    vi.stubEnv('AUV_LINUX_INPUT_BACKEND', 'uinput')
+    const context = createContext<ElectronMainContextExtensions, ElectronMainEmitOptions>()
+    setupComputerUse(context)
+    await expect(defineInvoke(context, computerUsePasteText)({ text: 'Xin chào Angela' })).rejects.toThrow('liblept.so.5')
+    expect(clipboardMock.writeText).toHaveBeenNthCalledWith(1, 'Xin chào Angela')
+    expect(clipboardMock.writeText).toHaveBeenNthCalledWith(2, 'previous clipboard')
+  })
+
+  it('rejects paste requests after application shutdown', async () => {
+    const context = createContext<ElectronMainContextExtensions, ElectronMainEmitOptions>()
+    setupComputerUse(context)
+    await emitAppBeforeQuit()
+    await expect(defineInvoke(context, computerUsePasteText)({ text: 'Xin chào' })).rejects.toThrow('stopped')
+    expect(startAuv).not.toHaveBeenCalled()
   })
 })

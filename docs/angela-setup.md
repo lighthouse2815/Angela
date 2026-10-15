@@ -279,7 +279,9 @@ Interface xuất hiện ở Portal frontend không chứng minh backend điều 
 [Niri chưa hỗ trợ RemoteDesktop](https://github.com/niri-wm/niri/issues/390).
 AUV có sẵn backend `uinput`, không cần thêm công cụ điều khiển khác.
 Kiểm thử đã đối chiếu nội dung ô nhập trong cửa sổ Electron riêng.
-Chưa kiểm chứng thao tác chuột hoặc nhập tiếng Việt qua backend này.
+Ngày 16/10/2026, bài thử cửa sổ riêng đã xác minh thêm hai click thật, nhập ASCII và dán đúng câu tiếng Việt.
+Bài thử đọc lại nội dung ô nhập và kiểm tra sự kiện đến từ hệ điều hành.
+Đây là kiểm chứng bộ thực thi, chưa chứng minh mô hình tự điều khiển được mọi ứng dụng.
 
 ### Chạy với uinput trên Linux
 
@@ -302,6 +304,35 @@ pkexec setfacl -x "u:$(id -u)" /dev/uinput
 ```
 
 Không có thay đổi group hoặc quy tắc udev vĩnh viễn.
+
+### Nhập tiếng Việt và kiểm thử desktop
+
+Khi cần nhập tiếng Việt, Angela có công cụ `computer_use_paste_text` trong **Use computer**.
+Cần đưa focus vào đúng ô nhập trước khi gọi công cụ.
+Trên Linux chạy uinput, công cụ dùng clipboard của Electron và gửi Ctrl+V qua AUV.
+Cách này không cần Portal RemoteDesktop. Backend khác tiếp tục dùng lệnh dán gốc của AUV.
+Công cụ chỉ nhận tối đa 16.384 ký tự mỗi lần.
+
+Công cụ từ chối nếu clipboard có ảnh, HTML hoặc định dạng riêng để tránh làm mất dữ liệu.
+Khi clipboard chỉ có văn bản, công cụ khôi phục nội dung cũ sau thao tác dán.
+Nếu bạn copy nội dung mới trong lúc dán, công cụ giữ nội dung mới.
+Kết quả gửi phím thành công chưa chứng minh ô nhập nhận đúng chữ. Angela cần kiểm tra giao diện sau thao tác.
+
+Sau khi cấp quyền uinput tạm thời như trên, chạy từ thư mục gốc repository:
+
+```bash
+AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AUV_LINUX_INPUT_BACKEND=uinput mise exec -- pnpm -F @proj-airi/stage-tamagotchi smoke:computer-use-input
+```
+
+Bài thử cần phiên Wayland đang mở khóa và đúng một màn hình.
+Nếu có `ELECTRON_RUN_AS_NODE=1`, bỏ biến này trước khi chạy.
+Cửa sổ thử nghiệm chạy toàn màn hình với hồ sơ tạm riêng, không dùng tài khoản hoặc tài liệu của bạn.
+Bài thử click nút, click ô nhập, nhập ASCII rồi dán câu tiếng Việt và đối chiếu nội dung thực tế.
+Bài thử giữ clipboard văn bản/HTML ban đầu ngoài thao tác dán và khôi phục sau kiểm tra.
+Định dạng clipboard khác bị từ chối. Không chuyển focus hoặc copy nội dung trong lúc bài thử chạy.
+Kết quả và ảnh cửa sổ thử nằm trong `.cache`. Có thể đổi thư mục bằng `SMOKE_REPORT_DIR`.
+Không cần mô hình AI hoặc API key cho bài thử này.
+Thu hồi quyền uinput tạm thời sau khi kiểm thử xong.
 
 ## Dữ liệu và cập nhật
 

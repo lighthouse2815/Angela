@@ -22,7 +22,7 @@ The selection is local to the composer. A new composer starts with it on. While 
 Turn it off before sending messages that must not receive computer-use tools.
 
 Only the current selection grants access, including retries and tool reruns. Historical messages do not grant access.
-The selected request receives `computer_use`, `computer_use_read_image`, and the learning directory tools described below.
+The selected request receives `computer_use`, `computer_use_paste_text`, `computer_use_read_image`, and the learning directory tools described below.
 The first tool accepts AUV arguments, such as `["invoke", "window.list"]`.
 Use `["invoke", "--help"]` and command-specific help to discover supported operations.
 The image tool returns a screenshot as model image content. It accepts only PNG and JPEG artifacts inside the app's computer-use store.
@@ -39,6 +39,16 @@ Nonzero exits retain AUV output and failure details as tool errors. A zero exit 
 On macOS, grant Accessibility and Screen Recording permissions to the launching app when the OS requests them.
 Some application actions also need Automation permission. If `app.probePermissions` reports missing screen-recording permission, a capture can contain only the desktop background despite exit code zero. Available commands depend on the OS and AUV backend.
 Use this feature for local native applications. It does not expose a remote-device gateway or replace the separate `services/computer-use-mcp` service.
+
+### Literal text and Vietnamese
+
+Use `computer_use_paste_text` for literal text, including Vietnamese, after focusing the intended input.
+On Linux with `AUV_LINUX_INPUT_BACKEND=uinput`, Electron supplies the clipboard and AUV sends Ctrl+V.
+This path does not need the RemoteDesktop clipboard portal. Other backends use native AUV paste.
+Desktop operations share one queue, so another tool call cannot interrupt the paste sequence.
+The Electron path accepts only plain text clipboard formats. It refuses images, HTML, and custom formats before input.
+It restores the previous text unless the clipboard changes during delivery. A new user copy takes precedence.
+The tool reports delivery without claiming that the application received the text. Inspect the resulting UI.
 
 ### Native development build
 
@@ -119,3 +129,21 @@ pnpm exec vitest run --config apps/stage-tamagotchi/vitest.node.config.ts apps/s
 Set `AIRI_COMPUTER_USE_LIVE=1` to include the CLI/private-daemon test. Set `AUV_BINARY_PATH` to test a native development build.
 It invokes help and an invalid argument, without injecting desktop input.
 For renderer verification, launch with `APP_REMOTE_DEBUG=true` and an unused `APP_REMOTE_DEBUG_PORT`, then attach `agent-browser` to the chat CDP target.
+
+### Live Linux input verification
+
+Run the smoke on an unlocked Wayland session with one output and temporary uinput access:
+
+```sh
+AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AUV_LINUX_INPUT_BACKEND=uinput pnpm -F @proj-airi/stage-tamagotchi smoke:computer-use-input
+```
+
+If the shell sets `ELECTRON_RUN_AS_NODE`, unset it before launch. The script never grants device permissions.
+It opens a separate fullscreen fixture with an isolated temporary profile. It needs no API key or application build.
+Native AUV input must click a button, focus the control, type ASCII, and paste an exact Vietnamese sentence.
+The fixture counts trusted events and reads the resulting value. DOM code never supplies clicks or input text.
+The smoke preserves text and HTML clipboard content around its plain text test. It refuses other initial formats.
+A new user copy during delivery takes precedence. Avoid changing focus while this input test runs.
+The report and fixture-only screenshot go into `.cache`. Set `SMOKE_REPORT_DIR` to choose the output directory.
+The test stops its private daemon and removes its temporary profile. Revoke temporary uinput access after the run.
+This proves native execution against the fixture. It does not prove model planning or arbitrary application control.

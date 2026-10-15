@@ -1,4 +1,5 @@
 import type { AuvDaemon } from '@auv-js/sdk/node'
+import type { Clipboard } from 'electron'
 
 import type { ComputerUseResult } from '../../../../shared/eventa/computer-use'
 
@@ -10,6 +11,7 @@ import { randomUUID } from 'node:crypto'
 import { chmod, mkdtemp, readFile, realpath, rm, stat } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { isAbsolute, join, relative, sep } from 'node:path'
+import { setTimeout } from 'node:timers/promises'
 import { promisify } from 'node:util'
 
 import { AuvDaemonStartError, startAuv } from '@auv-js/sdk/node'
@@ -20,7 +22,7 @@ const execFileAsync = promisify(execFile)
 const inputSchema = v.object({ argv: v.pipe(v.array(v.pipe(v.string(), v.maxLength(16384), v.check(value => !value.includes('\0')))), v.minLength(2), v.maxLength(128)) })
 
 /** Owns one private daemon and serializes desktop operations across renderer windows. */
-export function createComputerUseRuntime(options: { binaryPath: string, storeRoot: string }) {
+export function createComputerUseRuntime(options: { binaryPath: string, storeRoot: string, clipboard?: Pick<Clipboard, 'availableFormats' | 'readText' | 'writeText' | 'clear'> }) {
   let daemon: AuvDaemon | undefined
   let socketDirectory: string | undefined
   let disposed = false
@@ -95,44 +97,82 @@ export function createComputerUseRuntime(options: { binaryPath: string, storeRoo
     if (argv.some(arg => managedFlags.some(flag => arg === flag || arg.startsWith(`${flag}=`))))
       throw new Error('Computer use routing and storage are managed by AIRI.')
 
+    return enqueue(() => execute(argv))
+  }
+
+  async function execute(argv: string[]): Promise<ComputerUseResult> {
+    const active = await connect()
+    const command = [...argv]
+    if (!command.includes('--json') && !command.includes('--help') && !command.includes('-h') && command[1] !== 'help')
+      command.push('--json')
+    command.push('--store-root', options.storeRoot)
+    let stdout: string
+    let stderr: string
+    let exitCode = 0
+    try {
+      ({ stdout, stderr } = await execFileAsync(options.binaryPath, command, {
+        env: { ...process.env, AUV_ENDPOINT: active.connectionOptions.endpoint, AUV_CONTEXT: undefined },
+        encoding: 'utf8',
+        timeout: 120000,
+        maxBuffer: 4 * 1024 * 1024,
+        windowsHide: true,
+        signal: abort.signal,
+      }))
+    }
+    catch (error) {
+      // Nonzero exits carry AUV's failure_details. Spawn failures and timeouts throw.
+      if (!(error instanceof Error) || !('code' in error) || typeof error.code !== 'number'
+        || ('killed' in error && error.killed) || !('stdout' in error) || typeof error.stdout !== 'string'
+        || !('stderr' in error) || typeof error.stderr !== 'string') {
+        throw error
+      }
+      exitCode = error.code
+      stdout = error.stdout
+      stderr = error.stderr
+    }
+    let output: unknown = stdout.trim()
+    try {
+      output = JSON.parse(stdout)
+    }
+    catch {
+      // Help output is text. Keep it intact for command discovery.
+    }
+    return { argv, exitCode, output, stderr }
+  }
+
+  /** Pastes into the focused control. Input delivery does not verify the resulting control value. */
+  async function pasteText(input: unknown): Promise<ComputerUseResult> {
+    const { text } = v.parse(v.object({ text: v.pipe(v.string(), v.minLength(1), v.maxLength(16384), v.check(value => !value.includes('\0'))) }), input)
+    const clipboard = options.clipboard
+    if (!clipboard)
+      return run({ argv: ['invoke', 'input.pasteText', text] })
+
     return enqueue(async () => {
-      const active = await connect()
-      const command = [...argv]
-      if (!command.includes('--json') && !command.includes('--help') && !command.includes('-h') && command[1] !== 'help')
-        command.push('--json')
-      command.push('--store-root', options.storeRoot)
-      let stdout: string
-      let stderr: string
-      let exitCode = 0
+      // Electron avoids the RemoteDesktop clipboard portal on Linux uinput.
+      // Refuse rich clipboard data because a text snapshot cannot restore it.
+      const formats = clipboard.availableFormats()
+      if (formats.some(format => !/^text\/plain(?:;charset=utf-8)?$/i.test(format)))
+        throw new Error('Clipboard contains non-text data. Copy plain text before pasting with computer use.')
+      const previous = clipboard.readText()
+      clipboard.writeText(text)
+      let restored = false
+      let result: ComputerUseResult
       try {
-        ({ stdout, stderr } = await execFileAsync(options.binaryPath, command, {
-          env: { ...process.env, AUV_ENDPOINT: active.connectionOptions.endpoint, AUV_CONTEXT: undefined },
-          encoding: 'utf8',
-          timeout: 120000,
-          maxBuffer: 4 * 1024 * 1024,
-          windowsHide: true,
-          signal: abort.signal,
-        }))
+        result = await execute(['invoke', 'input.key', 'ctrl+v'])
+        // The receiving process reads the clipboard asynchronously after the key event.
+        await setTimeout(250, undefined, { signal: abort.signal })
       }
-      catch (error) {
-        // Nonzero exits carry AUV's failure_details. Spawn failures and timeouts throw.
-        if (!(error instanceof Error) || !('code' in error) || typeof error.code !== 'number'
-          || ('killed' in error && error.killed) || !('stdout' in error) || typeof error.stdout !== 'string'
-          || !('stderr' in error) || typeof error.stderr !== 'string') {
-          throw error
+      finally {
+        // A user copy during delivery takes precedence over the previous snapshot.
+        if (clipboard.readText() === text && clipboard.availableFormats().every(format => /^text\/plain(?:;charset=utf-8)?$/i.test(format))) {
+          if (formats.length)
+            clipboard.writeText(previous)
+          else
+            clipboard.clear()
+          restored = true
         }
-        exitCode = error.code
-        stdout = error.stdout
-        stderr = error.stderr
       }
-      let output: unknown = stdout.trim()
-      try {
-        output = JSON.parse(stdout)
-      }
-      catch {
-        // Help output is text. Keep it intact for command discovery.
-      }
-      return { argv, exitCode, output, stderr }
+      return { ...result, output: { keyboard: result.output, clipboardRestored: restored, verified: false } }
     })
   }
 
@@ -169,5 +209,5 @@ export function createComputerUseRuntime(options: { binaryPath: string, storeRoo
     }
   }
 
-  return { run, readImage, dispose }
+  return { run, pasteText, readImage, dispose }
 }

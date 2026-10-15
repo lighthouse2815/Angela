@@ -7,10 +7,10 @@ import { env, platform } from 'node:process'
 
 import { binaryPath } from '@auv-js/cli/binary'
 import { defineInvokeHandler } from '@moeru/eventa'
-import { app } from 'electron'
+import { app, clipboard } from 'electron'
 import { object, parse, string } from 'valibot'
 
-import { computerUseReadImage, computerUseRun } from '../../../../shared/eventa/computer-use'
+import { computerUsePasteText, computerUseReadImage, computerUseRun } from '../../../../shared/eventa/computer-use'
 import { onAppBeforeQuit } from '../../../libs/bootkit/lifecycle'
 import { createComputerUseRuntime } from './runtime'
 
@@ -47,11 +47,13 @@ export function setupComputerUse(context: ReturnType<typeof createContext>['cont
       runtime = createComputerUseRuntime({
         binaryPath: executable,
         storeRoot: join(app.getPath('userData'), 'computer-use'),
+        clipboard: platform === 'linux' && env.AUV_LINUX_INPUT_BACKEND === 'uinput' ? clipboard : undefined,
       })
     }
     return runtime
   }
   defineInvokeHandler(context, computerUseRun, input => getRuntime().run(input))
+  defineInvokeHandler(context, computerUsePasteText, input => getRuntime().pasteText(input))
   defineInvokeHandler(context, computerUseReadImage, input => getRuntime().readImage(input))
   onAppBeforeQuit(async () => {
     stopped = true

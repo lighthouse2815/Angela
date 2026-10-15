@@ -12,6 +12,7 @@ import { widgetsTools } from './builtin/widgets'
 
 export const computerUseToolReferences = [
   { name: 'computer_use' },
+  { name: 'computer_use_paste_text' },
   { name: 'computer_use_read_image' },
   { name: 'study_workspace_directory' },
   { name: 'study_workspace_list' },

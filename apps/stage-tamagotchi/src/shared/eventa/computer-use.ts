@@ -10,3 +10,5 @@ export interface ComputerUseResult {
 
 export const computerUseRun = defineInvokeEventa<ComputerUseResult, { argv: string[] }>('eventa:invoke:computer-use:run')
 export const computerUseReadImage = defineInvokeEventa<string, { path: string }>('eventa:invoke:computer-use:read-image')
+
+export const computerUsePasteText = defineInvokeEventa<ComputerUseResult, { text: string }>('eventa:invoke:computer-use:paste-text')
