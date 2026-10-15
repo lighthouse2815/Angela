@@ -61,6 +61,12 @@ Thanh âm lượng nằm cạnh nút trên màn hình lớn. Điện thoại dù
 Khi phát lời chào mẫu, âm lượng nhạc giảm còn một phần tư và trở lại sau lời chào.
 Nếu trình duyệt chặn phát nhạc, bấm **Nhạc nền** để bắt đầu.
 
+## PowerPoint
+
+[`Angela_Thuyet_Trinh.pptx`](./Angela_Thuyet_Trinh.pptx) gồm 20 slide 16:9, giữ bố cục HTML bằng ảnh.
+Mỗi slide có lời thuyết minh trong ghi chú. Chữ trong ảnh không sửa trực tiếp được.
+Hiệu ứng và âm thanh nằm trong bản HTML và video.
+
 ## Video thuyết trình
 
 [`video/angela-pitch-vi.mp4`](./video/angela-pitch-vi.mp4) là bản MP4 ngang 1920 × 1080, 30 khung hình mỗi giây.
