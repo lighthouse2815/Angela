@@ -31,6 +31,8 @@ function startMusic() {
   musicRequested = true
   musicStatus.textContent = ''
   backgroundMusic.play().catch((error) => {
+    if (error.name === 'NotAllowedError')
+      musicRequested = false
     if (error.name !== 'AbortError')
       musicStatus.textContent = 'Chưa phát được nhạc nền. Bấm nút Nhạc nền để thử lại.'
   })
@@ -55,6 +57,8 @@ document.addEventListener('click', (event) => {
     startMusic()
 })
 updateMusicVolume()
+backgroundMusic.autoplay = true
+startMusic()
 
 slides.forEach((slide, index) => {
   const reveals = slide.querySelectorAll(`

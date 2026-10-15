@@ -53,7 +53,8 @@ Hội thoại dùng câu trả lời soạn sẵn. Giọng đọc dùng tính n�
 
 Bản pitch dùng “Doki Doki Literature Club! (Main Theme)” của Team Salvato, từ file MP3 người dùng cung cấp.
 File nằm tại `public/assets/doki-doki-main-theme.mp3`.
-Nhạc bắt đầu ở lần bấm hoặc chuyển slide bằng bàn phím đầu tiên, với âm lượng 18%.
+Trang tự phát nhạc ngay khi mở, với âm lượng 18%, nếu trình duyệt cho phép.
+Nếu trình duyệt chặn tự phát, nhạc bắt đầu ở lần bấm hoặc chuyển slide bằng bàn phím đầu tiên.
 Nhạc phát liên tục qua các slide và tự lặp khi hết bài.
 Nút **Nhạc nền** ở thanh dưới cùng dùng để tạm dừng hoặc phát tiếp.
 Thanh âm lượng nằm cạnh nút trên màn hình lớn. Điện thoại dùng nút bật hoặc tạm dừng.
