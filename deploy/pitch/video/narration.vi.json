@@ -1,0 +1,86 @@
+{
+  "voice": "vi-VN-HoaiMyNeural",
+  "rate": "+0%",
+  "slides": [
+    {
+      "title": "Angela — Người bạn AI",
+      "text": "Xin chào mọi người. Hôm nay, mình xin giới thiệu Angela, ý tưởng về một người bạn AI đồng hành trong học tập. Angela giúp người học trò chuyện, ghi nhớ phần đang học và cùng vượt qua những bài khó. Mục tiêu là để mỗi buổi học đều có một bước tiến nhỏ."
+    },
+    {
+      "title": "Lý do chọn đề tài",
+      "text": "Lý do chọn đề tài bắt đầu từ một trải nghiệm quen thuộc: học một mình và gặp chỗ bí. Người học cần nơi để hỏi lại, thử sai và được giải thích dễ hiểu. Với các công cụ AI có sẵn, chúng mình có thể bắt đầu từ việc hỗ trợ học lập trình bằng tiếng Việt."
+    },
+    {
+      "title": "Vấn đề trong việc tự học",
+      "text": "Có ba vấn đề thường gặp. Đọc lời giải thấy hiểu, nhưng tự làm lại chưa biết bắt đầu. Những lỗi nhỏ, như quên điều kiện dừng của đệ quy, cứ lặp lại. Sang buổi sau, người học lại mất thời gian nhớ mình đã học đến đâu. Hội thoại, bài tập và ghi chú chưa được nối liền."
+    },
+    {
+      "title": "Người dùng hướng tới",
+      "text": "Nhóm người dùng đầu tiên là sinh viên và người mới tự học lập trình. Chúng mình tập trung vào bài Python nhỏ, ví dụ ngắn và gợi ý từng bước. Lập trình có đầu vào, đầu ra để kiểm tra. Sau khi kiểm chứng cách học này, Angela mới mở rộng sang ngoại ngữ và kỹ năng khác."
+    },
+    {
+      "title": "Cơ hội phát triển",
+      "text": "Câu trả lời chỉ là khởi đầu. Điều Angela muốn thử là một quá trình nối tiếp: hỏi bài, thực hành, lưu chỗ vướng rồi quay lại ôn. Chúng mình dùng mô hình AI có sẵn và tập trung vào cách tổ chức việc học. Giá trị cần kiểm chứng là người học có tiếp tục học được hay không."
+    },
+    {
+      "title": "Ý tưởng Angela",
+      "text": "Vậy nếu có một người bạn AI nhớ bài đang dở thì sao? Đó là ý tưởng của Angela. Người học có thể trò chuyện, nói rõ phần mình chưa hiểu và nhận gợi ý cho bước tiếp theo. Nhân vật tạo cảm giác gần gũi, để việc hỏi lại trở nên tự nhiên hơn."
+    },
+    {
+      "title": "Ba thành phần cốt lõi",
+      "text": "Angela kết nối ba phần: trò chuyện để hiểu, ghi nhớ để tiếp nối, và thực hành để kiểm tra. Hội thoại ưu tiên ví dụ và gợi ý. Trí nhớ giữ mục tiêu, lỗi thường gặp và lịch ôn. Phần chạy code trong môi trường giới hạn là hướng phát triển tiếp theo, chưa phải tính năng đã hoàn thiện."
+    },
+    {
+      "title": "Một buổi học cùng Angela",
+      "text": "Ví dụ, người học chưa hiểu đệ quy. Angela gợi ý theo dõi từng lần gọi hàm và tìm điều kiện dừng, thay vì đưa ngay lời giải. Sau đó, người học tự sửa bài, lưu chỗ còn vướng và hẹn buổi ôn. Hội thoại trên slide là minh họa dựng sẵn cho ý tưởng này."
+    },
+    {
+      "title": "Trí nhớ và lịch ôn",
+      "text": "Trí nhớ học tập giữ những gì cần cho lần học tiếp theo: mục tiêu, nội dung đang học, cách giải thích phù hợp và lỗi hay mắc. Dữ liệu hiện lưu trên máy, tách theo nhân vật. Người dùng có quyền xem, sửa, xóa hoặc tắt trí nhớ. Lịch ôn giúp nhắc lại phần còn chưa chắc."
+    },
+    {
+      "title": "Các cách tương tác",
+      "text": "Trải nghiệm ưu tiên là học trên web và máy tính, ngay cạnh tài liệu và bài tập. Người học có thể gõ khi làm bài hoặc dùng giọng nói khi muốn hỏi nhanh. Điện thoại và Telegram là hướng mở rộng. Việc đồng bộ trí nhớ học tập giữa các kênh vẫn cần được phát triển."
+    },
+    {
+      "title": "Ý tưởng thực hành trong sandbox",
+      "text": "Một hướng tiếp theo là cho Angela chạy bài code nhỏ trong môi trường cách ly, rồi dùng đầu ra để giải thích. Ví dụ, hàm giai thừa cần điều kiện dừng khi n bằng không. Đây mới là mô phỏng. Môi trường thực thi còn cần giới hạn quyền truy cập, tài nguyên và thời gian chạy."
+    },
+    {
+      "title": "Giá trị khác biệt",
+      "text": "Điểm nhấn của Angela là buổi học được nối tiếp. Nhân vật giúp người học dễ mở lời. Trí nhớ gắn với mục tiêu và bài còn dở. Thực hành đi cùng lịch quay lại ôn. Đây là lựa chọn thiết kế cần thử nghiệm, chưa phải lợi thế đã được đo so với các sản phẩm khác."
+    },
+    {
+      "title": "Nền tảng hiện tại",
+      "text": "Dự án hiện đã có nhân vật, hội thoại kết nối nhà cung cấp AI, ghi nhớ học tập và quản lý lịch ôn. Những phần cần làm tiếp gồm chạy code có giới hạn, đồng bộ nhiều kênh và thử nghiệm với người học. Chúng mình phân biệt rõ phần đã có với phần mới nằm trong định hướng."
+    },
+    {
+      "title": "Hướng triển khai kỹ thuật",
+      "text": "Về triển khai, giao diện web và máy tính kết nối hội thoại, giọng nói và nhân vật. Angela tổ chức ngữ cảnh học tập, gọi mô hình AI qua giao diện lập trình và lưu trí nhớ trên máy. Môi trường chạy code và đồng bộ được bổ sung theo nhu cầu. Chúng mình ưu tiên tái sử dụng công cụ phù hợp."
+    },
+    {
+      "title": "Thách thức của đề tài",
+      "text": "Có bốn thách thức chính. AI có thể giải thích sai. Trí nhớ có thể lưu dữ liệu không chính xác hoặc riêng tư. Hội thoại và giọng nói làm tăng độ trễ, chi phí. Chạy code cần được cách ly an toàn. Sau cùng, một bản demo chạy được vẫn phải trả lời: người học có học tốt hơn không?"
+    },
+    {
+      "title": "Hướng giải quyết thách thức",
+      "text": "Hướng giải quyết là kiểm tra lời giải bằng ví dụ và bài làm. Cho người dùng kiểm soát dữ liệu ghi nhớ. Đo thời gian phản hồi và chi phí trước khi mở rộng. Với code, cần cách ly và giới hạn tài nguyên. Đây là các việc cần triển khai, kiểm tra và đánh giá, thay vì coi rủi ro đã được giải quyết."
+    },
+    {
+      "title": "Lộ trình xây dựng",
+      "text": "Lộ trình có ba giai đoạn. Đầu tiên, hoàn thiện một buổi học với hội thoại tiếng Việt, ghi nhớ và lịch ôn. Tiếp theo, cho người học thật sử dụng, quan sát và sửa những điểm khó hiểu. Sau khi có kết quả, mới mở rộng chạy code, đồng bộ và nội dung học. Mỗi giai đoạn có một kết quả cần đạt."
+    },
+    {
+      "title": "Cách đánh giá hiệu quả",
+      "text": "Hiệu quả được đánh giá bằng bài làm và việc quay lại học. Người học có giải thích lại được không? Có tự làm được bài tương tự không? Có quay lại ôn và nhận đúng ngữ cảnh không? Chúng mình dự kiến so sánh các bài có độ khó tương đương. Hiện chưa có kết quả thử nghiệm với người học."
+    },
+    {
+      "title": "Tương lai phát triển",
+      "text": "Trong tương lai, Angela có thể gợi ý bài theo lỗi thường gặp và điều chỉnh lịch ôn. Sau đó là tiếp nối việc học giữa nhiều thiết bị. Xa hơn, sản phẩm có thể hỗ trợ ngoại ngữ và tài liệu cá nhân. Nguyên tắc là chỉ thêm tính năng khi nó giúp người học tiến thêm một bước."
+    },
+    {
+      "title": "Kết thúc và trao đổi",
+      "text": "Angela bắt đầu từ một người bạn để hỏi và hướng tới một trợ lý biết bạn đang học gì. Một bài khó, một bước nhỏ, rồi cùng học tiếp. Điều chúng mình cần tiếp theo là người dùng thử, phản hồi cụ thể và kết quả bài làm để kiểm chứng ý tưởng. Cảm ơn mọi người đã lắng nghe."
+    }
+  ]
+}

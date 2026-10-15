@@ -61,6 +61,59 @@ Thanh âm lượng nằm cạnh nút trên màn hình lớn. Điện thoại dù
 Khi phát lời chào mẫu, âm lượng nhạc giảm còn một phần tư và trở lại sau lời chào.
 Nếu trình duyệt chặn phát nhạc, bấm **Nhạc nền** để bắt đầu.
 
+## Video thuyết trình
+
+[`video/angela-pitch-vi.mp4`](./video/angela-pitch-vi.mp4) là bản MP4 ngang 1920 × 1080, 30 khung hình mỗi giây.
+Video giữ chuyển động của 20 slide, có giọng nữ AI tiếng Việt và nhạc nền ở âm lượng nhỏ.
+Giọng đọc dùng `vi-VN-HoaiMyNeural`, được tạo qua công cụ [edge-tts](https://github.com/rany2/edge-tts).
+Lời thuyết minh nằm trong [`video/narration.vi.json`](./video/narration.vi.json).
+Nội dung phân biệt tính năng đã có với định hướng.
+
+MP4 có 20 chương và phụ đề tiếng Việt có thể bật trong trình phát hỗ trợ.
+Phụ đề rời nằm tại [`video/angela-pitch-vi.srt`](./video/angela-pitch-vi.srt).
+[`video/timing.json`](./video/timing.json) lưu thời điểm mở slide và bắt đầu lời đọc.
+Video nằm ngoài `public/`, nên không làm tăng dung lượng tải trang pitch.
+
+### Xuất lại video
+
+Cần Node.js, dependency Playwright của repository, Python 3, FFmpeg và FFprobe.
+Công cụ xuất dùng Edge TTS CLI riêng, không thêm dependency vào ứng dụng.
+Lần tạo giọng đầu tiên cần kết nối Internet. Các lần sau tái sử dụng âm thanh khi lời đọc không đổi.
+
+Từ thư mục gốc repository, chuẩn bị công cụ:
+
+```bash
+python3 -m venv /tmp/angela-video-tools
+/tmp/angela-video-tools/bin/python -m pip install edge-tts==7.3.1
+pnpm exec playwright install chromium
+```
+
+Chạy máy chủ trang pitch trong một terminal:
+
+```bash
+python3 -m http.server 8098 --bind 127.0.0.1 --directory deploy/pitch/public
+```
+
+Trong terminal khác, xuất video:
+
+```bash
+EDGE_TTS_BIN=/tmp/angela-video-tools/bin/edge-tts node deploy/pitch/export-video.mjs
+```
+
+`PITCH_URL` đổi địa chỉ máy chủ. `VIDEO_WORK_DIR` đổi thư mục chứa âm thanh tạm và bản ghi WebM.
+Công cụ ghi hình theo thời lượng lời đọc rồi ghép âm thanh, nhạc nền, phụ đề và chương bằng FFmpeg.
+Các nút tương tác được ẩn trong bản ghi. HTML gốc tiếp tục hoạt động như trước.
+Mỗi lần chạy ghi đè MP4, phụ đề và dữ liệu thời gian trong `video/`.
+
+Nếu bước ghép bị gián đoạn sau khi ghi hình, dùng lại bản ghi:
+
+```bash
+VIDEO_RESUME=1 EDGE_TTS_BIN=/tmp/angela-video-tools/bin/edge-tts node deploy/pitch/export-video.mjs
+```
+
+Chế độ này kiểm tra nội dung HTML, CSS, JavaScript và lời đọc với bản ghi đã lưu.
+Nếu nội dung thay đổi, chạy lại không có `VIDEO_RESUME` để ghi hình mới.
+
 ## Hình ảnh và phông chữ
 
 Hình `public/assets/angela-study.png` tạo bằng công cụ imagegen tích hợp, dựa trên nhân vật trong bản pitch gốc.

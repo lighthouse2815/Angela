@@ -1,0 +1,339 @@
+1
+00:00:00,700 --> 00:00:02,687
+Xin chào mọi người.
+
+2
+00:00:02,637 --> 00:00:08,512
+Hôm nay, mình xin giới thiệu Angela, ý tưởng về một người bạn AI đồng hành trong học tập.
+
+3
+00:00:08,512 --> 00:00:13,950
+Angela giúp người học trò chuyện, ghi nhớ phần đang học và cùng vượt qua những bài khó.
+
+4
+00:00:13,950 --> 00:00:17,762
+Mục tiêu là để mỗi buổi học đều có một bước tiến nhỏ.
+
+5
+00:00:19,580 --> 00:00:24,917
+Lý do chọn đề tài bắt đầu từ một trải nghiệm quen thuộc: học một mình và gặp chỗ bí.
+
+6
+00:00:24,867 --> 00:00:29,430
+Người học cần nơi để hỏi lại, thử sai và được giải thích dễ hiểu.
+
+7
+00:00:29,430 --> 00:00:35,442
+Với các công cụ AI có sẵn, chúng mình có thể bắt đầu từ việc hỗ trợ học lập trình bằng tiếng Việt.
+
+8
+00:00:37,220 --> 00:00:39,507
+Có ba vấn đề thường gặp.
+
+9
+00:00:39,457 --> 00:00:43,632
+Đọc lời giải thấy hiểu, nhưng tự làm lại chưa biết bắt đầu.
+
+10
+00:00:43,632 --> 00:00:48,295
+Những lỗi nhỏ, như quên điều kiện dừng của đệ quy, cứ lặp lại.
+
+11
+00:00:48,295 --> 00:00:52,795
+Sang buổi sau, người học lại mất thời gian nhớ mình đã học đến đâu.
+
+12
+00:00:52,795 --> 00:00:56,682
+Hội thoại, bài tập và ghi chú chưa được nối liền.
+
+13
+00:00:58,460 --> 00:01:02,660
+Nhóm người dùng đầu tiên là sinh viên và người mới tự học lập trình.
+
+14
+00:01:02,610 --> 00:01:07,510
+Chúng mình tập trung vào bài Python nhỏ, ví dụ ngắn và gợi ý từng bước.
+
+15
+00:01:07,510 --> 00:01:11,197
+Lập trình có đầu vào, đầu ra để kiểm tra.
+
+16
+00:01:11,197 --> 00:01:16,710
+Sau khi kiểm chứng cách học này, Angela mới mở rộng sang ngoại ngữ và kỹ năng khác.
+
+17
+00:01:18,500 --> 00:01:21,062
+Câu trả lời chỉ là khởi đầu.
+
+18
+00:01:21,012 --> 00:01:27,875
+Điều Angela muốn thử là một quá trình nối tiếp: hỏi bài, thực hành, lưu chỗ vướng rồi quay lại ôn.
+
+19
+00:01:27,875 --> 00:01:32,425
+Chúng mình dùng mô hình AI có sẵn và tập trung vào cách tổ chức việc học.
+
+20
+00:01:32,425 --> 00:01:36,487
+Giá trị cần kiểm chứng là người học có tiếp tục học được hay không.
+
+21
+00:01:38,300 --> 00:01:42,362
+Vậy nếu có một người bạn AI nhớ bài đang dở thì sao?
+
+22
+00:01:42,312 --> 00:01:45,087
+Đó là ý tưởng của Angela.
+
+23
+00:01:45,087 --> 00:01:50,650
+Người học có thể trò chuyện, nói rõ phần mình chưa hiểu và nhận gợi ý cho bước tiếp theo.
+
+24
+00:01:50,650 --> 00:01:55,412
+Nhân vật tạo cảm giác gần gũi, để việc hỏi lại trở nên tự nhiên hơn.
+
+25
+00:01:57,140 --> 00:02:03,765
+Angela kết nối ba phần: trò chuyện để hiểu, ghi nhớ để tiếp nối, và thực hành để kiểm tra.
+
+26
+00:02:03,715 --> 00:02:09,490
+Hội thoại ưu tiên ví dụ và gợi ý. Trí nhớ giữ mục tiêu, lỗi thường gặp và lịch ôn.
+
+27
+00:02:09,490 --> 00:02:15,090
+Phần chạy code trong môi trường giới hạn là hướng phát triển tiếp theo, chưa phải tính năng đã hoàn thiện.
+
+28
+00:02:16,900 --> 00:02:20,012
+Ví dụ, người học chưa hiểu đệ quy.
+
+29
+00:02:19,962 --> 00:02:26,012
+Angela gợi ý theo dõi từng lần gọi hàm và tìm điều kiện dừng, thay vì đưa ngay lời giải.
+
+30
+00:02:26,012 --> 00:02:30,950
+Sau đó, người học tự sửa bài, lưu chỗ còn vướng và hẹn buổi ôn.
+
+31
+00:02:30,950 --> 00:02:34,912
+Hội thoại trên slide là minh họa dựng sẵn cho ý tưởng này.
+
+32
+00:02:36,620 --> 00:02:44,120
+Trí nhớ học tập giữ những gì cần cho lần học tiếp theo: mục tiêu, nội dung đang học, cách giải thích phù hợp và lỗi hay mắc.
+
+33
+00:02:44,070 --> 00:02:47,520
+Dữ liệu hiện lưu trên máy, tách theo nhân vật.
+
+34
+00:02:47,520 --> 00:02:51,832
+Người dùng có quyền xem, sửa, xóa hoặc tắt trí nhớ.
+
+35
+00:02:51,832 --> 00:02:54,782
+Lịch ôn giúp nhắc lại phần còn chưa chắc.
+
+36
+00:02:56,580 --> 00:03:01,655
+Trải nghiệm ưu tiên là học trên web và máy tính, ngay cạnh tài liệu và bài tập.
+
+37
+00:03:01,605 --> 00:03:05,980
+Người học có thể gõ khi làm bài hoặc dùng giọng nói khi muốn hỏi nhanh.
+
+38
+00:03:05,980 --> 00:03:09,367
+Điện thoại và Telegram là hướng mở rộng.
+
+39
+00:03:09,367 --> 00:03:13,580
+Việc đồng bộ trí nhớ học tập giữa các kênh vẫn cần được phát triển.
+
+40
+00:03:15,380 --> 00:03:21,692
+Một hướng tiếp theo là cho Angela chạy bài code nhỏ trong môi trường cách ly, rồi dùng đầu ra để giải thích.
+
+41
+00:03:21,642 --> 00:03:26,142
+Ví dụ, hàm giai thừa cần điều kiện dừng khi n bằng không.
+
+42
+00:03:26,142 --> 00:03:28,342
+Đây mới là mô phỏng.
+
+43
+00:03:28,342 --> 00:03:33,267
+Môi trường thực thi còn cần giới hạn quyền truy cập, tài nguyên và thời gian chạy.
+
+44
+00:03:35,020 --> 00:03:38,645
+Điểm nhấn của Angela là buổi học được nối tiếp.
+
+45
+00:03:38,595 --> 00:03:41,395
+Nhân vật giúp người học dễ mở lời.
+
+46
+00:03:41,395 --> 00:03:44,770
+Trí nhớ gắn với mục tiêu và bài còn dở.
+
+47
+00:03:44,770 --> 00:03:47,457
+Thực hành đi cùng lịch quay lại ôn.
+
+48
+00:03:47,457 --> 00:03:53,245
+Đây là lựa chọn thiết kế cần thử nghiệm, chưa phải lợi thế đã được đo so với các sản phẩm khác.
+
+49
+00:03:54,980 --> 00:04:01,780
+Dự án hiện đã có nhân vật, hội thoại kết nối nhà cung cấp AI, ghi nhớ học tập và quản lý lịch ôn.
+
+50
+00:04:01,730 --> 00:04:07,555
+Những phần cần làm tiếp gồm chạy code có giới hạn, đồng bộ nhiều kênh và thử nghiệm với người học.
+
+51
+00:04:07,555 --> 00:04:11,780
+Chúng mình phân biệt rõ phần đã có với phần mới nằm trong định hướng.
+
+52
+00:04:13,580 --> 00:04:19,205
+Về triển khai, giao diện web và máy tính kết nối hội thoại, giọng nói và nhân vật.
+
+53
+00:04:19,155 --> 00:04:25,480
+Angela tổ chức ngữ cảnh học tập, gọi mô hình AI qua giao diện lập trình và lưu trí nhớ trên máy.
+
+54
+00:04:25,480 --> 00:04:29,305
+Môi trường chạy code và đồng bộ được bổ sung theo nhu cầu.
+
+55
+00:04:29,305 --> 00:04:32,680
+Chúng mình ưu tiên tái sử dụng công cụ phù hợp.
+
+56
+00:04:34,460 --> 00:04:36,510
+Có bốn thách thức chính.
+
+57
+00:04:36,460 --> 00:04:38,947
+AI có thể giải thích sai.
+
+58
+00:04:38,947 --> 00:04:42,797
+Trí nhớ có thể lưu dữ liệu không chính xác hoặc riêng tư.
+
+59
+00:04:42,797 --> 00:04:46,697
+Hội thoại và giọng nói làm tăng độ trễ, chi phí.
+
+60
+00:04:46,697 --> 00:04:49,397
+Chạy code cần được cách ly an toàn.
+
+61
+00:04:49,397 --> 00:04:54,922
+Sau cùng, một bản demo chạy được vẫn phải trả lời: người học có học tốt hơn không?
+
+62
+00:04:56,660 --> 00:05:00,785
+Hướng giải quyết là kiểm tra lời giải bằng ví dụ và bài làm.
+
+63
+00:05:00,735 --> 00:05:03,722
+Cho người dùng kiểm soát dữ liệu ghi nhớ.
+
+64
+00:05:03,722 --> 00:05:07,410
+Đo thời gian phản hồi và chi phí trước khi mở rộng.
+
+65
+00:05:07,410 --> 00:05:10,935
+Với code, cần cách ly và giới hạn tài nguyên.
+
+66
+00:05:10,935 --> 00:05:16,835
+Đây là các việc cần triển khai, kiểm tra và đánh giá, thay vì coi rủi ro đã được giải quyết.
+
+67
+00:05:18,660 --> 00:05:21,135
+Lộ trình có ba giai đoạn.
+
+68
+00:05:21,085 --> 00:05:26,347
+Đầu tiên, hoàn thiện một buổi học với hội thoại tiếng Việt, ghi nhớ và lịch ôn.
+
+69
+00:05:26,347 --> 00:05:31,310
+Tiếp theo, cho người học thật sử dụng, quan sát và sửa những điểm khó hiểu.
+
+70
+00:05:31,310 --> 00:05:36,460
+Sau khi có kết quả, mới mở rộng chạy code, đồng bộ và nội dung học.
+
+71
+00:05:36,460 --> 00:05:39,397
+Mỗi giai đoạn có một kết quả cần đạt.
+
+72
+00:05:41,180 --> 00:05:45,067
+Hiệu quả được đánh giá bằng bài làm và việc quay lại học.
+
+73
+00:05:45,017 --> 00:05:47,655
+Người học có giải thích lại được không?
+
+74
+00:05:47,655 --> 00:05:50,405
+Có tự làm được bài tương tự không?
+
+75
+00:05:50,405 --> 00:05:53,517
+Có quay lại ôn và nhận đúng ngữ cảnh không?
+
+76
+00:05:53,517 --> 00:05:57,355
+Chúng mình dự kiến so sánh các bài có độ khó tương đương.
+
+77
+00:05:57,355 --> 00:06:00,517
+Hiện chưa có kết quả thử nghiệm với người học.
+
+78
+00:06:02,220 --> 00:06:07,632
+Trong tương lai, Angela có thể gợi ý bài theo lỗi thường gặp và điều chỉnh lịch ôn.
+
+79
+00:06:07,582 --> 00:06:11,045
+Sau đó là tiếp nối việc học giữa nhiều thiết bị.
+
+80
+00:06:11,045 --> 00:06:15,695
+Xa hơn, sản phẩm có thể hỗ trợ ngoại ngữ và tài liệu cá nhân.
+
+81
+00:06:15,695 --> 00:06:19,957
+Nguyên tắc là chỉ thêm tính năng khi nó giúp người học tiến thêm một bước.
+
+82
+00:06:21,700 --> 00:06:27,212
+Angela bắt đầu từ một người bạn để hỏi và hướng tới một trợ lý biết bạn đang học gì.
+
+83
+00:06:27,162 --> 00:06:31,050
+Một bài khó, một bước nhỏ, rồi cùng học tiếp.
+
+84
+00:06:31,050 --> 00:06:37,375
+Điều chúng mình cần tiếp theo là người dùng thử, phản hồi cụ thể và kết quả bài làm để kiểm chứng ý tưởng.
+
+85
+00:06:37,375 --> 00:06:40,012
+Cảm ơn mọi người đã lắng nghe.
