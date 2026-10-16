@@ -584,7 +584,7 @@ This budget does not change the model context budget controlled by `ANGELA_CONTE
 New model-saved facts include a source quote and session ID. The model marks task-independent identity and communication facts as core.
 Use pin/unpin to correct that selection directly. Existing unclassified facts remain searchable.
 The host offers `skill_save` for reusable workflows with current-user evidence or successful observed MCP output.
-Skill records include the source kind and session. Proposed plans, model answers and failed tool outcomes cannot serve as host verification evidence.
+Skill records include the source kind and session. Serialized size checks run before atomic replacement to preserve readable source files. Proposed plans, model answers and failed tool outcomes cannot serve as host verification evidence.
 Semantic interpretation of user confirmations and workflow quality still depends on the selected model. Saved skills do not retrain model weights.
 
 Session indexing stores overlapping excerpts plus an extractive overview from the opening and closing messages.

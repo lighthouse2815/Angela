@@ -144,7 +144,10 @@ export class Skills {
       if (version !== skill.expected_version)
         throw new Error(this.messages.memoryChanged)
       const header = { name: skill.name, description: skill.description, verification: { quote: skill.verification_quote, updatedAt: new Date().toISOString(), source: provenance ?? { kind: 'import' } } }
-      await writeFile(temporary, `---\n${stringify(header)}---\n${skill.instructions}\n`, { mode: 0o600, flag: 'wx' })
+      const source = `---\n${stringify(header)}---\n${skill.instructions}\n`
+      if (source.length > 16_000)
+        throw new Error(this.messages.skillsInvalid)
+      await writeFile(temporary, source, { mode: 0o600, flag: 'wx' })
       await rename(temporary, join(directory, 'SKILL.md'))
       try {
         await RecallIndex.invalidate(this.dataDir, `skill:${skill.name}`)
