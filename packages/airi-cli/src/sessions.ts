@@ -10,6 +10,8 @@ import { chatMessagesToTurns, conversationToChatMessages } from '@proj-airi/core
 
 import * as v from 'valibot'
 
+import { RecallIndex } from './recall-index'
+
 // CLI sessions use portable text messages. Provider-native continuation stays in memory for the current process.
 const messagesSchema: v.GenericSchema<Message[]> = v.array(v.variant('role', [
   v.object({ role: v.literal('system'), content: v.string() }),
@@ -72,6 +74,12 @@ export class Sessions {
     const session = await this.open(record.workspace, id)
     try {
       await unlink(join(this.directory, `${id}.json`))
+      try {
+        await RecallIndex.invalidate(this.directory, `history:${id}`)
+      }
+      catch {
+        throw new Error(this.messages.recallCleanup)
+      }
     }
     finally {
       await session.close()

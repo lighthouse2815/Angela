@@ -9,6 +9,7 @@ import { errorMessageFrom } from '@moeru/std'
 import * as v from 'valibot'
 
 import { MemoryFile } from './memory-file'
+import { RecallIndex } from './recall-index'
 
 const textSchema = v.pipe(v.string(), v.trim(), v.minLength(1), v.maxLength(500))
 const idSchema = v.pipe(v.string(), v.uuid())
@@ -27,8 +28,21 @@ type State = v.InferOutput<typeof stateSchema>
 export class Memory {
   private readonly file: MemoryFile<State>
 
-  constructor(dataDir: string, private readonly messages: typeof cliMessages.en) {
+  constructor(private readonly dataDir: string, private readonly messages: typeof cliMessages.en) {
     this.file = new MemoryFile<State>(join(dataDir, 'memory'), 'personal', stateSchema, () => ({ version: 1, enabled: true, autoEnabled: true, entries: [] }), { invalid: messages.memoryInvalid, locked: messages.memoryLocked })
+  }
+
+  private async edit(change: (state: State) => void, target?: () => string | undefined, purgeAll = false) {
+    if (purgeAll || target?.())
+      await RecallIndex.invalidate(this.dataDir, 'personal', target?.())
+    await this.file.edit(change)
+    try {
+      if (purgeAll || target?.())
+        await RecallIndex.invalidate(this.dataDir, 'personal', target?.())
+    }
+    catch {
+      throw new Error(this.messages.recallCleanup)
+    }
   }
 
   /** Missing storage is enabled and empty. Invalid storage is never silently overwritten. */
@@ -37,11 +51,11 @@ export class Memory {
   }
 
   async setEnabled(enabled: boolean) {
-    await this.file.edit(state => state.enabled = enabled)
+    await this.edit(state => state.enabled = enabled, undefined, !enabled)
   }
 
   async setAutomatic(autoEnabled: boolean) {
-    await this.file.edit(state => state.autoEnabled = autoEnabled)
+    await this.edit(state => state.autoEnabled = autoEnabled)
   }
 
   /** Text limits and duplicate detection apply to direct commands and model tools alike. */
@@ -51,8 +65,8 @@ export class Memory {
       throw new Error(this.messages.memoryText)
     if (id && !v.safeParse(idSchema, id).success)
       throw new Error(this.messages.memoryMissing)
-    let savedId = ''
-    await this.file.edit((state) => {
+    let savedId = id ?? ''
+    await this.edit((state) => {
       if (!state.enabled)
         throw new Error(this.messages.memoryDisabled)
       const current = id ? state.entries.find(entry => entry.id === id) : state.entries.find(entry => entry.text.toLowerCase() === parsed.output.toLowerCase())
@@ -78,12 +92,12 @@ export class Memory {
         savedId = randomUUID()
         state.entries.push({ id: savedId, text: parsed.output, createdAt: now, updatedAt: now, core: metadata?.core ?? false, source: metadata?.source ?? { quote: parsed.output } })
       }
-    })
+    }, () => savedId ? `personal:${savedId}` : undefined)
     return savedId
   }
 
   async forget(id: string, expectedText?: string) {
-    await this.file.edit((state) => {
+    await this.edit((state) => {
       const index = state.entries.findIndex(entry => entry.id === id)
       if (index < 0)
         throw new Error(this.messages.memoryMissing)
@@ -94,7 +108,7 @@ export class Memory {
           throw new Error(this.messages.memoryChanged)
       }
       state.entries.splice(index, 1)
-    })
+    }, () => `personal:${id}`)
   }
 
   /** Saved text is request-local context, never persisted as a system turn in chat history. */
@@ -142,7 +156,7 @@ export class Memory {
             core: { type: 'boolean', description: 'True only for a core profile fact needed across tasks: name, address, language or general communication preferences.' },
             source_quote: { type: 'string', description: 'Verbatim evidence from the current user message.' },
           },
-          required: ['action', 'id', 'text', 'source_quote'],
+          required: ['action', 'id', 'text', 'source_quote', 'core'],
           additionalProperties: false,
         },
       },
@@ -186,7 +200,7 @@ export class Memory {
     }
     const pin = /^\/memory (pin|unpin) (\S+)$/u.exec(text)
     if (pin) {
-      await this.file.edit((state) => {
+      await this.edit((state) => {
         const entry = state.entries.find(entry => entry.id === pin[2])
         if (!entry)
           throw new Error(this.messages.memoryMissing)

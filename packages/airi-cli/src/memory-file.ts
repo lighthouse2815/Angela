@@ -47,7 +47,10 @@ export class MemoryFile<T> {
     try {
       const state = await this.read()
       change(state)
-      await writeFile(temporary, JSON.stringify(v.parse(this.schema, state)), { flag: 'wx', mode: 0o600 })
+      const source = JSON.stringify(v.parse(this.schema, state))
+      if (source.length > 128_000)
+        throw new Error(this.errors.invalid)
+      await writeFile(temporary, source, { flag: 'wx', mode: 0o600 })
       await rename(temporary, join(this.directory, `${this.name}.json`))
     }
     finally {

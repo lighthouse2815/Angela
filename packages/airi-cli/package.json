@@ -12,6 +12,9 @@
     "README.md",
     "dist"
   ],
+  "engines": {
+    "node": ">=22.13.0"
+  },
   "scripts": {
     "dev": "tsx src/bin/run.ts",
     "build": "tsdown",

@@ -239,7 +239,7 @@ it('automatically saves a volunteered fact through a real tool round and recalls
     bodies.push(body)
     response.writeHead(200, { 'Content-Type': 'text/event-stream' })
     const delta = bodies.length === 1
-      ? { role: 'assistant', tool_calls: [{ index: 0, id: 'personal-save', type: 'function', function: { name: 'personal_memory', arguments: JSON.stringify({ action: 'remember', id: null, text: 'Tôi tên là Đăng', source_quote: 'Tôi tên là Đăng' }) } }] }
+      ? { role: 'assistant', tool_calls: [{ index: 0, id: 'personal-save', type: 'function', function: { name: 'personal_memory', arguments: JSON.stringify({ action: 'remember', id: null, text: 'Tôi tên là Đăng', source_quote: 'Tôi tên là Đăng', core: true }) } }] }
       : { role: 'assistant', content: 'Đã hiểu.' }
     response.end(`data: ${JSON.stringify({ choices: [{ index: 0, delta, finish_reason: bodies.length === 1 ? 'tool_calls' : 'stop' }] })}\n\ndata: [DONE]\n\n`)
   })
@@ -255,7 +255,7 @@ it('automatically saves a volunteered fact through a real tool round and recalls
   const first = await run(['--prompt', 'Tôi tên là Đăng'], env).result
   expect(first, first.stderr).toMatchObject({ code: 0 })
   const memory = new Memory(directory, cliMessages.en)
-  expect((await memory.read()).entries[0]!.text).toBe('Tôi tên là Đăng')
+  expect((await memory.read()).entries[0]).toMatchObject({ text: 'Tôi tên là Đăng', core: true })
   expect(bodies[0]).toContain('Automatic personal memory is enabled')
   expect(bodies[1]).toContain('saved')
   const next = await run(['--prompt', 'Bạn nhớ gì?'], env).result
@@ -267,13 +267,14 @@ it('automatically saves a volunteered fact through a real tool round and recalls
   const disabled = await run(['--prompt', 'Chào'], env).result
   expect(disabled, disabled.stderr).toMatchObject({ code: 0 })
   expect(bodies[3]).not.toContain('Tôi tên là Đăng')
-  expect(bodies[3]).not.toContain('personal_memory')
+  expect(JSON.parse(bodies[3]!).tools).not.toContainEqual(expect.objectContaining({ function: expect.objectContaining({ name: 'personal_memory' }) }))
+  expect(JSON.parse(bodies[3]!).tools).toContainEqual(expect.objectContaining({ function: expect.objectContaining({ name: 'task_create' }) }))
   const memoryPath = join(directory, 'memory', 'personal.json')
   await writeFile(memoryPath, '{broken memory')
   const degraded = await run(['--prompt', 'Chào lần nữa'], env).result
   expect(degraded, degraded.stderr).toMatchObject({ code: 0, stdout: 'Đã hiểu.\n' })
   expect(degraded.stderr).toContain(cliMessages.vi.memoryUnavailable)
-  expect(bodies[4]).not.toContain('personal_memory')
+  expect(JSON.parse(bodies[4]!).tools).not.toContainEqual(expect.objectContaining({ function: expect.objectContaining({ name: 'personal_memory' }) }))
   expect(bodies[4]).not.toContain('Personal records:')
   expect(await readFile(memoryPath, 'utf8')).toBe('{broken memory')
 }, 20_000)
@@ -353,6 +354,8 @@ it('creates a conversational task through the real CLI tool runtime and restores
   const first = await run(['--prompt', '10h tối nhắc tao học tiếng Trung'], env).result
   expect(first, first.stderr).toMatchObject({ code: 0 })
   expect(bodies[0]).toContain('task_create')
+  expect(bodies[0]).toContain('memory_search')
+  expect(bodies[0]).toContain('personal_memory')
   expect(bodies[0]).toContain('Current clock:')
   expect(bodies[1]).toContain('saved')
   expect(bodies[1]).toContain('Học tiếng Trung')

@@ -18,6 +18,7 @@ const memoryResultSchema = v.variant('status', [
   v.object({ status: v.literal('deleted'), id: v.pipe(v.string(), v.uuid()) }),
   v.object({ status: v.literal('rejected'), reason: v.string() }),
 ])
+const recallResultSchema = v.object({ status: v.picklist(['saved', 'ok', 'rejected', 'unavailable']), reason: v.optional(v.string()), name: v.optional(v.string()), indexed: v.optional(v.boolean()) })
 const pendingSchema = v.object({ action: v.object({ kind: v.string(), input: v.record(v.string(), v.unknown()) }) })
 const callSchema = v.object({ name: v.string() })
 const backendSchema = v.object({
@@ -48,6 +49,7 @@ export class Output {
   hasText = false
   private textOpen = false
   private readonly calls = new Map<string, string>()
+  private readonly memoryCalls = new Set<string>()
   private timer?: ReturnType<typeof setInterval>
   private label?: string
   private approvalTool?: string
@@ -98,6 +100,7 @@ export class Output {
     this.hasText = false
     this.answerStarted = false
     this.calls.clear()
+    this.memoryCalls.clear()
     this.status(this.messages.thinking)
   }
 
@@ -125,6 +128,8 @@ export class Output {
         break
       case 'tool-call':
         {
+          if (['personal_memory', 'skill_save', 'memory_search', 'memory_read'].includes(event.toolName))
+            this.memoryCalls.add(event.toolCallId)
           let name = event.toolName
           if (name === 'builtIn_mcpCallTool') {
             try {
@@ -177,6 +182,7 @@ export class Output {
     this.pause()
     this.endText()
     this.calls.clear()
+    this.memoryCalls.clear()
     this.awaitingApproval = false
     this.deferred.length = 0
   }
@@ -185,6 +191,7 @@ export class Output {
     this.pause()
     this.endText()
     const name = this.calls.get(event.toolCallId) ?? this.messages.tool
+    const memoryCall = this.memoryCalls.delete(event.toolCallId)
     this.calls.delete(event.toolCallId)
     if (name === 'builtIn_mcpListTools' && event.type === 'tool-result') {
       this.stderr.write(`✓ ${this.messages.discoveringTools}\n`)
@@ -197,7 +204,7 @@ export class Output {
         }
         catch { /* Plain text is also a supported tool result. */ }
       }
-      if (name === 'personal_memory' && event.type === 'tool-result') {
+      if (memoryCall && name === 'personal_memory' && event.type === 'tool-result') {
         const memory = v.safeParse(memoryResultSchema, raw)
         if (memory.success) {
           const change = memory.output
@@ -212,6 +219,21 @@ export class Output {
             this.stderr.write(`✓ ${label}\n`)
             this.preview(change.status === 'saved' ? `${change.id} ${JSON.stringify(change.text)}` : change.id)
           }
+          this.status(this.calls.size ? this.messages.runningTool : this.messages.thinking)
+          return
+        }
+      }
+      if (memoryCall && ['skill_save', 'memory_search', 'memory_read'].includes(name) && event.type === 'tool-result') {
+        const result = v.safeParse(recallResultSchema, raw)
+        if (result.success) {
+          const failed = result.output.status === 'rejected' || result.output.status === 'unavailable'
+          this.stderr.write(`${failed ? '✗' : '✓'} ${name}: ${failed ? this.messages.toolFailed : this.messages.toolDone}\n`)
+          if (result.output.reason)
+            this.preview(result.output.reason)
+          if (result.output.name)
+            this.preview(result.output.name)
+          if (result.output.indexed === false)
+            this.preview(this.messages.recallPartial)
           this.status(this.calls.size ? this.messages.runningTool : this.messages.thinking)
           return
         }
