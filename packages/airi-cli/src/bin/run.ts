@@ -133,6 +133,7 @@ async function main() {
         if (!output.hasText)
           throw new Error(messages.emptyResponse)
         completed = true
+        await session.save(chat.conversation, false)
         output.stop()
         if (voice)
           await voice.speak(answer, active.signal)

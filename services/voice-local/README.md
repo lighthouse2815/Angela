@@ -5,6 +5,7 @@ Faster Whisper recognizes Vietnamese locally with a CPU model and INT8 precision
 Edge TTS reads replies through Microsoft's online service without an API key.
 Reply text goes to Microsoft. Microphone audio stays on this machine.
 Edge TTS depends on Internet access and service availability.
+A response without audio triggers one retry within the same request timeout.
 
 ## Run
 

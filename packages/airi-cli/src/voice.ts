@@ -85,6 +85,15 @@ export class Voice {
 
   /** Playback completes before another capture starts, so Angela does not record her own answer. */
   async speak(text: string, signal: AbortSignal) {
+    // Bound each audio request and start playback before the remaining text is synthesized.
+    const chunks = text.match(/[\s\S]{1,1800}(?:\s|$)|[\s\S]{1,1800}/gu)
+    for (const chunk of chunks ?? []) {
+      signal.throwIfAborted()
+      await this.speakChunk(chunk, signal)
+    }
+  }
+
+  private async speakChunk(text: string, signal: AbortSignal) {
     const response = await this.request('audio/speech', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

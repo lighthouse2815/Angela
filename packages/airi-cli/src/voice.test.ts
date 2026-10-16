@@ -101,3 +101,32 @@ it('loads voice configuration outside the workspace and lets environment values 
     await rm(directory, { recursive: true, force: true })
   }
 })
+
+it('splits long replies without losing text and stops future chunks on cancellation', async () => {
+  const controller = new AbortController()
+  const fetch = vi.fn(async (_url: URL, _init: RequestInit) => new Response(new Uint8Array([82, 73, 70, 70])))
+  vi.stubGlobal('fetch', fetch)
+  spawn.mockImplementation(() => {
+    const child = new EventEmitter()
+    queueMicrotask(() => child.emit('close', 0))
+    return child
+  })
+  const voice = new Voice({ ANGELA_VOICE_BASE_URL: 'http://localhost/v1/' }, cliMessages.en)
+  const text = 'Xin chào Angela. '.repeat(800)
+  await voice.speak(text, controller.signal)
+  const chunks = fetch.mock.calls.map(([, request]) => JSON.parse(String(request.body)).input as string)
+  expect(chunks.length).toBeGreaterThan(1)
+  expect(chunks.join('')).toBe(text)
+  expect(chunks.every(chunk => chunk.length <= 1801)).toBe(true)
+  fetch.mockClear()
+  spawn.mockImplementation(() => {
+    const child = new EventEmitter()
+    queueMicrotask(() => {
+      controller.abort()
+      child.emit('close', 0)
+    })
+    return child
+  })
+  await expect(voice.speak(text, controller.signal)).rejects.toThrow()
+  expect(fetch).toHaveBeenCalledTimes(1)
+})

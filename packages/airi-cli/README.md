@@ -126,7 +126,8 @@ ANGELA_TTS_VOICE=alloy
 The audio service must support `audio/transcriptions` and `audio/speech` with WAV output.
 Model and voice names must match your service. A chat-only router does not supply audio automatically.
 Audio goes to the configured service. Temporary audio files are deleted after each operation.
-Failed playback keeps the answer visible in chat. Voice mode requires an interactive terminal.
+Long replies play in bounded parts. Ctrl+C stops playback and remaining parts.
+The conversation is saved before playback. Failed playback keeps the answer visible in chat. Voice mode requires an interactive terminal.
 
 ## Terminal tools
 

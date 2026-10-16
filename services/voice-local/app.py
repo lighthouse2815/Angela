@@ -86,10 +86,17 @@ async def speech(body: Speech):
         raise HTTPException(400, "Select a Vietnamese Edge voice")
     try:
         async with asyncio.timeout(90):
-            chunks = []
-            async for chunk in edge_tts.Communicate(body.input, body.voice).stream():
-                if chunk["type"] == "audio":
-                    chunks.append(chunk["data"])
+            for attempt in range(2):
+                chunks = []
+                try:
+                    async for chunk in edge_tts.Communicate(body.input, body.voice).stream():
+                        if chunk["type"] == "audio":
+                            chunks.append(chunk["data"])
+                    break
+                except edge_tts.exceptions.NoAudioReceived:
+                    if attempt == 1:
+                        raise
+                    await asyncio.sleep(0.5)
             audio = await run_in_threadpool(decode_audio, b"".join(chunks))
             return Response(audio, media_type="audio/wav")
     except Exception:

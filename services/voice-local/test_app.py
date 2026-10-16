@@ -6,7 +6,9 @@ import unittest
 import wave
 
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
+
+from edge_tts.exceptions import NoAudioReceived
 
 from fastapi import HTTPException, UploadFile
 from faster_whisper.audio import decode_audio
@@ -55,6 +57,22 @@ class AudioTests(unittest.TestCase):
         communicate.assert_called_once_with("Xin chào", "vi-VN-HoaiMyNeural")
         decode.assert_called_once_with(b"mp3")
         self.assertEqual(result.media_type, "audio/wav")
+        self.assertEqual(result.body, b"RIFFwav")
+
+    def test_retries_missing_edge_audio_once(self):
+        async def missing():
+            raise NoAudioReceived("no audio")
+            yield
+
+        async def success():
+            yield {"type": "audio", "data": b"mp3"}
+
+        clients = [SimpleNamespace(stream=missing), SimpleNamespace(stream=success)]
+        with patch("app.edge_tts.Communicate", side_effect=clients) as communicate:
+            with patch("app.decode_audio", return_value=b"RIFFwav"):
+                with patch("app.asyncio.sleep", new_callable=AsyncMock):
+                    result = asyncio.run(speech(Speech(input="Xin chào")))
+        self.assertEqual(communicate.call_count, 2)
         self.assertEqual(result.body, b"RIFFwav")
 
     def test_unsupported_voice_rejects_before_network(self):
