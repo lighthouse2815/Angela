@@ -43,6 +43,7 @@ let localExecutable: string
 
 beforeEach(async () => {
   vi.clearAllMocks()
+  vi.stubEnv('NIRI_SOCKET', '')
   vi.stubEnv('AUV_BINARY_PATH', '')
   vi.stubEnv('AUV_LINUX_INPUT_BACKEND', '')
   appMock.isPackaged = true

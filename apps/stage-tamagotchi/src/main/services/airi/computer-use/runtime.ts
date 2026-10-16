@@ -1,7 +1,6 @@
 import type { AuvDaemon } from '@auv-js/sdk/node'
-import type { Clipboard } from 'electron'
 
-import type { ComputerUseResult } from '../../../../shared/eventa/computer-use'
+import type { ComputerUseResult, ComputerUseWindowResult } from '../../../../shared/eventa/computer-use'
 
 import process from 'node:process'
 
@@ -19,10 +18,12 @@ import { AuvDaemonStartError, startAuv } from '@auv-js/sdk/node'
 import * as v from 'valibot'
 
 const execFileAsync = promisify(execFile)
-const inputSchema = v.object({ argv: v.pipe(v.array(v.pipe(v.string(), v.maxLength(16384), v.check(value => !value.includes('\0')))), v.minLength(2), v.maxLength(128)) })
+const windowIdSchema = v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(Number.MAX_SAFE_INTEGER))
+const windowSchema = v.object({ id: windowIdSchema, title: v.nullable(v.string()), app_id: v.nullable(v.string()), is_focused: v.boolean() })
+const inputSchema = v.object({ argv: v.pipe(v.array(v.pipe(v.string(), v.maxLength(16384), v.check(value => !value.includes('\0')))), v.minLength(2), v.maxLength(128)), windowId: v.nullish(windowIdSchema) })
 
 /** Owns one private daemon and serializes desktop operations across renderer windows. */
-export function createComputerUseRuntime(options: { binaryPath: string, storeRoot: string, clipboard?: Pick<Clipboard, 'availableFormats' | 'readText' | 'writeText' | 'clear'> }) {
+export function createComputerUseRuntime(options: { binaryPath: string, storeRoot: string, windowBackend?: 'niri', clipboard?: { availableFormats: () => string[] | Promise<string[]>, readText: () => string | Promise<string>, writeText: (text: string) => void | Promise<void>, clear: () => void | Promise<void> } }) {
   let daemon: AuvDaemon | undefined
   let socketDirectory: string | undefined
   let disposed = false
@@ -88,7 +89,7 @@ export function createComputerUseRuntime(options: { binaryPath: string, storeRoo
   }
 
   async function run(input: unknown): Promise<ComputerUseResult> {
-    const { argv } = v.parse(inputSchema, input)
+    const { argv, windowId } = v.parse(inputSchema, input)
     if (argv[0] !== 'invoke' || !/^(?:--help|-h|help|(?:app|display|screen|window|input|mediaControl)\.[a-zA-Z]+)$/.test(argv[1]))
       throw new Error('Use invoke with a desktop command or --help.')
 
@@ -97,11 +98,15 @@ export function createComputerUseRuntime(options: { binaryPath: string, storeRoo
     if (argv.some(arg => managedFlags.some(flag => arg === flag || arg.startsWith(`${flag}=`))))
       throw new Error('Computer use routing and storage are managed by AIRI.')
 
-    return enqueue(() => execute(argv))
+    if (windowId != null && argv[1].startsWith('input.') && argv.some(arg => arg === '--target' || arg.startsWith('--target=')))
+      throw new Error('Do not combine a Niri windowId with an AUV target. Use foreground input after selecting the native window.')
+    return enqueue(() => execute(argv, windowId))
   }
 
-  async function execute(argv: string[]): Promise<ComputerUseResult> {
+  async function execute(argv: string[], windowId?: number | null): Promise<ComputerUseResult> {
     const active = await connect()
+    if (windowId != null && argv[1].startsWith('input.'))
+      await requireFocusedWindow(windowId)
     const command = [...argv]
     if (!command.includes('--json') && !command.includes('--help') && !command.includes('-h') && command[1] !== 'help')
       command.push('--json')
@@ -142,37 +147,84 @@ export function createComputerUseRuntime(options: { binaryPath: string, storeRoo
 
   /** Pastes into the focused control. Input delivery does not verify the resulting control value. */
   async function pasteText(input: unknown): Promise<ComputerUseResult> {
-    const { text } = v.parse(v.object({ text: v.pipe(v.string(), v.minLength(1), v.maxLength(16384), v.check(value => !value.includes('\0'))) }), input)
+    const { text, windowId } = v.parse(v.object({ text: v.pipe(v.string(), v.minLength(1), v.maxLength(16384), v.check(value => !value.includes('\0'))), windowId: v.nullish(windowIdSchema) }), input)
     const clipboard = options.clipboard
     if (!clipboard)
-      return run({ argv: ['invoke', 'input.pasteText', text] })
+      return run({ argv: ['invoke', 'input.pasteText', text], windowId })
 
     return enqueue(async () => {
-      // Electron avoids the RemoteDesktop clipboard portal on Linux uinput.
+      if (windowId != null)
+        await requireFocusedWindow(windowId)
+      // The host clipboard adapter avoids the RemoteDesktop portal on Linux uinput.
       // Refuse rich clipboard data because a text snapshot cannot restore it.
-      const formats = clipboard.availableFormats()
+      const formats = await clipboard.availableFormats()
       if (formats.some(format => !/^text\/plain(?:;charset=utf-8)?$/i.test(format)))
         throw new Error('Clipboard contains non-text data. Copy plain text before pasting with computer use.')
-      const previous = clipboard.readText()
-      clipboard.writeText(text)
+      const previous = await clipboard.readText()
       let restored = false
       let result: ComputerUseResult
       try {
-        result = await execute(['invoke', 'input.key', 'ctrl+v'])
+        await clipboard.writeText(text)
+        result = await execute(['invoke', 'input.key', 'ctrl+v'], windowId)
         // The receiving process reads the clipboard asynchronously after the key event.
         await setTimeout(250, undefined, { signal: abort.signal })
       }
       finally {
         // A user copy during delivery takes precedence over the previous snapshot.
-        if (clipboard.readText() === text && clipboard.availableFormats().every(format => /^text\/plain(?:;charset=utf-8)?$/i.test(format))) {
+        if (await clipboard.readText() === text && (await clipboard.availableFormats()).every(format => /^text\/plain(?:;charset=utf-8)?$/i.test(format))) {
           if (formats.length)
-            clipboard.writeText(previous)
+            await clipboard.writeText(previous)
           else
-            clipboard.clear()
+            await clipboard.clear()
           restored = true
         }
       }
       return { ...result, output: { keyboard: result.output, clipboardRestored: restored, verified: false } }
+    })
+  }
+
+  async function niri(args: string[]): Promise<unknown> {
+    if (options.windowBackend !== 'niri')
+      throw new Error('Native window selection currently requires Linux Niri. Use AUV window discovery on other desktops.')
+    const { stdout } = await execFileAsync('niri', ['msg', '--json', ...args], {
+      encoding: 'utf8',
+      timeout: 5000,
+      maxBuffer: 1024 * 1024,
+      signal: abort.signal,
+      windowsHide: true,
+    })
+    // Niri actions acknowledge success through exit status and emit no JSON.
+    if (args[0] === 'action')
+      return undefined
+    return JSON.parse(stdout)
+  }
+
+  async function requireFocusedWindow(id: number) {
+    const focused = v.parse(v.nullable(windowSchema), await niri(['focused-window']))
+    if (focused?.id !== id || !focused.is_focused)
+      throw new Error('The requested Niri window is no longer focused. Inspect windows and focus the intended ID before retrying.')
+  }
+
+  /** Lists compositor windows or focuses one exact native ID. Calls share the desktop input queue. */
+  async function windows(input: unknown): Promise<ComputerUseWindowResult> {
+    const request = v.parse(v.variant('action', [
+      v.object({ action: v.literal('list'), title: v.nullish(v.pipe(v.string(), v.minLength(1), v.maxLength(256))) }),
+      v.object({ action: v.literal('focus'), id: windowIdSchema }),
+    ]), input)
+    return enqueue(async () => {
+      const entries = v.parse(v.array(windowSchema), await niri(['windows']))
+      if (request.action === 'focus') {
+        if (!entries.some(entry => entry.id === request.id))
+          throw new Error('The requested Niri window does not exist. List windows again.')
+        await niri(['action', 'focus-window', '--id', String(request.id)])
+        // The compositor acknowledges the action before every client receives focus.
+        await requireFocusedWindow(request.id)
+        return { backend: 'niri', windows: entries.filter(entry => entry.id === request.id).map(entry => ({ id: entry.id, title: (entry.title ?? '').slice(0, 1000), appId: entry.app_id ?? '', focused: true })) }
+      }
+      return {
+        backend: 'niri',
+        windows: entries.filter(entry => !request.title || entry.title?.includes(request.title)).slice(0, 200).map(entry => ({ id: entry.id, title: (entry.title ?? '').slice(0, 1000), appId: entry.app_id ?? '', focused: entry.is_focused })),
+      }
     })
   }
 
@@ -209,5 +261,5 @@ export function createComputerUseRuntime(options: { binaryPath: string, storeRoo
     }
   }
 
-  return { run, pasteText, readImage, dispose }
+  return { run, pasteText, windows, readImage, dispose }
 }

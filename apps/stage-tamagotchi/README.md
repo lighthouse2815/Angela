@@ -22,7 +22,7 @@ The selection is local to the composer. A new composer starts with it on. While 
 Turn it off before sending messages that must not receive computer-use tools.
 
 Only the current selection grants access, including retries and tool reruns. Historical messages do not grant access.
-The selected request receives `computer_use`, `computer_use_paste_text`, `computer_use_read_image`, and the learning directory tools described below.
+The selected request receives `computer_use`, `computer_use_press_key`, `computer_use_paste_text`, `computer_use_windows`, `computer_use_read_image`, and the learning directory tools described below.
 The first tool accepts AUV arguments, such as `["invoke", "window.list"]`.
 Use `["invoke", "--help"]` and command-specific help to discover supported operations.
 The image tool returns a screenshot as model image content. It accepts only PNG and JPEG artifacts inside the app's computer-use store.
@@ -43,12 +43,27 @@ Use this feature for local native applications. It does not expose a remote-devi
 ### Literal text and Vietnamese
 
 Use `computer_use_paste_text` for literal text, including Vietnamese, after focusing the intended input.
-On Linux with `AUV_LINUX_INPUT_BACKEND=uinput`, Electron supplies the clipboard and AUV sends Ctrl+V.
+On Niri with `AUV_LINUX_INPUT_BACKEND=uinput`, wl-clipboard supplies the system selection and AUV sends Ctrl+V.
+Install `wl-copy` and `wl-paste` from [wl-clipboard](https://github.com/bugaevc/wl-clipboard). Text travels through stdin, outside process arguments.
+Other Linux uinput desktops retain the Electron clipboard adapter.
 This path does not need the RemoteDesktop clipboard portal. Other backends use native AUV paste.
 Desktop operations share one queue, so another tool call cannot interrupt the paste sequence.
-The Electron path accepts only plain text clipboard formats. It refuses images, HTML, and custom formats before input.
+Host clipboard adapters accept only plain text formats. It refuses images, HTML, and custom formats before input.
 It restores the previous text unless the clipboard changes during delivery. A new user copy takes precedence.
 The tool reports delivery without claiming that the application received the text. Inspect the resulting UI.
+
+### Native window selection on Niri
+
+On Linux Niri, `computer_use_windows` lists native compositor windows and focuses an exact returned ID.
+Use a title substring to limit the results to the intended application. Results contain at most 200 matches.
+The host enables this backend only when the Niri socket is present. Other desktops use their existing AUV commands.
+Niri IDs differ from AUV accessibility IDs. Never pass a Niri ID as an AUV `--target`.
+After focus, pass `windowId` to `computer_use_press_key`, `computer_use` input commands, and `computer_use_paste_text`.
+The key tool accepts a key or shortcut such as `ctrl+1`, `ctrl+a`, or `ctrl+s`, without CLI arguments.
+The host checks compositor focus immediately before native input, after daemon startup. A changed focus rejects input.
+Guarded paste also checks focus before touching the clipboard. Calls share the same desktop queue.
+Focus confirms the selected window, without verifying its document contents. Inspect the resulting application state.
+Existing calls without `windowId` retain their current foreground behavior.
 
 ### Native development build
 
@@ -147,3 +162,27 @@ A new user copy during delivery takes precedence. Avoid changing focus while thi
 The report and fixture-only screenshot go into `.cache`. Set `SMOKE_REPORT_DIR` to choose the output directory.
 The test stops its private daemon and removes its temporary profile. Revoke temporary uinput access after the run.
 This proves native execution against the fixture. It does not prove model planning or arbitrary application control.
+
+### Model-driven VS Code verification
+
+Configure a chat model with tool calling in the local development profile. Build desktop before this smoke.
+Run on Linux Niri with temporary uinput access:
+
+```sh
+AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AUV_LINUX_INPUT_BACKEND=uinput pnpm exec tsx apps/stage-tamagotchi/scripts/computer-use-model-smoke.ts
+```
+
+The smoke copies only Local Storage into a private temporary profile. It requires a local-only account state.
+Set `SMOKE_SOURCE_PROFILE` to choose a different source profile. Set `SMOKE_CODE_BINARY` for a different native VS Code binary.
+The default editor binary is `/usr/share/code/code`. The smoke launches separate editor data and extension directories.
+Two temporary documents appear in separate windows. The model must select the target, paste Vietnamese, and save it.
+The harness permits native input only to its two editor windows. It forwards allowed calls to the registered production executors.
+The test reads the saved target, checks that the other file stayed intact, and verifies every input target ID.
+This proves a keyboard workflow with native window selection. It does not prove visual grounding or arbitrary application support.
+The test requires an empty or plain text clipboard. Rich formats remain untouched.
+It checks the real Wayland selection, stops its process groups, and removes temporary profiles and provider logs.
+Set `SMOKE_DIAGNOSTICS=1` to record fixture tool calls and editor state for failure diagnosis.
+The report contains verification flags and tool names, without credentials or document contents. Revoke uinput access after the run.
+
+The 2026-10-16 Niri run passed with Gemini 3.1 Flash Lite and real VS Code.
+The saved document matched the requested Vietnamese text. The other file stayed intact and the native clipboard returned to its initial state.

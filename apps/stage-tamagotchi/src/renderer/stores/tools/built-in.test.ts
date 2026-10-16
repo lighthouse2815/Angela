@@ -46,7 +46,9 @@ describe('useTamagotchiBuiltinToolsStore', async () => {
       { id: 'tamagotchi:stage_widgets', defaultActive: false },
       { id: 'tamagotchi:get_weather', defaultActive: false },
       { id: 'tamagotchi:computer_use', defaultActive: false },
+      { id: 'tamagotchi:computer_use_press_key', defaultActive: false },
       { id: 'tamagotchi:computer_use_paste_text', defaultActive: false },
+      { id: 'tamagotchi:computer_use_windows', defaultActive: false },
       { id: 'tamagotchi:computer_use_read_image', defaultActive: false },
       { id: 'tamagotchi:study_workspace_directory', defaultActive: false },
       { id: 'tamagotchi:study_workspace_list', defaultActive: false },
@@ -55,7 +57,9 @@ describe('useTamagotchiBuiltinToolsStore', async () => {
     ])
     expect(toolsStore.tools.filter(tool => tool.requiresExplicitSelection).map(tool => tool.function.name)).toEqual([
       'computer_use',
+      'computer_use_press_key',
       'computer_use_paste_text',
+      'computer_use_windows',
       'computer_use_read_image',
       'study_workspace_directory',
       'study_workspace_list',

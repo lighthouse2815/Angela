@@ -10,9 +10,10 @@ import { defineInvokeHandler } from '@moeru/eventa'
 import { app, clipboard } from 'electron'
 import { object, parse, string } from 'valibot'
 
-import { computerUsePasteText, computerUseReadImage, computerUseRun } from '../../../../shared/eventa/computer-use'
+import { computerUsePasteText, computerUseReadImage, computerUseRun, computerUseWindows } from '../../../../shared/eventa/computer-use'
 import { onAppBeforeQuit } from '../../../libs/bootkit/lifecycle'
 import { createComputerUseRuntime } from './runtime'
+import { WaylandClipboard } from './wayland-clipboard'
 
 const cliPackage = parse(object({ version: string() }), createRequire(import.meta.url)('@auv-js/cli/package.json'))
 
@@ -47,13 +48,17 @@ export function setupComputerUse(context: ReturnType<typeof createContext>['cont
       runtime = createComputerUseRuntime({
         binaryPath: executable,
         storeRoot: join(app.getPath('userData'), 'computer-use'),
-        clipboard: platform === 'linux' && env.AUV_LINUX_INPUT_BACKEND === 'uinput' ? clipboard : undefined,
+        windowBackend: platform === 'linux' && env.NIRI_SOCKET ? 'niri' : undefined,
+        clipboard: platform === 'linux' && env.AUV_LINUX_INPUT_BACKEND === 'uinput'
+          ? env.NIRI_SOCKET ? new WaylandClipboard() : clipboard
+          : undefined,
       })
     }
     return runtime
   }
   defineInvokeHandler(context, computerUseRun, input => getRuntime().run(input))
   defineInvokeHandler(context, computerUsePasteText, input => getRuntime().pasteText(input))
+  defineInvokeHandler(context, computerUseWindows, input => getRuntime().windows(input))
   defineInvokeHandler(context, computerUseReadImage, input => getRuntime().readImage(input))
   onAppBeforeQuit(async () => {
     stopped = true

@@ -309,7 +309,10 @@ Không có thay đổi group hoặc quy tắc udev vĩnh viễn.
 
 Khi cần nhập tiếng Việt, Angela có công cụ `computer_use_paste_text` trong **Use computer**.
 Cần đưa focus vào đúng ô nhập trước khi gọi công cụ.
-Trên Linux chạy uinput, công cụ dùng clipboard của Electron và gửi Ctrl+V qua AUV.
+Trên Niri chạy uinput, công cụ dùng `wl-copy` và `wl-paste` để truy cập clipboard hệ thống, rồi gửi Ctrl+V qua AUV.
+Cần cài gói [wl-clipboard](https://github.com/bugaevc/wl-clipboard). Máy phát triển hiện đã có hai lệnh này.
+Văn bản đi qua stdin, không xuất hiện trong tham số tiến trình.
+Các desktop Linux uinput khác tiếp tục dùng adapter clipboard Electron.
 Cách này không cần Portal RemoteDesktop. Backend khác tiếp tục dùng lệnh dán gốc của AUV.
 Công cụ chỉ nhận tối đa 16.384 ký tự mỗi lần.
 
@@ -333,6 +336,47 @@ Bài thử giữ clipboard văn bản/HTML ban đầu ngoài thao tác dán và 
 Kết quả và ảnh cửa sổ thử nằm trong `.cache`. Có thể đổi thư mục bằng `SMOKE_REPORT_DIR`.
 Không cần mô hình AI hoặc API key cho bài thử này.
 Thu hồi quyền uinput tạm thời sau khi kiểm thử xong.
+
+### Chọn đúng cửa sổ trên Niri
+
+Trên Linux Niri, Angela có công cụ `computer_use_windows` trong **Use computer**.
+Công cụ liệt kê cửa sổ và đưa focus đến đúng ID vừa tìm được.
+Có thể lọc theo một phần tiêu đề để không gửi danh sách cửa sổ không liên quan đến mô hình.
+Mỗi kết quả liệt kê có tối đa 200 cửa sổ phù hợp.
+
+Sau khi chọn cửa sổ, Angela truyền `windowId` vào các lệnh nhập và công cụ dán tiếng Việt.
+Công cụ `computer_use_press_key` nhận trực tiếp phím hoặc tổ hợp như `ctrl+1`, `ctrl+a`, `ctrl+s`.
+Mô hình không cần tự ghép lệnh CLI cho thao tác nhấn phím.
+Nếu cửa sổ khác đang có focus, lệnh bị từ chối trước khi gửi phím.
+Trạng thái focus được đọc lại sau khi daemon khởi động để tránh dùng kết quả cũ.
+Lệnh dán cũng kiểm tra focus trước khi thay clipboard.
+Nếu không truyền `windowId`, công cụ vẫn hoạt động trên cửa sổ hiện có focus như trước.
+ID Niri khác ID accessibility của AUV. Không dùng ID Niri cho tham số AUV `--target`.
+Backend chọn cửa sổ này chỉ dành cho Niri. Các desktop khác tiếp tục dùng công cụ AUV hiện có.
+
+Để kiểm chứng với mô hình thật, cần cấu hình mô hình chat hỗ trợ công cụ và build desktop trước.
+Bài thử dùng hồ sơ tạm từ cấu hình local hiện có, hai cửa sổ VS Code và hai tệp tạm.
+Mô hình phải tự chọn cửa sổ đích, nhập tiếng Việt và lưu tệp. Tệp còn lại phải giữ nguyên.
+Bộ kiểm thử giới hạn lệnh vào hai cửa sổ tạm, rồi gọi bộ thực thi thật của ứng dụng.
+Không mở terminal hoặc chỉnh tài liệu trong workspace hiện tại.
+
+Sau khi cấp quyền uinput tạm thời, chạy từ thư mục gốc repository:
+
+```bash
+AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AUV_LINUX_INPUT_BACKEND=uinput mise exec -- pnpm exec tsx apps/stage-tamagotchi/scripts/computer-use-model-smoke.ts
+```
+
+Mặc định dùng VS Code tại `/usr/share/code/code`. Đổi bằng `SMOKE_CODE_BINARY` nếu cài ở nơi khác.
+Có thể chọn hồ sơ cấu hình khác qua `SMOKE_SOURCE_PROFILE`, hoặc thư mục kết quả qua `SMOKE_REPORT_DIR`.
+Bài thử cần clipboard trống hoặc chỉ có văn bản. Clipboard có định dạng khác được giữ nguyên và bài thử dừng.
+Có thể bật `SMOKE_DIAGNOSTICS=1` để ghi lệnh và trạng thái trình soạn thảo trong thư mục kết quả.
+Bài thử không chứng minh khả năng nhận diện giao diện bằng hình ảnh hoặc hỗ trợ mọi ứng dụng.
+Thu hồi quyền uinput tạm thời sau khi kiểm thử xong.
+
+Kiểm tra ngày 16/10/2026 trên Niri với Gemini 3.1 Flash Lite đã chạy thành công luồng chọn cửa sổ VS Code và lưu tiếng Việt.
+Nội dung tệp trên đĩa khớp yêu cầu. Tệp ở cửa sổ còn lại giữ nguyên.
+Các lệnh nhập đều dùng ID cửa sổ đích. Clipboard hệ thống trở về trạng thái ban đầu sau thao tác dán.
+Kiểm thử dùng thư mục và hồ sơ riêng, không chỉnh workspace đang mở của người dùng.
 
 ## Dữ liệu và cập nhật
 
