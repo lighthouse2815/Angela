@@ -33,7 +33,7 @@ function run(args: string[], env: NodeJS.ProcessEnv = {}) {
   const directory = mkdtempSync(join(tmpdir(), 'angela-cli-test-'))
   directories.push(directory)
   const child = spawn(process.execPath, ['--import', 'tsx', fileURLToPath(new URL('./bin/run.ts', import.meta.url)), ...args], {
-    env: { ...process.env, ANGELA_MODEL: 'test-model', ANGELA_API_KEY: '', ANGELA_API: 'chat-completions', ANGELA_DATA_DIR: directory, ...env },
+    env: { ...process.env, ANGELA_MODEL: 'test-model', ANGELA_API_KEY: '', ANGELA_API: 'chat-completions', ANGELA_DATA_DIR: directory, ANGELA_CONFIG: join(directory, 'config.json'), ...env },
     stdio: ['pipe', 'pipe', 'pipe'],
   })
   children.push(child)

@@ -11,6 +11,7 @@ export default defineConfig({
       'apps/stage-tamagotchi/vitest.node.config.ts',
       'packages/cap-vite',
       'packages/airi-cli',
+      'packages/local-config',
       'packages/ccc',
       'packages/core-agent',
       'packages/i18n',

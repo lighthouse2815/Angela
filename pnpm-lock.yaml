@@ -3857,6 +3857,9 @@ importers:
       '@proj-airi/i18n':
         specifier: workspace:^
         version: link:../i18n
+      '@proj-airi/local-config':
+        specifier: workspace:^
+        version: link:../local-config
       '@proj-airi/provider-inference':
         specifier: workspace:^
         version: link:../provider-inference
@@ -4157,6 +4160,19 @@ importers:
       '@types/w3c-web-hid':
         specifier: 'catalog:'
         version: 1.0.7
+
+  packages/local-config:
+    dependencies:
+      '@proj-airi/provider-inference':
+        specifier: workspace:^
+        version: link:../provider-inference
+      valibot:
+        specifier: 'catalog:'
+        version: 1.4.2(typescript@6.0.3)
+    devDependencies:
+      vite:
+        specifier: 'catalog:'
+        version: 8.2.2(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0)
 
   packages/memory-pgvector:
     dependencies:

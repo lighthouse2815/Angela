@@ -1,5 +1,9 @@
 const en = {
   description: 'Angela terminal chat',
+  provider: 'Provider instance from the shared file (or ANGELA_PROVIDER)',
+  configFile: 'Shared configuration path (or ANGELA_CONFIG)',
+  unknownProvider: 'Provider instance is missing from the shared configuration',
+  unsupportedProvider: 'This provider cannot generate text in the CLI',
   model: 'Model ID (or ANGELA_MODEL)',
   baseUrl: 'Provider endpoint (or ANGELA_BASE_URL)',
   protocol: 'chat-completions or responses (or ANGELA_API)',
@@ -41,6 +45,10 @@ const en = {
 
 const vi: typeof en = {
   description: 'Trò chuyện với Angela trong terminal',
+  provider: 'Provider trong file dùng chung (hoặc ANGELA_PROVIDER)',
+  configFile: 'Đường dẫn cấu hình dùng chung (hoặc ANGELA_CONFIG)',
+  unknownProvider: 'Không có provider này trong cấu hình dùng chung',
+  unsupportedProvider: 'Provider này không hỗ trợ sinh văn bản trong CLI',
   model: 'ID mô hình (hoặc ANGELA_MODEL)',
   baseUrl: 'Địa chỉ provider (hoặc ANGELA_BASE_URL)',
   protocol: 'chat-completions hoặc responses (hoặc ANGELA_API)',

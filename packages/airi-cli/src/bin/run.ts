@@ -9,7 +9,7 @@ import { fileURLToPath } from 'node:url'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { errorMessageFrom } from '@moeru/std'
-import { getDefinedProvider, getGenerationProvider } from '@proj-airi/provider-inference'
+import { getGenerationProvider, listProviders } from '@proj-airi/provider-inference'
 
 import { Chat } from '../chat'
 import { readConfig } from '../config'
@@ -25,11 +25,13 @@ import { Terminal } from '../terminal'
  *                    -> McpTools -> MCP client -> tool server
  */
 async function main() {
-  const config = readConfig(process.argv.slice(2), process.env)
+  const config = await readConfig(process.argv.slice(2), process.env)
   const messages = config.messages
   if (config.help) {
     process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\n\n${[
       ['--model', messages.model],
+      ['--provider', messages.provider],
+      ['--config', messages.configFile],
       ['--base-url', messages.baseUrl],
       ['--api', messages.protocol],
       ['--prompt, -p', messages.prompt],
@@ -59,8 +61,12 @@ async function main() {
     throw new Error(messages.invalidWorkspace)
   const session = await sessions.open(workspace, config.resume)
   try {
-    const definition = getDefinedProvider('openai-compatible')!
-    const provider = getGenerationProvider(await definition.createProvider({ apiKey: config.apiKey, baseUrl: config.baseUrl, api: config.api }))!
+    const definition = listProviders().find(provider => provider.id === config.definitionId)
+    if (!definition)
+      throw new Error(`${messages.unsupportedProvider}: ${config.definitionId}`)
+    const provider = getGenerationProvider(await definition.createProvider(config.providerConfig))
+    if (!provider)
+      throw new Error(`${messages.unsupportedProvider}: ${config.definitionId}`)
     const chat = new Chat(config.model, provider, workspace, session.restore())
     await session.save(chat.conversation, session.record.interrupted)
     process.stderr.write(`${messages.session}: ${session.record.id}\n`)

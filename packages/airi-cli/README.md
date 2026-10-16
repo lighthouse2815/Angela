@@ -11,7 +11,21 @@ pnpm install
 pnpm build:cli
 ```
 
-Configure the provider through environment variables:
+## Shared local configuration
+
+The CLI reads `~/.config/angela/config.json`, shared with desktop and locally served web.
+Select a direct provider and chat model in either application's settings, then run `pnpm cli`.
+No account login is required for direct providers. Account sessions stay outside the shared file.
+
+`ANGELA_CONFIG` or `--config /path/to/config.json` selects another file.
+`XDG_CONFIG_HOME` changes the default configuration directory.
+Use `--provider INSTANCE_ID` to select another saved provider instance.
+Flags override environment variables, which override the shared file. Overrides do not change the file.
+See [the configuration package](../local-config/README.md) for its schema and storage rules.
+
+## Environment overrides
+
+Configure a provider without a shared file through environment variables:
 
 ```sh
 export ANGELA_MODEL='your-model-id'
@@ -26,7 +40,7 @@ Local endpoints can use an empty API key. Credentials have no command-line flag.
 `pnpm cli` also reads `.env.cli.local` from the repository root when this file exists.
 Store the same `ANGELA_*` variables there for later runs. Existing environment variables take priority over file values.
 Git ignores this file. On POSIX systems, use `chmod 600 .env.cli.local` to restrict access.
-The built executable reads environment variables only. To load this file with the executable, use Node's `--env-file` flag.
+The built executable reads the shared configuration and environment variables. To load this file with the executable, use Node's `--env-file` flag.
 
 ```sh
 pnpm cli --prompt 'Giải thích async/await'
@@ -44,7 +58,7 @@ With workspace dependencies installed and built, this executable works from anot
 
 The executable uses workspace packages. It is not a self-contained binary or a published npm package.
 
-Flags override environment configuration. The default interface language is Vietnamese.
+The default interface language is Vietnamese.
 Use `ANGELA_LOCALE=en` or `--locale en` for English.
 
 During interactive chat, Ctrl+C cancels the current request. Use `/exit` or Ctrl+D to quit.
