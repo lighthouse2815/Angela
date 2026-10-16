@@ -43,7 +43,7 @@ it('clears the interactive display and separates agent replies from the user pro
   output.event({ type: 'text-delta', text: 'chào' })
   output.stop()
   expect(answer()).toContain('\u001B[36m')
-  expect(stripVTControlCharacters(answer())).toBe('✦ Angela\nXin chào\n')
+  expect(stripVTControlCharacters(answer())).toBe('✦ Angela\n\nXin chào\n')
   output.start()
   output.event({ type: 'text-delta', text: 'Một lượt mới' })
   output.stop()

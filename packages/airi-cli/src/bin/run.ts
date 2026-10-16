@@ -162,7 +162,7 @@ async function main() {
             output.decided(false)
             return false
           }
-          const approved = (await input.ask(`${messages.approve} `, signal))?.trim().toLowerCase() === 'yes'
+          const approved = (await input.ask(`\n${messages.approve} `, signal))?.trim().toLowerCase() === 'yes'
           output.decided(approved)
           return approved
         }, messages, config.computerUse ? workspace : undefined)
@@ -173,6 +173,7 @@ async function main() {
         process.stderr.write(`${messages.workspace}: ${workspace}\n${messages.welcome}\n`)
         while (true) {
           const text = (await input.ask(output.prompt()))?.trim()
+          output.submitted()
           if (text === undefined || text === '/exit')
             break
           if (text)

@@ -66,6 +66,7 @@ One-shot requests return exit code 1 for errors and 130 for cancellation.
 
 Interactive startup clears the terminal display and shows Angela's robot icon.
 Angela's replies use cyan with an agent label. The input prompt uses green, and your text uses the terminal's default color.
+The input area has a border. Blank lines separate requests, replies, and tool approval questions.
 Terminal color settings, including `NO_COLOR`, control color support.
 Piped and one-shot requests keep plain output without the startup banner or screen clearing.
 

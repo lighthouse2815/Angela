@@ -35,6 +35,7 @@ export class Output {
   private readonly deferred: StreamEvent[] = []
   private interactive = false
   private answerStarted = false
+  private inputWidth = 0
 
   constructor(
     private readonly messages: typeof cliMessages.en,
@@ -57,7 +58,19 @@ export class Output {
   }
 
   prompt() {
-    return this.interactive ? styleText(['bold', 'green'], '❯ ', { stream: this.stderr }) : '> '
+    if (!this.interactive)
+      return '> '
+    this.inputWidth = Math.max(1, Math.min(this.stderr.columns || 80, 100) - 2)
+    const border = styleText('dim', `╭${'─'.repeat(this.inputWidth)}╮`, { stream: this.stderr })
+    return `\n${border}\n${styleText(['bold', 'green'], '│ ❯ ', { stream: this.stderr })}`
+  }
+
+  /** Closes the input area before progress or approval output takes the terminal. */
+  submitted() {
+    if (!this.inputWidth)
+      return
+    this.stderr.write(`${styleText('dim', `╰${'─'.repeat(this.inputWidth)}╯`, { stream: this.stderr })}\n\n`)
+    this.inputWidth = 0
   }
 
   /** Starts one request. The caller must stop progress in its finally block. */
@@ -80,7 +93,7 @@ export class Output {
           return
         this.pause()
         if (this.interactive && !this.answerStarted)
-          this.stdout.write(`${styleText(['bold', 'cyan'], '✦ Angela', { stream: this.stdout })}\n`)
+          this.stdout.write(`${styleText(['bold', 'cyan'], '✦ Angela', { stream: this.stdout })}\n\n`)
         this.answerStarted = true
         this.stdout.write(this.interactive ? styleText('cyan', event.text, { stream: this.stdout }) : event.text)
         this.hasText ||= Boolean(event.text.trim())
@@ -133,6 +146,8 @@ export class Output {
 
   decided(approved: boolean) {
     this.awaitingApproval = false
+    if (this.interactive)
+      this.stderr.write('\n')
     this.status(approved ? `${this.messages.runningTool}: ${this.approvalTool ?? this.messages.tool}` : this.messages.thinking)
     for (const event of this.deferred.splice(0))
       this.event(event)
