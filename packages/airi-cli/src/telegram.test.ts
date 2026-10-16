@@ -116,10 +116,12 @@ it('restores each private chat separately after restart and never exposes termin
 it('allows local help and status without a model request, and resets only the selected chat', async () => {
   const { message, reply, fetch, host } = await connect()
   await message('/start')
+  await message('/help')
   await message('/status')
   await message('/permistion full')
   expect(fetch).not.toHaveBeenCalled()
   expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramWelcome)
+  expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramCommands)
   await message('Old conversation')
   await vi.waitFor(() => expect(reply).toHaveBeenCalledWith('Xin chào'))
   await message('/new')

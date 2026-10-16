@@ -73,6 +73,7 @@ The default interface language is Vietnamese.
 Use `ANGELA_LOCALE=en` or `--locale en` for English.
 
 During interactive chat, Ctrl+C cancels the current request. Use `/exit` or Ctrl+D to quit.
+Use `/help` to list the chat commands and keyboard controls without contacting the model.
 One-shot requests return exit code 1 for errors and 130 for cancellation.
 
 Interactive startup clears the terminal display and shows Angela's robot icon.
@@ -184,7 +185,8 @@ Only one polling process can use the bot token. An existing webhook prevents sta
 
 Telegram commands:
 
-- `/start` or `/help`: show the available commands.
+- `/start`: introduce Angela.
+- `/help`: list Telegram commands and describe each command.
 - `/status`: show the model, session ID, and request status.
 - `/new`: clear the current chat's stored conversation and start again.
 - `/cancel`: cancel the current request.

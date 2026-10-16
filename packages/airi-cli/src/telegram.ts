@@ -37,7 +37,8 @@ export class TelegramChat {
       if (!this.closing && ctx.chat?.type === 'private' && ctx.from && this.allowedUsers.has(ctx.from.id))
         await next()
     })
-    bot.command(['start', 'help'], ctx => ctx.reply(messages.telegramWelcome))
+    bot.command('start', ctx => ctx.reply(messages.telegramWelcome))
+    bot.command('help', ctx => ctx.reply(messages.telegramCommands))
     bot.command('cancel', async (ctx) => {
       const job = this.jobs.get(ctx.chat.id)
       if (!job) {
@@ -57,7 +58,7 @@ export class TelegramChat {
       }
       const reset = ctx.message.text === '/new' || ctx.message.text === `/new@${bot.botInfo.username}`
       if (ctx.message.text.startsWith('/') && !reset) {
-        await ctx.reply(messages.telegramWelcome)
+        await ctx.reply(messages.telegramCommands)
         return
       }
       const controller = new AbortController()

@@ -188,6 +188,10 @@ async function main() {
           output.submitted()
           if (text === undefined || text === '/exit')
             break
+          if (text === '/help') {
+            process.stderr.write(`${messages.cliCommands}\n`)
+            continue
+          }
           const commandResponse = permissions.command(text)
           if (commandResponse !== undefined) {
             process.stderr.write(`${commandResponse}\n`)
