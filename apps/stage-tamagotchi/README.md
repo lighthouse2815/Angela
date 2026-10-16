@@ -3,6 +3,15 @@
 The Electron desktop app runs AIRI characters, chat, voice, and desktop tools.
 Shared character behavior belongs in `packages/stage-ui`. Use `stage-web` for browser-only features.
 
+## Shared local configuration
+
+Desktop shares direct provider settings and the chat model with CLI and locally served web through `~/.config/angela/config.json`.
+Set `ANGELA_CONFIG` before starting the application to select another file.
+The main process owns file access through Eventa IPC. Only the Pinia leader persists completed settings actions.
+Existing direct providers import once per profile. External edits refresh every 1.5 seconds.
+Account sessions and interface preferences remain with their current stores.
+See [local configuration](../../packages/local-config/README.md) for the file contract.
+
 ## Development
 
 From the repository root, run `pnpm install`, then `pnpm dev:tamagotchi`.

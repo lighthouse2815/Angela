@@ -9,12 +9,16 @@ import { fileURLToPath } from 'node:url'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { errorMessageFrom } from '@moeru/std'
-import { getDefinedProvider, getGenerationProvider } from '@proj-airi/provider-inference'
+import { getGenerationProvider, listProviders } from '@proj-airi/provider-inference'
 
 import { Chat } from '../chat'
 import { readConfig } from '../config'
+import { formatRequestError } from '../errors'
 import { McpTools } from '../mcp'
+import { Output } from '../output'
+import { Permissions } from '../permissions'
 import { Sessions } from '../sessions'
+import { runTelegram } from '../telegram'
 import { Terminal } from '../terminal'
 
 /**
@@ -25,11 +29,17 @@ import { Terminal } from '../terminal'
  *                    -> McpTools -> MCP client -> tool server
  */
 async function main() {
-  const config = readConfig(process.argv.slice(2), process.env)
+  if (process.argv[2] === 'telegram') {
+    await runTelegram(process.argv.slice(3), process.env)
+    return
+  }
+  const config = await readConfig(process.argv.slice(2), process.env)
   const messages = config.messages
   if (config.help) {
-    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\n\n${[
+    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela telegram [--help]\n\n${[
       ['--model', messages.model],
+      ['--provider', messages.provider],
+      ['--config', messages.configFile],
       ['--base-url', messages.baseUrl],
       ['--api', messages.protocol],
       ['--prompt, -p', messages.prompt],
@@ -59,14 +69,22 @@ async function main() {
     throw new Error(messages.invalidWorkspace)
   const session = await sessions.open(workspace, config.resume)
   try {
-    const definition = getDefinedProvider('openai-compatible')!
-    const provider = getGenerationProvider(await definition.createProvider({ apiKey: config.apiKey, baseUrl: config.baseUrl, api: config.api }))!
+    const definition = listProviders().find(provider => provider.id === config.definitionId)
+    if (!definition)
+      throw new Error(`${messages.unsupportedProvider}: ${config.definitionId}`)
+    const provider = getGenerationProvider(await definition.createProvider(config.providerConfig))
+    if (!provider)
+      throw new Error(`${messages.unsupportedProvider}: ${config.definitionId}`)
     const chat = new Chat(config.model, provider, workspace, session.restore())
     await session.save(chat.conversation, session.record.interrupted)
+    const interactive = process.stdin.isTTY && config.prompt === undefined
+    const output = new Output(messages)
+    const permissions = new Permissions(messages)
+    if (interactive)
+      output.intro()
     process.stderr.write(`${messages.session}: ${session.record.id}\n`)
     if (session.record.interrupted)
       process.stderr.write(`${messages.incompleteSession}\n`)
-    const interactive = process.stdin.isTTY && config.prompt === undefined
     let input: Terminal | undefined
     let active: AbortController | undefined
     const shutdown = new AbortController()
@@ -96,30 +114,30 @@ async function main() {
       active = new AbortController()
       let completed = false
       try {
+        output.start()
         await session.save(chat.conversation, true)
         await chat.send(text, {
           abortSignal: active.signal,
           tools: mcp?.definitions(),
-          onStreamEvent(event) {
-            if (event.type === 'text-delta')
-              process.stdout.write(event.text)
-            if (event.type === 'error')
-              throw event.error
-            if (event.type === 'tool-call')
-              process.stderr.write(`\n${messages.tool}: ${event.toolName}\n`)
-            if (event.type === 'tool-result' || event.type === 'tool-error')
-              process.stderr.write(`${JSON.stringify(event)}\n`)
+          diagnostics: {
+            // The send catch owns the final message. SDK promise diagnostics must not print the same failure again.
+            error() {},
+            warn() { output.retry() },
           },
+          onStreamEvent: event => output.event(event),
         })
+        if (!output.hasText)
+          throw new Error(messages.emptyResponse)
         completed = true
-        process.stdout.write('\n')
       }
       catch (error) {
-        process.stderr.write(`\n${active.signal.aborted ? messages.interrupted : `${messages.failed}: ${errorMessageFrom(error) ?? String(error)}`}\n`)
+        output.stop()
+        process.stderr.write(`\n${active.signal.aborted ? messages.interrupted : `${messages.failed}: ${formatRequestError(error, messages)}`}\n`)
         if (!interactive && process.exitCode !== 143)
           process.exitCode = active.signal.aborted ? 130 : 1
       }
       finally {
+        output.stop()
         active = undefined
         await session.save(chat.conversation, !completed)
       }
@@ -146,20 +164,39 @@ async function main() {
         })
         await client.connect(transport, { signal: shutdown.signal })
         mcp = new McpTools(client, async (request, signal) => {
-          process.stderr.write(`\n${messages.tool}: ${request.name}\n${JSON.stringify(request.arguments, null, 2)}\n`)
-          if (!input)
+          output.approval(request)
+          if (permissions.fullAccess) {
+            signal?.throwIfAborted()
+            output.decided(true)
+            return true
+          }
+          if (!input) {
+            output.decided(false)
             return false
-          return (await input.ask(`${messages.approve} `, signal))?.trim().toLowerCase() === 'yes'
+          }
+          const approved = (await input.ask(`\n${messages.approve} `, signal))?.trim().toLowerCase() === 'yes'
+          output.decided(approved)
+          return approved
         }, messages, config.computerUse ? workspace : undefined)
         await mcp.discover(shutdown.signal)
         process.stderr.write(`${messages.mcpConnected}\n`)
       }
       if (input && interactive) {
-        process.stderr.write(`${messages.workspace}: ${workspace}\n${messages.welcome}\n`)
+        process.stderr.write(`${messages.workspace}: ${workspace}\n${messages.welcome}\n${messages.permissionAsk}\n`)
         while (true) {
-          const text = (await input.ask('> '))?.trim()
+          const text = (await input.ask(output.prompt()))?.trim()
+          output.submitted()
           if (text === undefined || text === '/exit')
             break
+          if (text === '/help') {
+            process.stderr.write(`${messages.cliCommands}\n`)
+            continue
+          }
+          const commandResponse = permissions.command(text)
+          if (commandResponse !== undefined) {
+            process.stderr.write(`${commandResponse}\n`)
+            continue
+          }
           if (text)
             await send(text)
         }

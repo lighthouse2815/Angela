@@ -60,7 +60,7 @@ export class McpTools {
         type: 'function',
         function: {
           name: 'builtIn_mcpCallTool',
-          description: 'Call a discovered MCP tool. arguments contains a JSON object. User approval is required.',
+          description: 'Call a discovered MCP tool. arguments contains a JSON object. The CLI applies the user-selected approval mode.',
           parameters: {
             type: 'object',
             properties: { name: { type: 'string' }, arguments: { type: 'string' } },

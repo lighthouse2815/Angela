@@ -41,6 +41,7 @@ import { setupHomeAssistant } from './services/airi/home-assistant'
 import { setupBuiltInServer } from './services/airi/http-server'
 import { IOTraceRecordingService } from './services/airi/io-trace-recording'
 import { setupLearningReviewNotifications } from './services/airi/learning-reviews'
+import { setupLocalProviderConfig } from './services/airi/local-config'
 import { setupMcpManager } from './services/airi/mcp-servers'
 import { setupExtensionHost } from './services/airi/plugins'
 import { setupStudyWorkspace } from './services/airi/study-workspace'
@@ -394,6 +395,7 @@ app.whenReady().then(async () => {
     callback: async (deps) => {
       const { context } = createContext(ipcMain)
       setupComputerUse(context)
+      setupLocalProviderConfig(context)
       setupStudyWorkspace(context)
       setupHomeAssistant(context)
       await setupArtistryBridge({

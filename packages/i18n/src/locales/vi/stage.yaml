@@ -275,3 +275,5 @@ character-switcher:
 computer-use:
   label: Sử dụng máy tính
   description: Cho phép cửa sổ trò chuyện này xem và điều khiển ứng dụng gốc trên máy tính này.
+
+local-config-error: Không thể đồng bộ cài đặt nhà cung cấp. Kiểm tra file cấu hình chung.

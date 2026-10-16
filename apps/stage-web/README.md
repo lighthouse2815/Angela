@@ -6,6 +6,14 @@
 
 > Heavily inspired by [Neuro-sama](https://www.youtube.com/@Neurosama)
 
+## Shared local configuration
+
+When served on localhost through Vite development or preview, this app shares `~/.config/angela/config.json` with desktop and CLI.
+Set `ANGELA_CONFIG` before starting Vite to select another file. Provider settings save automatically and external edits refresh every 1.5 seconds.
+Each browser profile imports its existing direct providers once. Shared values take priority when instance IDs match.
+The Vite endpoint only accepts local, same-origin requests. Hosted builds keep their current configuration behavior.
+See [local configuration](../../packages/local-config/README.md) for the file contract.
+
 ## Performance diagnostics
 
 Run `pnpm dev:web:https` from the repository root. Open `/devtools/performance-visualizer` and enable FPS.

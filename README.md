@@ -33,7 +33,7 @@ Sau khi cài dependencies, build CLI cùng các package cần thiết:
 pnpm build:cli
 ```
 
-Đặt `ANGELA_MODEL`, `ANGELA_BASE_URL` và `ANGELA_API_KEY` theo provider của bạn, rồi chạy:
+Chọn provider trực tiếp và model trong phần cài đặt của desktop hoặc web local, rồi chạy:
 
 ```bash
 pnpm cli
@@ -44,6 +44,20 @@ pnpm cli --resume ID_PHIEN
 
 CLI hỏi xác nhận trước khi gọi công cụ. Model không được tự phê duyệt thao tác.
 Xem [hướng dẫn CLI](./packages/airi-cli/README.md) để cấu hình provider, MCP và thư mục lưu phiên.
+
+## Cấu hình dùng chung trên máy
+
+Desktop, web chạy bằng Vite trên localhost và CLI dùng chung `~/.config/angela/config.json`.
+File lưu provider, API key và model chat. Provider trực tiếp không yêu cầu đăng nhập tài khoản Angela.
+Lần mở đầu, ứng dụng nhập các provider trực tiếp đã lưu trong trình duyệt vào file chung.
+Thay đổi trong cài đặt được lưu tự động. Các cửa sổ đang mở đọc lại file sau khoảng 1,5 giây.
+CLI đọc file khi bắt đầu phiên.
+
+Đặt `ANGELA_CONFIG` trước khi chạy ứng dụng để dùng file khác. CLI còn hỗ trợ `--config`.
+Thứ tự ưu tiên của CLI: tham số dòng lệnh → biến môi trường → file chung.
+Các biến `ANGELA_MODEL`, `ANGELA_BASE_URL` và `ANGELA_API_KEY` vẫn dùng được để ghi đè cho từng lần chạy.
+File chứa key nằm ngoài repository. Không đưa file này lên Git.
+Cấu hình bản hosted và đồng bộ qua tài khoản nằm ngoài phạm vi hiện tại.
 
 ## AI và giọng nói
 

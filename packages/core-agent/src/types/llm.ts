@@ -67,6 +67,11 @@ export interface StreamOptions {
   abortSignal?: AbortSignal
   headers?: Record<string, string>
   onStreamEvent?: (event: StreamEvent) => void | Promise<void>
+  /**
+   * Hosts own diagnostic output. Request failures still reject the generation promise.
+   * @default console
+   */
+  diagnostics?: Pick<Console, 'error' | 'warn'>
   /** Called once after the full stream, including tool rounds, has settled. */
   onUsage?: (usage: LlmUsage) => void | Promise<void>
   /** Internal correlation kept out of the provider request body. */

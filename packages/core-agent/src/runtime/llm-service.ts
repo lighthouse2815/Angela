@@ -79,6 +79,7 @@ async function streamOnce({
   options,
   builtinToolsResolver,
 }: StreamFromOptions) {
+  const diagnostics = options?.diagnostics ?? console
   const initialStep = await options?.resolveStep?.()
   const currentModel = initialStep?.model ?? model
   const currentProvider = initialStep?.chatProvider ?? chatProvider
@@ -178,7 +179,7 @@ async function streamOnce({
           usage = await streamResult.totalUsage
         }
         catch (error) {
-          console.error('Stream totalUsage error:', error)
+          diagnostics.error('Stream totalUsage error:', error)
         }
         try {
           const normalizedUsage = !usage
@@ -190,37 +191,37 @@ async function streamOnce({
         catch (error) {
           // Usage observers are telemetry-only and must not turn a completed
           // provider response into a failed user message.
-          console.error('Stream usage callback error:', error)
+          diagnostics.error('Stream usage callback error:', error)
         }
         resolveOnce()
       }).catch((error) => {
         // A failure after `steps` resolved belongs to optional usage
         // observation and cannot invalidate the completed response.
         if (stepsSettled) {
-          console.error('Stream usage observation error:', error)
+          diagnostics.error('Stream usage observation error:', error)
           resolveOnce()
           return
         }
         rejectOnce(error)
         if (reportsFailure(error))
-          console.error('Stream steps error:', error)
+          diagnostics.error('Stream steps error:', error)
       })
       // `steps` can reject before the success path awaits `messages`.
       // Keep this rejection sink so xsAI cannot create an unhandled rejection.
       void streamResult.generatedTurn.catch((error) => {
         if (reportsFailure(error))
-          console.error('Stream generated turn error:', error)
+          diagnostics.error('Stream generated turn error:', error)
       })
       void streamResult.usage.catch((error) => {
         if (reportsFailure(error))
-          console.error('Stream usage error:', error)
+          diagnostics.error('Stream usage error:', error)
       })
       // `steps` and `totalUsage` reject independently when xsAI fails a
       // stream. The success path awaits `totalUsage`, but if `steps` rejects
       // first that await never runs, so keep this unconditional rejection sink.
       void streamResult.totalUsage.catch((error) => {
         if (reportsFailure(error))
-          console.error('Stream totalUsage error:', error)
+          diagnostics.error('Stream totalUsage error:', error)
       })
     }
     catch (error) {
@@ -238,6 +239,7 @@ async function streamOnce({
  * Cancelling through `abortSignal` also ends a pending retry wait.
  */
 async function streamWithTransientRetry(input: StreamFromOptions) {
+  const diagnostics = input.options?.diagnostics ?? console
   for (let attempt = 0; ; attempt++) {
     let consumerNotified = false
     try {
@@ -256,7 +258,7 @@ async function streamWithTransientRetry(input: StreamFromOptions) {
       const delayMs = consumerNotified ? undefined : transientRetryDelayMs(error, attempt)
       if (delayMs == null)
         throw error
-      console.warn(`[llm] Retrying provider request in ${delayMs}ms (retry ${attempt + 1}/${transientRetry.backoffMs.length}):`, error)
+      diagnostics.warn(`[llm] Retrying provider request in ${delayMs}ms (retry ${attempt + 1}/${transientRetry.backoffMs.length}):`, error)
       await waitBeforeRetry(delayMs, input.options?.abortSignal)
     }
   }

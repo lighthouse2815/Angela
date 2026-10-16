@@ -21,8 +21,12 @@
     "@proj-airi/computer-use-mcp": "workspace:^",
     "@proj-airi/core-agent": "workspace:^",
     "@proj-airi/i18n": "workspace:^",
+    "@proj-airi/local-config": "workspace:^",
     "@proj-airi/provider-inference": "workspace:^",
+    "@xsai/shared": "catalog:",
     "@xsai/shared-chat": "catalog:",
+    "abort-controller": "catalog:",
+    "grammy": "catalog:",
     "valibot": "catalog:"
   }
 }
