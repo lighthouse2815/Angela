@@ -4,12 +4,14 @@ Agent-facing guide for `server/apps/api`.
 
 ## Overview
 
-Hono-based Node.js resource API. The sibling `server/apps/auth` workspace app owns Better Auth, OIDC, sessions, and account lifecycle; this package owns billing, chat sync, LLM gateway forwarding, and business observability. **Multi-instance deployed on Railway** — design all features assuming N>1 instances sharing the same Postgres and Redis.
+The hosted Hono API owns billing, chat sync, LLM gateway forwarding, and business observability.
+The deferred service at `dev-infuture/server/apps/auth` owns Better Auth, OIDC, sessions, and account lifecycle.
+Hosted Railway instances share Postgres and Redis. Design hosted features for multiple instances.
 
 ## Deployment Model
 
 - Hosted on **Railway**, multiple instances behind a load balancer.
-- Independent applications: `server/apps/api/src/main.ts` and `server/apps/auth/src/main.ts`. There is no runtime role CLI and neither app imports the other service graph.
+- Independent applications: `server/apps/api/src/main.ts` and `dev-infuture/server/apps/auth/src/main.ts`. There is no runtime role CLI and neither app imports the other service graph.
 - The API has no background polling loops or fire-and-forget tasks — every business write happens inside the request thread.
 - Stateless per-instance: no local state that matters across requests.
 - Cross-instance coordination via Redis Pub/Sub (WebSocket broadcast). DB-level idempotency (`(userId, requestId)` partial unique index on `flux_transaction`) covers retries.
@@ -17,9 +19,11 @@ Hono-based Node.js resource API. The sibling `server/apps/auth` workspace app ow
 
 ## Tech Stack
 
-Hono, Drizzle ORM, PostgreSQL, Redis, Stripe, OpenTelemetry, Valibot, injeca (DI), tsx. Better Auth lives only in `server/apps/auth`.
+Hono, Drizzle ORM, PostgreSQL, Redis, Stripe, OpenTelemetry, Valibot, injeca (DI), tsx. Better Auth lives only in `dev-infuture/server/apps/auth`.
 
 ## Commands
+
+Auth is deferred. Activate its workspace through [`dev-infuture/README.md`](../../../dev-infuture/README.md) before using Auth commands.
 
 ```sh
 pnpm -F @proj-airi/api-server dev                # dev with dotenvx (.env.local)
@@ -35,7 +39,7 @@ Local observability is maintained in `proj-airi/airi-railway`; run its `otel/doc
 
 ## Architecture Summary
 
-**Entry & DI**: `server/apps/api/src/main.ts` → `src/server.ts` → `src/app.ts`; `server/apps/auth/src/main.ts` → `src/server.ts`. The workspace apps have separate package manifests, env schemas, Dockerfiles, and composition roots.
+**Entry & DI**: `server/apps/api/src/main.ts` → `src/server.ts` → `src/app.ts`; `dev-infuture/server/apps/auth/src/main.ts` → `src/server.ts`. The workspace apps have separate package manifests, env schemas, Dockerfiles, and composition roots.
 
 **Layering**:
 - **Routes** (`src/routes/`): thin — param validation (Valibot), auth guards, error mapping. No business logic here.
@@ -52,5 +56,5 @@ Local observability is maintained in `proj-airi/airi-railway`; run its `otel/doc
 - **No async billing pipeline**: debits and credits update balance + ledger in one transaction. The `(user_id, request_id)` partial unique index gives DB-level idempotency for retries; LLM `request log` rows are written best-effort right after the response is delivered.
 - **In-process LLM/TTS router**: `/api/v1/openai` is dispatched by `services/domain/llm-router` reading `LLM_ROUTER_CONFIG` (per-model upstream chain + envelope-encrypted keys). `chat/completions` walks LLM upstreams with key fallback; `audio/speech` delegates to a TTS adapter (`azure` / `dashscope-cosyvoice` / `volcengine`); `audio/voices` returns the adapter's compiled-in catalog. Server handles auth/billing/logging, not model execution.
 - **Redis is cache + pub/sub, not truth**: balance cache, app_settings read cache, WebSocket cross-instance pub/sub. Truth is always Postgres.
-- **Auth boundary**: `server/apps/auth` owns Better Auth + OIDC. The API's `sessionMiddleware` validates Auth-issued JWTs and fills context but doesn't block; `authGuard` returns 401.
+- **Auth boundary**: `dev-infuture/server/apps/auth` owns Better Auth + OIDC. The API's `sessionMiddleware` validates Auth-issued JWTs and fills context but doesn't block; `authGuard` returns 401.
 - **Multi-instance safe**: all writes go through Postgres transactions; cross-instance messaging uses Redis Pub/Sub. No async work or in-process singletons.

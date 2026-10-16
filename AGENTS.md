@@ -10,7 +10,7 @@ All apps use Vue 3, Vite, TypeScript, Pinia, VueUse, UnoCSS, Vitest, and ESLint.
 | --- | --- |
 | `apps/stage-web` | The web app. It uses Vue Router. |
 | `apps/stage-tamagotchi` | The Electron desktop app. |
-| `apps/stage-pocket` | The mobile app. It uses Vue Router, Capacitor, Kotlin, and Swift. |
+| `dev-infuture/apps/stage-pocket` | The mobile app. It uses Vue Router, Capacitor, Kotlin, and Swift. |
 | `packages/stage-ui` | Business components, composables, and stores that stage-web and stage-tamagotchi share. |
 | `packages/stage-ui-three` | Three.js bindings and Vue components. |
 | `packages/stage-shared` | Logic that the stage packages and the stage apps share. |
@@ -20,10 +20,10 @@ All apps use Vue 3, Vite, TypeScript, Pinia, VueUse, UnoCSS, Vitest, and ESLint.
 | `packages/i18n` | All translations. |
 | `packages/server-runtime`, `packages/server-sdk`, `packages/server-shared` | The server channel that `services/` and `plugins/` use. |
 | `server/apps/api` | The hosted Hono resource API and its business domains. |
-| `server/apps/auth` | The standalone Better Auth and OIDC service. |
-| `server/packages` | Backend-only schema and Node infrastructure packages. |
-| `server/dev/caddy` | Local Auth and API edge routing. |
-| `server/docker-compose.yaml` | The complete local backend stack. |
+| `dev-infuture/server/apps/auth` | The standalone Better Auth and OIDC service. |
+| `server/packages` | Shared API schemas and chat contracts that desktop types also consume. |
+| `dev-infuture/server/dev/caddy` | Local Auth and API edge routing. |
+| `dev-infuture/server/docker-compose.yaml` | The complete local backend stack. |
 
 Key files and directories:
 
@@ -39,6 +39,13 @@ Key files and directories:
 - The dependency injection example is `apps/stage-tamagotchi/src/main/index.ts`.
 - Style configuration is in `uno.config.ts`. Existing animations are in `apps/stage-web/src/styles`.
 - Lint rules are in `eslint.config.ts`.
+
+## Current Development Scope
+
+Focus on `apps/stage-tamagotchi`, local AI, voice, memory, computer use, avatars, and Telegram.
+Deferred modules live in `dev-infuture/` and stay outside the default workspace.
+Read [`dev-infuture/README.md`](dev-infuture/README.md) before restoring one.
+The API and shared server packages remain active because desktop imports their contracts.
 
 ## Commands
 
