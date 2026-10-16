@@ -370,8 +370,8 @@ Use these interactive commands:
 /memory on
 ```
 
-`/memory` shows full record IDs, texts, and enabled state. Replace `ID` with one listed ID.
-Direct commands save before reporting success. They do not call the AI provider.
+`/memory` shows the record count, full record IDs, texts, and enabled state. Replace `ID` with one listed ID.
+Direct save and edit commands show the saved text and ID after the write succeeds. They do not call the AI provider.
 Automatic memory is on by default. Clear statements such as “Tôi tên là Đăng” can be saved without a remember request.
 The existing chat model selects durable first-person facts and writes them through its native tool. No separate extraction request is added.
 Use `/memory auto off` for explicit-request-only edits while keeping saved facts available. `/memory auto on` restores automatic selection.
@@ -381,7 +381,11 @@ Repeated behavior alone does not establish a lasting preference. Angela asks bef
 Clear self-corrections update matching records. Ambiguous conflicts require clarification, and equivalent facts reuse an existing record.
 These semantic decisions depend on the selected model. Inspect `/memory` to check what it actually saved.
 Model saves require a verbatim excerpt from your current message. Paraphrased or inferred facts are rejected.
-The model reports success only after the storage tool succeeds. Use `/memory` to inspect saved records.
+The CLI shows a memory notification after each successful model tool write, including voice turns.
+Saved and updated notifications show the text and record ID. Deleted notifications show the record ID.
+Rejected edits show a failure notice and reason. These notices appear in terminal output, outside spoken replies.
+A failed or cancelled reply does not undo completed memory writes. Notifications do not depend on the model confirming success.
+Use `/memory` to inspect saved records.
 Voice transcripts go to the model. Only typed slash commands directly edit memory.
 
 Memory holds at most 50 records, with 500 characters per record. Exact duplicate saves reuse the existing record.

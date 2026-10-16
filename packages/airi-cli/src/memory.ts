@@ -160,7 +160,7 @@ export class Memory {
             return { status: 'deleted', id }
           }
           const saved = await this.remember(text!, id ?? undefined, existing?.text)
-          return { status: 'saved', id: saved }
+          return { status: 'saved', id: saved, action, text }
         }
         catch (error) {
           options.abortSignal?.throwIfAborted()
@@ -174,7 +174,7 @@ export class Memory {
   async command(text: string): Promise<string | undefined> {
     if (text === '/memory') {
       const state = await this.read()
-      return [state.enabled ? this.messages.memoryEnabled : this.messages.memoryDisabled, state.autoEnabled ? this.messages.memoryAutomatic : this.messages.memoryRequested, ...state.entries.map(entry => `${entry.id} ${JSON.stringify(entry.text)}`), this.messages.memoryUsage].join('\n')
+      return [state.enabled ? this.messages.memoryEnabled : this.messages.memoryDisabled, state.autoEnabled ? this.messages.memoryAutomatic : this.messages.memoryRequested, `${this.messages.memoryCount}: ${state.entries.length}/50`, ...state.entries.map(entry => `${entry.id} ${JSON.stringify(entry.text)}`), this.messages.memoryUsage].join('\n')
     }
     if (text === '/memory auto on' || text === '/memory auto off') {
       const automatic = text === '/memory auto on'
@@ -186,11 +186,15 @@ export class Memory {
       await this.setEnabled(enabled)
       return enabled ? this.messages.memoryEnabled : this.messages.memoryDisabled
     }
-    if (text.startsWith('/remember '))
-      return `${this.messages.memorySaved}: ${await this.remember(text.slice(10))}`
+    if (text.startsWith('/remember ')) {
+      const fact = text.slice(10).trim()
+      return `${this.messages.memorySaved}: ${await this.remember(fact)} ${JSON.stringify(fact)}`
+    }
     const update = /^\/memory edit (\S+) ([\s\S]+)$/u.exec(text)
-    if (update)
-      return `${this.messages.memorySaved}: ${await this.remember(update[2]!, update[1]!)}`
+    if (update) {
+      const fact = update[2]!.trim()
+      return `${this.messages.memorySaved}: ${await this.remember(fact, update[1]!)} ${JSON.stringify(fact)}`
+    }
     if (text.startsWith('/forget ')) {
       await this.forget(text.slice(8).trim())
       return this.messages.memoryForgotten

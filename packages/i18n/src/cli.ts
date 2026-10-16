@@ -1,4 +1,7 @@
 const en = {
+  memoryCount: 'Saved memories',
+  memoryUpdated: 'Memory updated',
+  memoryNotSaved: 'Cannot confirm the memory edit',
   doctorVoiceReady: 'Voice health endpoint is ready. Transcription and speech have not been tested.',
   doctorUsage: 'angela doctor [--json] [--locale en|vi] [--config PATH] [--data-dir PATH] [--cwd PATH] [--model ID] [--base-url URL]',
   doctorContext: 'Context budget is valid.',
@@ -170,6 +173,9 @@ const en = {
 }
 
 const vi: typeof en = {
+  memoryCount: 'Số ghi nhớ đã lưu',
+  memoryUpdated: 'Đã cập nhật ghi nhớ',
+  memoryNotSaved: 'Không xác nhận được thay đổi ghi nhớ',
   doctorVoiceReady: 'Endpoint sức khỏe voice sẵn sàng. Chưa thử nhận dạng và phát giọng nói.',
   doctorUsage: 'angela doctor [--json] [--locale en|vi] [--config PATH] [--data-dir PATH] [--cwd PATH] [--model ID] [--base-url URL]',
   doctorContext: 'Ngân sách ngữ cảnh hợp lệ.',

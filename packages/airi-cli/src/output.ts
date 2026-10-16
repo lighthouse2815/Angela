@@ -12,6 +12,12 @@ import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js'
 
 import * as v from 'valibot'
 
+// Only successful storage results can produce a memory-change confirmation.
+const memoryResultSchema = v.variant('status', [
+  v.object({ status: v.literal('saved'), id: v.pipe(v.string(), v.uuid()), action: v.picklist(['remember', 'update']), text: v.pipe(v.string(), v.maxLength(500)) }),
+  v.object({ status: v.literal('deleted'), id: v.pipe(v.string(), v.uuid()) }),
+  v.object({ status: v.literal('rejected'), reason: v.string() }),
+])
 const pendingSchema = v.object({ action: v.object({ kind: v.string(), input: v.record(v.string(), v.unknown()) }) })
 const callSchema = v.object({ name: v.string() })
 const backendSchema = v.object({
@@ -190,6 +196,25 @@ export class Output {
           raw = JSON.parse(raw)
         }
         catch { /* Plain text is also a supported tool result. */ }
+      }
+      if (name === 'personal_memory' && event.type === 'tool-result') {
+        const memory = v.safeParse(memoryResultSchema, raw)
+        if (memory.success) {
+          const change = memory.output
+          if (change.status === 'rejected') {
+            this.stderr.write(`✗ ${this.messages.memoryNotSaved}\n`)
+            this.preview(change.reason)
+          }
+          else {
+            const label = change.status === 'deleted'
+              ? this.messages.memoryForgotten
+              : change.action === 'update' ? this.messages.memoryUpdated : this.messages.memorySaved
+            this.stderr.write(`✓ ${label}\n`)
+            this.preview(change.status === 'saved' ? `${change.id} ${JSON.stringify(change.text)}` : change.id)
+          }
+          this.status(this.calls.size ? this.messages.runningTool : this.messages.thinking)
+          return
+        }
       }
       const result = CallToolResultSchema.safeParse(raw)
       const backend = v.safeParse(backendSchema, result.success ? result.data.structuredContent : undefined)
