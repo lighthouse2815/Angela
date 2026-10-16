@@ -1,5 +1,6 @@
 const en = {
   tasks: {
+    input: 'Invalid task input. Use a valid title, task ID, timezone, and schedule. Routine tasks require recurrence and dueAt.',
     invalid: 'Task storage is invalid or full. Preserve tasks/tasks.json and repair it before retrying.',
     locked: 'Task storage is busy or has a lock from an interrupted write. Retry after the other writer exits.',
     missing: 'Task not found. Use /tasks and copy its full ID.',
@@ -127,7 +128,7 @@ const en = {
   cwd: 'Workspace directory',
   locale: 'Interface language: en or vi',
   help: 'Show help',
-  cliCommands: 'Available commands:\n/voice — Speak and hear replies.\n/chat — Return to text chat.\n/context — Show context budget and summary status.\n/project — View and manage this project checkpoint.\n/memory — View and manage personal memory.\n/remember TEXT — Save a personal fact.\n/forget ID — Delete one personal memory.\n/help — Show this list.\n/permistion — Show the current tool permission mode.\n/permistion full — Run tools without confirmation in this session.\n/permistion ask — Ask before each tool call.\n/permission — Alias for /permistion. on/off also select full/ask.\n/exit — Exit Angela.\n\nCtrl+C — Cancel the active request. Ctrl+D — Exit.',
+  cliCommands: 'Available commands:\n/voice — Speak and hear replies.\n/chat — Return to text chat.\n/tasks — List pending tasks.\n/today — List tasks due today.\n/done ID — Complete a task.\n/cancel ID — Cancel a task.\n/snooze ID 10m — Snooze a task.\n/context — Show context budget and summary status.\n/project — View and manage this project checkpoint.\n/memory — View and manage personal memory.\n/remember TEXT — Save a personal fact.\n/forget ID — Delete one personal memory.\n/help — Show this list.\n/permistion — Show the current tool permission mode.\n/permistion full — Run tools without confirmation in this session.\n/permistion ask — Ask before each tool call.\n/permission — Alias for /permistion. on/off also select full/ask.\n/exit — Exit Angela.\n\nCtrl+C — Cancel the active request. Ctrl+D — Exit.',
   telegramCommands: 'Available Telegram commands:\n/start — Introduce Angela.\n/help — Show this list.\n/status — Show the model, session, and request status.\n/new — Clear this conversation and start again.\n/cancel — Cancel the active request.\n/permistion — Show tool permissions. Use full or ask to change them.\n/permission — Alias for /permistion.\n\nTools run on the machine hosting this bot. Confirmation is required by default.',
   missingModel: 'Set ANGELA_MODEL or pass --model.',
   invalidUrl: 'Use an HTTP or HTTPS provider endpoint.',
@@ -207,6 +208,7 @@ const en = {
 
 const vi: typeof en = {
   tasks: {
+    input: 'Dữ liệu tác vụ không hợp lệ. Kiểm tra tiêu đề, ID, múi giờ và lịch. Routine cần recurrence và dueAt.',
     invalid: 'Kho tác vụ không hợp lệ hoặc đã đầy. Giữ file tasks/tasks.json và sửa trước khi thử lại.',
     locked: 'Kho tác vụ đang bận hoặc còn khóa từ lần ghi bị gián đoạn. Thử lại sau khi tiến trình ghi thoát.',
     missing: 'Không tìm thấy tác vụ. Dùng /tasks rồi sao chép ID đầy đủ.',
@@ -334,7 +336,7 @@ const vi: typeof en = {
   cwd: 'Thư mục làm việc',
   locale: 'Ngôn ngữ giao diện: en hoặc vi',
   help: 'Hiện hướng dẫn',
-  cliCommands: 'Danh sách lệnh:\n/voice — Nói và nghe trả lời.\n/chat — Quay lại nhập chữ.\n/context — Xem ngân sách ngữ cảnh và trạng thái tóm tắt.\n/project — Xem và quản lý bản tóm tắt dự án.\n/memory — Xem và quản lý memory cá nhân.\n/remember NỘI_DUNG — Lưu một ghi nhớ.\n/forget ID — Xóa một ghi nhớ.\n/help — Hiện danh sách này.\n/permistion — Xem chế độ quyền công cụ hiện tại.\n/permistion full — Chạy tool không cần xác nhận trong phiên này.\n/permistion ask — Hỏi xác nhận trước mỗi lần gọi tool.\n/permission — Tên khác của /permistion. on/off tương ứng full/ask.\n/exit — Thoát Angela.\n\nCtrl+C — Hủy yêu cầu đang chạy. Ctrl+D — Thoát.',
+  cliCommands: 'Danh sách lệnh:\n/voice — Nói và nghe trả lời.\n/chat — Quay lại nhập chữ.\n/tasks — Xem tác vụ đang chờ.\n/today — Xem tác vụ hôm nay.\n/done ID — Hoàn thành tác vụ.\n/cancel ID — Hủy tác vụ.\n/snooze ID 10m — Nhắc lại sau 10 phút.\n/context — Xem ngân sách ngữ cảnh và trạng thái tóm tắt.\n/project — Xem và quản lý bản tóm tắt dự án.\n/memory — Xem và quản lý memory cá nhân.\n/remember NỘI_DUNG — Lưu một ghi nhớ.\n/forget ID — Xóa một ghi nhớ.\n/help — Hiện danh sách này.\n/permistion — Xem chế độ quyền công cụ hiện tại.\n/permistion full — Chạy tool không cần xác nhận trong phiên này.\n/permistion ask — Hỏi xác nhận trước mỗi lần gọi tool.\n/permission — Tên khác của /permistion. on/off tương ứng full/ask.\n/exit — Thoát Angela.\n\nCtrl+C — Hủy yêu cầu đang chạy. Ctrl+D — Thoát.',
   telegramCommands: 'Danh sách lệnh Telegram:\n/start — Giới thiệu Angela.\n/help — Hiện danh sách này.\n/status — Xem model, phiên và trạng thái yêu cầu.\n/new — Xóa hội thoại hiện tại và bắt đầu lại.\n/cancel — Hủy yêu cầu đang chạy.\n/permistion — Xem quyền công cụ. Dùng full hoặc ask để đổi quyền.\n/permission — Tên khác của /permistion.\n\nTool chạy trên máy đang mở bot. Mặc định phải xác nhận.',
   missingModel: 'Đặt ANGELA_MODEL hoặc truyền --model.',
   invalidUrl: 'Dùng địa chỉ provider HTTP hoặc HTTPS.',

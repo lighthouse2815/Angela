@@ -22,6 +22,9 @@ import { ProjectMemory } from '../project-memory'
 import { runSessionCommand } from '../session-command'
 import { Sessions } from '../sessions'
 import { StreamingSpeech } from '../streaming-speech'
+import { taskCommand } from '../task-commands'
+import { taskContext, taskTools } from '../task-tools'
+import { Tasks } from '../tasks'
 import { runTelegram } from '../telegram'
 import { Terminal } from '../terminal'
 import { Voice } from '../voice'
@@ -102,6 +105,7 @@ async function main() {
     const output = new Output(messages)
     const permissions = new Permissions(messages)
     let input: Terminal | undefined
+    const tasks = new Tasks(config.dataDir, messages.tasks)
     const memory = new Memory(config.dataDir, messages)
     const project = await ProjectMemory.open(config.dataDir, workspace, messages)
     if (interactive)
@@ -190,7 +194,7 @@ async function main() {
         }
         await chat.send(text, {
           abortSignal: active.signal,
-          tools: [...(mcp?.definitions() ?? []), ...memoryTools, ...projectTools],
+          tools: [...(mcp?.definitions() ?? []), ...memoryTools, ...projectTools, ...taskTools(tasks, messages.tasks)],
           diagnostics: {
             // The send catch owns the final message. SDK promise diagnostics must not print the same failure again.
             error() {},
@@ -209,7 +213,7 @@ async function main() {
             if (event.type === 'text-delta')
               await speech?.push(event.text)
           },
-        }, [memoryContext, projectContext].filter(Boolean).join('\n\n'))
+        }, [memoryContext, projectContext, taskContext(tasks)].filter(Boolean).join('\n\n'))
         if (!output.hasText)
           throw new Error(messages.emptyResponse)
         completed = true
@@ -351,7 +355,7 @@ async function main() {
             continue
           }
           try {
-            const response = await project.command(text) ?? await memory.command(text)
+            const response = await taskCommand(text, tasks, messages.tasks, config.locale) ?? await project.command(text) ?? await memory.command(text)
             if (response !== undefined) {
               process.stderr.write(`${response}\n`)
               continue

@@ -75,6 +75,7 @@ export async function readConfig(args: string[], env: NodeJS.ProcessEnv) {
     computerUse: values['computer-use'] ?? !values['mcp-command'],
     mcpCommand: values['mcp-command'],
     mcpArgs: values['mcp-arg'] ?? [],
+    locale,
     messages,
   }
 }

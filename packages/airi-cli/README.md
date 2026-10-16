@@ -551,3 +551,25 @@ The service exposes create, list, find, update, complete, cancel, and snooze ope
 Date-only tasks retain their date without an alarm time. Snooze preserves the task ID and original due time.
 Daily and weekly routines use local calendar time. Selected weekdays use Sunday as 0 and Saturday as 6.
 Routine completion records a check-in and retains the series. Cancellation stops the series.
+
+### Conversation and management
+
+Ask Angela to create or change tasks in ordinary conversation. For example: `10h tối nhắc tao học tiếng Trung`.
+The model uses six validated tools: `task_create`, `task_list`, `task_update`, `task_complete`, `task_cancel`, and `task_snooze`.
+Relative times use a fresh clock and the local CLI timezone. Ambiguous times require clarification.
+A request with only a date can create a date-only task without an alarm.
+
+Use these commands during interactive chat:
+
+```text
+/tasks
+/tasks all
+/today
+/done ID
+/cancel ID
+/snooze ID 10m
+```
+
+Commands use the full task ID printed by `/tasks`. Snooze also accepts durations such as `30m`, `2h`, and `1d`.
+`/tasks all` includes completed and cancelled history. `/today` uses the local calendar date.
+Conversational references use the existing chat history and saved tool results.
