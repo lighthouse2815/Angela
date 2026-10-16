@@ -77,6 +77,7 @@ it('uses fresh request-local memory without retaining removed facts in persisted
   expect(requests[1]).not.toContain('old-preference')
   expect(requests[1]).toContain('new-preference')
   expect(requests[2]).not.toContain('Personal records')
-  expect(JSON.stringify(chat.conversation)).not.toContain('preference')
+  expect(JSON.stringify(chat.conversation)).not.toContain('old-preference')
+  expect(JSON.stringify(chat.conversation)).not.toContain('new-preference')
   expect(chat.conversation.turns.map(turn => turn.type)).toEqual(['system', 'user', 'assistant', 'user', 'assistant', 'user', 'assistant'])
 })

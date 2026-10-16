@@ -1,5 +1,8 @@
 const en = {
-  memoryUsage: '/memory | /memory on|off | /remember TEXT | /memory edit ID TEXT | /forget ID',
+  memoryUsage: '/memory | /memory on|off | /memory auto on|off | /remember TEXT | /memory edit ID TEXT | /forget ID',
+  memoryUnavailable: 'Personal memory is unavailable for this reply. Chat continues without it. Check /memory. Stored data was not changed.',
+  memoryAutomatic: 'Automatic memory is on. Angela can remember clear durable facts you share without a remember request.',
+  memoryRequested: 'Automatic memory is off. Existing facts remain available. New edits require an explicit remember or update request.',
   memoryEnabled: 'Personal memory is enabled. Saved facts are sent to the selected AI provider.',
   memoryDisabled: 'Personal memory is disabled. Saved records remain on disk. Earlier messages in this conversation remain visible to the model.',
   memorySaved: 'Memory saved',
@@ -130,7 +133,10 @@ const en = {
 }
 
 const vi: typeof en = {
-  memoryUsage: '/memory | /memory on|off | /remember NỘI_DUNG | /memory edit ID NỘI_DUNG | /forget ID',
+  memoryUsage: '/memory | /memory on|off | /memory auto on|off | /remember NỘI_DUNG | /memory edit ID NỘI_DUNG | /forget ID',
+  memoryUnavailable: 'Không đọc được memory cho lượt này. Chat tiếp tục không kèm ghi nhớ. Kiểm tra /memory. Dữ liệu lưu chưa bị thay đổi.',
+  memoryAutomatic: 'Đã bật tự ghi nhớ. Angela có thể nhớ thông tin bền vững bạn chia sẻ mà không cần yêu cầu lưu.',
+  memoryRequested: 'Đã tắt tự ghi nhớ. Ghi nhớ cũ vẫn được dùng. Chỉ lưu hoặc sửa khi bạn yêu cầu rõ ràng.',
   memoryEnabled: 'Đã bật memory cá nhân. Ghi nhớ được gửi kèm đến nhà cung cấp AI đang chọn.',
   memoryDisabled: 'Đã tắt memory cá nhân. Ghi nhớ vẫn được giữ trên đĩa. Model vẫn thấy nội dung đã có trong cuộc trò chuyện này.',
   memorySaved: 'Đã lưu ghi nhớ',

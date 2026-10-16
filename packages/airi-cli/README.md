@@ -364,13 +364,22 @@ Use these interactive commands:
 /memory
 /memory edit ID Tôi thích giải thích chi tiết bằng tiếng Việt
 /forget ID
+/memory auto off
+/memory auto on
 /memory off
 /memory on
 ```
 
 `/memory` shows full record IDs, texts, and enabled state. Replace `ID` with one listed ID.
 Direct commands save before reporting success. They do not call the AI provider.
-In normal conversation, ask Angela to remember a fact. The model can propose a memory edit through its native tool.
+Automatic memory is on by default. Clear statements such as “Tôi tên là Đăng” can be saved without a remember request.
+The existing chat model selects durable first-person facts and writes them through its native tool. No separate extraction request is added.
+Use `/memory auto off` for explicit-request-only edits while keeping saved facts available. `/memory auto on` restores automatic selection.
+`/memory off` disables all saved context and model memory tools. Turning memory back on preserves your automatic-selection setting.
+Temporary moods, task commands, quotes, hypothetical examples, and inferred traits are excluded by the model instructions.
+Repeated behavior alone does not establish a lasting preference. Angela asks before turning an inference into a saved fact.
+Clear self-corrections update matching records. Ambiguous conflicts require clarification, and equivalent facts reuse an existing record.
+These semantic decisions depend on the selected model. Inspect `/memory` to check what it actually saved.
 Model saves require a verbatim excerpt from your current message. Paraphrased or inferred facts are rejected.
 The model reports success only after the storage tool succeeds. Use `/memory` to inspect saved records.
 Voice transcripts go to the model. Only typed slash commands directly edit memory.
@@ -383,7 +392,15 @@ Earlier conversation messages, tool results, and saved session history remain un
 A new session avoids previous conversation context. Resuming an old session can still expose its earlier messages.
 Deleting a chat session does not delete personal memory.
 
-Each write locks the memory file and replaces it atomically. Other writers report a lock error instead of losing edits.
-Unreadable data stays untouched and blocks requests that need memory. Repair the file before continuing.
+Parallel tool edits in one CLI process are serialized. Each write locks the memory file and replaces it atomically. Other writers report a lock error instead of losing edits.
+Unreadable data stays untouched. Chat continues without memory for that reply and shows a warning.
+Memory edits remain blocked until the data is repaired.
 After a process crash, an abandoned `memory/personal.lock` can block edits.
 Before removing that lock manually, make sure no CLI process is writing memory.
+
+Personal memory design follows bounded core context in [Letta memory blocks](https://docs.letta.com/v1-sdk/memory/memory-blocks),
+selective extraction in [Mem0](https://docs.mem0.ai/core-concepts/memory-operations/add),
+and separation of durable facts from transcripts in [OpenClaw](https://docs.openclaw.ai/concepts/memory-architecture).
+Angela uses its existing local store and tool runtime. It does not add these frameworks as dependencies.
+Record IDs and text enter model context. Storage timestamps stay on disk to reduce repeated prompt overhead.
+Assistant identity and behavior stay in the base system prompt. User memories cannot change tool approval settings.

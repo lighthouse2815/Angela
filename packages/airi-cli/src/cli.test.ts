@@ -3,7 +3,7 @@ import process from 'node:process'
 import { spawn } from 'node:child_process'
 import { once } from 'node:events'
 import { mkdtempSync } from 'node:fs'
-import { readdir, readFile, rm } from 'node:fs/promises'
+import { readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -229,7 +229,7 @@ it('runs history administration without a model or provider connection', async (
   expect(output.stderr).not.toContain('MCP')
 })
 
-it('saves a user-requested fact through a real tool round and recalls it in a fresh CLI process', async () => {
+it('automatically saves a volunteered fact through a real tool round and recalls it in a fresh CLI process', async () => {
   const bodies: string[] = []
   const server = createServer(async (request, response) => {
     let body = ''
@@ -238,7 +238,7 @@ it('saves a user-requested fact through a real tool round and recalls it in a fr
     bodies.push(body)
     response.writeHead(200, { 'Content-Type': 'text/event-stream' })
     const delta = bodies.length === 1
-      ? { role: 'assistant', tool_calls: [{ index: 0, id: 'personal-save', type: 'function', function: { name: 'personal_memory', arguments: JSON.stringify({ action: 'remember', id: null, text: 'tôi thích tiếng Việt', source_quote: 'tôi thích tiếng Việt' }) } }] }
+      ? { role: 'assistant', tool_calls: [{ index: 0, id: 'personal-save', type: 'function', function: { name: 'personal_memory', arguments: JSON.stringify({ action: 'remember', id: null, text: 'Tôi tên là Đăng', source_quote: 'Tôi tên là Đăng' }) } }] }
       : { role: 'assistant', content: 'Đã hiểu.' }
     response.end(`data: ${JSON.stringify({ choices: [{ index: 0, delta, finish_reason: bodies.length === 1 ? 'tool_calls' : 'stop' }] })}\n\ndata: [DONE]\n\n`)
   })
@@ -251,19 +251,28 @@ it('saves a user-requested fact through a real tool round and recalls it in a fr
   const directory = mkdtempSync(join(tmpdir(), 'angela-cli-memory-'))
   directories.push(directory)
   const env = { ANGELA_DATA_DIR: directory, ANGELA_BASE_URL: `http://127.0.0.1:${address.port}/v1/` }
-  const first = await run(['--prompt', 'Nhớ tôi thích tiếng Việt'], env).result
+  const first = await run(['--prompt', 'Tôi tên là Đăng'], env).result
   expect(first, first.stderr).toMatchObject({ code: 0 })
   const memory = new Memory(directory, cliMessages.en)
-  expect((await memory.read()).entries[0]!.text).toBe('tôi thích tiếng Việt')
+  expect((await memory.read()).entries[0]!.text).toBe('Tôi tên là Đăng')
+  expect(bodies[0]).toContain('Automatic personal memory is enabled')
   expect(bodies[1]).toContain('saved')
   const next = await run(['--prompt', 'Bạn nhớ gì?'], env).result
   expect(next, next.stderr).toMatchObject({ code: 0 })
-  expect(bodies[2]).toContain('tôi thích tiếng Việt')
+  expect(bodies[2]).toContain('Tôi tên là Đăng')
   for (const file of (await readdir(directory)).filter(file => file.endsWith('.json')))
     expect(await readFile(join(directory, file), 'utf8')).not.toContain('Personal records:')
   await memory.setEnabled(false)
   const disabled = await run(['--prompt', 'Chào'], env).result
   expect(disabled, disabled.stderr).toMatchObject({ code: 0 })
-  expect(bodies[3]).not.toContain('tôi thích tiếng Việt')
+  expect(bodies[3]).not.toContain('Tôi tên là Đăng')
   expect(bodies[3]).not.toContain('personal_memory')
+  const memoryPath = join(directory, 'memory', 'personal.json')
+  await writeFile(memoryPath, '{broken memory')
+  const degraded = await run(['--prompt', 'Chào lần nữa'], env).result
+  expect(degraded, degraded.stderr).toMatchObject({ code: 0, stdout: 'Đã hiểu.\n' })
+  expect(degraded.stderr).toContain(cliMessages.vi.memoryUnavailable)
+  expect(bodies[4]).not.toContain('personal_memory')
+  expect(bodies[4]).not.toContain('Personal records:')
+  expect(await readFile(memoryPath, 'utf8')).toBe('{broken memory')
 }, 20_000)

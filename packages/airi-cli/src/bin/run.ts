@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import type { Tool } from '@xsai/shared-chat'
+
 import process from 'node:process'
 
 import { realpath, stat } from 'node:fs/promises'
@@ -157,8 +159,16 @@ async function main() {
       try {
         output.start()
         await session.save(chat.conversation, true)
-        const memoryContext = await memory.context()
-        const memoryTools = await memory.tools(text)
+        let memoryContext = ''
+        let memoryTools: Tool[] = []
+        try {
+          memoryContext = await memory.context()
+          memoryTools = await memory.tools(text)
+        }
+        catch {
+          memoryContext = ''
+          process.stderr.write(`\n${messages.memoryUnavailable}\n`)
+        }
         await chat.send(text, {
           abortSignal: active.signal,
           tools: [...(mcp?.definitions() ?? []), ...memoryTools],
