@@ -153,6 +153,52 @@ History preserves text and correlated tool calls and results through the core ru
 Native provider continuation and reasoning metadata remain in memory for the current process.
 Interrupted requests are marked. The CLI does not fabricate an assistant answer or undo external actions.
 
+## Telegram
+
+Run `angela telegram` to start private text chat through Telegram, using grammY long polling.
+This host reuses Angela's shared provider configuration and session storage. It needs no database, public port, or webhook.
+The existing integration in `integrations/telegram-bot` remains a separate service with its own database and media features.
+
+Create a bot through Telegram's `@BotFather` and get your numeric Telegram user ID.
+Store the bot token and allowed user IDs in `~/.config/angela/telegram.env`:
+
+```dotenv
+ANGELA_TELEGRAM_BOT_TOKEN=<your-bot-token>
+ANGELA_TELEGRAM_ALLOWED_USER_IDS=<your-numeric-user-id>
+```
+
+Use `chmod 600 ~/.config/angela/telegram.env` to restrict access. Keep this file outside Git.
+Environment variables override file values. `ANGELA_TELEGRAM_ENV` selects another environment file.
+`XDG_CONFIG_HOME` changes the configuration directory. Separate multiple allowed IDs with commas.
+The bot refuses to start without a token and a nonempty list of numeric IDs.
+Unauthorized users, groups, and channels receive no response and cannot access sessions or the model.
+
+```sh
+angela telegram
+angela telegram --cwd /path/to/project --model your-model-id
+angela telegram --help
+```
+
+Keep this process and your provider, such as local 9router, running while you use Telegram.
+Only one polling process can use the bot token. An existing webhook prevents startup instead of being silently removed.
+
+Telegram commands:
+
+- `/start` or `/help`: show the available commands.
+- `/status`: show the model, session ID, and request status.
+- `/new`: clear the current chat's stored conversation and start again.
+- `/cancel`: cancel the current request.
+
+Each private chat has a separate session, also isolated by bot ID.
+Sessions live under `~/.angela/sessions/telegram` and survive restarts. Restart from the same workspace to resume them.
+The bot runs one request per chat and stays responsive to cancellation while the model works.
+Requests time out after five minutes. Ctrl+C cancels active requests and releases session locks.
+Long replies are split into plain Telegram messages. Telegram does not interpret model output as formatting.
+
+This first version provides text chat only. It has no terminal tools, file access, or CLI permission mode.
+It does not send existing CLI conversations to Telegram. A failed delivery leaves the generated answer in the saved session.
+Validate routing and authorization with local API tests before you connect a real bot.
+
 ## Checks
 
 ```sh

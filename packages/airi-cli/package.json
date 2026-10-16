@@ -25,6 +25,8 @@
     "@proj-airi/provider-inference": "workspace:^",
     "@xsai/shared": "catalog:",
     "@xsai/shared-chat": "catalog:",
+    "abort-controller": "catalog:",
+    "grammy": "catalog:",
     "valibot": "catalog:"
   }
 }

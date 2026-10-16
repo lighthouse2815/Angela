@@ -18,6 +18,7 @@ import { McpTools } from '../mcp'
 import { Output } from '../output'
 import { Permissions } from '../permissions'
 import { Sessions } from '../sessions'
+import { runTelegram } from '../telegram'
 import { Terminal } from '../terminal'
 
 /**
@@ -28,10 +29,14 @@ import { Terminal } from '../terminal'
  *                    -> McpTools -> MCP client -> tool server
  */
 async function main() {
+  if (process.argv[2] === 'telegram') {
+    await runTelegram(process.argv.slice(3), process.env)
+    return
+  }
   const config = await readConfig(process.argv.slice(2), process.env)
   const messages = config.messages
   if (config.help) {
-    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\n\n${[
+    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela telegram [--help]\n\n${[
       ['--model', messages.model],
       ['--provider', messages.provider],
       ['--config', messages.configFile],

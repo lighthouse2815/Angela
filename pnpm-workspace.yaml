@@ -302,6 +302,7 @@ catalog:
   '@xsai/stream-transcription': 0.5.1
   '@xsai/tool': 0.5.1
   '@xsai/utils-chat': 0.5.1
+  abort-controller: ^3.0.0
   alien-signals: ^3.2.1
   animejs: ^4.5.0
   async-mutex: 0.5.0

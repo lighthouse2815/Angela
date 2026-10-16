@@ -67,6 +67,19 @@ const en = {
   invalidSession: 'The session file is invalid or uses an unsupported format.',
   incompleteSession: 'The previous request did not finish. Verify tool outcomes before repeating actions.',
   noSessions: 'No saved sessions.',
+  telegramUsage: 'angela telegram [--model ID] [--cwd PATH]\nSet ANGELA_TELEGRAM_BOT_TOKEN and ANGELA_TELEGRAM_ALLOWED_USER_IDS in the environment or ~/.config/angela/telegram.env.\nCommands: /start, /help, /status, /new, /cancel. Private text chat only. Terminal tools are unavailable.',
+  telegramTokenMissing: 'Set a valid ANGELA_TELEGRAM_BOT_TOKEN from @BotFather.',
+  telegramUsersMissing: 'Set ANGELA_TELEGRAM_ALLOWED_USER_IDS to your numeric Telegram user ID. Separate multiple IDs with commas.',
+  telegramReady: 'Telegram bot started. Press Ctrl+C to stop.',
+  telegramStopped: 'Telegram bot stopped.',
+  telegramFailed: 'Telegram connection failed. Check the bot token, network, and whether another process uses this bot.',
+  telegramBusy: 'A request is running. Use /cancel before sending another request.',
+  telegramIdle: 'No request is running.',
+  telegramCancelled: 'The request was cancelled.',
+  telegramNew: 'Started a new conversation. The previous conversation history was cleared.',
+  telegramWelcome: 'I am Angela. Send a text message to chat.\n/new clears this conversation. /cancel stops a request. /status shows the model and session.\nThis connection has no terminal tools or file access.',
+  telegramRequestFailed: 'The request failed. Try again later. Your session remains saved.',
+  telegramDeliveryFailed: 'Could not deliver a Telegram reply. The conversation remains saved.',
 }
 
 const vi: typeof en = {
@@ -138,6 +151,19 @@ const vi: typeof en = {
   invalidSession: 'File phiên không hợp lệ hoặc dùng định dạng chưa hỗ trợ.',
   incompleteSession: 'Yêu cầu trước chưa hoàn thành. Kiểm tra kết quả công cụ trước khi lặp lại thao tác.',
   noSessions: 'Chưa có phiên đã lưu.',
+  telegramUsage: 'angela telegram [--model ID] [--cwd PATH]\nĐặt ANGELA_TELEGRAM_BOT_TOKEN và ANGELA_TELEGRAM_ALLOWED_USER_IDS trong biến môi trường hoặc ~/.config/angela/telegram.env.\nLệnh: /start, /help, /status, /new, /cancel. Chỉ chat văn bản riêng tư, chưa có công cụ terminal.',
+  telegramTokenMissing: 'Đặt ANGELA_TELEGRAM_BOT_TOKEN hợp lệ lấy từ @BotFather.',
+  telegramUsersMissing: 'Đặt ANGELA_TELEGRAM_ALLOWED_USER_IDS là Telegram user ID dạng số của bạn. Ngăn cách nhiều ID bằng dấu phẩy.',
+  telegramReady: 'Bot Telegram đã chạy. Nhấn Ctrl+C để dừng.',
+  telegramStopped: 'Đã dừng bot Telegram.',
+  telegramFailed: 'Không kết nối được Telegram. Kiểm tra bot token, mạng và tiến trình khác đang dùng bot này.',
+  telegramBusy: 'Đang xử lý yêu cầu. Dùng /cancel trước khi gửi yêu cầu khác.',
+  telegramIdle: 'Không có yêu cầu đang chạy.',
+  telegramCancelled: 'Đã hủy yêu cầu.',
+  telegramNew: 'Đã bắt đầu cuộc trò chuyện mới và xóa lịch sử hội thoại trước.',
+  telegramWelcome: 'Mình là Angela. Gửi tin nhắn văn bản để chat.\n/new xóa hội thoại hiện tại. /cancel hủy yêu cầu. /status xem model và phiên.\nKết nối này chưa có công cụ terminal hoặc quyền truy cập file.',
+  telegramRequestFailed: 'Yêu cầu thất bại. Hãy thử lại sau. Phiên trò chuyện vẫn được lưu.',
+  telegramDeliveryFailed: 'Không gửi được phản hồi Telegram. Hội thoại vẫn được lưu.',
 }
 
 /** CLI hosts select a language without loading browser translation plugins. */

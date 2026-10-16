@@ -9,12 +9,12 @@ import { streamFrom } from '@proj-airi/core-agent'
 export class Chat {
   readonly conversation: Conversation = { turns: [] }
 
-  constructor(private readonly model: string, private readonly provider: GenerationProvider, workspace: string, history?: Conversation) {
+  constructor(private readonly model: string, private readonly provider: GenerationProvider, workspace: string, history?: Conversation, toolsAvailable = true) {
     this.conversation.turns.push({
       type: 'system',
       id: randomUUID(),
       authority: 'system',
-      content: [{ type: 'text', text: `You are Angela, a coding assistant. Reply in the user's language. Report only verified tool outcomes. Ask before destructive changes. Previous requests can stop after tool side effects. Verify the workspace before repeating actions. Workspace: ${JSON.stringify(workspace)}.` }],
+      content: [{ type: 'text', text: `You are Angela, a coding assistant. Reply in the user's language. Report only verified tool outcomes. Ask before destructive changes. Previous requests can stop after tool side effects. Verify the workspace before repeating actions. Workspace: ${JSON.stringify(workspace)}.${toolsAvailable ? '' : ' This is text-only chat. No tools or filesystem access are available. Do not claim to read, edit, or execute files.'}` }],
     })
     if (history)
       this.conversation.turns.push(...history.turns.filter(turn => turn.type !== 'system'))

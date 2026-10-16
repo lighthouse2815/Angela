@@ -624,6 +624,9 @@ catalogs:
     '@xsai/utils-chat':
       specifier: 0.5.1
       version: 0.5.1
+    abort-controller:
+      specifier: ^3.0.0
+      version: 3.0.0
     alien-signals:
       specifier: ^3.2.1
       version: 3.2.1
@@ -3875,6 +3878,12 @@ importers:
       '@xsai/shared-chat':
         specifier: 'catalog:'
         version: 0.5.1
+      abort-controller:
+        specifier: 'catalog:'
+        version: 3.0.0
+      grammy:
+        specifier: 'catalog:'
+        version: 1.45.1(supports-color@10.2.2)
       valibot:
         specifier: 'catalog:'
         version: 1.4.2(typescript@6.0.3)

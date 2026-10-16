@@ -142,6 +142,29 @@ it('lists sessions without a model or provider credentials', async () => {
   expect(await result).toMatchObject({ code: 0, stderr: '' })
 })
 
+it('shows Telegram setup help without credentials or contacting Telegram', async () => {
+  const { result } = run(['telegram', '--help'], { ANGELA_MODEL: '' })
+  const output = await result
+  expect(output.code).toBe(0)
+  expect(output.stdout).toContain('ANGELA_TELEGRAM_BOT_TOKEN')
+  expect(output.stdout).toContain('ANGELA_TELEGRAM_ALLOWED_USER_IDS')
+})
+
+it.each([
+  { token: '', users: '100', message: 'ANGELA_TELEGRAM_BOT_TOKEN' },
+  { token: '42:private-test-token', users: '', message: 'ANGELA_TELEGRAM_ALLOWED_USER_IDS' },
+  { token: '42:private-test-token', users: '100,wrong', message: 'ANGELA_TELEGRAM_ALLOWED_USER_IDS' },
+])('rejects missing or invalid Telegram credentials before starting the bot: $users', async ({ token, users, message }) => {
+  const { result } = run(['telegram'], {
+    ANGELA_TELEGRAM_BOT_TOKEN: token,
+    ANGELA_TELEGRAM_ALLOWED_USER_IDS: users,
+  })
+  const output = await result
+  expect(output.code).toBe(1)
+  expect(output.stderr).toContain(message)
+  expect(output.stderr).not.toContain('private-test-token')
+})
+
 // A provider failure rejects several SDK promises. Raw console diagnostics hid the final CLI error under repeated stacks.
 it('shows a readable overload error without SDK stacks or provider response bodies', async () => {
   let requests = 0
