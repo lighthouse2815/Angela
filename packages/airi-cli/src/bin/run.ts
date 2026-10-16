@@ -175,7 +175,7 @@ async function main() {
           let text = (await input.ask(voice ? messages.voicePrompt : output.prompt(), undefined, messages.cliCommands))?.trim()
           if (text === '/voice') {
             try {
-              voice ??= new Voice(process.env, messages)
+              voice ??= await Voice.load(process.env, messages)
               process.stderr.write(`${messages.voiceReady}\n`)
             }
             catch (error) {

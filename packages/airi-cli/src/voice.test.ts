@@ -1,5 +1,7 @@
 import { EventEmitter } from 'node:events'
-import { writeFile } from 'node:fs/promises'
+import { mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 
 import { cliMessages } from '@proj-airi/i18n/cli'
 import { afterEach, expect, it, vi } from 'vitest'
@@ -59,13 +61,13 @@ it('does not play failed speech responses or disclose the provider body', async 
   expect(spawn).not.toHaveBeenCalled()
 })
 
-it('transcribes a captured WAV and sends the selected STT model', async () => {
+it('transcribes a captured WAV when PipeWire returns 1 after an intentional stop', async () => {
   let recorded: Promise<void> = Promise.resolve()
   spawn.mockImplementation((_command: string, args: string[]) => {
     const child = new EventEmitter()
     recorded = writeFile(args.at(-1)!, new Uint8Array([82, 73, 70, 70]))
     Object.assign(child, { kill: () => {
-      queueMicrotask(() => child.emit('close', 0, null))
+      queueMicrotask(() => child.emit('close', 1, null))
     } })
     return child
   })
@@ -81,4 +83,21 @@ it('transcribes a captured WAV and sends the selected STT model', async () => {
   const body = fetch.mock.calls[0]?.[1].body as FormData
   expect(body.get('model')).toBe('local-stt')
   expect(body.get('file')).toBeInstanceOf(Blob)
+})
+
+it('loads voice configuration outside the workspace and lets environment values override it', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'angela-voice-config-'))
+  try {
+    const path = join(directory, 'voice.env')
+    await writeFile(path, 'ANGELA_VOICE_BASE_URL=http://localhost:8000/v1/\nANGELA_TTS_MODEL=edge-tts\n')
+    const voice = await Voice.load({ ANGELA_VOICE_ENV: path, ANGELA_VOICE_BASE_URL: 'http://localhost:9000/v1/' }, cliMessages.en)
+    const fetch = vi.fn(async (_url: URL, _init: RequestInit) => new Response('denied', { status: 401 }))
+    vi.stubGlobal('fetch', fetch)
+    await expect(voice.speak('Xin chào', new AbortController().signal)).rejects.toThrow('HTTP 401')
+    expect(String(fetch.mock.calls[0]?.[0])).toBe('http://localhost:9000/v1/audio/speech')
+    expect(JSON.parse(String(fetch.mock.calls[0]?.[1].body)).model).toBe('edge-tts')
+  }
+  finally {
+    await rm(directory, { recursive: true, force: true })
+  }
 })

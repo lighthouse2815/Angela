@@ -108,6 +108,8 @@ Type `/chat` to return to text chat. During capture, `/chat` discards the audio.
 Ctrl+C cancels capture, transcription, generation, or playback. The conversation and tool permissions stay in the same session.
 The microphone stays off during playback. This mode does not provide continuous listening or wake words.
 
+For a free setup without an API key, use [the local voice service](../../services/voice-local/README.md).
+
 Linux voice uses the existing PipeWire commands `pw-record` and `pw-play`.
 Configure an OpenAI-compatible audio service in `.env.cli.local` or environment variables:
 
@@ -118,6 +120,8 @@ ANGELA_TTS_MODEL=tts-1
 ANGELA_TTS_VOICE=alloy
 ```
 
+`~/.config/angela/voice.env` stores audio configuration for the installed CLI from any directory.
+`ANGELA_VOICE_ENV` selects another file. Environment variables override file values.
 `ANGELA_VOICE_API_KEY` supplies an optional audio credential, separate from the chat credential.
 The audio service must support `audio/transcriptions` and `audio/speech` with WAV output.
 Model and voice names must match your service. A chat-only router does not supply audio automatically.

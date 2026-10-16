@@ -1,0 +1,14 @@
+services:
+  voice:
+    build: .
+    ports:
+      - '127.0.0.1:8000:8000'
+    environment:
+      ANGELA_WHISPER_MODEL: small
+      HF_HOME: /models
+    volumes:
+      - models:/models
+    restart: unless-stopped
+    mem_limit: 2g
+volumes:
+  models:

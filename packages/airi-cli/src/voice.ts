@@ -4,12 +4,27 @@ import process from 'node:process'
 
 import { spawn } from 'node:child_process'
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
+import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { parseEnv } from 'node:util'
 
 /** Owns private audio files, PipeWire children, and one serial audio request at a time. */
 export class Voice {
   private readonly baseUrl: URL
+
+  /** Reads device-local audio configuration. Process environment values override the file. */
+  static async load(env: NodeJS.ProcessEnv, messages: typeof cliMessages.en) {
+    const path = env.ANGELA_VOICE_ENV ?? join(env.XDG_CONFIG_HOME ?? join(homedir(), '.config'), 'angela', 'voice.env')
+    let saved: NodeJS.ProcessEnv | undefined
+    try {
+      saved = parseEnv(await readFile(path, 'utf8'))
+    }
+    catch (error) {
+      if (!(error instanceof Error) || !('code' in error) || error.code !== 'ENOENT' || env.ANGELA_VOICE_ENV)
+        throw error
+    }
+    return new Voice({ ...saved, ...env }, messages)
+  }
 
   constructor(private readonly env: NodeJS.ProcessEnv, private readonly messages: typeof cliMessages.en) {
     if (process.platform !== 'linux')
@@ -27,11 +42,15 @@ export class Voice {
     try {
       const path = join(directory, 'input.wav')
       const child = spawn('pw-record', ['--rate', '16000', '--channels', '1', '--format', 's16', path], { stdio: 'ignore' })
+      let stopping = false
       const closed = new Promise<void>((resolve, reject) => {
         child.once('error', () => reject(new Error(this.messages.voicePlatform)))
-        child.once('close', (code, reason) => code === 0 || reason === 'SIGINT' ? resolve() : reject(new Error(this.messages.voiceFailed)))
+        child.once('close', (code, reason) => code === 0 || reason === 'SIGINT' || (stopping && code === 1) ? resolve() : reject(new Error(this.messages.voiceFailed)))
       })
-      const abort = () => child.kill('SIGINT')
+      const abort = () => {
+        stopping = true
+        child.kill('SIGINT')
+      }
       signal.addEventListener('abort', abort, { once: true })
       try {
         signal.throwIfAborted()
@@ -39,7 +58,7 @@ export class Voice {
         const text = await Promise.race([stop(), closed.then(() => {
           throw new Error(this.messages.voiceFailed)
         })])
-        child.kill('SIGINT')
+        abort()
         await closed
         signal.throwIfAborted()
         if (text === undefined || text.trim())
@@ -54,7 +73,7 @@ export class Voice {
         return data.text.trim()
       }
       finally {
-        child.kill('SIGINT')
+        abort()
         await closed.catch(() => {})
         signal.removeEventListener('abort', abort)
       }
