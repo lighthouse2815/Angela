@@ -5,7 +5,7 @@ import { cwd } from 'node:process'
 import { defineConfig } from 'bumpp'
 import { x } from 'tinyexec'
 
-const androidVersionFile = join(cwd(), 'apps/stage-pocket/android/app-version.properties')
+const androidVersionFile = join(cwd(), 'dev-infuture/apps/stage-pocket/android/app-version.properties')
 
 const androidVersionCodePattern = /^AIRI_VERSION_CODE=(\d+)$/m
 
@@ -30,7 +30,7 @@ async function syncAndroidVersion(version: string) {
   console.info(`Bumping Android version to ${version} (${currentVersionCode} -> ${nextVersionCode})`)
 }
 
-const iOSProjectFile = join(cwd(), 'apps/stage-pocket/ios/App/App.xcodeproj/project.pbxproj')
+const iOSProjectFile = join(cwd(), 'dev-infuture/apps/stage-pocket/ios/App/App.xcodeproj/project.pbxproj')
 
 const iOSMarketingVersionPattern = /MARKETING_VERSION = .*?;/g
 const iOSMarketingVersionTrimPattern = /-.+$/g

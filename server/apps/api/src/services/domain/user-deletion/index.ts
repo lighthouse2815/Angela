@@ -19,7 +19,7 @@ export type { UserDeletionContext, UserDeletionExecutor, UserDeletionHandler, Us
  * Call stack:
  *
  * better-auth `/delete-user/callback`
- *   -> `user.deleteUser.beforeDelete` (`server/apps/auth/src/auth.ts`)
+ *   -> `user.deleteUser.beforeDelete` (`dev-infuture/server/apps/auth/src/auth.ts`)
  *     -> Auth `RemoteUserDeletionService`
  *       -> `POST /internal/auth/user-deletion`
  *         -> {@link UserDeletionService.softDeleteAll}

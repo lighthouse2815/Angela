@@ -1,3 +1,5 @@
+> Mobile and hosted authentication are archived. Read [the activation guide](../dev-infuture/README.md) before using their commands.
+
 <picture>
   <source
     width="100%"
@@ -322,7 +324,7 @@ CAPACITOR_DEVICE_ID_IOS="<DEVICE_ID_OR_SIMULATOR_NAME>" pnpm dev:pocket:ios
 
 Quote the target: simulator names such as `iPhone 16 Pro` contain spaces.
 
-You can see the list of available devices and simulators by running `pnpm -F @proj-airi/stage-pocket exec cap run ios --list`. `@capacitor/cli` is declared in `apps/stage-pocket`, so `cap` does not resolve from the repository root.
+You can see the list of available devices and simulators by running `pnpm -F @proj-airi/stage-pocket exec cap run ios --list`. `@capacitor/cli` is declared in `dev-infuture/apps/stage-pocket`, so `cap` does not resolve from the repository root.
 
 If you need to connect server channel on pocket in wireless mode, you need to start tamagotchi as root:
 

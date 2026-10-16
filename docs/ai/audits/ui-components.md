@@ -30,7 +30,7 @@ Review that export before adding a showcase or removing it. This batch does not 
 | Area | Source SFCs | Render shared component imports | Files with raw controls |
 | --- | ---: | ---: | ---: |
 | `apps/stage-web/` | 26 | 16 | 7 |
-| `apps/stage-pocket/` | 23 | 13 | 5 |
+| `dev-infuture/apps/stage-pocket/` | 23 | 13 | 5 |
 | `apps/stage-tamagotchi/` | 91 | 50 | 14 |
 | `apps/stage-tamagotchi-kirie/` | 76 | 42 | 13 |
 | `packages/stage-layouts/` | 33 | 12 | 5 |
@@ -49,7 +49,7 @@ The Kirie application repeats several desktop control implementations. Treat the
 | [packages/stage-ui/src/components/layouts/page-header.vue:82](../../../packages/stage-ui/src/components/layouts/page-header.vue#L82) | The back action uses a native button without its own accessible label. | Use IconButton and provide a localized accessible name. |
 | [packages/stage-ui/src/components/scenarios/providers/provider-validation-alerts.vue:34](../../../packages/stage-ui/src/components/scenarios/providers/provider-validation-alerts.vue#L34) | Validation actions use multiple native buttons. | Use Button or GhostButton. Retain the validation state and action handlers. |
 | [packages/stage-pages/src/pages/settings/providers/index.vue:223](../../../packages/stage-pages/src/pages/settings/providers/index.vue#L223) | Category and filter controls use native buttons. | Compare SelectTab and GhostButton. Preserve selected state and navigation. |
-| [apps/stage-pocket/src/components/websocket-status-button.vue:59](../../../apps/stage-pocket/src/components/websocket-status-button.vue#L59) | Connection state owns a custom surface and native button. | Build the status surface on BasicButton. Preserve connection labels and state colors. |
+| [dev-infuture/apps/stage-pocket/src/components/websocket-status-button.vue:59](../../../apps/stage-pocket/src/components/websocket-status-button.vue#L59) | Connection state owns a custom surface and native button. | Build the status surface on BasicButton. Preserve connection labels and state colors. |
 | [packages/stage-ui/src/components/scenarios/chat/components/tool-call-shell.vue:33](../../../packages/stage-ui/src/components/scenarios/chat/components/tool-call-shell.vue#L33) | A local trigger button sits inside shared Collapsible. | Use GhostButton or BasicButton. Keep the collapsible contract. |
 | [packages/stage-ui/src/components/misc/steppers/steppers.vue:125](../../../packages/stage-ui/src/components/misc/steppers/steppers.vue#L125) | Stepper actions use native buttons. | Compare Button and GhostButton for the action surface. |
 | [packages/stage-ui/src/components/data-pane/property-number.vue:159](../../../packages/stage-ui/src/components/data-pane/property-number.vue#L159) | Numeric controls include custom drag and pointer behavior. | Retain the domain interaction. Evaluate shared Input only after comparing behavior. |

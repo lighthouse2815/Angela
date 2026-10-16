@@ -13,6 +13,7 @@ export default defineConfig({
   vue: true,
 }, {
   ignores: [
+    'dev-infuture/**',
     'cspell.config.yaml',
     'cspell.config.yml',
     'crowdin.yaml',
@@ -25,8 +26,6 @@ export default defineConfig({
     'apps/stage-tamagotchi-electron/src/renderer/bindings/**',
     '**/flatpak/**',
     '**/flatpak-repo/**',
-    'apps/stage-pocket/ios/**',
-    'apps/stage-pocket/android/**',
     '**/drizzle/**',
     '**/.astro/**',
     'docs/superpowers/**',

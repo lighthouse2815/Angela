@@ -12,6 +12,10 @@ pnpm install
 pnpm dev:tamagotchi
 ```
 
+Giai đoạn hiện tại ưu tiên desktop/local AI. Các module tạm hoãn nằm trong
+[`dev-infuture/`](./dev-infuture/README.md) và không tham gia workspace mặc định.
+API và shared contract còn ở `server/` vì desktop vẫn sử dụng kiểu dữ liệu của chúng.
+
 Bản web:
 
 ```bash

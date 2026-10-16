@@ -40,7 +40,7 @@ const userAvatar = computed(() => user.value?.image ?? null)
 // the fallback by URL prefix instead of carrying a redundant `imageSource`
 // flag — Gravatar URL format is stable and prefix-matching keeps the API
 // surface small. If the avatar source ever changes, both this constant
-// and server/apps/auth/src/routes.ts must move together.
+// and dev-infuture/server/apps/auth/src/routes.ts must move together.
 const GRAVATAR_AVATAR_PREFIX = 'https://www.gravatar.com/avatar/'
 const usingGravatarFallback = computed(
   () => userAvatar.value?.startsWith(GRAVATAR_AVATAR_PREFIX) ?? false,
@@ -129,7 +129,7 @@ function scrollToSection(id: SectionId) {
 }
 
 // Connected accounts: state + handlers come from the shared composable
-// in stage-ui so this page and apps/ui-server-auth's profile page stay
+// in stage-ui so this page and dev-infuture/apps/ui-server-auth's profile page stay
 // in lockstep. The composable handles list/unlink/link, the last-sign-in-
 // method guard, and the auto-refresh on auth state change.
 //

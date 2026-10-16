@@ -31,10 +31,10 @@ flowchart LR
 ## Affected files
 
 ```text
-server/apps/auth/src/
+dev-infuture/server/apps/auth/src/
   auth.ts
   tests/auth.test.ts
-apps/ui-server-auth/src/pages/
+dev-infuture/apps/ui-server-auth/src/pages/
   verify-email.vue
 server/docs/ai/adr/
   2026-10-09-account-deletion-email-result.md

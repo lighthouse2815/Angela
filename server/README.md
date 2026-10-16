@@ -1,3 +1,7 @@
+> Desktop development keeps the API types and shared contracts here.
+> Auth, Compose, Caddy, and Railway files moved to [dev-infuture](../dev-infuture/README.md).
+> The local desktop does not require this hosted stack.
+
 # AIRI Backend
 
 Project AIRI's hosted backend source lives under this folder. Workspace package
@@ -21,7 +25,7 @@ From the repository root:
 pnpm dev:backend
 ```
 
-The command uses `server/docker-compose.yaml` and exposes only Caddy at
+The command uses `dev-infuture/server/docker-compose.yaml` and exposes only Caddy at
 `http://localhost:6112`.
 
 ## Railway deployment

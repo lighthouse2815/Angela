@@ -21,7 +21,7 @@ flowchart LR
 server/
   apps/auth/src/{routes.ts,tests/routes-check-email.test.ts}
   docs/ai/adr/2026-10-10-email-verification-discovery.md
-apps/ui-server-auth/src/{modules/email-password.ts,pages/sign-in.vue}
+dev-infuture/apps/ui-server-auth/src/{modules/email-password.ts,pages/sign-in.vue}
 ```
 
 ## Flow and verification
