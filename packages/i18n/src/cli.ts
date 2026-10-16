@@ -13,6 +13,8 @@ const en = {
   sessionDeleteCancelled: 'Deletion cancelled.',
   sessionDeleted: 'Deleted session',
 
+  voiceEchoCleanup: 'Cannot remove the private echo filter. Angela will retry. Check pactl and PipeWire.',
+  voiceEchoUnavailable: 'Echo cancellation is unavailable. Voice uses separate listening and speaking turns. Check pactl and PipeWire.',
   voiceReady: 'Automatic voice mode. Speak naturally. /chat returns to text chat.',
   voiceRecord: 'Listening to your speech. Silence sends it automatically.',
   voicePrompt: 'Microphone on. Speak when ready.',
@@ -129,6 +131,8 @@ const vi: typeof en = {
   sessionDeleteCancelled: 'Đã hủy xóa.',
   sessionDeleted: 'Đã xóa phiên',
 
+  voiceEchoCleanup: 'Chưa gỡ được bộ khử vọng riêng. Angela sẽ thử lại. Kiểm tra pactl và PipeWire.',
+  voiceEchoUnavailable: 'Không bật được khử vọng. Voice sẽ nghe và nói theo lượt. Kiểm tra pactl và PipeWire.',
   voiceReady: 'Đã bật voice tự động. Cứ nói chuyện. /chat quay lại nhập chữ.',
   voiceRecord: 'Đang nghe bạn nói. Ngừng nói để tự gửi.',
   voicePrompt: 'Micro đang bật. Bạn có thể nói.',

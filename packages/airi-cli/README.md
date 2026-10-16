@@ -121,11 +121,12 @@ Docker with Compose and a running daemon are required. Keep this source checkout
 
 Type `/voice` during interactive chat to start automatic listening.
 Speak normally. About 1.2 seconds of silence ends your utterance and sends it automatically.
-Angela reads the answer, then listens again. Enter is not required.
+Angela reads the answer. With interruption enabled, you can speak during replies. Enter is not required.
 The terminal shows when the microphone is on, when speech starts, and when transcription or playback starts.
 Type `/chat` to discard the current capture and return to text chat.
 Ctrl+C stops the current operation and returns to text mode. `/voice` starts listening again.
-By default, the microphone stays off during transcription, generation, tool approval, and playback.
+By default, `/voice` creates a private PipeWire WebRTC echo filter and enables voice interruption.
+If the filter is unavailable, Angela reports this and uses separate listening and speaking turns.
 With voice interruption enabled, a separate capture listens during replies without reading terminal input.
 Spoken text goes only to the model. Only typed commands can change tool permissions.
 The conversation and tool permissions stay in the same session.
@@ -313,12 +314,13 @@ ANGELA_VOICE_SOURCE=angela_echo_source
 ANGELA_VOICE_SINK=angela_echo_sink
 ```
 
-Values accept PipeWire node names or serial numbers. Without these values, PipeWire selects the default devices.
+Values accept PipeWire node names or serial numbers. Without overrides, Angela creates a private echo-filtered source and sink.
+The filter uses the current system microphone and speakers. Each voice session gets unique device names.
 Use `wpctl status -n` to inspect device names. Restart voice mode after changing the configuration.
 Device selection affects only Angela. It does not change system defaults.
 
 For echo cancellation, PipeWire provides [module-echo-cancel](https://docs.pipewire.org/page_pulse_module_echo_cancel.html).
-Create a source and sink pair with the existing PulseAudio compatibility service:
+Angela creates and removes its own filter automatically. For a manually managed filter, use the PulseAudio compatibility service:
 
 ```sh
 pactl load-module module-echo-cancel source_name=angela_echo_source sink_name=angela_echo_sink aec_method=webrtc
@@ -342,4 +344,9 @@ Already completed tool actions remain in effect. Interrupted generations keep th
 A completed text reply stays saved even when its playback is interrupted.
 An empty transcript starts listening again. Ctrl+C discards the capture and returns to text mode.
 Spoken text never acts as a CLI command or grants tool permission.
-The module lasts until you unload it or the audio service restarts. Angela does not create or remove it.
+`/chat`, Ctrl+C, service failures, normal exit, and SIGTERM remove the filter that Angela created.
+User-configured devices and manually loaded filters stay unchanged.
+Explicit headphone mode (`ANGELA_VOICE_BARGE_IN=1`) skips automatic echo cancellation.
+Disabling interruption (`ANGELA_VOICE_BARGE_IN=0`) also skips automatic echo cancellation.
+If only one device override is set, Angela keeps separate listening and speaking turns.
+A forced process kill or machine crash prevents cleanup. Restarting the audio service removes remaining modules.

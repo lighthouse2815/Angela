@@ -11,6 +11,7 @@ import { cliMessages } from '@proj-airi/i18n/cli'
 import { afterEach, expect, it, vi } from 'vitest'
 import { WebSocketServer } from 'ws'
 
+import { EchoCancellation } from './echo-cancellation'
 import { Voice } from './voice'
 
 const { spawn } = vi.hoisted(() => ({ spawn: vi.fn() }))
@@ -277,4 +278,43 @@ it('routes recording and playback to the configured devices without shell expans
   })
   await voice.speak('Xin chào', new AbortController().signal)
   expect(spawn).toHaveBeenLastCalledWith('pw-play', ['--target', sink, expect.stringMatching(/answer\.wav$/)], expect.objectContaining({ stdio: 'ignore' }))
+})
+
+it('creates an owned echo filter for default voice mode and releases it before reuse', async () => {
+  const start = vi.spyOn(EchoCancellation.prototype, 'start').mockResolvedValue()
+  const close = vi.spyOn(EchoCancellation.prototype, 'close').mockResolvedValue()
+  vi.spyOn(EchoCancellation.prototype, 'active', 'get').mockReturnValue(true)
+  const voice = new Voice({ ANGELA_VOICE_BASE_URL: 'http://localhost/v1/' }, cliMessages.en)
+  await voice.start(new AbortController().signal)
+  await voice.start(new AbortController().signal)
+  expect(start).toHaveBeenCalledTimes(1)
+  expect(voice.canInterrupt).toBe(true)
+  await voice.close()
+  expect(close).toHaveBeenCalledTimes(1)
+  expect(voice.canInterrupt).toBe(false)
+})
+
+it('preserves explicit device selection and headphone or turn-based modes', async () => {
+  const start = vi.spyOn(EchoCancellation.prototype, 'start').mockResolvedValue()
+  for (const settings of [
+    { ANGELA_VOICE_SOURCE: 'source' },
+    { ANGELA_VOICE_SINK: 'sink' },
+    { ANGELA_VOICE_BARGE_IN: '0' },
+    { ANGELA_VOICE_BARGE_IN: '1' },
+  ]) {
+    const voice = new Voice({ ANGELA_VOICE_BASE_URL: 'http://localhost/v1/', ...settings }, cliMessages.en)
+    await voice.start(new AbortController().signal)
+    await voice.close()
+  }
+  expect(start).not.toHaveBeenCalled()
+})
+
+it('keeps separate turns after filter creation fails and retains ownership for cleanup', async () => {
+  vi.spyOn(EchoCancellation.prototype, 'start').mockRejectedValue(new Error('No echo filter'))
+  const close = vi.spyOn(EchoCancellation.prototype, 'close').mockResolvedValue()
+  const voice = new Voice({ ANGELA_VOICE_BASE_URL: 'http://localhost/v1/' }, cliMessages.en)
+  await expect(voice.start(new AbortController().signal)).rejects.toThrow('No echo filter')
+  expect(voice.canInterrupt).toBe(false)
+  await voice.close()
+  expect(close).toHaveBeenCalledTimes(1)
 })

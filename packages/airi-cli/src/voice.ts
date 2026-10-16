@@ -12,9 +12,12 @@ import { parseEnv } from 'node:util'
 
 import WebSocket from 'ws'
 
+import { EchoCancellation } from './echo-cancellation'
+
 /** Owns private audio files, PipeWire children, and one serial audio request at a time. */
 export class Voice {
   private readonly baseUrl: URL
+  private echo: EchoCancellation | undefined
 
   /** Deletes only recognized audio directories older than one day whose owner process is no longer alive. */
   static async cleanupTemporaryAudio(root = tmpdir(), now = Date.now()) {
@@ -106,9 +109,33 @@ export class Voice {
       throw new Error(messages.voiceConfig)
   }
 
+  /** Enables interruption through an owned echo filter unless the user selects devices or explicit headphone mode. */
+  async start(signal: AbortSignal) {
+    if (this.echo && !this.echo.active)
+      await this.close()
+    if (this.echo || this.env.ANGELA_VOICE_SOURCE || this.env.ANGELA_VOICE_SINK || ['0', '1'].includes(this.env.ANGELA_VOICE_BARGE_IN ?? ''))
+      return
+    const echo = new EchoCancellation(this.env)
+    try {
+      await echo.start(signal)
+      this.echo = echo
+    }
+    catch (error) {
+      // Retain ownership when cleanup fails so the CLI can retry before creating another filter.
+      this.echo = echo
+      throw error
+    }
+  }
+
+  /** The CLI stops captures and playback before releasing these devices. */
+  async close() {
+    await this.echo?.close()
+    this.echo = undefined
+  }
+
   /** Echo-filtered devices or an explicit headphone setup permit simultaneous capture and playback. */
   get canInterrupt() {
-    return this.env.ANGELA_VOICE_BARGE_IN === '1'
+    return !!this.echo?.active || this.env.ANGELA_VOICE_BARGE_IN === '1'
       || (this.env.ANGELA_VOICE_BARGE_IN !== '0' && !!this.env.ANGELA_VOICE_SOURCE && !!this.env.ANGELA_VOICE_SINK)
   }
 
@@ -150,7 +177,8 @@ export class Voice {
           if (message.type === 'ready' && !recorder) {
             clearTimeout(timer)
             state('ready')
-            recorder = spawn('pw-record', [...(this.env.ANGELA_VOICE_SOURCE ? ['--target', this.env.ANGELA_VOICE_SOURCE] : []), '--raw', '--rate', '16000', '--channels', '1', '--format', 's16', '-'], { stdio: ['ignore', 'pipe', 'ignore'] })
+            const source = this.echo?.active ? this.echo.source : this.env.ANGELA_VOICE_SOURCE
+            recorder = spawn('pw-record', [...(source ? ['--target', source] : []), '--raw', '--rate', '16000', '--channels', '1', '--format', 's16', '-'], { stdio: ['ignore', 'pipe', 'ignore'] })
             recorder.once('error', () => reject(new Error(this.messages.voicePlatform)))
             stopped = new Promise<void>((done) => {
               recorder!.once('close', () => {
@@ -232,7 +260,8 @@ export class Voice {
       await writeFile(path, new Uint8Array(await response.arrayBuffer()), { mode: 0o600 })
       signal.throwIfAborted()
       await new Promise<void>((resolve, reject) => {
-        const child = spawn('pw-play', [...(this.env.ANGELA_VOICE_SINK ? ['--target', this.env.ANGELA_VOICE_SINK] : []), path], { stdio: 'ignore', signal })
+        const sink = this.echo?.active ? this.echo.sink : this.env.ANGELA_VOICE_SINK
+        const child = spawn('pw-play', [...(sink ? ['--target', sink] : []), path], { stdio: 'ignore', signal })
         child.once('error', () => reject(new Error(this.messages.voicePlatform)))
         child.once('close', code => code === 0 ? resolve() : reject(new Error(this.messages.voiceFailed)))
       })

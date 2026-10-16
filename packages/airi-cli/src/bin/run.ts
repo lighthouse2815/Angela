@@ -101,6 +101,7 @@ async function main() {
     let active: AbortController | undefined
     const shutdown = new AbortController()
     let voice: Voice | undefined
+    let loadedVoice: Voice | undefined
     let interruption: VoiceInterruption | undefined
     const interrupt = () => {
       if (interruption) {
@@ -119,6 +120,7 @@ async function main() {
     if (process.stdin.isTTY)
       input = new Terminal(interrupt)
     const stop = () => {
+      voice = undefined
       interruption?.cancel()
       active?.abort()
       shutdown.abort()
@@ -129,6 +131,16 @@ async function main() {
     let mcp: McpTools | undefined
 
     let pendingUtterance: string | undefined
+
+    async function releaseVoice() {
+      try {
+        await loadedVoice?.close()
+        loadedVoice = undefined
+      }
+      catch {
+        process.stderr.write(`${messages.voiceEchoCleanup}\n`)
+      }
+    }
 
     async function send(text: string) {
       active = new AbortController()
@@ -210,6 +222,8 @@ async function main() {
       if (input && interactive) {
         process.stderr.write(`${messages.workspace}: ${workspace}\n${messages.welcome}\n${messages.permissionAsk}\n`)
         while (true) {
+          if (!voice)
+            await releaseVoice()
           if (pendingUtterance && voice) {
             const utterance = pendingUtterance
             pendingUtterance = undefined
@@ -256,7 +270,22 @@ async function main() {
           }
           if (text === '/voice') {
             try {
-              voice ??= await Voice.load(process.env, messages)
+              voice ??= loadedVoice ?? await Voice.load(process.env, messages)
+              loadedVoice = voice
+              active = new AbortController()
+              try {
+                await voice.start(active.signal)
+              }
+              catch {
+                if (active.signal.aborted) {
+                  voice = undefined
+                  continue
+                }
+                process.stderr.write(`${messages.voiceEchoUnavailable}\n`)
+              }
+              finally {
+                active = undefined
+              }
               process.stderr.write(`${messages.voiceReady}\n`)
             }
             catch (error) {
@@ -299,7 +328,12 @@ async function main() {
     }
     finally {
       input?.close()
-      await mcp?.close()
+      try {
+        await releaseVoice()
+      }
+      finally {
+        await mcp?.close()
+      }
       process.off('SIGINT', interrupt)
       process.off('SIGTERM', stop)
     }
