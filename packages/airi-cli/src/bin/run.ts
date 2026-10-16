@@ -12,6 +12,7 @@ import { getGenerationProvider, listProviders } from '@proj-airi/provider-infere
 
 import { Chat } from '../chat'
 import { readConfig } from '../config'
+import { runDoctor } from '../doctor'
 import { formatRequestError } from '../errors'
 import { McpTools } from '../mcp'
 import { Memory } from '../memory'
@@ -35,6 +36,10 @@ import { runVoiceService } from '../voice-service'
  *                    -> McpTools -> MCP client -> tool server
  */
 async function main() {
+  if (process.argv[2] === 'doctor') {
+    await runDoctor(process.argv.slice(3), process.env)
+    return
+  }
   if (process.argv[2] === 'voice') {
     await runVoiceService(process.argv.slice(3), process.env)
     return
@@ -50,7 +55,7 @@ async function main() {
   const config = await readConfig(process.argv.slice(2), process.env)
   const messages = config.messages
   if (config.help) {
-    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela telegram [--help]\nangela voice start|stop|status [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
+    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela doctor [--json] [--help]\nangela telegram [--help]\nangela voice start|stop|status [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
       ['--model', messages.model],
       ['--provider', messages.provider],
       ['--config', messages.configFile],

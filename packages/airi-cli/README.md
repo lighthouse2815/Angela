@@ -465,3 +465,30 @@ Cancellation, empty summaries, and oversized summaries stop the request without 
 If the current input, required system context, or a single historical turn cannot fit, shorten it or start a new session.
 Context preparation runs before a generation stream. Tool output accumulated inside that stream can still exceed the provider window.
 This release does not truncate active tool output or automatically retry provider context-limit errors.
+
+## Diagnose a CLI setup
+
+Run `angela doctor` before starting chat, or `angela doctor --json` for structured results.
+Use `--locale en|vi`, `--config`, `--data-dir`, `--cwd`, `--model` and `--base-url`
+with the same meanings as in chat. `angela doctor --help` lists these options.
+
+The command checks provider configuration, context budget, directory permissions,
+personal and project memory, saved sessions, lock files, voice health, audio commands
+and available audio devices. Missing memory or history is normal on a new setup.
+It preserves corrupt files and locks. A lock can belong to a running writer;
+inspect that process before removing a lock yourself.
+
+For OpenAI-compatible providers, it sends a bounded GET request to the configured
+`/models` endpoint with the configured API key. It refuses redirects and does not
+print credentials or provider error bodies. It sends no prompts or memory and
+makes no generation request. Providers without this check receive a warning.
+A listed model does not prove that generation works or that its permissions are sufficient.
+
+Doctor does not write files, start services, record audio, play sound or load echo
+cancellation modules. Directory permission checks do not test actual writes or free
+space. Voice health and device listings do not verify transcription, speech or
+microphone quality. Use `/voice` for a real conversation to check those and echo
+cancellation. The echo check always reports this limitation as a warning.
+
+Exit code 1 means at least one error; warnings alone return 0. JSON contains
+`healthy` (no errors) and `checks`, each with `id`, `status` and a localized `message`.
