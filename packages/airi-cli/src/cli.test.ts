@@ -113,6 +113,24 @@ it('rejects empty input without calling a provider', async () => {
   expect(await result).toMatchObject({ code: 1, stdout: '' })
 })
 
+it('reports an empty provider answer instead of silently completing the request', async () => {
+  const server = createServer((_request, response) => {
+    response.writeHead(200, { 'Content-Type': 'text/event-stream' })
+    response.end(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', content: '' }, finish_reason: 'stop' }] })}\n\ndata: [DONE]\n\n`)
+  })
+  servers.push(server)
+  server.listen(0, '127.0.0.1')
+  await once(server, 'listening')
+  const address = server.address()
+  if (!address || typeof address === 'string')
+    throw new Error('Missing provider port')
+  const { result } = run(['--prompt', 'Create a file'], { ANGELA_BASE_URL: `http://127.0.0.1:${address.port}/v1/` })
+  const output = await result
+  expect(output.code).toBe(1)
+  expect(output.stdout).toBe('')
+  expect(output.stderr).toContain('Model không trả lời')
+})
+
 it('lists sessions without a model or provider credentials', async () => {
   const { child, result } = run(['--list-sessions'], { ANGELA_MODEL: '' })
   child.stdin.end()

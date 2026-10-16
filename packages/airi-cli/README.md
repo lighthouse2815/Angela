@@ -68,6 +68,14 @@ Provider errors show one localized message with an HTTP status and a next step.
 For example, HTTP 503 explains that the model is overloaded or unavailable. HTTP 401 asks you to check credentials.
 Automatic retries show a short progress message. SDK stacks, response headers, and raw provider bodies stay out of terminal output.
 
+During requests, the terminal shows thinking, tool discovery, and execution progress with elapsed time.
+Tool results show their status and up to three lines of output, limited to 600 characters.
+The model and saved conversation retain the full tool result.
+Approval prompts show the complete action and working directory before execution.
+Progress pauses during approval and stops before an answer, cancellation, or error.
+Piped output keeps answers on stdout and plain progress messages on stderr.
+An empty model answer reports an error instead of returning silently to the prompt.
+
 ## Scope
 
 This entry point provides text chat and an optional MCP connection.

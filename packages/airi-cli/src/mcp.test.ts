@@ -1,6 +1,8 @@
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js'
 import type { GenerationProvider } from '@proj-airi/provider-inference'
 
+import { PassThrough } from 'node:stream'
+
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
@@ -10,6 +12,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Chat } from './chat'
 import { McpTools } from './mcp'
+import { Output } from './output'
 
 const connections: { close: () => Promise<void> }[] = []
 afterEach(async () => {
@@ -104,6 +107,8 @@ describe('mCP host approval', () => {
 
 it('runs a model-requested tool through the real generation and MCP protocols', async () => {
   const { tools, invoke } = await connect()
+  const fullOutput = `${'Long command output\n'.repeat(100)}Final verification marker`
+  invoke.mockReturnValueOnce({ content: [{ type: 'text', text: fullOutput }] })
   const toolCall = {
     index: 0,
     id: 'call-1',
@@ -118,9 +123,24 @@ it('runs a model-requested tool through the real generation and MCP protocols', 
     generation: model => ({ protocol: 'chat-completions', config: { model, baseURL: 'https://provider.example/v1/', fetch } }),
   }
   const chat = new Chat('test-model', provider, '/workspace')
-  await chat.send('Run pwd', { tools: tools.definitions() })
+  const stdout = new PassThrough()
+  const stderr = new PassThrough()
+  let progress = ''
+  stderr.on('data', chunk => progress += chunk)
+  const output = new Output(cliMessages.en, stdout, stderr)
+  output.start()
+  try {
+    await chat.send('Run pwd', { tools: tools.definitions(), onStreamEvent: event => output.event(event) })
+  }
+  finally {
+    output.stop()
+  }
   expect(invoke).toHaveBeenCalledWith('terminal_exec', { command: 'pwd' })
   expect(fetch).toHaveBeenCalledTimes(2)
-  expect(String(fetch.mock.calls[1][1]?.body)).toContain('done')
+  const body = JSON.parse(String(fetch.mock.calls[1][1]?.body))
+  const toolResult = body.messages.find((message: { role: string }) => message.role === 'tool')
+  expect(JSON.parse(toolResult.content).content[0].text).toBe(fullOutput)
+  expect(progress).toContain('Output shortened')
+  expect(progress).not.toContain('Final verification marker')
   expect(chat.conversation.turns.at(-1)).toMatchObject({ type: 'assistant', status: 'completed' })
 })

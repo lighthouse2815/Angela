@@ -15,6 +15,7 @@ import { Chat } from '../chat'
 import { readConfig } from '../config'
 import { formatRequestError } from '../errors'
 import { McpTools } from '../mcp'
+import { Output } from '../output'
 import { Sessions } from '../sessions'
 import { Terminal } from '../terminal'
 
@@ -98,11 +99,13 @@ async function main() {
     process.on('SIGTERM', stop)
     let client: Client | undefined
     let mcp: McpTools | undefined
+    const output = new Output(messages)
 
     async function send(text: string) {
       active = new AbortController()
       let completed = false
       try {
+        output.start()
         await session.save(chat.conversation, true)
         await chat.send(text, {
           abortSignal: active.signal,
@@ -110,28 +113,22 @@ async function main() {
           diagnostics: {
             // The send catch owns the final message. SDK promise diagnostics must not print the same failure again.
             error() {},
-            warn() { process.stderr.write(`${messages.retrying}\n`) },
+            warn() { output.retry() },
           },
-          onStreamEvent(event) {
-            if (event.type === 'text-delta')
-              process.stdout.write(event.text)
-            if (event.type === 'error')
-              throw event.error
-            if (event.type === 'tool-call')
-              process.stderr.write(`\n${messages.tool}: ${event.toolName}\n`)
-            if (event.type === 'tool-result' || event.type === 'tool-error')
-              process.stderr.write(`${JSON.stringify(event)}\n`)
-          },
+          onStreamEvent: event => output.event(event),
         })
+        if (!output.hasText)
+          throw new Error(messages.emptyResponse)
         completed = true
-        process.stdout.write('\n')
       }
       catch (error) {
+        output.stop()
         process.stderr.write(`\n${active.signal.aborted ? messages.interrupted : `${messages.failed}: ${formatRequestError(error, messages)}`}\n`)
         if (!interactive && process.exitCode !== 143)
           process.exitCode = active.signal.aborted ? 130 : 1
       }
       finally {
+        output.stop()
         active = undefined
         await session.save(chat.conversation, !completed)
       }
@@ -158,10 +155,14 @@ async function main() {
         })
         await client.connect(transport, { signal: shutdown.signal })
         mcp = new McpTools(client, async (request, signal) => {
-          process.stderr.write(`\n${messages.tool}: ${request.name}\n${JSON.stringify(request.arguments, null, 2)}\n`)
-          if (!input)
+          output.approval(request)
+          if (!input) {
+            output.decided(false)
             return false
-          return (await input.ask(`${messages.approve} `, signal))?.trim().toLowerCase() === 'yes'
+          }
+          const approved = (await input.ask(`${messages.approve} `, signal))?.trim().toLowerCase() === 'yes'
+          output.decided(approved)
+          return approved
         }, messages, config.computerUse ? workspace : undefined)
         await mcp.discover(shutdown.signal)
         process.stderr.write(`${messages.mcpConnected}\n`)
