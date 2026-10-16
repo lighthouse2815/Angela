@@ -1,3 +1,4 @@
+import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js'
 import type { GenerationProvider } from '@proj-airi/provider-inference'
 import type { Update } from 'grammy/types'
 
@@ -7,18 +8,25 @@ import { createServer } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import { Client } from '@modelcontextprotocol/sdk/client/index.js'
+import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
+import { Server } from '@modelcontextprotocol/sdk/server/index.js'
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js'
 import { cliMessages } from '@proj-airi/i18n/cli'
 import { Bot } from 'grammy'
 import { afterEach, expect, it, vi } from 'vitest'
 
+import { McpTools } from './mcp'
 import { Sessions } from './sessions'
 import { TelegramChat } from './telegram'
 
 const hosts: TelegramChat[] = []
 const directories: string[] = []
+const toolServers: Server[] = []
 const servers: ReturnType<typeof createServer>[] = []
 afterEach(async () => {
   await Promise.all(hosts.splice(0).map(host => host.close()))
+  await Promise.all(toolServers.splice(0).map(server => server.close()))
   await Promise.all(servers.splice(0).map(server => new Promise<void>((resolve, reject) => server.close(error => error ? reject(error) : resolve()))))
   await Promise.all(directories.splice(0).map(directory => rm(directory, { recursive: true, force: true })))
 })
@@ -61,7 +69,20 @@ async function connect(fetch = vi.fn<typeof globalThis.fetch>().mockImplementati
   const provider: GenerationProvider = {
     generation: model => ({ protocol: 'chat-completions', config: { model, baseURL: 'https://provider.example/v1/', fetch } }),
   }
-  const host = new TelegramChat(bot, provider, 'test-model', new Sessions(directory, cliMessages.vi), directory, cliMessages.vi, new Set([100, 200]))
+  const invoke = vi.fn<(name: string, args?: Record<string, unknown>) => CallToolResult>(() => ({ content: [{ type: 'text', text: 'tool-result-marker' }] }))
+  const connectTools = vi.fn(async (_id: string, confirm: ConstructorParameters<typeof McpTools>[1], signal: AbortSignal) => {
+    const server = new Server({ name: 'test-tools', version: '1' }, { capabilities: { tools: {} } })
+    toolServers.push(server)
+    server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: [{ name: 'terminal_exec', inputSchema: { type: 'object' as const, properties: { command: { type: 'string' } } } }] }))
+    server.setRequestHandler(CallToolRequestSchema, async request => invoke(request.params.name, request.params.arguments))
+    const client = new Client({ name: 'test-telegram', version: '1' })
+    const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
+    await Promise.all([client.connect(clientTransport), server.connect(serverTransport)])
+    const tools = new McpTools(client, confirm, cliMessages.vi, directory)
+    await tools.discover(signal)
+    return tools
+  })
+  const host = new TelegramChat(bot, provider, 'test-model', new Sessions(directory, cliMessages.vi), directory, cliMessages.vi, new Set([100, 200]), connectTools)
   hosts.push(host)
   let updateId = 0
   async function message(text: string, id = 100, group = false) {
@@ -79,7 +100,26 @@ async function connect(fetch = vi.fn<typeof globalThis.fetch>().mockImplementati
     }
     await bot.handleUpdate(update)
   }
-  return { host, message, fetch, directory, calls, reply }
+  async function callback(data: string, id = 100) {
+    await bot.handleUpdate({
+      update_id: ++updateId,
+      callback_query: {
+        id: `callback-${updateId}`,
+        chat_instance: 'test-instance',
+        data,
+        from: { id, is_bot: false, first_name: 'User' },
+        message: { message_id: 10, date: 1, chat: { id, type: 'private', first_name: 'User' }, text: 'Approval' },
+      },
+    })
+  }
+  function approval() {
+    const request = calls.findLast(call => call.method === 'sendMessage' && 'reply_markup' in call.payload)
+    if (!request)
+      throw new Error('Missing approval request')
+    const payload = request.payload as { reply_markup: { inline_keyboard: { callback_data: string }[][] } }
+    return payload.reply_markup.inline_keyboard[0][0].callback_data
+  }
+  return { host, message, callback, approval, fetch, directory, calls, reply, invoke, connectTools }
 }
 
 it('ignores unauthorized senders and groups before any API call or session write', async () => {
@@ -92,18 +132,21 @@ it('ignores unauthorized senders and groups before any API call or session write
   expect(await readdir(directory)).toEqual([])
 })
 
-it('restores each private chat separately after restart and never exposes terminal tools', async () => {
+it('restores each private chat separately after restart and connects isolated terminal tools', async () => {
   const first = await connect()
   await first.message('Remember my name')
   await vi.waitFor(() => expect(first.reply).toHaveBeenCalledWith('Xin chào'))
+  await first.message('/permission full')
   await first.host.close()
   const next = await connect(undefined, first.directory)
+  await next.message('/permission')
+  expect(next.reply.mock.calls.at(-1)?.[0]).toContain(cliMessages.vi.permissionAsk)
   await next.message('What did I say?')
   await vi.waitFor(() => expect(next.reply).toHaveBeenCalledWith('Xin chào'))
   const request = JSON.parse(String(next.fetch.mock.calls[0][1]?.body))
   expect(request.messages).toEqual(expect.arrayContaining([expect.objectContaining({ role: 'user', content: 'Remember my name' })]))
-  expect(request.tools ?? []).toEqual([])
-  expect(JSON.stringify(request.messages[0])).toContain('No tools or filesystem access')
+  expect(request.tools).toEqual(expect.arrayContaining([expect.objectContaining({ function: expect.objectContaining({ name: 'builtIn_mcpCallTool' }) })]))
+  expect(JSON.stringify(request.messages[0])).not.toContain('No tools or filesystem access')
   await next.message('Another private chat', 200)
   await vi.waitFor(() => expect(next.fetch).toHaveBeenCalledTimes(2))
   expect(String(next.fetch.mock.calls[1][1]?.body)).not.toContain('Remember my name')
@@ -120,7 +163,7 @@ it('allows local help and status without a model request, and resets only the se
   await message('/status')
   await message('/permistion full')
   expect(fetch).not.toHaveBeenCalled()
-  expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramWelcome)
+  expect(reply).toHaveBeenCalledWith(expect.stringContaining(cliMessages.vi.telegramWelcome))
   expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramCommands)
   await message('Old conversation')
   await vi.waitFor(() => expect(reply).toHaveBeenCalledWith('Xin chào'))
@@ -155,8 +198,8 @@ it('splits long Unicode replies without corrupting characters or enabling Telegr
   const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValue(completion(text))
   const { message, reply, calls, host } = await connect(fetch)
   await message('Long answer')
-  await vi.waitFor(() => expect(reply).toHaveBeenCalledTimes(3))
-  expect(reply.mock.calls.map(call => call[0]).join('')).toBe(text)
+  await vi.waitFor(() => expect(reply.mock.calls.filter(call => call[0].startsWith('😀'))).toHaveLength(3))
+  expect(reply.mock.calls.filter(call => call[0].startsWith('😀')).map(call => call[0]).join('')).toBe(text)
   expect(reply.mock.calls.every(call => call[0].length <= 4096)).toBe(true)
   expect(calls.filter(call => call.method === 'sendMessage').every(call => !('parse_mode' in call.payload))).toBe(true)
   await host.close()
@@ -166,7 +209,130 @@ it('returns a readable failure without exposing provider diagnostics', async () 
   const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValue(new Response(JSON.stringify({ error: { message: 'private-provider-secret' } }), { status: 401 }))
   const { message, reply, host } = await connect(fetch)
   await message('Hello')
-  await vi.waitFor(() => expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramRequestFailed))
+  await vi.waitFor(() => expect(reply).toHaveBeenCalledWith(expect.stringContaining('HTTP 401')))
   expect(JSON.stringify(reply.mock.calls)).not.toContain('private-provider-secret')
   await host.close()
 })
+
+function toolCompletion(command = 'pwd') {
+  const call = {
+    index: 0,
+    id: 'call-terminal',
+    type: 'function',
+    function: { name: 'builtIn_mcpCallTool', arguments: JSON.stringify({ name: 'terminal_exec', arguments: JSON.stringify({ command }) }) },
+  }
+  return new Response(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', tool_calls: [call] }, finish_reason: 'tool_calls' }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } })
+}
+
+it.each([true, false])('runs a tool only after the matching Telegram approval: %s', async (approved) => {
+  const fetch = vi.fn<typeof globalThis.fetch>()
+    .mockResolvedValueOnce(toolCompletion())
+    .mockResolvedValueOnce(completion('Finished'))
+  const { message, callback, approval, reply, invoke, directory, calls, host } = await connect(fetch)
+  const fullResult = `${'output line\n'.repeat(100)}full-result-marker`
+  invoke.mockReturnValue({ content: [{ type: 'text', text: fullResult }] })
+  await message('Run pwd')
+  await vi.waitFor(() => expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramApproval))
+  expect(invoke).not.toHaveBeenCalled()
+  expect(reply).toHaveBeenCalledWith(expect.stringContaining(`cwd: ${directory}`))
+  const data = approval()
+  await callback(data, 999)
+  await callback(data, 200)
+  expect(invoke).not.toHaveBeenCalled()
+  await callback(data.replace(':yes', approved ? ':yes' : ':no'))
+  await vi.waitFor(() => expect(reply).toHaveBeenCalledWith('Finished'))
+  expect(invoke).toHaveBeenCalledTimes(approved ? 1 : 0)
+  const body = JSON.parse(String(fetch.mock.calls[1][1]?.body))
+  expect(JSON.stringify(body)).toContain(approved ? 'full-result-marker' : cliMessages.vi.approvalDenied)
+  if (approved) {
+    expect(invoke).toHaveBeenCalledWith('terminal_exec', { command: 'pwd', cwd: directory })
+    await vi.waitFor(() => expect(JSON.stringify(calls)).toContain(cliMessages.vi.outputShortened))
+    expect(JSON.stringify(calls)).not.toContain('full-result-marker')
+  }
+  await callback(data)
+  expect(invoke).toHaveBeenCalledTimes(approved ? 1 : 0)
+  expect(calls.some(call => call.method === 'editMessageReplyMarkup')).toBe(true)
+  await host.close()
+})
+
+it('requires a fresh confirmation for a pending server action and rejects replayed buttons', async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValueOnce(toolCompletion()).mockResolvedValueOnce(completion('Finished'))
+  const { message, callback, approval, reply, invoke, host } = await connect(fetch)
+  invoke.mockReturnValueOnce({ content: [], structuredContent: { status: 'approval_required', pendingActionId: 'server-pending', action: { kind: 'terminal_exec', input: { command: 'pwd' } } } })
+  await message('Run pwd')
+  await vi.waitFor(() => expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramApproval))
+  const first = approval()
+  await callback(first)
+  await vi.waitFor(() => expect(approval()).not.toBe(first))
+  const second = approval()
+  await callback(first)
+  expect(invoke).toHaveBeenCalledOnce()
+  await callback(second.replace(':yes', ':no'))
+  await vi.waitFor(() => expect(reply).toHaveBeenCalledWith('Finished'))
+  expect(invoke.mock.calls[1]).toEqual(['desktop_reject_pending_action', { id: 'server-pending' }])
+  await host.close()
+})
+
+it('isolates full access by chat, resolves a waiting approval, and resets access with a new conversation', async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>().mockImplementation(async () => completion('Finished'))
+  const { message, reply, invoke, host, connectTools } = await connect(fetch)
+  fetch.mockResolvedValueOnce(toolCompletion())
+  await message('Run pwd')
+  await vi.waitFor(() => expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramApproval))
+  await message('/permistion full', 999)
+  expect(invoke).not.toHaveBeenCalled()
+  await message('/permission full')
+  await vi.waitFor(() => expect(reply).toHaveBeenCalledWith('Finished'))
+  expect(invoke).toHaveBeenCalledOnce()
+  fetch.mockResolvedValueOnce(toolCompletion())
+  invoke.mockReturnValueOnce({ content: [], structuredContent: { status: 'approval_required', pendingActionId: 'full-pending' } })
+  await message('Run it again')
+  await vi.waitFor(() => expect(invoke).toHaveBeenCalledTimes(3))
+  expect(invoke.mock.calls[2]).toEqual(['desktop_approve_pending_action', { id: 'full-pending' }])
+  await vi.waitFor(() => expect(reply.mock.calls.filter(call => call[0] === 'Finished')).toHaveLength(2))
+  expect(connectTools).toHaveBeenCalledOnce()
+  await message('/permistion', 200)
+  expect(reply.mock.calls.at(-1)?.[0]).toContain(cliMessages.vi.permissionAsk)
+  await message('/new')
+  await vi.waitFor(() => expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramNew))
+  await message('/permistion')
+  expect(reply.mock.calls.at(-1)?.[0]).toContain(cliMessages.vi.permissionAsk)
+  await host.close()
+})
+
+it('cancels approval waits without executing and ignores their buttons after cancellation', async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValueOnce(toolCompletion())
+  const { message, callback, approval, reply, invoke, host, directory } = await connect(fetch)
+  await message('Run pwd')
+  await vi.waitFor(() => expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramApproval))
+  const data = approval()
+  await message('/cancel')
+  await callback(data)
+  expect(invoke).not.toHaveBeenCalled()
+  expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramCancelled)
+  expect((await readdir(directory)).some(file => file.endsWith('.lock'))).toBe(false)
+  await host.close()
+})
+
+it('runs a Telegram-requested command through the built-in stdio service in the selected workspace', async () => {
+  const command = 'test -z "$ANGELA_API_KEY" && test -z "$ANGELA_TELEGRAM_BOT_TOKEN" && printf "provider= bot=\\n" && pwd && printf "created-by-telegram" > tool-proof.txt'
+  const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValueOnce(toolCompletion(command)).mockResolvedValueOnce(completion('Verified'))
+  const { message, reply, directory, host, connectTools } = await connect(fetch)
+  connectTools.mockImplementation(async (id, confirm, signal) => await McpTools.connect(
+    { computerUse: true, mcpArgs: [] },
+    directory,
+    join(directory, 'audit', id),
+    confirm,
+    cliMessages.vi,
+    { ANGELA_API_KEY: 'test-provider-secret', ANGELA_TELEGRAM_BOT_TOKEN: 'test-bot-secret' },
+    signal,
+  ))
+  await message('/permission full')
+  await message('Run pwd')
+  await vi.waitFor(() => expect(reply).toHaveBeenCalledWith('Verified'), { timeout: 15_000 })
+  expect(String(fetch.mock.calls[1][1]?.body)).toContain(directory)
+  expect(String(fetch.mock.calls[1][1]?.body)).toContain('provider= bot=')
+  expect(await readFile(join(directory, 'tool-proof.txt'), 'utf8')).toBe('created-by-telegram')
+  expect(JSON.stringify(reply.mock.calls)).not.toContain('test-provider-secret')
+  await host.close()
+}, 20_000)

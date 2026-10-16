@@ -1,8 +1,13 @@
-import type { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import type { CallToolResult, Tool as McpTool } from '@modelcontextprotocol/sdk/types.js'
 import type { cliMessages } from '@proj-airi/i18n/cli'
 import type { Tool } from '@xsai/shared-chat'
 
+import process from 'node:process'
+
+import { fileURLToPath } from 'node:url'
+
+import { Client } from '@modelcontextprotocol/sdk/client/index.js'
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js'
 
 import * as v from 'valibot'
@@ -26,6 +31,48 @@ export class McpTools {
     private readonly messages: typeof cliMessages.en,
     private readonly workspace?: string,
   ) {}
+
+  /** Connects one host session. The caller closes it after all active calls finish. */
+  static async connect(
+    config: { computerUse: boolean, mcpCommand?: string, mcpArgs: string[] },
+    workspace: string,
+    sessionRoot: string,
+    confirm: Confirm,
+    messages: typeof cliMessages.en,
+    env: NodeJS.ProcessEnv,
+    signal?: AbortSignal,
+  ) {
+    const client = new Client({ name: '@proj-airi/airi-cli', version: '0.12.0-beta.5' })
+    const childEnv: Record<string, string> = {}
+    for (const [key, value] of Object.entries(env)) {
+      if (value !== undefined && !['ANGELA_API_KEY', 'ANGELA_TELEGRAM_BOT_TOKEN'].includes(key))
+        childEnv[key] = value
+    }
+    if (config.computerUse && !childEnv.COMPUTER_USE_SESSION_ROOT)
+      childEnv.COMPUTER_USE_SESSION_ROOT = sessionRoot
+    const tools = new McpTools(client, confirm, messages, config.computerUse ? workspace : undefined)
+    try {
+      await client.connect(new StdioClientTransport({
+        command: config.computerUse ? process.execPath : config.mcpCommand!,
+        args: config.computerUse
+          ? [fileURLToPath(new URL('./bin/run.mjs', import.meta.resolve('@proj-airi/computer-use-mcp')))]
+          : config.mcpArgs,
+        cwd: workspace,
+        env: childEnv,
+        stderr: 'inherit',
+      }), { signal })
+      await tools.discover(signal)
+      return tools
+    }
+    catch (error) {
+      await client.close()
+      throw error
+    }
+  }
+
+  async close() {
+    await this.client.close()
+  }
 
   /** Reads every discovery page. Built-in mode exposes terminal operations only. */
   async discover(signal?: AbortSignal) {

@@ -23,6 +23,20 @@ const backendSchema = v.object({
   }),
 })
 
+/** Shows the effective action, including server-side pending actions, before a host approves it. */
+export function describeTool(request: { name: string, arguments: Record<string, unknown> }, messages: typeof cliMessages.en) {
+  const pendingAction = request.name === 'desktop_approve_pending_action' || request.name === 'desktop_reject_pending_action'
+  const pending = v.safeParse(pendingSchema, pendingAction ? request.arguments.pending : undefined)
+  const name = pending.success ? pending.output.action.kind : request.name
+  const args = pending.success ? pending.output.action.input : request.arguments
+  const lines = [`◇ ${messages.tool}: ${name}`]
+  for (const [key, value] of Object.entries(args)) {
+    const text = typeof value === 'string' ? value : JSON.stringify(value)
+    lines.push(`  ${key}: ${stripVTControlCharacters(text ?? '')}`)
+  }
+  return { name, text: `${lines.join('\n')}\n` }
+}
+
 /** Owns transient progress and bounded tool previews. Full tool results stay in the conversation. */
 export class Output {
   hasText = false
@@ -132,16 +146,9 @@ export class Output {
     this.pause()
     this.endText()
     this.awaitingApproval = true
-    const pendingAction = request.name === 'desktop_approve_pending_action' || request.name === 'desktop_reject_pending_action'
-    const pending = v.safeParse(pendingSchema, pendingAction ? request.arguments.pending : undefined)
-    const name = pending.success ? pending.output.action.kind : request.name
-    const args = pending.success ? pending.output.action.input : request.arguments
-    this.approvalTool = name
-    this.stderr.write(`◇ ${this.messages.tool}: ${name}\n`)
-    for (const [key, value] of Object.entries(args)) {
-      const text = typeof value === 'string' ? value : JSON.stringify(value)
-      this.stderr.write(`  ${key}: ${stripVTControlCharacters(text ?? '')}\n`)
-    }
+    const action = describeTool(request, this.messages)
+    this.approvalTool = action.name
+    this.stderr.write(action.text)
   }
 
   decided(approved: boolean) {

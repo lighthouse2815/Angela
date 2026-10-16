@@ -181,7 +181,7 @@ Interrupted requests are marked. The CLI does not fabricate an assistant answer 
 
 ## Telegram
 
-Run `angela telegram` to start private text chat through Telegram, using grammY long polling.
+Run `angela telegram` to chat and use local terminal tools through Telegram, using grammY long polling.
 This host reuses Angela's shared provider configuration and session storage. It needs no database, public port, or webhook.
 The existing integration in `integrations/telegram-bot` remains a separate service with its own database and media features.
 
@@ -212,9 +212,11 @@ Telegram commands:
 
 - `/start`: introduce Angela.
 - `/help`: list Telegram commands and describe each command.
-- `/status`: show the model, session ID, and request status.
-- `/new`: clear the current chat's stored conversation and start again.
-- `/cancel`: cancel the current request.
+- `/status`: show the model, session ID, workspace, permissions, and request status.
+- `/new`: clear the current chat's stored conversation, close its tools, and restore confirmation mode.
+- `/cancel`: cancel the current request, including a pending tool confirmation.
+- `/permistion`: show permissions. Use `/permistion full` for automatic approval or `/permistion ask` for confirmation.
+- `/permission`: alias for `/permistion`.
 
 Each private chat has a separate session, also isolated by bot ID.
 Sessions live under `~/.angela/sessions/telegram` and survive restarts. Restart from the same workspace to resume them.
@@ -222,7 +224,21 @@ The bot runs one request per chat and stays responsive to cancellation while the
 Requests time out after five minutes. Ctrl+C cancels active requests and releases session locks.
 Long replies are split into plain Telegram messages. Telegram does not interpret model output as formatting.
 
-This first version provides text chat only. It has no terminal tools, file access, or CLI permission mode.
+Each chat connects the same MCP terminal tools as the CLI. File reads and edits use terminal commands.
+Tools run on the machine hosting the bot, in the selected workspace. The workspace is not a filesystem sandbox.
+`--mcp-command` and repeated `--mcp-arg` flags select another trusted stdio server.
+Each chat owns a separate MCP connection. Normal requests retain its terminal state until reset, cancellation, or shutdown.
+The tool child process does not receive the provider key or Telegram bot token through their Angela environment variables.
+
+Confirmation mode is the default. The bot sends the complete action and workspace before showing Allow and Deny buttons.
+Each button authorizes one action in its original private chat. Cancelled, completed, and replaced buttons cannot authorize another action.
+Server-side pending actions require a second confirmation. Full access automatically handles both confirmation stages.
+Full access belongs to one chat and lasts until `/new`, an explicit permission change, or a process restart.
+Only an authorized Telegram command can change permissions. Model output and saved conversations cannot change them.
+
+The bot edits one progress message with thinking, tool status, and compact results.
+Tool previews reuse the CLI's three-line, 600-character limit. The model and saved session retain the full result.
+Actions that already ran can retain side effects after cancellation. Cancellation closes that chat's MCP connection.
 It does not send existing CLI conversations to Telegram. A failed delivery leaves the generated answer in the saved session.
 Validate routing and authorization with local API tests before you connect a real bot.
 

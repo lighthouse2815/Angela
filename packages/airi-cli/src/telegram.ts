@@ -4,24 +4,38 @@ import type { Context } from 'grammy'
 
 import process from 'node:process'
 
-import { createHash } from 'node:crypto'
+import { createHash, randomUUID } from 'node:crypto'
 import { readFile, realpath, stat } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
+import { Writable } from 'node:stream'
 import { parseEnv } from 'node:util'
 
 import { getGenerationProvider, listProviders } from '@proj-airi/provider-inference'
+import { APICallError } from '@xsai/shared'
 import { AbortController as TelegramAbortController } from 'abort-controller'
-import { Bot } from 'grammy'
+import { Bot, InlineKeyboard } from 'grammy'
 
 import { Chat } from './chat'
 import { readConfig } from './config'
+import { formatRequestError } from './errors'
+import { McpTools } from './mcp'
+import { describeTool, Output } from './output'
+import { Permissions } from './permissions'
 import { Sessions } from './sessions'
+
+interface ChatState {
+  permissions: Permissions
+  tools?: McpTools
+  output?: Output
+  pending?: { id: string, finish: (approved: boolean) => void }
+}
 
 /** Owns private chat jobs. Each chat has one persisted session and at most one active generation. */
 export class TelegramChat {
   private readonly jobs = new Map<number, { controller: AbortController, done: Promise<void> }>()
   private closing = false
+  private readonly chats = new Map<number, ChatState>()
 
   constructor(
     private readonly bot: Bot,
@@ -31,14 +45,33 @@ export class TelegramChat {
     private readonly workspace: string,
     private readonly messages: typeof cliMessages.en,
     private readonly allowedUsers: ReadonlySet<number>,
+    private readonly connectTools: (sessionId: string, confirm: ConstructorParameters<typeof McpTools>[1], signal: AbortSignal) => Promise<McpTools>,
   ) {
     bot.use(async (ctx, next) => {
       // Check the sender before commands, typing indicators, session reads, or provider requests.
       if (!this.closing && ctx.chat?.type === 'private' && ctx.from && this.allowedUsers.has(ctx.from.id))
         await next()
     })
-    bot.command('start', ctx => ctx.reply(messages.telegramWelcome))
+    bot.command('start', ctx => ctx.reply(`${messages.telegramWelcome}\n${messages.workspace}: ${workspace}`))
     bot.command('help', ctx => ctx.reply(messages.telegramCommands))
+    bot.command(['permistion', 'permission'], async (ctx) => {
+      const state = this.state(ctx.chat.id)
+      const response = state.permissions.command(`/permission ${ctx.match}`)
+      if (state.permissions.fullAccess)
+        state.pending?.finish(true)
+      await ctx.reply(response ?? messages.permissionUsage)
+    })
+    bot.on('callback_query:data', async (ctx) => {
+      const state = ctx.chat && this.chats.get(ctx.chat.id)
+      const [, id, decision] = ctx.callbackQuery.data.split(':')
+      if (ctx.callbackQuery.data.startsWith('tool:') && state?.pending?.id === id && ['yes', 'no'].includes(decision ?? '')) {
+        state.pending.finish(decision === 'yes')
+        await ctx.answerCallbackQuery({ text: decision === 'yes' ? messages.telegramApproved : messages.approvalDenied })
+      }
+      else {
+        await ctx.answerCallbackQuery({ text: messages.telegramApprovalExpired })
+      }
+    })
     bot.command('cancel', async (ctx) => {
       const job = this.jobs.get(ctx.chat.id)
       if (!job) {
@@ -49,7 +82,7 @@ export class TelegramChat {
       await job.done
     })
     bot.command('status', async (ctx) => {
-      await ctx.reply(`${messages.model}: ${model}\n${messages.session}: ${this.sessionId(ctx.chat.id)}\n${this.jobs.has(ctx.chat.id) ? messages.thinking : messages.telegramIdle}`)
+      await ctx.reply(`${messages.model}: ${model}\n${messages.session}: ${this.sessionId(ctx.chat.id)}\n${this.jobs.has(ctx.chat.id) ? messages.thinking : messages.telegramIdle}\n${messages.workspace}: ${workspace}\n${this.state(ctx.chat.id).permissions.fullAccess ? messages.permissionFull : messages.permissionAsk}`)
     })
     bot.on('message:text', async (ctx) => {
       if (this.jobs.has(ctx.chat.id)) {
@@ -80,6 +113,8 @@ export class TelegramChat {
     for (const job of this.jobs.values())
       job.controller.abort()
     await Promise.all([...this.jobs.values()].map(job => job.done))
+    await Promise.all([...this.chats.values()].map(state => state.tools?.close()))
+    this.chats.clear()
   }
 
   private sessionId(chatId: number) {
@@ -88,62 +123,183 @@ export class TelegramChat {
     return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-8${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`
   }
 
+  private state(chatId: number) {
+    let state = this.chats.get(chatId)
+    if (!state) {
+      state = { permissions: new Permissions(this.messages) }
+      this.chats.set(chatId, state)
+    }
+    return state
+  }
+
+  private async reply(chatId: number, text: string, signal?: AbortSignal) {
+    const characters = Array.from(text)
+    for (let offset = 0; offset < characters.length; offset += 2000) {
+      signal?.throwIfAborted()
+      await this.bot.api.sendMessage(chatId, characters.slice(offset, offset + 2000).join(''))
+    }
+  }
+
+  private async confirm(chatId: number, request: Parameters<typeof describeTool>[0], signal?: AbortSignal) {
+    signal?.throwIfAborted()
+    const state = this.state(chatId)
+    const action = describeTool(request, this.messages)
+    if (state.permissions.fullAccess) {
+      await this.reply(chatId, action.text, signal)
+      return true
+    }
+    const id = randomUUID()
+    const decision = Promise.withResolvers<boolean>()
+    const finish = (approved: boolean) => {
+      if (state.pending?.id === id) {
+        state.pending = undefined
+        decision.resolve(approved)
+      }
+    }
+    state.pending = { id, finish }
+    const abort = () => finish(false)
+    signal?.addEventListener('abort', abort, { once: true })
+    let messageId: number | undefined
+    try {
+      await this.reply(chatId, action.text, signal)
+      const message = await this.bot.api.sendMessage(chatId, this.messages.telegramApproval, {
+        reply_markup: new InlineKeyboard()
+          .text(this.messages.telegramAllow, `tool:${id}:yes`)
+          .text(this.messages.telegramDeny, `tool:${id}:no`),
+      })
+      messageId = message.message_id
+      signal?.throwIfAborted()
+      return await decision.promise
+    }
+    finally {
+      finish(false)
+      signal?.removeEventListener('abort', abort)
+      if (messageId !== undefined)
+        await this.bot.api.editMessageReplyMarkup(chatId, messageId, { reply_markup: { inline_keyboard: [] } }).catch(() => {})
+    }
+  }
+
   private async respond(ctx: Context, text: string, reset: boolean, signal: AbortSignal) {
     if (!ctx.chat)
       return
-    const session = await this.sessions.open(this.workspace, this.sessionId(ctx.chat.id))
+    const chatId = ctx.chat.id
+    const state = this.state(chatId)
+    const session = await this.sessions.open(this.workspace, this.sessionId(chatId))
+    const requestSignal = AbortSignal.any([signal, AbortSignal.timeout(300_000)])
     let timer: ReturnType<typeof setInterval> | undefined
     let delivering = false
+    let progress = ''
+    let deliveredProgress = ''
+    let editing: Promise<void> | undefined
+    let progressId: number | undefined
+    const sink = new Writable({ write(chunk, _encoding, callback) {
+      progress = Array.from(progress + String(chunk)).slice(-1500).join('')
+      callback()
+    } })
+    const output = new Output(this.messages, sink, sink)
+    const flush = () => {
+      if (editing)
+        return editing
+      const current = progress.trim()
+      if (progressId === undefined || !current || current === deliveredProgress)
+        return Promise.resolve()
+      // Coalesce updates while Telegram is slow. A final flush sends the latest state.
+      editing = this.bot.api.editMessageText(chatId, progressId, current).then(() => {
+        deliveredProgress = current
+      }).catch(() => {}).finally(() => {
+        editing = undefined
+      })
+      return editing
+    }
     try {
-      const chat = new Chat(this.model, this.provider, this.workspace, reset ? undefined : session.restore(), false)
+      const chat = new Chat(this.model, this.provider, this.workspace, reset ? undefined : session.restore())
       if (reset) {
+        await state.tools?.close()
+        state.tools = undefined
+        state.permissions = new Permissions(this.messages)
         await session.save(chat.conversation, false)
         await ctx.reply(this.messages.telegramNew)
         return
       }
-      signal.throwIfAborted()
+      requestSignal.throwIfAborted()
       await session.save(chat.conversation, true)
+      state.output = output
+      output.start()
+      const status = await ctx.reply(this.messages.thinking)
+      progressId = status.message_id
+      deliveredProgress = this.messages.thinking
       const typing = () => {
         void ctx.replyWithChatAction('typing').catch(() => {})
+        void flush()
       }
       typing()
-      timer = setInterval(typing, 4000)
+      timer = setInterval(typing, 2000)
       timer.unref()
+      state.tools ??= await this.connectTools(this.sessionId(chatId), async (request, approvalSignal) => {
+        state.output?.approval(request)
+        try {
+          const approved = await this.confirm(chatId, request, approvalSignal)
+          state.output?.decided(approved)
+          return approved
+        }
+        catch (error) {
+          state.output?.decided(false)
+          throw error
+        }
+      }, requestSignal)
       let answer = ''
       let generated = false
       await chat.send(text, {
-        abortSignal: AbortSignal.any([signal, AbortSignal.timeout(300_000)]),
-        diagnostics: { error() {}, warn() {} },
+        abortSignal: requestSignal,
+        tools: state.tools.definitions(),
+        diagnostics: { error() {}, warn() { output.retry() } },
         onStreamEvent(event) {
           if (event.type === 'text-delta')
             answer += event.text
-          if (event.type === 'error')
-            throw event.error
+          else
+            output.event(event)
         },
       }).then(() => {
         generated = Boolean(answer.trim())
       }).finally(async () => {
-        await session.save(chat.conversation, signal.aborted || !generated)
+        await session.save(chat.conversation, requestSignal.aborted || !generated)
       })
-      signal.throwIfAborted()
+      requestSignal.throwIfAborted()
       if (!answer.trim())
         throw new Error(this.messages.emptyResponse)
       clearInterval(timer)
       timer = undefined
+      output.stop()
+      sink.write(`✓ ${this.messages.toolDone}\n`)
+      await editing
+      await flush()
       delivering = true
-      // Telegram limits messages to 4096 characters. Code points prevent splitting surrogate pairs.
-      const characters = Array.from(answer)
-      for (let offset = 0; offset < characters.length; offset += 2000) {
-        signal.throwIfAborted()
-        await ctx.reply(characters.slice(offset, offset + 2000).join(''))
-      }
+      await this.reply(chatId, answer, requestSignal)
     }
-    catch {
-      await ctx.reply(signal.aborted ? this.messages.telegramCancelled : delivering ? this.messages.telegramDeliveryFailed : this.messages.telegramRequestFailed)
+    catch (error) {
+      if (requestSignal.aborted) {
+        await state.tools?.close()
+        state.tools = undefined
+      }
+      let failure = this.messages.telegramRequestFailed
+      if (signal.aborted)
+        failure = this.messages.telegramCancelled
+      else if (requestSignal.aborted)
+        failure = this.messages.providerTimeout
+      else if (delivering)
+        failure = this.messages.telegramDeliveryFailed
+      else if (APICallError.isInstance(error))
+        failure = `${this.messages.failed}: ${formatRequestError(error, this.messages)}`
+      sink.write(`✗ ${failure}\n`)
+      await ctx.reply(failure)
     }
     finally {
       if (timer)
         clearInterval(timer)
+      output.stop()
+      state.output = undefined
+      await editing
+      await flush()
       await session.close()
     }
   }
@@ -190,7 +346,7 @@ export async function runTelegram(args: string[], env: NodeJS.ProcessEnv) {
   if (!provider)
     throw new Error(messages.unsupportedProvider)
   const bot = new Bot(token)
-  const host = new TelegramChat(bot, provider, config.model, new Sessions(join(config.dataDir, 'telegram'), messages), workspace, messages, new Set(ids.map(Number)))
+  const host = new TelegramChat(bot, provider, config.model, new Sessions(join(config.dataDir, 'telegram'), messages), workspace, messages, new Set(ids.map(Number)), async (id, confirm, signal) => await McpTools.connect(config, workspace, join(config.dataDir, 'telegram', 'computer-use', id), confirm, messages, merged, signal))
   bot.catch(() => {
     process.stderr.write(`${messages.telegramFailed}\n`)
   })
@@ -214,7 +370,7 @@ export async function runTelegram(args: string[], env: NodeJS.ProcessEnv) {
       throw new Error(messages.telegramFailed)
     if (!stopped) {
       await bot.start({
-        allowed_updates: ['message'],
+        allowed_updates: ['message', 'callback_query'],
         onStart: () => { process.stderr.write(`${messages.telegramReady}\n`) },
       })
     }

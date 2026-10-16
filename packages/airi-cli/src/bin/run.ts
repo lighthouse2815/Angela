@@ -4,10 +4,7 @@ import process from 'node:process'
 
 import { realpath, stat } from 'node:fs/promises'
 import { join } from 'node:path'
-import { fileURLToPath } from 'node:url'
 
-import { Client } from '@modelcontextprotocol/sdk/client/index.js'
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 import { errorMessageFrom } from '@moeru/std'
 import { getGenerationProvider, listProviders } from '@proj-airi/provider-inference'
 
@@ -108,7 +105,6 @@ async function main() {
       process.exitCode = 143
     }
     process.on('SIGTERM', stop)
-    let client: Client | undefined
     let mcp: McpTools | undefined
 
     let voice: Voice | undefined
@@ -156,25 +152,7 @@ async function main() {
 
     try {
       if (config.computerUse || config.mcpCommand) {
-        client = new Client({ name: '@proj-airi/airi-cli', version: '0.12.0-beta.5' })
-        const childEnv: Record<string, string> = {}
-        for (const [key, value] of Object.entries(process.env)) {
-          if (value !== undefined && key !== 'ANGELA_API_KEY')
-            childEnv[key] = value
-        }
-        if (config.computerUse && !childEnv.COMPUTER_USE_SESSION_ROOT)
-          childEnv.COMPUTER_USE_SESSION_ROOT = join(config.dataDir, 'computer-use', session.record.id)
-        const transport = new StdioClientTransport({
-          command: config.computerUse ? process.execPath : config.mcpCommand!,
-          args: config.computerUse
-            ? [fileURLToPath(new URL('./bin/run.mjs', import.meta.resolve('@proj-airi/computer-use-mcp')))]
-            : config.mcpArgs,
-          cwd: workspace,
-          env: childEnv,
-          stderr: 'inherit',
-        })
-        await client.connect(transport, { signal: shutdown.signal })
-        mcp = new McpTools(client, async (request, signal) => {
+        mcp = await McpTools.connect(config, workspace, join(config.dataDir, 'computer-use', session.record.id), async (request, signal) => {
           output.approval(request)
           if (permissions.fullAccess) {
             signal?.throwIfAborted()
@@ -188,8 +166,7 @@ async function main() {
           const approved = (await input.ask(`\n${messages.approve} `, signal))?.trim().toLowerCase() === 'yes'
           output.decided(approved)
           return approved
-        }, messages, config.computerUse ? workspace : undefined)
-        await mcp.discover(shutdown.signal)
+        }, messages, process.env, shutdown.signal)
         process.stderr.write(`${messages.mcpConnected}\n`)
       }
       if (input && interactive) {
@@ -263,7 +240,7 @@ async function main() {
     }
     finally {
       input?.close()
-      await client?.close()
+      await mcp?.close()
       process.off('SIGINT', interrupt)
       process.off('SIGTERM', stop)
     }
