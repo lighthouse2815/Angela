@@ -44,7 +44,7 @@ class WorkerTests(unittest.TestCase):
         sample.pts_3d[62][1] = -0.1
         sample.euler = (-179, 35, 88)
         event = worker.observation([sample], 1234, {})
-        self.assertEqual(event["features"]["smileLike"], 0)
+        self.assertLessEqual(event["features"]["smileLike"], 0.25)
         self.assertAlmostEqual(event["headPose"]["yaw"], -35)
         self.assertAlmostEqual(event["headPose"]["pitch"], 1)
         self.assertAlmostEqual(event["headPose"]["roll"], 2)

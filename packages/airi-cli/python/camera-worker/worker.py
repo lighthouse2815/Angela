@@ -48,7 +48,9 @@ def observation(faces, timestamp, metrics):
         upper = sum(float(points[index][1]) for index in (49, 50, 51)) / 3
         corners = (float(left[1]) + float(right[1])) / 2
         # Dimensionless mouth-corner lift. The heuristic is a visible cue, not emotion.
-        smile = ((corners - upper) / width + 0.02) / 0.16
+        # Upstream's canonical neutral mouth has a lift ratio near -0.125.
+        # Corners near the upper-lip line produce a smile-like score near 0.67.
+        smile = ((corners - upper) / width + 0.12) / 0.18
         opening = abs(sum(float(points[index][1]) for index in (59, 60, 61))
                       - sum(float(points[index][1]) for index in (63, 64, 65))) / (3 * width)
         if math.isfinite(smile) and math.isfinite(opening):
