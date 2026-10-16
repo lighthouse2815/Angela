@@ -184,7 +184,7 @@ async function main() {
       if (input && interactive) {
         process.stderr.write(`${messages.workspace}: ${workspace}\n${messages.welcome}\n${messages.permissionAsk}\n`)
         while (true) {
-          const text = (await input.ask(output.prompt()))?.trim()
+          const text = (await input.ask(output.prompt(), undefined, messages.cliCommands))?.trim()
           output.submitted()
           if (text === undefined || text === '/exit')
             break

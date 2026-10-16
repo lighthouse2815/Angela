@@ -74,6 +74,7 @@ Use `ANGELA_LOCALE=en` or `--locale en` for English.
 
 During interactive chat, Ctrl+C cancels the current request. Use `/exit` or Ctrl+D to quit.
 Use `/help` to list the chat commands and keyboard controls without contacting the model.
+Type `/` at the start of the input to show command suggestions. Keep typing to filter them, then press Tab to complete.
 One-shot requests return exit code 1 for errors and 130 for cancellation.
 
 Interactive startup clears the terminal display and shows Angela's robot icon.
