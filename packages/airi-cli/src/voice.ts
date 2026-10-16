@@ -5,9 +5,9 @@ import type { cliMessages } from '@proj-airi/i18n/cli'
 import process from 'node:process'
 
 import { spawn } from 'node:child_process'
-import { lstat, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { lstat, mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { homedir, tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { parseEnv } from 'node:util'
 
 import WebSocket from 'ws'
@@ -55,7 +55,7 @@ export class Voice {
 
   /** Reads device-local audio configuration. Process environment values override the file. */
   static async load(env: NodeJS.ProcessEnv, messages: typeof cliMessages.en) {
-    const path = env.ANGELA_VOICE_ENV ?? join(env.XDG_CONFIG_HOME ?? join(homedir(), '.config'), 'angela', 'voice.env')
+    const path = Voice.environmentPath(env)
     let saved: NodeJS.ProcessEnv | undefined
     try {
       saved = parseEnv(await readFile(path, 'utf8'))
@@ -65,6 +65,35 @@ export class Voice {
         throw error
     }
     return new Voice({ ...saved, ...env }, messages)
+  }
+
+  /** Creates local audio defaults only when the private configuration file does not exist. */
+  static async configureLocal(env: NodeJS.ProcessEnv) {
+    const path = Voice.environmentPath(env)
+    await mkdir(dirname(path), { recursive: true, mode: 0o700 })
+    try {
+      await writeFile(path, 'ANGELA_VOICE_BASE_URL=http://127.0.0.1:8000/v1/\nANGELA_STT_MODEL=small\nANGELA_TTS_MODEL=edge-tts\nANGELA_TTS_VOICE=vi-VN-HoaiMyNeural\n', { flag: 'wx', mode: 0o600 })
+    }
+    catch (error) {
+      if (!(error instanceof Error) || !('code' in error) || error.code !== 'EEXIST')
+        throw error
+    }
+  }
+
+  private static environmentPath(env: NodeJS.ProcessEnv) {
+    return env.ANGELA_VOICE_ENV ?? join(env.XDG_CONFIG_HOME ?? join(homedir(), '.config'), 'angela', 'voice.env')
+  }
+
+  /** Checks readiness without starting a model or opening the microphone. */
+  async healthy() {
+    try {
+      const response = await fetch(new URL('/health', this.baseUrl), { signal: AbortSignal.timeout(3000) })
+      const body: unknown = await response.json()
+      return response.ok && !!body && typeof body === 'object' && 'status' in body && body.status === 'ok'
+    }
+    catch {
+      return false
+    }
   }
 
   constructor(private readonly env: NodeJS.ProcessEnv, private readonly messages: typeof cliMessages.en) {

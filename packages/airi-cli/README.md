@@ -100,6 +100,23 @@ An empty model answer reports an error instead of returning silently to the prom
 This entry point provides text chat, Linux voice, and a built-in terminal MCP connection.
 The web and desktop applications provide avatars and visual settings.
 
+## Local voice service commands
+
+```sh
+angela voice start
+angela voice status
+angela voice stop
+```
+
+These commands work from any directory and do not need a chat model or provider credentials.
+`start` builds and starts the local Docker service, then waits for readiness.
+It creates private local voice defaults only when `voice.env` does not exist. Existing configuration stays unchanged.
+`status` shows the container state, configured endpoint health, and availability of PipeWire commands.
+It does not record audio. The actual microphone is checked when capture starts.
+`stop` stops the service and retains downloaded models and history.
+Docker with Compose and a running daemon are required. Keep this source checkout available.
+`ANGELA_VOICE_COMPOSE` selects another Compose file when the service has moved.
+
 ## Voice in the current session
 
 Type `/voice` during interactive chat to start automatic listening.

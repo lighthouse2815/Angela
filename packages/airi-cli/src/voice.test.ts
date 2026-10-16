@@ -2,7 +2,7 @@ import process from 'node:process'
 
 import { Buffer } from 'node:buffer'
 import { EventEmitter, once } from 'node:events'
-import { mkdir, mkdtemp, readdir, rm, utimes, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readdir, readFile, rm, utimes, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { PassThrough } from 'node:stream'
@@ -229,4 +229,29 @@ it('cleans only stale audio, preserving active owners, recent files, and unrelat
   finally {
     await rm(root, { recursive: true, force: true })
   }
+})
+
+it('creates private local configuration once and preserves customized endpoints', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'angela-voice-settings-'))
+  const env = { ANGELA_VOICE_ENV: join(root, 'voice.env') }
+  try {
+    await Voice.configureLocal(env)
+    expect(await readFile(env.ANGELA_VOICE_ENV, 'utf8')).toContain('ANGELA_STT_MODEL=small')
+    await writeFile(env.ANGELA_VOICE_ENV, 'ANGELA_VOICE_BASE_URL=http://localhost:9000/v1/\n')
+    await Voice.configureLocal(env)
+    expect(await readFile(env.ANGELA_VOICE_ENV, 'utf8')).toBe('ANGELA_VOICE_BASE_URL=http://localhost:9000/v1/\n')
+  }
+  finally {
+    await rm(root, { recursive: true, force: true })
+  }
+})
+
+it('checks endpoint readiness without starting capture or exposing invalid response bodies', async () => {
+  const voice = new Voice({ ANGELA_VOICE_BASE_URL: 'http://localhost/v1/' }, cliMessages.en)
+  const fetch = vi.fn(async () => Response.json({ status: 'ok' }))
+  vi.stubGlobal('fetch', fetch)
+  expect(await voice.healthy()).toBe(true)
+  fetch.mockImplementation(async () => new Response('private upstream error', { status: 502 }))
+  expect(await voice.healthy()).toBe(false)
+  expect(spawn).not.toHaveBeenCalled()
 })

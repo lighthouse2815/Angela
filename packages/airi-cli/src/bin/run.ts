@@ -19,6 +19,7 @@ import { Sessions } from '../sessions'
 import { runTelegram } from '../telegram'
 import { Terminal } from '../terminal'
 import { Voice } from '../voice'
+import { runVoiceService } from '../voice-service'
 
 /**
  * Runs terminal chat and owns input, signals, and provider configuration.
@@ -28,6 +29,10 @@ import { Voice } from '../voice'
  *                    -> McpTools -> MCP client -> tool server
  */
 async function main() {
+  if (process.argv[2] === 'voice') {
+    await runVoiceService(process.argv.slice(3), process.env)
+    return
+  }
   if (process.argv[2] === 'sessions') {
     await runSessionCommand(process.argv.slice(3), process.env)
     return
@@ -39,7 +44,7 @@ async function main() {
   const config = await readConfig(process.argv.slice(2), process.env)
   const messages = config.messages
   if (config.help) {
-    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela telegram [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
+    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela telegram [--help]\nangela voice start|stop|status [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
       ['--model', messages.model],
       ['--provider', messages.provider],
       ['--config', messages.configFile],

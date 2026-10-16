@@ -1,4 +1,12 @@
 const en = {
+  voiceServiceUsage: 'angela voice start|stop|status [--locale en|vi]. Start builds the local service. Stop keeps downloaded models.',
+  voiceServiceMissing: 'Local voice files are missing. Keep the Angela checkout available, or set ANGELA_VOICE_COMPOSE to its compose.yaml.',
+  voiceDockerMissing: 'Cannot start Docker. Install Docker with Compose and start its daemon.',
+  voiceServiceFailed: 'Docker Compose failed. Review the Docker output and check its daemon and permissions.',
+  voiceServiceReady: 'Voice service is ready. Open angela and type /voice.',
+  voiceServiceOffline: 'Voice service is not ready. Check its container logs and configured endpoint.',
+  voiceToolsReady: 'PipeWire recording and playback commands are available. The microphone is checked when voice capture starts.',
+
   sessionsUsage: 'angela sessions list|usage|delete ID|cleanup-audio [--data-dir PATH] [--locale en|vi]. Only CLI history JSON bytes are counted.',
   sessionDeleteInteractive: 'Session deletion needs an interactive terminal. No files were deleted.',
   sessionDeleteConfirm: 'To delete this history, type its full session ID:',
@@ -107,6 +115,14 @@ const en = {
 }
 
 const vi: typeof en = {
+  voiceServiceUsage: 'angela voice start|stop|status [--locale en|vi]. start dựng dịch vụ local; stop giữ nguyên model đã tải.',
+  voiceServiceMissing: 'Không tìm thấy dịch vụ voice. Giữ thư mục source Angela hoặc đặt ANGELA_VOICE_COMPOSE trỏ đến compose.yaml.',
+  voiceDockerMissing: 'Không chạy được Docker. Cài Docker cùng Compose và bật Docker daemon.',
+  voiceServiceFailed: 'Docker Compose thất bại. Xem thông báo Docker, kiểm tra daemon và quyền truy cập.',
+  voiceServiceReady: 'Dịch vụ voice đã sẵn sàng. Mở angela rồi gõ /voice.',
+  voiceServiceOffline: 'Dịch vụ voice chưa sẵn sàng. Kiểm tra log container và endpoint đang cấu hình.',
+  voiceToolsReady: 'Đã có lệnh thu/phát PipeWire. Micro thực tế được kiểm tra khi bắt đầu nghe.',
+
   sessionsUsage: 'angela sessions list|usage|delete ID|cleanup-audio [--data-dir PATH] [--locale en|vi]. Dung lượng chỉ tính file lịch sử CLI.',
   sessionDeleteInteractive: 'Cần terminal tương tác để xác nhận xóa phiên. Chưa xóa file nào.',
   sessionDeleteConfirm: 'Để xóa lịch sử này, nhập đầy đủ ID phiên:',
