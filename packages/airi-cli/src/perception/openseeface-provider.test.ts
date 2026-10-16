@@ -226,4 +226,15 @@ describe('session camera commands', () => {
     expect(child.kill).toHaveBeenCalledWith('SIGTERM')
     await camera.close()
   })
+
+  it('does not report ON when a worker exits immediately after readiness', async () => {
+    const camera = new Camera({}, cliMessages.en)
+    const starting = camera.command('/camera on')
+    await vi.waitFor(() => expect(spawn).toHaveBeenCalledOnce())
+    event({ type: 'ready' })
+    child.emit('close', 1)
+    expect(await starting).toContain('worker_exited')
+    expect(camera.enabled).toBe(false)
+    await camera.close()
+  })
 })

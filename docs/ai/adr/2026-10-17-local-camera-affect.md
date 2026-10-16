@@ -8,7 +8,7 @@ Status: accepted
 `Chat.send` already accepts request-only system context alongside persisted conversation turns.
 `Context.prepare` keeps system context during compaction and summarizes historical turns only.
 CLI services read environment settings, use Valibot at data boundaries, and report localized diagnostics through stderr.
-The task/reminder worktree has unrelated merge conflicts. Camera changes use a separate branch from the clean CLI baseline.
+Camera changes use a separate branch from the clean CLI baseline.
 
 ## Decision
 
@@ -86,10 +86,10 @@ The general `doctor` command does not initialize a camera runtime.
 ## Validation on 2026-10-17
 
 - Python worker unit tests: 11 passed without webcam or inference dependencies.
-- Camera TypeScript tests: 32 passed, including a real fixture subprocess and model request/persistence assertions.
+- Camera TypeScript tests: 33 passed, including a real fixture subprocess and model request/persistence assertions.
 - CLI and i18n typecheck/build: passed.
 - i18n tests: 20 passed.
-- Full CLI suite: 162 passed, one existing failure in automatic personal-memory recall.
+- Full CLI suite: 163 passed, one existing failure in automatic personal-memory recall.
 - The same memory failure reproduces on baseline commit `2991a5b` in a separate worktree.
 - Root `pnpm lint`: one existing method-signature error in `docs/ai/context/task-reminder-engine-plan.md:310`, plus existing warnings.
 - Feature files pass `moeru-lint` without warnings.
@@ -100,6 +100,26 @@ The general `doctor` command does not initialize a camera runtime.
 
 The hardware-free tests cover crashes, stalls, malformed protocol, cancellation, shutdown escalation, and missing device behavior.
 They do not certify facial cue accuracy across users or lighting conditions.
+
+Commands executed:
+
+| Command | Result |
+| --- | --- |
+| `python3 -m unittest discover -s packages/airi-cli/python/camera-worker -p test.py` | 11 passed |
+| `pnpm -F @proj-airi/airi-cli exec vitest run src/perception` | 33 passed |
+| `pnpm -F @proj-airi/airi-cli test` | 163 passed, one baseline failure |
+| `pnpm -F @proj-airi/i18n test` | 20 passed |
+| `pnpm -F @proj-airi/airi-cli typecheck` | Passed |
+| `pnpm -F @proj-airi/i18n typecheck` | Passed |
+| `pnpm -F @proj-airi/airi-cli build` | Passed |
+| `pnpm -F @proj-airi/i18n build` | Passed |
+| `pnpm lint` | Baseline plan error described above |
+| `pnpm typecheck` | Default heap exhausted in stage-ui |
+| `NODE_OPTIONS=--max-old-space-size=8192 pnpm typecheck --concurrency=2` | Manually interrupted because of memory pressure |
+| `packages/airi-cli/python/camera-worker/.venv/bin/python packages/airi-cli/python/camera-worker/worker.py --check` | Dependencies and models available |
+| `packages/airi-cli/python/camera-worker/.venv/bin/python packages/airi-cli/python/camera-worker/worker.py --smoke` | Real models processed a synthetic black frame |
+
+Targeted `moeru-lint` checks covered the changed CLI sources, i18n strings, README, fixtures, and this ADR without errors or warnings.
 
 ## Changed files
 

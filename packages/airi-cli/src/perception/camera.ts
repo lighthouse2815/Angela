@@ -72,6 +72,8 @@ export class Camera {
       this.unsubscribe = this.provider.subscribe(observation => this.engine.observe(observation))
       await this.provider.start()
       signal?.throwIfAborted()
+      if (!this.enabled)
+        throw new Error('worker_exited')
       return this.messages.cameraOn
     }
     catch {
