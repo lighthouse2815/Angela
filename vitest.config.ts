@@ -10,6 +10,7 @@ export default defineConfig({
       'apps/ui-server-auth',
       'apps/stage-tamagotchi/vitest.node.config.ts',
       'packages/cap-vite',
+      'packages/airi-cli',
       'packages/ccc',
       'packages/core-agent',
       'packages/i18n',

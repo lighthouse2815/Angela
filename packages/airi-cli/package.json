@@ -1,0 +1,25 @@
+{
+  "name": "@proj-airi/airi-cli",
+  "type": "module",
+  "version": "0.12.0-beta.5",
+  "private": true,
+  "description": "Terminal chat and MCP client for Angela",
+  "license": "MIT",
+  "bin": {
+    "angela": "./dist/bin/run.mjs"
+  },
+  "files": ["README.md", "dist"],
+  "scripts": {
+    "dev": "tsx src/bin/run.ts",
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "@moeru/std": "catalog:",
+    "@proj-airi/core-agent": "workspace:^",
+    "@proj-airi/i18n": "workspace:^",
+    "@proj-airi/provider-inference": "workspace:^",
+    "valibot": "catalog:"
+  }
+}

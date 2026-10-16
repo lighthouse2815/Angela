@@ -14,6 +14,7 @@
     "url": "https://github.com/lighthouse2815/Angela.git"
   },
   "scripts": {
+    "cli": "tsx packages/airi-cli/src/bin/run.ts",
     "postinstall": "pnpm exec simple-git-hooks && pnpm run build:packages",
     "dev": "pnpm -r -F @proj-airi/stage-web dev",
     "dev:ui": "pnpm -rF @proj-airi/stage-ui run story:dev",

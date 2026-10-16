@@ -4,6 +4,7 @@ import { defineConfig } from 'tsdown'
 
 export default defineConfig({
   entry: {
+    'cli': 'src/cli.ts',
     'index': 'src/index.ts',
     'locales/index': 'src/locales/index.ts',
     'locales/en/index': 'src/locales/en/index.ts',
