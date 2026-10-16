@@ -154,8 +154,11 @@ ANGELA_TTS_VOICE=alloy
 The audio service must support `audio/transcriptions` and `audio/speech` with WAV output.
 Model and voice names must match your service. A chat-only router does not supply audio automatically.
 Audio goes to the configured service. Temporary audio files are deleted after each operation.
-Long replies play in bounded parts. Ctrl+C stops playback and remaining parts.
-The conversation is saved before playback. Failed playback keeps the answer visible in chat. Voice mode requires an interactive terminal.
+Angela starts reading complete sentences while the model continues its reply.
+Text waiting for audio is bounded. Slow playback applies backpressure to model event processing.
+Only one audio request and playback run at a time. Ctrl+C cancels all remaining speech.
+Completed replies are saved before the final audio drains. A cancelled generation keeps the existing interrupted-session behavior.
+Audio failures stop speech for that reply while text generation and history continue. Failed playback keeps the answer visible in chat. Voice mode requires an interactive terminal.
 
 ## Terminal tools
 

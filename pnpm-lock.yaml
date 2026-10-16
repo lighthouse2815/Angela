@@ -3194,6 +3194,9 @@ importers:
       '@proj-airi/local-config':
         specifier: workspace:^
         version: link:../local-config
+      '@proj-airi/pipelines-audio':
+        specifier: workspace:^
+        version: link:../pipelines-audio
       '@proj-airi/provider-inference':
         specifier: workspace:^
         version: link:../provider-inference

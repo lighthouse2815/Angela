@@ -16,6 +16,7 @@ import { Output } from '../output'
 import { Permissions } from '../permissions'
 import { runSessionCommand } from '../session-command'
 import { Sessions } from '../sessions'
+import { StreamingSpeech } from '../streaming-speech'
 import { runTelegram } from '../telegram'
 import { Terminal } from '../terminal'
 import { Voice } from '../voice'
@@ -122,8 +123,8 @@ async function main() {
     let voice: Voice | undefined
 
     async function send(text: string) {
-      let answer = ''
       active = new AbortController()
+      const speech = voice ? new StreamingSpeech(voice, active.signal, () => process.stderr.write(`\n${messages.voiceSpeaking}\n`)) : undefined
       let completed = false
       try {
         output.start()
@@ -136,10 +137,10 @@ async function main() {
             error() {},
             warn() { output.retry() },
           },
-          onStreamEvent: (event) => {
+          onStreamEvent: async (event) => {
             output.event(event)
             if (event.type === 'text-delta')
-              answer += event.text
+              await speech?.push(event.text)
           },
         })
         if (!output.hasText)
@@ -147,10 +148,7 @@ async function main() {
         completed = true
         await session.save(chat.conversation, false)
         output.stop()
-        if (voice) {
-          process.stderr.write(`${messages.voiceSpeaking}\n`)
-          await voice.speak(answer, active.signal)
-        }
+        await speech?.finish()
       }
       catch (error) {
         if (active.signal.aborted)
@@ -161,6 +159,7 @@ async function main() {
           process.exitCode = active.signal.aborted ? 130 : 1
       }
       finally {
+        await speech?.cancel()
         output.stop()
         active = undefined
         await session.save(chat.conversation, !completed)
