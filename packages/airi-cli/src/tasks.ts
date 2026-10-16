@@ -64,10 +64,13 @@ export class Tasks {
   async complete(id: string) {
     return await this.edit(id, (task) => {
       this.pending(task)
+      const delivered = task.lastNotifiedAt && (!task.completedAt || task.completedAt < task.lastNotifiedAt)
       task.completedAt = new Date(this.clock()).toISOString()
       task.snoozedUntil = undefined
       if (task.recurrence) {
-        task.dueAt = nextOccurrence(task, this.clock())
+        // Check-ins acknowledge the delivered occurrence. Early completion consumes the next undelivered occurrence.
+        if (!delivered || Date.parse(task.dueAt!) <= this.clock())
+          task.dueAt = nextOccurrence(task, Math.max(this.clock(), Date.parse(task.dueAt!)))
         task.notifiedFor = undefined
       }
       else {

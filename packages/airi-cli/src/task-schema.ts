@@ -1,8 +1,8 @@
 import * as v from 'valibot'
 
 export const taskId = v.pipe(v.string(), v.uuid())
-export const taskTime = v.pipe(v.string(), v.isoTimestamp(), v.check(value => Number.isFinite(Date.parse(value))), v.transform(value => new Date(value).toISOString()))
 export const taskDate = v.pipe(v.string(), v.isoDate(), v.check(value => new Date(`${value}T00:00:00Z`).toISOString().slice(0, 10) === value))
+export const taskTime = v.pipe(v.string(), v.isoTimestamp(), v.check(value => /(?:Z|[+-]\d{2}:\d{2})$/u.test(value) && v.is(taskDate, value.slice(0, 10)) && Number.isFinite(Date.parse(value))), v.transform(value => new Date(value).toISOString()))
 export const taskZone = v.pipe(v.string(), v.check((zone) => {
   try {
     new Intl.DateTimeFormat('en', { timeZone: zone }).format()
@@ -12,11 +12,11 @@ export const taskZone = v.pipe(v.string(), v.check((zone) => {
     return false
   }
 }))
-const recurrence = v.strictObject({
+const recurrence = v.pipe(v.strictObject({
   type: v.picklist(['daily', 'weekly']),
   interval: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(52)), 1),
   daysOfWeek: v.optional(v.pipe(v.array(v.pipe(v.number(), v.integer(), v.minValue(0), v.maxValue(6))), v.minLength(1), v.maxLength(7))),
-})
+}), v.check(value => !value.daysOfWeek || (value.type === 'weekly' && new Set(value.daysOfWeek).size === value.daysOfWeek.length)))
 const fields = {
   title: v.pipe(v.string(), v.trim(), v.minLength(1), v.maxLength(200)),
   type: v.picklist(['todo', 'reminder', 'deadline', 'routine', 'follow_up']),

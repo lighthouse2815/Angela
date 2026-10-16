@@ -131,3 +131,21 @@ it('checks in recurring tasks without losing the recurrence or completing the se
   await tasks.cancel(task.id)
   expect((await tasks.find(task.id)).status).toBe('cancelled')
 })
+
+it('rejects impossible timestamps and invalid recurrence settings before saving', async () => {
+  const { tasks } = await setup()
+  await expect(tasks.create({ title: 'Impossible date', type: 'reminder', dueAt: '2026-02-30T22:00:00Z' })).rejects.toThrow()
+  await expect(tasks.create({ title: 'Duplicate weekdays', type: 'routine', dueAt: '2026-10-17T22:00:00Z', recurrence: { type: 'weekly', daysOfWeek: [1, 1] } })).rejects.toThrow()
+  await expect(tasks.create({ title: 'Daily weekdays', type: 'routine', dueAt: '2026-10-17T22:00:00Z', recurrence: { type: 'daily', daysOfWeek: [1] } })).rejects.toThrow()
+  expect(await tasks.list()).toEqual([])
+})
+
+it('completes an undelivered routine occurrence early and retains the next occurrence after delivery', async () => {
+  const { tasks } = await setup()
+  const early = await tasks.create({ title: 'Early study', type: 'routine', dueAt: '2026-10-17T22:00:00+07:00', recurrence: { type: 'daily' } })
+  expect((await tasks.complete(early.id)).dueAt).toBe('2026-10-18T15:00:00.000Z')
+  const delivered = await tasks.create({ title: 'Delivered study', type: 'routine', dueAt: '2026-10-17T09:00:00Z', recurrence: { type: 'daily' } })
+  await tasks.claim(delivered.id, delivered.dueAt!)
+  const next = (await tasks.find(delivered.id)).dueAt
+  expect((await tasks.complete(delivered.id)).dueAt).toBe(next)
+})
