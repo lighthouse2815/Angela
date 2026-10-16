@@ -23,6 +23,11 @@ pnpm cli
 Use `ANGELA_API=responses` for a Responses endpoint. The default protocol is `chat-completions`.
 Local endpoints can use an empty API key. Credentials have no command-line flag.
 
+`pnpm cli` also reads `.env.cli.local` from the repository root when this file exists.
+Store the same `ANGELA_*` variables there for later runs. Existing environment variables take priority over file values.
+Git ignores this file. On POSIX systems, use `chmod 600 .env.cli.local` to restrict access.
+The built executable reads environment variables only. To load this file with the executable, use Node's `--env-file` flag.
+
 ```sh
 pnpm cli --prompt 'Giải thích async/await'
 printf 'Giải thích async/await' | pnpm cli
