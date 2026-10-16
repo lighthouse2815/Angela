@@ -23,7 +23,7 @@ export class Tasks {
   /** Reads a fresh snapshot. Filters use this service's local calendar and stable due-time/ID ordering. */
   async list(filter: { status?: Task['status'] | 'all', type?: Task['type'], date?: string } = {}) {
     const state = await this.file.read()
-    return state.tasks.filter(task => (filter.status === 'all' || task.status === (filter.status ?? 'pending')) && (!filter.type || task.type === filter.type) && (!filter.date || task.dueDate === filter.date || Boolean(taskDue(task) && localDate(Date.parse(taskDue(task)!), this.timezone) === filter.date)))
+    return state.tasks.filter(task => (filter.status === 'all' || task.status === (filter.status ?? 'pending')) && (!filter.type || task.type === filter.type) && (!filter.date || (!taskDue(task) && task.dueDate === filter.date) || Boolean(taskDue(task) && localDate(Date.parse(taskDue(task)!), this.timezone) === filter.date)))
       .sort((a, b) => (taskDue(a) ?? a.dueDate ?? '9999').localeCompare(taskDue(b) ?? b.dueDate ?? '9999') || a.id.localeCompare(b.id))
   }
 
@@ -107,7 +107,9 @@ export class Tasks {
       task.lastNotifiedAt = new Date(this.clock()).toISOString()
       task.updatedAt = task.lastNotifiedAt
       if (task.recurrence) {
-        task.dueAt = nextOccurrence(task, Math.max(this.clock(), Date.parse(task.dueAt!)))
+        // An extra snooze after delivery must retain the routine's already advanced future occurrence.
+        if (!task.snoozedUntil || Date.parse(task.dueAt!) <= this.clock())
+          task.dueAt = nextOccurrence(task, Math.max(this.clock(), Date.parse(task.dueAt!)))
         task.snoozedUntil = undefined
       }
     })

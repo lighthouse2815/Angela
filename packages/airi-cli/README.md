@@ -573,3 +573,16 @@ Use these commands during interactive chat:
 Commands use the full task ID printed by `/tasks`. Snooze also accepts durations such as `30m`, `2h`, and `1d`.
 `/tasks all` includes completed and cancelled history. `/today` uses the local calendar date.
 Conversational references use the existing chat history and saved tool results.
+
+### Scheduler and occurrence policy
+
+`ReminderScheduler` owns one timer and an interchangeable `ReminderNotifier`. It batches overdue occurrences after startup.
+It claims each occurrence under the existing file lock before delivery. Normal restart cannot replay a claimed occurrence.
+If a process crashes after the claim but before delivery, that notification can be lost.
+Use `/tasks` to review pending work and snooze a missed notification. Delivery failure never marks a task complete.
+
+Daily and weekly recurrence retain local wall time across timezone offset changes.
+A nonexistent DST time moves forward by the gap. A repeated DST time uses its first occurrence.
+Offline routines produce one overdue notification and then advance to the next future occurrence.
+An extra snooze after delivery retains the next regular occurrence.
+The scheduler reconciles clock changes and other CLI writers within one minute. Local mutations reschedule it immediately.
