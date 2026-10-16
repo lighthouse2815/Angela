@@ -1,4 +1,5 @@
 import { PassThrough } from 'node:stream'
+import { stripVTControlCharacters } from 'node:util'
 
 import { cliMessages } from '@proj-airi/i18n/cli'
 import { afterEach, expect, it, vi } from 'vitest'
@@ -8,7 +9,7 @@ import { Output } from './output'
 afterEach(() => vi.useRealTimers())
 
 function render(tty = false) {
-  const stdout = new PassThrough()
+  const stdout = Object.assign(new PassThrough(), { isTTY: tty })
   const stderr = Object.assign(new PassThrough(), { isTTY: tty, columns: 80 })
   let answer = ''
   let progress = ''
@@ -27,6 +28,37 @@ it('shows activity without printing reasoning tokens or polluting piped answers'
   expect(answer()).toBe('Xin chào\n')
   expect(progress()).toContain('Đang suy nghĩ')
   expect(progress()).not.toContain('private reasoning')
+  expect(progress()).not.toContain('\u001B')
+})
+
+it('clears the interactive display and separates agent replies from the user prompt', () => {
+  const { output, answer, progress } = render(true)
+  output.intro()
+  expect(progress()).toContain('\u001B[3J')
+  expect(progress()).toContain('◕ ◕')
+  expect(progress()).toContain('ANGELA')
+  expect(output.prompt()).toContain('\u001B[32m')
+  output.start()
+  output.event({ type: 'text-delta', text: 'Xin ' })
+  output.event({ type: 'text-delta', text: 'chào' })
+  output.stop()
+  expect(answer()).toContain('\u001B[36m')
+  expect(stripVTControlCharacters(answer())).toBe('✦ Angela\nXin chào\n')
+  output.start()
+  output.event({ type: 'text-delta', text: 'Một lượt mới' })
+  output.stop()
+  expect(stripVTControlCharacters(answer()).match(/✦ Angela/g)).toHaveLength(2)
+})
+
+it('keeps redirected output free of banners, screen clearing, and color codes', () => {
+  const { output, answer, progress } = render()
+  output.intro()
+  expect(progress()).toBe('')
+  expect(output.prompt()).toBe('> ')
+  output.start()
+  output.event({ type: 'text-delta', text: 'Plain answer' })
+  output.stop()
+  expect(answer()).toBe('Plain answer\n')
   expect(progress()).not.toContain('\u001B')
 })
 

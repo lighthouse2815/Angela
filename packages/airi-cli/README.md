@@ -64,6 +64,11 @@ Use `ANGELA_LOCALE=en` or `--locale en` for English.
 During interactive chat, Ctrl+C cancels the current request. Use `/exit` or Ctrl+D to quit.
 One-shot requests return exit code 1 for errors and 130 for cancellation.
 
+Interactive startup clears the terminal display and shows Angela's robot icon.
+Angela's replies use cyan with an agent label. The input prompt uses green, and your text uses the terminal's default color.
+Terminal color settings, including `NO_COLOR`, control color support.
+Piped and one-shot requests keep plain output without the startup banner or screen clearing.
+
 Provider errors show one localized message with an HTTP status and a next step.
 For example, HTTP 503 explains that the model is overloaded or unavailable. HTTP 401 asks you to check credentials.
 Automatic retries show a short progress message. SDK stacks, response headers, and raw provider bodies stay out of terminal output.

@@ -5,8 +5,8 @@ import type { cliMessages } from '@proj-airi/i18n/cli'
 
 import process from 'node:process'
 
-import { clearLine, cursorTo } from 'node:readline'
-import { stripVTControlCharacters } from 'node:util'
+import { clearLine, clearScreenDown, cursorTo } from 'node:readline'
+import { stripVTControlCharacters, styleText } from 'node:util'
 
 import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js'
 
@@ -33,16 +33,37 @@ export class Output {
   private approvalTool?: string
   private awaitingApproval = false
   private readonly deferred: StreamEvent[] = []
+  private interactive = false
+  private answerStarted = false
 
   constructor(
     private readonly messages: typeof cliMessages.en,
-    private readonly stdout: Writable = process.stdout,
+    private readonly stdout: Writable & { isTTY?: boolean } = process.stdout,
     private readonly stderr: Writable & { isTTY?: boolean, columns?: number } = process.stderr,
   ) {}
+
+  /** Clears the interactive display once. Redirected streams keep plain output. */
+  intro() {
+    this.interactive = Boolean(this.stdout.isTTY && this.stderr.isTTY)
+    if (!this.interactive)
+      return
+    // Erase saved lines as well as the viewport. Shell history stays outside this display lifecycle.
+    this.stderr.write('\u001B[3J')
+    cursorTo(this.stderr, 0, 0)
+    clearScreenDown(this.stderr)
+    const robot = '  ╭─────╮\n  │ ◕ ◕ │  ANGELA\n  ╰─┬─┬─╯\n    ╵ ╵'
+    this.stderr.write(`${styleText(['bold', 'cyan'], robot, { stream: this.stderr })}\n`)
+    this.stderr.write(`${styleText('dim', this.messages.description, { stream: this.stderr })}\n\n`)
+  }
+
+  prompt() {
+    return this.interactive ? styleText(['bold', 'green'], '❯ ', { stream: this.stderr }) : '> '
+  }
 
   /** Starts one request. The caller must stop progress in its finally block. */
   start() {
     this.hasText = false
+    this.answerStarted = false
     this.calls.clear()
     this.status(this.messages.thinking)
   }
@@ -58,7 +79,10 @@ export class Output {
         if (!event.text)
           return
         this.pause()
-        this.stdout.write(event.text)
+        if (this.interactive && !this.answerStarted)
+          this.stdout.write(`${styleText(['bold', 'cyan'], '✦ Angela', { stream: this.stdout })}\n`)
+        this.answerStarted = true
+        this.stdout.write(this.interactive ? styleText('cyan', event.text, { stream: this.stdout }) : event.text)
         this.hasText ||= Boolean(event.text.trim())
         this.textOpen = !event.text.endsWith('\n')
         break

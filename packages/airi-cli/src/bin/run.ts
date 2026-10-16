@@ -71,10 +71,13 @@ async function main() {
       throw new Error(`${messages.unsupportedProvider}: ${config.definitionId}`)
     const chat = new Chat(config.model, provider, workspace, session.restore())
     await session.save(chat.conversation, session.record.interrupted)
+    const interactive = process.stdin.isTTY && config.prompt === undefined
+    const output = new Output(messages)
+    if (interactive)
+      output.intro()
     process.stderr.write(`${messages.session}: ${session.record.id}\n`)
     if (session.record.interrupted)
       process.stderr.write(`${messages.incompleteSession}\n`)
-    const interactive = process.stdin.isTTY && config.prompt === undefined
     let input: Terminal | undefined
     let active: AbortController | undefined
     const shutdown = new AbortController()
@@ -99,7 +102,6 @@ async function main() {
     process.on('SIGTERM', stop)
     let client: Client | undefined
     let mcp: McpTools | undefined
-    const output = new Output(messages)
 
     async function send(text: string) {
       active = new AbortController()
@@ -170,7 +172,7 @@ async function main() {
       if (input && interactive) {
         process.stderr.write(`${messages.workspace}: ${workspace}\n${messages.welcome}\n`)
         while (true) {
-          const text = (await input.ask('> '))?.trim()
+          const text = (await input.ask(output.prompt()))?.trim()
           if (text === undefined || text === '/exit')
             break
           if (text)
