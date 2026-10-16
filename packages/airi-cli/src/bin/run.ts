@@ -17,6 +17,7 @@ import { McpTools } from '../mcp'
 import { Memory } from '../memory'
 import { Output } from '../output'
 import { Permissions } from '../permissions'
+import { ProjectMemory } from '../project-memory'
 import { runSessionCommand } from '../session-command'
 import { Sessions } from '../sessions'
 import { StreamingSpeech } from '../streaming-speech'
@@ -97,6 +98,7 @@ async function main() {
     const permissions = new Permissions(messages)
     let input: Terminal | undefined
     const memory = new Memory(config.dataDir, messages)
+    const project = await ProjectMemory.open(config.dataDir, workspace, messages)
     if (interactive)
       output.intro()
     process.stderr.write(`${messages.session}: ${session.record.id}\n`)
@@ -159,6 +161,18 @@ async function main() {
       try {
         output.start()
         await session.save(chat.conversation, true)
+        const projectObservations: string[] = []
+        const projectCalls = new Set<string>()
+        let projectContext = ''
+        let projectTools: Tool[] = []
+        try {
+          projectContext = await project.context()
+          projectTools = await project.tools(text, session.record.id, projectObservations)
+        }
+        catch {
+          projectContext = ''
+          process.stderr.write(`\n${messages.projectMemoryUnavailable}\n`)
+        }
         let memoryContext = ''
         let memoryTools: Tool[] = []
         try {
@@ -171,7 +185,7 @@ async function main() {
         }
         await chat.send(text, {
           abortSignal: active.signal,
-          tools: [...(mcp?.definitions() ?? []), ...memoryTools],
+          tools: [...(mcp?.definitions() ?? []), ...memoryTools, ...projectTools],
           diagnostics: {
             // The send catch owns the final message. SDK promise diagnostics must not print the same failure again.
             error() {},
@@ -179,10 +193,18 @@ async function main() {
           },
           onStreamEvent: async (event) => {
             output.event(event)
+            if (event.type === 'tool-call' && event.toolName === 'builtIn_mcpCallTool')
+              projectCalls.add(event.toolCallId)
+            if ((event.type === 'tool-result' || event.type === 'tool-error') && projectCalls.delete(event.toolCallId) && event.result) {
+              const observation = typeof event.result === 'string' ? event.result : JSON.stringify(event.result)
+              projectObservations.push(observation.slice(0, 20_000))
+              if (projectObservations.length > 8)
+                projectObservations.shift()
+            }
             if (event.type === 'text-delta')
               await speech?.push(event.text)
           },
-        }, memoryContext)
+        }, [memoryContext, projectContext].filter(Boolean).join('\n\n'))
         if (!output.hasText)
           throw new Error(messages.emptyResponse)
         completed = true
@@ -320,7 +342,7 @@ async function main() {
             continue
           }
           try {
-            const response = await memory.command(text)
+            const response = await project.command(text) ?? await memory.command(text)
             if (response !== undefined) {
               process.stderr.write(`${response}\n`)
               continue

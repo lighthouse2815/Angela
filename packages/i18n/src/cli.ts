@@ -1,4 +1,13 @@
 const en = {
+  projectMemoryUsage: '/project | /project on|off | /project clear',
+  projectMemoryLocked: 'Cannot lock project memory for writing. Check other CLI sessions and the project lock file.',
+  projectMemoryEnabled: 'Project memory is enabled for this workspace. Checkpoints are sent to the selected AI provider.',
+  projectMemoryDisabled: 'Project memory is disabled. Saved checkpoints and earlier chat history remain on disk.',
+  projectMemoryCleared: 'Project checkpoint cleared. Project files, personal memory, and chat history are unchanged.',
+  projectMemoryChanged: 'Project memory changed in another turn. Review the latest checkpoint before retrying.',
+  projectMemoryInvalid: 'Cannot read project memory. Check memory/projects in the CLI data directory. Stored data was not changed.',
+  projectMemoryUnavailable: 'Project memory is unavailable for this reply. Chat continues without its checkpoint. Check /project.',
+
   memoryUsage: '/memory | /memory on|off | /memory auto on|off | /remember TEXT | /memory edit ID TEXT | /forget ID',
   memoryUnavailable: 'Personal memory is unavailable for this reply. Chat continues without it. Check /memory. Stored data was not changed.',
   memoryAutomatic: 'Automatic memory is on. Angela can remember clear durable facts you share without a remember request.',
@@ -54,7 +63,7 @@ const en = {
   cwd: 'Workspace directory',
   locale: 'Interface language: en or vi',
   help: 'Show help',
-  cliCommands: 'Available commands:\n/voice — Speak and hear replies.\n/chat — Return to text chat.\n/memory — View and manage personal memory.\n/remember TEXT — Save a personal fact.\n/forget ID — Delete one personal memory.\n/help — Show this list.\n/permistion — Show the current tool permission mode.\n/permistion full — Run tools without confirmation in this session.\n/permistion ask — Ask before each tool call.\n/permission — Alias for /permistion. on/off also select full/ask.\n/exit — Exit Angela.\n\nCtrl+C — Cancel the active request. Ctrl+D — Exit.',
+  cliCommands: 'Available commands:\n/voice — Speak and hear replies.\n/chat — Return to text chat.\n/project — View and manage this project checkpoint.\n/memory — View and manage personal memory.\n/remember TEXT — Save a personal fact.\n/forget ID — Delete one personal memory.\n/help — Show this list.\n/permistion — Show the current tool permission mode.\n/permistion full — Run tools without confirmation in this session.\n/permistion ask — Ask before each tool call.\n/permission — Alias for /permistion. on/off also select full/ask.\n/exit — Exit Angela.\n\nCtrl+C — Cancel the active request. Ctrl+D — Exit.',
   telegramCommands: 'Available Telegram commands:\n/start — Introduce Angela.\n/help — Show this list.\n/status — Show the model, session, and request status.\n/new — Clear this conversation and start again.\n/cancel — Cancel the active request.\n/permistion — Show tool permissions. Use full or ask to change them.\n/permission — Alias for /permistion.\n\nTools run on the machine hosting this bot. Confirmation is required by default.',
   missingModel: 'Set ANGELA_MODEL or pass --model.',
   invalidUrl: 'Use an HTTP or HTTPS provider endpoint.',
@@ -133,6 +142,15 @@ const en = {
 }
 
 const vi: typeof en = {
+  projectMemoryUsage: '/project | /project on|off | /project clear',
+  projectMemoryLocked: 'Không khóa được memory dự án để ghi. Kiểm tra phiên CLI khác và file khóa của dự án.',
+  projectMemoryEnabled: 'Đã bật memory dự án cho thư mục này. Bản tóm tắt được gửi kèm đến nhà cung cấp AI đang chọn.',
+  projectMemoryDisabled: 'Đã tắt memory dự án. Bản tóm tắt và lịch sử trò chuyện cũ vẫn được giữ trên đĩa.',
+  projectMemoryCleared: 'Đã xóa bản tóm tắt dự án. File dự án, memory cá nhân và lịch sử trò chuyện không thay đổi.',
+  projectMemoryChanged: 'Memory dự án đã thay đổi ở lượt khác. Đọc bản tóm tắt mới nhất trước khi thử lại.',
+  projectMemoryInvalid: 'Không đọc được memory dự án. Kiểm tra memory/projects trong thư mục dữ liệu CLI. Dữ liệu lưu chưa bị thay đổi.',
+  projectMemoryUnavailable: 'Memory dự án chưa dùng được cho lượt này. Chat tiếp tục không kèm bản tóm tắt. Kiểm tra /project.',
+
   memoryUsage: '/memory | /memory on|off | /memory auto on|off | /remember NỘI_DUNG | /memory edit ID NỘI_DUNG | /forget ID',
   memoryUnavailable: 'Không đọc được memory cho lượt này. Chat tiếp tục không kèm ghi nhớ. Kiểm tra /memory. Dữ liệu lưu chưa bị thay đổi.',
   memoryAutomatic: 'Đã bật tự ghi nhớ. Angela có thể nhớ thông tin bền vững bạn chia sẻ mà không cần yêu cầu lưu.',
@@ -188,7 +206,7 @@ const vi: typeof en = {
   cwd: 'Thư mục làm việc',
   locale: 'Ngôn ngữ giao diện: en hoặc vi',
   help: 'Hiện hướng dẫn',
-  cliCommands: 'Danh sách lệnh:\n/voice — Nói và nghe trả lời.\n/chat — Quay lại nhập chữ.\n/memory — Xem và quản lý memory cá nhân.\n/remember NỘI_DUNG — Lưu một ghi nhớ.\n/forget ID — Xóa một ghi nhớ.\n/help — Hiện danh sách này.\n/permistion — Xem chế độ quyền công cụ hiện tại.\n/permistion full — Chạy tool không cần xác nhận trong phiên này.\n/permistion ask — Hỏi xác nhận trước mỗi lần gọi tool.\n/permission — Tên khác của /permistion. on/off tương ứng full/ask.\n/exit — Thoát Angela.\n\nCtrl+C — Hủy yêu cầu đang chạy. Ctrl+D — Thoát.',
+  cliCommands: 'Danh sách lệnh:\n/voice — Nói và nghe trả lời.\n/chat — Quay lại nhập chữ.\n/project — Xem và quản lý bản tóm tắt dự án.\n/memory — Xem và quản lý memory cá nhân.\n/remember NỘI_DUNG — Lưu một ghi nhớ.\n/forget ID — Xóa một ghi nhớ.\n/help — Hiện danh sách này.\n/permistion — Xem chế độ quyền công cụ hiện tại.\n/permistion full — Chạy tool không cần xác nhận trong phiên này.\n/permistion ask — Hỏi xác nhận trước mỗi lần gọi tool.\n/permission — Tên khác của /permistion. on/off tương ứng full/ask.\n/exit — Thoát Angela.\n\nCtrl+C — Hủy yêu cầu đang chạy. Ctrl+D — Thoát.',
   telegramCommands: 'Danh sách lệnh Telegram:\n/start — Giới thiệu Angela.\n/help — Hiện danh sách này.\n/status — Xem model, phiên và trạng thái yêu cầu.\n/new — Xóa hội thoại hiện tại và bắt đầu lại.\n/cancel — Hủy yêu cầu đang chạy.\n/permistion — Xem quyền công cụ. Dùng full hoặc ask để đổi quyền.\n/permission — Tên khác của /permistion.\n\nTool chạy trên máy đang mở bot. Mặc định phải xác nhận.',
   missingModel: 'Đặt ANGELA_MODEL hoặc truyền --model.',
   invalidUrl: 'Dùng địa chỉ provider HTTP hoặc HTTPS.',

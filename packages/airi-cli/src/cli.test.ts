@@ -3,7 +3,7 @@ import process from 'node:process'
 import { spawn } from 'node:child_process'
 import { once } from 'node:events'
 import { mkdtempSync } from 'node:fs'
-import { readdir, readFile, rm, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -14,6 +14,7 @@ import { LocalConfigFile } from '@proj-airi/local-config/node'
 import { afterEach, expect, it } from 'vitest'
 
 import { Memory } from './memory'
+import { ProjectMemory } from './project-memory'
 
 const children: ReturnType<typeof spawn>[] = []
 const servers: ReturnType<typeof createServer>[] = []
@@ -276,3 +277,52 @@ it('automatically saves a volunteered fact through a real tool round and recalls
   expect(bodies[4]).not.toContain('Personal records:')
   expect(await readFile(memoryPath, 'utf8')).toBe('{broken memory')
 }, 20_000)
+
+it('recalls an isolated project checkpoint in a fresh process and omits disabled or broken project memory', async () => {
+  const requests: string[] = []
+  const snapshot = { goal: 'Hoàn thiện CLI', status: 'active', decisions: ['Dùng API hiện tại'], completed: [], blockers: [], nextStep: 'Thêm memory' }
+  const server = createServer(async (request, response) => {
+    let body = ''
+    for await (const chunk of request)
+      body += chunk
+    requests.push(body)
+    response.writeHead(200, { 'Content-Type': 'text/event-stream' })
+    const delta = requests.length === 1
+      ? { role: 'assistant', tool_calls: [{ index: 0, id: 'project-save', type: 'function', function: { name: 'project_memory', arguments: JSON.stringify({ expected_revision: 0, snapshot, source_quote: 'Hoàn thiện CLI' }) } }] }
+      : { role: 'assistant', content: 'Tiếp tục dự án.' }
+    response.end(`data: ${JSON.stringify({ choices: [{ index: 0, delta, finish_reason: requests.length === 1 ? 'tool_calls' : 'stop' }] })}\n\ndata: [DONE]\n\n`)
+  })
+  servers.push(server)
+  server.listen(0, '127.0.0.1')
+  await once(server, 'listening')
+  const address = server.address()
+  if (!address || typeof address === 'string')
+    throw new Error('Missing provider port')
+  const directory = mkdtempSync(join(tmpdir(), 'angela-cli-project-'))
+  directories.push(directory)
+  const data = join(directory, 'data')
+  const workspace = join(directory, 'workspace')
+  const otherWorkspace = join(directory, 'other')
+  await mkdir(workspace)
+  await mkdir(otherWorkspace)
+  const env = { ANGELA_DATA_DIR: data, ANGELA_BASE_URL: `http://127.0.0.1:${address.port}/v1/` }
+  const first = await run(['--cwd', workspace, '--prompt', 'Hoàn thiện CLI. Quyết định dùng API hiện tại. Bước tiếp theo: thêm memory.'], env).result
+  expect(first, first.stderr).toMatchObject({ code: 0 })
+  const project = await ProjectMemory.open(data, workspace, cliMessages.en)
+  expect((await project.read()).snapshot).toEqual(snapshot)
+  expect((await new Memory(data, cliMessages.en).read()).entries).toEqual([])
+  expect(await run(['--cwd', workspace, '--prompt', 'Làm tiếp'], env).result).toMatchObject({ code: 0 })
+  expect(requests[2]).toContain('Hoàn thiện CLI')
+  expect(requests[2]).toContain('Verify current files, Git state, and tests')
+  expect(await run(['--cwd', otherWorkspace, '--prompt', 'Chào'], env).result).toMatchObject({ code: 0 })
+  expect(requests[3]).not.toContain('Hoàn thiện CLI')
+  await project.setEnabled(false)
+  expect(await run(['--cwd', workspace, '--prompt', 'Chào'], env).result).toMatchObject({ code: 0 })
+  expect(requests[4]).not.toContain('Project checkpoint:')
+  const files = await readdir(join(data, 'memory', 'projects'))
+  await writeFile(join(data, 'memory', 'projects', files[0]!), '{broken project')
+  const degraded = await run(['--cwd', workspace, '--prompt', 'Chào'], env).result
+  expect(degraded, degraded.stderr).toMatchObject({ code: 0 })
+  expect(degraded.stderr).toContain(cliMessages.vi.projectMemoryUnavailable)
+  expect(requests[5]).not.toContain('Project checkpoint:')
+}, 25_000)

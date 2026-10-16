@@ -404,3 +404,38 @@ and separation of durable facts from transcripts in [OpenClaw](https://docs.open
 Angela uses its existing local store and tool runtime. It does not add these frameworks as dependencies.
 Record IDs and text enter model context. Storage timestamps stay on disk to reduce repeated prompt overhead.
 Assistant identity and behavior stay in the base system prompt. User memories cannot change tool approval settings.
+
+## Project memory
+
+Project memory keeps one compact work checkpoint across CLI sessions: goal, status, decisions, reported completed work, blockers, and next step.
+It is independent of personal memory, chat history, and the computer-use service's in-process task tracker.
+Nested folders in one Git repository share a checkpoint. Without Git, the canonical working directory defines the project.
+Separate clones and worktrees have separate checkpoints. Symlink aliases resolve to the same canonical directory.
+
+```text
+/project
+/project off
+/project on
+/project clear
+```
+
+`/project` shows the selected project, saved checkpoint, revision, and source session.
+`/project off` removes its context and tools from subsequent requests without deleting saved work.
+`/project clear` clears this checkpoint only. Project files, chat history, and personal memory remain unchanged.
+Spoken text goes to the model. Only typed commands directly disable or clear project memory.
+
+The chat model uses `project_memory` after meaningful progress. No additional model or background extraction request is required.
+Each save replaces the bounded checkpoint and checks its expected revision under the shared memory file lock.
+Concurrent sessions receive the current checkpoint on conflict so they can merge newer work before retrying.
+The tool requires a source quote from the current user message or host-observed MCP output in that turn.
+Model answers and memory-tool results cannot serve as observed MCP evidence. Evidence establishes provenance, not proof of every summary claim.
+The model must distinguish plans, user reports, failures, and completed tool actions. These semantic decisions depend on the selected model.
+Older checkpoints are untrusted historical reports. Angela must check live files, Git state, and relevant tests before relying on prior completion claims.
+Interrupted turns can already have saved a checkpoint. Verify actual tool effects before repeating work.
+
+Private checkpoint files live under `<data-dir>/memory/projects/`, indexed by a hash of the canonical project path.
+They contain up to eight decisions, ten completed items, five blockers, and bounded goal and next-step text.
+Enabled checkpoints are sent to the selected model. Do not store secrets or raw transcripts.
+Unreadable checkpoint files remain untouched. Chat continues without project context and shows a warning.
+Personal and project memories reuse the same atomic file writer, private permissions, and per-process write queue.
+After a crash, remove an abandoned project `.lock` only after checking that its writer has stopped.
