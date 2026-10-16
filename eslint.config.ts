@@ -13,6 +13,7 @@ export default defineConfig({
   vue: true,
 }, {
   ignores: [
+    'third_party/**', // Preserve imported upstream sources.
     'cspell.config.yaml',
     'cspell.config.yml',
     'crowdin.yaml',
