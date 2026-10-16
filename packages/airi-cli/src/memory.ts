@@ -2,17 +2,18 @@ import type { cliMessages } from '@proj-airi/i18n/cli'
 import type { Tool } from '@xsai/shared-chat'
 
 import { randomUUID } from 'node:crypto'
-import { mkdir, open, readFile, rename, unlink, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import { errorMessageFrom } from '@moeru/std'
 
 import * as v from 'valibot'
 
+import { MemoryFile } from './memory-file'
+
 const textSchema = v.pipe(v.string(), v.trim(), v.minLength(1), v.maxLength(500))
 const idSchema = v.pipe(v.string(), v.uuid())
 const entrySchema = v.object({ id: idSchema, text: textSchema, createdAt: v.string(), updatedAt: v.string() })
-const stateSchema = v.object({ version: v.literal(1), enabled: v.boolean(), autoEnabled: v.optional(v.boolean(), true), entries: v.pipe(v.array(entrySchema), v.maxLength(50)) })
+const stateSchema = v.pipe(v.object({ version: v.literal(1), enabled: v.boolean(), autoEnabled: v.optional(v.boolean(), true), entries: v.pipe(v.array(entrySchema), v.maxLength(50)) }), v.check(state => new Set(state.entries.map(entry => entry.id)).size === state.entries.length))
 const editSchema = v.object({
   action: v.picklist(['remember', 'update', 'forget']),
   id: v.nullable(idSchema),
@@ -23,66 +24,23 @@ type State = v.InferOutput<typeof stateSchema>
 
 /** Owns bounded personal facts across CLI sessions in one data directory. Every edit reads under an exclusive file lock. */
 export class Memory {
-  private readonly directory: string
-  private readonly path: string
-  private writes: Promise<void> = Promise.resolve()
+  private readonly file: MemoryFile<State>
 
   constructor(dataDir: string, private readonly messages: typeof cliMessages.en) {
-    this.directory = join(dataDir, 'memory')
-    this.path = join(this.directory, 'personal.json')
+    this.file = new MemoryFile<State>(join(dataDir, 'memory'), 'personal', stateSchema, () => ({ version: 1, enabled: true, autoEnabled: true, entries: [] }), { invalid: messages.memoryInvalid, locked: messages.memoryLocked })
   }
 
   /** Missing storage is enabled and empty. Invalid storage is never silently overwritten. */
   async read(): Promise<State> {
-    try {
-      const source = await readFile(this.path, 'utf8')
-      if (source.length > 128_000)
-        throw new Error(this.messages.memoryInvalid)
-      const parsed = v.safeParse(stateSchema, JSON.parse(source))
-      if (!parsed.success || new Set(parsed.output.entries.map(entry => entry.id)).size !== parsed.output.entries.length)
-        throw new Error(this.messages.memoryInvalid)
-      return parsed.output
-    }
-    catch (error) {
-      if (error instanceof Error && 'code' in error && error.code === 'ENOENT')
-        return { version: 1, enabled: true, autoEnabled: true, entries: [] }
-      throw new Error(this.messages.memoryInvalid)
-    }
-  }
-
-  private async edit(change: (state: State) => void) {
-    // Model tool calls can run in parallel. Serialize this session before acquiring the cross-process file lock.
-    const pending = this.writes.then(() => this.write(change))
-    this.writes = pending.then(() => {}, () => {})
-    await pending
-  }
-
-  private async write(change: (state: State) => void) {
-    await mkdir(this.directory, { recursive: true, mode: 0o700 })
-    const lockPath = join(this.directory, 'personal.lock')
-    const lock = await open(lockPath, 'wx', 0o600).catch(() => {
-      throw new Error(this.messages.memoryLocked)
-    })
-    const temporary = join(this.directory, `${randomUUID()}.tmp`)
-    try {
-      const state = await this.read()
-      change(state)
-      await writeFile(temporary, JSON.stringify(v.parse(stateSchema, state)), { flag: 'wx', mode: 0o600 })
-      await rename(temporary, this.path)
-    }
-    finally {
-      await unlink(temporary).catch(() => {})
-      await lock.close()
-      await unlink(lockPath)
-    }
+    return await this.file.read()
   }
 
   async setEnabled(enabled: boolean) {
-    await this.edit(state => state.enabled = enabled)
+    await this.file.edit(state => state.enabled = enabled)
   }
 
   async setAutomatic(autoEnabled: boolean) {
-    await this.edit(state => state.autoEnabled = autoEnabled)
+    await this.file.edit(state => state.autoEnabled = autoEnabled)
   }
 
   /** Text limits and duplicate detection apply to direct commands and model tools alike. */
@@ -93,7 +51,7 @@ export class Memory {
     if (id && !v.safeParse(idSchema, id).success)
       throw new Error(this.messages.memoryMissing)
     let savedId = ''
-    await this.edit((state) => {
+    await this.file.edit((state) => {
       if (!state.enabled)
         throw new Error(this.messages.memoryDisabled)
       const current = id ? state.entries.find(entry => entry.id === id) : state.entries.find(entry => entry.text.toLowerCase() === parsed.output.toLowerCase())
@@ -118,7 +76,7 @@ export class Memory {
   }
 
   async forget(id: string, expectedText?: string) {
-    await this.edit((state) => {
+    await this.file.edit((state) => {
       const index = state.entries.findIndex(entry => entry.id === id)
       if (index < 0)
         throw new Error(this.messages.memoryMissing)
