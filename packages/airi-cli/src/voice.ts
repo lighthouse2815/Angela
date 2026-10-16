@@ -5,7 +5,7 @@ import type { cliMessages } from '@proj-airi/i18n/cli'
 import process from 'node:process'
 
 import { spawn } from 'node:child_process'
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { lstat, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { parseEnv } from 'node:util'
@@ -15,6 +15,43 @@ import WebSocket from 'ws'
 /** Owns private audio files, PipeWire children, and one serial audio request at a time. */
 export class Voice {
   private readonly baseUrl: URL
+
+  /** Deletes only recognized audio directories older than one day whose owner process is no longer alive. */
+  static async cleanupTemporaryAudio(root = tmpdir(), now = Date.now()) {
+    let removed = 0
+    for (const entry of await readdir(root, { withFileTypes: true })) {
+      if (!entry.isDirectory() || !/^angela-voice-[\w-]+$/.test(entry.name))
+        continue
+      const directory = join(root, entry.name)
+      try {
+        const info = await lstat(directory)
+        if (!info.isDirectory() || now - info.mtimeMs < 86_400_000)
+          continue
+        const files = await readdir(directory, { withFileTypes: true })
+        if (files.some(file => !file.isFile() || !['input.wav', 'answer.wav', 'owner.json'].includes(file.name)))
+          continue
+        if (files.some(file => file.name === 'owner.json')) {
+          const owner: unknown = JSON.parse(await readFile(join(directory, 'owner.json'), 'utf8'))
+          if (!owner || typeof owner !== 'object' || !('pid' in owner) || typeof owner.pid !== 'number' || !Number.isSafeInteger(owner.pid) || owner.pid <= 0)
+            continue
+          try {
+            process.kill(owner.pid, 0)
+            continue
+          }
+          catch (error) {
+            if (!(error instanceof Error) || !('code' in error) || error.code !== 'ESRCH')
+              continue
+          }
+        }
+        await rm(directory, { recursive: true })
+        removed++
+      }
+      catch {
+        // A concurrent cleanup or an inaccessible directory must not prevent chat startup.
+      }
+    }
+    return { removed }
+  }
 
   /** Reads device-local audio configuration. Process environment values override the file. */
   static async load(env: NodeJS.ProcessEnv, messages: typeof cliMessages.en) {
@@ -155,6 +192,7 @@ export class Voice {
     }, signal)
     const directory = await mkdtemp(join(tmpdir(), 'angela-voice-'))
     try {
+      await writeFile(join(directory, 'owner.json'), JSON.stringify({ pid: process.pid }), { mode: 0o600, flag: 'wx' })
       const path = join(directory, 'answer.wav')
       await writeFile(path, new Uint8Array(await response.arrayBuffer()), { mode: 0o600 })
       signal.throwIfAborted()

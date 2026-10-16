@@ -216,3 +216,12 @@ it.each([
   expect(output.stderr).not.toContain('private-provider-diagnostics')
   expect(output.stderr).not.toContain('APICallError')
 })
+
+it('runs history administration without a model or provider connection', async () => {
+  const { child, result } = run(['sessions', 'usage'], { ANGELA_MODEL: '' })
+  child.stdin.end()
+  const output = await result
+  expect(output.code).toBe(0)
+  expect(JSON.parse(output.stdout)).toMatchObject({ sessions: 0, bytes: 0 })
+  expect(output.stderr).not.toContain('MCP')
+})

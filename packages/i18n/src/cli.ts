@@ -1,4 +1,10 @@
 const en = {
+  sessionsUsage: 'angela sessions list|usage|delete ID|cleanup-audio [--data-dir PATH] [--locale en|vi]. Only CLI history JSON bytes are counted.',
+  sessionDeleteInteractive: 'Session deletion needs an interactive terminal. No files were deleted.',
+  sessionDeleteConfirm: 'To delete this history, type its full session ID:',
+  sessionDeleteCancelled: 'Deletion cancelled.',
+  sessionDeleted: 'Deleted session',
+
   voiceReady: 'Automatic voice mode. Speak naturally. /chat returns to text chat.',
   voiceRecord: 'Listening to your speech. Silence sends it automatically.',
   voicePrompt: 'Microphone on. Speak when ready. /chat stops listening.',
@@ -101,6 +107,12 @@ const en = {
 }
 
 const vi: typeof en = {
+  sessionsUsage: 'angela sessions list|usage|delete ID|cleanup-audio [--data-dir PATH] [--locale en|vi]. Dung lượng chỉ tính file lịch sử CLI.',
+  sessionDeleteInteractive: 'Cần terminal tương tác để xác nhận xóa phiên. Chưa xóa file nào.',
+  sessionDeleteConfirm: 'Để xóa lịch sử này, nhập đầy đủ ID phiên:',
+  sessionDeleteCancelled: 'Đã hủy xóa.',
+  sessionDeleted: 'Đã xóa phiên',
+
   voiceReady: 'Đã bật voice tự động. Cứ nói chuyện. /chat quay lại nhập chữ.',
   voiceRecord: 'Đang nghe bạn nói. Ngừng nói để tự gửi.',
   voicePrompt: 'Micro đang bật. Bạn có thể nói. /chat để dừng nghe.',

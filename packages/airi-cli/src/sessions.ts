@@ -3,7 +3,7 @@ import type { cliMessages } from '@proj-airi/i18n/cli'
 import type { Message } from '@xsai/shared-chat'
 
 import { randomUUID } from 'node:crypto'
-import { mkdir, open, readdir, readFile, rename, unlink, writeFile } from 'node:fs/promises'
+import { mkdir, open, readdir, readFile, rename, stat, unlink, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import { chatMessagesToTurns, conversationToChatMessages } from '@proj-airi/core-agent'
@@ -55,6 +55,27 @@ export class Sessions {
     }
     const records = await Promise.all(files.filter(file => /^[\da-f-]{36}\.json$/i.test(file)).map(file => this.read(file.slice(0, -5))))
     return records.sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).map(({ id, workspace, updatedAt, interrupted }) => ({ id, workspace, updatedAt, interrupted }))
+  }
+
+  /** Reports CLI history bytes only. Tool audit files and Telegram sessions have separate lifetimes. */
+  async usage() {
+    const records = await this.list()
+    let bytes = 0
+    for (const record of records)
+      bytes += (await stat(join(this.directory, `${record.id}.json`))).size
+    return { directory: this.directory, sessions: records.length, bytes }
+  }
+
+  /** Deletes one validated history under the same exclusive lock used by chat writers. */
+  async remove(id: string) {
+    const record = await this.read(id)
+    const session = await this.open(record.workspace, id)
+    try {
+      await unlink(join(this.directory, `${id}.json`))
+    }
+    finally {
+      await session.close()
+    }
   }
 
   /** Validates the complete stored message contract before any record reaches the generation runtime. */

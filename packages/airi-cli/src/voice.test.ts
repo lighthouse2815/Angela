@@ -1,6 +1,8 @@
+import process from 'node:process'
+
 import { Buffer } from 'node:buffer'
 import { EventEmitter, once } from 'node:events'
-import { mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, readdir, rm, utimes, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { PassThrough } from 'node:stream'
@@ -203,4 +205,28 @@ it('treats an unexpected recorder exit as a failure instead of sending partial a
   await expect(voice.listen(pendingCommand, new AbortController().signal, () => {
     setImmediate(() => mic.child.emit('close', 1, null))
   })).rejects.toThrow(cliMessages.en.voiceFailed)
+})
+
+it('cleans only stale audio, preserving active owners, recent files, and unrelated content', async () => {
+  const root = await mkdtemp(join(tmpdir(), 'angela-audio-cleanup-'))
+  const old = new Date(Date.now() - 2 * 86_400_000)
+  try {
+    for (const name of ['angela-voice-stale', 'angela-voice-empty', 'angela-voice-active', 'angela-voice-recent', 'angela-voice-unrelated', 'other-app']) {
+      const directory = join(root, name)
+      await mkdir(directory)
+      if (name !== 'angela-voice-empty')
+        await writeFile(join(directory, 'answer.wav'), 'audio')
+      if (name === 'angela-voice-active')
+        await writeFile(join(directory, 'owner.json'), JSON.stringify({ pid: process.pid }))
+      if (name === 'angela-voice-unrelated')
+        await writeFile(join(directory, 'notes.txt'), 'keep')
+      if (name !== 'angela-voice-recent')
+        await utimes(directory, old, old)
+    }
+    expect(await Voice.cleanupTemporaryAudio(root)).toEqual({ removed: 2 })
+    expect((await readdir(root)).sort()).toEqual(['angela-voice-active', 'angela-voice-recent', 'angela-voice-unrelated', 'other-app'])
+  }
+  finally {
+    await rm(root, { recursive: true, force: true })
+  }
 })

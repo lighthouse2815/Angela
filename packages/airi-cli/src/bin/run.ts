@@ -14,6 +14,7 @@ import { formatRequestError } from '../errors'
 import { McpTools } from '../mcp'
 import { Output } from '../output'
 import { Permissions } from '../permissions'
+import { runSessionCommand } from '../session-command'
 import { Sessions } from '../sessions'
 import { runTelegram } from '../telegram'
 import { Terminal } from '../terminal'
@@ -27,6 +28,10 @@ import { Voice } from '../voice'
  *                    -> McpTools -> MCP client -> tool server
  */
 async function main() {
+  if (process.argv[2] === 'sessions') {
+    await runSessionCommand(process.argv.slice(3), process.env)
+    return
+  }
   if (process.argv[2] === 'telegram') {
     await runTelegram(process.argv.slice(3), process.env)
     return
@@ -34,7 +39,7 @@ async function main() {
   const config = await readConfig(process.argv.slice(2), process.env)
   const messages = config.messages
   if (config.help) {
-    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela telegram [--help]\n\n${[
+    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela telegram [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
       ['--model', messages.model],
       ['--provider', messages.provider],
       ['--config', messages.configFile],
@@ -54,6 +59,8 @@ async function main() {
     return
   }
 
+  // Temporary audio cleanup is best effort. It never deletes chat history or active playback.
+  await Voice.cleanupTemporaryAudio().catch(() => {})
   const sessions = new Sessions(config.dataDir, messages)
   if (config.list) {
     const list = await sessions.list()

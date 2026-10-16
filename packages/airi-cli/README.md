@@ -195,6 +195,24 @@ History preserves text and correlated tool calls and results through the core ru
 Native provider continuation and reasoning metadata remain in memory for the current process.
 Interrupted requests are marked. The CLI does not fabricate an assistant answer or undo external actions.
 
+## Data maintenance
+
+```sh
+angela sessions list
+angela sessions usage
+angela sessions delete SESSION_ID
+angela sessions cleanup-audio
+```
+
+These commands do not need a chat provider. `--data-dir` selects another CLI session directory.
+Usage reports CLI history JSON bytes. Telegram history, model caches, and tool audit files are not included.
+Deletion shows the selected history metadata and requires its full ID again in an interactive terminal.
+An open or locked session cannot be deleted. No history is deleted automatically.
+
+Chat startup removes recognized audio directories older than 24 hours, unless their owner process is still alive.
+Unknown content is preserved. `cleanup-audio` runs the same cleanup explicitly.
+Normal playback deletes its temporary WAV immediately. Automatic microphone capture stays in memory.
+
 ## Telegram
 
 Run `angela telegram` to chat and use local terminal tools through Telegram, using grammY long polling.

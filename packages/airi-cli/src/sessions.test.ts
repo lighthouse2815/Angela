@@ -97,3 +97,17 @@ describe('saved terminal sessions', () => {
     await expect(stat(missing)).rejects.toMatchObject({ code: 'ENOENT' })
   })
 })
+
+it('reports history bytes and refuses to delete a session held by a writer', async () => {
+  const { sessions, directory } = await setup()
+  const session = await sessions.open('/workspace')
+  await session.save(conversation, false)
+  const path = join(directory, `${session.record.id}.json`)
+  expect(await sessions.usage()).toEqual({ directory, sessions: 1, bytes: (await stat(path)).size })
+  await expect(sessions.remove(session.record.id)).rejects.toThrow(cliMessages.en.sessionLocked)
+  expect(await sessions.read(session.record.id)).toBeDefined()
+  await session.close()
+  await sessions.remove(session.record.id)
+  expect(await readdir(directory)).toEqual([])
+  expect(await sessions.usage()).toEqual({ directory, sessions: 0, bytes: 0 })
+})
