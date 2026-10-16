@@ -1,4 +1,13 @@
 const en = {
+  voiceReady: 'Voice mode. Press Enter to record. /chat returns to text chat.',
+  voiceRecord: 'Recording. Enter sends, /chat discards: ',
+  voicePrompt: 'Voice [Enter / /chat]: ',
+  chatReady: 'Text chat mode.',
+  voicePlatform: 'CLI voice requires Linux with pw-record and pw-play (PipeWire).',
+  voiceConfig: 'Set ANGELA_VOICE_BASE_URL to an OpenAI-compatible audio endpoint.',
+  voiceFailed: 'Voice failed. Check the audio endpoint, models, microphone, and PipeWire.',
+  voiceEmpty: 'No speech was recognized.',
+
   description: 'Angela terminal chat',
   provider: 'Provider instance from the shared file (or ANGELA_PROVIDER)',
   configFile: 'Shared configuration path (or ANGELA_CONFIG)',
@@ -11,7 +20,7 @@ const en = {
   cwd: 'Workspace directory',
   locale: 'Interface language: en or vi',
   help: 'Show help',
-  cliCommands: 'Available commands:\n/help — Show this list.\n/permistion — Show the current tool permission mode.\n/permistion full — Run tools without confirmation in this session.\n/permistion ask — Ask before each tool call.\n/permission — Alias for /permistion. on/off also select full/ask.\n/exit — Exit Angela.\n\nCtrl+C — Cancel the active request. Ctrl+D — Exit.',
+  cliCommands: 'Available commands:\n/voice — Speak and hear replies.\n/chat — Return to text chat.\n/help — Show this list.\n/permistion — Show the current tool permission mode.\n/permistion full — Run tools without confirmation in this session.\n/permistion ask — Ask before each tool call.\n/permission — Alias for /permistion. on/off also select full/ask.\n/exit — Exit Angela.\n\nCtrl+C — Cancel the active request. Ctrl+D — Exit.',
   telegramCommands: 'Available Telegram commands:\n/start — Introduce Angela.\n/help — Show this list.\n/status — Show the model, session, and request status.\n/new — Clear this conversation and start again.\n/cancel — Cancel the active request.\n\nText chat only. Terminal tools and /permistion are unavailable.',
   missingModel: 'Set ANGELA_MODEL or pass --model.',
   invalidUrl: 'Use an HTTP or HTTPS provider endpoint.',
@@ -85,6 +94,15 @@ const en = {
 }
 
 const vi: typeof en = {
+  voiceReady: 'Đã bật voice. Enter để thu âm. /chat quay lại nhập chữ.',
+  voiceRecord: 'Đang thu âm. Enter để gửi, /chat để bỏ bản thu: ',
+  voicePrompt: 'Voice [Enter / /chat]: ',
+  chatReady: 'Đã chuyển sang chat bằng chữ.',
+  voicePlatform: 'Voice CLI cần Linux có pw-record và pw-play (PipeWire).',
+  voiceConfig: 'Đặt ANGELA_VOICE_BASE_URL trỏ đến endpoint âm thanh tương thích OpenAI.',
+  voiceFailed: 'Voice thất bại. Kiểm tra endpoint âm thanh, model, micro và PipeWire.',
+  voiceEmpty: 'Không nhận được lời nói.',
+
   description: 'Trò chuyện với Angela trong terminal',
   provider: 'Provider trong file dùng chung (hoặc ANGELA_PROVIDER)',
   configFile: 'Đường dẫn cấu hình dùng chung (hoặc ANGELA_CONFIG)',
@@ -97,7 +115,7 @@ const vi: typeof en = {
   cwd: 'Thư mục làm việc',
   locale: 'Ngôn ngữ giao diện: en hoặc vi',
   help: 'Hiện hướng dẫn',
-  cliCommands: 'Danh sách lệnh:\n/help — Hiện danh sách này.\n/permistion — Xem chế độ quyền công cụ hiện tại.\n/permistion full — Chạy tool không cần xác nhận trong phiên này.\n/permistion ask — Hỏi xác nhận trước mỗi lần gọi tool.\n/permission — Tên khác của /permistion. on/off tương ứng full/ask.\n/exit — Thoát Angela.\n\nCtrl+C — Hủy yêu cầu đang chạy. Ctrl+D — Thoát.',
+  cliCommands: 'Danh sách lệnh:\n/voice — Nói và nghe trả lời.\n/chat — Quay lại nhập chữ.\n/help — Hiện danh sách này.\n/permistion — Xem chế độ quyền công cụ hiện tại.\n/permistion full — Chạy tool không cần xác nhận trong phiên này.\n/permistion ask — Hỏi xác nhận trước mỗi lần gọi tool.\n/permission — Tên khác của /permistion. on/off tương ứng full/ask.\n/exit — Thoát Angela.\n\nCtrl+C — Hủy yêu cầu đang chạy. Ctrl+D — Thoát.',
   telegramCommands: 'Danh sách lệnh Telegram:\n/start — Giới thiệu Angela.\n/help — Hiện danh sách này.\n/status — Xem model, phiên và trạng thái yêu cầu.\n/new — Xóa hội thoại hiện tại và bắt đầu lại.\n/cancel — Hủy yêu cầu đang chạy.\n\nChỉ chat văn bản. Chưa có tool terminal hoặc lệnh /permistion.',
   missingModel: 'Đặt ANGELA_MODEL hoặc truyền --model.',
   invalidUrl: 'Dùng địa chỉ provider HTTP hoặc HTTPS.',

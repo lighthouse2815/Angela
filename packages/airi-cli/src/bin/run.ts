@@ -20,6 +20,7 @@ import { Permissions } from '../permissions'
 import { Sessions } from '../sessions'
 import { runTelegram } from '../telegram'
 import { Terminal } from '../terminal'
+import { Voice } from '../voice'
 
 /**
  * Runs terminal chat and owns input, signals, and provider configuration.
@@ -110,7 +111,10 @@ async function main() {
     let client: Client | undefined
     let mcp: McpTools | undefined
 
+    let voice: Voice | undefined
+
     async function send(text: string) {
+      let answer = ''
       active = new AbortController()
       let completed = false
       try {
@@ -124,11 +128,18 @@ async function main() {
             error() {},
             warn() { output.retry() },
           },
-          onStreamEvent: event => output.event(event),
+          onStreamEvent: (event) => {
+            output.event(event)
+            if (event.type === 'text-delta')
+              answer += event.text
+          },
         })
         if (!output.hasText)
           throw new Error(messages.emptyResponse)
         completed = true
+        output.stop()
+        if (voice)
+          await voice.speak(answer, active.signal)
       }
       catch (error) {
         output.stop()
@@ -184,7 +195,44 @@ async function main() {
       if (input && interactive) {
         process.stderr.write(`${messages.workspace}: ${workspace}\n${messages.welcome}\n${messages.permissionAsk}\n`)
         while (true) {
-          const text = (await input.ask(output.prompt(), undefined, messages.cliCommands))?.trim()
+          let text = (await input.ask(voice ? messages.voicePrompt : output.prompt(), undefined, messages.cliCommands))?.trim()
+          if (text === '/voice') {
+            try {
+              voice ??= new Voice(process.env, messages)
+              process.stderr.write(`${messages.voiceReady}\n`)
+            }
+            catch (error) {
+              process.stderr.write(`${errorMessageFrom(error)}\n`)
+            }
+            continue
+          }
+          if (text === '/chat') {
+            voice = undefined
+            process.stderr.write(`${messages.chatReady}\n`)
+            continue
+          }
+          if (voice && text === '') {
+            active = new AbortController()
+            const capture = active
+            try {
+              text = await voice.listen(() => input!.ask(messages.voiceRecord, capture.signal), capture.signal)
+            }
+            catch (error) {
+              process.stderr.write(`${capture.signal.aborted ? messages.interrupted : errorMessageFrom(error)}\n`)
+              continue
+            }
+            finally {
+              capture.abort()
+              active = undefined
+            }
+            if (text?.trim() === '/chat') {
+              voice = undefined
+              process.stderr.write(`${messages.chatReady}\n`)
+              continue
+            }
+            if (text && !text.startsWith('/'))
+              process.stderr.write(`${text}\n`)
+          }
           output.submitted()
           if (text === undefined || text === '/exit')
             break

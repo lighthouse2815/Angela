@@ -97,8 +97,32 @@ An empty model answer reports an error instead of returning silently to the prom
 
 ## Scope
 
-This entry point provides text chat and a built-in terminal MCP connection.
-The web and desktop applications provide avatars, voice, and visual settings.
+This entry point provides text chat, Linux voice, and a built-in terminal MCP connection.
+The web and desktop applications provide avatars and visual settings.
+
+## Voice in the current session
+
+Type `/voice` during interactive chat to speak and hear Angela's replies.
+Press Enter to start capture. Press Enter again to send the audio.
+Type `/chat` to return to text chat. During capture, `/chat` discards the audio.
+Ctrl+C cancels capture, transcription, generation, or playback. The conversation and tool permissions stay in the same session.
+The microphone stays off during playback. This mode does not provide continuous listening or wake words.
+
+Linux voice uses the existing PipeWire commands `pw-record` and `pw-play`.
+Configure an OpenAI-compatible audio service in `.env.cli.local` or environment variables:
+
+```dotenv
+ANGELA_VOICE_BASE_URL=http://localhost:8000/v1/
+ANGELA_STT_MODEL=whisper-1
+ANGELA_TTS_MODEL=tts-1
+ANGELA_TTS_VOICE=alloy
+```
+
+`ANGELA_VOICE_API_KEY` supplies an optional audio credential, separate from the chat credential.
+The audio service must support `audio/transcriptions` and `audio/speech` with WAV output.
+Model and voice names must match your service. A chat-only router does not supply audio automatically.
+Audio goes to the configured service. Temporary audio files are deleted after each operation.
+Failed playback keeps the answer visible in chat. Voice mode requires an interactive terminal.
 
 ## Terminal tools
 
