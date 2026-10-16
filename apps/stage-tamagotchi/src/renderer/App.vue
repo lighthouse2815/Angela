@@ -10,6 +10,7 @@ import { updateModelAssetStatus, useInferencePreload } from '@proj-airi/stage-ui
 import { usePiniaSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { initializeAnalytics } from '@proj-airi/stage-ui/libs/product-signals'
 import { isSherpawModelBundled, setSherpawModelAssetHost } from '@proj-airi/stage-ui/libs/providers/providers/sherpaw/model-assets'
+import { connectLocalProviderConfig } from '@proj-airi/stage-ui/services/local-provider-config'
 import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
 import { useCharacterOrchestratorStore } from '@proj-airi/stage-ui/stores/character'
 import { useChatStore } from '@proj-airi/stage-ui/stores/chat'
@@ -32,6 +33,7 @@ import { useTheme } from '@proj-airi/ui'
 import { isEqual } from 'es-toolkit'
 import { storeToRefs } from 'pinia'
 import { onMounted, onUnmounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import { toast, Toaster } from 'vue-sonner'
 
@@ -45,6 +47,7 @@ import {
   i18nGetLocale,
   i18nSetLocale,
 } from '../shared/eventa'
+import { localConfigRead, localConfigUpdate } from '../shared/eventa/local-config'
 import { electronModelAssetCancel, electronModelAssetEnsure, electronModelAssetRemove, electronModelAssetsClear, electronModelAssetsList, electronModelAssetStatusChanged } from '../shared/eventa/model-assets'
 import {
   electronPluginUpdateCapability,
@@ -85,6 +88,9 @@ const { language, themeColorsHue, themeColorsHueDynamic } = storeToRefs(settings
 const router = useRouter()
 const route = useRoute()
 const context = useElectronEventaContext()
+const { t } = useI18n()
+const readLocalConfig = useElectronEventaInvoke(localConfigRead)
+const updateLocalConfig = useElectronEventaInvoke(localConfigUpdate)
 const listModelAssets = useElectronEventaInvoke(electronModelAssetsList)
 const ensureModelAsset = useElectronEventaInvoke(electronModelAssetEnsure)
 const cancelModelAsset = useElectronEventaInvoke(electronModelAssetCancel)
@@ -171,6 +177,7 @@ function createFullStageRuntime() {
   useSettingsStageModel()
   useVisionStore()
 
+  let localConfig: Awaited<ReturnType<typeof connectLocalProviderConfig>> | undefined
   let stopAuthenticatedSetup: (() => void) | undefined
   let stopLoggedOutSetup: (() => void) | undefined
 
@@ -303,6 +310,10 @@ function createFullStageRuntime() {
       if (!authStore.isAuthenticated)
         await removeAuthenticationProviderConfiguration()
 
+      localConfig?.stop()
+      localConfig = await connectLocalProviderConfig({ read: readLocalConfig, update: updateLocalConfig }, () => syncedPinia.isLeader(), () => {
+        toast.error(t('stage.local-config-error'))
+      })
       await displayModelsStore.loadDisplayModelsFromIndexedDB()
       await settingsStore.initializeStageModel()
       await settingsAudioDeviceStore.initialize()
@@ -345,6 +356,7 @@ function createFullStageRuntime() {
       inferencePreload.triggerPreload()
     },
     dispose() {
+      localConfig?.stop()
       stopAuthenticatedSetup?.()
       stopLoggedOutSetup?.()
       contextBridgeStore.dispose()

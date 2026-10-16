@@ -2,6 +2,15 @@
 
 Shared core for stage
 
+## Shared local provider settings
+
+`connectLocalProviderConfig` connects existing provider and card actions to a host-owned configuration transport.
+Desktop supplies Eventa IPC. Local web supplies the Vite HTTP transport from `@proj-airi/local-config`.
+Only the Pinia leader reads and writes the file. Followers send explicit actions through existing synchronized stores.
+Remote snapshots apply without persistence echoes. Each profile imports its existing direct providers once per configuration file.
+Local storage retains interface state and cached provider snapshots. The shared file owns direct providers and the selected chat model.
+Stop the connection when the application unmounts. Use `flush()` to await pending writes.
+
 ## Experimental features
 
 Register flags in `libs/feature-flags.ts`. Read their state through `useFeatureFlagsStore().isEnabled(key)`.

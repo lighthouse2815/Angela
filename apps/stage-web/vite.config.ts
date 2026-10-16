@@ -19,6 +19,7 @@ import VueRouter from 'vue-router/vite'
 
 import { tryCatch } from '@moeru/std'
 import { localeRemap, serializeStartupFallbackLocales } from '@proj-airi/i18n'
+import { localConfigPlugin } from '@proj-airi/local-config/vite'
 import { paraformerBilingualZhEn, xAsrBilingualZhEnInt8, zipformerMultilingual } from '@proj-airi/provider-inference/sherpaw-transcription/models'
 import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
 import { Download } from '@proj-airi/unplugin-fetch/vite'
@@ -125,6 +126,7 @@ export default defineConfig({
   },
 
   plugins: [
+    localConfigPlugin(),
     {
       name: 'airi-startup-locales',
       transformIndexHtml: html => html.replace('__AIRI_STARTUP_LOCALES__', serializeStartupFallbackLocales(messages, localeRemap)),

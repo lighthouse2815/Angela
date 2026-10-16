@@ -9,6 +9,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { LocalConfigFile } from '@proj-airi/local-config/node'
 import { afterEach, expect, it } from 'vitest'
 
 const children: ReturnType<typeof spawn>[] = []
@@ -45,13 +46,15 @@ function run(args: string[], env: NodeJS.ProcessEnv = {}) {
   return { child, result, directory }
 }
 
-it('reads piped UTF-8 input and streams a provider response through the CLI', async () => {
+it('reads shared credentials and piped UTF-8 input, then resumes the streamed conversation', async () => {
   const bodies: string[] = []
+  const authorization: (string | undefined)[] = []
   const server = createServer(async (request, response) => {
     let body = ''
     for await (const chunk of request)
       body += chunk
     bodies.push(body)
+    authorization.push(request.headers.authorization)
     response.writeHead(200, { 'Content-Type': 'text/event-stream' })
     response.end(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', content: 'Xin chào từ Angela' }, finish_reason: 'stop' }] })}\n\ndata: [DONE]\n\n`)
   })
@@ -61,17 +64,28 @@ it('reads piped UTF-8 input and streams a provider response through the CLI', as
   const address = server.address()
   if (!address || typeof address === 'string')
     throw new Error('Missing provider port')
-  const env = { ANGELA_BASE_URL: `http://127.0.0.1:${address.port}/v1/`, ANGELA_API_KEY: 'test-only-provider-secret' }
+  const configDirectory = mkdtempSync(join(tmpdir(), 'angela-cli-shared-'))
+  directories.push(configDirectory)
+  const configPath = join(configDirectory, 'config.json')
+  const apiKey = 'test-only-provider-secret'
+  await new LocalConfigFile(configPath).update({
+    providers: { local: { definitionId: 'openai-compatible', config: { baseUrl: `http://127.0.0.1:${address.port}/v1/`, apiKey }, status: 'configured' } },
+    chat: { provider: 'local', model: 'shared-model' },
+  })
+  const env = { ANGELA_CONFIG: configPath, ANGELA_MODEL: undefined, ANGELA_BASE_URL: undefined, ANGELA_API_KEY: undefined, ANGELA_API: undefined, ANGELA_PROVIDER: undefined }
   const { child, result, directory } = run([], env)
   child.stdin.end('Chào Angela')
   const first = await result
   expect(first).toMatchObject({ code: 0, stdout: 'Xin chào từ Angela\n' })
   expect(bodies[0]).toContain('Chào Angela')
+  expect(JSON.parse(bodies[0]).model).toBe('shared-model')
+  expect(authorization[0]).toBe(`Bearer ${apiKey}`)
+  expect(first.stderr).not.toContain(apiKey)
   const files = await readdir(directory)
   expect(files).toHaveLength(1)
   const sessionId = files[0].replace('.json', '')
   const stored = await readFile(join(directory, files[0]), 'utf8')
-  expect(stored).not.toContain(env.ANGELA_API_KEY)
+  expect(stored).not.toContain(apiKey)
   const resumed = run(['--resume', sessionId, '--prompt', 'Bạn nhớ gì?'], { ...env, ANGELA_DATA_DIR: directory })
   expect(await resumed.result).toMatchObject({ code: 0 })
   expect(bodies[1]).toContain('Xin chào từ Angela')

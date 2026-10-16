@@ -1924,6 +1924,9 @@ importers:
       '@proj-airi/input-gamepad-vueuse':
         specifier: workspace:^
         version: link:../../packages/input-gamepad-vueuse
+      '@proj-airi/local-config':
+        specifier: workspace:^
+        version: link:../../packages/local-config
       '@proj-airi/model-driver-lipsync':
         specifier: workspace:^
         version: link:../../packages/model-driver-lipsync
@@ -2920,6 +2923,9 @@ importers:
       '@proj-airi/i18n':
         specifier: workspace:^
         version: link:../../packages/i18n
+      '@proj-airi/local-config':
+        specifier: workspace:^
+        version: link:../../packages/local-config
       '@proj-airi/model-driver-mediapipe':
         specifier: workspace:^
         version: link:../../packages/model-driver-mediapipe
@@ -4890,6 +4896,9 @@ importers:
       '@proj-airi/input-gamepad':
         specifier: workspace:^
         version: link:../input-gamepad
+      '@proj-airi/local-config':
+        specifier: workspace:^
+        version: link:../local-config
       '@proj-airi/model-driver-lipsync':
         specifier: workspace:^
         version: link:../model-driver-lipsync

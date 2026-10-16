@@ -280,3 +280,5 @@ status:
   sign-in-unconfirmed: Could not confirm your session. Please sign in again.
   dismiss: Dismiss
   configure-hearing: Select and configure a Hearing provider in Settings.
+
+local-config-error: Could not synchronize local provider settings. Check the shared configuration file.

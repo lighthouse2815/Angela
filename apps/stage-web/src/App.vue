@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import { HttpLocalConfig } from '@proj-airi/local-config'
 import { OnboardingDialog, OnboardingStepAnalyticsNotice, StartupOverlay, ToasterRoot } from '@proj-airi/stage-ui/components'
 import { useInferencePreload } from '@proj-airi/stage-ui/composables'
 import { useStartupResourceTimeout } from '@proj-airi/stage-ui/composables/use-startup-resource-timeout'
 import { usePiniaSynced } from '@proj-airi/stage-ui/libs/pinia'
 import { initializeAnalytics, isAnalyticsAvailableInBuild } from '@proj-airi/stage-ui/libs/product-signals'
+import { connectLocalProviderConfig } from '@proj-airi/stage-ui/services/local-provider-config'
 import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
 import { useCharacterOrchestratorStore } from '@proj-airi/stage-ui/stores/character'
 import { useChatStore } from '@proj-airi/stage-ui/stores/chat'
@@ -58,6 +60,7 @@ useSpeechStore()
 useSettingsStageModel()
 useVisionStore()
 
+let localConfig: Awaited<ReturnType<typeof connectLocalProviderConfig>> | undefined
 let stopAuthenticatedSetup: (() => void) | undefined
 let stopLoggedOutSetup: (() => void) | undefined
 
@@ -156,6 +159,12 @@ async function loadStartup() {
       registerAuthenticatedSetup()
       if (!authStore.isAuthenticated)
         await removeAuthenticationProviderConfiguration()
+      if (['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) {
+        localConfig?.stop()
+        localConfig = await connectLocalProviderConfig(new HttpLocalConfig(), () => syncedPinia.isLeader(), () => {
+          toast.error(i18n.t('stage.local-config-error'))
+        })
+      }
     })
     await startup.run('chat', () => chatStore.initialize(syncedPinia))
     await startup.run('services', () => {
@@ -188,6 +197,7 @@ watch(() => [startup.resources.find(resource => resource.id === 'modelSelection'
 })
 
 onUnmounted(() => {
+  localConfig?.stop()
   stopAuthenticatedSetup?.()
   stopLoggedOutSetup?.()
   chatStore.dispose()
