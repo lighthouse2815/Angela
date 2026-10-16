@@ -13,6 +13,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { Chat } from './chat'
 import { McpTools } from './mcp'
 import { Output } from './output'
+import { Permissions } from './permissions'
 
 const connections: { close: () => Promise<void> }[] = []
 afterEach(async () => {
@@ -39,6 +40,27 @@ async function connect(confirm = vi.fn(async () => true), workspace?: string) {
 }
 
 describe('mCP host approval', () => {
+  it('automatically resolves pending actions in full mode and asks again after disabling it', async () => {
+    const permissions = new Permissions(cliMessages.en)
+    const ask = vi.fn(async () => false)
+    const confirm = vi.fn(async () => permissions.fullAccess || await ask())
+    const { tools, invoke } = await connect(confirm)
+    permissions.command('/permistion full')
+    invoke.mockReturnValueOnce({ content: [], structuredContent: { status: 'approval_required', pendingActionId: 'pending-full' } })
+    await tools.call('terminal_exec', { command: 'pwd' })
+    expect(ask).not.toHaveBeenCalled()
+    expect(invoke.mock.calls).toEqual([
+      ['terminal_exec', { command: 'pwd' }],
+      ['desktop_approve_pending_action', { id: 'pending-full' }],
+    ])
+    expect(await tools.call('desktop_approve_pending_action', { id: 'other' })).toMatchObject({ isError: true })
+    expect(invoke).toHaveBeenCalledTimes(2)
+    permissions.command('/permistion ask')
+    expect(await tools.call('terminal_exec', { command: 'pwd' })).toMatchObject({ isError: true })
+    expect(ask).toHaveBeenCalledOnce()
+    expect(invoke).toHaveBeenCalledTimes(2)
+  })
+
   it('does not send a denied tool call to the server', async () => {
     const { tools, invoke } = await connect(vi.fn(async () => false))
     expect(await tools.call('terminal_exec', { command: 'pwd' })).toMatchObject({ isError: true })

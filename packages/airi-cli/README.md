@@ -101,8 +101,13 @@ The built-in connection exposes terminal tools only. File reads and edits use te
 The CLI supplies the selected workspace when a terminal call omits `cwd`.
 The workspace is a working directory, not a filesystem sandbox.
 
-Before each tool call, the CLI shows its name and arguments. Type `yes` to allow that exact call.
-Server-side pending actions require a second confirmation of the returned action.
+By default, the CLI shows each tool call and asks for confirmation. Type `yes` to allow that exact call.
+Server-side pending actions require a second confirmation in this mode.
+Use `/permistion` to see the current mode, `/permistion full` for full access, and `/permistion ask` to restore confirmation.
+`/permission` is an alias. `on` selects full access, and `off` restores confirmation.
+Full access automatically approves tool calls and pending server actions. The CLI still displays each action and its result.
+The mode lasts for the current process. New and resumed sessions start with confirmation required.
+Permission commands run locally, without contacting the model. They do not connect an MCP server or override server policy denials.
 The model cannot call approval endpoints directly. Without a terminal reader, tool calls are denied.
 Cancellation stops the model request and MCP wait. Completed or running external actions can retain side effects.
 

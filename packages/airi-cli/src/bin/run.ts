@@ -16,6 +16,7 @@ import { readConfig } from '../config'
 import { formatRequestError } from '../errors'
 import { McpTools } from '../mcp'
 import { Output } from '../output'
+import { Permissions } from '../permissions'
 import { Sessions } from '../sessions'
 import { Terminal } from '../terminal'
 
@@ -73,6 +74,7 @@ async function main() {
     await session.save(chat.conversation, session.record.interrupted)
     const interactive = process.stdin.isTTY && config.prompt === undefined
     const output = new Output(messages)
+    const permissions = new Permissions(messages)
     if (interactive)
       output.intro()
     process.stderr.write(`${messages.session}: ${session.record.id}\n`)
@@ -158,6 +160,11 @@ async function main() {
         await client.connect(transport, { signal: shutdown.signal })
         mcp = new McpTools(client, async (request, signal) => {
           output.approval(request)
+          if (permissions.fullAccess) {
+            signal?.throwIfAborted()
+            output.decided(true)
+            return true
+          }
           if (!input) {
             output.decided(false)
             return false
@@ -170,12 +177,17 @@ async function main() {
         process.stderr.write(`${messages.mcpConnected}\n`)
       }
       if (input && interactive) {
-        process.stderr.write(`${messages.workspace}: ${workspace}\n${messages.welcome}\n`)
+        process.stderr.write(`${messages.workspace}: ${workspace}\n${messages.welcome}\n${messages.permissionAsk}\n`)
         while (true) {
           const text = (await input.ask(output.prompt()))?.trim()
           output.submitted()
           if (text === undefined || text === '/exit')
             break
+          const commandResponse = permissions.command(text)
+          if (commandResponse !== undefined) {
+            process.stderr.write(`${commandResponse}\n`)
+            continue
+          }
           if (text)
             await send(text)
         }
