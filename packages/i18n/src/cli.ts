@@ -1,4 +1,12 @@
 const en = {
+  recallInvalid: 'Recall is unavailable. Check /memory status. Source files have not been deleted.',
+  recallPartial: 'Some recall sources or embeddings are unavailable. Check /memory status. Available keyword results remain usable.',
+  recallUsage: '/memory search TEXT | /memory search-all TEXT | /memory read ID | /memory used | /memory status | /memory recall|history|semantic on|off | /memory budget 2000..24000 | /memory reindex',
+  recallUsed: 'Sources supplied in the latest request (historical data, not proof of current state):',
+  recallIndexed: 'Memory index synchronized.',
+  recallChanged: 'Recall settings updated.',
+  recallEmbeddingConfig: 'Set ANGELA_EMBEDDING_MODEL and a valid OpenAI-compatible embedding base URL.',
+  recallEmbeddingFailed: 'Embedding service is unavailable. Keyword search remains active. Check embedding configuration and service status.',
   memoryCoreLimit: 'Core profile is full (4000 characters). Unpin another fact first.',
   skillsUsage: '/skills | /skills show NAME | /skills import PATH | /skills on|off [NAME]',
   skillsInvalid: 'Cannot read skill files. Check memory/skills and YAML headers.',
@@ -180,6 +188,14 @@ const en = {
 }
 
 const vi: typeof en = {
+  recallInvalid: 'Không truy xuất được memory. Kiểm tra /memory status. File gốc chưa bị xóa.',
+  recallPartial: 'Một số nguồn ghi nhớ hoặc embedding không truy cập được. Kiểm tra /memory status. Kết quả từ khóa khả dụng vẫn được dùng.',
+  recallUsage: '/memory search NỘI_DUNG | /memory search-all NỘI_DUNG | /memory read ID | /memory used | /memory status | /memory recall|history|semantic on|off | /memory budget 2000..24000 | /memory reindex',
+  recallUsed: 'Nguồn đã đưa vào yêu cầu gần nhất (dữ liệu lịch sử, không xác nhận trạng thái hiện tại):',
+  recallIndexed: 'Đã đồng bộ chỉ mục ghi nhớ.',
+  recallChanged: 'Đã cập nhật cấu hình truy xuất ghi nhớ.',
+  recallEmbeddingConfig: 'Đặt ANGELA_EMBEDDING_MODEL và base URL embedding tương thích OpenAI hợp lệ.',
+  recallEmbeddingFailed: 'Dịch vụ embedding không khả dụng. Tìm kiếm từ khóa vẫn hoạt động. Kiểm tra cấu hình embedding và dịch vụ.',
   memoryCoreLimit: 'Hồ sơ cốt lõi đã đủ 4000 ký tự. Bỏ ghim ghi nhớ khác trước.',
   skillsUsage: '/skills | /skills show TÊN | /skills import ĐƯỜNG_DẪN | /skills on|off [TÊN]',
   skillsInvalid: 'Không đọc được kỹ năng. Kiểm tra memory/skills và phần đầu YAML.',

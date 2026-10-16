@@ -511,3 +511,32 @@ Explicit imports and model saves use atomic replacement and exclusive per-skill 
 Imports create new skills. Updating an existing skill requires its current version.
 Agent-discovered project files do not automatically join this trusted store.
 A skill is reusable guidance, never proof that the current task succeeded or permission to run a tool.
+
+## Recall index
+
+The CLI maintains a private derived index at `memory/recall.sqlite` using Node.js SQLite and FTS5.
+Node.js 22.13 or newer is required for this feature. The index never replaces authoritative source files.
+FTS5 ranks keyword matches with BM25. Vietnamese keywords support accents and common unaccented spelling, including `đ`.
+
+Personal facts, enabled skills, and prior CLI user/assistant messages have distinct source identities.
+Raw tool payloads, system prompts, Telegram histories and provider configuration are excluded from this index.
+History normally stays within the current workspace. Explicit cross-workspace searches can find other CLI sessions in the same data directory.
+Current-session messages remain under the existing context manager and are not duplicated into recall.
+Excerpts carry their source, version and update time. Session dates describe session updates, not individual message timestamps.
+
+File notifications schedule incremental history updates. Periodic reconciliation detects missed notifications.
+Unchanged sources retain cached vectors. Background embedding batches yield between requests.
+Every read rechecks the authoritative source and its enable switch before returning data.
+Invalid files remain untouched and generate partial-recall status. Atomic updates and exclusive writer locks continue protecting source files.
+
+Semantic retrieval is opt-in through `ANGELA_EMBEDDING_MODEL`.
+`ANGELA_EMBEDDING_BASE_URL` selects an OpenAI-compatible embedding endpoint. Otherwise the chat base URL is used.
+`ANGELA_EMBEDDING_API_KEY` selects its credential. Chat credentials are inherited only for the same origin.
+Enabling embeddings sends indexed text, including historical user/assistant messages, to that endpoint.
+The CLI installs no local model. Missing configuration uses keyword search. Failed requests report degraded semantic status and retain keyword access.
+Requests reject redirects and bound response sizes, vector dimensions and execution time.
+Keyword and cosine rankings combine through reciprocal rank fusion. Duplicate excerpts and repeated source hits are limited before context selection.
+
+The excerpt budget is separate from fixed memory instructions and the bounded skill catalog.
+Core facts take priority. Long documents remain readable through explicit recall tools.
+`/memory used` reports supplied sources, not proof that the model relied on every source or that old outcomes remain true.
