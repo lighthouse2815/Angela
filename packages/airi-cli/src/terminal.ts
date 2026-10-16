@@ -2,12 +2,15 @@ import type { CompleterResult } from 'node:readline'
 
 import process from 'node:process'
 
+import { clearScreenDown, cursorTo, moveCursor } from 'node:readline'
 import { createInterface } from 'node:readline/promises'
 import { styleText } from 'node:util'
 
 /** Owns the terminal reader. EOF releases pending questions, and turn cancellation keeps the reader open. */
 export class Terminal {
   private commands: string[] = []
+  private asking = false
+  private redraw?: () => void
 
   private readonly input = createInterface({
     input: process.stdin,
@@ -54,6 +57,8 @@ export class Terminal {
     }
     if (process.stderr.isTTY && this.commands.length)
       process.stdin.on('keypress', draw)
+    this.asking = true
+    this.redraw = () => draw('', {})
     try {
       return await this.input.question(prompt, { signal: combined })
     }
@@ -63,11 +68,32 @@ export class Terminal {
       throw error
     }
     finally {
+      this.asking = false
+      this.redraw = undefined
       process.stdin.off('keypress', draw)
       this.commands = []
       if (visible)
         process.stderr.write('\u001B7\r\n\u001B[J\u001B8')
     }
+  }
+
+  get hasInput() {
+    return this.asking && Boolean(this.input.line)
+  }
+
+  /** Writes above the complete editable prompt, then restores its line, cursor, and command suggestions. */
+  notify(text: string) {
+    if (!this.asking || !process.stderr.isTTY) {
+      process.stderr.write(`\n${text}\n`)
+      return
+    }
+    const position = this.input.getCursorPos()
+    moveCursor(process.stderr, 0, -position.rows)
+    cursorTo(process.stderr, 0)
+    clearScreenDown(process.stderr)
+    process.stderr.write(`${text}\n`)
+    this.input.prompt(true)
+    this.redraw?.()
   }
 
   close() {

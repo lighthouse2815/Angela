@@ -8,10 +8,10 @@ import { stripVTControlCharacters } from 'node:util'
 import { localDate, taskDue, taskDuration } from './task-time'
 
 /** Renders saved data without terminal escape sequences. IDs remain stable across views and restarts. */
-export function formatTask(task: Task, locale: string, noTime: string) {
+export function formatTask(task: Task, locale: string, messages: typeof cliMessages.en.tasks) {
   const due = taskDue(task)
-  const time = due ? new Intl.DateTimeFormat(locale, { timeZone: task.timezone, dateStyle: 'short', timeStyle: 'short' }).format(Date.parse(due)) : task.dueDate ?? noTime
-  return `${time} [${task.type}/${task.status}] ${stripVTControlCharacters(task.title).replace(/[\r\n]/gu, ' ')}\n  ${task.id} (${task.timezone})`
+  const time = due ? new Intl.DateTimeFormat(locale, { timeZone: task.timezone, dateStyle: 'short', timeStyle: 'short' }).format(Date.parse(due)) : task.dueDate ?? messages.noTime
+  return `${time} [${messages.types[task.type]}/${messages.statuses[task.status]}] ${stripVTControlCharacters(task.title).replace(/[\r\n]/gu, ' ')}\n  ${task.id} (${task.timezone})`
 }
 
 /** Direct commands share the same service as model tools. Normal messages pass through unchanged. */
@@ -23,7 +23,7 @@ export async function taskCommand(text: string, tasks: Tasks, messages: typeof c
     if (duration || (selection && (command !== '/tasks' || selection !== 'all')))
       return messages.usage
     const list = await tasks.list({ status: selection === 'all' ? 'all' : 'pending', date: command === '/today' ? localDate(tasks.now(), tasks.timezone) : undefined })
-    return list.length ? `${command === '/today' ? messages.today : messages.heading}\n\n${list.map(task => formatTask(task, locale, messages.noTime)).join('\n')}` : messages.empty
+    return list.length ? `${command === '/today' ? messages.today : messages.heading}\n\n${list.map(task => formatTask(task, locale, messages)).join('\n')}` : messages.empty
   }
   if (!selection || extra.length || (command === '/snooze' ? !duration : Boolean(duration)))
     return messages.usage
@@ -42,5 +42,5 @@ export async function taskCommand(text: string, tasks: Tasks, messages: typeof c
       return messages.usage
     saved = await tasks.snooze(selection, new Date(tasks.now() + delay).toISOString())
   }
-  return `${messages.saved}\n${formatTask(saved, locale, messages.noTime)}`
+  return `${messages.saved}\n${formatTask(saved, locale, messages)}`
 }

@@ -326,3 +326,51 @@ it('recalls an isolated project checkpoint in a fresh process and omits disabled
   expect(degraded.stderr).toContain(cliMessages.vi.projectMemoryUnavailable)
   expect(requests[5]).not.toContain('Project checkpoint:')
 }, 25_000)
+
+it('creates a conversational task through the real CLI tool runtime and restores overdue context without duplicate delivery', async () => {
+  const bodies: string[] = []
+  const server = createServer(async (request, response) => {
+    let body = ''
+    for await (const chunk of request)
+      body += chunk
+    bodies.push(body)
+    response.writeHead(200, { 'Content-Type': 'text/event-stream' })
+    const first = bodies.length === 1
+    const delta = first
+      ? { role: 'assistant', tool_calls: [{ index: 0, id: 'task-save', type: 'function', function: { name: 'task_create', arguments: JSON.stringify({ title: 'Học tiếng Trung', type: 'reminder', dueAt: '2026-01-01T22:00:00+07:00', timezone: 'Asia/Ho_Chi_Minh' }) } }] }
+      : { role: 'assistant', content: 'Đã lưu việc học tiếng Trung.' }
+    response.end(`data: ${JSON.stringify({ choices: [{ index: 0, delta, finish_reason: first ? 'tool_calls' : 'stop' }] })}\n\ndata: [DONE]\n\n`)
+  })
+  servers.push(server)
+  server.listen(0, '127.0.0.1')
+  await once(server, 'listening')
+  const address = server.address()
+  if (!address || typeof address === 'string')
+    throw new Error('Missing provider port')
+  const directory = mkdtempSync(join(tmpdir(), 'angela-cli-tasks-'))
+  directories.push(directory)
+  const env = { ANGELA_DATA_DIR: directory, ANGELA_BASE_URL: `http://127.0.0.1:${address.port}/v1/` }
+  const first = await run(['--prompt', '10h tối nhắc tao học tiếng Trung'], env).result
+  expect(first, first.stderr).toMatchObject({ code: 0 })
+  expect(bodies[0]).toContain('task_create')
+  expect(bodies[0]).toContain('Current clock:')
+  expect(bodies[1]).toContain('saved')
+  expect(bodies[1]).toContain('Học tiếng Trung')
+  const file = join(directory, 'tasks', 'tasks.json')
+  const initial = JSON.parse(await readFile(file, 'utf8'))
+  expect(initial.tasks).toHaveLength(1)
+  expect(initial.tasks[0]).toMatchObject({ title: 'Học tiếng Trung', status: 'pending' })
+  const sessionFile = (await readdir(directory)).find(name => name.endsWith('.json'))!
+  const sessionId = sessionFile.replace('.json', '')
+  const next = await run(['--resume', sessionId, '--prompt', '15 phút nữa nhắc lại'], env).result
+  expect(next, next.stderr).toMatchObject({ code: 0 })
+  const delivered = JSON.parse(await readFile(file, 'utf8'))
+  expect(delivered.tasks[0].lastNotifiedAt).toBeTypeOf('string')
+  const history = JSON.parse(await readFile(join(directory, sessionFile), 'utf8'))
+  expect(JSON.stringify(history)).toContain(initial.tasks[0].id)
+  expect(history.messages.filter((message: { role: string, content?: string }) => message.role === 'assistant' && (message.content?.includes(cliMessages.vi.tasks.overdue) || message.content?.includes(cliMessages.vi.tasks.reminder)))).toHaveLength(1)
+  expect(bodies[2]).toContain(initial.tasks[0].id)
+  const third = await run(['--resume', sessionId, '--prompt', 'Hôm nay còn việc gì?'], env).result
+  expect(third, third.stderr).toMatchObject({ code: 0 })
+  expect(third.stderr).not.toContain(cliMessages.vi.tasks.overdue)
+}, 20_000)

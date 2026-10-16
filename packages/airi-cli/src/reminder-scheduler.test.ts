@@ -38,15 +38,21 @@ it('selects the nearest deadline, fires once, and ignores unscheduled tasks', as
   const later = await tasks.create({ title: 'Later', type: 'reminder', dueAt: new Date(now + 50_000).toISOString() })
   const first = await tasks.create({ title: 'First', type: 'deadline', dueAt: new Date(now + 10_000).toISOString() })
   await tasks.create({ title: 'Date only', type: 'todo', dueDate: '2026-10-17' })
+  const fired = [Promise.withResolvers<void>(), Promise.withResolvers<void>()]
+  notify.mockImplementation(async () => {
+    fired[notify.mock.calls.length - 1]?.resolve()
+  })
   await scheduler.start()
   await scheduler.start()
   expect(vi.getTimerCount()).toBe(1)
   await vi.advanceTimersByTimeAsync(10_000)
+  await fired[0]!.promise
   await scheduler.refresh()
   expect(notify).toHaveBeenCalledTimes(1)
   expect(notify.mock.calls[0]![0]).toMatchObject([{ id: first.id }])
   expect(notify.mock.calls[0]![1]).toBe(false)
   await vi.advanceTimersByTimeAsync(40_000)
+  await fired[1]!.promise
   await scheduler.refresh()
   expect(notify).toHaveBeenCalledTimes(2)
   expect(notify.mock.calls[1]![0]).toMatchObject([{ id: later.id }])

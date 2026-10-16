@@ -8,6 +8,7 @@ import { realpath, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import { errorMessageFrom } from '@moeru/std'
+import { chatMessagesToTurns } from '@proj-airi/core-agent'
 import { getGenerationProvider, listProviders } from '@proj-airi/provider-inference'
 
 import { Chat } from '../chat'
@@ -19,6 +20,8 @@ import { Memory } from '../memory'
 import { Output } from '../output'
 import { Permissions } from '../permissions'
 import { ProjectMemory } from '../project-memory'
+import { ReminderNotifications } from '../reminder-notifications'
+import { ReminderScheduler } from '../reminder-scheduler'
 import { runSessionCommand } from '../session-command'
 import { Sessions } from '../sessions'
 import { StreamingSpeech } from '../streaming-speech'
@@ -146,6 +149,25 @@ async function main() {
     let mcp: McpTools | undefined
 
     let pendingUtterance: string | undefined
+    let voiceReady = false
+    let reminderWake: AbortController | undefined
+    const notifications = new ReminderNotifications(messages.tasks, config.locale, (text, announced) => {
+      if (input)
+        input.notify(text)
+      else
+        process.stderr.write(`\n${text}\n`)
+      if (announced.length)
+        chat.conversation.turns.push(...chatMessagesToTurns([{ role: 'assistant', content: text }]))
+      if (voiceReady && !input?.hasInput)
+        reminderWake?.abort()
+    })
+    const scheduler = new ReminderScheduler(tasks, notifications, (error) => {
+      const text = `${messages.tasks.unavailable} ${errorMessageFrom(error) ?? messages.tasks.failed}`
+      if (input)
+        input.notify(text)
+      else
+        process.stderr.write(`\n${text}\n`)
+    })
 
     async function releaseVoice() {
       try {
@@ -158,6 +180,7 @@ async function main() {
     }
 
     async function send(text: string) {
+      notifications.pause()
       active = new AbortController()
       const speech = voice ? new StreamingSpeech(voice, active.signal, () => process.stderr.write(`\n${messages.voiceSpeaking}\n`)) : undefined
       interruption = voice?.canInterrupt
@@ -241,6 +264,7 @@ async function main() {
           interruption?.cancel()
           interruption = undefined
           active = undefined
+          notifications.resume()
         }
       }
     }
@@ -264,9 +288,19 @@ async function main() {
         }, messages, process.env, shutdown.signal)
         process.stderr.write(`${messages.mcpConnected}\n`)
       }
+      await scheduler.start()
       if (input && interactive) {
         process.stderr.write(`${messages.workspace}: ${workspace}\n${messages.welcome}\n${messages.permissionAsk}\n`)
-        while (true) {
+        while (!shutdown.signal.aborted) {
+          notifications.setVoiceEnabled(Boolean(voice))
+          if (voice && notifications.hasSpeech) {
+            const speaking = new AbortController()
+            active = speaking
+            await notifications.speak(voice, AbortSignal.any([speaking.signal, shutdown.signal]))
+            if (speaking.signal.aborted)
+              voice = undefined
+            active = undefined
+          }
           if (!voice)
             await releaseVoice()
           if (pendingUtterance && voice) {
@@ -280,8 +314,13 @@ async function main() {
           if (voice) {
             active = new AbortController()
             const capture = active
+            const wake = new AbortController()
+            reminderWake = wake
             try {
-              const result = await voice.listen(signal => input!.ask('', signal, messages.cliCommands), capture.signal, (state) => {
+              const result = await voice.listen(signal => input!.ask('', signal, messages.cliCommands), AbortSignal.any([capture.signal, wake.signal]), (state) => {
+                voiceReady = state === 'ready'
+                if (voiceReady && notifications.hasSpeech && !input?.hasInput)
+                  wake.abort()
                 const label = state === 'ready' ? messages.voicePrompt : state === 'speech' ? messages.voiceRecord : messages.voiceTranscribing
                 process.stderr.write(`${label}\n`)
               })
@@ -300,6 +339,8 @@ async function main() {
               text = result.text
             }
             catch (error) {
+              if (wake.signal.aborted && !capture.signal.aborted && !shutdown.signal.aborted)
+                continue
               process.stderr.write(`${capture.signal.aborted ? messages.interrupted : errorMessageFrom(error)}\n`)
               voice = undefined
               process.stderr.write(`${messages.chatReady}\n`)
@@ -308,6 +349,8 @@ async function main() {
             finally {
               capture.abort()
               active = undefined
+              voiceReady = false
+              reminderWake = undefined
             }
           }
           else {
@@ -317,6 +360,7 @@ async function main() {
             try {
               voice ??= loadedVoice ?? await Voice.load(process.env, messages)
               loadedVoice = voice
+              notifications.setVoiceEnabled(true)
               active = new AbortController()
               try {
                 await voice.start(active.signal)
@@ -340,6 +384,7 @@ async function main() {
           }
           if (text === '/chat') {
             voice = undefined
+            notifications.setVoiceEnabled(false)
             process.stderr.write(`${messages.chatReady}\n`)
             continue
           }
@@ -387,15 +432,27 @@ async function main() {
       }
     }
     finally {
-      input?.close()
       try {
-        await releaseVoice()
+        await scheduler.refresh()
+        await scheduler.close()
+        notifications.resume()
+        await session.save(chat.conversation, session.record.interrupted)
       }
       finally {
-        await mcp?.close()
+        input?.close()
+        try {
+          await releaseVoice()
+        }
+        finally {
+          try {
+            await mcp?.close()
+          }
+          finally {
+            process.off('SIGINT', interrupt)
+            process.off('SIGTERM', stop)
+          }
+        }
       }
-      process.off('SIGINT', interrupt)
-      process.off('SIGTERM', stop)
     }
   }
   finally {

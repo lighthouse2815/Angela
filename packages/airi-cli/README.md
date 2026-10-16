@@ -1,6 +1,7 @@
 # Angela CLI
 
 Chat with Angela from a Node.js terminal. The CLI uses AIRI's existing provider and generation runtime.
+Angela can manage everyday tasks and deliver reminders while the terminal process remains open.
 
 ## Run
 
@@ -541,7 +542,7 @@ The excerpt budget is separate from fixed memory instructions and the bounded sk
 Core facts take priority. Long documents remain readable through explicit recall tools.
 `/memory used` reports supplied sources, not proof that the model relied on every source or that old outcomes remain true.
 
-## Task domain
+## Tasks and reminders
 
 `Tasks` owns everyday todos, reminders, deadlines, routines, and follow-ups across CLI sessions.
 It reuses `MemoryFile` for validated, private, atomic storage at `tasks/tasks.json` under the CLI data directory.
@@ -551,6 +552,7 @@ The service exposes create, list, find, update, complete, cancel, and snooze ope
 Date-only tasks retain their date without an alarm time. Snooze preserves the task ID and original due time.
 Daily and weekly routines use local calendar time. Selected weekdays use Sunday as 0 and Saturday as 6.
 Routine completion records a check-in and retains the series. Cancellation stops the series.
+Early completion consumes the next undelivered occurrence. A check-in after delivery retains the next regular occurrence.
 
 ### Conversation and management
 
@@ -586,3 +588,38 @@ A nonexistent DST time moves forward by the gap. A repeated DST time uses its fi
 Offline routines produce one overdue notification and then advance to the next future occurrence.
 An extra snooze after delivery retains the next regular occurrence.
 The scheduler reconciles clock changes and other CLI writers within one minute. Local mutations reschedule it immediately.
+
+### Notifications and voice
+
+The interactive CLI starts the scheduler automatically. Notifications appear above the editable prompt and retain your text and cursor.
+Notifications wait until streamed replies and tool approvals finish. Their task IDs enter the existing session history.
+This context lets the model resolve conversational references after a reminder.
+One-shot requests also recover overdue reminders. Their normal exit drains due notifications and saves the session.
+
+In `/voice` mode, text remains the primary notification. Angela speaks queued reminders through the existing TTS and playback service.
+Reminders wait until Angela finishes her current reply. They also wait while you speak or type a voice-mode command.
+Idle microphone capture stops before reminder playback and resumes afterward. TTS failure leaves the text notification visible.
+`/chat` disables reminder speech. Core task tests do not require audio services.
+
+Tasks share the CLI data directory across workspaces and sessions. Telegram reminder delivery is not part of V1.
+By default, the clock and calendar use the operating system timezone. A task can retain an explicit IANA timezone.
+To select the CLI timezone through Node's standard environment, run `TZ=Asia/Ho_Chi_Minh angela`.
+Routine intervals support 1–52 days or weeks. Snooze durations support 1 minute through 366 days.
+
+V1 has no daemon. Closing Angela stops notification delivery. Reopening the CLI surfaces unclaimed overdue occurrences once.
+Date-only tasks have no notification until you choose an alarm time. Completed and cancelled tasks remain in `/tasks all`.
+
+### Validation
+
+Run the package checks from the repository root:
+
+```sh
+pnpm -F @proj-airi/airi-cli typecheck
+pnpm -F @proj-airi/airi-cli test
+pnpm -F @proj-airi/airi-cli build
+pnpm lint
+```
+
+Task tests cover persistence, validation, tools, management commands, recurrence, fake-clock scheduling, restart recovery, and notification queues.
+CLI tests use a local provider stub with the real generation and tool runtime.
+POSIX terminal tests use Python 3 and a real PTY to exercise prompt input, cursor positions, wrapping, and command suggestions.

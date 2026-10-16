@@ -307,7 +307,7 @@ Conceptually:
 
 ```ts
 interface ReminderNotifier {
-  notify(task: AngelaTask): Promise<void>
+  notify: (task: AngelaTask) => Promise<void>
 }
 ```
 

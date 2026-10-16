@@ -1,5 +1,7 @@
 const en = {
   tasks: {
+    types: { todo: 'To-do', reminder: 'Reminder', deadline: 'Deadline', routine: 'Routine', follow_up: 'Follow-up' },
+    statuses: { pending: 'Pending', completed: 'Completed', cancelled: 'Cancelled' },
     input: 'Invalid task input. Use a valid title, task ID, timezone, and schedule. Routine tasks require recurrence and dueAt.',
     invalid: 'Task storage is invalid or full. Preserve tasks/tasks.json and repair it before retrying.',
     locked: 'Task storage is busy or has a lock from an interrupted write. Retry after the other writer exits.',
@@ -208,6 +210,8 @@ const en = {
 
 const vi: typeof en = {
   tasks: {
+    types: { todo: 'Việc cần làm', reminder: 'Nhắc việc', deadline: 'Hạn chót', routine: 'Thói quen', follow_up: 'Hỏi thăm tiến độ' },
+    statuses: { pending: 'Đang chờ', completed: 'Hoàn thành', cancelled: 'Đã hủy' },
     input: 'Dữ liệu tác vụ không hợp lệ. Kiểm tra tiêu đề, ID, múi giờ và lịch. Routine cần recurrence và dueAt.',
     invalid: 'Kho tác vụ không hợp lệ hoặc đã đầy. Giữ file tasks/tasks.json và sửa trước khi thử lại.',
     locked: 'Kho tác vụ đang bận hoặc còn khóa từ lần ghi bị gián đoạn. Thử lại sau khi tiến trình ghi thoát.',
