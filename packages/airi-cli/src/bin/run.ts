@@ -3,6 +3,7 @@
 import process from 'node:process'
 
 import { realpath, stat } from 'node:fs/promises'
+import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
@@ -132,6 +133,8 @@ async function main() {
           if (value !== undefined && key !== 'ANGELA_API_KEY')
             childEnv[key] = value
         }
+        if (config.computerUse && !childEnv.COMPUTER_USE_SESSION_ROOT)
+          childEnv.COMPUTER_USE_SESSION_ROOT = join(config.dataDir, 'computer-use', session.record.id)
         const transport = new StdioClientTransport({
           command: config.computerUse ? process.execPath : config.mcpCommand!,
           args: config.computerUse

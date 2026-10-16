@@ -18,6 +18,27 @@ Bản web:
 pnpm dev:web
 ```
 
+## Bản CLI
+
+CLI hỗ trợ chat streaming, công cụ terminal qua MCP và lưu/tiếp tục phiên.
+Sau khi cài dependencies, build CLI cùng các package cần thiết:
+
+```bash
+pnpm build:cli
+```
+
+Đặt `ANGELA_MODEL`, `ANGELA_BASE_URL` và `ANGELA_API_KEY` theo provider của bạn, rồi chạy:
+
+```bash
+pnpm cli
+pnpm cli --computer-use
+pnpm cli --list-sessions
+pnpm cli --resume ID_PHIEN
+```
+
+CLI hỏi xác nhận trước khi gọi công cụ. Model không được tự phê duyệt thao tác.
+Xem [hướng dẫn CLI](./packages/airi-cli/README.md) để cấu hình provider, MCP và thư mục lưu phiên.
+
 ## AI và giọng nói
 
 Để bắt đầu với free tier, thêm Google Gemini và nhập API key từ Google AI Studio.

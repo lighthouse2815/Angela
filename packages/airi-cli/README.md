@@ -8,7 +8,7 @@ From the repository root, install workspace dependencies and build the required 
 
 ```sh
 pnpm install
-pnpm -F @proj-airi/airi-cli... build
+pnpm build:cli
 ```
 
 Configure the provider through environment variables:
@@ -29,6 +29,15 @@ printf 'Giải thích async/await' | pnpm cli
 pnpm cli --cwd ./packages/core-agent --locale en
 pnpm cli --help
 ```
+
+The package also builds an executable at `packages/airi-cli/dist/bin/run.mjs`.
+With workspace dependencies installed and built, this executable works from another directory:
+
+```sh
+/absolute/path/to/airi/packages/airi-cli/dist/bin/run.mjs --cwd /path/to/workspace
+```
+
+The executable uses workspace packages. It is not a self-contained binary or a published npm package.
 
 Flags override environment configuration. The default interface language is Vietnamese.
 Use `ANGELA_LOCALE=en` or `--locale en` for English.
@@ -68,6 +77,8 @@ pnpm cli --mcp-command pnpm --mcp-arg=-F --mcp-arg=@proj-airi/computer-use-mcp -
 
 The server starts in `--cwd`. Its stderr goes to the terminal. CLI output never mixes with the server protocol.
 The child process does not receive `ANGELA_API_KEY`. Other environment variables remain available to the server.
+Built-in service audit files go under the CLI session directory, outside the workspace.
+An explicit `COMPUTER_USE_SESSION_ROOT` overrides this location.
 
 ## Sessions
 

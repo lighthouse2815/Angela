@@ -9,7 +9,13 @@ presentation to the `computer-use-mcp` runtime.
 This document is a boundary and contract proposal. It is not an implementation
 plan for a full CLI in this PR.
 
-## Current Status
+## Shipped Terminal Client
+
+[`packages/airi-cli`](../../packages/airi-cli/README.md) provides text chat, MCP terminal tools, host approval, and saved sessions.
+It uses generation events from `core-agent` and tool calls over stdio MCP.
+The runner event envelope and Chafa renderer below remain proposals.
+
+## Runner Event Proposal
 
 As of 2026-04-26, the main branch does not expose a stable coding runner event
 stream. A CLI that renders real progress needs a runner contract first. Starting

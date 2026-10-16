@@ -15,6 +15,7 @@
   },
   "scripts": {
     "cli": "tsx packages/airi-cli/src/bin/run.ts",
+    "build:cli": "pnpm -F @proj-airi/airi-cli... build",
     "postinstall": "pnpm exec simple-git-hooks && pnpm run build:packages",
     "dev": "pnpm -r -F @proj-airi/stage-web dev",
     "dev:ui": "pnpm -rF @proj-airi/stage-ui run story:dev",
