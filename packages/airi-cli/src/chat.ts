@@ -21,12 +21,19 @@ export class Chat {
   }
 
   /** The caller serializes sends and owns cancellation and event rendering. */
-  async send(text: string, options: StreamOptions) {
+  async send(text: string, options: StreamOptions, memory = '') {
     this.conversation.turns.push({ type: 'user', id: randomUUID(), content: [{ type: 'text', text }] })
     await streamFrom({
       model: this.model,
       chatProvider: this.provider,
-      conversation: this.conversation,
+      conversation: memory
+        ? { turns: [this.conversation.turns[0]!, {
+            type: 'system',
+            id: randomUUID(),
+            authority: 'system',
+            content: [{ type: 'text', text: memory }],
+          }, ...this.conversation.turns.slice(1)] }
+        : this.conversation,
       options: {
         ...options,
         onGeneratedTurn: (turn) => {

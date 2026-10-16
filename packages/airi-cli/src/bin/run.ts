@@ -12,6 +12,7 @@ import { Chat } from '../chat'
 import { readConfig } from '../config'
 import { formatRequestError } from '../errors'
 import { McpTools } from '../mcp'
+import { Memory } from '../memory'
 import { Output } from '../output'
 import { Permissions } from '../permissions'
 import { runSessionCommand } from '../session-command'
@@ -92,12 +93,13 @@ async function main() {
     const interactive = process.stdin.isTTY && config.prompt === undefined
     const output = new Output(messages)
     const permissions = new Permissions(messages)
+    let input: Terminal | undefined
+    const memory = new Memory(config.dataDir, messages)
     if (interactive)
       output.intro()
     process.stderr.write(`${messages.session}: ${session.record.id}\n`)
     if (session.record.interrupted)
       process.stderr.write(`${messages.incompleteSession}\n`)
-    let input: Terminal | undefined
     let active: AbortController | undefined
     const shutdown = new AbortController()
     let voice: Voice | undefined
@@ -155,9 +157,11 @@ async function main() {
       try {
         output.start()
         await session.save(chat.conversation, true)
+        const memoryContext = await memory.context()
+        const memoryTools = await memory.tools(text)
         await chat.send(text, {
           abortSignal: active.signal,
-          tools: mcp?.definitions(),
+          tools: [...(mcp?.definitions() ?? []), ...memoryTools],
           diagnostics: {
             // The send catch owns the final message. SDK promise diagnostics must not print the same failure again.
             error() {},
@@ -168,7 +172,7 @@ async function main() {
             if (event.type === 'text-delta')
               await speech?.push(event.text)
           },
-        })
+        }, memoryContext)
         if (!output.hasText)
           throw new Error(messages.emptyResponse)
         completed = true
@@ -303,6 +307,17 @@ async function main() {
             break
           if (text === '/help') {
             process.stderr.write(`${messages.cliCommands}\n`)
+            continue
+          }
+          try {
+            const response = await memory.command(text)
+            if (response !== undefined) {
+              process.stderr.write(`${response}\n`)
+              continue
+            }
+          }
+          catch (error) {
+            process.stderr.write(`${errorMessageFrom(error)}\n`)
             continue
           }
           const commandResponse = permissions.command(text)

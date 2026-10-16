@@ -59,3 +59,24 @@ describe('terminal conversation', () => {
     expect(chat.conversation.turns.map(turn => turn.type)).toEqual(['system', 'user'])
   })
 })
+
+it('uses fresh request-local memory without retaining removed facts in persisted system context', async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>()
+    .mockResolvedValueOnce(completion('Đã hiểu'))
+    .mockResolvedValueOnce(completion('Tiếp tục'))
+    .mockResolvedValueOnce(completion('Memory đã tắt'))
+  const provider: GenerationProvider = {
+    generation: model => ({ protocol: 'chat-completions', config: { model, baseURL: 'https://provider.example/v1/', fetch } }),
+  }
+  const chat = new Chat('test-model', provider, '/workspace')
+  await chat.send('Chào', {}, 'Personal records: old-preference')
+  await chat.send('Tiếp', {}, 'Personal records: new-preference')
+  await chat.send('Tiếp nữa', {})
+  const requests = fetch.mock.calls.map(([, init]) => String(init?.body))
+  expect(requests[0]).toContain('old-preference')
+  expect(requests[1]).not.toContain('old-preference')
+  expect(requests[1]).toContain('new-preference')
+  expect(requests[2]).not.toContain('Personal records')
+  expect(JSON.stringify(chat.conversation)).not.toContain('preference')
+  expect(chat.conversation.turns.map(turn => turn.type)).toEqual(['system', 'user', 'assistant', 'user', 'assistant', 'user', 'assistant'])
+})

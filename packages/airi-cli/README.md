@@ -350,3 +350,40 @@ Explicit headphone mode (`ANGELA_VOICE_BARGE_IN=1`) skips automatic echo cancell
 Disabling interruption (`ANGELA_VOICE_BARGE_IN=0`) also skips automatic echo cancellation.
 If only one device override is set, Angela keeps separate listening and speaking turns.
 A forced process kill or machine crash prevents cleanup. Restarting the audio service removes remaining modules.
+
+## Personal memory
+
+Personal memory stores facts and preferences across CLI sessions that use the same data directory.
+It works for text and voice. Desktop learning memory and Telegram memory stay separate.
+No extra model, embeddings, database, or service is required.
+
+Use these interactive commands:
+
+```text
+/remember Tôi thích câu trả lời ngắn bằng tiếng Việt
+/memory
+/memory edit ID Tôi thích giải thích chi tiết bằng tiếng Việt
+/forget ID
+/memory off
+/memory on
+```
+
+`/memory` shows full record IDs, texts, and enabled state. Replace `ID` with one listed ID.
+Direct commands save before reporting success. They do not call the AI provider.
+In normal conversation, ask Angela to remember a fact. The model can propose a memory edit through its native tool.
+Model saves require a verbatim excerpt from your current message. Paraphrased or inferred facts are rejected.
+The model reports success only after the storage tool succeeds. Use `/memory` to inspect saved records.
+Voice transcripts go to the model. Only typed slash commands directly edit memory.
+
+Memory holds at most 50 records, with 500 characters per record. Exact duplicate saves reuse the existing record.
+It is stored as private plaintext at `<data-dir>/memory/personal.json`. The default data directory is `~/.angela/sessions`.
+Saved facts are sent to the currently selected chat provider. Do not save credentials or secrets.
+Enabled memory is refreshed before each CLI request. Disabling it removes saved context and tools from later requests.
+Earlier conversation messages, tool results, and saved session history remain unchanged after disabling or forgetting a fact.
+A new session avoids previous conversation context. Resuming an old session can still expose its earlier messages.
+Deleting a chat session does not delete personal memory.
+
+Each write locks the memory file and replaces it atomically. Other writers report a lock error instead of losing edits.
+Unreadable data stays untouched and blocks requests that need memory. Repair the file before continuing.
+After a process crash, an abandoned `memory/personal.lock` can block edits.
+Before removing that lock manually, make sure no CLI process is writing memory.

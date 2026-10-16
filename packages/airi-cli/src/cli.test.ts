@@ -9,8 +9,11 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { cliMessages } from '@proj-airi/i18n/cli'
 import { LocalConfigFile } from '@proj-airi/local-config/node'
 import { afterEach, expect, it } from 'vitest'
+
+import { Memory } from './memory'
 
 const children: ReturnType<typeof spawn>[] = []
 const servers: ReturnType<typeof createServer>[] = []
@@ -76,7 +79,7 @@ it('reads shared credentials and piped UTF-8 input, then resumes the streamed co
   const { child, result, directory } = run([], env)
   child.stdin.end('Chào Angela')
   const first = await result
-  expect(first).toMatchObject({ code: 0, stdout: 'Xin chào từ Angela\n' })
+  expect(first, first.stderr).toMatchObject({ code: 0, stdout: 'Xin chào từ Angela\n' })
   expect(bodies[0]).toContain('Chào Angela')
   expect(JSON.parse(bodies[0]).model).toBe('shared-model')
   expect(authorization[0]).toBe(`Bearer ${apiKey}`)
@@ -225,3 +228,42 @@ it('runs history administration without a model or provider connection', async (
   expect(JSON.parse(output.stdout)).toMatchObject({ sessions: 0, bytes: 0 })
   expect(output.stderr).not.toContain('MCP')
 })
+
+it('saves a user-requested fact through a real tool round and recalls it in a fresh CLI process', async () => {
+  const bodies: string[] = []
+  const server = createServer(async (request, response) => {
+    let body = ''
+    for await (const chunk of request)
+      body += chunk
+    bodies.push(body)
+    response.writeHead(200, { 'Content-Type': 'text/event-stream' })
+    const delta = bodies.length === 1
+      ? { role: 'assistant', tool_calls: [{ index: 0, id: 'personal-save', type: 'function', function: { name: 'personal_memory', arguments: JSON.stringify({ action: 'remember', id: null, text: 'tôi thích tiếng Việt', source_quote: 'tôi thích tiếng Việt' }) } }] }
+      : { role: 'assistant', content: 'Đã hiểu.' }
+    response.end(`data: ${JSON.stringify({ choices: [{ index: 0, delta, finish_reason: bodies.length === 1 ? 'tool_calls' : 'stop' }] })}\n\ndata: [DONE]\n\n`)
+  })
+  servers.push(server)
+  server.listen(0, '127.0.0.1')
+  await once(server, 'listening')
+  const address = server.address()
+  if (!address || typeof address === 'string')
+    throw new Error('Missing provider port')
+  const directory = mkdtempSync(join(tmpdir(), 'angela-cli-memory-'))
+  directories.push(directory)
+  const env = { ANGELA_DATA_DIR: directory, ANGELA_BASE_URL: `http://127.0.0.1:${address.port}/v1/` }
+  const first = await run(['--prompt', 'Nhớ tôi thích tiếng Việt'], env).result
+  expect(first, first.stderr).toMatchObject({ code: 0 })
+  const memory = new Memory(directory, cliMessages.en)
+  expect((await memory.read()).entries[0]!.text).toBe('tôi thích tiếng Việt')
+  expect(bodies[1]).toContain('saved')
+  const next = await run(['--prompt', 'Bạn nhớ gì?'], env).result
+  expect(next, next.stderr).toMatchObject({ code: 0 })
+  expect(bodies[2]).toContain('tôi thích tiếng Việt')
+  for (const file of (await readdir(directory)).filter(file => file.endsWith('.json')))
+    expect(await readFile(join(directory, file), 'utf8')).not.toContain('Personal records:')
+  await memory.setEnabled(false)
+  const disabled = await run(['--prompt', 'Chào'], env).result
+  expect(disabled, disabled.stderr).toMatchObject({ code: 0 })
+  expect(bodies[3]).not.toContain('tôi thích tiếng Việt')
+  expect(bodies[3]).not.toContain('personal_memory')
+}, 20_000)
