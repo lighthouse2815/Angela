@@ -18,6 +18,7 @@ import { formatRequestError } from '../errors'
 import { McpTools } from '../mcp'
 import { Memory } from '../memory'
 import { Output } from '../output'
+import { Camera } from '../perception/camera'
 import { Permissions } from '../permissions'
 import { ProjectMemory } from '../project-memory'
 import { Recall } from '../recall'
@@ -103,6 +104,7 @@ async function main() {
     const interactive = process.stdin.isTTY && config.prompt === undefined
     const output = new Output(messages)
     const permissions = new Permissions(messages)
+    const camera = new Camera(process.env, messages)
     let input: Terminal | undefined
     const memory = new Memory(config.dataDir, messages)
     const project = await ProjectMemory.open(config.dataDir, workspace, messages)
@@ -242,7 +244,7 @@ async function main() {
             if (event.type === 'text-delta')
               await speech?.push(event.text)
           },
-        }, [memoryContext, projectContext].filter(Boolean).join('\n\n'))
+        }, [memoryContext, projectContext, camera.getContext()].filter(Boolean).join('\n\n'))
         if (!output.hasText)
           throw new Error(messages.emptyResponse)
         completed = true
@@ -304,6 +306,9 @@ async function main() {
       if (input && interactive) {
         process.stderr.write(`${messages.workspace}: ${workspace}\n${messages.welcome}\n${messages.permissionAsk}\n`)
         while (true) {
+          const cameraNotice = camera.takeNotice()
+          if (cameraNotice)
+            process.stderr.write(`${cameraNotice}\n`)
           if (!voice)
             await releaseVoice()
           if (pendingUtterance && voice) {
@@ -320,7 +325,7 @@ async function main() {
             try {
               const result = await voice.listen(signal => input!.ask('', signal, messages.cliCommands), capture.signal, (state) => {
                 const label = state === 'ready' ? messages.voicePrompt : state === 'speech' ? messages.voiceRecord : messages.voiceTranscribing
-                process.stderr.write(`${label}\n`)
+                process.stderr.write(`${camera.enabled ? `${messages.cameraIndicator} | ` : ''}${label}\n`)
               })
               if (result.kind === 'transcript') {
                 if (result.text) {
@@ -348,7 +353,7 @@ async function main() {
             }
           }
           else {
-            text = (await input.ask(output.prompt(), undefined, messages.cliCommands))?.trim()
+            text = (await input.ask(`${camera.enabled ? `${messages.cameraIndicator}\n` : ''}${output.prompt()}`, undefined, messages.cliCommands))?.trim()
           }
           if (text === '/voice') {
             try {
@@ -393,7 +398,7 @@ async function main() {
           }
           active = new AbortController()
           try {
-            const response = await project.command(text) ?? await recall.command(text, active.signal) ?? await recall.skills.command(text) ?? await memory.command(text)
+            const response = await camera.command(text, active.signal) ?? await project.command(text) ?? await recall.command(text, active.signal) ?? await recall.skills.command(text) ?? await memory.command(text)
             if (response !== undefined) {
               if (recallReady && /^\/(?:remember |forget |memory (?:edit |pin |unpin |auto |on$|off$)|skills (?:import |edit |forget |on|off))/u.test(text))
                 await recall.changed()
@@ -431,6 +436,7 @@ async function main() {
     }
     finally {
       input?.close()
+      await camera.close()
       try {
         await releaseVoice()
       }

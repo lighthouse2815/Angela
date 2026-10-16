@@ -34,7 +34,7 @@ export const workerEventSchema = v.variant('type', [
   v.strictObject({ type: v.literal('ready') }),
   v.strictObject({
     type: v.literal('error'),
-    code: v.picklist(['source_missing', 'model_missing', 'dependencies_missing', 'model_load_failed', 'camera_unavailable', 'camera_disconnected', 'tracking_failed', 'worker_failed']),
+    code: v.picklist(['source_missing', 'model_missing', 'dependencies_missing', 'opencv_unavailable', 'numpy_unavailable', 'onnxruntime_unavailable', 'model_load_failed', 'camera_unavailable', 'camera_disconnected', 'tracking_failed', 'worker_failed']),
   }),
 ])
 

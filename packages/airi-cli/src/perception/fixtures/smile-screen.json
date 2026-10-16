@@ -1,0 +1,11 @@
+{
+  "samples": 20,
+  "intervalMs": 50,
+  "observation": {
+    "type": "face_observation",
+    "faceDetected": true,
+    "confidence": 0.91,
+    "headPose": { "yaw": 3, "pitch": -2, "roll": 1 },
+    "features": { "smileLike": 0.86, "mouthOpen": 0.1 }
+  }
+}

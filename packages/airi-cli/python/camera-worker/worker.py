@@ -111,8 +111,17 @@ def dependencies(upstream):
     sys.path.insert(0, str(upstream))
     try:
         import cv2
+    except (ImportError, OSError):
+        raise WorkerError("opencv_unavailable") from None
+    try:
         import numpy
+    except (ImportError, OSError):
+        raise WorkerError("numpy_unavailable") from None
+    try:
         import onnxruntime
+    except (ImportError, OSError):
+        raise WorkerError("onnxruntime_unavailable") from None
+    try:
         from tracker import Tracker
     except (ImportError, OSError):
         raise WorkerError("dependencies_missing") from None
@@ -135,6 +144,8 @@ def run(args, emit, stopped):
         if args.smoke:
             faces = tracker.predict(numpy.zeros((480, 640, 3), dtype=numpy.uint8))
             emit(observation(faces, int(time.time() * 1000), {"captureFps": 0, "processedFps": 0, "latencyMs": 0, "droppedFrames": 0}))
+            return
+        if stopped.is_set():
             return
         device = cv2.VideoCapture(args.device)
         capture = None

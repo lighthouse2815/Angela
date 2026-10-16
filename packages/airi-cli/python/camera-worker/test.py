@@ -108,6 +108,14 @@ class WorkerTests(unittest.TestCase):
         self.assertEqual(error.exception.code, "camera_unavailable")
         self.assertEqual(released, [True])
 
+    def test_cancelled_initialization_never_opens_camera(self):
+        stopped = threading.Event()
+        stopped.set()
+        fake_cv = SimpleNamespace(VideoCapture=lambda *_: self.fail("camera accessed after cancellation"))
+        args = SimpleNamespace(upstream=Path("unused"), check=False, smoke=False)
+        with patch.object(worker, "dependencies", return_value=(fake_cv, None, lambda *_, **__: None)):
+            worker.run(args, lambda _: self.fail("unexpected event"), stopped)
+
     def test_main_preserves_jsonl_and_excludes_upstream_prints(self):
         output = io.StringIO()
         args = ["worker.py", "--check"]
