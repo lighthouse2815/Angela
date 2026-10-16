@@ -540,3 +540,14 @@ Keyword and cosine rankings combine through reciprocal rank fusion. Duplicate ex
 The excerpt budget is separate from fixed memory instructions and the bounded skill catalog.
 Core facts take priority. Long documents remain readable through explicit recall tools.
 `/memory used` reports supplied sources, not proof that the model relied on every source or that old outcomes remain true.
+
+## Task domain
+
+`Tasks` owns everyday todos, reminders, deadlines, routines, and follow-ups across CLI sessions.
+It reuses `MemoryFile` for validated, private, atomic storage at `tasks/tasks.json` under the CLI data directory.
+The store holds at most 100 tasks, including completed and cancelled history. Invalid files remain untouched.
+
+The service exposes create, list, find, update, complete, cancel, and snooze operations.
+Date-only tasks retain their date without an alarm time. Snooze preserves the task ID and original due time.
+Daily and weekly routines use local calendar time. Selected weekdays use Sunday as 0 and Saturday as 6.
+Routine completion records a check-in and retains the series. Cancellation stops the series.
