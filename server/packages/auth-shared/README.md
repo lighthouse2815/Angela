@@ -12,6 +12,6 @@ Neutral authentication contracts shared by the resource API and the standalone a
 
 - Better Auth runtime construction or HTTP routes.
 - Service environment parsing, database pools, Redis, email, or telemetry.
-- Importing either `server/apps/api` or `dev-infuture/server/apps/auth`.
+- Importing either `server/apps/api` or `../dev-in-future/server/apps/auth`.
 
 Keeping this package free of runtime composition lets both applications depend on the same protocol without depending on each other.

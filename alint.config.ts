@@ -9,6 +9,6 @@ export default defineConfig([
     plugins: {
       js: jsPlugin,
     },
-    ignores: ['**/node_modules/**', 'dev-infuture/**'],
+    ignores: ['**/node_modules/**'],
   },
 ])

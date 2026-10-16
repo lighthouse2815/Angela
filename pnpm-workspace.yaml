@@ -71,7 +71,6 @@ packages:
   - engines/**
   - apps/**
   - server/**
-  - '!dev-infuture/**'
   - '!**/dist/**'
 
 overrides:

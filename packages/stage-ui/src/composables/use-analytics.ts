@@ -232,7 +232,7 @@ export function useAnalytics() {
     })
   }
 
-  // ─── Account lifecycle (same event names as dev-infuture/apps/ui-server-auth's
+  // ─── Account lifecycle (same event names as ../dev-in-future/apps/ui-server-auth's
   // analytics module — both surfaces feed one OpenPanel series) ───────────
 
   function trackPasswordChanged() {

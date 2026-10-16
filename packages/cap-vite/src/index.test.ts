@@ -26,11 +26,11 @@ describe('prepareCapViteLaunch', () => {
   it('uses the leading positional vite root as the wrapper root', async () => {
     const { prepareCapViteLaunch } = await import('./index')
 
-    expect(prepareCapViteLaunch(['dev-infuture/apps/stage-pocket', '--host', '0.0.0.0'])).toEqual({
+    expect(prepareCapViteLaunch(['../dev-in-future/apps/stage-pocket', '--host', '0.0.0.0'])).toEqual({
       baseConfigFile: undefined,
       configLoader: undefined,
-      projectRoot: resolve(process.cwd(), 'dev-infuture/apps/stage-pocket'),
-      viteArgs: ['dev-infuture/apps/stage-pocket', '--host', '0.0.0.0'],
+      projectRoot: resolve(process.cwd(), '../dev-in-future/apps/stage-pocket'),
+      viteArgs: ['../dev-in-future/apps/stage-pocket', '--host', '0.0.0.0'],
       wrapperConfigFile: expect.stringMatching(/packages\/cap-vite\/(src|dist)\/vite-wrapper-config\.(ts|mjs)$/),
     })
   })

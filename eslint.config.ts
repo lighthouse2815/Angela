@@ -13,7 +13,6 @@ export default defineConfig({
   vue: true,
 }, {
   ignores: [
-    'dev-infuture/**',
     'cspell.config.yaml',
     'cspell.config.yml',
     'crowdin.yaml',

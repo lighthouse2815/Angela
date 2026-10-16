@@ -1,5 +1,5 @@
 > Desktop development keeps the API types and shared contracts here.
-> Auth, Compose, Caddy, and Railway files moved to [dev-infuture](../dev-infuture/README.md).
+> Auth, Compose, Caddy, and Railway files moved to [dev-infuture](../../dev-in-future/README.md).
 > The local desktop does not require this hosted stack.
 
 # AIRI Backend
@@ -25,7 +25,7 @@ From the repository root:
 pnpm dev:backend
 ```
 
-The command uses `dev-infuture/server/docker-compose.yaml` and exposes only Caddy at
+The command uses `../dev-in-future/server/docker-compose.yaml` and exposes only Caddy at
 `http://localhost:6112`.
 
 ## Railway deployment

@@ -1,7 +1,7 @@
 # `@proj-airi/api-server`
 
 Project AIRI's resource API. Authentication is a separate workspace app at
-`dev-infuture/server/apps/auth`; this package does not instantiate Better Auth or expose
+`../dev-in-future/server/apps/auth`; this package does not instantiate Better Auth or expose
 auth/OIDC routes.
 
 ## Responsibilities
@@ -199,7 +199,7 @@ pnpm dev:backend
 For source-level debugging, start `@proj-airi/api-server` and
 `@proj-airi/auth-server` separately instead.
 
-`dev-infuture/server/docker-compose.yaml` exposes the local Caddy gateway at `http://localhost:6112` and keeps
+`../dev-in-future/server/docker-compose.yaml` exposes the local Caddy gateway at `http://localhost:6112` and keeps
 the API and Auth container ports private.
 
 ## Service boundaries
@@ -212,12 +212,12 @@ the API and Auth container ports private.
 - `AUTH_SERVER_INTERNAL_URL` optionally sends JWKS fetches directly to Auth on
   the private network while issuer and audience remain `AUTH_SERVER_URL`.
 - Auth tables and principal types come from `@proj-airi/auth-shared`; no module
-  under `dev-infuture/server/apps/auth` is imported.
+  under `../dev-in-future/server/apps/auth` is imported.
 
 ## Railway
 
-The deferred Dockerfile is `dev-infuture/server/api-production/railway/Dockerfile`.
-Read [the future development guide](../../../dev-infuture/README.md) before restoring cloud deployments.
+The deferred Dockerfile is `../dev-in-future/server/api-production/railway/Dockerfile`.
+Read [the future development guide](../../../../dev-in-future/README.md) before restoring cloud deployments.
 
 Deploy this as the Resource API Railway service. Keep the service Root
 Directory at the repository root because the Dockerfile copies shared

@@ -13,7 +13,9 @@ pnpm dev:tamagotchi
 ```
 
 Giai đoạn hiện tại ưu tiên desktop/local AI. Các module tạm hoãn nằm trong
-[`dev-infuture/`](./dev-infuture/README.md) và không tham gia workspace mặc định.
+[`../dev-in-future/`](../dev-in-future/README.md) và không tham gia workspace mặc định.
+Thư mục này nằm ngoài Git repository `airi/` và chỉ được lưu local.
+Code trước khi chuyển vẫn có trong commit `d4e6d03` trên GitHub.
 API và shared contract còn ở `server/` vì desktop vẫn sử dụng kiểu dữ liệu của chúng.
 
 Bản web:
