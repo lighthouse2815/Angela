@@ -142,8 +142,7 @@ function renderEntry(message: ProjectionEntry, supportsContentArray: boolean): C
       calls.push({ type: 'function', id: segment.callId, function: { name: segment.name, arguments: segment.arguments } })
     }
     else {
-      if (calls.length)
-        flush()
+      // One model round keeps text and calls in one assistant message, followed by its correlated results.
       if (role === 'assistant') {
         if (segment.type === 'refusal')
           assistantParts.push({ type: 'refusal', refusal: segment.text })

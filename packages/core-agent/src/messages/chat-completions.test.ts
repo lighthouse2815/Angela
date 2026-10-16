@@ -2,6 +2,23 @@ import { expect, it } from 'vitest'
 
 import { chatMessagesToTurns, conversationToChatMessages } from './chat-completions'
 
+it('keeps tool calls and trailing text in one assistant message before their results', () => {
+  const conversation = { turns: chatMessagesToTurns([
+    { role: 'assistant', tool_calls: [{ id: 'call-1', type: 'function', function: { name: 'read', arguments: '{}' } }] },
+    { role: 'tool', tool_call_id: 'call-1', content: 'file contents' },
+  ]) }
+  const assistant = conversation.turns[0]
+  if (assistant.type !== 'assistant')
+    throw new Error('Expected an assistant turn')
+  assistant.rounds[0].content.push({ type: 'text', text: 'Reading the file' })
+  const messages = conversationToChatMessages(conversation, false)
+  expect(messages).toEqual([
+    { role: 'assistant', content: 'Reading the file', tool_calls: [{ id: 'call-1', type: 'function', function: { name: 'read', arguments: '{}' } }] },
+    { role: 'tool', tool_call_id: 'call-1', content: 'file contents' },
+  ])
+  expect(conversationToChatMessages({ turns: chatMessagesToTurns(messages) }, false)).toEqual(messages)
+})
+
 // https://github.com/moeru-ai/airi/pull/2477
 it('preserves nested provider extensions on native Chat replay', () => {
   // ROOT CAUSE:
