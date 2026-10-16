@@ -144,7 +144,7 @@ export class Voice {
           if (message.type === 'ready' && !recorder) {
             clearTimeout(timer)
             state('ready')
-            recorder = spawn('pw-record', ['--raw', '--rate', '16000', '--channels', '1', '--format', 's16', '-'], { stdio: ['ignore', 'pipe', 'ignore'] })
+            recorder = spawn('pw-record', [...(this.env.ANGELA_VOICE_SOURCE ? ['--target', this.env.ANGELA_VOICE_SOURCE] : []), '--raw', '--rate', '16000', '--channels', '1', '--format', 's16', '-'], { stdio: ['ignore', 'pipe', 'ignore'] })
             recorder.once('error', () => reject(new Error(this.messages.voicePlatform)))
             stopped = new Promise<void>((done) => {
               recorder!.once('close', () => {
@@ -226,7 +226,7 @@ export class Voice {
       await writeFile(path, new Uint8Array(await response.arrayBuffer()), { mode: 0o600 })
       signal.throwIfAborted()
       await new Promise<void>((resolve, reject) => {
-        const child = spawn('pw-play', [path], { stdio: 'ignore', signal })
+        const child = spawn('pw-play', [...(this.env.ANGELA_VOICE_SINK ? ['--target', this.env.ANGELA_VOICE_SINK] : []), path], { stdio: 'ignore', signal })
         child.once('error', () => reject(new Error(this.messages.voicePlatform)))
         child.once('close', code => code === 0 ? resolve() : reject(new Error(this.messages.voiceFailed)))
       })

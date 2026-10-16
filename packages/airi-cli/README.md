@@ -126,7 +126,7 @@ The terminal shows when the microphone is on, when speech starts, and when trans
 Type `/chat` to discard the current capture and return to text chat.
 Ctrl+C stops the current operation and returns to text mode. `/voice` starts listening again.
 The microphone stays off during transcription, generation, tool approval, and playback.
-Voice interruption and echo cancellation are not part of this mode.
+Voice interruption is not part of this mode. External echo cancellation can supply the microphone source.
 Spoken text goes only to the model. Only typed commands can change tool permissions.
 The conversation and tool permissions stay in the same session.
 
@@ -303,3 +303,33 @@ pnpm -F @proj-airi/airi-cli typecheck
 pnpm -F @proj-airi/airi-cli test
 pnpm -F @proj-airi/airi-cli build
 ```
+
+## Audio device selection
+
+Set these optional values in `~/.config/angela/voice.env` to select devices for Angela:
+
+```dotenv
+ANGELA_VOICE_SOURCE=angela_echo_source
+ANGELA_VOICE_SINK=angela_echo_sink
+```
+
+Values accept PipeWire node names or serial numbers. Without these values, PipeWire selects the default devices.
+Use `wpctl status -n` to inspect device names. Restart voice mode after changing the configuration.
+Device selection affects only Angela. It does not change system defaults.
+
+For echo cancellation, PipeWire provides [module-echo-cancel](https://docs.pipewire.org/page_pulse_module_echo_cancel.html).
+Create a source and sink pair with the existing PulseAudio compatibility service:
+
+```sh
+pactl load-module module-echo-cancel source_name=angela_echo_source sink_name=angela_echo_sink aec_method=webrtc
+```
+
+The command prints a module ID. Keep that ID to remove this module later:
+
+```sh
+pactl unload-module MODULE_ID
+```
+
+Route Angela through both names above so the filter receives microphone audio and the playback reference.
+This filter does not enable voice interruption. The microphone still stops during replies.
+The module lasts until you unload it or the audio service restarts. Angela does not create or remove it.

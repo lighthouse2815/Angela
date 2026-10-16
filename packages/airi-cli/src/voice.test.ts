@@ -104,14 +104,14 @@ it('splits long replies without losing text and stops future chunks on cancellat
   expect(fetch).toHaveBeenCalledTimes(1)
 })
 
-async function endpoint() {
+async function endpoint(env: NodeJS.ProcessEnv = {}) {
   const server = new WebSocketServer({ port: 0, host: '127.0.0.1' })
   servers.push(server)
   await once(server, 'listening')
   const address = server.address()
   if (!address || typeof address === 'string')
     throw new Error('Missing test port')
-  return { server, voice: new Voice({ ANGELA_VOICE_BASE_URL: `http://127.0.0.1:${address.port}/v1/`, ANGELA_STT_MODEL: 'small' }, cliMessages.en) }
+  return { server, voice: new Voice({ ANGELA_VOICE_BASE_URL: `http://127.0.0.1:${address.port}/v1/`, ANGELA_STT_MODEL: 'small', ...env }, cliMessages.en) }
 }
 
 function microphone() {
@@ -254,4 +254,27 @@ it('checks endpoint readiness without starting capture or exposing invalid respo
   fetch.mockImplementation(async () => new Response('private upstream error', { status: 502 }))
   expect(await voice.healthy()).toBe(false)
   expect(spawn).not.toHaveBeenCalled()
+})
+
+it('routes recording and playback to the configured devices without shell expansion', async () => {
+  const source = 'microphone name $(touch /tmp/not-executed)'
+  const sink = 'speaker name; echo ignored'
+  const { server, voice } = await endpoint({ ANGELA_VOICE_SOURCE: source, ANGELA_VOICE_SINK: sink })
+  const mic = microphone()
+  server.on('connection', socket => socket.once('message', () => socket.send(JSON.stringify({ type: 'ready' }))))
+  await voice.listen(async () => {
+    await vi.waitFor(() => expect(spawn).toHaveBeenCalled())
+    return '/chat'
+  }, new AbortController().signal, () => {})
+  expect(spawn).toHaveBeenCalledWith('pw-record', ['--target', source, '--raw', '--rate', '16000', '--channels', '1', '--format', 's16', '-'], expect.any(Object))
+  expect(mic.kill).toHaveBeenCalledWith('SIGINT')
+
+  vi.stubGlobal('fetch', vi.fn(async () => new Response(new Uint8Array([82, 73, 70, 70]))))
+  spawn.mockImplementation(() => {
+    const child = new EventEmitter()
+    queueMicrotask(() => child.emit('close', 0))
+    return child
+  })
+  await voice.speak('Xin chào', new AbortController().signal)
+  expect(spawn).toHaveBeenLastCalledWith('pw-play', ['--target', sink, expect.stringMatching(/answer\.wav$/)], expect.objectContaining({ stdio: 'ignore' }))
 })
