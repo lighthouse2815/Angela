@@ -16,6 +16,9 @@ export function readConfig(args: string[], env: NodeJS.ProcessEnv) {
       'cwd': { type: 'string' },
       'locale': { type: 'string' },
       'help': { type: 'boolean', short: 'h' },
+      'computer-use': { type: 'boolean' },
+      'mcp-command': { type: 'string' },
+      'mcp-arg': { type: 'string', multiple: true },
     },
   })
   const locale = v.parse(v.picklist(['en', 'vi'], cliMessages.en.invalidLocale), values.locale ?? env.ANGELA_LOCALE ?? 'vi')
@@ -28,6 +31,10 @@ export function readConfig(args: string[], env: NodeJS.ProcessEnv) {
   if (!['http:', 'https:'].includes(new URL(baseUrl).protocol))
     throw new Error(messages.invalidUrl)
   const api = v.parse(v.picklist(['chat-completions', 'responses'], messages.invalidApi), values.api ?? env.ANGELA_API ?? 'chat-completions')
+  if (values['computer-use'] && values['mcp-command'])
+    throw new Error(messages.conflictingMcp)
+  if (values['mcp-arg'] && !values['mcp-command'])
+    throw new Error(messages.missingMcpCommand)
   return {
     help: false as const,
     model,
@@ -36,6 +43,9 @@ export function readConfig(args: string[], env: NodeJS.ProcessEnv) {
     apiKey: env.ANGELA_API_KEY ?? '',
     prompt: values.prompt,
     cwd: values.cwd,
+    computerUse: values['computer-use'] ?? false,
+    mcpCommand: values['mcp-command'],
+    mcpArgs: values['mcp-arg'] ?? [],
     messages,
   }
 }

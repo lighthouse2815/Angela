@@ -16,10 +16,13 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "catalog:",
     "@moeru/std": "catalog:",
+    "@proj-airi/computer-use-mcp": "workspace:^",
     "@proj-airi/core-agent": "workspace:^",
     "@proj-airi/i18n": "workspace:^",
     "@proj-airi/provider-inference": "workspace:^",
+    "@xsai/shared-chat": "catalog:",
     "valibot": "catalog:"
   }
 }

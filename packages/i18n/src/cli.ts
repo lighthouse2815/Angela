@@ -17,6 +17,16 @@ const en = {
   emptyInput: 'Enter a request or pipe text into the CLI.',
   failed: 'Request failed',
   tool: 'Tool',
+  computerUse: 'Connect the built-in terminal MCP service',
+  mcpCommand: 'Start an MCP server with this executable',
+  mcpArg: 'Argument for the MCP server. Repeat for each argument.',
+  conflictingMcp: 'Use either --computer-use or --mcp-command.',
+  missingMcpCommand: 'Use --mcp-command with --mcp-arg.',
+  approve: 'Allow this tool call? Type yes to allow:',
+  approvalDenied: 'The user did not approve this tool call.',
+  approvalReserved: 'Only the CLI can resolve pending approvals.',
+  unknownTool: 'This tool is not available in this session.',
+  mcpConnected: 'MCP connected',
 }
 
 const vi: typeof en = {
@@ -38,6 +48,16 @@ const vi: typeof en = {
   emptyInput: 'Nhập yêu cầu hoặc truyền văn bản vào CLI qua pipe.',
   failed: 'Yêu cầu thất bại',
   tool: 'Công cụ',
+  computerUse: 'Kết nối dịch vụ MCP terminal có sẵn',
+  mcpCommand: 'Khởi động MCP server bằng chương trình này',
+  mcpArg: 'Đối số của MCP server. Lặp lại cho từng đối số.',
+  conflictingMcp: 'Chỉ dùng một trong --computer-use và --mcp-command.',
+  missingMcpCommand: 'Dùng --mcp-command cùng --mcp-arg.',
+  approve: 'Cho phép gọi công cụ này? Nhập yes để cho phép:',
+  approvalDenied: 'Người dùng chưa chấp thuận gọi công cụ này.',
+  approvalReserved: 'Chỉ CLI được xử lý yêu cầu phê duyệt.',
+  unknownTool: 'Công cụ này không có trong phiên hiện tại.',
+  mcpConnected: 'Đã kết nối MCP',
 }
 
 /** CLI hosts select a language without loading browser translation plugins. */

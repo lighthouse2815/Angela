@@ -21,4 +21,10 @@ describe('cLI configuration', () => {
     expect(() => readConfig(['--model', 'm', '--base-url', 'file:///tmp/provider'], {})).toThrow('HTTP')
     expect(() => readConfig(['--model', 'm', '--api', 'invalid'], {})).toThrow('responses')
   })
+
+  it('keeps server arguments as an argv array and rejects conflicting servers', () => {
+    expect(readConfig(['--model', 'm', '--mcp-command', 'node', '--mcp-arg=server.mjs', '--mcp-arg=a b'], {})).toMatchObject({ mcpCommand: 'node', mcpArgs: ['server.mjs', 'a b'] })
+    expect(() => readConfig(['--model', 'm', '--computer-use', '--mcp-command', 'node'], {})).toThrow('--computer-use')
+    expect(() => readConfig(['--model', 'm', '--mcp-arg=test'], {})).toThrow('--mcp-command')
+  })
 })

@@ -3842,9 +3842,15 @@ importers:
 
   packages/airi-cli:
     dependencies:
+      '@modelcontextprotocol/sdk':
+        specifier: 'catalog:'
+        version: 1.30.0(supports-color@10.2.2)(zod@4.4.3)
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
+      '@proj-airi/computer-use-mcp':
+        specifier: workspace:^
+        version: link:../../services/computer-use-mcp
       '@proj-airi/core-agent':
         specifier: workspace:^
         version: link:../core-agent
@@ -3854,6 +3860,9 @@ importers:
       '@proj-airi/provider-inference':
         specifier: workspace:^
         version: link:../provider-inference
+      '@xsai/shared-chat':
+        specifier: 'catalog:'
+        version: 0.5.1
       valibot:
         specifier: 'catalog:'
         version: 1.4.2(typescript@6.0.3)
