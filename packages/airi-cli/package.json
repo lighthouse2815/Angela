@@ -10,7 +10,11 @@
   },
   "files": [
     "README.md",
-    "dist"
+    "dist",
+    "python/camera-worker/README.md",
+    "python/camera-worker/pyproject.toml",
+    "python/camera-worker/uv.lock",
+    "python/camera-worker/worker.py"
   ],
   "engines": {
     "node": ">=22.13.0"
@@ -23,6 +27,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "catalog:",
+    "@moeru/eventa": "catalog:",
     "@moeru/std": "catalog:",
     "@proj-airi/computer-use-mcp": "workspace:^",
     "@proj-airi/core-agent": "workspace:^",
