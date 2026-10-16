@@ -125,8 +125,8 @@ Angela reads the answer, then listens again. Enter is not required.
 The terminal shows when the microphone is on, when speech starts, and when transcription or playback starts.
 Type `/chat` to discard the current capture and return to text chat.
 Ctrl+C stops the current operation and returns to text mode. `/voice` starts listening again.
-The microphone stays off during transcription, generation, tool approval, and playback.
-Voice interruption is not part of this mode. External echo cancellation can supply the microphone source.
+By default, the microphone stays off during transcription, generation, tool approval, and playback.
+With voice interruption enabled, a separate capture listens during replies without reading terminal input.
 Spoken text goes only to the model. Only typed commands can change tool permissions.
 The conversation and tool permissions stay in the same session.
 
@@ -331,5 +331,15 @@ pactl unload-module MODULE_ID
 ```
 
 Route Angela through both names above so the filter receives microphone audio and the playback reference.
-This filter does not enable voice interruption. The microphone still stops during replies.
+With both device values configured, voice interruption starts automatically.
+Use an echo-filtered source and sink pair for speaker playback. Device selection alone does not cancel echo.
+For headphones, set `ANGELA_VOICE_BARGE_IN=1` without a virtual source or sink.
+Set `ANGELA_VOICE_BARGE_IN=0` to disable interruption regardless of device selection.
+
+When speech starts, Angela cancels generation, queued speech, playback, and pending tool approval.
+The interrupting capture stays alive through transcription. The next turn starts after the previous turn settles and saves.
+Already completed tool actions remain in effect. Interrupted generations keep their existing session recovery behavior.
+A completed text reply stays saved even when its playback is interrupted.
+An empty transcript starts listening again. Ctrl+C discards the capture and returns to text mode.
+Spoken text never acts as a CLI command or grants tool permission.
 The module lasts until you unload it or the audio service restarts. Angela does not create or remove it.

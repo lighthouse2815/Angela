@@ -106,8 +106,14 @@ export class Voice {
       throw new Error(messages.voiceConfig)
   }
 
+  /** Echo-filtered devices or an explicit headphone setup permit simultaneous capture and playback. */
+  get canInterrupt() {
+    return this.env.ANGELA_VOICE_BARGE_IN === '1'
+      || (this.env.ANGELA_VOICE_BARGE_IN !== '0' && !!this.env.ANGELA_VOICE_SOURCE && !!this.env.ANGELA_VOICE_SINK)
+  }
+
   /** One call owns its socket, microphone, and terminal question. Only a completed utterance reaches STT. */
-  async listen(command: (signal: AbortSignal) => Promise<string | undefined>, signal: AbortSignal, state: (value: 'ready' | 'speech' | 'transcribing') => void) {
+  async listen(command: ((signal: AbortSignal) => Promise<string | undefined>) | undefined, signal: AbortSignal, state: (value: 'ready' | 'speech' | 'transcribing') => void) {
     signal.throwIfAborted()
     const lifetime = new AbortController()
     const combined = AbortSignal.any([signal, lifetime.signal])
@@ -186,13 +192,13 @@ export class Voice {
     })
     const commands = async () => {
       while (true) {
-        const text = await command(combined)
+        const text = await command!(combined)
         if (text === undefined || text.trim())
           return { kind: 'command' as const, text: text?.trim() }
       }
     }
     try {
-      return await Promise.race([transcript, commands()])
+      return await (command ? Promise.race([transcript, commands()]) : transcript)
     }
     finally {
       lifetime.abort()
@@ -203,7 +209,7 @@ export class Voice {
     }
   }
 
-  /** Playback completes before another capture starts, so Angela does not record her own answer. */
+  /** The caller selects echo-filtered devices before enabling concurrent capture and playback. */
   async speak(text: string, signal: AbortSignal) {
     // Bound each audio request and start playback before the remaining text is synthesized.
     const chunks = text.match(/[\s\S]{1,1800}(?:\s|$)|[\s\S]{1,1800}/gu)

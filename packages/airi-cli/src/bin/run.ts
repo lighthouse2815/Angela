@@ -20,6 +20,7 @@ import { StreamingSpeech } from '../streaming-speech'
 import { runTelegram } from '../telegram'
 import { Terminal } from '../terminal'
 import { Voice } from '../voice'
+import { VoiceInterruption } from '../voice-interruption'
 import { runVoiceService } from '../voice-service'
 
 /**
@@ -99,7 +100,13 @@ async function main() {
     let input: Terminal | undefined
     let active: AbortController | undefined
     const shutdown = new AbortController()
+    let voice: Voice | undefined
+    let interruption: VoiceInterruption | undefined
     const interrupt = () => {
+      if (interruption) {
+        interruption.cancel()
+        voice = undefined
+      }
       if (active) {
         active.abort()
       }
@@ -112,6 +119,7 @@ async function main() {
     if (process.stdin.isTTY)
       input = new Terminal(interrupt)
     const stop = () => {
+      interruption?.cancel()
       active?.abort()
       shutdown.abort()
       input?.close()
@@ -120,11 +128,17 @@ async function main() {
     process.on('SIGTERM', stop)
     let mcp: McpTools | undefined
 
-    let voice: Voice | undefined
+    let pendingUtterance: string | undefined
 
     async function send(text: string) {
       active = new AbortController()
       const speech = voice ? new StreamingSpeech(voice, active.signal, () => process.stderr.write(`\n${messages.voiceSpeaking}\n`)) : undefined
+      interruption = voice?.canInterrupt
+        ? new VoiceInterruption(voice, active, (state) => {
+            const label = state === 'ready' ? messages.voicePrompt : state === 'speech' ? messages.voiceRecord : messages.voiceTranscribing
+            process.stderr.write(`${label}\n`)
+          })
+        : undefined
       let completed = false
       try {
         output.start()
@@ -151,7 +165,7 @@ async function main() {
         await speech?.finish()
       }
       catch (error) {
-        if (active.signal.aborted)
+        if (active.signal.aborted && !interruption?.interrupted)
           voice = undefined
         output.stop()
         process.stderr.write(`\n${active.signal.aborted ? messages.interrupted : `${messages.failed}: ${formatRequestError(error, messages)}`}\n`)
@@ -161,8 +175,16 @@ async function main() {
       finally {
         await speech?.cancel()
         output.stop()
-        active = undefined
-        await session.save(chat.conversation, !completed)
+        try {
+          await session.save(chat.conversation, !completed)
+          const next = await interruption?.finish()
+          pendingUtterance = voice ? next : undefined
+        }
+        finally {
+          interruption?.cancel()
+          interruption = undefined
+          active = undefined
+        }
       }
     }
 
@@ -188,6 +210,13 @@ async function main() {
       if (input && interactive) {
         process.stderr.write(`${messages.workspace}: ${workspace}\n${messages.welcome}\n${messages.permissionAsk}\n`)
         while (true) {
+          if (pendingUtterance && voice) {
+            const utterance = pendingUtterance
+            pendingUtterance = undefined
+            process.stderr.write(`${utterance}\n`)
+            await send(utterance)
+            continue
+          }
           let text: string | undefined
           if (voice) {
             active = new AbortController()
