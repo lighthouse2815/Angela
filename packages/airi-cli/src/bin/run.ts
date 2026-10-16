@@ -13,6 +13,7 @@ import { getGenerationProvider, listProviders } from '@proj-airi/provider-infere
 
 import { Chat } from '../chat'
 import { readConfig } from '../config'
+import { formatRequestError } from '../errors'
 import { McpTools } from '../mcp'
 import { Sessions } from '../sessions'
 import { Terminal } from '../terminal'
@@ -106,6 +107,11 @@ async function main() {
         await chat.send(text, {
           abortSignal: active.signal,
           tools: mcp?.definitions(),
+          diagnostics: {
+            // The send catch owns the final message. SDK promise diagnostics must not print the same failure again.
+            error() {},
+            warn() { process.stderr.write(`${messages.retrying}\n`) },
+          },
           onStreamEvent(event) {
             if (event.type === 'text-delta')
               process.stdout.write(event.text)
@@ -121,7 +127,7 @@ async function main() {
         process.stdout.write('\n')
       }
       catch (error) {
-        process.stderr.write(`\n${active.signal.aborted ? messages.interrupted : `${messages.failed}: ${errorMessageFrom(error) ?? String(error)}`}\n`)
+        process.stderr.write(`\n${active.signal.aborted ? messages.interrupted : `${messages.failed}: ${formatRequestError(error, messages)}`}\n`)
         if (!interactive && process.exitCode !== 143)
           process.exitCode = active.signal.aborted ? 130 : 1
       }

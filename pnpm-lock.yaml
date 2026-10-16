@@ -3869,6 +3869,9 @@ importers:
       '@proj-airi/provider-inference':
         specifier: workspace:^
         version: link:../provider-inference
+      '@xsai/shared':
+        specifier: 'catalog:'
+        version: 0.5.1
       '@xsai/shared-chat':
         specifier: 'catalog:'
         version: 0.5.1

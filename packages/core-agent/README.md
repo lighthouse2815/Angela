@@ -14,6 +14,9 @@
 
 `streamFrom` retries a request up to three times when the provider returns HTTP 408, 429, or 5xx before any stream event reaches the caller. It waits for the `Retry-After` delay when the header is readable, or 3s, 6s, and 12s otherwise. A `Retry-After` longer than 30s fails at once. Other statuses, network failures, and failures after output or tool calls fail at once, so text and tool side effects never repeat. `abortSignal` also cancels a pending wait.
 
+`options.diagnostics` supplies the host's `error` and `warn` output methods. The default is `console`.
+Hosts can replace SDK diagnostics with their own presentation. Generation failures still reject the returned promise.
+
 When a caller supplies `resolveStep`, `streamFrom` reads current settings before each model request. It resolves the first request before projecting the conversation. A continuation scope change starts a new SDK stream. Completed rounds and usage remain in one assistant turn. The callback returns the current tools and header overrides for each request.
 
 `prepareConversation` adapts media to the resolved request before the protocol adapter projects the conversation. It runs for each SDK stream, so it also runs after a scope change selects another model. It returns a request copy and keeps stored recordings intact. Stage uses it to send audio only to models that accept audio, and transcripts to other models.

@@ -317,6 +317,20 @@ describe('transient provider failures (Issue #2660)', () => {
     expect(fetch).toHaveBeenCalledTimes(4)
   })
 
+  it('routes SDK diagnostics to the host without consuming the provider failure', async () => {
+    const fetch = vi.fn<typeof globalThis.fetch>(async () => unavailable())
+    const diagnostics = { error: vi.fn(), warn: vi.fn() }
+    await expect(streamFrom({
+      model: 'test',
+      chatProvider: provider(fetch),
+      conversation: { turns: [] },
+      options: { diagnostics },
+    })).rejects.toMatchObject({ statusCode: 503 })
+    expect(fetch).toHaveBeenCalledTimes(4)
+    expect(diagnostics.warn).toHaveBeenCalledTimes(3)
+    expect(diagnostics.error).toHaveBeenCalledWith('Stream steps error:', expect.objectContaining({ statusCode: 503 }))
+  })
+
   it('does not retry permanent request errors', async () => {
     const fetch = vi.fn<typeof globalThis.fetch>(async () => new Response('{"error":"invalid api key"}', { status: 401 }))
     await expect(streamFrom({ model: 'test', chatProvider: provider(fetch), conversation: { turns: [] } })).rejects.toMatchObject({ statusCode: 401 })

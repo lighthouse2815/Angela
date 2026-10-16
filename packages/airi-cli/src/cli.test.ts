@@ -118,3 +118,55 @@ it('lists sessions without a model or provider credentials', async () => {
   child.stdin.end()
   expect(await result).toMatchObject({ code: 0, stderr: '' })
 })
+
+// A provider failure rejects several SDK promises. Raw console diagnostics hid the final CLI error under repeated stacks.
+it('shows a readable overload error without SDK stacks or provider response bodies', async () => {
+  let requests = 0
+  const server = createServer((_request, response) => {
+    requests++
+    response.writeHead(503, { 'Content-Type': 'application/json', 'Retry-After': '0' })
+    response.end(JSON.stringify({ error: { message: 'private-provider-response-test-secret', status: 'UNAVAILABLE' } }))
+  })
+  servers.push(server)
+  server.listen(0, '127.0.0.1')
+  await once(server, 'listening')
+  const address = server.address()
+  if (!address || typeof address === 'string')
+    throw new Error('Missing provider port')
+  const { result } = run(['--prompt', 'Hello'], { ANGELA_BASE_URL: `http://127.0.0.1:${address.port}/v1/` })
+  const output = await result
+  expect(output.code).toBe(1)
+  expect(output.stdout).toBe('')
+  expect(output.stderr).toContain('HTTP 503')
+  expect(output.stderr).toContain('quá tải')
+  expect(output.stderr).not.toContain('APICallError')
+  expect(output.stderr).not.toContain('Stream usage error')
+  expect(output.stderr).not.toContain('private-provider-response-test-secret')
+  expect(output.stderr.match(/Yêu cầu thất bại:/g)).toHaveLength(1)
+  expect(output.stderr.match(/Đang thử lại/g)).toHaveLength(3)
+  expect(requests).toBe(4)
+})
+
+it.each([
+  { status: 401, locale: 'en', message: 'Check your API key and access permissions.' },
+  { status: 429, locale: 'vi', message: 'Kiểm tra hạn mức' },
+])('explains HTTP $status in locale $locale without echoing provider diagnostics', async ({ status, locale, message }) => {
+  const server = createServer((_request, response) => {
+    response.writeHead(status, { 'Content-Type': 'application/json', 'Retry-After': '0' })
+    response.end(JSON.stringify({ error: { message: 'private-provider-diagnostics' } }))
+  })
+  servers.push(server)
+  server.listen(0, '127.0.0.1')
+  await once(server, 'listening')
+  const address = server.address()
+  if (!address || typeof address === 'string')
+    throw new Error('Missing provider port')
+  const { result } = run(['--prompt', 'Hello', '--locale', locale], { ANGELA_BASE_URL: `http://127.0.0.1:${address.port}/v1/` })
+  const output = await result
+  expect(output.code).toBe(1)
+  expect(output.stdout).toBe('')
+  expect(output.stderr).toContain(`HTTP ${status}`)
+  expect(output.stderr).toContain(message)
+  expect(output.stderr).not.toContain('private-provider-diagnostics')
+  expect(output.stderr).not.toContain('APICallError')
+})

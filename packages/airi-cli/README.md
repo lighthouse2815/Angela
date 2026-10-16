@@ -64,6 +64,10 @@ Use `ANGELA_LOCALE=en` or `--locale en` for English.
 During interactive chat, Ctrl+C cancels the current request. Use `/exit` or Ctrl+D to quit.
 One-shot requests return exit code 1 for errors and 130 for cancellation.
 
+Provider errors show one localized message with an HTTP status and a next step.
+For example, HTTP 503 explains that the model is overloaded or unavailable. HTTP 401 asks you to check credentials.
+Automatic retries show a short progress message. SDK stacks, response headers, and raw provider bodies stay out of terminal output.
+
 ## Scope
 
 This entry point provides text chat and an optional MCP connection.
