@@ -2,7 +2,7 @@ import type { cliMessages } from '@proj-airi/i18n/cli'
 import type { Tool } from '@xsai/shared-chat'
 
 import { createHash, randomUUID } from 'node:crypto'
-import { lstat, mkdir, open, readdir, readFile, realpath, rename, unlink, writeFile } from 'node:fs/promises'
+import { lstat, mkdir, open, readdir, readFile, realpath, rename, stat, unlink, writeFile } from 'node:fs/promises'
 import { join, relative, resolve, sep } from 'node:path'
 
 import { errorMessageFrom } from '@moeru/std'
@@ -11,9 +11,10 @@ import { parseDocument, stringify } from 'yaml'
 import * as v from 'valibot'
 
 import { MemoryFile } from './memory-file'
+import { RecallIndex } from './recall-index'
 
 const nameSchema = v.pipe(v.string(), v.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u), v.maxLength(64))
-const headerSchema = v.object({ name: nameSchema, description: v.pipe(v.string(), v.trim(), v.minLength(1), v.maxLength(1024)) })
+const headerSchema = v.object({ name: nameSchema, description: v.pipe(v.string(), v.trim(), v.minLength(1), v.maxLength(1024)), verification: v.optional(v.object({ quote: v.pipe(v.string(), v.maxLength(2000)), updatedAt: v.string(), source: v.optional(v.object({ kind: v.picklist(['user', 'tool', 'import']), sessionId: v.optional(v.pipe(v.string(), v.uuid())) })) })) })
 const stateSchema = v.object({ enabled: v.boolean(), disabled: v.array(nameSchema) })
 const saveSchema = v.object({
   name: nameSchema,
@@ -25,10 +26,11 @@ const saveSchema = v.object({
 
 /** Owns trusted user-managed skill files. Project files never become executable guidance merely because a directory was opened. */
 export class Skills {
+  private readonly cache = new Map<string, { stamp: string, skill: v.InferOutput<typeof headerSchema> & { instructions: string, version: string } }>()
   readonly directory: string
   private readonly settings: MemoryFile<v.InferOutput<typeof stateSchema>>
 
-  constructor(dataDir: string, private readonly messages: typeof cliMessages.en) {
+  constructor(private readonly dataDir: string, private readonly messages: typeof cliMessages.en) {
     this.directory = join(dataDir, 'memory', 'skills')
     this.settings = new MemoryFile(join(dataDir, 'memory'), 'skills-settings', stateSchema, () => ({ enabled: true, disabled: [] }), { invalid: messages.skillsInvalid, locked: messages.memoryLocked })
   }
@@ -44,17 +46,34 @@ export class Skills {
         return []
       throw error
     }
-    const skills: { name: string, description: string, instructions: string, version: string, enabled: boolean }[] = []
+    const skills: (v.InferOutput<typeof headerSchema> & { instructions: string, version: string, enabled: boolean })[] = []
     for (const name of names.sort()) {
       if (!v.safeParse(nameSchema, name).success)
         continue
       try {
         const path = join(this.directory, name, 'SKILL.md')
+        try {
+          await lstat(path)
+        }
+        catch (error) {
+          if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
+            this.cache.delete(name)
+            continue
+          }
+          throw error
+        }
         const root = await realpath(this.directory)
         const file = await realpath(path)
         const location = relative(root, file)
         if (location.startsWith(`..${sep}`) || location === '..' || resolve(root, location) !== file || !(await lstat(file)).isFile())
           throw new Error(this.messages.skillsInvalid)
+        const information = await stat(file)
+        const stamp = `${information.ino}:${information.mtimeMs}:${information.size}`
+        const cached = this.cache.get(name)
+        if (cached?.stamp === stamp) {
+          skills.push({ ...cached.skill, enabled: settings.enabled && !settings.disabled.includes(name) })
+          continue
+        }
         const source = await readFile(file, 'utf8')
         if (source.length > 16_000)
           throw new Error(this.messages.skillsInvalid)
@@ -67,7 +86,9 @@ export class Skills {
         const header = v.parse(headerSchema, document.toJS({ maxAliasCount: 0 }))
         if (header.name !== name || !match[2]!.trim() || match[2]!.length > 12_000)
           throw new Error(this.messages.skillsInvalid)
-        skills.push({ ...header, instructions: match[2]!.trim(), version: createHash('sha256').update(source).digest('hex'), enabled: settings.enabled && !settings.disabled.includes(name) })
+        const skill = { ...header, instructions: match[2]!.trim(), version: createHash('sha256').update(source).digest('hex') }
+        this.cache.set(name, { stamp, skill })
+        skills.push({ ...skill, enabled: settings.enabled && !settings.disabled.includes(name) })
       }
       catch {
         // Invalid skills fail visibly instead of silently changing the available workflow catalog.
@@ -99,7 +120,7 @@ export class Skills {
   }
 
   /** Writes one skill atomically under an exclusive lock. Version checks prevent overwriting a workflow changed by another session. */
-  async save(input: v.InferOutput<typeof saveSchema>) {
+  async save(input: v.InferOutput<typeof saveSchema>, provenance?: { sessionId: string, kind: 'user' | 'tool' }) {
     const skill = v.parse(saveSchema, input)
     const directory = join(this.directory, skill.name)
     await mkdir(directory, { recursive: true, mode: 0o700 })
@@ -122,9 +143,15 @@ export class Skills {
       }
       if (version !== skill.expected_version)
         throw new Error(this.messages.memoryChanged)
-      const header = { name: skill.name, description: skill.description, verification: { quote: skill.verification_quote, updatedAt: new Date().toISOString() } }
+      const header = { name: skill.name, description: skill.description, verification: { quote: skill.verification_quote, updatedAt: new Date().toISOString(), source: provenance ?? { kind: 'import' } } }
       await writeFile(temporary, `---\n${stringify(header)}---\n${skill.instructions}\n`, { mode: 0o600, flag: 'wx' })
       await rename(temporary, join(directory, 'SKILL.md'))
+      try {
+        await RecallIndex.invalidate(this.dataDir, `skill:${skill.name}`)
+      }
+      catch {
+        throw new Error(this.messages.recallCleanup)
+      }
     }
     finally {
       await unlink(temporary).catch(() => {})
@@ -133,7 +160,7 @@ export class Skills {
     }
   }
 
-  tools(userText: string, observations: readonly string[], onChange: () => Promise<void>): Tool[] {
+  tools(userText: string, observations: readonly string[], sessionId: string, onChange: () => Promise<void>): Tool[] {
     return [{
       type: 'function',
       function: {
@@ -147,19 +174,45 @@ export class Skills {
           return { status: 'rejected', reason: this.messages.skillsUsage }
         if (!userText.includes(parsed.output.verification_quote) && !observations.some(observation => observation.includes(parsed.output.verification_quote)))
           return { status: 'rejected', reason: this.messages.memoryEvidence }
-        if (!(await this.settings.read()).enabled)
+        const settings = await this.settings.read()
+        if (!settings.enabled || settings.disabled.includes(parsed.output.name))
           return { status: 'rejected', reason: this.messages.skillsMissing }
         options.abortSignal?.throwIfAborted()
         try {
-          await this.save(parsed.output)
-          await onChange()
-          return { status: 'saved', name: parsed.output.name }
+          await this.save(parsed.output, { sessionId, kind: observations.some(observation => observation.includes(parsed.output.verification_quote)) ? 'tool' : 'user' })
+          let indexed = true
+          try {
+            await onChange()
+          }
+          catch {
+            indexed = false
+          }
+          return { status: 'saved', name: parsed.output.name, indexed }
         }
         catch (error) {
           return { status: 'rejected', reason: errorMessageFrom(error) ?? this.messages.skillsInvalid }
         }
       },
     }]
+  }
+
+  async forget(name: string) {
+    v.parse(nameSchema, name)
+    const directory = join(this.directory, name)
+    const root = await realpath(this.directory)
+    if (await realpath(directory) !== join(root, name))
+      throw new Error(this.messages.skillsInvalid)
+    const lockPath = join(directory, 'SKILL.lock')
+    const lock = await open(lockPath, 'wx', 0o600)
+    try {
+      await unlink(join(directory, 'SKILL.md'))
+      this.cache.delete(name)
+      await RecallIndex.invalidate(this.dataDir, `skill:${name}`)
+    }
+    finally {
+      await lock.close()
+      await unlink(lockPath)
+    }
   }
 
   async command(text: string): Promise<string | undefined> {
@@ -169,6 +222,17 @@ export class Skills {
       return JSON.stringify(await this.read(text.slice(13).trim()), null, 2)
     if (text.startsWith('/skills import '))
       return `${this.messages.memorySaved}: ${await this.import(text.slice(15).trim())}`
+    if (text.startsWith('/skills forget ')) {
+      await this.forget(text.slice(15).trim())
+      return this.messages.memoryForgotten
+    }
+    const edit = /^\/skills edit ([a-z0-9-]+) ([\s\S]+)$/u.exec(text)
+    if (edit) {
+      const previous = await this.read(edit[1]!)
+      const document = await readFile(edit[2]!.trim(), 'utf8')
+      await this.save({ name: previous.name, description: previous.description, instructions: document, verification_quote: this.messages.skillsImported, expected_version: previous.version })
+      return this.messages.memoryUpdated
+    }
     const toggle = /^\/skills (on|off)(?: ([a-z0-9-]+))?$/u.exec(text)
     if (toggle) {
       const name = toggle[2]
@@ -180,6 +244,8 @@ export class Skills {
         else
           state.disabled = toggle[1] === 'on' ? state.disabled.filter(item => item !== name) : [...new Set([...state.disabled, name])]
       })
+      if (name)
+        await RecallIndex.invalidate(this.dataDir, `skill:${name}`)
       return this.messages.skillsChanged
     }
     if (/^\/skills(?:\s|$)/u.test(text))

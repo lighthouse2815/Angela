@@ -7,6 +7,7 @@ import process from 'node:process'
 import { realpath, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 
+import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js'
 import { errorMessageFrom } from '@moeru/std'
 import { getGenerationProvider, listProviders } from '@proj-airi/provider-inference'
 
@@ -19,6 +20,7 @@ import { Memory } from '../memory'
 import { Output } from '../output'
 import { Permissions } from '../permissions'
 import { ProjectMemory } from '../project-memory'
+import { Recall } from '../recall'
 import { runSessionCommand } from '../session-command'
 import { Sessions } from '../sessions'
 import { StreamingSpeech } from '../streaming-speech'
@@ -104,6 +106,8 @@ async function main() {
     let input: Terminal | undefined
     const memory = new Memory(config.dataDir, messages)
     const project = await ProjectMemory.open(config.dataDir, workspace, messages)
+    const recall = new Recall(config.dataDir, project.workspace, session.record.id, messages, process.env, config)
+    let recallReady = false
     if (interactive)
       output.intro()
     process.stderr.write(`${messages.session}: ${session.record.id}\n`)
@@ -167,6 +171,7 @@ async function main() {
         output.start()
         await session.save(chat.conversation, true)
         const projectObservations: string[] = []
+        const verifiedObservations: string[] = []
         const projectCalls = new Set<string>()
         let projectContext = ''
         let projectTools: Tool[] = []
@@ -181,16 +186,31 @@ async function main() {
         let memoryContext = ''
         let memoryTools: Tool[] = []
         try {
-          memoryContext = await memory.context()
-          memoryTools = await memory.tools(text)
+          memoryTools = await memory.tools(text, session.record.id)
+        }
+        catch {
+          process.stderr.write(`\n${messages.memoryUnavailable}\n`)
+        }
+        try {
+          if (recallReady) {
+            const prepared = await recall.prepare(text, active.signal)
+            memoryContext = prepared.context
+            if (prepared.warning)
+              process.stderr.write(`\n${prepared.warning}\n`)
+          }
+          else {
+            const state = await memory.read()
+            memoryContext = await memory.context(state.entries.filter(entry => entry.core).map(entry => entry.id))
+          }
         }
         catch {
           memoryContext = ''
-          process.stderr.write(`\n${messages.memoryUnavailable}\n`)
+          active.signal.throwIfAborted()
+          process.stderr.write(`\n${recallReady ? messages.recallInvalid : messages.memoryUnavailable}\n`)
         }
         await chat.send(text, {
           abortSignal: active.signal,
-          tools: [...(mcp?.definitions() ?? []), ...memoryTools, ...projectTools],
+          tools: [...(mcp?.definitions() ?? []), ...memoryTools, ...projectTools, ...(recallReady ? [...recall.tools(), ...recall.skills.tools(text, verifiedObservations, session.record.id, () => recall.changed(false))] : [])],
           diagnostics: {
             // The send catch owns the final message. SDK promise diagnostics must not print the same failure again.
             error() {},
@@ -203,6 +223,19 @@ async function main() {
             if ((event.type === 'tool-result' || event.type === 'tool-error') && projectCalls.delete(event.toolCallId) && event.result) {
               const observation = typeof event.result === 'string' ? event.result : JSON.stringify(event.result)
               projectObservations.push(observation.slice(0, 20_000))
+              if (event.type === 'tool-result') {
+                try {
+                  const result = CallToolResultSchema.safeParse(typeof event.result === 'string' ? JSON.parse(event.result) : event.result)
+                  const backend = result.success ? result.data.structuredContent?.backendResult : undefined
+                  const failed = backend && typeof backend === 'object' && (('timedOut' in backend && backend.timedOut) || ('exitCode' in backend && backend.exitCode !== undefined && backend.exitCode !== null && backend.exitCode !== 0))
+                  if (result.success && !result.data.isError && !failed) {
+                    verifiedObservations.push(observation.slice(0, 20_000))
+                    if (verifiedObservations.length > 8)
+                      verifiedObservations.shift()
+                  }
+                }
+                catch { /* Unrecognized payloads cannot establish verification evidence. */ }
+              }
               if (projectObservations.length > 8)
                 projectObservations.shift()
             }
@@ -242,6 +275,14 @@ async function main() {
     }
 
     try {
+      try {
+        await recall.start()
+        recallReady = true
+      }
+      catch {
+        await recall.close()
+        process.stderr.write(`${messages.recallInvalid}\n`)
+      }
       if (config.computerUse || config.mcpCommand) {
         mcp = await McpTools.connect(config, workspace, join(config.dataDir, 'computer-use', session.record.id), async (request, signal) => {
           output.approval(request)
@@ -350,9 +391,12 @@ async function main() {
             process.stderr.write(`${messages.cliCommands}\n`)
             continue
           }
+          active = new AbortController()
           try {
-            const response = await project.command(text) ?? await memory.command(text)
+            const response = await project.command(text) ?? await recall.command(text, active.signal) ?? await recall.skills.command(text) ?? await memory.command(text)
             if (response !== undefined) {
+              if (recallReady && /^\/(?:remember |forget |memory (?:edit |pin |unpin |auto |on$|off$)|skills (?:import |edit |forget |on|off))/u.test(text))
+                await recall.changed()
               process.stderr.write(`${response}\n`)
               continue
             }
@@ -360,6 +404,9 @@ async function main() {
           catch (error) {
             process.stderr.write(`${errorMessageFrom(error)}\n`)
             continue
+          }
+          finally {
+            active = undefined
           }
           const commandResponse = permissions.command(text)
           if (commandResponse !== undefined) {
@@ -388,7 +435,12 @@ async function main() {
         await releaseVoice()
       }
       finally {
-        await mcp?.close()
+        try {
+          await mcp?.close()
+        }
+        finally {
+          await recall.close()
+        }
       }
       process.off('SIGINT', interrupt)
       process.off('SIGTERM', stop)

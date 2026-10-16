@@ -18,40 +18,46 @@ export class RecallIndex {
     await mkdir(directory, { recursive: true, mode: 0o700 })
     const path = join(directory, 'recall.sqlite')
     const database = new DatabaseSync(path)
-    await chmod(path, 0o600)
-    database.function('search_text', { deterministic: true }, text => String(text).normalize('NFD').replace(/\p{M}/gu, '').replace(/đ/giu, 'd'))
-    database.exec(`
-      PRAGMA busy_timeout=3000;
-      PRAGMA secure_delete=ON;
-      PRAGMA journal_mode=DELETE;
-      CREATE TABLE IF NOT EXISTS sources(origin TEXT PRIMARY KEY, version TEXT NOT NULL);
-      CREATE TABLE IF NOT EXISTS excerpts(
-        rowid INTEGER PRIMARY KEY, id TEXT UNIQUE NOT NULL, kind TEXT NOT NULL, scope TEXT NOT NULL,
-        origin TEXT NOT NULL, version TEXT NOT NULL, text TEXT NOT NULL, updatedAt TEXT NOT NULL, tokens TEXT NOT NULL,
-        vector BLOB, namespace TEXT
-      );
-      CREATE INDEX IF NOT EXISTS excerpts_scope ON excerpts(scope,kind);
-      CREATE INDEX IF NOT EXISTS excerpts_origin ON excerpts(origin);
-      CREATE VIRTUAL TABLE IF NOT EXISTS search USING fts5(tokens, content='excerpts', content_rowid='rowid', tokenize='unicode61 remove_diacritics 2');
-      CREATE TRIGGER IF NOT EXISTS excerpts_insert AFTER INSERT ON excerpts BEGIN INSERT INTO search(rowid,tokens) VALUES(new.rowid,new.tokens); END;
-      CREATE TRIGGER IF NOT EXISTS excerpts_delete AFTER DELETE ON excerpts BEGIN INSERT INTO search(search,rowid,tokens) VALUES('delete',old.rowid,old.tokens); END;
-      CREATE TRIGGER IF NOT EXISTS excerpts_update AFTER UPDATE OF tokens ON excerpts BEGIN
-        INSERT INTO search(search,rowid,tokens) VALUES('delete',old.rowid,old.tokens);
-        INSERT INTO search(rowid,tokens) VALUES(new.rowid,new.tokens);
-      END;
-    `)
-    database.prepare('INSERT INTO search(search,rank) VALUES(\'secure-delete\',1)').run()
-    database.function('similarity', { deterministic: true }, (left, right) => {
-      if (!(left instanceof Uint8Array) || !(right instanceof Uint8Array) || left.byteLength !== right.byteLength || left.byteLength % 4)
-        return -1
-      const a = new Float32Array(left.slice().buffer)
-      const b = new Float32Array(right.slice().buffer)
-      let score = 0
-      for (let i = 0; i < a.length; i++)
-        score += a[i]! * b[i]!
-      return score
-    })
-    return new RecallIndex(database)
+    try {
+      await chmod(path, 0o600)
+      database.function('search_text', { deterministic: true }, text => String(text).normalize('NFD').replace(/\p{M}/gu, '').replace(/đ/giu, 'd'))
+      database.exec(`
+        PRAGMA busy_timeout=3000;
+        PRAGMA secure_delete=ON;
+        PRAGMA journal_mode=DELETE;
+        CREATE TABLE IF NOT EXISTS sources(origin TEXT PRIMARY KEY, version TEXT NOT NULL);
+        CREATE TABLE IF NOT EXISTS excerpts(
+          rowid INTEGER PRIMARY KEY, id TEXT UNIQUE NOT NULL, kind TEXT NOT NULL, scope TEXT NOT NULL,
+          origin TEXT NOT NULL, version TEXT NOT NULL, text TEXT NOT NULL, updatedAt TEXT NOT NULL, tokens TEXT NOT NULL,
+          vector BLOB, namespace TEXT
+        );
+        CREATE INDEX IF NOT EXISTS excerpts_scope ON excerpts(scope,kind);
+        CREATE INDEX IF NOT EXISTS excerpts_origin ON excerpts(origin);
+        CREATE VIRTUAL TABLE IF NOT EXISTS search USING fts5(tokens, content='excerpts', content_rowid='rowid', tokenize='unicode61 remove_diacritics 2');
+        CREATE TRIGGER IF NOT EXISTS excerpts_insert AFTER INSERT ON excerpts BEGIN INSERT INTO search(rowid,tokens) VALUES(new.rowid,new.tokens); END;
+        CREATE TRIGGER IF NOT EXISTS excerpts_delete AFTER DELETE ON excerpts BEGIN INSERT INTO search(search,rowid,tokens) VALUES('delete',old.rowid,old.tokens); END;
+        CREATE TRIGGER IF NOT EXISTS excerpts_update AFTER UPDATE OF tokens ON excerpts BEGIN
+          INSERT INTO search(search,rowid,tokens) VALUES('delete',old.rowid,old.tokens);
+          INSERT INTO search(rowid,tokens) VALUES(new.rowid,new.tokens);
+        END;
+      `)
+      database.prepare('INSERT INTO search(search,rank) VALUES(\'secure-delete\',1)').run()
+      database.function('similarity', { deterministic: true }, (left, right) => {
+        if (!(left instanceof Uint8Array) || !(right instanceof Uint8Array) || left.byteLength !== right.byteLength || left.byteLength % 4)
+          return -1
+        const a = new Float32Array(left.slice().buffer)
+        const b = new Float32Array(right.slice().buffer)
+        let score = 0
+        for (let i = 0; i < a.length; i++)
+          score += a[i]! * b[i]!
+        return score
+      })
+      return new RecallIndex(database)
+    }
+    catch (error) {
+      database.close()
+      throw error
+    }
   }
 
   close() {
@@ -90,10 +96,10 @@ export class RecallIndex {
     }
   }
 
-  remove(origin: string) {
+  remove(origin: string, id?: string) {
     this.database.exec('BEGIN IMMEDIATE')
     try {
-      this.database.prepare('DELETE FROM excerpts WHERE origin=?').run(origin)
+      this.database.prepare('DELETE FROM excerpts WHERE origin=? AND (? IS NULL OR id=?)').run(origin, id ?? null, id ?? null)
       this.database.prepare('DELETE FROM sources WHERE origin=?').run(origin)
       // FTS5 secure-delete also removes obsolete token entries from its segment index.
       this.database.prepare('INSERT INTO search(search,rank) VALUES(\'secure-delete\',1)').run()
@@ -105,6 +111,10 @@ export class RecallIndex {
     }
   }
 
+  rescan() {
+    this.database.prepare('UPDATE sources SET version=\'\'').run()
+  }
+
   rebuild() {
     this.database.prepare('INSERT INTO search(search) VALUES(\'rebuild\')').run()
   }
@@ -114,8 +124,8 @@ export class RecallIndex {
     return row ? v.parse(hitSchema, row) : undefined
   }
 
-  missingVectors(namespace: string) {
-    return this.database.prepare('SELECT id,text,version FROM excerpts WHERE vector IS NULL OR namespace IS NULL OR namespace<>? LIMIT 8').all(namespace).map(row => ({ id: String(row.id), text: String(row.text), version: String(row.version) }))
+  missingVectors(namespace: string, dimensions?: number) {
+    return this.database.prepare('SELECT id,text,version FROM excerpts WHERE vector IS NULL OR namespace IS NULL OR namespace<>? OR (? IS NOT NULL AND length(vector)<>?) LIMIT 8').all(namespace, dimensions ?? null, (dimensions ?? 0) * 4).map(row => ({ id: String(row.id), text: String(row.text), version: String(row.version) }))
   }
 
   vectors(namespace: string, items: { id: string, version: string, vector: Float32Array }[]) {
@@ -123,15 +133,15 @@ export class RecallIndex {
       this.database.prepare('UPDATE excerpts SET vector=?,namespace=? WHERE id=? AND version=?').run(new Uint8Array(item.vector.buffer, item.vector.byteOffset, item.vector.byteLength), namespace, item.id, item.version)
   }
 
-  search(query: string, scope: string, namespace?: string, vector?: Float32Array) {
+  search(query: string, scope: string, namespace?: string, vector?: Float32Array, excludedOrigin = '') {
     const ignored = new Set('a an the is are was were i you me my we to of in on and or for this that what how please toi ban minh la thi ma va co cho cua cac cai voi duoc lam gi nhu hay khong mot nhung'.split(' '))
-    const terms = [...new Set(query.normalize('NFD').replace(/\p{M}/gu, '').replace(/đ/giu, 'd').toLowerCase().match(/[\p{L}\p{N}_-]+/gu) ?? [])].filter(term => term.length > 1 && !ignored.has(term)).slice(0, 32)
+    const terms = [...new Set(query.normalize('NFD').replace(/\p{M}/gu, '').replace(/đ/giu, 'd').toLowerCase().match(/[\p{L}\p{N}_-]+/gu) ?? [])].filter(term => term.length > 1 && !ignored.has(term)).slice(-32)
     const lexical = terms.length
       ? this.database.prepare(`SELECT excerpts.* FROM search JOIN excerpts ON excerpts.rowid=search.rowid
-          WHERE search MATCH ? AND (?='*' OR excerpts.scope='' OR excerpts.scope=?) ORDER BY bm25(search) LIMIT 80`).all(terms.map(term => `"${term}"`).join(' OR '), scope, scope)
+          WHERE search MATCH ? AND (?='*' OR excerpts.scope='' OR excerpts.scope=?) AND excerpts.origin<>? ORDER BY bm25(search) LIMIT 80`).all(terms.map(term => `"${term}"`).join(' OR '), scope, scope, excludedOrigin)
       : []
     const semantic = namespace && vector
-      ? this.database.prepare(`SELECT *,similarity(vector,?) AS score FROM excerpts WHERE namespace=? AND length(vector)=? AND (?='*' OR scope='' OR scope=?) ORDER BY score DESC LIMIT 80`).all(new Uint8Array(vector.buffer, vector.byteOffset, vector.byteLength), namespace, vector.byteLength, scope, scope).filter(row => Number(row.score) >= 0.35)
+      ? this.database.prepare(`SELECT *,similarity(vector,?) AS score FROM excerpts WHERE namespace=? AND length(vector)=? AND (?='*' OR scope='' OR scope=?) AND origin<>? ORDER BY score DESC LIMIT 80`).all(new Uint8Array(vector.buffer, vector.byteOffset, vector.byteLength), namespace, vector.byteLength, scope, scope, excludedOrigin).filter(row => Number(row.score) >= 0.35)
       : []
     const ranked = new Map<string, { hit: RecallHit, score: number }>()
     for (const results of [lexical, semantic]) {
@@ -144,12 +154,12 @@ export class RecallIndex {
     return [...ranked.values()].sort((a, b) => b.score - a.score || b.hit.updatedAt.localeCompare(a.hit.updatedAt)).map(item => item.hit)
   }
 
-  stats() {
-    return { sources: Number(this.database.prepare('SELECT count(*) AS n FROM sources').get()!.n), excerpts: Number(this.database.prepare('SELECT count(*) AS n FROM excerpts').get()!.n), vectors: Number(this.database.prepare('SELECT count(*) AS n FROM excerpts WHERE vector IS NOT NULL').get()!.n) }
+  stats(namespace?: string, dimensions?: number) {
+    return { sources: Number(this.database.prepare('SELECT count(*) AS n FROM sources').get()!.n), excerpts: Number(this.database.prepare('SELECT count(*) AS n FROM excerpts').get()!.n), vectors: Number(this.database.prepare('SELECT count(*) AS n FROM excerpts WHERE vector IS NOT NULL AND namespace=? AND (? IS NULL OR length(vector)=?)').get(namespace ?? '', dimensions ?? null, (dimensions ?? 0) * 4)!.n) }
   }
 
   /** Writers purge derived copies without creating an index for users who have not enabled retrieval. */
-  static async invalidate(dataDir: string, origin: string) {
+  static async invalidate(dataDir: string, origin: string, id?: string) {
     try {
       await stat(join(dataDir, 'memory', 'recall.sqlite'))
     }
@@ -160,7 +170,7 @@ export class RecallIndex {
     }
     const index = await RecallIndex.open(dataDir)
     try {
-      index.remove(origin)
+      index.remove(origin, id)
     }
     finally {
       index.close()

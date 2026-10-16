@@ -16,6 +16,7 @@ export class Embeddings {
   private readonly queries = new Map<string, Float32Array>()
   private retryAfter = 0
   private failure = false
+  private dimension?: number
 
   constructor(env: NodeJS.ProcessEnv, defaults: { baseUrl?: string, apiKey: string }, private readonly messages: typeof cliMessages.en) {
     this.model = env.ANGELA_EMBEDDING_MODEL?.trim() ?? ''
@@ -27,6 +28,10 @@ export class Embeddings {
     // A different embedding endpoint never inherits credentials from the chat provider.
     this.key = env.ANGELA_EMBEDDING_API_KEY ?? (defaults.baseUrl && new URL(defaults.baseUrl).origin === this.url.origin ? defaults.apiKey : '')
     this.namespace = createHash('sha256').update(`${this.url.href}\n${this.model}`).digest('hex')
+  }
+
+  get dimensions() {
+    return this.dimension
   }
 
   get status() {
@@ -80,6 +85,9 @@ export class Embeddings {
         const ordered = parsed.data.sort((a, b) => a.index - b.index)
         if (ordered.some((item, index) => item.index !== index || item.embedding.length !== ordered[0]!.embedding.length))
           throw new Error(this.messages.recallEmbeddingFailed)
+        if (this.dimension !== undefined && this.dimension !== ordered[0]!.embedding.length)
+          throw new Error(this.messages.recallEmbeddingFailed)
+        this.dimension = ordered[0]!.embedding.length
         const vectors = ordered.map(({ embedding }) => {
           const norm = Math.sqrt(embedding.reduce((sum, value) => sum + value * value, 0))
           if (!Number.isFinite(norm) || norm === 0)

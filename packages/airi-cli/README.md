@@ -355,7 +355,7 @@ A forced process kill or machine crash prevents cleanup. Restarting the audio se
 
 Personal memory stores facts and preferences across CLI sessions that use the same data directory.
 It works for text and voice. Desktop learning memory and Telegram memory stay separate.
-No extra model, embeddings, database, or service is required.
+No extra service or local AI model is required. Recall uses an embedded SQLite index.
 
 Use these interactive commands:
 
@@ -391,7 +391,7 @@ Voice transcripts go to the model. Only typed slash commands directly edit memor
 Memory holds at most 50 records, with 500 characters per record. Exact duplicate saves reuse the existing record.
 It is stored as private plaintext at `<data-dir>/memory/personal.json`. The default data directory is `~/.angela/sessions`.
 Saved facts are sent to the currently selected chat provider. Do not save credentials or secrets.
-Enabled memory is refreshed before each CLI request. Disabling it removes saved context and tools from later requests.
+Enabled core profile facts and relevant personal records are refreshed before each CLI request. Disabling it removes saved context and tools from later requests.
 Earlier conversation messages, tool results, and saved session history remain unchanged after disabling or forgetting a fact.
 A new session avoids previous conversation context. Resuming an old session can still expose its earlier messages.
 Deleting a chat session does not delete personal memory.
@@ -406,7 +406,7 @@ Personal memory design follows bounded core context in [Letta memory blocks](htt
 selective extraction in [Mem0](https://docs.mem0.ai/core-concepts/memory-operations/add),
 and separation of durable facts from transcripts in [OpenClaw](https://docs.openclaw.ai/concepts/memory-architecture).
 Angela uses its existing local store and tool runtime. It does not add these frameworks as dependencies.
-Record IDs and text enter model context. Storage timestamps stay on disk to reduce repeated prompt overhead.
+Selected personal records enter model context with their IDs. Recall excerpts also carry source dates and versions.
 Assistant identity and behavior stay in the base system prompt. User memories cannot change tool approval settings.
 
 ## Project memory
@@ -534,9 +534,72 @@ Semantic retrieval is opt-in through `ANGELA_EMBEDDING_MODEL`.
 `ANGELA_EMBEDDING_API_KEY` selects its credential. Chat credentials are inherited only for the same origin.
 Enabling embeddings sends indexed text, including historical user/assistant messages, to that endpoint.
 The CLI installs no local model. Missing configuration uses keyword search. Failed requests report degraded semantic status and retain keyword access.
-Requests reject redirects and bound response sizes, vector dimensions and execution time.
+Requests reject redirects and bound response sizes, vector dimensions and execution time. Indexes distinguish embedding endpoint, model and dimensions.
 Keyword and cosine rankings combine through reciprocal rank fusion. Duplicate excerpts and repeated source hits are limited before context selection.
 
 The excerpt budget is separate from fixed memory instructions and the bounded skill catalog.
 Core facts take priority. Long documents remain readable through explicit recall tools.
 `/memory used` reports supplied sources, not proof that the model relied on every source or that old outcomes remain true.
+
+
+## Automatic recall and controls
+
+Text and voice turns share automatic recall. The host supplies pinned profile facts, matching excerpts, and a bounded skill catalog before generation.
+The model can search additional sources and read long skills in pages. It must load a complete relevant skill before following its workflow.
+Search tool results contain bounded snippets. `memory_read` returns up to 4000 characters and a continuation offset.
+Automatic excerpts default to 12000 characters, with pinned profile facts taking priority. Fixed instructions and the skill catalog have separate bounds.
+This budget does not change the model context budget controlled by `ANGELA_CONTEXT_TOKENS`.
+`/memory status` also reports the latest completed search latency, prepared-context size and selected-source count.
+
+```text
+/memory pin ID
+/memory unpin ID
+/memory search cách chạy dự án
+/memory search-all lỗi hôm qua
+/memory read SOURCE_ID
+/memory used
+/memory status
+/memory budget 12000
+/memory history off
+/memory semantic off
+/memory recall off
+/memory recall on
+/memory reindex
+/skills
+/skills show NAME
+/skills import /path/to/SKILL.md
+/skills edit NAME /path/to/instructions.md
+/skills off NAME
+/skills on NAME
+/skills forget NAME
+```
+
+`/memory history off` removes history from recall without deleting sessions. Turning it on indexes them again.
+`/memory recall off` disables search and automatic excerpts. The pinned personal profile and existing personal-memory controls remain available.
+`/memory auto off` controls model writes, independently of recall. `/memory off` disables all personal context and personal-memory tools.
+`/skills off` disables the skill store. Individual skills can be disabled without removing their documents.
+`/skills edit` reads instruction text from the selected file and preserves the skill name and description.
+`/skills forget` deletes the selected skill document and its derived index. It does not delete historical conversations that mentioned that workflow.
+
+New model-saved facts include a source quote and session ID. The model marks task-independent identity and communication facts as core.
+Use pin/unpin to correct that selection directly. Existing unclassified facts remain searchable.
+The host offers `skill_save` for reusable workflows with current-user evidence or successful observed MCP output.
+Skill records include the source kind and session. Proposed plans, model answers and failed tool outcomes cannot serve as host verification evidence.
+Semantic interpretation of user confirmations and workflow quality still depends on the selected model. Saved skills do not retrain model weights.
+
+Session indexing stores overlapping excerpts plus an extractive overview from the opening and closing messages.
+These overviews quote actual messages. They are not generated completion claims or proof that old tool side effects remain true.
+Today/yesterday queries use local calendar dates and recorded session update dates. Individual message dates are unavailable in the existing session format.
+
+Forgetting or updating personal facts removes their derived excerpts and vectors. Unchanged facts retain their vectors.
+Deleting a session also removes its derived source. Files changed by another CLI process are revalidated before use.
+If an index cleanup fails after a source write, the CLI reports that partial outcome. Reindex after resolving the storage error.
+`/memory used` hides cached text when a source was subsequently removed, disabled or changed.
+Source files and saved session history have separate deletion controls. Forgetting a fact does not erase previous user messages or external backups.
+Background tasks stop on CLI shutdown and abort pending embedding requests. No extra chat-generation request is added for indexing.
+
+CLI recall follows the separation of profiles, skills and conversation search in
+[Hermes](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory),
+progressive skill loading in [Pi](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/skills.md),
+and hybrid retrieval in [OpenClaw](https://docs.openclaw.ai/concepts/memory-search).
+This implementation reuses Angela storage, context management, MCP and permission handling.
