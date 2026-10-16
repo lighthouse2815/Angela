@@ -32,7 +32,8 @@
     "abort-controller": "catalog:",
     "grammy": "catalog:",
     "valibot": "catalog:",
-    "ws": "catalog:"
+    "ws": "catalog:",
+    "yaml": "catalog:"
   },
   "devDependencies": {
     "@types/ws": "catalog:"

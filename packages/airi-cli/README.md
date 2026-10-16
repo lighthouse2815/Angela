@@ -496,3 +496,18 @@ cancellation. The echo check always reports this limitation as a warning.
 
 Exit code 1 means at least one error; warnings alone return 0. JSON contains
 `healthy` (no errors) and `checks`, each with `id`, `status` and a localized `message`.
+
+
+## Memory stores and reusable skills
+
+Personal facts remain in `memory/personal.json`. Optional `core` and `source` fields describe pinned facts and evidence for each edit.
+Unclassified facts have no core designation. Direct commands record their text as evidence. Model writes also record the source session.
+Use `/memory pin ID` and `/memory unpin ID` to control the core profile, limited to 4000 characters.
+
+Reusable workflows live in `memory/skills/NAME/SKILL.md` with YAML `name` and `description` fields.
+Skill instructions describe when to use the workflow, its steps, pitfalls, and verification.
+The header records the latest verification quote and update time. File hashes identify versions for conflict detection.
+Explicit imports and model saves use atomic replacement and exclusive per-skill locks.
+Imports create new skills. Updating an existing skill requires its current version.
+Agent-discovered project files do not automatically join this trusted store.
+A skill is reusable guidance, never proof that the current task succeeded or permission to run a tool.

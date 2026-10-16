@@ -3218,6 +3218,9 @@ importers:
       ws:
         specifier: 'catalog:'
         version: 8.21.3(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      yaml:
+        specifier: 'catalog:'
+        version: 2.9.0
     devDependencies:
       '@types/ws':
         specifier: 'catalog:'

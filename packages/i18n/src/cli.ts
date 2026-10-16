@@ -1,4 +1,11 @@
 const en = {
+  memoryCoreLimit: 'Core profile is full (4000 characters). Unpin another fact first.',
+  skillsUsage: '/skills | /skills show NAME | /skills import PATH | /skills on|off [NAME]',
+  skillsInvalid: 'Cannot read skill files. Check memory/skills and YAML headers.',
+  skillsMissing: 'Skill is missing or disabled.',
+  skillsChanged: 'Skill selection updated.',
+  skillsImported: 'Imported by an explicit local command.',
+  memoryPinned: 'Core profile selection updated. Pinned facts accompany every request when personal memory is enabled.',
   memoryCount: 'Saved memories',
   memoryUpdated: 'Memory updated',
   memoryNotSaved: 'Cannot confirm the memory edit',
@@ -39,7 +46,7 @@ const en = {
   projectMemoryInvalid: 'Cannot read project memory. Check memory/projects in the CLI data directory. Stored data was not changed.',
   projectMemoryUnavailable: 'Project memory is unavailable for this reply. Chat continues without its checkpoint. Check /project.',
 
-  memoryUsage: '/memory | /memory on|off | /memory auto on|off | /remember TEXT | /memory edit ID TEXT | /forget ID',
+  memoryUsage: '/memory | /memory on|off | /memory auto on|off | /memory pin|unpin ID | /remember TEXT | /memory edit ID TEXT | /forget ID',
   memoryUnavailable: 'Personal memory is unavailable for this reply. Chat continues without it. Check /memory. Stored data was not changed.',
   memoryAutomatic: 'Automatic memory is on. Angela can remember clear durable facts you share without a remember request.',
   memoryRequested: 'Automatic memory is off. Existing facts remain available. New edits require an explicit remember or update request.',
@@ -173,6 +180,13 @@ const en = {
 }
 
 const vi: typeof en = {
+  memoryCoreLimit: 'Hồ sơ cốt lõi đã đủ 4000 ký tự. Bỏ ghim ghi nhớ khác trước.',
+  skillsUsage: '/skills | /skills show TÊN | /skills import ĐƯỜNG_DẪN | /skills on|off [TÊN]',
+  skillsInvalid: 'Không đọc được kỹ năng. Kiểm tra memory/skills và phần đầu YAML.',
+  skillsMissing: 'Kỹ năng không tồn tại hoặc đã tắt.',
+  skillsChanged: 'Đã cập nhật lựa chọn kỹ năng.',
+  skillsImported: 'Được nhập bằng lệnh trực tiếp của người dùng.',
+  memoryPinned: 'Đã cập nhật hồ sơ cốt lõi. Ghi nhớ được ghim đi kèm mỗi yêu cầu khi memory cá nhân bật.',
   memoryCount: 'Số ghi nhớ đã lưu',
   memoryUpdated: 'Đã cập nhật ghi nhớ',
   memoryNotSaved: 'Không xác nhận được thay đổi ghi nhớ',
@@ -213,7 +227,7 @@ const vi: typeof en = {
   projectMemoryInvalid: 'Không đọc được memory dự án. Kiểm tra memory/projects trong thư mục dữ liệu CLI. Dữ liệu lưu chưa bị thay đổi.',
   projectMemoryUnavailable: 'Memory dự án chưa dùng được cho lượt này. Chat tiếp tục không kèm bản tóm tắt. Kiểm tra /project.',
 
-  memoryUsage: '/memory | /memory on|off | /memory auto on|off | /remember NỘI_DUNG | /memory edit ID NỘI_DUNG | /forget ID',
+  memoryUsage: '/memory | /memory on|off | /memory auto on|off | /memory pin|unpin ID | /remember NỘI_DUNG | /memory edit ID NỘI_DUNG | /forget ID',
   memoryUnavailable: 'Không đọc được memory cho lượt này. Chat tiếp tục không kèm ghi nhớ. Kiểm tra /memory. Dữ liệu lưu chưa bị thay đổi.',
   memoryAutomatic: 'Đã bật tự ghi nhớ. Angela có thể nhớ thông tin bền vững bạn chia sẻ mà không cần yêu cầu lưu.',
   memoryRequested: 'Đã tắt tự ghi nhớ. Ghi nhớ cũ vẫn được dùng. Chỉ lưu hoặc sửa khi bạn yêu cầu rõ ràng.',
