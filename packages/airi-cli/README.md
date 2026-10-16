@@ -58,6 +58,17 @@ With workspace dependencies installed and built, this executable works from anot
 
 The executable uses workspace packages. It is not a self-contained binary or a published npm package.
 
+To install the `angela` command on Linux or macOS, run these commands from the repository root after the build:
+
+```sh
+mkdir -p "$HOME/.local/bin"
+ln -s "$PWD/packages/airi-cli/dist/bin/run.mjs" "$HOME/.local/bin/angela"
+```
+
+Make sure that `$HOME/.local/bin` is on `PATH`. Keep this checkout and its built workspace packages available.
+From any directory, use `angela` for chat or `angela --computer-use` for terminal tools.
+The current directory becomes the workspace. `--cwd` selects another directory.
+
 The default interface language is Vietnamese.
 Use `ANGELA_LOCALE=en` or `--locale en` for English.
 
