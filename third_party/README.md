@@ -15,7 +15,8 @@ Gaze tracking is disabled, but the tracker still loads `mnv3_gaze32_split_opt.on
 Keep the complete upstream tree for provenance and future subtree updates.
 
 Upstream pins Python 3.9 and its runtime dependencies in `pyproject.toml` and `uv.lock`.
-Use that environment for the Angela worker. Do not install training dependencies from `Source/`.
+Angela uses its own locked Python 3.11 CPU environment because the upstream ONNX wheel fails on the development kernel.
+See [worker setup](../packages/airi-cli/python/camera-worker/README.md). Do not install training dependencies from `Source/`.
 
 To update, use `git subtree pull --prefix=third_party/openseeface --squash <upstream> master`.
 Then update this revision and run the camera tests before release.
