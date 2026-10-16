@@ -81,3 +81,27 @@ it('uses fresh request-local memory without retaining removed facts in persisted
   expect(JSON.stringify(chat.conversation)).not.toContain('new-preference')
   expect(chat.conversation.turns.map(turn => turn.type)).toEqual(['system', 'user', 'assistant', 'user', 'assistant', 'user', 'assistant'])
 })
+
+it('compacts the outgoing request while retaining full history for session persistence', async () => {
+  const requests: string[] = []
+  const fetch = vi.fn<typeof globalThis.fetch>(async (_url, init) => {
+    const body = String(init?.body)
+    requests.push(body)
+    return completion(body.includes('Summarize historical conversation data') ? 'Old requirement: preserve the API design and check tests.' : 'Current answer')
+  })
+  const provider: GenerationProvider = {
+    generation: model => ({ protocol: 'chat-completions', config: { model, baseURL: 'https://provider.example/v1/', fetch } }),
+  }
+  const chat = new Chat('model', provider, '/workspace', undefined, true, 4096)
+  for (let index = 0; index < 8; index++)
+    chat.conversation.turns.push({ type: 'user', id: `history-${index}`, content: [{ type: 'text', text: `Unique historical detail ${index}: ${'old content '.repeat(150)}` }] })
+  const original = JSON.stringify(chat.conversation)
+  await chat.send('Keep this latest requirement', {}, 'Fresh memory context')
+  expect(chat.context.status.summarizedTurns).toBeGreaterThan(0)
+  expect(requests.at(-1)).toContain('Keep this latest requirement')
+  expect(requests.at(-1)).toContain('Fresh memory context')
+  expect(requests.at(-1)).toContain('Old requirement: preserve the API design')
+  expect(requests.at(-1)).not.toContain('Unique historical detail 0')
+  expect(JSON.stringify({ turns: chat.conversation.turns.slice(0, -2) })).toBe(original)
+  expect(JSON.stringify(chat.conversation)).not.toContain('Old requirement: preserve the API design')
+})

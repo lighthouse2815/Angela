@@ -1,4 +1,8 @@
 const en = {
+  contextLimit: 'ANGELA_CONTEXT_TOKENS must be an integer between 4096 and 2000000.',
+  contextTooLarge: 'Required context exceeds the configured budget. Shorten the current input or start a new session. Full history remains saved.',
+  contextSummaryFailed: 'History summarization failed or exceeded its size limit. Retry the request. Full history remains saved.',
+  contextStatus: 'Context estimates (not provider token counts):',
   projectMemoryUsage: '/project | /project on|off | /project clear',
   projectMemoryLocked: 'Cannot lock project memory for writing. Check other CLI sessions and the project lock file.',
   projectMemoryEnabled: 'Project memory is enabled for this workspace. Checkpoints are sent to the selected AI provider.',
@@ -63,7 +67,7 @@ const en = {
   cwd: 'Workspace directory',
   locale: 'Interface language: en or vi',
   help: 'Show help',
-  cliCommands: 'Available commands:\n/voice — Speak and hear replies.\n/chat — Return to text chat.\n/project — View and manage this project checkpoint.\n/memory — View and manage personal memory.\n/remember TEXT — Save a personal fact.\n/forget ID — Delete one personal memory.\n/help — Show this list.\n/permistion — Show the current tool permission mode.\n/permistion full — Run tools without confirmation in this session.\n/permistion ask — Ask before each tool call.\n/permission — Alias for /permistion. on/off also select full/ask.\n/exit — Exit Angela.\n\nCtrl+C — Cancel the active request. Ctrl+D — Exit.',
+  cliCommands: 'Available commands:\n/voice — Speak and hear replies.\n/chat — Return to text chat.\n/context — Show context budget and summary status.\n/project — View and manage this project checkpoint.\n/memory — View and manage personal memory.\n/remember TEXT — Save a personal fact.\n/forget ID — Delete one personal memory.\n/help — Show this list.\n/permistion — Show the current tool permission mode.\n/permistion full — Run tools without confirmation in this session.\n/permistion ask — Ask before each tool call.\n/permission — Alias for /permistion. on/off also select full/ask.\n/exit — Exit Angela.\n\nCtrl+C — Cancel the active request. Ctrl+D — Exit.',
   telegramCommands: 'Available Telegram commands:\n/start — Introduce Angela.\n/help — Show this list.\n/status — Show the model, session, and request status.\n/new — Clear this conversation and start again.\n/cancel — Cancel the active request.\n/permistion — Show tool permissions. Use full or ask to change them.\n/permission — Alias for /permistion.\n\nTools run on the machine hosting this bot. Confirmation is required by default.',
   missingModel: 'Set ANGELA_MODEL or pass --model.',
   invalidUrl: 'Use an HTTP or HTTPS provider endpoint.',
@@ -142,6 +146,10 @@ const en = {
 }
 
 const vi: typeof en = {
+  contextLimit: 'ANGELA_CONTEXT_TOKENS phải là số nguyên từ 4096 đến 2000000.',
+  contextTooLarge: 'Ngữ cảnh bắt buộc vượt ngân sách đã đặt. Rút ngắn nội dung hiện tại hoặc mở phiên mới. Lịch sử đầy đủ vẫn được lưu.',
+  contextSummaryFailed: 'Không tóm tắt được lịch sử hoặc bản tóm tắt quá dài. Thử gửi lại. Lịch sử đầy đủ vẫn được lưu.',
+  contextStatus: 'Ước lượng ngữ cảnh (không phải số token từ nhà cung cấp):',
   projectMemoryUsage: '/project | /project on|off | /project clear',
   projectMemoryLocked: 'Không khóa được memory dự án để ghi. Kiểm tra phiên CLI khác và file khóa của dự án.',
   projectMemoryEnabled: 'Đã bật memory dự án cho thư mục này. Bản tóm tắt được gửi kèm đến nhà cung cấp AI đang chọn.',
@@ -206,7 +214,7 @@ const vi: typeof en = {
   cwd: 'Thư mục làm việc',
   locale: 'Ngôn ngữ giao diện: en hoặc vi',
   help: 'Hiện hướng dẫn',
-  cliCommands: 'Danh sách lệnh:\n/voice — Nói và nghe trả lời.\n/chat — Quay lại nhập chữ.\n/project — Xem và quản lý bản tóm tắt dự án.\n/memory — Xem và quản lý memory cá nhân.\n/remember NỘI_DUNG — Lưu một ghi nhớ.\n/forget ID — Xóa một ghi nhớ.\n/help — Hiện danh sách này.\n/permistion — Xem chế độ quyền công cụ hiện tại.\n/permistion full — Chạy tool không cần xác nhận trong phiên này.\n/permistion ask — Hỏi xác nhận trước mỗi lần gọi tool.\n/permission — Tên khác của /permistion. on/off tương ứng full/ask.\n/exit — Thoát Angela.\n\nCtrl+C — Hủy yêu cầu đang chạy. Ctrl+D — Thoát.',
+  cliCommands: 'Danh sách lệnh:\n/voice — Nói và nghe trả lời.\n/chat — Quay lại nhập chữ.\n/context — Xem ngân sách ngữ cảnh và trạng thái tóm tắt.\n/project — Xem và quản lý bản tóm tắt dự án.\n/memory — Xem và quản lý memory cá nhân.\n/remember NỘI_DUNG — Lưu một ghi nhớ.\n/forget ID — Xóa một ghi nhớ.\n/help — Hiện danh sách này.\n/permistion — Xem chế độ quyền công cụ hiện tại.\n/permistion full — Chạy tool không cần xác nhận trong phiên này.\n/permistion ask — Hỏi xác nhận trước mỗi lần gọi tool.\n/permission — Tên khác của /permistion. on/off tương ứng full/ask.\n/exit — Thoát Angela.\n\nCtrl+C — Hủy yêu cầu đang chạy. Ctrl+D — Thoát.',
   telegramCommands: 'Danh sách lệnh Telegram:\n/start — Giới thiệu Angela.\n/help — Hiện danh sách này.\n/status — Xem model, phiên và trạng thái yêu cầu.\n/new — Xóa hội thoại hiện tại và bắt đầu lại.\n/cancel — Hủy yêu cầu đang chạy.\n/permistion — Xem quyền công cụ. Dùng full hoặc ask để đổi quyền.\n/permission — Tên khác của /permistion.\n\nTool chạy trên máy đang mở bot. Mặc định phải xác nhận.',
   missingModel: 'Đặt ANGELA_MODEL hoặc truyền --model.',
   invalidUrl: 'Dùng địa chỉ provider HTTP hoặc HTTPS.',

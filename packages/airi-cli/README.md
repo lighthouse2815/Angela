@@ -439,3 +439,29 @@ Enabled checkpoints are sent to the selected model. Do not store secrets or raw 
 Unreadable checkpoint files remain untouched. Chat continues without project context and shows a warning.
 Personal and project memories reuse the same atomic file writer, private permissions, and per-process write queue.
 After a crash, remove an abandoned project `.lock` only after checking that its writer has stopped.
+
+## Long conversation context
+
+The CLI keeps full conversation history on disk and prepares a smaller request view when older turns exceed its context budget.
+`/context` shows the configured budget, estimated input tokens, output reserve, summarized turns, and compaction count.
+Set `ANGELA_CONTEXT_TOKENS` before starting Angela to select a budget from 4096 to 2000000 (default: 32000).
+Choose a budget that fits your selected model. This setting does not discover or change its context-window capacity.
+
+Input estimates use UTF-8 byte length divided by three, including projected messages and custom tool schemas.
+They are heuristic estimates, not provider token counts. Multimodal payloads and provider-specific overhead can differ.
+The CLI reserves up to 4096 estimated tokens for output, or one quarter of smaller budgets.
+The reserve is accounting headroom, not a provider output-token cap.
+
+When needed, Angela calls the configured model without tools to summarize older complete turns.
+Each summary retains requirements, decisions, paths, reported outcomes, failures, and unresolved work within 3000 characters.
+The latest user turn, system and memory context, and subsequent tool rounds remain intact.
+Tool calls and results within retained assistant turns stay together.
+Summaries are untrusted historical reports, not tool permissions or proof that earlier actions still match the workspace.
+They can lose detail. Full session history remains available for recovery.
+
+Summarization adds API requests only when compaction is needed. The process caches its rolling summary for later turns.
+Summaries are not saved as history or personal memory. Resuming a large session reconstructs the summary and can incur new requests.
+Cancellation, empty summaries, and oversized summaries stop the request without replacing history.
+If the current input, required system context, or a single historical turn cannot fit, shorten it or start a new session.
+Context preparation runs before a generation stream. Tool output accumulated inside that stream can still exceed the provider window.
+This release does not truncate active tool output or automatically retry provider context-limit errors.

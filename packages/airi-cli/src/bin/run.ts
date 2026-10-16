@@ -91,7 +91,7 @@ async function main() {
     const provider = getGenerationProvider(await definition.createProvider(config.providerConfig))
     if (!provider)
       throw new Error(`${messages.unsupportedProvider}: ${config.definitionId}`)
-    const chat = new Chat(config.model, provider, workspace, session.restore())
+    const chat = new Chat(config.model, provider, workspace, session.restore(), true, Number(process.env.ANGELA_CONTEXT_TOKENS ?? 32_000), messages)
     await session.save(chat.conversation, session.record.interrupted)
     const interactive = process.stdin.isTTY && config.prompt === undefined
     const output = new Output(messages)
@@ -337,6 +337,10 @@ async function main() {
           output.submitted()
           if (text === undefined || text === '/exit')
             break
+          if (text === '/context') {
+            process.stderr.write(`${messages.contextStatus} ${JSON.stringify(chat.context.status)}\n`)
+            continue
+          }
           if (text === '/help') {
             process.stderr.write(`${messages.cliCommands}\n`)
             continue

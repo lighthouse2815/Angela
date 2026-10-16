@@ -4,12 +4,17 @@ import type { GenerationProvider } from '@proj-airi/provider-inference'
 import { randomUUID } from 'node:crypto'
 
 import { streamFrom } from '@proj-airi/core-agent'
+import { cliMessages } from '@proj-airi/i18n/cli'
+
+import { Context } from './context'
 
 /** Owns one serial conversation. Failed generations never append an incomplete assistant turn. */
 export class Chat {
+  readonly context: Context
   readonly conversation: Conversation = { turns: [] }
 
-  constructor(private readonly model: string, private readonly provider: GenerationProvider, workspace: string, history?: Conversation, toolsAvailable = true) {
+  constructor(private readonly model: string, private readonly provider: GenerationProvider, workspace: string, history?: Conversation, toolsAvailable = true, contextLimit = 32_000, messages = cliMessages.en) {
+    this.context = new Context(contextLimit, messages)
     this.conversation.turns.push({
       type: 'system',
       id: randomUUID(),
@@ -36,6 +41,10 @@ export class Chat {
         : this.conversation,
       options: {
         ...options,
+        prepareConversation: async (conversation, target) => {
+          const prepared = options.prepareConversation ? await options.prepareConversation(conversation, target) : conversation
+          return await this.context.prepare(prepared, this.model, this.provider, options)
+        },
         onGeneratedTurn: (turn) => {
           this.conversation.turns.push(turn)
         },
