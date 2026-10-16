@@ -81,16 +81,21 @@ it('reads shared credentials and piped UTF-8 input, then resumes the streamed co
   expect(JSON.parse(bodies[0]).model).toBe('shared-model')
   expect(authorization[0]).toBe(`Bearer ${apiKey}`)
   expect(first.stderr).not.toContain(apiKey)
-  const files = await readdir(directory)
+  const files = (await readdir(directory)).filter(file => file.endsWith('.json'))
   expect(files).toHaveLength(1)
   const sessionId = files[0].replace('.json', '')
   const stored = await readFile(join(directory, files[0]), 'utf8')
   expect(stored).not.toContain(apiKey)
+  expect(first.stderr).toContain('Đã kết nối MCP')
+  expect(JSON.parse(bodies[0]).tools).toEqual(expect.arrayContaining([
+    expect.objectContaining({ function: expect.objectContaining({ name: 'builtIn_mcpCallTool' }) }),
+  ]))
   const resumed = run(['--resume', sessionId, '--prompt', 'Bạn nhớ gì?'], { ...env, ANGELA_DATA_DIR: directory })
   expect(await resumed.result).toMatchObject({ code: 0 })
   expect(bodies[1]).toContain('Xin chào từ Angela')
   expect(bodies[1]).toContain('Bạn nhớ gì?')
-})
+  // Both CLI processes start and gracefully close the real built-in MCP service.
+}, 15_000)
 
 it('returns exit code 130 after SIGINT cancels the active provider request', async () => {
   const server = createServer((_request, response) => response.writeHead(200, { 'Content-Type': 'text/event-stream' }))

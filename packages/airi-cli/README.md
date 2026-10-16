@@ -66,7 +66,7 @@ ln -s "$PWD/packages/airi-cli/dist/bin/run.mjs" "$HOME/.local/bin/angela"
 ```
 
 Make sure that `$HOME/.local/bin` is on `PATH`. Keep this checkout and its built workspace packages available.
-From any directory, use `angela` for chat or `angela --computer-use` for terminal tools.
+From any directory, run `angela`. It connects the built-in terminal tools automatically.
 The current directory becomes the workspace. `--cwd` selects another directory.
 
 The default interface language is Vietnamese.
@@ -95,20 +95,21 @@ An empty model answer reports an error instead of returning silently to the prom
 
 ## Scope
 
-This entry point provides text chat and an optional MCP connection.
+This entry point provides text chat and a built-in terminal MCP connection.
 The web and desktop applications provide avatars, voice, and visual settings.
 
 ## Terminal tools
 
-Build the service, then connect its terminal tools:
+Build the service before the first run. The CLI connects its terminal tools automatically:
 
 ```sh
 pnpm -F @proj-airi/computer-use-mcp build
-pnpm cli --computer-use --cwd ./packages/core-agent
+angela --cwd ./packages/core-agent
 ```
 
 The model discovers tools through `builtIn_mcpListTools` and calls them through `builtIn_mcpCallTool`.
 The built-in connection exposes terminal tools only. File reads and edits use terminal commands.
+`--computer-use` remains accepted. An explicit `--mcp-command` selects another server instead of the built-in service.
 The CLI supplies the selected workspace when a terminal call omits `cwd`.
 The workspace is a working directory, not a filesystem sandbox.
 

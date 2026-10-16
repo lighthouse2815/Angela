@@ -72,7 +72,7 @@ export async function readConfig(args: string[], env: NodeJS.ProcessEnv) {
     apiKey,
     prompt: values.prompt,
     cwd: values.cwd,
-    computerUse: values['computer-use'] ?? false,
+    computerUse: values['computer-use'] ?? !values['mcp-command'],
     mcpCommand: values['mcp-command'],
     mcpArgs: values['mcp-arg'] ?? [],
     messages,

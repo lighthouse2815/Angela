@@ -32,7 +32,8 @@ describe('cLI configuration', () => {
   })
 
   it('keeps server arguments as an argv array and rejects conflicting servers', async () => {
-    expect(await read(['--model', 'm', '--mcp-command', 'node', '--mcp-arg=server.mjs', '--mcp-arg=a b'])).toMatchObject({ mcpCommand: 'node', mcpArgs: ['server.mjs', 'a b'] })
+    expect(await read(['--model', 'm'])).toMatchObject({ computerUse: true })
+    expect(await read(['--model', 'm', '--mcp-command', 'node', '--mcp-arg=server.mjs', '--mcp-arg=a b'])).toMatchObject({ computerUse: false, mcpCommand: 'node', mcpArgs: ['server.mjs', 'a b'] })
     await expect(read(['--model', 'm', '--computer-use', '--mcp-command', 'node'])).rejects.toThrow('--computer-use')
     await expect(read(['--model', 'm', '--mcp-arg=test'])).rejects.toThrow('--mcp-command')
   })
