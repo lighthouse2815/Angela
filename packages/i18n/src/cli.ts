@@ -27,6 +27,16 @@ const en = {
   approvalReserved: 'Only the CLI can resolve pending approvals.',
   unknownTool: 'This tool is not available in this session.',
   mcpConnected: 'MCP connected',
+  resume: 'Resume a saved session by ID',
+  listSessions: 'List saved sessions without contacting a provider',
+  dataDir: 'Session directory (or ANGELA_DATA_DIR)',
+  invalidId: 'Use a session ID from --list-sessions.',
+  invalidWorkspace: 'The workspace must be a directory.',
+  session: 'Session',
+  sessionLocked: 'This session is open in another process, or its previous process left a lock file.',
+  invalidSession: 'The session file is invalid or uses an unsupported format.',
+  incompleteSession: 'The previous request did not finish. Verify tool outcomes before repeating actions.',
+  noSessions: 'No saved sessions.',
 }
 
 const vi: typeof en = {
@@ -58,6 +68,16 @@ const vi: typeof en = {
   approvalReserved: 'Chỉ CLI được xử lý yêu cầu phê duyệt.',
   unknownTool: 'Công cụ này không có trong phiên hiện tại.',
   mcpConnected: 'Đã kết nối MCP',
+  resume: 'Tiếp tục phiên đã lưu theo ID',
+  listSessions: 'Liệt kê phiên đã lưu, không gọi provider',
+  dataDir: 'Thư mục lưu phiên (hoặc ANGELA_DATA_DIR)',
+  invalidId: 'Dùng ID phiên từ --list-sessions.',
+  invalidWorkspace: 'Thư mục làm việc phải là một thư mục.',
+  session: 'Phiên',
+  sessionLocked: 'Phiên đang mở trong tiến trình khác hoặc tiến trình trước để lại file khóa.',
+  invalidSession: 'File phiên không hợp lệ hoặc dùng định dạng chưa hỗ trợ.',
+  incompleteSession: 'Yêu cầu trước chưa hoàn thành. Kiểm tra kết quả công cụ trước khi lặp lại thao tác.',
+  noSessions: 'Chưa có phiên đã lưu.',
 }
 
 /** CLI hosts select a language without loading browser translation plugins. */

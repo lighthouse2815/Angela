@@ -69,6 +69,25 @@ pnpm cli --mcp-command pnpm --mcp-arg=-F --mcp-arg=@proj-airi/computer-use-mcp -
 The server starts in `--cwd`. Its stderr goes to the terminal. CLI output never mixes with the server protocol.
 The child process does not receive `ANGELA_API_KEY`. Other environment variables remain available to the server.
 
+## Sessions
+
+Each run saves a session in `~/.angela/sessions`. Use `ANGELA_DATA_DIR` or `--data-dir` to change this directory.
+The CLI prints its session ID to stderr. Session files use private permissions and atomic replacement.
+
+```sh
+pnpm cli --list-sessions
+pnpm cli --resume SESSION_ID
+```
+
+Resume requires the same provider configuration as a new chat. Credentials and provider configuration are not stored in session files.
+The saved workspace remains active unless `--cwd` specifies the same directory.
+A session lock prevents two CLI processes from writing the same session.
+After a crash, remove its `.lock` file only after you confirm that the previous process stopped.
+
+History preserves text and correlated tool calls and results through the core runtime's portable message projection.
+Native provider continuation and reasoning metadata remain in memory for the current process.
+Interrupted requests are marked. The CLI does not fabricate an assistant answer or undo external actions.
+
 ## Checks
 
 ```sh

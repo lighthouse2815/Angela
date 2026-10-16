@@ -1,3 +1,5 @@
+import { homedir } from 'node:os'
+import { join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 
 import { cliMessages } from '@proj-airi/i18n/cli'
@@ -19,12 +21,20 @@ export function readConfig(args: string[], env: NodeJS.ProcessEnv) {
       'computer-use': { type: 'boolean' },
       'mcp-command': { type: 'string' },
       'mcp-arg': { type: 'string', multiple: true },
+      'resume': { type: 'string' },
+      'list-sessions': { type: 'boolean' },
+      'data-dir': { type: 'string' },
     },
   })
   const locale = v.parse(v.picklist(['en', 'vi'], cliMessages.en.invalidLocale), values.locale ?? env.ANGELA_LOCALE ?? 'vi')
   const messages = cliMessages[locale]
   if (values.help)
     return { help: true as const, messages }
+
+  const dataDir = resolve(values['data-dir'] ?? env.ANGELA_DATA_DIR ?? join(homedir(), '.angela', 'sessions'))
+  if (values['list-sessions'])
+    return { help: false as const, list: true as const, messages, dataDir }
+  const resume = values.resume === undefined ? undefined : v.parse(v.pipe(v.string(), v.uuid(messages.invalidId)), values.resume)
 
   const model = v.parse(v.pipe(v.string(), v.trim(), v.nonEmpty(messages.missingModel)), values.model ?? env.ANGELA_MODEL ?? '')
   const baseUrl = v.parse(v.pipe(v.string(), v.url(messages.invalidUrl)), values['base-url'] ?? env.ANGELA_BASE_URL ?? 'https://api.openai.com/v1/')
@@ -37,6 +47,9 @@ export function readConfig(args: string[], env: NodeJS.ProcessEnv) {
     throw new Error(messages.missingMcpCommand)
   return {
     help: false as const,
+    list: false as const,
+    dataDir,
+    resume,
     model,
     baseUrl,
     api,
