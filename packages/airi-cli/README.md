@@ -375,7 +375,8 @@ Direct save and edit commands show the saved text and ID after the write succeed
 Automatic memory is on by default. Clear statements such as “Tôi tên là Đăng” can be saved without a remember request.
 The existing chat model selects durable first-person facts and writes them through its native tool. No separate extraction request is added.
 Use `/memory auto off` for explicit-request-only edits while keeping saved facts available. `/memory auto on` restores automatic selection.
-`/memory off` disables all saved context and model memory tools. Turning memory back on preserves your automatic-selection setting.
+`/memory off` disables saved personal context and personal-memory tools. Turning it back on preserves your automatic-selection setting.
+History and skills have independent recall controls. Project checkpoints remain under `/project`.
 Temporary moods, task commands, quotes, hypothetical examples, and inferred traits are excluded by the model instructions.
 Repeated behavior alone does not establish a lasting preference. Angela asks before turning an inference into a saved fact.
 Clear self-corrections update matching records. Ambiguous conflicts require clarification, and equivalent facts reuse an existing record.
