@@ -1,7 +1,9 @@
 const en = {
-  voiceReady: 'Voice mode. Press Enter to record. /chat returns to text chat.',
-  voiceRecord: 'Recording. Enter sends, /chat discards: ',
-  voicePrompt: 'Voice [Enter / /chat]: ',
+  voiceReady: 'Automatic voice mode. Speak naturally. /chat returns to text chat.',
+  voiceRecord: 'Listening to your speech. Silence sends it automatically.',
+  voicePrompt: 'Microphone on. Speak when ready. /chat stops listening.',
+  voiceTranscribing: 'Microphone off. Recognizing speech…',
+  voiceSpeaking: 'Microphone off. Angela is speaking…',
   chatReady: 'Text chat mode.',
   voicePlatform: 'CLI voice requires Linux with pw-record and pw-play (PipeWire).',
   voiceConfig: 'Set ANGELA_VOICE_BASE_URL to an OpenAI-compatible audio endpoint.',
@@ -99,9 +101,11 @@ const en = {
 }
 
 const vi: typeof en = {
-  voiceReady: 'Đã bật voice. Enter để thu âm. /chat quay lại nhập chữ.',
-  voiceRecord: 'Đang thu âm. Enter để gửi, /chat để bỏ bản thu: ',
-  voicePrompt: 'Voice [Enter / /chat]: ',
+  voiceReady: 'Đã bật voice tự động. Cứ nói chuyện. /chat quay lại nhập chữ.',
+  voiceRecord: 'Đang nghe bạn nói. Ngừng nói để tự gửi.',
+  voicePrompt: 'Micro đang bật. Bạn có thể nói. /chat để dừng nghe.',
+  voiceTranscribing: 'Đã tắt micro. Đang nhận dạng lời nói…',
+  voiceSpeaking: 'Đã tắt micro. Angela đang trả lời bằng giọng nói…',
   chatReady: 'Đã chuyển sang chat bằng chữ.',
   voicePlatform: 'Voice CLI cần Linux có pw-record và pw-play (PipeWire).',
   voiceConfig: 'Đặt ANGELA_VOICE_BASE_URL trỏ đến endpoint âm thanh tương thích OpenAI.',

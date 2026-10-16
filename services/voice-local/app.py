@@ -5,15 +5,18 @@ import io
 import logging
 import os
 import subprocess
+import wave
 from functools import lru_cache
 from threading import Lock
 
 import edge_tts
 from faster_whisper import WhisperModel
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 from starlette.concurrency import run_in_threadpool
+
+from capture import SpeechCapture
 
 app = FastAPI(docs_url=None, redoc_url=None)
 transcription_lock = Lock()
@@ -60,6 +63,50 @@ async def transcriptions(file: UploadFile = File(...), model: str = Form(...)):
         raise HTTPException(502, "Transcription failed") from None
     finally:
         await file.close()
+
+
+@app.websocket("/v1/audio/listen")
+async def listen(socket: WebSocket):
+    """One connection owns one utterance. Disconnect discards its in-memory capture."""
+    await socket.accept()
+    try:
+        async with asyncio.timeout(10):
+            config = await socket.receive_json()
+        if config.get("model") != os.environ.get("ANGELA_WHISPER_MODEL", "small"):
+            await socket.close(code=1008, reason="STT model mismatch")
+            return
+        capture = await run_in_threadpool(SpeechCapture)
+        await socket.send_json({"type": "ready"})
+        while True:
+            data = await socket.receive_bytes()
+            if not data or len(data) > 65536:
+                await socket.close(code=1009, reason="Invalid audio frame")
+                return
+            started = capture.started
+            audio = await run_in_threadpool(capture.feed, data)
+            if capture.started and not started:
+                await socket.send_json({"type": "speech"})
+            if audio is None:
+                continue
+            await socket.send_json({"type": "transcribing"})
+            wav = io.BytesIO()
+            with wave.open(wav, "wb") as output:
+                output.setnchannels(1)
+                output.setsampwidth(2)
+                output.setframerate(16000)
+                output.writeframes(audio)
+            text = await run_in_threadpool(transcribe_audio, wav.getvalue())
+            await socket.send_json({"type": "transcript", "text": text})
+            await socket.close()
+            return
+    except WebSocketDisconnect:
+        return
+    except Exception:
+        logger.exception("Automatic listening failed")
+        try:
+            await socket.close(code=1011, reason="Automatic listening failed")
+        except RuntimeError:
+            pass
 
 
 class Speech(BaseModel):

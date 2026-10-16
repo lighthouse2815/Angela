@@ -3212,6 +3212,13 @@ importers:
       valibot:
         specifier: 'catalog:'
         version: 1.4.2(typescript@6.0.3)
+      ws:
+        specifier: 'catalog:'
+        version: 8.21.3(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+    devDependencies:
+      '@types/ws':
+        specifier: 'catalog:'
+        version: 8.18.1
 
   packages/audio:
     dependencies:

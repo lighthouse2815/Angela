@@ -1,3 +1,5 @@
+import type { Buffer } from 'node:buffer'
+
 import type { cliMessages } from '@proj-airi/i18n/cli'
 
 import process from 'node:process'
@@ -7,6 +9,8 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { parseEnv } from 'node:util'
+
+import WebSocket from 'ws'
 
 /** Owns private audio files, PipeWire children, and one serial audio request at a time. */
 export class Voice {
@@ -36,50 +40,100 @@ export class Voice {
       throw new Error(messages.voiceConfig)
   }
 
-  /** Enter stops capture. EOF or a command discards it. Cancellation terminates the child and deletes audio. */
-  async listen(stop: () => Promise<string | undefined>, signal: AbortSignal): Promise<string | undefined> {
-    const directory = await mkdtemp(join(tmpdir(), 'angela-voice-'))
-    try {
-      const path = join(directory, 'input.wav')
-      const child = spawn('pw-record', ['--rate', '16000', '--channels', '1', '--format', 's16', path], { stdio: 'ignore' })
-      let stopping = false
-      const closed = new Promise<void>((resolve, reject) => {
-        child.once('error', () => reject(new Error(this.messages.voicePlatform)))
-        child.once('close', (code, reason) => code === 0 || reason === 'SIGINT' || (stopping && code === 1) ? resolve() : reject(new Error(this.messages.voiceFailed)))
+  /** One call owns its socket, microphone, and terminal question. Only a completed utterance reaches STT. */
+  async listen(command: (signal: AbortSignal) => Promise<string | undefined>, signal: AbortSignal, state: (value: 'ready' | 'speech' | 'transcribing') => void) {
+    signal.throwIfAborted()
+    const lifetime = new AbortController()
+    const combined = AbortSignal.any([signal, lifetime.signal])
+    const url = new URL('audio/listen', this.baseUrl)
+    url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:'
+    const socket = new WebSocket(url, {
+      handshakeTimeout: 10_000,
+      headers: this.env.ANGELA_VOICE_API_KEY ? { Authorization: `Bearer ${this.env.ANGELA_VOICE_API_KEY}` } : undefined,
+    })
+    let recorder: ReturnType<typeof spawn> | undefined
+    let stopped: Promise<void> | undefined
+    let transcribing = false
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const transcript = new Promise<{ kind: 'transcript', text: string }>((resolve, reject) => {
+      const fail = () => reject(new Error(this.messages.voiceFailed))
+      const abort = () => reject(combined.reason)
+      combined.addEventListener('abort', abort, { once: true })
+      socket.once('close', () => {
+        combined.removeEventListener('abort', abort)
+        fail()
       })
-      const abort = () => {
-        stopping = true
-        child.kill('SIGINT')
-      }
-      signal.addEventListener('abort', abort, { once: true })
-      try {
-        signal.throwIfAborted()
-        // A recorder failure must release the terminal question through the caller's signal.
-        const text = await Promise.race([stop(), closed.then(() => {
-          throw new Error(this.messages.voiceFailed)
-        })])
-        abort()
-        await closed
-        signal.throwIfAborted()
+      socket.once('error', fail)
+      socket.once('open', () => {
+        socket.send(JSON.stringify({ model: this.env.ANGELA_STT_MODEL ?? 'whisper-1' }))
+        timer = setTimeout(fail, 10_000)
+      })
+      socket.on('message', (data, binary) => {
+        try {
+          if (binary || data.toString().length > 4096)
+            throw new Error(this.messages.voiceFailed)
+          const message: unknown = JSON.parse(data.toString())
+          if (!message || typeof message !== 'object' || !('type' in message))
+            throw new Error(this.messages.voiceFailed)
+          if (message.type === 'ready' && !recorder) {
+            clearTimeout(timer)
+            state('ready')
+            recorder = spawn('pw-record', ['--raw', '--rate', '16000', '--channels', '1', '--format', 's16', '-'], { stdio: ['ignore', 'pipe', 'ignore'] })
+            recorder.once('error', () => reject(new Error(this.messages.voicePlatform)))
+            stopped = new Promise<void>((done) => {
+              recorder!.once('close', () => {
+                done()
+                if (!transcribing && !combined.aborted)
+                  fail()
+              })
+            })
+            recorder.stdout?.on('data', (chunk: Buffer) => {
+              if (transcribing || combined.aborted)
+                return
+              if (socket.readyState !== WebSocket.OPEN || socket.bufferedAmount > 256_000) {
+                fail()
+                return
+              }
+              socket.send(chunk)
+            })
+          }
+          else if (message.type === 'speech' && recorder && !transcribing) {
+            state('speech')
+          }
+          else if (message.type === 'transcribing' && recorder && !transcribing) {
+            transcribing = true
+            recorder.kill('SIGINT')
+            state('transcribing')
+            timer = setTimeout(fail, 120_000)
+          }
+          else if (message.type === 'transcript' && transcribing && 'text' in message && typeof message.text === 'string') {
+            resolve({ kind: 'transcript', text: message.text.trim() })
+          }
+          else {
+            fail()
+          }
+        }
+        catch {
+          fail()
+        }
+      })
+    })
+    const commands = async () => {
+      while (true) {
+        const text = await command(combined)
         if (text === undefined || text.trim())
-          return text
-        const body = new FormData()
-        body.set('model', this.env.ANGELA_STT_MODEL ?? 'whisper-1')
-        body.set('file', new Blob([await readFile(path)], { type: 'audio/wav' }), 'input.wav')
-        const response = await this.request('audio/transcriptions', { method: 'POST', body }, signal)
-        const data: unknown = await response.json()
-        if (!data || typeof data !== 'object' || !('text' in data) || typeof data.text !== 'string' || !data.text.trim())
-          throw new Error(this.messages.voiceEmpty)
-        return data.text.trim()
-      }
-      finally {
-        abort()
-        await closed.catch(() => {})
-        signal.removeEventListener('abort', abort)
+          return { kind: 'command' as const, text: text?.trim() }
       }
     }
+    try {
+      return await Promise.race([transcript, commands()])
+    }
     finally {
-      await rm(directory, { recursive: true, force: true })
+      lifetime.abort()
+      clearTimeout(timer)
+      recorder?.kill('SIGINT')
+      socket.terminate()
+      await stopped
     }
   }
 

@@ -5,3 +5,4 @@ uvicorn==0.54.0
 python-multipart==0.0.32
 # Faster Whisper 1.2.1 requires the metadata_errors argument removed in PyAV 19.
 av==18.0.0
+websockets==17.2

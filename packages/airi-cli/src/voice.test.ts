@@ -1,17 +1,27 @@
-import { EventEmitter } from 'node:events'
+import { Buffer } from 'node:buffer'
+import { EventEmitter, once } from 'node:events'
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { PassThrough } from 'node:stream'
 
 import { cliMessages } from '@proj-airi/i18n/cli'
 import { afterEach, expect, it, vi } from 'vitest'
+import { WebSocketServer } from 'ws'
 
 import { Voice } from './voice'
 
 const { spawn } = vi.hoisted(() => ({ spawn: vi.fn() }))
 vi.mock('node:child_process', () => ({ spawn }))
 
-afterEach(() => {
+const servers: WebSocketServer[] = []
+
+afterEach(async () => {
+  for (const server of servers.splice(0)) {
+    for (const socket of server.clients)
+      socket.terminate()
+    await new Promise<void>(resolve => server.close(() => resolve()))
+  }
   vi.unstubAllGlobals()
   vi.restoreAllMocks()
   spawn.mockReset()
@@ -20,21 +30,6 @@ afterEach(() => {
 it('requires an explicit audio endpoint before voice mode starts', () => {
   expect(() => new Voice({}, cliMessages.en)).toThrow(cliMessages.en.voiceConfig)
   expect(() => new Voice({ ANGELA_VOICE_BASE_URL: 'file:///tmp/audio' }, cliMessages.en)).toThrow(cliMessages.en.voiceConfig)
-})
-
-it('discards capture when the user switches back to chat without an audio request', async () => {
-  const child = new EventEmitter()
-  const kill = vi.fn(() => {
-    queueMicrotask(() => child.emit('close', 0, null))
-  })
-  Object.assign(child, { kill })
-  spawn.mockReturnValue(child)
-  const fetch = vi.fn()
-  vi.stubGlobal('fetch', fetch)
-  const voice = new Voice({ ANGELA_VOICE_BASE_URL: 'http://localhost/v1/' }, cliMessages.en)
-  expect(await voice.listen(async () => '/chat', new AbortController().signal)).toBe('/chat')
-  expect(kill).toHaveBeenCalledWith('SIGINT')
-  expect(fetch).not.toHaveBeenCalled()
 })
 
 it('sends the configured TTS model, voice and isolated audio credential before playback', async () => {
@@ -59,30 +54,6 @@ it('does not play failed speech responses or disclose the provider body', async 
   const voice = new Voice({ ANGELA_VOICE_BASE_URL: 'http://localhost/v1/' }, cliMessages.en)
   await expect(voice.speak('Hello', new AbortController().signal)).rejects.toThrow(`${cliMessages.en.voiceFailed} HTTP 401`)
   expect(spawn).not.toHaveBeenCalled()
-})
-
-it('transcribes a captured WAV when PipeWire returns 1 after an intentional stop', async () => {
-  let recorded: Promise<void> = Promise.resolve()
-  spawn.mockImplementation((_command: string, args: string[]) => {
-    const child = new EventEmitter()
-    recorded = writeFile(args.at(-1)!, new Uint8Array([82, 73, 70, 70]))
-    Object.assign(child, { kill: () => {
-      queueMicrotask(() => child.emit('close', 1, null))
-    } })
-    return child
-  })
-  const fetch = vi.fn(async (_url: URL, _init: RequestInit) => Response.json({ text: '  Mở ứng dụng  ' }))
-  vi.stubGlobal('fetch', fetch)
-  const voice = new Voice({ ANGELA_VOICE_BASE_URL: 'http://localhost/v1', ANGELA_STT_MODEL: 'local-stt' }, cliMessages.en)
-  const result = await voice.listen(async () => {
-    await recorded
-    return ''
-  }, new AbortController().signal)
-  expect(result).toBe('Mở ứng dụng')
-  expect(String(fetch.mock.calls[0]?.[0])).toBe('http://localhost/v1/audio/transcriptions')
-  const body = fetch.mock.calls[0]?.[1].body as FormData
-  expect(body.get('model')).toBe('local-stt')
-  expect(body.get('file')).toBeInstanceOf(Blob)
 })
 
 it('loads voice configuration outside the workspace and lets environment values override it', async () => {
@@ -129,4 +100,107 @@ it('splits long replies without losing text and stops future chunks on cancellat
   })
   await expect(voice.speak(text, controller.signal)).rejects.toThrow()
   expect(fetch).toHaveBeenCalledTimes(1)
+})
+
+async function endpoint() {
+  const server = new WebSocketServer({ port: 0, host: '127.0.0.1' })
+  servers.push(server)
+  await once(server, 'listening')
+  const address = server.address()
+  if (!address || typeof address === 'string')
+    throw new Error('Missing test port')
+  return { server, voice: new Voice({ ANGELA_VOICE_BASE_URL: `http://127.0.0.1:${address.port}/v1/`, ANGELA_STT_MODEL: 'small' }, cliMessages.en) }
+}
+
+function microphone() {
+  const child = new EventEmitter()
+  const stdout = new PassThrough()
+  const kill = vi.fn(() => {
+    queueMicrotask(() => child.emit('close', 1, null))
+  })
+  Object.assign(child, { stdout, kill })
+  spawn.mockReturnValue(child)
+  return { child, stdout, kill }
+}
+
+function pendingCommand(signal: AbortSignal): Promise<string | undefined> {
+  return new Promise((_resolve, reject) => signal.addEventListener('abort', () => reject(signal.reason), { once: true }))
+}
+
+it('streams raw audio and stops the microphone before transcription, then returns the utterance', async () => {
+  const { server, voice } = await endpoint()
+  const mic = microphone()
+  const frames: Buffer[] = []
+  const states: string[] = []
+  server.on('connection', (socket, request) => {
+    expect(request.url).toBe('/v1/audio/listen')
+    socket.on('message', (data, binary) => {
+      if (!binary) {
+        expect(JSON.parse(data.toString())).toEqual({ model: 'small' })
+        socket.send(JSON.stringify({ type: 'ready' }))
+      }
+      else {
+        frames.push(Buffer.from(data.toString()))
+        socket.send(JSON.stringify({ type: 'speech' }))
+        socket.send(JSON.stringify({ type: 'transcribing' }))
+        socket.send(JSON.stringify({ type: 'transcript', text: 'Mở ứng dụng' }))
+      }
+    })
+  })
+  const result = await voice.listen(pendingCommand, new AbortController().signal, (state) => {
+    states.push(state)
+    if (state === 'ready')
+      setImmediate(() => mic.stdout.write(Buffer.from('audio')))
+    if (state === 'transcribing')
+      expect(mic.kill).toHaveBeenCalled()
+  })
+  expect(result).toEqual({ kind: 'transcript', text: 'Mở ứng dụng' })
+  expect(states).toEqual(['ready', 'speech', 'transcribing'])
+  expect(frames).toEqual([Buffer.from('audio')])
+  expect(spawn).toHaveBeenCalledWith('pw-record', expect.arrayContaining(['--raw', '-']), expect.objectContaining({ stdio: ['ignore', 'pipe', 'ignore'] }))
+})
+
+it('lets /chat discard a capture and closes the microphone', async () => {
+  const { server, voice } = await endpoint()
+  const mic = microphone()
+  let sendCommand: ((value: string) => void) | undefined
+  server.on('connection', socket => socket.once('message', () => socket.send(JSON.stringify({ type: 'ready' }))))
+  const result = await voice.listen(() => new Promise<string>(resolve => sendCommand = resolve), new AbortController().signal, () => sendCommand?.('/chat'))
+  expect(result).toEqual({ kind: 'command', text: '/chat' })
+  expect(mic.kill).toHaveBeenCalledWith('SIGINT')
+})
+
+it('cancels listening without leaving a terminal question or microphone running', async () => {
+  const { server, voice } = await endpoint()
+  const mic = microphone()
+  const controller = new AbortController()
+  let question: AbortSignal | undefined
+  server.on('connection', socket => socket.once('message', () => socket.send(JSON.stringify({ type: 'ready' }))))
+  await expect(voice.listen((signal) => {
+    question = signal
+    return pendingCommand(signal)
+  }, controller.signal, () => controller.abort())).rejects.toThrow()
+  expect(question?.aborted).toBe(true)
+  expect(mic.kill).toHaveBeenCalledWith('SIGINT')
+})
+
+it('rejects service disconnects and cancels the pending terminal question', async () => {
+  const { server, voice } = await endpoint()
+  let question: AbortSignal | undefined
+  server.on('connection', socket => socket.close())
+  await expect(voice.listen((signal) => {
+    question = signal
+    return pendingCommand(signal)
+  }, new AbortController().signal, () => {})).rejects.toThrow(cliMessages.en.voiceFailed)
+  expect(question?.aborted).toBe(true)
+  expect(spawn).not.toHaveBeenCalled()
+})
+
+it('treats an unexpected recorder exit as a failure instead of sending partial audio', async () => {
+  const { server, voice } = await endpoint()
+  const mic = microphone()
+  server.on('connection', socket => socket.once('message', () => socket.send(JSON.stringify({ type: 'ready' }))))
+  await expect(voice.listen(pendingCommand, new AbortController().signal, () => {
+    setImmediate(() => mic.child.emit('close', 1, null))
+  })).rejects.toThrow(cliMessages.en.voiceFailed)
 })

@@ -8,7 +8,10 @@
   "bin": {
     "angela": "./dist/bin/run.mjs"
   },
-  "files": ["README.md", "dist"],
+  "files": [
+    "README.md",
+    "dist"
+  ],
   "scripts": {
     "dev": "tsx src/bin/run.ts",
     "build": "tsdown",
@@ -27,6 +30,10 @@
     "@xsai/shared-chat": "catalog:",
     "abort-controller": "catalog:",
     "grammy": "catalog:",
-    "valibot": "catalog:"
+    "valibot": "catalog:",
+    "ws": "catalog:"
+  },
+  "devDependencies": {
+    "@types/ws": "catalog:"
   }
 }

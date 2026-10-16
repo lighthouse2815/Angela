@@ -5,6 +5,7 @@ services:
       - '127.0.0.1:8000:8000'
     environment:
       ANGELA_WHISPER_MODEL: small
+      ANGELA_VOICE_SILENCE_MS: ${ANGELA_VOICE_SILENCE_MS:-1200}
       HF_HOME: /models
     volumes:
       - models:/models

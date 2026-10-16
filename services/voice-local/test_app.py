@@ -13,7 +13,8 @@ from edge_tts.exceptions import NoAudioReceived
 from fastapi import HTTPException, UploadFile
 from faster_whisper.audio import decode_audio
 
-from app import Speech, speech, transcriptions
+from app import Speech, listen, speech, transcriptions
+from capture import SpeechCapture
 
 
 class AudioTests(unittest.TestCase):
@@ -81,6 +82,65 @@ class AudioTests(unittest.TestCase):
                 asyncio.run(speech(Speech(input="Xin chào", voice="unknown")))
         self.assertEqual(caught.exception.status_code, 400)
         communicate.assert_not_called()
+
+
+class CaptureTests(unittest.TestCase):
+    def test_idle_audio_stays_bounded_and_does_not_trigger(self):
+        with patch("capture.get_speech_timestamps", return_value=[]):
+            capture = SpeechCapture()
+            for _ in range(200):
+                self.assertIsNone(capture.feed(b"\x00" * 8192))
+        self.assertFalse(capture.started)
+        self.assertLessEqual(len(capture.window), 96000)
+        self.assertEqual(len(capture.audio), 0)
+
+    def test_speech_ends_after_silero_reports_trailing_silence(self):
+        with patch("capture.get_speech_timestamps", return_value=[{"start": 0, "end": 4096}]):
+            capture = SpeechCapture()
+            self.assertIsNone(capture.feed(b"\x00" * 8192))
+        self.assertTrue(capture.started)
+        with patch("capture.get_speech_timestamps", return_value=[]):
+            audio = capture.feed(b"\x00" * 8192)
+        self.assertEqual(len(audio), 16384)
+
+    def test_long_utterances_are_limited_to_thirty_seconds(self):
+        with patch("capture.get_speech_timestamps", return_value=[{"start": 0, "end": 32000}]):
+            capture = SpeechCapture()
+            audio = None
+            for _ in range(120):
+                audio = capture.feed(b"\x00" * 8192)
+                if audio is not None:
+                    break
+        self.assertEqual(len(audio), 960000)
+
+    def test_fragmented_frames_are_preserved(self):
+        with patch("capture.get_speech_timestamps", return_value=[]):
+            capture = SpeechCapture()
+            capture.feed(b"a" * 8191)
+            capture.feed(b"b")
+        self.assertEqual(capture.window, b"a" * 8191 + b"b")
+        self.assertEqual(len(capture.pending), 0)
+
+    def test_websocket_sends_lifecycle_and_transcript(self):
+        socket = SimpleNamespace(
+            accept=AsyncMock(), receive_json=AsyncMock(return_value={"model": "small"}),
+            receive_bytes=AsyncMock(side_effect=[b"a" * 8192, b"b" * 8192]),
+            send_json=AsyncMock(), close=AsyncMock(),
+        )
+        with patch("capture.get_speech_timestamps", side_effect=[[{"start": 0, "end": 4096}], []]):
+            with patch("app.transcribe_audio", return_value="Xin chào") as transcribe:
+                asyncio.run(listen(socket))
+        events = [call.args[0] for call in socket.send_json.call_args_list]
+        self.assertEqual(events, [{"type": "ready"}, {"type": "speech"}, {"type": "transcribing"}, {"type": "transcript", "text": "Xin chào"}])
+        self.assertTrue(transcribe.call_args.args[0].startswith(b"RIFF"))
+        socket.close.assert_awaited_once()
+
+    def test_model_mismatch_does_not_open_capture(self):
+        socket = SimpleNamespace(accept=AsyncMock(), receive_json=AsyncMock(return_value={"model": "wrong"}), close=AsyncMock())
+        with patch("app.SpeechCapture") as capture:
+            asyncio.run(listen(socket))
+        capture.assert_not_called()
+        self.assertEqual(socket.close.call_args.kwargs["code"], 1008)
 
 
 if __name__ == "__main__":

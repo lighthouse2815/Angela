@@ -135,10 +135,14 @@ async function main() {
         completed = true
         await session.save(chat.conversation, false)
         output.stop()
-        if (voice)
+        if (voice) {
+          process.stderr.write(`${messages.voiceSpeaking}\n`)
           await voice.speak(answer, active.signal)
+        }
       }
       catch (error) {
+        if (active.signal.aborted)
+          voice = undefined
         output.stop()
         process.stderr.write(`\n${active.signal.aborted ? messages.interrupted : `${messages.failed}: ${formatRequestError(error, messages)}`}\n`)
         if (!interactive && process.exitCode !== 143)
@@ -173,7 +177,43 @@ async function main() {
       if (input && interactive) {
         process.stderr.write(`${messages.workspace}: ${workspace}\n${messages.welcome}\n${messages.permissionAsk}\n`)
         while (true) {
-          let text = (await input.ask(voice ? messages.voicePrompt : output.prompt(), undefined, messages.cliCommands))?.trim()
+          let text: string | undefined
+          if (voice) {
+            active = new AbortController()
+            const capture = active
+            try {
+              const result = await voice.listen(signal => input!.ask('', signal, messages.cliCommands), capture.signal, (state) => {
+                const label = state === 'ready' ? messages.voicePrompt : state === 'speech' ? messages.voiceRecord : messages.voiceTranscribing
+                process.stderr.write(`${label}\n`)
+              })
+              if (result.kind === 'transcript') {
+                if (result.text) {
+                  process.stderr.write(`${result.text}\n`)
+                  capture.abort()
+                  active = undefined
+                  await send(result.text)
+                }
+                else {
+                  process.stderr.write(`${messages.voiceEmpty}\n`)
+                }
+                continue
+              }
+              text = result.text
+            }
+            catch (error) {
+              process.stderr.write(`${capture.signal.aborted ? messages.interrupted : errorMessageFrom(error)}\n`)
+              voice = undefined
+              process.stderr.write(`${messages.chatReady}\n`)
+              continue
+            }
+            finally {
+              capture.abort()
+              active = undefined
+            }
+          }
+          else {
+            text = (await input.ask(output.prompt(), undefined, messages.cliCommands))?.trim()
+          }
           if (text === '/voice') {
             try {
               voice ??= await Voice.load(process.env, messages)
@@ -188,28 +228,6 @@ async function main() {
             voice = undefined
             process.stderr.write(`${messages.chatReady}\n`)
             continue
-          }
-          if (voice && text === '') {
-            active = new AbortController()
-            const capture = active
-            try {
-              text = await voice.listen(() => input!.ask(messages.voiceRecord, capture.signal), capture.signal)
-            }
-            catch (error) {
-              process.stderr.write(`${capture.signal.aborted ? messages.interrupted : errorMessageFrom(error)}\n`)
-              continue
-            }
-            finally {
-              capture.abort()
-              active = undefined
-            }
-            if (text?.trim() === '/chat') {
-              voice = undefined
-              process.stderr.write(`${messages.chatReady}\n`)
-              continue
-            }
-            if (text && !text.startsWith('/'))
-              process.stderr.write(`${text}\n`)
           }
           output.submitted()
           if (text === undefined || text === '/exit')

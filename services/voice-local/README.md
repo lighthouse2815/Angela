@@ -28,8 +28,19 @@ ANGELA_TTS_MODEL=edge-tts
 ANGELA_TTS_VOICE=vi-VN-HoaiMyNeural
 ```
 
-Restart Angela CLI. Type `/voice`, then press Enter to start capture.
-Press Enter again to send. Type `/chat` to return to text.
+Restart Angela CLI. Type `/voice` and speak without pressing Enter.
+Silero VAD detects speech and ends an utterance after about 1.2 seconds of silence.
+After Angela reads the answer, the CLI listens again. Type `/chat` to return to text.
+Ctrl+C cancels voice mode. Start it again with `/voice`.
+The microphone stays off while Angela processes or reads a reply.
+Set `ANGELA_VOICE_SILENCE_MS` before starting Compose to adjust silence between 400 and 2000 ms.
+The default is 1200 ms. Longer pauses reduce interruptions but increase response delay.
+
+The `v1/audio/listen` WebSocket accepts a JSON STT model selection, then raw 16 kHz mono signed 16-bit PCM.
+It emits `ready`, `speech`, `transcribing`, and `transcript` events for one utterance, then closes.
+Silero comes from Faster Whisper's bundled ONNX assets. No additional model download is required for VAD.
+Capture retains three seconds of idle context and at most 30 seconds per utterance in memory.
+Disconnect discards capture. An STT operation already in progress can finish after the client disconnects.
 No voice API key is required. The existing chat provider remains separate.
 The CLI reads this file from any working directory. Environment variables override its values.
 `ANGELA_VOICE_ENV` selects another file. `XDG_CONFIG_HOME` selects another configuration directory.

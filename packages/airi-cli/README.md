@@ -102,11 +102,22 @@ The web and desktop applications provide avatars and visual settings.
 
 ## Voice in the current session
 
-Type `/voice` during interactive chat to speak and hear Angela's replies.
-Press Enter to start capture. Press Enter again to send the audio.
-Type `/chat` to return to text chat. During capture, `/chat` discards the audio.
-Ctrl+C cancels capture, transcription, generation, or playback. The conversation and tool permissions stay in the same session.
-The microphone stays off during playback. This mode does not provide continuous listening or wake words.
+Type `/voice` during interactive chat to start automatic listening.
+Speak normally. About 1.2 seconds of silence ends your utterance and sends it automatically.
+Angela reads the answer, then listens again. Enter is not required.
+The terminal shows when the microphone is on, when speech starts, and when transcription or playback starts.
+Type `/chat` to discard the current capture and return to text chat.
+Ctrl+C stops the current operation and returns to text mode. `/voice` starts listening again.
+The microphone stays off during transcription, generation, tool approval, and playback.
+Voice interruption and echo cancellation are not part of this mode.
+Spoken text goes only to the model. Only typed commands can change tool permissions.
+The conversation and tool permissions stay in the same session.
+
+Automatic listening requires the local voice service's `audio/listen` WebSocket endpoint.
+The CLI streams 16 kHz mono PCM directly from PipeWire. Captures stay in memory and are discarded after each turn.
+Silero detects speech using the ONNX model already bundled with Faster Whisper.
+Idle audio uses a three-second rolling window. Utterances are limited to 30 seconds.
+Service or microphone failures return to text mode instead of restarting in a loop.
 
 For a free setup without an API key, use [the local voice service](../../services/voice-local/README.md).
 
