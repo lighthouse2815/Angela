@@ -4,11 +4,15 @@ import type { Interaction } from 'discord.js'
 import { env } from 'node:process'
 
 import { useLogg } from '@guiiai/logg'
+import { cliMessages } from '@proj-airi/i18n/cli'
 import { Client as ServerChannel } from '@proj-airi/server-sdk'
 import { ContextUpdateStrategy } from '@proj-airi/server-shared/types'
-import { Client, Events, GatewayIntentBits, Partials } from 'discord.js'
+import { Client, Events, GatewayIntentBits, MessageFlags, Partials } from 'discord.js'
+
+import * as v from 'valibot'
 
 import { handlePing, registerCommands, VoiceManager } from '../bots/discord/commands'
+import { Speech } from '../pipelines/speech'
 
 const log = useLogg('DiscordAdapter').useGlobalConfig()
 
@@ -18,20 +22,7 @@ export interface DiscordAdapterConfig {
   airiUrl?: string
 }
 
-// Define Discord configuration type
-interface DiscordConfig {
-  token?: string
-  enabled?: boolean
-}
-
-// Type guard to safely validate the configuration object
-function isDiscordConfig(config: unknown): config is DiscordConfig {
-  if (typeof config !== 'object' || config === null)
-    return false
-  const c = config as Record<string, unknown>
-  return (typeof c.token === 'string' || typeof c.token === 'undefined')
-    && (typeof c.enabled === 'boolean' || typeof c.enabled === 'undefined')
-}
+const configuration = v.object({ token: v.optional(v.string()), enabled: v.optional(v.boolean()) })
 
 function normalizeDiscordMetadata(discord?: Discord): Discord | undefined {
   if (!discord)
@@ -57,6 +48,7 @@ export class DiscordAdapter {
   private discordClient: Client
   private discordToken: string
   private voiceManager: VoiceManager
+  private readonly voiceMessages = (env.ANGELA_LOCALE === 'en' ? cliMessages.en : cliMessages.vi).discordVoice
   private isReconnecting = false
 
   constructor(config: DiscordAdapterConfig) {
@@ -83,12 +75,13 @@ export class DiscordAdapter {
         'input:voice',
         'module:configure',
         'output:gen-ai:chat:message',
+        'output:gen-ai:chat:complete',
       ],
       token: config.airiToken,
       url: config.airiUrl,
     })
 
-    this.voiceManager = new VoiceManager(this.discordClient, this.airiClient)
+    this.voiceManager = new VoiceManager(this.discordClient, this.airiClient, new Speech(), this.voiceMessages)
 
     this.setupEventHandlers()
   }
@@ -102,14 +95,15 @@ export class DiscordAdapter {
       }
       this.isReconnecting = true
       try {
-        log.log('Received Discord configuration:', event.data.config)
+        log.log('Received Discord configuration')
 
-        if (isDiscordConfig(event.data.config)) {
-          const config = event.data.config as DiscordConfig
-          const { token, enabled } = config
+        const parsed = v.safeParse(configuration, event.data.config)
+        if (parsed.success) {
+          const { token, enabled } = parsed.output
 
           if (enabled === false) {
-            if (this.discordClient.isReady) {
+            this.voiceManager.close()
+            if (this.discordClient.isReady()) {
               log.log('Disabling Discord bot as per configuration...')
               await this.discordClient.destroy()
             }
@@ -119,16 +113,18 @@ export class DiscordAdapter {
           // If enabled, but no token is provided, stop the bot if it's running.
           if (!token) {
             log.warn('Discord bot enabled, but no token provided. Stopping bot.')
-            if (this.discordClient.isReady) {
+            this.voiceManager.close()
+            if (this.discordClient.isReady()) {
               await this.discordClient.destroy()
             }
             return
           }
 
           // Connect or reconnect if token changed or client is not ready.
-          if (this.discordToken !== token || !this.discordClient.isReady) {
+          if (this.discordToken !== token || !this.discordClient.isReady()) {
             this.discordToken = token
-            if (this.discordClient.isReady) {
+            this.voiceManager.close()
+            if (this.discordClient.isReady()) {
               log.log('Reconnecting Discord client with new token...')
               await this.discordClient.destroy()
             }
@@ -142,7 +138,7 @@ export class DiscordAdapter {
         }
       }
       catch (error) {
-        log.withError(error as Error).error('Failed to apply Discord configuration.')
+        log.withError(error).error('Failed to apply Discord configuration.')
       }
       finally {
         this.isReconnecting = false
@@ -159,10 +155,14 @@ export class DiscordAdapter {
     // Handle output from AIRI system (IA response)
     this.airiClient.onEvent('output:gen-ai:chat:message', async (event) => {
       try {
-        const message = (event.data as { message?: { content: string } }).message
-        const discordContext = (event.data)['gen-ai:chat'].input.data.discord
+        const message = event.data.message
+        const discordContext = event.data['gen-ai:chat']?.input?.data.discord
 
-        if (message?.content && discordContext?.channelId) {
+        // Voice playback waits for the completed turn. Intermediate messages never reach the call or its text channel.
+        if (discordContext && 'voiceRequestId' in discordContext)
+          return
+
+        if (typeof message?.content === 'string' && message.content && discordContext?.channelId) {
           const channel = await this.discordClient.channels.fetch(discordContext.channelId)
           if (channel?.isTextBased() && 'send' in channel && typeof channel.send === 'function') {
             const content = message.content
@@ -196,15 +196,23 @@ export class DiscordAdapter {
         }
       }
       catch (error) {
-        log.withError(error as Error).error('Failed to send response to Discord')
+        log.withError(error).error('Failed to send response to Discord')
       }
     })
 
+    this.airiClient.onEvent('output:gen-ai:chat:complete', async (event) => {
+      const context = event.data['gen-ai:chat']?.input?.data.discord
+      const content = event.data.message.content
+      await this.voiceManager.handleResponse(context, typeof content === 'string' ? content : '')
+    })
+
     // Set up Discord event handlers
-    this.discordClient.once(Events.ClientReady, async (readyClient) => {
+    this.discordClient.on(Events.ClientReady, async (readyClient) => {
       log.log(`Discord bot ready! User: ${readyClient.user.tag}`)
       // Register commands dynamically using the authenticated client's ID and token
-      await registerCommands(this.discordToken, readyClient.user.id)
+      await registerCommands(this.discordToken, readyClient.user.id, this.voiceMessages).catch(() => {
+        log.error('Discord command registration failed')
+      })
     })
 
     // Handle text messages from Discord
@@ -292,13 +300,28 @@ export class DiscordAdapter {
 
       log.log(`Interaction received: /${interaction.commandName} from ${interaction.user.tag}`)
 
-      switch (interaction.commandName) {
-        case 'ping':
-          await handlePing(interaction)
-          break
-        case 'summon':
-          await this.voiceManager.handleJoinChannelCommand(interaction)
-          break
+      try {
+        switch (interaction.commandName) {
+          case 'ping':
+            await handlePing(interaction)
+            break
+          case 'summon':
+            await this.voiceManager.handleJoinChannelCommand(interaction)
+            break
+          case 'leave':
+            await this.voiceManager.handleLeaveChannelCommand(interaction)
+            break
+          case 'listen':
+            await this.voiceManager.handleListeningCommand(interaction)
+            break
+        }
+      }
+      catch {
+        log.error('Discord command failed')
+        if (interaction.deferred || interaction.replied)
+          await interaction.editReply(this.voiceMessages.failed).catch(() => {})
+        else
+          await interaction.reply({ content: this.voiceMessages.failed, flags: MessageFlags.Ephemeral }).catch(() => {})
       }
     })
   }
@@ -325,6 +348,7 @@ export class DiscordAdapter {
   async stop(): Promise<void> {
     log.log('Stopping Discord adapter...')
     try {
+      this.voiceManager.close()
       await this.discordClient.destroy()
       this.airiClient.close()
       log.log('Discord adapter stopped')

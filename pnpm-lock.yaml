@@ -2801,6 +2801,9 @@ importers:
       '@proj-airi/audio':
         specifier: workspace:^
         version: link:../../packages/audio
+      '@proj-airi/i18n':
+        specifier: workspace:^
+        version: link:../../packages/i18n
       '@proj-airi/server-sdk':
         specifier: workspace:^
         version: link:../../packages/server-sdk
@@ -2837,6 +2840,9 @@ importers:
       tsx:
         specifier: 'catalog:'
         version: 4.23.12
+      valibot:
+        specifier: 'catalog:'
+        version: 1.4.2(typescript@6.0.3)
       wavefile:
         specifier: 'catalog:'
         version: 11.0.0

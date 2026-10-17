@@ -1,53 +1,104 @@
-# `discord-bot`
+# Angela Discord bot
 
-Allow アイリ to talk to you and many other users in Discord voice channels.
+Angela can chat through mentions and direct messages, and join a server voice channel for spoken conversation.
+This adapter uses the existing AIRI server channel. Keep an Angela desktop or web client connected with a working chat provider.
+Use this package for voice conversation. The CLI Telegram task, permission, status, and recovery commands are separate features.
 
-## Getting started
+## Setup
 
-```shell
-git clone git@github.com:moeru-ai/airi.git
-pnpm i
+Use the workspace Node.js and pnpm versions. Install dependencies from the repository root.
+Install FFmpeg and put it on PATH. The existing Discord voice and Opus packages handle transport and audio decoding.
+
+Create a bot in the [Discord Developer Portal](https://discord.com/developers/applications).
+Enable Message Content Intent for mention-based text chat.
+Invite the bot with the `bot` and `applications.commands` scopes.
+Grant View Channel, Connect, Speak, and Send Messages in the call channel and its text chat.
+
+From the repository root, copy the configuration template:
+
+```sh
+cp integrations/discord-bot/.env.example integrations/discord-bot/.env.local
 ```
 
-In [Discord Developer Portal](https://discord.com/developers/home), create a new application and this will be the bot
-you will add to your server.
+Set `DISCORD_TOKEN` in the local file. Set `AIRI_URL` and `AIRI_TOKEN` to match Angela's server-channel settings.
+Keep credentials in the ignored local file or environment. Never commit them.
+The authenticated Discord bot ID registers commands automatically. `DISCORD_BOT_CLIENT_ID` is not required.
 
-In the **"Bot"** tab, find "Privileged Gateway Intents" section, toggle on the following intents:
+The template uses the existing [voice service](../../services/voice-local/README.md) on port 8000.
+Start that service separately. Its default models are `small` for transcription and `edge-tts` for speech.
+The default voice is `vi-VN-HoaiMyNeural`. Edge speech uses an external service.
+For another compatible provider, set both endpoint URLs, model names, API keys, and the speech voice.
+Use HTTP or HTTPS endpoint URLs with a trailing slash. The speech endpoint must support WAV responses.
+STT and TTS keys remain separate. Local endpoints can use empty keys.
 
-- **"Server Members Intent"**
-- **"Message Content Intent"**
+Start Angela's desktop or local web client, then start the adapter:
 
-Now look above the "Privileged Gateway Intents" section, you will find the "Token" section,
-for newly created bots, click "Reset Token" to generate a new token, and copy the token for later use.
-
-> [!NOTE]
-> If you ever forgot the token or lost it, you can always click "Reset Token" to generate a new token,
-> but remember to update the token in your `.env.local` file, or configure through the UI as well.
-
-Create a `.env.local` file:
-
-```shell
-cd integrations/discord-bot
-cp .env .env.local
+```sh
+pnpm -F @proj-airi/discord-bot start
 ```
 
-Fill-in the following credentials as configurations:
+Use `ANGELA_LOCALE=en` for English command descriptions and notices. Vietnamese is the default.
 
-```shell
-DISCORD_TOKEN=''
-DISCORD_BOT_CLIENT_ID=''
+## Call controls
 
-OPENAI_MODEL=''
-OPENAI_API_KEY=''
-OPENAI_API_BASE_URL=''
+Join a normal server voice channel, then use `/summon`.
+Angela starts listening after the connection reaches Ready and the join notice succeeds.
+The notice states that speech goes to the configured transcription service.
 
-ELEVENLABS_API_KEY=''
-ELEVENLABS_API_BASE_URL=''
+| Command | Behavior |
+| --- | --- |
+| `/summon` | Join your voice channel and start listening. |
+| `/listen enabled:false` | Stop capture, queued speech, pending voice requests, and playback. Remain in the channel. |
+| `/listen enabled:true` | Resume listening explicitly. |
+| `/leave` | Stop the call and disconnect. |
+| `/ping` | Check whether the bot responds. |
+
+Call controls require membership in the same voice channel as Angela.
+One bot can own one voice connection per server. A summon from another channel does not move an active call.
+Direct calls, group DMs, and Stage channels are outside this implementation.
+
+## Conversation behavior
+
+Each room owns its capture streams, speaker buffers, request queue, playback, and cancellation state.
+Discord user IDs identify speakers. This is not voiceprint recognition.
+The shared conversation session belongs to that server and voice channel. The speaker prefix identifies each person's input.
+Text chat retains its existing routing and sessions.
+
+The receiver ends a speech capture after 800 ms of silence through Discord's AfterSilence policy.
+Quiet captures remain local and do not trigger transcription. Confirmed speech can interrupt Angela's pending or audible reply.
+A room keeps at most four queued utterances. Overlapping speakers retain separate buffers.
+A capture can last at most 30 seconds. Longer captures are discarded with a notice instead of a partial transcript.
+Each reply has a 90-second deadline covering transcription, the AI response, speech generation, and playback.
+
+Only `output:gen-ai:chat:complete` triggers speech. Intermediate assistant messages never play in the call.
+The room, speaker, and random request ID must match the active turn before playback.
+Interrupted, duplicate, disconnected, or previous-call responses are ignored.
+Interruption stops playback and cancels pending speech synthesis. An active transcription can finish to preserve the speaker's words.
+An interrupted turn's reply remains silent. Pausing or leaving also cancels pending transcription requests.
+These controls do not cancel remote AI generation in the desktop client.
+Voice pauses and disconnects discard pending audio. They do not automatically reactivate after restart.
+
+Audio stays in bounded memory inside the adapter. The adapter writes no recordings to disk.
+The configured STT provider receives captured audio. The AI receives transcripts, and the TTS provider receives reply text.
+Angela's existing chat history and the providers' own retention settings remain in effect.
+
+## Checks
+
+```sh
+pnpm -F @proj-airi/discord-bot typecheck
+pnpm -F @proj-airi/discord-bot test
+ANGELA_DISCORD_AUDIO_TEST=1 pnpm -F @proj-airi/discord-bot test
+pnpm -F @proj-airi/i18n typecheck
+pnpm -F @proj-airi/i18n test
+pnpm -F @proj-airi/i18n build
+pnpm lint
 ```
 
-```shell
-pnpm run -F @proj-airi/discord-bot start
-```
+Tests use local speech HTTP fixtures, real Discord-format Opus encoding/decoding, and mocked Discord transport boundaries.
+`ANGELA_DISCORD_AUDIO_TEST=1` also runs the real WAV-to-Opus playback pipeline through FFmpeg. This optional check requires FFmpeg on PATH.
+They cover response routing, speaker separation, interruption, pause/resume, timeout, connection failure, and cleanup.
+A live acceptance check still needs a bot token, a Discord server, two participants, and working speech providers.
+Check audible playback, interruption, concurrent speakers, `/listen`, `/leave`, and reconnect behavior in that server.
 
 ## Other similar projects
 

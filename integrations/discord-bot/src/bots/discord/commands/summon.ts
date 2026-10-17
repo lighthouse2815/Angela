@@ -1,579 +1,414 @@
-import type { Readable } from 'node:stream'
-
-import type { AudioPlayer, VoiceConnection, VoiceConnectionState } from '@discordjs/voice'
-import type { Logg } from '@guiiai/logg'
+import type { AudioPlayer, AudioResource, VoiceConnection } from '@discordjs/voice'
+import type { cliMessages } from '@proj-airi/i18n/cli'
 import type { Client as AiriClient } from '@proj-airi/server-sdk'
-import type { Discord } from '@proj-airi/server-shared/types'
-import type {
-  BaseGuildVoiceChannel,
-  CacheType,
-  ChatInputCommandInteraction,
-  Client as DiscordClient,
-  GuildMember,
-} from 'discord.js'
+import type { ChatInputCommandInteraction, Client as DiscordClient, VoiceChannel } from 'discord.js'
+
+import type { Speech } from '../../../pipelines/speech'
 
 import { Buffer } from 'node:buffer'
-import { EventEmitter } from 'node:events'
-import { pipeline } from 'node:stream'
+import { randomUUID } from 'node:crypto'
+import { pipeline, Readable } from 'node:stream'
 
-import {
-  createAudioPlayer,
-  createAudioResource,
-  entersState,
-  getVoiceConnections,
-  joinVoiceChannel,
-  NoSubscriberBehavior,
-  StreamType,
-  VoiceConnectionStatus,
-} from '@discordjs/voice'
+import { AudioPlayerStatus, createAudioPlayer, createAudioResource, EndBehaviorType, entersState, joinVoiceChannel, NoSubscriberBehavior, StreamType, VoiceConnectionStatus } from '@discordjs/voice'
 import { useLogg } from '@guiiai/logg'
+import { ChannelType } from 'discord.js'
+
+import * as v from 'valibot'
 
 import { DECODE_SAMPLE_RATE } from '../../../constants/audio'
-import { openaiTranscribe } from '../../../pipelines/tts'
 import { convertOpusToWav } from '../../../utils/audio'
-import { AudioMonitor } from '../../../utils/audio-monitor'
 import { OpusDecoder } from '../../../utils/opus'
 
-function isValidTranscription(text: string): boolean {
-  if (!text || text.includes('[BLANK_AUDIO]'))
-    return false
-  return true
+// The original Discord context returns with the AI response. Room and request IDs fence late or duplicated responses.
+const voiceContext = v.object({
+  guildId: v.string(),
+  channelId: v.string(),
+  voiceRequestId: v.pipe(v.string(), v.uuid()),
+  guildMember: v.object({ id: v.string(), displayName: v.string(), nickname: v.string() }),
+})
+interface Turn {
+  id: string
+  userId: string
+  stage: 'transcribing' | 'waiting' | 'synthesizing' | 'playing'
+  controller: AbortController
+  finished: ReturnType<typeof Promise.withResolvers<void>>
+  suppressed: boolean
+}
+interface Capture { stream: Readable, decoder: OpusDecoder, voiced: boolean }
+interface Utterance { userId: string, displayName: string, pcm: Buffer }
+interface Room {
+  channel: VoiceChannel
+  connection: VoiceConnection
+  player: AudioPlayer
+  resource?: AudioResource
+  paused: boolean
+  captures: Map<string, Capture>
+  queue: Utterance[]
+  draining: boolean
+  turn?: Turn
+  lastNotice: number
+  onSpeaking: (userId: string) => void
 }
 
-async function setSelfVoice(logger: Logg, me?: GuildMember | null) {
-  if (me?.voice && me.permissions.has('DeafenMembers')) {
+/** Owns one call per guild. Each room has independent capture, reply correlation, cancellation, and playback. */
+export class VoiceManager {
+  private readonly logger = useLogg('VoiceManager').useGlobalConfig()
+  private readonly rooms = new Map<string, Room>()
+
+  constructor(
+    private readonly client: DiscordClient,
+    private readonly airiClient: AiriClient,
+    private readonly speech: Speech,
+    private readonly messages: typeof cliMessages.en.discordVoice,
+  ) {}
+
+  async handleJoinChannelCommand(interaction: ChatInputCommandInteraction) {
+    await interaction.deferReply()
+    if (!interaction.guild) {
+      await interaction.editReply(this.messages.joinFirst)
+      return
+    }
+    const member = await interaction.guild.members.fetch(interaction.user.id)
+    const channel = member.voice.channel
+    if (!channel || channel.type !== ChannelType.GuildVoice) {
+      await interaction.editReply(this.messages.joinFirst)
+      return
+    }
+    const previous = this.rooms.get(channel.guild.id)
+    if (previous) {
+      await interaction.editReply(previous.channel.id === channel.id ? this.messages.alreadyJoined : this.messages.otherRoom)
+      return
+    }
     try {
-      await me.voice.setDeaf(false)
-      await me.voice.setMute(false)
+      this.speech.validate()
     }
-    catch (error) {
-      logger.withError(error).log('Failed to modify voice state') // Continue anyway
+    catch {
+      await interaction.editReply(this.messages.configuration)
+      return
     }
-  }
-}
-
-// eliza/packages/client-discord/src/voice.ts at develop · elizaOS/eliza
-// https://github.com/elizaOS/eliza/blob/develop/packages/client-discord/src/voice.ts
-
-export class VoiceManager extends EventEmitter {
-  private logger = useLogg('VoiceManager').useGlobalConfig()
-  private processingVoice: boolean = false
-  private transcriptionTimeout: NodeJS.Timeout | null = null
-  private userStates: Map<
-    string,
-    {
-      buffers: Buffer[]
-      totalLength: number
-      lastActive: number
-      transcriptionText: string
+    let room: Room | undefined
+    try {
+      if (!channel.joinable || !channel.speakable)
+        throw new Error('Voice channel permissions are unavailable')
+      room = this.join(channel)
+      await entersState(room.connection, VoiceConnectionStatus.Ready, 20_000)
+      if (this.rooms.get(channel.guild.id) !== room)
+        throw new Error('Voice connection closed during startup')
+      await interaction.editReply(this.messages.joined)
+      if (interaction.channelId !== channel.id)
+        await channel.send({ content: this.messages.joined, allowedMentions: { parse: [] } })
+      room.paused = false
     }
-  > = new Map()
-
-  private activeAudioPlayer: AudioPlayer | null = null
-  private client: DiscordClient
-  private airiClient: AiriClient
-  private streams: Map<string, Readable> = new Map()
-  private connections: Map<string, VoiceConnection> = new Map()
-  private activeMonitors: Map<
-    string,
-    { channel: BaseGuildVoiceChannel, monitor: AudioMonitor }
-  > = new Map()
-
-  // Track event listeners for cleanup
-  private connectionListeners: Map<string, {
-    stateChange: (oldState: any, newState: any) => Promise<void>
-    error: (error: Error) => void
-    speakingStart: (userId: string) => void
-    speakingEnd: (userId: string) => void
-  }> = new Map()
-
-  constructor(client: DiscordClient, airiClient: AiriClient) {
-    super()
-    this.client = client
-    this.airiClient = airiClient
-  }
-
-  handleVoiceConnectionStateChange(channel: BaseGuildVoiceChannel, connection: VoiceConnection): (oldState: VoiceConnectionState, newState: VoiceConnectionState) => Promise<void> {
-    return async (oldState, newState) => {
-      this.logger.withFields({ old: oldState.status, new: newState.status }).log(
-        `Voice connection state changed from ${oldState.status} to ${newState.status}`,
-      )
-
-      if (newState.status === VoiceConnectionStatus.Destroyed) {
-        this.connections.delete(channel.id)
-      }
-      else if (!this.connections.has(channel.id) && (newState.status === VoiceConnectionStatus.Ready || newState.status === VoiceConnectionStatus.Signalling)) {
-        this.connections.set(channel.id, connection)
-      }
-      else if (newState.status === VoiceConnectionStatus.Disconnected) {
-        this.logger.log('Handling disconnection...')
-
-        try {
-        // Try to reconnect if disconnected
-          await Promise.race([
-            entersState(connection, VoiceConnectionStatus.Signalling, 5_000),
-            entersState(connection, VoiceConnectionStatus.Connecting, 5_000),
-          ])
-          // Seems to be reconnecting to a new channel
-          this.logger.log('Reconnecting to channel...')
-        }
-        catch (e) {
-        // Seems to be a real disconnect, destroy and cleanup
-          this.logger.log(`Disconnection confirmed - cleaning up...${e}`)
-          connection.destroy()
-          this.connections.delete(channel.id)
-        }
-      }
+    catch {
+      if (room && this.rooms.get(channel.guild.id) === room)
+        this.leave(channel.guild.id)
+      await interaction.editReply(this.messages.joinFailed)
     }
   }
 
-  handleVoiceConnectionError(error: unknown) {
-    this.logger.withError(error).log('Voice connection error')
-    // Don't immediately destroy - let the state change handler deal with it
-    this.logger.log('Connection error - will attempt to recover...')
+  async handleLeaveChannelCommand(interaction: ChatInputCommandInteraction) {
+    await interaction.deferReply()
+    const room = await this.controlledRoom(interaction)
+    if (!room)
+      return
+    this.leave(room.channel.guild.id)
+    await interaction.editReply(this.messages.left)
   }
 
-  handleAudioReceiveStreamStart(channel: BaseGuildVoiceChannel): (userId: string) => Promise<void> {
-    return async (userId) => {
-      let user = channel.members.get(userId)
-      if (!user) {
-        try {
-          user = await channel.guild.members.fetch(userId)
-        }
-        catch (error) {
-          this.logger.withError(error).error('Failed to fetch user')
-        }
-      }
-      if (user && !user?.user.bot) {
-        this.logger.log(`User speaking: ${user.displayName}`)
-        this.monitorMember(user as GuildMember, channel.id)
-        this.streams.get(userId)?.emit('speakingStarted')
-      }
-    }
+  async handleListeningCommand(interaction: ChatInputCommandInteraction) {
+    await interaction.deferReply()
+    const room = await this.controlledRoom(interaction)
+    if (!room)
+      return
+    room.paused = !interaction.options.getBoolean('enabled', true)
+    if (room.paused)
+      this.clear(room)
+    await interaction.editReply(room.paused ? this.messages.paused : this.messages.listening)
   }
 
-  handleAudioReceiveStreamEnd(channel: BaseGuildVoiceChannel): (userId: string) => void {
-    return async (userId: string) => {
-      const user = channel.members.get(userId)
-      if (!user?.user.bot) {
-        this.logger.log(`User stopped speaking: ${user.displayName}`)
-        this.streams.get(userId)?.emit('speakingStopped')
+  /** Returns true for voice responses, including stale ones, so they cannot fall through to ordinary text delivery. */
+  async handleResponse(context: unknown, text: string) {
+    if (!context || typeof context !== 'object' || !('voiceRequestId' in context))
+      return false
+    const parsed = v.safeParse(voiceContext, context)
+    if (!parsed.success)
+      return true
+    const data = parsed.output
+    const room = this.rooms.get(data.guildId)
+    const turn = room?.turn
+    if (!room || room.paused || room.channel.id !== data.channelId || !turn || turn.id !== data.voiceRequestId
+      || turn.userId !== data.guildMember.id || turn.stage !== 'waiting') {
+      return true
+    }
+    if (!text.trim()) {
+      this.notice(room, this.messages.failed)
+      this.interrupt(room)
+      return true
+    }
+    if (turn.suppressed || [...room.captures.values()].some(capture => capture.voiced)) {
+      this.interrupt(room)
+      return true
+    }
+    turn.stage = 'synthesizing'
+    try {
+      const audio = await this.speech.synthesize(text, turn.controller.signal)
+      if (room.turn !== turn || turn.controller.signal.aborted || room.paused)
+        return true
+      turn.stage = 'playing'
+      room.resource = createAudioResource(Readable.from([audio]), { inputType: StreamType.Arbitrary })
+      room.player.play(room.resource)
+    }
+    catch {
+      if (!turn.controller.signal.aborted) {
+        this.notice(room, this.messages.failed)
+        this.interrupt(room)
       }
     }
+    return true
   }
 
-  async joinChannel(interaction: ChatInputCommandInteraction<CacheType>, channel: BaseGuildVoiceChannel) {
-    const oldConnection = this.getVoiceConnection(
-      channel.guildId as string,
-    )
-    if (oldConnection) {
-      try {
-        oldConnection.destroy()
-        // Remove all associated streams and monitors
-        this.streams.clear()
-        this.activeMonitors.clear()
-      }
-      catch (error) {
-        this.logger.withError(error).log('Error leaving voice channel')
-      }
-    }
+  /** Stops every capture, pending speech request, playback stream, and voice connection before the adapter disconnects. */
+  close() {
+    for (const guildId of this.rooms.keys())
+      this.leave(guildId)
+  }
 
+  private join(channel: VoiceChannel) {
     const connection = joinVoiceChannel({
       channelId: channel.id,
       guildId: channel.guild.id,
-      adapterCreator: channel.guild.voiceAdapterCreator as any,
+      adapterCreator: channel.guild.voiceAdapterCreator,
+      group: this.client.user!.id,
       selfDeaf: false,
       selfMute: false,
-      group: this.client.user.id,
     })
-
-    try {
-      // Wait for either Ready or Signalling state
-      await Promise.race([
-        entersState(connection, VoiceConnectionStatus.Ready, 20_000),
-        entersState(connection, VoiceConnectionStatus.Signalling, 20_000),
-      ])
-
-      // Log connection success
-      this.logger.withField('state', connection.state.status).log('Voice connection established in state')
-      await interaction.reply(`Joined: ${channel.name}.`)
-
-      // Set up ongoing state change monitoring
-      connection.on('stateChange', this.handleVoiceConnectionStateChange(channel, connection))
-      connection.on('error', this.handleVoiceConnectionError)
-
-      // Store the connection
-      this.connections.set(channel.id, connection)
-
-      connection.receiver.speaking.on('start', this.handleAudioReceiveStreamStart(channel))
-      connection.receiver.speaking.on('end', this.handleAudioReceiveStreamEnd(channel))
-
-      // Continue with voice state modifications
-      await setSelfVoice(this.logger, channel.guild.members.me)
+    const player = createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Stop } })
+    const onSpeaking = (userId: string) => {
+      const current = this.rooms.get(channel.guild.id)
+      if (current?.connection === connection)
+        void this.capture(current, userId).catch(() => this.notice(current, this.messages.failed))
     }
-    catch (error) {
-      this.logger.log('Failed to establish voice connection:', error)
-
-      connection.destroy()
-      this.connections.delete(channel.id)
-      throw error
-    }
-  }
-
-  private getVoiceConnection(guildId: string) {
-    const connections = getVoiceConnections(this.client.user.id)
-    if (!connections) {
-      this.logger.warn('No voice connections found')
-      return
-    }
-    const connection = [...connections.values()].find(
-      connection => connection.joinConfig.guildId === guildId,
-    )
-    if (!connection) {
-      this.logger.warn('No voice connection found for guild')
-    }
-
-    return connection
-  }
-
-  private async monitorMember(
-    member: GuildMember,
-    channelId: string,
-  ) {
-    const userId = member?.id
-    const connection = this.getVoiceConnection(member?.guild?.id)
-    const receiveStream = connection?.receiver.subscribe(userId, {
-      autoDestroy: true,
-      emitClose: true,
-    })
-    if (!receiveStream) {
-      this.logger.warn('No voice data received')
-      return
-    }
-
-    const opusDecoder = new OpusDecoder(DECODE_SAMPLE_RATE, 1)
-    const volumeBuffer: number[] = []
-    const VOLUME_WINDOW_SIZE = 30
-    const SPEAKING_THRESHOLD = 0.05
-
-    const dataHandler = (pcmData: Buffer) => {
-      // Monitor the audio volume while the agent is speaking.
-      // If the average volume of the user's audio exceeds the defined threshold, it indicates active speaking.
-      // When active speaking is detected, stop the agent's current audio playback to avoid overlap.
-
-      if (this.activeAudioPlayer) {
-        const samples = new Int16Array(pcmData.buffer, pcmData.byteOffset, pcmData.length / 2)
-        const maxAmplitude = Math.max(...samples.map(Math.abs)) / 32768
-        volumeBuffer.push(maxAmplitude)
-
-        if (volumeBuffer.length > VOLUME_WINDOW_SIZE) {
-          volumeBuffer.shift()
-        }
-
-        const avgVolume
-          = volumeBuffer.reduce((sum, v) => sum + v, 0) / VOLUME_WINDOW_SIZE
-
-        if (avgVolume > SPEAKING_THRESHOLD) {
-          volumeBuffer.length = 0
-          this.cleanupAudioPlayer(this.activeAudioPlayer)
-          this.processingVoice = false
-        }
+    const room: Room = { channel, connection, player, paused: true, captures: new Map(), queue: [], draining: false, lastNotice: 0, onSpeaking }
+    this.rooms.set(channel.guild.id, room)
+    connection.subscribe(player)
+    connection.receiver.speaking.on('start', onSpeaking)
+    connection.on('error', () => this.notice(room, this.messages.failed))
+    connection.on('stateChange', (_oldState, state) => {
+      if (connection.joinConfig.channelId !== channel.id || state.status === VoiceConnectionStatus.Destroyed) {
+        if (this.rooms.get(channel.guild.id) === room)
+          this.leave(channel.guild.id)
       }
-    }
-
-    this.streams.set(userId, opusDecoder)
-    this.connections.set(userId, connection as VoiceConnection)
-
-    const errorHandler = err => this.logger.withError(err).error('Opus decoding error')
-    const streamCloseHandler = () => {
-      this.logger.withField('displayName', member?.displayName).log('Voice stream closed')
-
-      this.streams.delete(userId)
-      this.connections.delete(userId)
-    }
-    const closeHandler = () => {
-      this.logger.withField('displayName', member?.displayName).log('Opus decoder closed')
-
-      opusDecoder.removeListener('data', dataHandler)
-      opusDecoder.removeListener('error', errorHandler)
-      opusDecoder.removeListener('close', closeHandler)
-      receiveStream?.removeListener('close', streamCloseHandler)
-    }
-
-    opusDecoder.on('data', dataHandler)
-    opusDecoder.on('error', errorHandler)
-    opusDecoder.on('close', closeHandler)
-    receiveStream?.on('close', streamCloseHandler)
-
-    pipeline(receiveStream, opusDecoder, (err) => {
-      this.logger.withError(err).error('Opus decoding pipeline error')
-      if (err.message.includes('memory access out of bounds')) {
-        throw err
-      }
-    })
-
-    this.logger.log(`Monitoring user: ${member.displayName}`)
-    await this.handleUserStream(userId, member, member.guild.id, channelId, opusDecoder)
-  }
-
-  leaveChannel(channel: BaseGuildVoiceChannel) {
-    const connection = this.connections.get(channel.id)
-
-    if (connection) {
-      // Remove event listeners to prevent memory leaks
-      const listeners = this.connectionListeners.get(channel.id)
-      if (listeners) {
-        connection.off('stateChange', listeners.stateChange)
-        connection.off('error', listeners.error)
-        connection.receiver.speaking.off('start', listeners.speakingStart)
-        connection.receiver.speaking.off('end', listeners.speakingEnd)
-        this.connectionListeners.delete(channel.id)
-      }
-
-      connection.destroy()
-      this.connections.delete(channel.id)
-    }
-
-    // Stop monitoring all members in this channel
-    for (const [memberId, monitorInfo] of this.activeMonitors) {
-      if (monitorInfo.channel.id === channel.id && memberId !== this.client.user?.id) {
-        this.stopMonitoringMember(memberId)
-      }
-    }
-
-    this.logger.log(`Left voice channel: ${channel.name} (${channel.id})`)
-  }
-
-  stopMonitoringMember(memberId: string) {
-    const monitorInfo = this.activeMonitors.get(memberId)
-    if (!monitorInfo) {
-      return
-    }
-
-    monitorInfo.monitor.stop()
-    this.activeMonitors.delete(memberId)
-    this.streams.delete(memberId)
-    this.logger.log(`Stopped monitoring user ${memberId}`)
-  }
-
-  async debouncedProcessTranscription(
-    userId: string,
-    member: GuildMember,
-    guildId: string,
-    channelId: string,
-  ) {
-    const DEBOUNCE_TRANSCRIPTION_THRESHOLD = 1500 // wait for 1.5 seconds of silence
-
-    if (this.activeAudioPlayer?.state?.status === 'idle') {
-      this.logger.log('Cleaning up idle audio player.')
-      this.cleanupAudioPlayer(this.activeAudioPlayer)
-    }
-    if (this.activeAudioPlayer || this.processingVoice) {
-      const state = this.userStates.get(userId)
-      if (state) {
-        state.buffers.length = 0
-        state.totalLength = 0
-      }
-      return
-    }
-    if (this.transcriptionTimeout) {
-      clearTimeout(this.transcriptionTimeout)
-    }
-
-    this.transcriptionTimeout = setTimeout(async () => {
-      this.processingVoice = true
-      try {
-        await this.processTranscription(userId, member, guildId, channelId)
-        // Clean all users' previous buffers
-        this.userStates.forEach((state, _) => {
-          state.buffers.length = 0
-          state.totalLength = 0
+      else if (state.status === VoiceConnectionStatus.Disconnected) {
+        this.clear(room)
+        void Promise.race([
+          entersState(connection, VoiceConnectionStatus.Signalling, 5000),
+          entersState(connection, VoiceConnectionStatus.Connecting, 5000),
+        ]).catch(() => {
+          if (this.rooms.get(channel.guild.id) === room)
+            this.leave(channel.guild.id)
         })
       }
-      finally {
-        this.processingVoice = false
-      }
-    }, DEBOUNCE_TRANSCRIPTION_THRESHOLD)
+    })
+    player.on('error', () => {
+      this.notice(room, this.messages.failed)
+      this.interrupt(room)
+    })
+    player.on(AudioPlayerStatus.Idle, () => {
+      if (room.turn?.stage === 'playing')
+        room.turn.finished.resolve()
+      room.resource = undefined
+    })
+    return room
   }
 
-  private async handleUserStream(
-    userId: string,
-    member: GuildMember,
-    guildId: string,
-    channelId: string,
-    audioStream: Readable,
-  ) {
-    this.logger.log(`Starting audio monitor for user: ${userId}`)
-
-    if (!this.userStates.has(userId)) {
-      this.userStates.set(userId, {
-        buffers: [],
-        totalLength: 0,
-        lastActive: Date.now(),
-        transcriptionText: '',
-      })
+  private async controlledRoom(interaction: ChatInputCommandInteraction) {
+    const room = interaction.guildId ? this.rooms.get(interaction.guildId) : undefined
+    if (!room || !interaction.guild) {
+      await interaction.editReply(this.messages.absent)
+      return undefined
     }
-
-    const state = this.userStates.get(userId)
-
-    const processBuffer = async (buffer: Buffer) => {
-      try {
-        state!.buffers.push(buffer)
-        state!.totalLength += buffer.length
-        state!.lastActive = Date.now()
-
-        this.debouncedProcessTranscription(userId, member, guildId, channelId)
-      }
-      catch (error) {
-        this.logger.withError(error).withField('userId', userId).error('Error processing buffer')
-      }
+    const member = await interaction.guild.members.fetch(interaction.user.id)
+    if (member.voice.channelId !== room.channel.id) {
+      await interaction.editReply(this.messages.sameRoom)
+      return undefined
     }
+    return room
+  }
 
-    const _ = new AudioMonitor(
-      audioStream,
-      10000000,
-      () => {
-        if (this.transcriptionTimeout)
-          clearTimeout(this.transcriptionTimeout)
-      },
-      async (buffer) => {
-        if (!buffer) {
-          this.logger.error('Received empty buffer')
-          return
+  private async capture(room: Room, userId: string) {
+    if (room.paused || room.connection.state.status !== VoiceConnectionStatus.Ready
+      || this.rooms.get(room.channel.guild.id) !== room || room.captures.has(userId)) {
+      return
+    }
+    const member = room.channel.members.get(userId) ?? await room.channel.guild.members.fetch(userId).catch(() => undefined)
+    // An uncached speaker must still belong to this live call before any provider receives their audio.
+    if (!member || member.user.bot || member.voice.channelId !== room.channel.id || room.paused
+      || room.connection.state.status !== VoiceConnectionStatus.Ready
+      || this.rooms.get(room.channel.guild.id) !== room || room.captures.has(userId)) {
+      return
+    }
+    const stream = room.connection.receiver.subscribe(userId, { end: { behavior: EndBehaviorType.AfterSilence, duration: 800 } })
+    const decoder = new OpusDecoder(DECODE_SAMPLE_RATE, 1)
+    const capture: Capture = { stream, decoder, voiced: false }
+    room.captures.set(userId, capture)
+    const buffers: Buffer[] = []
+    let size = 0
+    let voicedSamples = 0
+    let tooLong = false
+    const limit = setTimeout(() => {
+      tooLong = true
+      stream.destroy(new Error('Voice capture limit exceeded'))
+    }, 30_000)
+    decoder.on('data', (chunk: Buffer) => {
+      size += chunk.length
+      if (size > DECODE_SAMPLE_RATE * 2 * 30) {
+        tooLong = true
+        stream.destroy(new Error('Voice capture limit exceeded'))
+        return
+      }
+      buffers.push(chunk)
+      let energy = 0
+      for (let offset = 0; offset + 1 < chunk.length; offset += 2)
+        energy += (chunk.readInt16LE(offset) / 32768) ** 2
+      const rms = Math.sqrt(energy / Math.max(1, chunk.length / 2))
+      if (rms > 0.015)
+        voicedSamples += chunk.length / 2
+      if (!capture.voiced && voicedSamples >= DECODE_SAMPLE_RATE * 0.06) {
+        capture.voiced = true
+        if (room.turn?.stage === 'transcribing')
+          room.turn.suppressed = true
+        else
+          this.interrupt(room)
+      }
+    })
+    pipeline(stream, decoder, (error) => {
+      clearTimeout(limit)
+      // Pause, leave, and replacement remove the capture first. Their late callbacks cannot enqueue another request.
+      if (room.captures.get(userId) !== capture)
+        return
+      room.captures.delete(userId)
+      if (error) {
+        this.notice(room, tooLong ? this.messages.tooLong : this.messages.failed)
+        return
+      }
+      if (!capture.voiced || size < DECODE_SAMPLE_RATE * 2 * 0.2)
+        return
+      if (room.queue.length >= 4) {
+        this.notice(room, this.messages.queueFull)
+        return
+      }
+      room.queue.push({ userId, displayName: member.displayName, pcm: Buffer.concat(buffers, size) })
+      void this.drain(room)
+    })
+  }
+
+  private async drain(room: Room) {
+    if (room.draining)
+      return
+    room.draining = true
+    try {
+      while (!room.paused && this.rooms.get(room.channel.guild.id) === room && room.queue.length) {
+        const utterance = room.queue.shift()!
+        const turn: Turn = {
+          id: randomUUID(),
+          userId: utterance.userId,
+          stage: 'transcribing',
+          controller: new AbortController(),
+          finished: Promise.withResolvers<void>(),
+          suppressed: [...room.captures.values()].some(capture => capture.voiced),
         }
-
-        await processBuffer(buffer)
-      },
-    )
-  }
-
-  private async processTranscription(
-    userId: string,
-    member: GuildMember,
-    guildId: string,
-    channelId: string,
-  ) {
-    const state = this.userStates.get(userId)
-    if (!state || state.buffers.length === 0)
-      return
-
-    try {
-      const inputBuffer = Buffer.concat(state.buffers, state.totalLength)
-
-      state.buffers.length = 0 // Clear the buffers
-      state.totalLength = 0
-
-      // Convert Opus to WAV
-      const wavBuffer = await convertOpusToWav(inputBuffer)
-      const result = await openaiTranscribe(wavBuffer)
-      const transcriptionText = result
-
-      if (transcriptionText && isValidTranscription(transcriptionText)) {
-        state.transcriptionText += transcriptionText
-
-        const discordContext = {
-          channelId,
-          guildId,
-          guildMember: member,
-        } satisfies Discord
-
-        this.airiClient.send({
-          type: 'input:text:voice',
-          data: { transcription: transcriptionText, discord: discordContext },
-        })
-
-        this.airiClient.send({
-          type: 'input:text',
-          data: { text: transcriptionText, discord: discordContext },
-        })
-      }
-      if (state.transcriptionText.length) {
-        this.cleanupAudioPlayer(this.activeAudioPlayer)
-        const finalText = state.transcriptionText
-        state.transcriptionText = ''
-
-        this.logger.withField('transcription', finalText).log('Transcription complete')
+        room.turn = turn
+        const deadline = setTimeout(() => {
+          if (room.turn === turn) {
+            this.notice(room, this.messages.timeout)
+            this.interrupt(room)
+          }
+        }, 90_000)
+        try {
+          const text = await this.speech.transcribe(convertOpusToWav(utterance.pcm), turn.controller.signal)
+          if (turn.controller.signal.aborted || room.turn !== turn)
+            continue
+          if (!text || text.includes('[BLANK_AUDIO]'))
+            continue
+          const discord = {
+            guildId: room.channel.guild.id,
+            guildName: room.channel.guild.name,
+            channelId: room.channel.id,
+            voiceRequestId: turn.id,
+            guildMember: { id: utterance.userId, displayName: utterance.displayName, nickname: utterance.displayName },
+          }
+          turn.stage = 'waiting'
+          this.airiClient.send({
+            type: 'input:text',
+            data: {
+              text,
+              discord,
+              overrides: {
+                sessionId: `discord-voice-${room.channel.guild.id}-${room.channel.id}`,
+                messagePrefix: `[Discord voice ${JSON.stringify({ userId: utterance.userId, displayName: utterance.displayName })}]: `,
+              },
+            },
+          })
+          await turn.finished.promise
+        }
+        catch {
+          if (!turn.controller.signal.aborted)
+            this.notice(room, this.messages.failed)
+        }
+        finally {
+          clearTimeout(deadline)
+          if (room.turn === turn)
+            this.interrupt(room)
+        }
       }
     }
-    catch (error) {
-      this.logger.withError(error).withField('userId', userId).error('Error processing transcription')
+    finally {
+      room.draining = false
     }
   }
 
-  async playAudioStream(userId: string, audioStream: Readable) {
-    const connection = this.connections.get(userId)
-    if (connection == null) {
-      this.logger.log(`No connection for user ${userId}`)
-      return
-    }
+  private interrupt(room: Room) {
+    const turn = room.turn
+    room.turn = undefined
+    turn?.controller.abort()
+    turn?.finished.resolve()
+    const resource = room.resource
+    room.resource = undefined
+    room.player.stop(true)
+    resource?.playStream.destroy()
+  }
 
-    this.cleanupAudioPlayer(this.activeAudioPlayer)
-    const audioPlayer = createAudioPlayer({
-      behaviors: {
-        noSubscriber: NoSubscriberBehavior.Pause,
-      },
+  private clear(room: Room) {
+    room.queue.length = 0
+    this.interrupt(room)
+    const captures = [...room.captures.values()]
+    room.captures.clear()
+    for (const capture of captures) {
+      capture.stream.destroy()
+      capture.decoder.destroy()
+    }
+  }
+
+  private leave(guildId: string) {
+    const room = this.rooms.get(guildId)
+    if (!room)
+      return
+    this.rooms.delete(guildId)
+    room.paused = true
+    this.clear(room)
+    room.connection.receiver.speaking.off('start', room.onSpeaking)
+    room.player.removeAllListeners(AudioPlayerStatus.Idle)
+    if (room.connection.state.status !== VoiceConnectionStatus.Destroyed)
+      room.connection.destroy()
+  }
+
+  private notice(room: Room, message: string) {
+    if (this.rooms.get(room.channel.guild.id) !== room || Date.now() - room.lastNotice < 10_000)
+      return
+    room.lastNotice = Date.now()
+    this.logger.warn('Discord voice notice')
+    void room.channel.send({ content: message, allowedMentions: { parse: [] } }).catch(() => {
+      this.logger.warn('Discord voice notice delivery failed')
     })
-
-    this.activeAudioPlayer = audioPlayer
-    connection.subscribe(audioPlayer)
-
-    const audioStartTime = Date.now()
-    const resource = createAudioResource(audioStream, {
-      inputType: StreamType.Arbitrary,
-    })
-
-    audioPlayer.on('error', error => this.logger.withError(error).log('Audio player error'))
-    audioPlayer.on('stateChange', (_oldState: any, newState: { status: string }) => {
-      if (newState.status === 'idle') {
-        const idleTime = Date.now()
-        this.logger.withField('elapsed', idleTime - audioStartTime).log(`Audio playback done`)
-      }
-    })
-
-    audioPlayer.play(resource)
-  }
-
-  cleanupAudioPlayer(audioPlayer: AudioPlayer) {
-    if (!audioPlayer)
-      return
-
-    audioPlayer.stop()
-    audioPlayer.removeAllListeners()
-    if (audioPlayer === this.activeAudioPlayer) {
-      this.activeAudioPlayer = null
-    }
-  }
-
-  async handleJoinChannelCommand(interaction: ChatInputCommandInteraction<CacheType>) {
-    try {
-      const currVoiceChannel = (interaction.member as GuildMember).voice.channel
-      if (!currVoiceChannel) {
-        return await interaction.reply('Please join a voice channel first.')
-      }
-
-      await this.joinChannel(interaction, currVoiceChannel)
-    }
-    catch (error) {
-      this.logger.withError(error).log('Error joining voice channel')
-    }
-  }
-
-  async handleLeaveChannelCommand(interaction: any) {
-    const connection = this.getVoiceConnection(interaction.guildId as any)
-
-    if (!connection) {
-      await interaction.reply('Not currently in a voice channel.')
-      return
-    }
-
-    try {
-      connection.destroy()
-      await interaction.reply('Left the voice channel.')
-    }
-    catch (error) {
-      this.logger.withError(error).log('Error leaving voice channel')
-
-      await interaction.reply('Failed to leave the voice channel.')
-    }
   }
 }

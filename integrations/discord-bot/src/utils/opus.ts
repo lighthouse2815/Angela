@@ -1,3 +1,5 @@
+import type { TransformCallback } from 'node:stream'
+
 import { Buffer } from 'node:buffer'
 import { Transform } from 'node:stream'
 
@@ -15,7 +17,7 @@ export class OpusDecoder extends Transform {
     this.decoder = new OpusScript(sampleRate, channels)
   }
 
-  _transform(chunk: Buffer, encoding: BufferEncoding, callback: (...args: any[]) => void) {
+  _transform(chunk: Buffer, _encoding: BufferEncoding, callback: TransformCallback) {
     try {
       // Decode Opus chunk to PCM
       const pcm = this.decoder.decode(chunk)
@@ -25,12 +27,12 @@ export class OpusDecoder extends Transform {
       callback()
     }
     catch (error) {
-      this.emit('error', error)
-      callback(error)
+      callback(error instanceof Error ? error : new Error('Opus decoding failed'))
     }
   }
 
-  _flush(callback: (...args: any[]) => void) {
-    callback()
+  _destroy(error: Error | null, callback: (error: Error | null) => void) {
+    this.decoder.delete()
+    callback(error)
   }
 }

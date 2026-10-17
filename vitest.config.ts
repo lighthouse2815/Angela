@@ -9,6 +9,7 @@ export default defineConfig({
       'apps/stage-tamagotchi/vitest.node.config.ts',
       'packages/cap-vite',
       'packages/airi-cli',
+      'integrations/discord-bot',
       'packages/local-config',
       'packages/ccc',
       'packages/core-agent',
