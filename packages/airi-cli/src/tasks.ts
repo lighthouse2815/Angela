@@ -42,7 +42,10 @@ export class Tasks {
     const parsed = v.parse(taskCreate, input)
     const now = new Date(this.clock()).toISOString()
     const task = v.parse(taskSchema, { ...parsed, id: randomUUID(), status: 'pending', timezone: parsed.timezone ?? this.timezone, createdAt: now, updatedAt: now, recurrenceAnchor: parsed.recurrence ? parsed.dueAt : undefined })
-    await this.file.edit(state => state.tasks.push(task))
+    await this.file.edit((state) => {
+      state.tasks.push(task)
+      this.retain(state)
+    })
     this.changed()
     return task
   }
@@ -203,9 +206,25 @@ export class Tasks {
       task.updatedAt = new Date(this.clock()).toISOString()
       updated = v.parse(taskSchema, task)
       state.tasks[index] = updated
+      this.retain(state)
     })
     this.changed()
     return updated!
+  }
+
+  /** Retention runs inside the storage lock. History cannot block active work, and pending tasks are never pruning candidates. */
+  private retain(state: v.InferOutput<typeof taskState>) {
+    const inactive = state.tasks.filter(task => task.status !== 'pending')
+      .sort((a, b) => a.updatedAt.localeCompare(b.updatedAt) || a.id.localeCompare(b.id))
+    if (state.tasks.length - inactive.length > 100)
+      throw new Error(this.messages.invalid)
+    let remaining = inactive.length
+    for (const oldest of inactive) {
+      if (remaining <= 50 && state.tasks.length <= 100 && JSON.stringify(state).length <= 128_000)
+        break
+      state.tasks.splice(state.tasks.findIndex(task => task.id === oldest.id), 1)
+      remaining--
+    }
   }
 
   private changed() {

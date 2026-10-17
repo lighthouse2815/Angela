@@ -691,7 +691,12 @@ This implementation reuses Angela storage, context management, MCP and permissio
 
 `Tasks` owns everyday todos, reminders, deadlines, routines, and follow-ups across CLI sessions.
 It reuses `MemoryFile` for validated, private, atomic storage at `tasks/tasks.json` under the CLI data directory.
-The store holds at most 100 tasks, including completed and cancelled history. Invalid files remain untouched.
+The store accepts at most 100 pending tasks and retains at most 50 completed or cancelled tasks.
+Each create or edit prunes the oldest inactive records under the same writer lock.
+Inactive records sort by `updatedAt`, then stable task ID. Pending tasks are never pruning candidates.
+History is pruned further to keep the total within 100 records and the existing 128000-character storage bound.
+A valid larger history is read and pruned on the next mutation. Corrupted storage remains untouched.
+Competing writers can receive an explicit busy error and retry. A failed write never commits partial cleanup.
 
 The service exposes create, list, find, update, complete, cancel, and snooze operations.
 Date-only tasks retain their date without an alarm time. Snooze preserves the task ID and original due time.

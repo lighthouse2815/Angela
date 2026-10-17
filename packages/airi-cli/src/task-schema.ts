@@ -54,7 +54,7 @@ export const taskSchema = v.pipe(v.object({
   snoozedUntil: v.optional(taskTime),
   recurrenceAnchor: v.optional(taskTime),
 }), v.check(task => !task.dueAt || !task.dueDate), v.check(task => !task.recurrence || Boolean(task.dueAt && task.recurrenceAnchor)), v.check(task => task.type !== 'routine' || Boolean(task.recurrence)))
-export const taskState = v.pipe(v.object({ version: v.literal(1), tasks: v.pipe(v.array(taskSchema), v.maxLength(100)) }), v.check(state => new Set(state.tasks.map(task => task.id)).size === state.tasks.length), v.check(state => JSON.stringify(state).length <= 128_000))
+export const taskState = v.pipe(v.object({ version: v.literal(1), tasks: v.array(taskSchema) }), v.check(state => new Set(state.tasks.map(task => task.id)).size === state.tasks.length), v.check(state => JSON.stringify(state).length <= 128_000))
 
 /** A saved everyday task. Recurring tasks retain their first local occurrence as the calendar anchor. */
 export type Task = v.InferOutput<typeof taskSchema>
