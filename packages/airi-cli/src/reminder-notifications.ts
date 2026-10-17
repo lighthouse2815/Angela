@@ -10,35 +10,51 @@ import { formatTask } from './task-commands'
 
 /** Buffers text during chat output. Voice runs only when the host reaches a safe boundary after capture or reply playback. */
 export class ReminderNotifications implements ReminderNotifier {
-  private readonly pending: { tasks: readonly Task[], overdue: boolean }[] = []
+  private readonly waiting = new Set<() => void>()
   private readonly speech: string[] = []
   private paused = false
   private voiceEnabled = false
   private speaking?: Promise<void>
 
-  constructor(private readonly messages: typeof cliMessages.en.tasks, private readonly locale: string, private readonly present: (text: string, tasks: readonly Task[]) => void) {}
+  constructor(private readonly messages: typeof cliMessages.en.tasks, private readonly locale: string, private readonly present: (text: string, tasks: readonly Task[]) => void | Promise<void>) {}
 
-  async notify(tasks: readonly Task[], overdue: boolean, signal: AbortSignal) {
-    signal.throwIfAborted()
-    this.pending.push({ tasks, overdue })
-    if (!this.paused)
-      this.resume()
+  /** Resolves only after text presentation. Buffered calls reject on cancellation without presenting stale notifications. */
+  async notify(tasks: readonly Task[], overdue: boolean, signal: AbortSignal, verify?: () => Promise<void>) {
+    do {
+      signal.throwIfAborted()
+      if (this.paused) {
+        await new Promise<void>((resolve, reject) => {
+          const finish = () => {
+            this.waiting.delete(finish)
+            signal.removeEventListener('abort', finish)
+            if (signal.aborted)
+              reject(signal.reason)
+            else
+              resolve()
+          }
+          this.waiting.add(finish)
+          signal.addEventListener('abort', finish, { once: true })
+        })
+      }
+      await verify?.()
+      signal.throwIfAborted()
+    } while (this.paused)
+    const heading = overdue ? this.messages.overdue : this.messages.reminder
+    const text = `${heading}\n\n${tasks.map(task => formatTask(task, this.locale, this.messages)).join('\n')}`
+    await this.present(text, tasks)
+    if (this.voiceEnabled)
+      this.speech.push(`${heading}. ${tasks.map(task => stripVTControlCharacters(task.title)).join('. ')}`)
   }
 
   pause() {
     this.paused = true
   }
 
-  /** Flushes complete notifications after the host releases streamed output and approval prompts. */
+  /** Releases buffered delivery after streamed output and approvals. The scheduler retains the lease until presentation completes. */
   resume() {
     this.paused = false
-    for (const batch of this.pending.splice(0)) {
-      const heading = batch.overdue ? this.messages.overdue : this.messages.reminder
-      const text = `${heading}\n\n${batch.tasks.map(task => formatTask(task, this.locale, this.messages)).join('\n')}`
-      this.present(text, batch.tasks)
-      if (this.voiceEnabled)
-        this.speech.push(`${heading}. ${batch.tasks.map(task => stripVTControlCharacters(task.title)).join('. ')}`)
-    }
+    for (const finish of this.waiting)
+      finish()
   }
 
   setVoiceEnabled(enabled: boolean) {
@@ -61,7 +77,7 @@ export class ReminderNotifications implements ReminderNotifier {
         }
         catch {
           if (!signal.aborted)
-            this.present(this.messages.voiceFailed, [])
+            await this.present(this.messages.voiceFailed, [])
         }
       }
     })().finally(() => { this.speaking = undefined })

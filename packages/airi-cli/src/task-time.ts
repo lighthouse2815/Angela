@@ -62,3 +62,17 @@ export function taskDuration(value: string) {
   const milliseconds = match ? Number(match[1]) * ({ m: 60_000, h: 3_600_000, d: 86_400_000 }[match[2]!] ?? 0) : 0
   return Number.isSafeInteger(milliseconds) && milliseconds > 0 && milliseconds <= 366 * 86_400_000 ? milliseconds : undefined
 }
+
+/** Returns the next claim opportunity. Missing delivery metadata means pending unless notifiedFor already confirms that occurrence. */
+export function deliveryDue(task: Task) {
+  const due = taskDue(task)
+  if (task.status !== 'pending' || !due || task.notifiedFor === due)
+    return undefined
+  if (task.delivery?.occurrence === due) {
+    if (task.delivery.status === 'claimed')
+      return Math.max(Date.parse(due), Date.parse(task.delivery.leaseUntil))
+    if (task.delivery.status === 'pending')
+      return Math.max(Date.parse(due), Date.parse(task.delivery.retryAt))
+  }
+  return Date.parse(due)
+}

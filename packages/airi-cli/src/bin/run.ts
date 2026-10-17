@@ -157,11 +157,15 @@ async function main() {
     let pendingUtterance: string | undefined
     let voiceReady = false
     let reminderWake: AbortController | undefined
-    const notifications = new ReminderNotifications(messages.tasks, config.locale, (text, announced) => {
-      if (input)
-        input.notify(text)
-      else
-        process.stderr.write(`\n${text}\n`)
+    const notifications = new ReminderNotifications(messages.tasks, config.locale, async (text, announced) => {
+      if (input) {
+        await input.notify(text)
+      }
+      else {
+        await new Promise<void>((resolve, reject) => {
+          process.stderr.write(`\n${text}\n`, error => error ? reject(error) : resolve())
+        })
+      }
       if (announced.length)
         chat.conversation.turns.push(...chatMessagesToTurns([{ role: 'assistant', content: text }]))
       if (voiceReady && !input?.hasInput)
@@ -170,7 +174,7 @@ async function main() {
     const scheduler = new ReminderScheduler(tasks, notifications, (error) => {
       const text = `${messages.tasks.unavailable} ${errorMessageFrom(error) ?? messages.tasks.failed}`
       if (input)
-        input.notify(text)
+        void input.notify(text).catch(() => {})
       else
         process.stderr.write(`\n${text}\n`)
     })
@@ -485,7 +489,10 @@ async function main() {
     }
     finally {
       try {
-        await scheduler.refresh()
+        if (!shutdown.signal.aborted) {
+          notifications.resume()
+          await scheduler.refresh()
+        }
         await scheduler.close()
         notifications.resume()
         await session.save(chat.conversation, session.record.interrupted)

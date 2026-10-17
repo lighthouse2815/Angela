@@ -724,9 +724,15 @@ Conversational references use the existing chat history and saved tool results.
 ### Scheduler and occurrence policy
 
 `ReminderScheduler` owns one timer and an interchangeable `ReminderNotifier`. It batches overdue occurrences after startup.
-It claims each occurrence under the existing file lock before delivery. Normal restart cannot replay a claimed occurrence.
-If a process crashes after the claim but before delivery, that notification can be lost.
-Use `/tasks` to review pending work and snooze a missed notification. Delivery failure never marks a task complete.
+Delivery progresses from pending to claimed to delivered under the existing file lock.
+A unique token fences each claim. Leases expire after 30 seconds and renew every 10 seconds during queued or slow presentation.
+A crashed owner leaves a retryable occurrence. A notifier failure retries after 30 seconds. Clean shutdown releases claims immediately.
+Only successful text presentation records `lastNotifiedAt` and advances a routine. A queued notification is not delivered.
+The notifier checks ownership immediately before presentation and honors cancellation. Terminal delivery waits for the output stream callback.
+Normal successful delivery does not replay after restart. Delivery failure never marks a task complete.
+A crash after presentation but before acknowledgment can repeat the notification. At-least-once delivery takes priority over silent loss.
+Existing `notifiedFor` markers remain confirmations for their occurrence. New tasks without delivery metadata start pending.
+Voice remains optional after text delivery. TTS failure does not undo a successful text notification.
 
 Daily and weekly recurrence retain local wall time across timezone offset changes.
 A nonexistent DST time moves forward by the gap. A repeated DST time uses its first occurrence.

@@ -46,6 +46,11 @@ export const taskSchema = v.pipe(v.object({
   completedAt: v.optional(taskTime),
   lastNotifiedAt: v.optional(taskTime),
   notifiedFor: v.optional(taskTime),
+  delivery: v.optional(v.variant('status', [
+    v.object({ status: v.literal('pending'), occurrence: taskTime, retryAt: taskTime }),
+    v.object({ status: v.literal('claimed'), occurrence: taskTime, token: taskId, claimedAt: taskTime, leaseUntil: taskTime }),
+    v.object({ status: v.literal('delivered'), occurrence: taskTime, deliveredAt: taskTime }),
+  ])),
   snoozedUntil: v.optional(taskTime),
   recurrenceAnchor: v.optional(taskTime),
 }), v.check(task => !task.dueAt || !task.dueDate), v.check(task => !task.recurrence || Boolean(task.dueAt && task.recurrenceAnchor)), v.check(task => task.type !== 'routine' || Boolean(task.recurrence)))

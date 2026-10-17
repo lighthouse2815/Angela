@@ -82,18 +82,22 @@ export class Terminal {
   }
 
   /** Writes above the complete editable prompt, then restores its line, cursor, and command suggestions. */
-  notify(text: string) {
+  async notify(text: string) {
     if (!this.asking || !process.stderr.isTTY) {
       process.stderr.write(`\n${text}\n`)
-      return
     }
-    const position = this.input.getCursorPos()
-    moveCursor(process.stderr, 0, -position.rows)
-    cursorTo(process.stderr, 0)
-    clearScreenDown(process.stderr)
-    process.stderr.write(`${text}\n`)
-    this.input.prompt(true)
-    this.redraw?.()
+    else {
+      const position = this.input.getCursorPos()
+      moveCursor(process.stderr, 0, -position.rows)
+      cursorTo(process.stderr, 0)
+      clearScreenDown(process.stderr)
+      process.stderr.write(`${text}\n`)
+      this.input.prompt(true)
+      this.redraw?.()
+    }
+    await new Promise<void>((resolve, reject) => {
+      process.stderr.write('', error => error ? reject(error) : resolve())
+    })
   }
 
   close() {

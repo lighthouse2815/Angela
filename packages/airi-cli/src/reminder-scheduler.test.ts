@@ -137,18 +137,19 @@ it('reconciles clock jumps and cross-process task changes without busy polling',
   expect(notify.mock.calls[1]![0]).toMatchObject([{ id: future.id }])
 })
 
-it('records a claim before failed delivery and reports failure without replay', async () => {
+it('keeps failed delivery pending and retries after the backoff', async () => {
   const { tasks, notify, scheduler, onError } = await setup()
   const task = await tasks.create({ title: 'Claim first', type: 'reminder', dueAt: new Date(now).toISOString() })
   notify.mockImplementation(async () => {
-    expect((await tasks.find(task.id)).lastNotifiedAt).toBe(new Date(now).toISOString())
+    expect((await tasks.find(task.id)).lastNotifiedAt).toBeUndefined()
     throw new Error('Delivery failed')
   })
   await scheduler.start()
   expect(onError).toHaveBeenCalledTimes(1)
+  notify.mockResolvedValue(undefined)
   await vi.advanceTimersByTimeAsync(60_000)
   await scheduler.refresh()
-  expect(notify).toHaveBeenCalledTimes(1)
+  expect(notify).toHaveBeenCalledTimes(2)
 })
 
 it('preserves corrupt data and recovers scheduling after storage repair', async () => {

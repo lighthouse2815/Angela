@@ -11,6 +11,9 @@ import { MemoryFile } from './memory-file'
 import { taskCreate, taskId, taskSchema, taskState, taskTime, taskUpdate } from './task-schema'
 import { localDate, nextOccurrence, taskDue } from './task-time'
 
+/** Delivery owners renew every ten seconds. Thirty seconds bounds recovery after a crashed process. */
+export const deliveryLeaseMs = 30_000
+
 /** Owns task invariants and atomic mutations across sessions. Subscribers observe successful local commits only. */
 export class Tasks {
   private readonly file: MemoryFile<v.InferOutput<typeof taskState>>
@@ -57,6 +60,7 @@ export class Tasks {
         task.recurrenceAnchor = task.recurrence ? task.dueAt : undefined
         task.snoozedUntil = undefined
         task.notifiedFor = undefined
+        task.delivery = undefined
       }
     })
   }
@@ -67,6 +71,7 @@ export class Tasks {
       const delivered = task.lastNotifiedAt && (!task.completedAt || task.completedAt < task.lastNotifiedAt)
       task.completedAt = new Date(this.clock()).toISOString()
       task.snoozedUntil = undefined
+      task.delivery = undefined
       if (task.recurrence) {
         // Check-ins acknowledge the delivered occurrence. Early completion consumes the next undelivered occurrence.
         if (!delivered || Date.parse(task.dueAt!) <= this.clock())
@@ -84,6 +89,7 @@ export class Tasks {
       this.pending(task)
       task.status = 'cancelled'
       task.snoozedUntil = undefined
+      task.delivery = undefined
     })
   }
 
@@ -95,28 +101,79 @@ export class Tasks {
       this.pending(task)
       task.snoozedUntil = target
       task.notifiedFor = undefined
+      task.delivery = undefined
     })
   }
 
-  /** Claims before delivery under the shared file lock. A crash after a claim can lose delivery, but cannot replay it. */
+  /** Claims expire without changing notification history or recurrence. The token fences acknowledgments from stale owners. */
   async claim(id: string, occurrence: string): Promise<Task | undefined> {
     let claimed: Task | undefined
     await this.file.edit((state) => {
       const task = state.tasks.find(task => task.id === id)
       if (!task || task.status !== 'pending' || taskDue(task) !== occurrence || task.notifiedFor === occurrence || Date.parse(occurrence) > this.clock())
         return
+      if (task.delivery?.occurrence === occurrence) {
+        if (task.delivery.status === 'claimed' && Date.parse(task.delivery.leaseUntil) > this.clock())
+          return
+        if (task.delivery.status === 'pending' && Date.parse(task.delivery.retryAt) > this.clock())
+          return
+      }
+      task.delivery = { status: 'claimed', occurrence, token: randomUUID(), claimedAt: new Date(this.clock()).toISOString(), leaseUntil: new Date(this.clock() + deliveryLeaseMs).toISOString() }
+      task.updatedAt = task.delivery.claimedAt
       claimed = structuredClone(task)
+    })
+    return claimed
+  }
+
+  /** A live owner must renew before expiry. An expired owner cannot reclaim its token, even without a competing writer. */
+  async renew(id: string, token: string) {
+    let renewed = false
+    await this.file.edit((state) => {
+      const task = state.tasks.find(task => task.id === id)
+      if (!task || !this.owns(task, token) || task.delivery?.status !== 'claimed')
+        return
+      task.delivery.leaseUntil = new Date(this.clock() + deliveryLeaseMs).toISOString()
+      renewed = true
+    })
+    return renewed
+  }
+
+  /** Only successful text delivery updates history and advances a routine. A lost acknowledgment can cause a retry, never silent loss. */
+  async delivered(id: string, token: string) {
+    let delivered = false
+    await this.file.edit((state) => {
+      const task = state.tasks.find(task => task.id === id)
+      if (!task || !this.owns(task, token) || task.delivery?.status !== 'claimed')
+        return
+      const occurrence = task.delivery.occurrence
       task.notifiedFor = occurrence
       task.lastNotifiedAt = new Date(this.clock()).toISOString()
       task.updatedAt = task.lastNotifiedAt
+      task.delivery = { status: 'delivered', occurrence, deliveredAt: task.lastNotifiedAt }
       if (task.recurrence) {
-        // An extra snooze after delivery must retain the routine's already advanced future occurrence.
+        // A snooze after delivery retains the already advanced next regular occurrence.
         if (!task.snoozedUntil || Date.parse(task.dueAt!) <= this.clock())
           task.dueAt = nextOccurrence(task, Math.max(this.clock(), Date.parse(task.dueAt!)))
         task.snoozedUntil = undefined
       }
+      delivered = true
     })
-    return claimed
+    return delivered
+  }
+
+  /** Failed or cancelled delivery releases only this owner's claim. A retry waits thirty seconds unless shutdown requests immediate recovery. */
+  async retry(id: string, token: string, immediate = false) {
+    await this.file.edit((state) => {
+      const task = state.tasks.find(task => task.id === id)
+      if (task?.delivery?.status !== 'claimed' || task.delivery.token !== token)
+        return
+      task.delivery = { status: 'pending', occurrence: task.delivery.occurrence, retryAt: new Date(this.clock() + (immediate ? 0 : deliveryLeaseMs)).toISOString() }
+    })
+  }
+
+  private owns(task: Task, token: string) {
+    return task.status === 'pending' && task.delivery?.status === 'claimed' && task.delivery.token === token
+      && taskDue(task) === task.delivery.occurrence && Date.parse(task.delivery.leaseUntil) > this.clock()
   }
 
   /** The scheduler owns its subscription lifetime. Cross-process changes are discovered by its bounded timer. */

@@ -30,11 +30,12 @@ it('buffers notifications during a reply or approval and queues audio after the 
   const notifications = new ReminderNotifications(messages, 'vi', present)
   notifications.setVoiceEnabled(true)
   notifications.pause()
-  await notifications.notify([task('Ôn từ')], false, new AbortController().signal)
+  const delivering = notifications.notify([task('Ôn từ')], false, new AbortController().signal)
   await notifications.speak({ speak }, new AbortController().signal)
   expect(present).not.toHaveBeenCalled()
   expect(speak).not.toHaveBeenCalled()
   notifications.resume()
+  await delivering
   expect(present).toHaveBeenCalledOnce()
   expect(notifications.hasSpeech).toBe(true)
   await notifications.speak({ speak }, new AbortController().signal)
@@ -72,4 +73,35 @@ it('rejects a cancelled notification before presentation and removes terminal es
   expect(present).not.toHaveBeenCalled()
   await notifications.notify([task('Safe\u001B[31m title')], false, new AbortController().signal)
   expect(present.mock.calls[0]![0]).not.toContain('\u001B')
+})
+
+it('does not acknowledge a queued notification before presentation and cancels it on shutdown', async () => {
+  const present = vi.fn()
+  const notifications = new ReminderNotifications(messages, 'en', present)
+  notifications.pause()
+  const controller = new AbortController()
+  let acknowledged = false
+  const pending = notifications.notify([task('Queued')], false, controller.signal).then(() => {
+    acknowledged = true
+  })
+  const rejected = expect(pending).rejects.toThrow()
+  expect(acknowledged).toBe(false)
+  expect(present).not.toHaveBeenCalled()
+  controller.abort()
+  await rejected
+  notifications.resume()
+  expect(present).not.toHaveBeenCalled()
+})
+
+it('checks ownership after the pause and propagates presentation failures to the scheduler', async () => {
+  const present = vi.fn().mockRejectedValue(new Error('Write failed'))
+  const notifications = new ReminderNotifications(messages, 'en', present)
+  notifications.pause()
+  const verify = vi.fn().mockRejectedValue(new Error('Claim changed'))
+  const pending = notifications.notify([task('Old task')], false, new AbortController().signal, verify)
+  const rejected = expect(pending).rejects.toThrow('Claim changed')
+  notifications.resume()
+  await rejected
+  expect(present).not.toHaveBeenCalled()
+  await expect(notifications.notify([task('New task')], false, new AbortController().signal)).rejects.toThrow('Write failed')
 })
