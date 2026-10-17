@@ -20,6 +20,7 @@
       "default": "./dist/airi-adapter.mjs"
     }
   },
+  "files": ["README.md", "dist", "package.json"],
   "scripts": {
     "build": "tsdown",
     "start": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.local src/index.ts",

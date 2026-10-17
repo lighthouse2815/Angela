@@ -14,6 +14,7 @@
     "url": "https://github.com/lighthouse2815/Angela.git"
   },
   "scripts": {
+    "package:cli": "node scripts/package-cli.mjs",
     "cli": "node --env-file-if-exists=.env.cli.local --import tsx packages/airi-cli/src/bin/run.ts",
     "build:cli": "pnpm -F @proj-airi/airi-cli... build",
     "postinstall": "pnpm exec simple-git-hooks && pnpm run build:packages",

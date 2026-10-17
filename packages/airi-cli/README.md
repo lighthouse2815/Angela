@@ -12,6 +12,58 @@ pnpm install
 pnpm build:cli
 ```
 
+## Configure the CLI
+
+Run `angela setup` to select a provider instance, provider definition, model, and endpoint interactively.
+Use `angela setup --list-providers` for provider definition IDs.
+Credentials come from `ANGELA_API_KEY` or the existing selected entry. Setup never asks for an echoed credential or prints it.
+Local endpoints can use an empty key. Settings use the existing private, locked, atomic shared configuration file.
+Unrelated providers remain intact. Setup saves configuration without making a generation request.
+
+For non-interactive setup:
+
+```sh
+angela setup --provider local --model your-model --base-url http://127.0.0.1:1234/v1/
+angela doctor
+angela
+```
+
+`--definition` defaults to `openai-compatible` for a new entry. `--api responses` selects the Responses protocol.
+`--config PATH` and `ANGELA_CONFIG` select another shared file. Invalid settings and corrupt files remain untouched.
+Set `ANGELA_API_KEY` through your shell or secret manager before setup when your provider requires it.
+Setup persists that key in the private configuration file. Temporary environment overrides for ordinary chat still do not modify this file.
+
+## Portable release
+
+Build a directory and compressed archive for the current operating system, architecture, and Node ABI:
+
+```sh
+pnpm package:cli --out /absolute/path/to/angela-portable
+```
+
+The output must not exist. Without `--out`, packaging writes under the checkout's ignored `dist` directory.
+The script reuses pnpm deployment and the existing build commands. `--skip-build` uses already built packages.
+The deployment-only injection flag creates a dedicated lockfile without changing workspace configuration or dependency versions.
+Packaging disables deployment scripts and checks that all symlinks resolve inside the release.
+It refuses accidental environment files and copies only named voice and camera resources.
+
+Transfer the resulting `.tar.gz`, extract it, and keep the directory together:
+
+```sh
+node /path/to/angela-portable/angela.mjs setup
+node /path/to/angela-portable/angela.mjs
+ln -s /path/to/angela-portable/angela.mjs ~/.local/bin/angela
+```
+
+The destination needs a compatible Node.js runtime, but no source checkout or pnpm.
+`portable.json` records the required OS, architecture, Node version, and native module ABI.
+Native dependencies require the same ABI. Build another release for a different target.
+Configuration and conversation data remain in the normal user directories and are never included in the archive.
+Voice still requires Docker and host audio utilities. Its compose resources are included.
+Camera code and tracking models are included. Install its Python dependencies separately with
+`uv sync --locked --project /path/to/angela-portable/python/camera-worker` before `/camera on`.
+`ANGELA_OPENSEEFACE_DIR` remains an explicit override for the tracking models.
+
 ## Shared local configuration
 
 The CLI reads `~/.config/angela/config.json`, shared with desktop and locally served web.
@@ -57,7 +109,7 @@ With workspace dependencies installed and built, this executable works from anot
 /absolute/path/to/airi/packages/airi-cli/dist/bin/run.mjs --cwd /path/to/workspace
 ```
 
-The executable uses workspace packages. It is not a self-contained binary or a published npm package.
+The checkout executable uses workspace packages. Use the portable release below to run without the checkout.
 
 To install the `angela` command on Linux or macOS, run these commands from the repository root after the build:
 

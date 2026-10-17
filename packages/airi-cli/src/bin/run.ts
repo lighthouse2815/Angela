@@ -28,6 +28,7 @@ import { ReminderScheduler } from '../reminder-scheduler'
 import { runReminders } from '../reminders'
 import { runSessionCommand } from '../session-command'
 import { Sessions } from '../sessions'
+import { runSetup } from '../setup'
 import { StreamingSpeech } from '../streaming-speech'
 import { taskCommand } from '../task-commands'
 import { taskContext, taskTools } from '../task-tools'
@@ -46,6 +47,10 @@ import { runVoiceService } from '../voice-service'
  *                    -> McpTools -> MCP client -> tool server
  */
 async function main() {
+  if (process.argv[2] === 'setup') {
+    await runSetup(process.argv.slice(3), process.env)
+    return
+  }
   if (process.argv[2] === 'reminders') {
     await runReminders(process.argv.slice(3), process.env)
     return
@@ -74,7 +79,7 @@ async function main() {
   const config = await readConfig(process.argv.slice(2), process.env)
   const messages = config.messages
   if (config.help) {
-    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela reminders install|start|stop|status|run [--help]\nangela doctor [--json] [--help]\nangela telegram [--help]\nangela discord [--help]\nangela voice start|stop|status [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
+    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela setup [--help]\nangela reminders install|start|stop|status|run [--help]\nangela doctor [--json] [--help]\nangela telegram [--help]\nangela discord [--help]\nangela voice start|stop|status [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
       ['--model', messages.model],
       ['--provider', messages.provider],
       ['--config', messages.configFile],

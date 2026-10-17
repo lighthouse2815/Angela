@@ -17,7 +17,9 @@ import { faceObservation, workerEventSchema } from './observation'
 
 /** Runtime selection does not enable the camera. Only an explicit start opens a device. */
 export function readCameraConfig(env: NodeJS.ProcessEnv) {
-  const upstream = env.ANGELA_OPENSEEFACE_DIR ?? fileURLToPath(new URL('../../../../third_party/openseeface/', import.meta.url))
+  // Portable releases carry models within the package. Source checkouts retain the vendored workspace location.
+  const packaged = fileURLToPath(new URL('../../resources/openseeface/', import.meta.url))
+  const upstream = env.ANGELA_OPENSEEFACE_DIR ?? (existsSync(packaged) ? packaged : fileURLToPath(new URL('../../../../third_party/openseeface/', import.meta.url)))
   const runtime = fileURLToPath(new URL('../../python/camera-worker/', import.meta.url))
   const bundled = join(runtime, '.venv', process.platform === 'win32' ? 'Scripts' : 'bin', process.platform === 'win32' ? 'python.exe' : 'python')
   const integer = (value: string | undefined, fallback: number, minimum: number, maximum: number) => v.parse(v.pipe(v.number(), v.integer(), v.minValue(minimum), v.maxValue(maximum)), Number(value ?? fallback))

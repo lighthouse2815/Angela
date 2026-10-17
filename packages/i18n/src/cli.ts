@@ -1,4 +1,11 @@
 const en = {
+  setup: {
+    usage: 'angela setup [--provider ID] [--definition ID] [--model ID] [--base-url URL] [--api chat-completions|responses] [--config PATH] [--locale en|vi]\nangela setup --list-providers\nNon-interactive setup requires --model.',
+    key: 'Set ANGELA_API_KEY before setup, or reuse the selected provider key. Local endpoints can use an empty key. Keys are never printed.',
+    definition: 'Provider definition ID (--list-providers)',
+    invalid: 'Invalid chat provider settings. Check the provider definition, model, HTTP endpoint, and required provider fields.',
+    saved: 'Shared provider settings saved privately. Run angela doctor to inspect the connection, then angela to chat.',
+  },
   telegramLocalSkills: 'Import or edit skill files from the local CLI. Telegram supports listing, reading, enabling, disabling, and forgetting saved skills.',
   telegramSharedUser: 'ANGELA_TELEGRAM_SHARED_USER_ID must select one ID from ANGELA_TELEGRAM_ALLOWED_USER_IDS. Only that user can share local CLI tasks and memory.',
   reminders: {
@@ -274,6 +281,13 @@ const en = {
 }
 
 const vi: typeof en = {
+  setup: {
+    usage: 'angela setup [--provider ID] [--definition ID] [--model ID] [--base-url URL] [--api chat-completions|responses] [--config PATH] [--locale en|vi]\nangela setup --list-providers\nCấu hình không tương tác cần --model.',
+    key: 'Đặt ANGELA_API_KEY trước khi setup hoặc dùng lại key của provider đã chọn. Endpoint local có thể để key trống. Key không được in ra.',
+    definition: 'ID định nghĩa provider (--list-providers)',
+    invalid: 'Cấu hình chat không hợp lệ. Kiểm tra định nghĩa provider, model, endpoint HTTP và các trường provider yêu cầu.',
+    saved: 'Đã lưu cấu hình provider dùng chung với quyền riêng tư. Chạy angela doctor để kiểm tra kết nối rồi angela để chat.',
+  },
   telegramLocalSkills: 'Import hoặc sửa file skill bằng CLI trên máy. Telegram hỗ trợ liệt kê, đọc, bật, tắt và quên skill đã lưu.',
   telegramSharedUser: 'ANGELA_TELEGRAM_SHARED_USER_ID phải là một ID trong ANGELA_TELEGRAM_ALLOWED_USER_IDS. Chỉ người đó được dùng chung tasks và memory với CLI.',
   reminders: {
