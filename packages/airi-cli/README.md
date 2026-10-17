@@ -936,3 +936,34 @@ The stub verifies tool integration and session context. It does not evaluate a l
 Delivery tests use fake clocks for lease expiry, renewal, concurrent claims, notifier errors, acknowledgment errors, and shutdown.
 Retention tests cover large histories, active-task preservation, deterministic pruning, concurrent writers, and invalid-storage preservation.
 POSIX terminal tests use Python 3 and a real PTY to exercise prompt input, cursor positions, wrapping, and command suggestions.
+
+## Live model evaluation
+
+```sh
+angela eval
+angela eval --case relative-time --repeat 3 --json
+angela eval --case memory --timeout-ms 60000 --model your-model
+```
+
+This command uses the selected real chat provider and the existing generation runtime. Requests can incur provider costs.
+It creates private temporary stores, uses synthetic Vietnamese prompts, and removes the stores after each case.
+It never reads personal memory, saved conversations, or Telegram stores and never starts MCP or executes model-selected shell commands.
+Provider configuration supplies credentials only for generation. Embeddings remain disabled in these synthetic recall stores.
+
+The cases measure observed behavior:
+
+- `relative-time`: saves exactly one reminder twenty minutes after the supplied clock in the Vietnamese timezone.
+- `ambiguous-task`: lists two matching tasks and asks for a choice without completing either one.
+- `memory`: saves a supplied name, reads it from disk, and recalls it in a fresh conversation through the real recall index.
+- `tool-selection`: chooses a read-only study-note tool and returns an unpredictable code from the actual fixture file.
+
+Reports include model ID, case ID, iteration, duration, tool names, and individual boolean checks.
+They exclude credentials, provider bodies, prompts, and generated answers. A success claim cannot pass a missing tool effect.
+`--json` produces structured output. Exit 0 means every case passed. Exit 1 means a case failed or setup failed.
+Ctrl+C cancels evaluation with exit 130. SIGTERM uses exit 143. Each case defaults to a 45-second timeout.
+`--repeat` accepts 1–5. `--timeout-ms` accepts 1000–300000. Model and provider overrides match ordinary CLI configuration.
+
+These fixtures measure a small set of behaviors. They do not establish general model quality, speech quality, or production reliability.
+The clarification check uses a simple question/selection phrase heuristic. Model answers can vary across runs.
+Normal automated tests use a local provider boundary to verify the evaluator and remain independent of live credentials.
+Run the live command separately when comparing providers or changing models. Keep its results distinct from unit-test results.

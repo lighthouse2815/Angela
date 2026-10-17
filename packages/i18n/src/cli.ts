@@ -1,4 +1,9 @@
 const en = {
+  evaluation: {
+    usage: 'angela eval [--case all|relative-time|ambiguous-task|memory|tool-selection] [--repeat 1..5] [--timeout-ms 1000..300000] [--json] [--model ID] [--provider ID] [--config PATH] [--base-url URL] [--api chat-completions|responses]',
+    scope: 'Live model evaluation uses synthetic prompts and temporary stores. Provider requests can incur costs. Personal data and MCP execution are excluded.',
+    failed: 'Evaluation could not finish. Check the provider configuration and available temporary storage. No personal data was changed.',
+  },
   setup: {
     usage: 'angela setup [--provider ID] [--definition ID] [--model ID] [--base-url URL] [--api chat-completions|responses] [--config PATH] [--locale en|vi]\nangela setup --list-providers\nNon-interactive setup requires --model.',
     key: 'Set ANGELA_API_KEY before setup, or reuse the selected provider key. Local endpoints can use an empty key. Keys are never printed.',
@@ -281,6 +286,11 @@ const en = {
 }
 
 const vi: typeof en = {
+  evaluation: {
+    usage: 'angela eval [--case all|relative-time|ambiguous-task|memory|tool-selection] [--repeat 1..5] [--timeout-ms 1000..300000] [--json] [--model ID] [--provider ID] [--config PATH] [--base-url URL] [--api chat-completions|responses]',
+    scope: 'Đánh giá model thật bằng yêu cầu mẫu và kho tạm. Lệnh gọi provider có thể tính phí. Không dùng dữ liệu cá nhân hay thực thi MCP.',
+    failed: 'Không hoàn tất được đánh giá. Kiểm tra cấu hình provider và chỗ trống thư mục tạm. Dữ liệu cá nhân không bị thay đổi.',
+  },
   setup: {
     usage: 'angela setup [--provider ID] [--definition ID] [--model ID] [--base-url URL] [--api chat-completions|responses] [--config PATH] [--locale en|vi]\nangela setup --list-providers\nCấu hình không tương tác cần --model.',
     key: 'Đặt ANGELA_API_KEY trước khi setup hoặc dùng lại key của provider đã chọn. Endpoint local có thể để key trống. Key không được in ra.',

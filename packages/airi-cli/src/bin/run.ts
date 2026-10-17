@@ -16,6 +16,7 @@ import { Chat } from '../chat'
 import { readConfig } from '../config'
 import { runDoctor } from '../doctor'
 import { formatRequestError } from '../errors'
+import { runEvaluation } from '../evaluation'
 import { McpTools } from '../mcp'
 import { Memory } from '../memory'
 import { Output } from '../output'
@@ -47,6 +48,10 @@ import { runVoiceService } from '../voice-service'
  *                    -> McpTools -> MCP client -> tool server
  */
 async function main() {
+  if (process.argv[2] === 'eval') {
+    await runEvaluation(process.argv.slice(3), process.env)
+    return
+  }
   if (process.argv[2] === 'setup') {
     await runSetup(process.argv.slice(3), process.env)
     return
@@ -79,7 +84,7 @@ async function main() {
   const config = await readConfig(process.argv.slice(2), process.env)
   const messages = config.messages
   if (config.help) {
-    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela setup [--help]\nangela reminders install|start|stop|status|run [--help]\nangela doctor [--json] [--help]\nangela telegram [--help]\nangela discord [--help]\nangela voice start|stop|status [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
+    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela eval [--help]\nangela setup [--help]\nangela reminders install|start|stop|status|run [--help]\nangela doctor [--json] [--help]\nangela telegram [--help]\nangela discord [--help]\nangela voice start|stop|status [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
       ['--model', messages.model],
       ['--provider', messages.provider],
       ['--config', messages.configFile],
