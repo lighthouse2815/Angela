@@ -1,4 +1,6 @@
 const en = {
+  telegramLocalSkills: 'Import or edit skill files from the local CLI. Telegram supports listing, reading, enabling, disabling, and forgetting saved skills.',
+  telegramSharedUser: 'ANGELA_TELEGRAM_SHARED_USER_ID must select one ID from ANGELA_TELEGRAM_ALLOWED_USER_IDS. Only that user can share local CLI tasks and memory.',
   reminders: {
     build: 'Build the CLI, then run angela reminders install using its built executable.',
     usage: 'angela reminders install|start|stop|status|run [--data-dir PATH] [--locale en|vi]',
@@ -177,7 +179,7 @@ const en = {
   locale: 'Interface language: en or vi',
   help: 'Show help',
   cliCommands: 'Available commands:\n/voice — Speak and hear replies.\n/chat — Return to text chat.\n/tasks — List pending tasks.\n/today — List tasks due today.\n/done ID — Complete a task.\n/cancel ID — Cancel a task.\n/snooze ID 10m — Snooze a task.\n/camera on — Enable local camera cues for this session.\n/camera off — Stop camera perception.\n/camera status — Show camera status.\n/camera debug — Show derived cues and diagnostics.\n/context — Show context budget and summary status.\n/project — View and manage this project checkpoint.\n/memory — View and manage personal memory.\n/memory search TEXT — Search profile, skills and earlier sessions.\n/memory used — Show sources used in the latest request.\n/memory status — Show indexing and semantic-search status.\n/skills — View and manage reusable workflows.\n/remember TEXT — Save a personal fact.\n/forget ID — Delete one personal memory.\n/help — Show this list.\n/permistion — Show the current tool permission mode.\n/permistion full — Run tools without confirmation in this session.\n/permistion ask — Ask before each tool call.\n/permission — Alias for /permistion. on/off also select full/ask.\n/exit — Exit Angela.\n\nCtrl+C — Cancel the active request. Ctrl+D — Exit.',
-  telegramCommands: 'Available Telegram commands:\n/start — Introduce Angela.\n/help — Show this list.\n/status — Show the model, session, and saved request progress.\n/result — Read the latest saved reply.\n/resume — Inspect and continue the last unfinished request.\n/new — Clear this conversation and start again.\n/cancel — Cancel the active request.\n/permistion — Show tool permissions. Use full or ask to change them.\n/permission — Alias for /permistion.\n\nTools run on the machine hosting this bot. Confirmation is required by default.',
+  telegramCommands: 'Available Telegram commands:\n/start — Introduce Angela.\n/help — Show this list.\n/status — Show the model, session, and saved request progress.\n/result — Read the latest saved reply.\n/resume — Inspect and continue the last unfinished request.\n/tasks [all], /today — View tasks.\n/done ID, /cancel ID, /snooze ID 10m — Manage tasks.\n/memory, /remember TEXT, /forget ID, /skills — Manage private memory and skills.\n/new — Clear this conversation and start again.\n/cancel — Cancel the active request.\n/permistion — Show tool permissions. Use full or ask to change them.\n/permission — Alias for /permistion.\n\nTools run on the machine hosting this bot. Confirmation is required by default.',
   missingModel: 'Set ANGELA_MODEL or pass --model.',
   invalidUrl: 'Use an HTTP or HTTPS provider endpoint.',
   invalidApi: 'Use chat-completions or responses for --api.',
@@ -272,6 +274,8 @@ const en = {
 }
 
 const vi: typeof en = {
+  telegramLocalSkills: 'Import hoặc sửa file skill bằng CLI trên máy. Telegram hỗ trợ liệt kê, đọc, bật, tắt và quên skill đã lưu.',
+  telegramSharedUser: 'ANGELA_TELEGRAM_SHARED_USER_ID phải là một ID trong ANGELA_TELEGRAM_ALLOWED_USER_IDS. Chỉ người đó được dùng chung tasks và memory với CLI.',
   reminders: {
     build: 'Build CLI rồi chạy angela reminders install bằng executable đã build.',
     usage: 'angela reminders install|start|stop|status|run [--data-dir PATH] [--locale en|vi]',
@@ -450,7 +454,7 @@ const vi: typeof en = {
   locale: 'Ngôn ngữ giao diện: en hoặc vi',
   help: 'Hiện hướng dẫn',
   cliCommands: 'Danh sách lệnh:\n/voice — Nói và nghe trả lời.\n/chat — Quay lại nhập chữ.\n/tasks — Xem tác vụ đang chờ.\n/today — Xem tác vụ hôm nay.\n/done ID — Hoàn thành tác vụ.\n/cancel ID — Hủy tác vụ.\n/snooze ID 10m — Nhắc lại sau 10 phút.\n/camera on — Bật tín hiệu camera cục bộ trong phiên này.\n/camera off — Tắt camera.\n/camera status — Xem trạng thái camera.\n/camera debug — Xem tín hiệu suy ra và chẩn đoán.\n/context — Xem ngân sách ngữ cảnh và trạng thái tóm tắt.\n/project — Xem và quản lý bản tóm tắt dự án.\n/memory — Xem và quản lý memory cá nhân.\n/memory search NỘI_DUNG — Tìm hồ sơ, kỹ năng và các phiên cũ.\n/memory used — Xem nguồn dùng trong yêu cầu gần nhất.\n/memory status — Xem trạng thái chỉ mục và tìm ngữ nghĩa.\n/skills — Xem và quản lý cách làm việc tái sử dụng.\n/remember NỘI_DUNG — Lưu một ghi nhớ.\n/forget ID — Xóa một ghi nhớ.\n/help — Hiện danh sách này.\n/permistion — Xem chế độ quyền công cụ hiện tại.\n/permistion full — Chạy tool không cần xác nhận trong phiên này.\n/permistion ask — Hỏi xác nhận trước mỗi lần gọi tool.\n/permission — Tên khác của /permistion. on/off tương ứng full/ask.\n/exit — Thoát Angela.\n\nCtrl+C — Hủy yêu cầu đang chạy. Ctrl+D — Thoát.',
-  telegramCommands: 'Danh sách lệnh Telegram:\n/start — Giới thiệu Angela.\n/help — Hiện danh sách này.\n/status — Xem model, phiên và tiến trình công việc đã lưu.\n/result — Đọc phản hồi gần nhất đã lưu.\n/resume — Kiểm tra và tiếp tục công việc dang dở gần nhất.\n/new — Xóa hội thoại hiện tại và bắt đầu lại.\n/cancel — Hủy yêu cầu đang chạy.\n/permistion — Xem quyền công cụ. Dùng full hoặc ask để đổi quyền.\n/permission — Tên khác của /permistion.\n\nTool chạy trên máy đang mở bot. Mặc định phải xác nhận.',
+  telegramCommands: 'Danh sách lệnh Telegram:\n/start — Giới thiệu Angela.\n/help — Hiện danh sách này.\n/status — Xem model, phiên và tiến trình công việc đã lưu.\n/result — Đọc phản hồi gần nhất đã lưu.\n/resume — Kiểm tra và tiếp tục công việc dang dở gần nhất.\n/tasks [all], /today — Xem công việc.\n/done ID, /cancel ID, /snooze ID 10m — Quản lý công việc.\n/memory, /remember TEXT, /forget ID, /skills — Quản lý memory và skill riêng.\n/new — Xóa hội thoại hiện tại và bắt đầu lại.\n/cancel — Hủy yêu cầu đang chạy.\n/permistion — Xem quyền công cụ. Dùng full hoặc ask để đổi quyền.\n/permission — Tên khác của /permistion.\n\nTool chạy trên máy đang mở bot. Mặc định phải xác nhận.',
   missingModel: 'Đặt ANGELA_MODEL hoặc truyền --model.',
   invalidUrl: 'Dùng địa chỉ provider HTTP hoặc HTTPS.',
   invalidApi: 'Dùng chat-completions hoặc responses cho --api.',

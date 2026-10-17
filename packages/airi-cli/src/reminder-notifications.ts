@@ -16,7 +16,7 @@ export class ReminderNotifications implements ReminderNotifier {
   private voiceEnabled = false
   private speaking?: Promise<void>
 
-  constructor(private readonly messages: typeof cliMessages.en.tasks, private readonly locale: string, private readonly present: (text: string, tasks: readonly Task[]) => void | Promise<void>) {}
+  constructor(private readonly messages: typeof cliMessages.en.tasks, private readonly locale: string, private readonly present: (text: string, tasks: readonly Task[], signal?: AbortSignal) => void | Promise<void>) {}
 
   /** Resolves only after text presentation. Buffered calls reject on cancellation without presenting stale notifications. */
   async notify(tasks: readonly Task[], overdue: boolean, signal: AbortSignal, verify?: () => Promise<void>) {
@@ -41,7 +41,7 @@ export class ReminderNotifications implements ReminderNotifier {
     } while (this.paused)
     const heading = overdue ? this.messages.overdue : this.messages.reminder
     const text = `${heading}\n\n${tasks.map(task => formatTask(task, this.locale, this.messages)).join('\n')}`
-    await this.present(text, tasks)
+    await this.present(text, tasks, signal)
     if (this.voiceEnabled)
       this.speech.push(`${heading}. ${tasks.map(task => stripVTControlCharacters(task.title)).join('. ')}`)
   }

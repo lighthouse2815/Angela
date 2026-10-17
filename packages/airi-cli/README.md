@@ -426,6 +426,35 @@ Actions that already ran can retain side effects after cancellation. Cancellatio
 It does not send existing CLI conversations to Telegram. A failed delivery leaves the generated answer in the saved session.
 Validate routing and authorization with local API tests before you connect a real bot.
 
+### Telegram tasks and memory
+
+Telegram exposes the same validated task tools, personal memory, keyword/semantic recall, and saved skill catalog as terminal chat.
+Use `/tasks [all]`, `/today`, `/done ID`, `/cancel ID`, and `/snooze ID 10m` without a model request.
+`/cancel` without an ID still cancels the active generation. Task changes wait until the current generation finishes.
+Use `/memory`, `/remember TEXT`, `/forget ID`, memory search/settings commands, and `/skills` to inspect and control private stores.
+Import and edit skill files through the local CLI. Telegram cannot import arbitrary host paths through direct skill commands.
+Model skill saves require confirmation in the current user's message. MCP output does not establish skill verification in this host.
+
+By default, tasks, facts, skills, recall settings, and indexes are isolated by bot and private user under
+`telegram/companions/BOT_ID/USER_ID` in the CLI data directory. Chat sessions keep their existing separate location.
+Private recall searches saved facts and skills. The current Telegram conversation remains in its existing session context.
+Other users and bots cannot search these private stores. `/new` clears conversation history, retaining tasks and personal memory.
+
+To use your terminal tasks and memory from your own Telegram account, explicitly set:
+
+```dotenv
+ANGELA_TELEGRAM_SHARED_USER_ID=<one-allowed-numeric-user-id>
+```
+
+The ID must appear in `ANGELA_TELEGRAM_ALLOWED_USER_IDS`. Only that user shares the terminal data directory and its history recall.
+Other allowed users keep separate stores. Changing this setting selects another store without deleting the old one.
+Treat this setting as access to your saved personal facts, skills, tasks, and terminal history.
+
+The bot starts each allowed user's scheduler after startup, including overdue delivery without another incoming message.
+Successful Telegram submission acknowledges delivery. Outages leave claims retryable and shutdown releases pending claims.
+Notifications wait for active replies and approvals. Closing the Telegram host stops its delivery until restart.
+Shared terminal and Telegram tasks use one delivery claim, so the first successful host chooses the delivery surface.
+
 ## Checks
 
 ```sh
@@ -805,7 +834,7 @@ Reminders wait until Angela finishes her current reply. They also wait while you
 Idle microphone capture stops before reminder playback and resumes afterward. TTS failure leaves the text notification visible.
 `/chat` disables reminder speech. Core task tests do not require audio services.
 
-Tasks share the CLI data directory across workspaces and sessions. Telegram reminder delivery is not part of V1.
+Tasks share the CLI data directory across workspaces and sessions. Telegram also supports tasks and reminders in its own private user stores.
 By default, the clock and calendar use the operating system timezone. A task can retain an explicit IANA timezone.
 To select the CLI timezone through Node's standard environment, run `TZ=Asia/Ho_Chi_Minh angela`.
 Routine intervals support 1–52 days or weeks. Snooze durations support 1 minute through 366 days.

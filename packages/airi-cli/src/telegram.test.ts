@@ -17,7 +17,9 @@ import { Bot } from 'grammy'
 import { afterEach, expect, it, vi } from 'vitest'
 
 import { McpTools } from './mcp'
+import { Memory } from './memory'
 import { Sessions } from './sessions'
+import { Tasks } from './tasks'
 import { TelegramChat } from './telegram'
 
 const hosts: TelegramChat[] = []
@@ -35,7 +37,7 @@ function completion(text: string) {
   return new Response(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', content: text }, finish_reason: 'stop' }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } })
 }
 
-async function connect(fetch = vi.fn<typeof globalThis.fetch>().mockImplementation(async () => completion('Xin chào')), existingDirectory?: string) {
+async function connect(fetch = vi.fn<typeof globalThis.fetch>().mockImplementation(async () => completion('Xin chào')), existingDirectory?: string, sharedUserId?: number) {
   const directory = existingDirectory ?? await mkdtemp(join(tmpdir(), 'angela-telegram-test-'))
   if (!existingDirectory)
     directories.push(directory)
@@ -90,7 +92,7 @@ async function connect(fetch = vi.fn<typeof globalThis.fetch>().mockImplementati
     await tools.discover(signal)
     return tools
   })
-  const host = new TelegramChat(bot, provider, 'test-model', new Sessions(directory, cliMessages.vi), directory, cliMessages.vi, new Set([100, 200]), connectTools)
+  const host = new TelegramChat(bot, provider, 'test-model', new Sessions(directory, cliMessages.vi), directory, cliMessages.vi, new Set([100, 200]), connectTools, { dataDir: directory, env: {}, locale: 'vi', apiKey: '', sharedUserId })
   hosts.push(host)
   let updateId = 0
   async function message(text: string, id = 100, group = false) {
@@ -483,4 +485,76 @@ it('does not resume empty, completed, or other-chat requests', async () => {
   await restarted.message('/resume', 200)
   expect(restarted.fetch).not.toHaveBeenCalled()
   expect(restarted.connectTools).not.toHaveBeenCalled()
+})
+
+function companionCompletion(name: string, input: object) {
+  const delta = { role: 'assistant', tool_calls: [{ index: 0, id: `call-${name}`, type: 'function', function: { name, arguments: JSON.stringify(input) } }] }
+  return new Response(`data: ${JSON.stringify({ choices: [{ index: 0, delta, finish_reason: 'tool_calls' }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } })
+}
+
+it('saves conversational tasks and facts through Telegram tools and recalls facts after restart without crossing users', async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>()
+    .mockResolvedValueOnce(companionCompletion('personal_memory', { action: 'remember', id: null, text: 'Tôi tên là Lan', source_quote: 'Tôi tên là Lan', core: true }))
+    .mockResolvedValueOnce(companionCompletion('task_create', { title: 'Học tiếng Trung', type: 'todo' }))
+    .mockResolvedValueOnce(completion('Đã lưu'))
+  const first = await connect(fetch)
+  await first.message('Tôi tên là Lan. Thêm việc học tiếng Trung vào danh sách.')
+  await vi.waitFor(() => expect(first.reply).toHaveBeenCalledWith('Đã lưu'))
+  await first.idle()
+  const data = join(first.directory, 'telegram', 'companions', '42', '100')
+  expect((await new Memory(data, cliMessages.vi).read()).entries[0]?.text).toBe('Tôi tên là Lan')
+  expect((await new Tasks(data, cliMessages.vi.tasks).list())[0]?.title).toBe('Học tiếng Trung')
+  expect(String(fetch.mock.calls[0][1]?.body)).toContain('task_create')
+  expect(String(fetch.mock.calls[0][1]?.body)).toContain('memory_search')
+  expect(first.invoke).not.toHaveBeenCalled()
+  await first.host.close()
+  const next = await connect(undefined, first.directory)
+  await next.message('Bạn nhớ gì về tôi?')
+  await vi.waitFor(() => expect(next.reply).toHaveBeenCalledWith('Xin chào'))
+  await next.idle()
+  expect(String(next.fetch.mock.calls[0][1]?.body)).toContain('Tôi tên là Lan')
+  await next.message('Bạn nhớ gì về tôi?', 200)
+  await vi.waitFor(() => expect(next.fetch).toHaveBeenCalledTimes(2))
+  expect(String(next.fetch.mock.calls[1][1]?.body)).not.toContain('Tôi tên là Lan')
+  await next.host.close()
+})
+
+it('delivers overdue Telegram reminders after restart without another message and preserves task commands and job cancellation', async () => {
+  const first = await connect()
+  const data = join(first.directory, 'telegram', 'companions', '42', '100')
+  const tasks = new Tasks(data, cliMessages.vi.tasks)
+  const task = await tasks.create({ title: 'Nhắc sau khi khởi động', type: 'reminder', dueAt: new Date(Date.now() - 1000).toISOString() })
+  await first.host.start()
+  expect(first.reply).toHaveBeenCalledWith(expect.stringContaining(task.title))
+  expect((await tasks.find(task.id)).delivery?.status).toBe('delivered')
+  await first.message('/tasks')
+  expect(first.reply.mock.calls.at(-1)?.[0]).toContain(task.id)
+  await first.message(`/cancel ${task.id}`)
+  expect((await tasks.find(task.id)).status).toBe('cancelled')
+  await first.message('/cancel')
+  expect(first.reply.mock.calls.at(-1)?.[0]).toBe(cliMessages.vi.telegramIdle)
+  await first.message('/skills import /private/host-file')
+  expect(first.reply.mock.calls.at(-1)?.[0]).toBe(cliMessages.vi.telegramLocalSkills)
+  expect(first.fetch).not.toHaveBeenCalled()
+  await first.host.close()
+  const next = await connect(undefined, first.directory)
+  await next.host.start()
+  expect(next.reply).not.toHaveBeenCalled()
+})
+
+it('shares terminal tasks and memory with only the explicitly selected Telegram owner', async () => {
+  const host = await connect(undefined, undefined, 100)
+  await new Memory(host.directory, cliMessages.vi).remember('Chủ máy thích trà', undefined, undefined, { core: true })
+  const task = await new Tasks(host.directory, cliMessages.vi.tasks).create({ title: 'Việc riêng của chủ máy', type: 'todo' })
+  await host.message('/tasks')
+  expect(host.reply.mock.calls.at(-1)?.[0]).toContain(task.id)
+  await host.message('/tasks', 200)
+  expect(host.reply.mock.calls.at(-1)?.[0]).not.toContain(task.id)
+  await host.message('Bạn nhớ sở thích của tôi không?')
+  await vi.waitFor(() => expect(host.fetch).toHaveBeenCalledTimes(1))
+  expect(String(host.fetch.mock.calls[0][1]?.body)).toContain('Chủ máy thích trà')
+  await host.idle()
+  await host.message('Bạn nhớ sở thích của tôi không?', 200)
+  await vi.waitFor(() => expect(host.fetch).toHaveBeenCalledTimes(2))
+  expect(String(host.fetch.mock.calls[1][1]?.body)).not.toContain('Chủ máy thích trà')
 })

@@ -25,6 +25,7 @@ import { McpTools } from './mcp'
 import { describeTool, Output } from './output'
 import { Permissions } from './permissions'
 import { Sessions } from './sessions'
+import { TelegramCompanion } from './telegram-companion'
 
 interface ChatState {
   permissions: Permissions
@@ -32,6 +33,7 @@ interface ChatState {
   output?: Output
   checkpoint?: (status?: SavedRequest['status']) => Promise<void>
   pending?: { id: string, finish: (approved: boolean) => void }
+  companion?: Promise<TelegramCompanion>
 }
 
 /** Owns private chat jobs. Each chat has one persisted session and at most one active generation. */
@@ -49,6 +51,7 @@ export class TelegramChat {
     private readonly messages: typeof cliMessages.en,
     private readonly allowedUsers: ReadonlySet<number>,
     private readonly connectTools: (sessionId: string, confirm: ConstructorParameters<typeof McpTools>[1], signal: AbortSignal) => Promise<McpTools>,
+    private readonly companionConfig: { dataDir: string, env: NodeJS.ProcessEnv, locale: string, baseUrl?: string, apiKey: string, sharedUserId?: number },
   ) {
     bot.use(async (ctx, next) => {
       // Check the sender before commands, typing indicators, session reads, or provider requests.
@@ -76,6 +79,14 @@ export class TelegramChat {
       }
     })
     bot.command('cancel', async (ctx) => {
+      if (ctx.match.trim()) {
+        if (this.jobs.has(ctx.chat.id)) {
+          await ctx.reply(messages.telegramBusy)
+          return
+        }
+        await this.reply(ctx.chat.id, await (await this.companion(ctx.chat.id)).command(`/cancel ${ctx.match}`) ?? messages.tasks.usage)
+        return
+      }
       const job = this.jobs.get(ctx.chat.id)
       if (!job) {
         await ctx.reply(messages.telegramIdle)
@@ -91,7 +102,7 @@ export class TelegramChat {
       const request = await this.request(ctx.chat.id)
       await this.reply(ctx.chat.id, request?.answer ?? messages.telegramNoResult)
     })
-    bot.command('resume', ctx => this.start(ctx, '', false, true))
+    bot.command('resume', ctx => this.startRequest(ctx, '', false, true))
     bot.on('message:text', async (ctx) => {
       const question = ctx.message.text.normalize('NFD').replace(/\p{M}/gu, '').replace(/đ/gi, 'd').toLowerCase().trim().replace(/[?!.]+$/u, '')
       if (/^(?:viec (?:luc nay|do) (?:da )?den dau roi|(?:da )?xong chua|den dau roi|status|how is it going|is it done)$/u.test(question)) {
@@ -99,7 +110,7 @@ export class TelegramChat {
         return
       }
       if (/^(?:tiep tuc viec (?:luc nay|do)|lam tiep viec (?:luc nay|do)|continue (?:the )?previous task)$/u.test(question)) {
-        await this.start(ctx, '', false, true)
+        await this.startRequest(ctx, '', false, true)
         return
       }
       if (this.jobs.has(ctx.chat.id)) {
@@ -108,11 +119,46 @@ export class TelegramChat {
       }
       const reset = ctx.message.text === '/new' || ctx.message.text === `/new@${bot.botInfo.username}`
       if (ctx.message.text.startsWith('/') && !reset) {
-        await ctx.reply(messages.telegramCommands)
+        try {
+          const text = ctx.message.text.replace(/^\/([a-z_-]+)@\w+/u, '/$1')
+          await this.reply(ctx.chat.id, await (await this.companion(ctx.chat.id)).command(text) ?? messages.telegramCommands)
+        }
+        catch {
+          await ctx.reply(messages.telegramRequestFailed)
+        }
         return
       }
-      await this.start(ctx, ctx.message.text, reset)
+      await this.startRequest(ctx, ctx.message.text, reset)
     })
+  }
+
+  /** Restarts reminder delivery for allowed private users without waiting for another message after host restart. */
+  async start() {
+    for (const user of this.allowedUsers) {
+      if (this.closing)
+        break
+      await this.companion(user)
+    }
+  }
+
+  private companion(chatId: number) {
+    const state = this.state(chatId)
+    state.companion ??= (async () => {
+      const root = this.companionConfig.sharedUserId === chatId
+        ? this.companionConfig.dataDir
+        : join(this.companionConfig.dataDir, 'telegram', 'companions', String(this.bot.botInfo.id), String(chatId))
+      const companion = new TelegramCompanion(root, this.workspace, this.sessionId(chatId), this.messages, this.companionConfig.locale, this.companionConfig.env, this.companionConfig, (text, signal) => this.reply(chatId, text, signal))
+      try {
+        await companion.start()
+        return companion
+      }
+      catch (error) {
+        await companion.close()
+        state.companion = undefined
+        throw error
+      }
+    })()
+    return state.companion
   }
 
   /** Stops accepting updates, cancels generations, and waits for session locks to release. */
@@ -122,10 +168,11 @@ export class TelegramChat {
       job.controller.abort()
     await Promise.all([...this.jobs.values()].map(job => job.done))
     await Promise.all([...this.chats.values()].map(state => state.tools?.close()))
+    await Promise.all([...this.chats.values()].map(async state => (await state.companion)?.close()))
     this.chats.clear()
   }
 
-  private async start(ctx: Context, text: string, reset: boolean, resume = false) {
+  private async startRequest(ctx: Context, text: string, reset: boolean, resume = false) {
     if (!ctx.chat)
       return
     const chatId = ctx.chat.id
@@ -203,9 +250,20 @@ export class TelegramChat {
 
   private async reply(chatId: number, text: string, signal?: AbortSignal) {
     const characters = Array.from(text)
-    for (let offset = 0; offset < characters.length; offset += 2000) {
-      signal?.throwIfAborted()
-      await this.bot.api.sendMessage(chatId, characters.slice(offset, offset + 2000).join(''))
+    const cancellation = new TelegramAbortController()
+    const abort = () => cancellation.abort()
+    signal?.throwIfAborted()
+    signal?.addEventListener('abort', abort, { once: true })
+    const timer = setTimeout(abort, 30_000)
+    try {
+      for (let offset = 0; offset < characters.length; offset += 2000) {
+        signal?.throwIfAborted()
+        await this.bot.api.sendMessage(chatId, characters.slice(offset, offset + 2000).join(''), {}, cancellation.signal)
+      }
+    }
+    finally {
+      clearTimeout(timer)
+      signal?.removeEventListener('abort', abort)
     }
   }
 
@@ -265,6 +323,7 @@ export class TelegramChat {
     let deliveredProgress = ''
     let editing: Promise<void> | undefined
     let progressId: number | undefined
+    let companion: TelegramCompanion | undefined
     const sink = new Writable({ write(chunk, _encoding, callback) {
       progress = Array.from(progress + String(chunk)).slice(-1500).join('')
       callback()
@@ -361,10 +420,12 @@ export class TelegramChat {
           throw error
         }
       }, requestSignal)
+      companion = await this.companion(chatId)
+      const prepared = await companion.prepare(text, session.record.id, requestSignal)
       let answer = ''
       await chat.send(text, {
         abortSignal: requestSignal,
-        tools: state.tools.definitions(),
+        tools: [...state.tools.definitions(), ...prepared.tools],
         prepareConversation: async (conversation) => {
           await checkpoint()
           return conversation
@@ -380,7 +441,7 @@ export class TelegramChat {
               await checkpoint()
           }
         },
-      }, recoveryContext)
+      }, [recoveryContext, prepared.context].filter(Boolean).join('\n\n'))
       requestSignal.throwIfAborted()
       if (!answer.trim())
         throw new Error(this.messages.emptyResponse)
@@ -428,6 +489,7 @@ export class TelegramChat {
       await flush()
       await saving.catch(() => {})
       await session.close()
+      await companion?.finish()
     }
   }
 }
@@ -465,6 +527,9 @@ export async function runTelegram(args: string[], env: NodeJS.ProcessEnv) {
   if (config.help || config.list)
     throw new Error(help.messages.telegramUsage)
   const messages = config.messages
+  const sharedUserId = merged.ANGELA_TELEGRAM_SHARED_USER_ID
+  if (sharedUserId && (!ids.includes(sharedUserId) || !/^\d+$/u.test(sharedUserId)))
+    throw new Error(messages.telegramSharedUser)
   const workspace = await realpath(config.cwd ?? process.cwd())
   if (!(await stat(workspace)).isDirectory())
     throw new Error(messages.invalidWorkspace)
@@ -473,7 +538,14 @@ export async function runTelegram(args: string[], env: NodeJS.ProcessEnv) {
   if (!provider)
     throw new Error(messages.unsupportedProvider)
   const bot = new Bot(token)
-  const host = new TelegramChat(bot, provider, config.model, new Sessions(join(config.dataDir, 'telegram'), messages), workspace, messages, new Set(ids.map(Number)), async (id, confirm, signal) => await McpTools.connect(config, workspace, join(config.dataDir, 'telegram', 'computer-use', id), confirm, messages, merged, signal))
+  const host = new TelegramChat(bot, provider, config.model, new Sessions(join(config.dataDir, 'telegram'), messages), workspace, messages, new Set(ids.map(Number)), async (id, confirm, signal) => await McpTools.connect(config, workspace, join(config.dataDir, 'telegram', 'computer-use', id), confirm, messages, merged, signal), {
+    dataDir: config.dataDir,
+    env: merged,
+    locale: config.locale,
+    baseUrl: config.baseUrl,
+    apiKey: config.apiKey,
+    sharedUserId: sharedUserId ? Number(sharedUserId) : undefined,
+  })
   bot.catch(() => {
     process.stderr.write(`${messages.telegramFailed}\n`)
   })
@@ -496,6 +568,7 @@ export async function runTelegram(args: string[], env: NodeJS.ProcessEnv) {
     if (webhook.url)
       throw new Error(messages.telegramFailed)
     if (!stopped) {
+      await host.start()
       await bot.start({
         allowed_updates: ['message', 'callback_query'],
         onStart: () => { process.stderr.write(`${messages.telegramReady}\n`) },
