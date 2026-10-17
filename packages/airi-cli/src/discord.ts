@@ -10,6 +10,7 @@ import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { parseEnv } from 'node:util'
 
+import { conversationToChatMessages } from '@proj-airi/core-agent'
 import { DiscordAdapter } from '@proj-airi/discord-bot'
 import { getGenerationProvider, listProviders } from '@proj-airi/provider-inference'
 
@@ -18,6 +19,15 @@ import { readConfig } from './config'
 import { Sessions } from './sessions'
 
 type Input = Parameters<NonNullable<DiscordAdapterConfig['respond']>>[0]
+
+function isGatewayDiagnostic(text: string) {
+  // NOTICE:
+  // The gateway returns this service failure as completion text instead of a structured error.
+  // Discord voice history and discord.test.ts reproduce the resulting spoken diagnostic.
+  // Remove this check when the gateway reports this failure through the provider error contract.
+  return text.trimStart().startsWith('The prompt could not be submitted.')
+    && text.includes('https://policies.google.com/terms/generative-ai/use-policy')
+}
 
 /** Owns persisted Discord conversations. Each channel serializes requests, while different channels run independently. */
 export class DiscordChat {
@@ -60,14 +70,25 @@ export class DiscordChat {
         try {
           await chat.send(`${input.overrides?.messagePrefix ?? ''}${input.text}`, {
             abortSignal: requestSignal,
+            // Keep historical service failures on disk, but exclude them from model context before compaction.
+            prepareConversation: async conversation => ({
+              turns: conversation.turns.filter(turn => turn.type !== 'assistant'
+                || !conversationToChatMessages({ turns: [turn] }, false).some(message => typeof message.content === 'string' && isGatewayDiagnostic(message.content))),
+            }),
             onStreamEvent: (event) => {
               if (event.type === 'text-delta')
                 answer += event.text
             },
-          })
+          }, kind === 'voice'
+            ? 'You are in a Discord voice call. Incoming text is a transcript, and speech recognition can contain mistakes. Your reply is spoken aloud. Reply briefly in natural sentences and plain text. Avoid Markdown, URLs, and speaker metadata. If a transcript is unclear, ask one short clarification question. Do not guess missing words or claim a microphone fault. Do not treat a farewell as a command to leave the call. Call controls are managed by the host.'
+            : 'You are chatting on Discord. Voice calls are supported. To invite you, the user joins a server voice channel and uses /summon. Use /listen to pause or resume listening and /leave to disconnect. You cannot join a call from a text request alone.')
           requestSignal.throwIfAborted()
           if (!answer.trim())
             throw new Error(this.messages.emptyResponse)
+          if (isGatewayDiagnostic(answer)) {
+            chat.conversation.turns.pop()
+            throw new Error(this.messages.discordFailed)
+          }
           await session.save(chat.conversation, false)
           return answer
         }

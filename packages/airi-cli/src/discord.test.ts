@@ -5,6 +5,7 @@ import { mkdtemp, readdir, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import { chatMessagesToTurns } from '@proj-airi/core-agent'
 import { cliMessages } from '@proj-airi/i18n/cli'
 import { afterEach, expect, it, vi } from 'vitest'
 
@@ -98,6 +99,63 @@ it('cancels interrupted voice generations, preserves their state, and releases t
   expect((await readdir(directory)).some(file => file.endsWith('.lock'))).toBe(false)
   fetch.mockResolvedValueOnce(completion('Recovered'))
   expect(await host.respond(input('Continue', 'room', true), new AbortController().signal)).toBe('Recovered')
+})
+
+it('describes Discord voice capabilities without claiming that the call is text-only', async () => {
+  const bodies: string[] = []
+  const { host } = await setup(async (_url, init) => {
+    bodies.push(String(init?.body))
+    return completion('Em nghe đây.')
+  })
+  const signal = new AbortController().signal
+  await host.respond(input('Em có vào call được không?'), signal)
+  await host.respond(input('Em nghe anh không?', 'room', true), signal)
+  expect(bodies[0]).toContain('/summon')
+  expect(bodies[0]).not.toContain('This is text-only chat')
+  expect(bodies[1]).toContain('You are in a Discord voice call')
+  expect(bodies[1]).toContain('speech recognition can contain mistakes')
+  expect(bodies[1]).toContain('plain text')
+  expect(bodies[1]).not.toContain('This is text-only chat')
+  expect(bodies[1]).toContain('No tools or filesystem access are available')
+})
+
+// The configured gateway returned a Google service diagnostic as successful assistant text during a live Discord call.
+it('rejects a gateway diagnostic without delivering or storing it as an assistant reply', async () => {
+  const diagnostic = 'The prompt could not be submitted. The prompt contains sensitive words that violate Google\'s [Generative AI Prohibited Use policy](https://policies.google.com/terms/generative-ai/use-policy). Try rephrasing the prompt.'
+  const fetch = vi.fn<typeof globalThis.fetch>()
+    .mockResolvedValueOnce(completion(diagnostic))
+    .mockResolvedValueOnce(completion('Em vẫn đang nghe.'))
+  const { host, sessions } = await setup(fetch)
+  const signal = new AbortController().signal
+  await expect(host.respond(input('Cảm ơn các bạn.', 'room', true), signal)).rejects.toThrow(cliMessages.vi.discordFailed)
+  const [failed] = await sessions.list()
+  expect(failed.interrupted).toBe(true)
+  expect((await sessions.read(failed.id)).messages.filter(message => message.role === 'assistant')).toEqual([])
+  expect(await host.respond(input('Ổn chứ?', 'room', true), signal)).toBe('Em vẫn đang nghe.')
+  expect(String(fetch.mock.calls[1][1]?.body)).not.toContain(diagnostic)
+})
+
+it('excludes previously saved gateway diagnostics from requests while preserving the stored history', async () => {
+  const bodies: string[] = []
+  const { host, directory, sessions } = await setup(async (_url, init) => {
+    bodies.push(String(init?.body))
+    return completion('Em nghe đây.')
+  })
+  const signal = new AbortController().signal
+  await host.respond(input('Xin chào', 'room', true), signal)
+  const [record] = await sessions.list()
+  const session = await sessions.open(directory, record.id)
+  const diagnostic = 'The prompt could not be submitted. https://policies.google.com/terms/generative-ai/use-policy'
+  try {
+    await session.save({ turns: chatMessagesToTurns([...session.record.messages, { role: 'user', content: 'Cảm ơn các bạn.' }, { role: 'assistant', content: diagnostic }]) }, false)
+  }
+  finally {
+    await session.close()
+  }
+  await host.respond(input('Em nghe anh không?', 'room', true), signal)
+  expect(bodies[1]).not.toContain(diagnostic)
+  expect(bodies[1]).toContain('Cảm ơn các bạn.')
+  expect((await sessions.read(record.id)).messages).toContainEqual({ role: 'assistant', content: diagnostic })
 })
 
 it('bounds each channel queue and cancels active and queued requests during shutdown', async () => {
