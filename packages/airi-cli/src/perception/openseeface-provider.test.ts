@@ -1,11 +1,20 @@
 import type { ChildProcessWithoutNullStreams } from 'node:child_process'
 
+import type { StreamOptions } from '@proj-airi/core-agent'
+import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { Tool } from '@xsai/shared-chat'
+
 import { ChildProcess, spawn } from 'node:child_process'
+import { mkdtemp, readdir, readFile, rm } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { PassThrough } from 'node:stream'
 
 import { cliMessages } from '@proj-airi/i18n/cli'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { Chat } from '../chat'
+import { Sessions } from '../sessions'
 import { Camera } from './camera'
 import { OpenSeeFaceProvider, readCameraConfig } from './openseeface-provider'
 
@@ -57,6 +66,31 @@ async function start() {
 
 function observation(timestamp = Date.now()) {
   return { type: 'face_observation', timestamp, faceDetected: true, confidence: 0.9, features: { smileLike: 0.8, mouthOpen: 0.1 }, headPose: { yaw: 2, pitch: 1, roll: 0 } }
+}
+
+function completion(delta: object, finishReason = 'stop') {
+  return new Response(`data: ${JSON.stringify({ choices: [{ index: 0, delta, finish_reason: finishReason }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } })
+}
+
+async function enableCamera() {
+  const camera = new Camera({}, cliMessages.en)
+  const starting = camera.command('/camera on')
+  await vi.waitFor(() => expect(spawn).toHaveBeenCalledOnce())
+  event({ type: 'ready' })
+  await starting
+  for (let time = 10_000; time <= 14_000; time += 100) {
+    vi.setSystemTime(time)
+    event(observation(time))
+  }
+  return camera
+}
+
+function requestOptions(chat: Chat, model: GenerationProvider, camera: Camera, tools: Tool[] = []): StreamOptions {
+  const persona = chat.conversation.turns.filter(turn => turn.type === 'system').flatMap(turn => turn.content).flatMap(part => part.type === 'text' ? [part.text] : []).join('\n')
+  return {
+    tools,
+    resolveStep: async () => ({ model: 'test', chatProvider: model, providerId: 'test', systemPrompt: [persona, camera.getContext()].filter(Boolean).join('\n\n'), tools }),
+  }
 }
 
 describe('openSeeFace process boundary', () => {
@@ -236,5 +270,93 @@ describe('session camera commands', () => {
     expect(await starting).toContain('worker_exited')
     expect(camera.enabled).toBe(false)
     await camera.close()
+  })
+})
+
+describe('request-only camera context', () => {
+  it('sends stable cues on consecutive user requests without retaining them in sessions or creating memory files', async () => {
+    const camera = await enableCamera()
+    const directory = await mkdtemp(join(tmpdir(), 'angela-camera-context-'))
+    const session = await new Sessions(directory, cliMessages.en).open('/workspace')
+    try {
+      const fetch = vi.fn<typeof globalThis.fetch>(async () => completion({ role: 'assistant', content: 'Here is another example.' }))
+      const model: GenerationProvider = { generation: model => ({ protocol: 'chat-completions', config: { model, baseURL: 'http://model.example/v1/', fetch } }) }
+      const chat = new Chat('test', model, '/workspace')
+      const options = requestOptions(chat, model, camera)
+      expect(fetch).not.toHaveBeenCalled()
+      for (const text of ['First question', 'Next question', 'One more question'])
+        await chat.send(text, options, 'Task context: pending study reminder')
+      expect(fetch).toHaveBeenCalledTimes(3)
+      for (const [, init] of fetch.mock.calls) {
+        const body = String(init?.body)
+        expect(body).toContain('face_present=true, expression=smile, attention=screen')
+        expect(body).toContain('Task context: pending study reminder')
+        expect(body).not.toContain('smileLike')
+        expect(body).not.toContain('headPose')
+        expect(body).not.toContain('image_url')
+      }
+      expect(String(fetch.mock.calls[1][1]?.body)).toContain('camera_reaction=quiet')
+      expect(JSON.stringify(chat.conversation)).not.toContain('Visual context')
+      await session.save(chat.conversation, false)
+      const saved = await readFile(join(directory, `${session.record.id}.json`), 'utf8')
+      expect(saved).not.toContain('Visual context')
+      expect(saved).not.toContain('camera_reaction')
+      expect(saved).not.toContain('smileLike')
+      expect(await readdir(directory)).toEqual([`${session.record.id}.json`, `${session.record.id}.lock`])
+      await camera.close()
+      await chat.send('Continue with camera off', options)
+      expect(String(fetch.mock.calls[3][1]?.body)).not.toContain('Visual context')
+    }
+    finally {
+      await camera.close()
+      await session.close()
+      await rm(directory, { recursive: true, force: true })
+    }
+  })
+
+  it.each(['unchanged', 'changed', 'stale', 'off'] as const)('reads current camera state after a tool call: %s', async (transition) => {
+    const camera = await enableCamera()
+    try {
+      const fetch = vi.fn<typeof globalThis.fetch>()
+        .mockResolvedValueOnce(completion({ role: 'assistant', tool_calls: [{ index: 0, id: 'step-1', type: 'function', function: { name: 'next_step', arguments: '{}' } }] }, 'tool_calls'))
+        .mockResolvedValueOnce(completion({ role: 'assistant', content: 'Here is the next step.' }))
+      const model: GenerationProvider = { generation: model => ({ protocol: 'chat-completions', config: { model, baseURL: 'http://model.example/v1/', fetch } }) }
+      const chat = new Chat('test', model, '/workspace')
+      const tools: Tool[] = [{
+        type: 'function',
+        function: { name: 'next_step', description: 'Read the next study step.', parameters: { type: 'object', properties: {}, required: [], additionalProperties: false } },
+        execute: async () => {
+          if (transition === 'off') {
+            await camera.close()
+          }
+          else if (transition === 'stale') {
+            vi.setSystemTime(17_000)
+          }
+          else if (transition === 'changed') {
+            for (let time = 14_100; time <= 18_000; time += 100) {
+              vi.setSystemTime(time)
+              event({ ...observation(time), headPose: { yaw: 40, pitch: 0, roll: 0 }, features: { smileLike: 0.05, mouthOpen: 0.1 } })
+            }
+          }
+          return 'Next step is available.'
+        },
+      }]
+      await chat.send('Explain the next step', requestOptions(chat, model, camera, tools), 'Task context: pending study reminder')
+      expect(fetch).toHaveBeenCalledTimes(2)
+      expect(String(fetch.mock.calls[0][1]?.body)).toContain('expression=smile, attention=screen')
+      const continuation = String(fetch.mock.calls[1][1]?.body)
+      expect(continuation).toContain('Task context: pending study reminder')
+      if (transition === 'off' || transition === 'stale') {
+        expect(continuation).not.toContain('Visual context')
+      }
+      else {
+        expect(continuation).toContain('camera_reaction=quiet')
+        expect(continuation).toContain(transition === 'changed' ? 'expression=neutral, attention=away' : 'expression=smile, attention=screen')
+      }
+      expect(JSON.stringify(chat.conversation)).not.toContain('Visual context')
+    }
+    finally {
+      await camera.close()
+    }
   })
 })

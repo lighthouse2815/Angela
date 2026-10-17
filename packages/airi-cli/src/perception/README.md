@@ -35,3 +35,18 @@ Durations measure confirmed output stability, not the length of one frame.
 
 This domain provides advisory conversational cues. It does not classify inner feelings, identity, health, or understanding.
 The heuristic thresholds need real-camera evaluation across users and lighting conditions.
+
+## Request context and conversational reactions
+
+`CameraContextProvider` supplies the current compact state on every relevant request while camera perception is ON.
+Freshness and evidence gates still apply. Reading the same state again does not hide it.
+The CLI's existing `resolveStep` hook refreshes the outgoing system prompt before each model call, including tool continuations.
+Task and memory context remain available through their existing system turns.
+Camera observations and injected cues never enter durable conversation, session, or memory storage.
+Camera updates do not initiate model requests.
+
+The provider tracks conversational reaction opportunities separately.
+An unchanged cue allows another commentary opportunity after sixty seconds. A changed cue requires at least ten seconds.
+These intervals affect the prompt's commentary guidance only. Every eligible request still receives the current state.
+During a quiet interval, Angela can adapt its tone or pace and cautiously answer explicit questions about cues.
+The policy does not detect whether a previous reply used an opportunity.

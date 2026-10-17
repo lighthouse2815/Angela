@@ -131,7 +131,7 @@ During interactive text or voice chat:
 ```
 
 `on` waits for the first successful capture and inference. A visible `📷 ON` indicator accompanies subsequent input prompts.
-`off` stops the worker and clears temporal state and context cooldowns. Restarting Angela also requires a new explicit `on`.
+`off` stops the worker and clears temporal state and the conversational reaction policy. Restarting Angela requires a new explicit `on`.
 These commands run locally and do not require a model request or tool permission approval.
 `debug` shows derived state, tracker confidence, stable duration, invalid events, capture/processed FPS, latency, and dropped frames.
 
@@ -146,8 +146,11 @@ Short spikes do not establish a cue. Weak evidence, uncertain geometry, and miss
 Observations expire after two seconds. Screen attention uses head direction, not eye gaze.
 See [thresholds and timing](src/perception/README.md).
 
-Stable cues enter the next chat request as uncertain advisory context.
-Changed cues have a ten-second cooldown. Unchanged cues refresh at most once per minute.
+Current stable, fresh cues accompany every user-initiated model request as uncertain advisory context, including requests after tool results.
+Unchanged cues remain available on consecutive requests. Context delivery has no cooldown.
+Conversational reaction guidance is separate: opportunities to volunteer comments wait ten seconds for changed cues or sixty seconds for unchanged cues.
+These intervals limit commentary only. The model still receives the current cues and can quietly adapt its tone or explanation pace.
+An opportunity does not prove that the model mentioned a cue. Explicit questions about cues can still receive cautious answers.
 Camera updates never trigger model requests or unsolicited chat messages.
 The context tells Angela to favor your words, adapt gently, and avoid factual claims about feelings, understanding, or sensitive traits.
 Observations and injected context do not enter session history, memory files, or summaries.

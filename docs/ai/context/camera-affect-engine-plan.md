@@ -69,9 +69,9 @@ The plan below is architectural guidance. Adapt paths to the actual repository i
 
 ---
 
-# Upstream Foundation
+## Upstream Foundation
 
-## Base repository
+### Base repository
 
 Use OpenSeeFace as the initial local face-tracking foundation:
 
@@ -83,7 +83,7 @@ OpenSeeFace provides CPU-based real-time face detection / landmark tracking usin
 
 The intent is to bring the source into Angela so the implementation can later be studied, modified, simplified, or gradually replaced by Angela-owned components.
 
-### Important source-management rule
+#### Important source-management rule
 
 Do not copy files manually without provenance.
 
@@ -105,7 +105,7 @@ Do not remove upstream `LICENSE`, `Licenses/`, copyright notices, or model/licen
 
 Do not immediately modify vendored upstream code unless required for integration. Build an adapter around it first.
 
-### Why OpenSeeFace instead of vendoring MediaPipe
+#### Why OpenSeeFace instead of vendoring MediaPipe
 
 Do not vendor the entire MediaPipe repository for this milestone. It is much larger and introduces unnecessary build/framework complexity for Angela's current CLI experiment.
 
@@ -120,7 +120,7 @@ The architecture must not make OpenSeeFace permanent or irreplaceable.
 
 ---
 
-# Target Architecture
+## Target Architecture
 
 Keep upstream tracking code isolated from Angela-owned perception logic.
 
@@ -169,7 +169,7 @@ The exact directory names may change to fit the repo.
 
 ---
 
-# Process Boundary
+## Process Boundary
 
 OpenSeeFace is Python-based while Angela CLI is TypeScript/Node-oriented. Do not mix Python internals directly into random CLI files.
 
@@ -227,11 +227,11 @@ Requirements for the process boundary:
 
 ---
 
-# Privacy and Safety Requirements
+## Privacy and Safety Requirements
 
 These are product requirements, not optional polish.
 
-## Camera state
+### Camera state
 
 Camera must be OFF by default.
 
@@ -255,7 +255,7 @@ Provide an obvious disable command:
 /camera off
 ```
 
-## Raw media
+### Raw media
 
 By default:
 
@@ -269,7 +269,7 @@ Process frames in memory and emit only derived observations / compact affect sta
 
 Raw-frame capture may later be exposed only as an explicit debugging feature with clear user action, never silently.
 
-## Language used by Angela
+### Language used by Angela
 
 Do not allow camera context to produce authoritative claims like:
 
@@ -292,7 +292,7 @@ Do not infer mental-health diagnoses, personality, deception, protected attribut
 
 ---
 
-# Phase 1 — Vendor and Run OpenSeeFace Independently
+## Phase 1 — Vendor and Run OpenSeeFace Independently
 
 Before integrating with Angela conversation logic, make the tracker work as an isolated local component.
 
@@ -330,7 +330,7 @@ No LLM/context integration yet.
 
 ---
 
-# Phase 2 — TypeScript Provider / Worker Manager
+## Phase 2 — TypeScript Provider / Worker Manager
 
 Create a TypeScript boundary for the camera worker.
 
@@ -338,10 +338,10 @@ Conceptual interface:
 
 ```ts
 interface FacePerceptionProvider {
-  start(): Promise<void>
-  stop(): Promise<void>
-  getLatestObservation(): RawFaceObservation | undefined
-  subscribe(listener: (observation: RawFaceObservation) => void): () => void
+  start: () => Promise<void>
+  stop: () => Promise<void>
+  getLatestObservation: () => RawFaceObservation | undefined
+  subscribe: (listener: (observation: RawFaceObservation) => void) => () => void
 }
 ```
 
@@ -369,7 +369,7 @@ Do not require a physical webcam for normal automated unit tests.
 
 ---
 
-# Phase 3 — Raw Observation Model
+## Phase 3 — Raw Observation Model
 
 Create a provider-neutral observation model.
 
@@ -408,7 +408,7 @@ without rewriting `AffectEngine`.
 
 ---
 
-# Phase 4 — Temporal Smoothing
+## Phase 4 — Temporal Smoothing
 
 Do not classify a cue from a single frame.
 
@@ -444,7 +444,7 @@ Avoid sleep-based tests. Use fake timestamps/clock.
 
 ---
 
-# Phase 5 — Angela Affect Engine V1
+## Phase 5 — Angela Affect Engine V1
 
 Build this logic as Angela-owned code, not inside vendored OpenSeeFace source.
 
@@ -464,15 +464,15 @@ unknown
 Recommended public state:
 
 ```ts
-type ExpressionCue =
-  | 'neutral'
-  | 'smile'
-  | 'unknown'
+type ExpressionCue
+  = | 'neutral'
+    | 'smile'
+    | 'unknown'
 
-type AttentionCue =
-  | 'screen'
-  | 'away'
-  | 'unknown'
+type AttentionCue
+  = | 'screen'
+    | 'away'
+    | 'unknown'
 
 interface AffectState {
   facePresent: boolean
@@ -513,7 +513,7 @@ Those labels create false certainty and are not needed for the companion UX.
 
 ---
 
-# Phase 6 — Personal Calibration
+## Phase 6 — Personal Calibration
 
 After the baseline V1 works, add optional personal calibration.
 
@@ -534,9 +534,9 @@ Angela asks the user to briefly provide:
 
 Store only derived calibration parameters by default, not images.
 
-Possible calibration data:
+Possible calibration data (conceptual, not executable TypeScript):
 
-```ts
+```text
 interface AffectCalibration {
   neutralFeatureBaseline: ...
   smileThresholdAdjustment: number
@@ -552,7 +552,7 @@ Calibration must be optional. The engine needs sensible defaults.
 
 ---
 
-# Phase 7 — Camera Commands and Diagnostics
+## Phase 7 — Camera Commands and Diagnostics
 
 Add a minimal user-facing management surface using existing CLI command conventions.
 
@@ -595,7 +595,7 @@ Do not make camera failure break normal Angela chat.
 
 ---
 
-# Phase 8 — Camera Context Provider
+## Phase 8 — Camera Context Provider
 
 Once perception is stable, expose only compact state to Angela's existing context/prompt pipeline.
 
@@ -603,7 +603,7 @@ Conceptual provider:
 
 ```ts
 interface CameraContextProvider {
-  getContext(): CameraContext | undefined
+  getContext: () => CameraContext | undefined
 }
 ```
 
@@ -619,11 +619,11 @@ Visual context (camera, uncertain soft cues):
 
 Do not inject every frame.
 
-Update context only when:
-
-- a stable state meaningfully changes;
-- enough time has passed;
-- the current interaction benefits from it.
+Provide the current stable, fresh state with every relevant user-initiated model request while the camera is ON.
+Keep unchanged cues available on consecutive requests and refresh state after tool results.
+Sampling and temporal smoothing update the state independently of request delivery.
+Never use a cooldown to omit current camera context.
+Use a separate conversational reaction policy to limit repeated unsolicited comments about cues.
 
 Do not let camera state consume large context budgets.
 
@@ -631,13 +631,13 @@ Do not persist every observation into chat history.
 
 ---
 
-# Phase 9 — Conversational Policy
+## Phase 9 — Conversational Policy
 
 Camera perception must affect **how Angela responds**, not dominate conversation.
 
 Examples:
 
-## Study mode
+### Study mode
 
 If stable uncertainty-like cues are added later and confidence is sufficient:
 
@@ -657,7 +657,7 @@ If a smile cue follows a correct answer:
 "Ừ, đúng rồi đấy 😄"
 ```
 
-## General conversation
+### General conversation
 
 Do not comment on every facial change.
 
@@ -672,7 +672,7 @@ The best camera feature is often invisible: Angela simply adjusts tone or decide
 
 ---
 
-# Phase 10 — Voice Integration
+## Phase 10 — Voice Integration
 
 Only after camera context and current voice systems are stable.
 
@@ -713,7 +713,7 @@ Do not say:
 
 ---
 
-# Sampling and Performance
+## Sampling and Performance
 
 Do not process camera at maximum webcam FPS unless needed.
 
@@ -744,7 +744,7 @@ Expose simple metrics in debug mode:
 
 ---
 
-# Error and Lifecycle Behavior
+## Error and Lifecycle Behavior
 
 The perception subsystem is optional.
 
@@ -770,9 +770,9 @@ Use bounded restart/backoff if automatic worker restart is implemented.
 
 ---
 
-# Testing Requirements
+## Testing Requirements
 
-## TypeScript unit tests
+### TypeScript unit tests
 
 At minimum:
 
@@ -788,13 +788,13 @@ At minimum:
 - context-provider output;
 - camera-disabled behavior.
 
-## Python tests
+### Python tests
 
 Where practical, test Angela-owned worker code separately from a real camera.
 
 Use recorded/mock landmark/tracker outputs instead of requiring webcam hardware in CI.
 
-## Integration tests
+### Integration tests
 
 Add at least one fixture-driven path:
 
@@ -812,7 +812,7 @@ Do not make standard CI depend on webcam availability.
 
 ---
 
-# Manual Acceptance Scenarios
+## Manual Acceptance Scenarios
 
 V1 should support these developer/user scenarios:
 
@@ -833,7 +833,7 @@ V1 should support these developer/user scenarios:
 
 ---
 
-# Non-Goals for V1
+## Non-Goals for V1
 
 Do not expand this task into:
 
@@ -858,7 +858,7 @@ These are not needed for the current Angela companion experience.
 
 ---
 
-# Optional Phase — HSEmotion Benchmark
+## Optional Phase — HSEmotion Benchmark
 
 Do not implement this until the V1 rule/landmark-based AffectEngine works.
 
@@ -882,7 +882,7 @@ If not, remove it.
 
 ---
 
-# Future Direction — Angela-Owned Perception
+## Future Direction — Angela-Owned Perception
 
 The long-term learning goal may be to gradually replace upstream components.
 
@@ -911,7 +911,7 @@ Do not rewrite working upstream ML code just for ownership. Replace components w
 
 ---
 
-# Parallel Development With Task & Reminder Engine
+## Parallel Development With Task & Reminder Engine
 
 This feature should be safe to develop simultaneously with:
 
@@ -952,7 +952,7 @@ When possible, isolate integrations into small commits to reduce merge conflicts
 
 ---
 
-# Suggested Implementation Order
+## Suggested Implementation Order
 
 Follow this order unless current architecture strongly suggests otherwise:
 
@@ -980,7 +980,7 @@ Do not add advanced emotion models before the V1 pipeline is stable.
 
 ---
 
-# Suggested Commit Breakdown
+## Suggested Commit Breakdown
 
 Keep commits reviewable. A reasonable breakdown is:
 
@@ -996,7 +996,7 @@ Do not mix unrelated refactors into these commits.
 
 ---
 
-# Definition of Done
+## Definition of Done
 
 The initial Camera / Affect Engine milestone is complete when:
 
@@ -1018,7 +1018,7 @@ The initial Camera / Affect Engine milestone is complete when:
 
 ---
 
-# Codex Execution Instruction
+## Codex Execution Instruction
 
 When implementing this plan, Codex should not stop after generating skeleton files.
 

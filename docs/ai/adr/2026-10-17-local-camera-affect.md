@@ -67,8 +67,19 @@ Frames remain in the Python process and are neither stored nor uploaded.
 The strict process schema excludes media, raw landmarks, and identity fields.
 Debug output contains derived cues and performance metrics only.
 
-Only stable, fresh cues enter a user-initiated model request.
-Changed cues have a ten-second cooldown. Unchanged cues refresh at most once per minute.
+Current stable, fresh cues enter every user-initiated model request, including requests after tool results.
+Context delivery has no cooldown. Unchanged cues remain available until stale, weak, unstable, or disabled.
+The CLI uses the existing `resolveStep` hook to read camera state before each SDK model call.
+`prepareConversation` alone runs before each SDK stream and cannot refresh context between all tool rounds in that stream.
+The request system prompt combines the original persona and current camera context. Task and memory context remain independent system turns.
+Only the outgoing prompt changes. The stored conversation's system turn remains unchanged.
+
+Conversational reaction opportunities are separate from state delivery.
+`CameraContextProvider` tracks only the last commentary opportunity and its cue key.
+Changed cues require ten seconds between opportunities. Unchanged cues require sixty seconds.
+During that interval, the request still contains the complete compact state with guidance against unsolicited commentary.
+Quiet tone or pace adjustments remain available. Explicit questions about cues can receive cautious answers.
+The policy tracks opportunities, not proof that the model commented. It does not parse replies or classify emotions.
 The context favors the user's words and prohibits factual claims about feelings, diagnoses, identity, sensitive traits, understanding, or deception.
 The model can adjust its tone or explanation pace without commenting on each visual change.
 No observation or injected context enters session history, summaries, profile memory, or project memory.
@@ -123,6 +134,10 @@ Targeted `moeru-lint` checks covered the changed CLI sources, i18n strings, READ
 
 ## Changed files
 
+The request-context correction passed all 225 CLI tests, CLI typecheck, and CLI build.
+Regression tests cover consecutive requests, changed cues, stale state, OFF, tool continuations, and session-file contents.
+No live camera tests or threshold changes belong to this correction.
+
 | Path | Role |
 | --- | --- |
 | `third_party/openseeface/**` | Complete unchanged upstream source, models, and license notices |
@@ -136,7 +151,7 @@ Targeted `moeru-lint` checks covered the changed CLI sources, i18n strings, READ
 | `packages/airi-cli/src/perception/observation.ts`, `observation.test.ts` | Protocol, neutral observations, Eventa contract and validation tests |
 | `packages/airi-cli/src/perception/openseeface-provider.ts`, `openseeface-provider.test.ts` | Child lifecycle, provider and camera-command tests |
 | `packages/airi-cli/src/perception/affect-engine.ts`, `affect-engine.test.ts` | Temporal smoothing and observable cue tests |
-| `packages/airi-cli/src/perception/camera-context.ts`, `camera-context.test.ts` | Context budget, cooldown, freshness, and conversational policy |
+| `packages/airi-cli/src/perception/camera-context.ts`, `camera-context.test.ts` | Current compact state, freshness, and separate commentary policy |
 | `packages/airi-cli/src/perception/camera.ts` | Session opt-in, commands, health notices and composition |
 | `packages/airi-cli/src/perception/pipeline.test.ts` | Process-to-model integration and persistence checks |
 | `packages/airi-cli/src/perception/fixtures/worker.py`, `smile-screen.json` | Real subprocess fixture without inference dependencies |

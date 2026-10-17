@@ -106,6 +106,8 @@ async function main() {
     if (!provider)
       throw new Error(`${messages.unsupportedProvider}: ${config.definitionId}`)
     const chat = new Chat(config.model, provider, workspace, session.restore(), true, Number(process.env.ANGELA_CONTEXT_TOKENS ?? 32_000), messages)
+    const modelTarget = { model: config.model, chatProvider: provider, providerId: definition.id }
+    const persona = chat.conversation.turns.filter(turn => turn.type === 'system').flatMap(turn => turn.content).flatMap(part => part.type === 'text' ? [part.text] : []).join('\n')
     await session.save(chat.conversation, session.record.interrupted)
     const interactive = process.stdin.isTTY && config.prompt === undefined
     const output = new Output(messages)
@@ -241,9 +243,15 @@ async function main() {
           active.signal.throwIfAborted()
           process.stderr.write(`\n${recallReady ? messages.recallInvalid : messages.memoryUnavailable}\n`)
         }
+        const tools = [...(mcp?.definitions() ?? []), ...memoryTools, ...projectTools, ...taskTools(tasks, messages.tasks), ...(recallReady ? [...recall.tools(), ...recall.skills.tools(text, verifiedObservations, session.record.id, () => recall.changed(false))] : [])]
         await chat.send(text, {
           abortSignal: active.signal,
-          tools: [...(mcp?.definitions() ?? []), ...memoryTools, ...projectTools, ...taskTools(tasks, messages.tasks), ...(recallReady ? [...recall.tools(), ...recall.skills.tools(text, verifiedObservations, session.record.id, () => recall.changed(false))] : [])],
+          tools,
+          resolveStep: async () => ({
+            ...modelTarget,
+            systemPrompt: [persona, camera.getContext()].filter(Boolean).join('\n\n'),
+            tools,
+          }),
           diagnostics: {
             // The send catch owns the final message. SDK promise diagnostics must not print the same failure again.
             error() {},
@@ -275,7 +283,7 @@ async function main() {
             if (event.type === 'text-delta')
               await speech?.push(event.text)
           },
-        }, [memoryContext, projectContext, taskContext(tasks), camera.getContext()].filter(Boolean).join('\n\n'))
+        }, [memoryContext, projectContext, taskContext(tasks)].filter(Boolean).join('\n\n'))
         if (!output.hasText)
           throw new Error(messages.emptyResponse)
         completed = true
