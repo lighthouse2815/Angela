@@ -488,8 +488,8 @@ export class TelegramChat {
       await editing
       await flush()
       await saving.catch(() => {})
-      await session.close()
       await companion?.finish()
+      await session.close()
     }
   }
 }
