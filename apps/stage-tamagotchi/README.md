@@ -108,12 +108,23 @@ The selection is shared across desktop windows and expires when the app exits.
 
 `study_workspace_list` lists subdirectories and supported documents. Listings contain at most 200 entries and scan at most 1,000 entries.
 `study_workspace_read` reads UTF-8 `.md`, `.markdown`, and `.txt` files up to 256 KiB.
+It also extracts text from `.pdf` files up to 10 MiB and 1,000 pages through [unpdf](https://github.com/unjs/unpdf).
+PDF results contain the relative path, total page count, numbered page text, and a `truncated` flag.
+PDF page numbers start at 1 and refer to physical pages, independent of printed labels.
+Optional `startPage` and `endPage` select an inclusive range of at most 20 pages.
+The default range contains 10 pages from `startPage`, or page 1 when absent, capped at the document end.
+Each PDF read returns at most 256 KiB of extracted text. Request fewer pages if this limit prevents a read.
+Read further ranges before a complete document summary. Partial ranges set `truncated` to true.
 Both tools accept relative paths within the selected directory. Hidden paths and symbolic links are refused.
 Document text goes to the selected chat provider as reference material. It is not a source of tool instructions or personal memories.
-PDF, Word, and image documents are unsupported.
+Scanned pages require OCR, which is unsupported. Pages without extractable text produce an explicit error when the whole requested range is empty.
+Password-protected PDFs, Word, and image documents are unsupported.
 
 `study_workspace_save_note` creates new Markdown files under `Angela Notes` within that directory.
 Notes contain at most 128 KiB. Existing files are never overwritten.
+The optional `sources` array accepts up to 20 references with a relative `path` and a physical PDF `page`.
+Omit `page` for text files. Only documents and pages read during the current folder selection can become source citations.
+The tool appends relative Markdown links with PDF page anchors. Citations count toward the note size limit.
 Successful results include the saved relative path and UTF-8 byte count.
 Folder changes wait for active file operations. Clearing access preserves saved notes.
 These tools use Electron IPC and Node filesystem APIs. They do not require AUV or desktop input permissions.

@@ -55,7 +55,7 @@ describe('study workspace IPC', () => {
     expect((await choose(client)).directory).toBe(await realpath(directory))
     expect(electron.dialog.showOpenDialog).toHaveBeenCalledWith(electron.owner, { properties: ['openDirectory'] })
     expect((await client.list({ path: '.' })).entries).toEqual([{ name: 'python.md', kind: 'document' }])
-    expect((await client.read({ path: 'python.md' })).text).toContain('for item in items:')
+    expect(await client.read({ path: 'python.md' })).toMatchObject({ text: expect.stringContaining('for item in items:') })
     const result = await client.saveNote({ filename: 'ôn-python.md', content: '# Ôn tập\nNguồn: python.md' })
     expect(await readFile(join(directory, result.path), 'utf8')).toBe('# Ôn tập\nNguồn: python.md')
     await client.directory({ action: 'clear' })

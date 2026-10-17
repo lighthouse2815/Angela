@@ -177,13 +177,22 @@ Tính năng này dùng cùng tùy chọn **Use computer** trong ô chat.
 4. Chọn thư mục trong hộp thoại hệ thống.
 5. Gửi: "Lưu phần cần ôn vào ghi chú Markdown, kèm đường dẫn tài liệu nguồn."
 
-Angela liệt kê thư mục con và đọc tệp `.md`, `.markdown`, `.txt` có mã hóa UTF-8.
-Mỗi tài liệu tối đa 256 KiB. PDF, Word và ảnh chưa được hỗ trợ.
+Angela liệt kê thư mục con và đọc tệp `.md`, `.markdown`, `.txt` có mã hóa UTF-8, tối đa 256 KiB.
+Angela cũng đọc PDF có lớp văn bản, tối đa 10 MiB và 1.000 trang.
+Bạn có thể yêu cầu: "Đọc trang 3 đến trang 8 của bài giảng PDF và giải thích cho mình."
+Mỗi lượt đọc PDF tối đa 20 trang và 256 KiB văn bản trích xuất. Mặc định đọc 10 trang đầu.
+Angela cần đọc tiếp các khoảng trang trước khi tóm tắt toàn bộ tài liệu dài.
+Số trang nguồn tính từ trang đầu của tệp PDF, bắt đầu ở 1, có thể khác số trang in trên tài liệu.
+PDF scan cần OCR, PDF yêu cầu mật khẩu, Word và ảnh chưa được hỗ trợ.
 Tệp ẩn, đường dẫn ra ngoài thư mục và liên kết tượng trưng bị từ chối.
 Nội dung tài liệu được gửi đến nhà cung cấp AI đang chọn khi công cụ đọc được gọi.
 
 Ghi chú nằm trong thư mục con `Angela Notes`. Mỗi ghi chú tối đa 128 KiB.
 Công cụ chỉ tạo tệp `.md` mới, không ghi đè tài liệu hoặc ghi chú đã có.
+Khi lưu tóm tắt, Angela có thể đính kèm nguồn đã đọc và số trang PDF vào ghi chú.
+Công cụ tạo liên kết tới tài liệu gốc, kèm vị trí trang của PDF. Một số ứng dụng đọc PDF không hỗ trợ mở đúng trang từ liên kết.
+Nguồn chỉ được chấp nhận nếu tài liệu hoặc trang đó đã được đọc trong phiên chọn thư mục hiện tại.
+Phần nguồn cũng tính vào giới hạn 128 KiB của ghi chú.
 Nếu tên đã tồn tại, yêu cầu Angela chọn tên mới.
 
 Quyền thư mục dùng chung giữa các cửa sổ desktop trong phiên hiện tại.
