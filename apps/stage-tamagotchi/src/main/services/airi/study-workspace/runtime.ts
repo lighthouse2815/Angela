@@ -1,17 +1,24 @@
-import type { StudyWorkspaceDocument, StudyWorkspaceListing, StudyWorkspaceReadRequest } from '../../../../shared/eventa/study-workspace'
+import type { StudyWorkspaceDocument, StudyWorkspaceListing, StudyWorkspaceReadRequest, StudyWorkspaceSearchResult } from '../../../../shared/eventa/study-workspace'
 
 import { Buffer } from 'node:buffer'
 import { constants } from 'node:fs'
 import { lstat, mkdir, open, opendir, realpath, stat } from 'node:fs/promises'
 import { extname, isAbsolute, join, relative, sep, win32 } from 'node:path'
 
+import { errorMessageFrom } from '@moeru/std'
 import { Mutex } from 'async-mutex'
+import { escapeRegExp } from 'es-toolkit'
 import { getResolvedPDFJS } from 'unpdf'
-import { array, integer, maxLength, minLength, minValue, number, object, optional, parse, pipe, string } from 'valibot'
+import { array, integer, maxLength, minLength, minValue, number, object, optional, parse, pipe, string, trim } from 'valibot'
 
 const pathSchema = object({ path: pipe(string(), maxLength(1024)) })
 const pageSchema = pipe(number(), integer(), minValue(1))
 const readSchema = object({ ...pathSchema.entries, startPage: optional(pageSchema), endPage: optional(pageSchema) })
+const searchSchema = object({
+  ...pathSchema.entries,
+  query: pipe(string(), trim(), minLength(1), maxLength(200)),
+  startPage: optional(pageSchema),
+})
 const noteSchema = object({
   filename: pipe(string(), minLength(1), maxLength(120)),
   content: pipe(string(), minLength(1), maxLength(128 * 1024)),
@@ -22,7 +29,7 @@ function isDocument(name: string) {
   return ['.md', '.markdown', '.txt', '.pdf'].includes(extname(name).toLowerCase())
 }
 
-async function readPdf(data: Uint8Array, path: string, input: StudyWorkspaceReadRequest) {
+async function* pdfPages(data: Uint8Array, start = 1, end?: number) {
   const { getDocument } = await getResolvedPDFJS()
   const loading = getDocument({
     data: new Uint8Array(data),
@@ -37,33 +44,62 @@ async function readPdf(data: Uint8Array, path: string, input: StudyWorkspaceRead
     const pdf = await loading.promise
     if (pdf.numPages > 1000)
       throw new Error('Learning PDFs must contain at most 1,000 pages.')
-    const start = input.startPage ?? 1
-    const end = input.endPage ?? Math.min(start + 9, pdf.numPages)
-    if (start > end || end > pdf.numPages || end - start >= 20)
-      throw new Error(`Choose an ordered range of at most 20 PDF pages within 1–${pdf.numPages}.`)
-    const pages: { page: number, text: string }[] = []
-    let bytes = 0
+    if (start > (end ?? pdf.numPages) || (end !== undefined && end > pdf.numPages))
+      throw new Error(`Choose an ordered PDF page range within 1–${pdf.numPages}.`)
     // Read sequentially so a document cannot fan out work across every page.
-    for (let page = start; page <= end; page++) {
+    for (let page = start; page <= (end ?? pdf.numPages); page++) {
       const documentPage = await pdf.getPage(page)
       try {
         const { items } = await documentPage.getTextContent()
         const text = items.map(item => 'str' in item ? item.str + (item.hasEOL ? '\n' : '') : '').join('').trim()
-        bytes += Buffer.byteLength(text, 'utf8')
-        if (bytes > 256 * 1024)
-          throw new Error('PDF text exceeds 256 KiB. Request fewer pages.')
-        pages.push({ page, text })
+        yield { page, text, totalPages: pdf.numPages }
       }
       finally {
         documentPage.cleanup()
       }
     }
-    if (!pages.some(page => page.text))
-      throw new Error('These PDF pages have no extractable text. Scanned pages require OCR, which is not supported.')
-    return { path, totalPages: pdf.numPages, pages, truncated: start !== 1 || end !== pdf.numPages }
   }
   finally {
     await loading.destroy()
+  }
+}
+
+async function readPdf(data: Uint8Array, path: string, input: StudyWorkspaceReadRequest) {
+  const start = input.startPage ?? 1
+  const count = input.endPage === undefined ? 10 : input.endPage - start + 1
+  if (count < 1 || count > 20)
+    throw new Error('Choose an ordered range of at most 20 PDF pages.')
+  const pages: { page: number, text: string }[] = []
+  let totalPages = 0
+  let bytes = 0
+  for await (const entry of pdfPages(data, start, input.endPage)) {
+    bytes += Buffer.byteLength(entry.text, 'utf8')
+    if (bytes > 256 * 1024)
+      throw new Error('PDF text exceeds 256 KiB. Request fewer pages.')
+    totalPages = entry.totalPages
+    pages.push({ page: entry.page, text: entry.text })
+    if (pages.length === count)
+      break
+  }
+  if (!pages.some(page => page.text))
+    throw new Error('These PDF pages have no extractable text. Scanned pages require OCR, which is not supported.')
+  return { path, totalPages, pages, truncated: start !== 1 || pages.at(-1)?.page !== totalPages }
+}
+
+function decodeText(data: Uint8Array) {
+  if (data.includes(0))
+    throw new Error('Learning documents must contain UTF-8 text, without binary data.')
+  return new TextDecoder('utf-8', { fatal: true }).decode(data)
+}
+
+function findExcerpt(text: string, query: RegExp) {
+  const normalized = text.normalize('NFC')
+  const match = query.exec(normalized)
+  if (!match)
+    return undefined
+  return {
+    excerpt: normalized.slice(Math.max(0, match.index - 150), match.index + 450).trim(),
+    line: normalized.slice(0, match.index).split(/\r\n|[\r\n]/u).length,
   }
 }
 
@@ -133,81 +169,175 @@ export class StudyWorkspace {
 
   async list(input: unknown): Promise<StudyWorkspaceListing> {
     const { path } = parse(pathSchema, input)
-    return this.mutex.runExclusive(async () => {
-      const resolved = await this.resolvePath(path)
-      const entries: StudyWorkspaceListing['entries'] = []
-      let scanned = 0
-      let truncated = false
-      const directory = await opendir(resolved.target)
-      for await (const entry of directory) {
-        // Bound scanning as well as returned entries for large or unrelated directories.
-        if (++scanned > 1000) {
-          truncated = true
-          break
-        }
-        if (entry.name.startsWith('.') || entry.isSymbolicLink())
-          continue
-        if (!entry.isDirectory() && (!entry.isFile() || !isDocument(entry.name)))
-          continue
-        if (entries.length === 200) {
-          truncated = true
-          break
-        }
-        entries.push({ name: entry.name, kind: entry.isDirectory() ? 'directory' : 'document' })
+    return this.mutex.runExclusive(() => this.listDirectory(path))
+  }
+
+  private async listDirectory(path: string): Promise<StudyWorkspaceListing> {
+    const resolved = await this.resolvePath(path)
+    const entries: StudyWorkspaceListing['entries'] = []
+    let scanned = 0
+    let truncated = false
+    const directory = await opendir(resolved.target)
+    for await (const entry of directory) {
+      // Bound scanning as well as returned entries for large or unrelated directories.
+      if (++scanned > 1000) {
+        truncated = true
+        break
       }
-      entries.sort((a, b) => a.name.localeCompare(b.name))
-      return { path: resolved.path, entries, truncated }
-    })
+      if (entry.name.startsWith('.') || entry.isSymbolicLink())
+        continue
+      if (!entry.isDirectory() && (!entry.isFile() || !isDocument(entry.name)))
+        continue
+      if (entries.length === 200) {
+        truncated = true
+        break
+      }
+      entries.push({ name: entry.name, kind: entry.isDirectory() ? 'directory' : 'document' })
+    }
+    entries.sort((a, b) => a.name.localeCompare(b.name))
+    return { path: resolved.path, entries, truncated }
+  }
+
+  private async loadDocument(path: string) {
+    const resolved = await this.resolvePath(path)
+    if (!isDocument(resolved.target))
+      throw new Error('Read a .md, .markdown, .txt, or .pdf learning document.')
+    const pdf = extname(resolved.target).toLowerCase() === '.pdf'
+    const limit = pdf ? 10 * 1024 * 1024 : 256 * 1024
+    const sizeLabel = pdf ? '10 MiB' : '256 KiB'
+    // Nonblocking open prevents a replaced document from blocking on a FIFO.
+    const file = await open(resolved.target, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK)
+    try {
+      const info = await file.stat()
+      if (!info.isFile() || info.size > limit)
+        throw new Error(`Learning documents must be regular files of at most ${sizeLabel}.`)
+      const buffer = Buffer.alloc(limit + 1)
+      let length = 0
+      while (length < buffer.length) {
+        const { bytesRead } = await file.read(buffer, length, buffer.length - length, length)
+        if (!bytesRead)
+          break
+        length += bytesRead
+      }
+      if (length > limit)
+        throw new Error(`Learning documents must be at most ${sizeLabel}.`)
+      return { path: resolved.path, pdf, data: buffer.subarray(0, length) }
+    }
+    finally {
+      await file.close()
+    }
   }
 
   async read(input: unknown): Promise<StudyWorkspaceDocument> {
     const request = parse(readSchema, input)
-    const { path } = request
     return this.mutex.runExclusive(async () => {
-      const resolved = await this.resolvePath(path)
-      if (!isDocument(resolved.target))
-        throw new Error('Read a .md, .markdown, .txt, or .pdf learning document.')
-      const pdf = extname(resolved.target).toLowerCase() === '.pdf'
+      const { path, pdf, data } = await this.loadDocument(request.path)
       if (!pdf && (request.startPage !== undefined || request.endPage !== undefined))
         throw new Error('Page ranges apply only to PDF documents.')
-      const limit = pdf ? 10 * 1024 * 1024 : 256 * 1024
-      const sizeLabel = pdf ? '10 MiB' : '256 KiB'
-      // Nonblocking open prevents a replaced document from blocking on a FIFO.
-      const file = await open(resolved.target, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK)
-      try {
-        const info = await file.stat()
-        if (!info.isFile() || info.size > limit)
-          throw new Error(`Learning documents must be regular files of at most ${sizeLabel}.`)
-        const buffer = Buffer.alloc(limit + 1)
-        let length = 0
-        while (length < buffer.length) {
-          const { bytesRead } = await file.read(buffer, length, buffer.length - length, length)
-          if (!bytesRead)
-            break
-          length += bytesRead
+      if (pdf) {
+        const document = await readPdf(data, path, request)
+        let pages = this.readSources.get(path)
+        if (!pages) {
+          pages = new Set<number>()
+          this.readSources.set(path, pages)
         }
-        if (length > limit)
-          throw new Error(`Learning documents must be at most ${sizeLabel}.`)
-        const data = buffer.subarray(0, length)
-        if (pdf) {
-          const document = await readPdf(data, resolved.path, request)
-          let pages = this.readSources.get(resolved.path)
-          if (!pages) {
-            pages = new Set<number>()
-            this.readSources.set(resolved.path, pages)
-          }
-          for (const page of document.pages)
-            pages.add(page.page)
-          return document
-        }
-        if (data.includes(0))
-          throw new Error('Learning documents must contain UTF-8 text, without binary data.')
-        const text = new TextDecoder('utf-8', { fatal: true }).decode(data)
-        this.readSources.set(resolved.path, new Set([0]))
-        return { path: resolved.path, text }
+        for (const page of document.pages)
+          pages.add(page.page)
+        return document
       }
-      finally {
-        await file.close()
+      const text = decodeText(data)
+      this.readSources.set(path, new Set([0]))
+      return { path, text }
+    })
+  }
+
+  /** Search does not grant note citations. A full document or page read must precede a saved source reference. */
+  async search(input: unknown): Promise<StudyWorkspaceSearchResult> {
+    const request = parse(searchSchema, input)
+    const query = new RegExp(request.query.normalize('NFC').split(/\s+/u).map(escapeRegExp).join('\\s+'), 'iu')
+    return this.mutex.runExclusive(async () => {
+      const scope = await this.resolvePath(request.path)
+      if (request.startPage !== undefined && (!(await lstat(scope.target)).isFile() || extname(scope.target).toLowerCase() !== '.pdf'))
+        throw new Error('Search page continuation applies only to a single PDF document.')
+      const queue: StudyWorkspaceSearchResult['pending'] = [{ path: scope.path, startPage: request.startPage }]
+      const pending: StudyWorkspaceSearchResult['pending'] = []
+      const matches: StudyWorkspaceSearchResult['matches'] = []
+      const skipped: StudyWorkspaceSearchResult['skipped'] = []
+      let searchedFiles = 0
+      let searchedPages = 0
+      let directories = 0
+      let inspected = 0
+      let bytes = 0
+      while (queue.length && matches.length < 20 && searchedFiles < 50 && searchedPages < 100 && directories < 50 && inspected < 200 && bytes < 2 * 1024 * 1024) {
+        const task = queue.shift()!
+        inspected++
+        try {
+          const resolved = await this.resolvePath(task.path)
+          if ((await lstat(resolved.target)).isDirectory()) {
+            const listing = await this.listDirectory(resolved.path)
+            directories++
+            if (listing.truncated)
+              skipped.push({ path: resolved.path, reason: 'Directory listing reached its limit. Search a more specific directory.' })
+            for (const entry of listing.entries)
+              queue.push({ path: listing.path === '.' ? entry.name : `${listing.path}/${entry.name}` })
+            continue
+          }
+          const document = await this.loadDocument(resolved.path)
+          searchedFiles++
+          if (document.pdf) {
+            let hasText = false
+            for await (const entry of pdfPages(document.data, task.startPage)) {
+              hasText ||= Boolean(entry.text)
+              const size = Buffer.byteLength(entry.text, 'utf8')
+              if (size > 2 * 1024 * 1024) {
+                skipped.push({ path: document.path, reason: `PDF page ${entry.page} exceeds the 2 MiB search text limit.` })
+                if (entry.page < entry.totalPages)
+                  pending.push({ path: document.path, startPage: entry.page + 1 })
+                break
+              }
+              if (bytes + size > 2 * 1024 * 1024) {
+                pending.push({ path: document.path, startPage: entry.page })
+                break
+              }
+              bytes += size
+              searchedPages++
+              const hit = findExcerpt(entry.text, query)
+              if (hit)
+                matches.push({ path: document.path, page: entry.page, excerpt: hit.excerpt })
+              if (matches.length === 20 || searchedPages === 100) {
+                if (entry.page < entry.totalPages)
+                  pending.push({ path: document.path, startPage: entry.page + 1 })
+                break
+              }
+            }
+            if (!hasText)
+              skipped.push({ path: document.path, reason: 'PDF pages have no extractable text. OCR is not supported.' })
+          }
+          else {
+            const text = decodeText(document.data)
+            if (bytes + document.data.length > 2 * 1024 * 1024) {
+              pending.push({ path: document.path })
+              break
+            }
+            bytes += document.data.length
+            const hit = findExcerpt(text, query)
+            if (hit)
+              matches.push({ path: document.path, ...hit })
+          }
+        }
+        catch (error) {
+          skipped.push({ path: task.path, reason: (errorMessageFrom(error) ?? 'Document search failed.').slice(0, 240) })
+        }
+      }
+      return {
+        path: scope.path,
+        query: request.query,
+        matches,
+        searchedFiles,
+        searchedPages,
+        truncated: queue.length > 0 || pending.length > 0 || skipped.length > 0,
+        pending: [...pending, ...queue].slice(0, 20),
+        skipped: skipped.slice(0, 20),
       }
     })
   }

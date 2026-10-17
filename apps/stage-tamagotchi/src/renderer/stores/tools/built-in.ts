@@ -19,6 +19,7 @@ export const computerUseToolReferences = [
   { name: 'study_workspace_directory' },
   { name: 'study_workspace_list' },
   { name: 'study_workspace_read' },
+  { name: 'study_workspace_search' },
   { name: 'study_workspace_save_note' },
 ] satisfies ChatToolReference[]
 

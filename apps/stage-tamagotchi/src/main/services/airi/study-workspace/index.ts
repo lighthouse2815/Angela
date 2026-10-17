@@ -4,7 +4,7 @@ import { defineInvokeHandler } from '@moeru/eventa'
 import { BrowserWindow, dialog } from 'electron'
 import { object, parse, picklist } from 'valibot'
 
-import { studyWorkspaceDirectory, studyWorkspaceList, studyWorkspaceRead, studyWorkspaceSaveNote } from '../../../../shared/eventa/study-workspace'
+import { studyWorkspaceDirectory, studyWorkspaceList, studyWorkspaceRead, studyWorkspaceSaveNote, studyWorkspaceSearch } from '../../../../shared/eventa/study-workspace'
 import { StudyWorkspace } from './runtime'
 
 /** Registers one session-owned workspace for all desktop chat windows. Only the native picker can grant folder access. */
@@ -43,5 +43,6 @@ export function setupStudyWorkspace(context: ReturnType<typeof createContext>['c
   })
   defineInvokeHandler(context, studyWorkspaceList, input => workspace.list(input))
   defineInvokeHandler(context, studyWorkspaceRead, input => workspace.read(input))
+  defineInvokeHandler(context, studyWorkspaceSearch, input => workspace.search(input))
   defineInvokeHandler(context, studyWorkspaceSaveNote, input => workspace.saveNote(input))
 }

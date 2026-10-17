@@ -53,6 +53,7 @@ describe('useTamagotchiBuiltinToolsStore', async () => {
       { id: 'tamagotchi:study_workspace_directory', defaultActive: false },
       { id: 'tamagotchi:study_workspace_list', defaultActive: false },
       { id: 'tamagotchi:study_workspace_read', defaultActive: false },
+      { id: 'tamagotchi:study_workspace_search', defaultActive: false },
       { id: 'tamagotchi:study_workspace_save_note', defaultActive: false },
     ])
     expect(toolsStore.tools.filter(tool => tool.requiresExplicitSelection).map(tool => tool.function.name)).toEqual([
@@ -64,6 +65,7 @@ describe('useTamagotchiBuiltinToolsStore', async () => {
       'study_workspace_directory',
       'study_workspace_list',
       'study_workspace_read',
+      'study_workspace_search',
       'study_workspace_save_note',
     ])
     expect(toolsStore.getToolsByNames('get_weather')[0]?.function.name).toBe('get_weather')

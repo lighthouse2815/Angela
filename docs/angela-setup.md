@@ -187,6 +187,17 @@ PDF scan cần OCR, PDF yêu cầu mật khẩu, Word và ảnh chưa được h
 Tệp ẩn, đường dẫn ra ngoài thư mục và liên kết tượng trưng bị từ chối.
 Nội dung tài liệu được gửi đến nhà cung cấp AI đang chọn khi công cụ đọc được gọi.
 
+Bạn có thể hỏi: "Tìm phần giải thích vòng lặp trong thư mục học Python giúp mình."
+Angela tìm cụm từ trong PDF, Markdown và TXT, gồm các thư mục con được cấp quyền.
+Kết quả có đường dẫn, số trang PDF hoặc dòng văn bản, kèm đoạn trích tối đa 600 ký tự.
+Tìm kiếm không phân biệt hoa/thường và chấp nhận khoảng trắng xuống dòng. Dấu tiếng Việt vẫn cần khớp.
+Mỗi tệp văn bản hoặc trang PDF trả về tối đa một đoạn trích.
+Khi tìm kiếm, kết quả gửi đến nhà cung cấp AI gồm đường dẫn, đoạn trích và trạng thái quét.
+Mỗi lượt tối đa 20 kết quả, 50 tài liệu, 100 trang PDF và 2 MiB văn bản được tìm.
+Nếu chạm giới hạn hoặc có tệp không đọc được, Angela cần kiểm tra phần còn lại trước khi kết luận không có nội dung.
+PDF dài có thể tìm tiếp từ trang được trả về. Thư mục quá lớn cần thu hẹp phạm vi tìm kiếm.
+Angela cần đọc tài liệu hoặc trang tìm được trước khi giải thích đầy đủ hoặc lưu ghi chú có trích dẫn nguồn.
+
 Ghi chú nằm trong thư mục con `Angela Notes`. Mỗi ghi chú tối đa 128 KiB.
 Công cụ chỉ tạo tệp `.md` mới, không ghi đè tài liệu hoặc ghi chú đã có.
 Khi lưu tóm tắt, Angela có thể đính kèm nguồn đã đọc và số trang PDF vào ghi chú.
@@ -201,7 +212,7 @@ Gửi "Bỏ quyền thư mục học hiện tại" để gọi thao tác `clear`
 Tắt **Use computer** để ngừng cung cấp công cụ tài liệu cho yêu cầu tiếp theo.
 Ghi chú đã lưu vẫn còn trên ổ đĩa.
 
-Các công cụ gồm `study_workspace_directory`, `study_workspace_list`, `study_workspace_read` và `study_workspace_save_note`.
+Các công cụ gồm `study_workspace_directory`, `study_workspace_list`, `study_workspace_read`, `study_workspace_search` và `study_workspace_save_note`.
 Chúng hoạt động độc lập với AUV và không cần quyền `/dev/uinput`.
 Trí nhớ và lịch ôn vẫn dùng mô-đun Trí nhớ dài hạn đã có.
 

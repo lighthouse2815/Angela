@@ -7,7 +7,7 @@ import { join } from 'node:path'
 import { createContext, defineInvoke } from '@moeru/eventa'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { studyWorkspaceDirectory, studyWorkspaceList, studyWorkspaceRead, studyWorkspaceSaveNote } from '../../../../shared/eventa/study-workspace'
+import { studyWorkspaceDirectory, studyWorkspaceList, studyWorkspaceRead, studyWorkspaceSaveNote, studyWorkspaceSearch } from '../../../../shared/eventa/study-workspace'
 import { setupStudyWorkspace } from './index'
 
 const electron = vi.hoisted(() => ({
@@ -38,6 +38,7 @@ function clients() {
     directory: defineInvoke(context, studyWorkspaceDirectory),
     list: defineInvoke(context, studyWorkspaceList),
     read: defineInvoke(context, studyWorkspaceRead),
+    search: defineInvoke(context, studyWorkspaceSearch),
     saveNote: defineInvoke(context, studyWorkspaceSaveNote),
   }
 }
@@ -56,10 +57,15 @@ describe('study workspace IPC', () => {
     expect(electron.dialog.showOpenDialog).toHaveBeenCalledWith(electron.owner, { properties: ['openDirectory'] })
     expect((await client.list({ path: '.' })).entries).toEqual([{ name: 'python.md', kind: 'document' }])
     expect(await client.read({ path: 'python.md' })).toMatchObject({ text: expect.stringContaining('for item in items:') })
+    expect(await client.search({ path: '.', query: 'vòng lặp' })).toMatchObject({
+      matches: [{ path: 'python.md', line: 1, excerpt: '# Vòng lặp\nfor item in items:' }],
+      truncated: false,
+    })
     const result = await client.saveNote({ filename: 'ôn-python.md', content: '# Ôn tập\nNguồn: python.md' })
     expect(await readFile(join(directory, result.path), 'utf8')).toBe('# Ôn tập\nNguồn: python.md')
     await client.directory({ action: 'clear' })
     await expect(client.read({ path: 'python.md' })).rejects.toThrow('Choose a learning directory')
+    await expect(client.search({ path: '.', query: 'vòng lặp' })).rejects.toThrow('Choose a learning directory')
   })
 
   it('keeps the prior selection when the native picker is cancelled', async () => {
@@ -79,6 +85,7 @@ describe('study workspace IPC', () => {
     const client = clients()
     await choose(client)
     await expect(Reflect.apply(client.read, undefined, [{ path: 42 }])).rejects.toThrow()
+    await expect(Reflect.apply(client.search, undefined, [{ path: '.', query: 42 }])).rejects.toThrow()
     await expect(Reflect.apply(client.directory, undefined, [{ action: 'grant', directory }])).rejects.toThrow()
   })
 

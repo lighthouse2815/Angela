@@ -120,6 +120,17 @@ Document text goes to the selected chat provider as reference material. It is no
 Scanned pages require OCR, which is unsupported. Pages without extractable text produce an explicit error when the whole requested range is empty.
 Password-protected PDFs, Word, and image documents are unsupported.
 
+`study_workspace_search` finds a literal phrase in a document or recursively within a directory. Use `path: "."` for the selected directory.
+Matches ignore letter case, preserve accents, and accept whitespace across line breaks. Regular expression characters remain literal.
+Each text file or PDF page contributes at most one excerpt, with a relative path and a line or physical page number.
+Excerpts contain at most 600 characters. Search reads current local files and sends paths, excerpts, and scan status to the chat provider.
+One call inspects at most 200 queued paths, 50 directories, 50 documents, and 100 PDF pages.
+Search text has a 2 MiB budget. Each directory retains the existing listing limits.
+Limits and unreadable files set `truncated`. Inspect `skipped` before a claim that content is absent.
+The `pending` array contains scopes to search next with the same query. Its `startPage` resumes a single PDF.
+The `pending` and `skipped` arrays contain at most 20 entries each, so these lists can also be incomplete.
+Search excerpts do not grant note citations. Read the matched document or page before a full explanation or a saved source citation.
+
 `study_workspace_save_note` creates new Markdown files under `Angela Notes` within that directory.
 Notes contain at most 128 KiB. Existing files are never overwritten.
 The optional `sources` array accepts up to 20 references with a relative `path` and a physical PDF `page`.
