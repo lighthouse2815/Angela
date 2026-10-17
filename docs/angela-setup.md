@@ -183,24 +183,31 @@ Bạn có thể yêu cầu: "Đọc trang 3 đến trang 8 của bài giảng PD
 Mỗi lượt đọc PDF tối đa 20 trang và 256 KiB văn bản trích xuất. Mặc định đọc 10 trang đầu.
 Angela cần đọc tiếp các khoảng trang trước khi tóm tắt toàn bộ tài liệu dài.
 Số trang nguồn tính từ trang đầu của tệp PDF, bắt đầu ở 1, có thể khác số trang in trên tài liệu.
-PDF scan cần OCR, PDF yêu cầu mật khẩu, Word và ảnh chưa được hỗ trợ.
+Angela cũng đọc Word `.docx`, gồm nội dung chính, tiêu đề chuẩn và văn bản trong bảng.
+DOCX tối đa 10 MiB nén, 20 MiB giải nén và 1.000 mục trong gói tệp.
+Kết quả chia thành các đoạn có số thứ tự và tiêu đề gần nhất, tối đa 256 KiB dữ liệu đoạn và 10.000 đoạn.
+Số đoạn tính theo thứ tự trích xuất nội dung không rỗng, không phải số trang hoặc số thứ tự danh sách trong Word.
+Header, footer, chú thích, ghi chú cuối tài liệu và chữ trong ảnh không thuộc phần nội dung DOCX được đọc.
+Tài liệu cần mật khẩu, Word `.doc` cũ và ảnh chưa được hỗ trợ. PDF scan cần OCR, hiện chưa được hỗ trợ.
 Tệp ẩn, đường dẫn ra ngoài thư mục và liên kết tượng trưng bị từ chối.
 Nội dung tài liệu được gửi đến nhà cung cấp AI đang chọn khi công cụ đọc được gọi.
 
 Bạn có thể hỏi: "Tìm phần giải thích vòng lặp trong thư mục học Python giúp mình."
-Angela tìm cụm từ trong PDF, Markdown và TXT, gồm các thư mục con được cấp quyền.
-Kết quả có đường dẫn, số trang PDF hoặc dòng văn bản, kèm đoạn trích tối đa 600 ký tự.
+Angela tìm cụm từ trong PDF, DOCX, Markdown và TXT, gồm các thư mục con được cấp quyền.
+Kết quả có đường dẫn, số trang PDF, số đoạn DOCX hoặc dòng văn bản, kèm đoạn trích tối đa 600 ký tự.
+Kết quả DOCX có thêm tiêu đề gần nhất nếu tài liệu dùng kiểu tiêu đề chuẩn.
 Tìm kiếm không phân biệt hoa/thường và chấp nhận khoảng trắng xuống dòng. Dấu tiếng Việt vẫn cần khớp.
-Mỗi tệp văn bản hoặc trang PDF trả về tối đa một đoạn trích.
+Mỗi tệp văn bản, trang PDF hoặc đoạn DOCX trả về tối đa một đoạn trích. Tìm kiếm DOCX không nối cụm từ qua hai đoạn riêng biệt.
 Khi tìm kiếm, kết quả gửi đến nhà cung cấp AI gồm đường dẫn, đoạn trích và trạng thái quét.
-Mỗi lượt tối đa 20 kết quả, 50 tài liệu, 100 trang PDF và 2 MiB văn bản được tìm.
+Mỗi lượt tối đa 20 kết quả, 50 tài liệu, 100 trang PDF, 500 đoạn DOCX và 2 MiB văn bản được tìm.
 Nếu chạm giới hạn hoặc có tệp không đọc được, Angela cần kiểm tra phần còn lại trước khi kết luận không có nội dung.
-PDF dài có thể tìm tiếp từ trang được trả về. Thư mục quá lớn cần thu hẹp phạm vi tìm kiếm.
+PDF và DOCX dài có thể tìm tiếp từ trang hoặc đoạn được trả về. Thư mục quá lớn cần thu hẹp phạm vi tìm kiếm.
 Angela cần đọc tài liệu hoặc trang tìm được trước khi giải thích đầy đủ hoặc lưu ghi chú có trích dẫn nguồn.
 
 Ghi chú nằm trong thư mục con `Angela Notes`. Mỗi ghi chú tối đa 128 KiB.
 Công cụ chỉ tạo tệp `.md` mới, không ghi đè tài liệu hoặc ghi chú đã có.
-Khi lưu tóm tắt, Angela có thể đính kèm nguồn đã đọc và số trang PDF vào ghi chú.
+Khi lưu tóm tắt, Angela có thể đính kèm nguồn đã đọc, số trang PDF hoặc số đoạn DOCX vào ghi chú.
+Nguồn DOCX tự kèm tiêu đề đã đọc gần nhất nếu có. Liên kết mở tệp gốc; vị trí đoạn được ghi trong nhãn nguồn.
 Công cụ tạo liên kết tới tài liệu gốc, kèm vị trí trang của PDF. Một số ứng dụng đọc PDF không hỗ trợ mở đúng trang từ liên kết.
 Nguồn chỉ được chấp nhận nếu tài liệu hoặc trang đó đã được đọc trong phiên chọn thư mục hiện tại.
 Phần nguồn cũng tính vào giới hạn 128 KiB của ghi chú.

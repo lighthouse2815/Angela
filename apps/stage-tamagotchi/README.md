@@ -118,24 +118,37 @@ Read further ranges before a complete document summary. Partial ranges set `trun
 Both tools accept relative paths within the selected directory. Hidden paths and symbolic links are refused.
 Document text goes to the selected chat provider as reference material. It is not a source of tool instructions or personal memories.
 Scanned pages require OCR, which is unsupported. Pages without extractable text produce an explicit error when the whole requested range is empty.
-Password-protected PDFs, Word, and image documents are unsupported.
+Password-protected documents, legacy `.doc` files, and image documents are unsupported.
+
+DOCX extraction uses [Mammoth](https://github.com/mwilliamson/mammoth.js) with a pinned document-transform API and disabled external file access.
+DOCX files support up to 10 MiB compressed, 20 MiB expanded, and 1,000 ZIP entries.
+The result has `format: "docx"`, numbered `paragraphs`, and extraction `warnings`.
+Paragraphs contain body text, including standard headings and table-cell paragraphs. Empty paragraphs are excluded from the numbering.
+Each paragraph includes the nearest standard Heading 1–9 or Title text when available. Numbered Heading styles also include their level.
+Paragraph data fits within 256 KiB and 10,000 paragraphs. Oversized output produces an error rather than a partial read.
+Headers, footers, footnotes, endnotes, comments, and image text are outside the extracted body.
+DOCX paragraph numbers refer to the extraction order. They are not Word page numbers or numbered-list labels.
 
 `study_workspace_search` finds a literal phrase in a document or recursively within a directory. Use `path: "."` for the selected directory.
 Matches ignore letter case, preserve accents, and accept whitespace across line breaks. Regular expression characters remain literal.
-Each text file or PDF page contributes at most one excerpt, with a relative path and a line or physical page number.
+Each text file, PDF page, or DOCX paragraph contributes at most one excerpt, with its relative path and position.
+DOCX results include a paragraph number and the nearest heading when available. Phrases do not span separate DOCX paragraphs.
 Excerpts contain at most 600 characters. Search reads current local files and sends paths, excerpts, and scan status to the chat provider.
-One call inspects at most 200 queued paths, 50 directories, 50 documents, and 100 PDF pages.
+One call inspects at most 200 queued paths, 50 directories, 50 documents, 100 PDF pages, and 500 DOCX paragraphs.
 Search text has a 2 MiB budget. Each directory retains the existing listing limits.
 Limits and unreadable files set `truncated`. Inspect `skipped` before a claim that content is absent.
-The `pending` array contains scopes to search next with the same query. Its `startPage` resumes a single PDF.
+The `pending` array contains scopes to search next with the same query.
+Its `startPage` resumes a single PDF. Its `startParagraph` resumes a single DOCX.
 The `pending` and `skipped` arrays contain at most 20 entries each, so these lists can also be incomplete.
 Search excerpts do not grant note citations. Read the matched document or page before a full explanation or a saved source citation.
 
 `study_workspace_save_note` creates new Markdown files under `Angela Notes` within that directory.
 Notes contain at most 128 KiB. Existing files are never overwritten.
-The optional `sources` array accepts up to 20 references with a relative `path` and a physical PDF `page`.
-Omit `page` for text files. Only documents and pages read during the current folder selection can become source citations.
-The tool appends relative Markdown links with PDF page anchors. Citations count toward the note size limit.
+The optional `sources` array accepts up to 20 references with a relative `path` and a PDF `page` or DOCX `paragraph`.
+Omit both position fields for text files. Only documents and positions read during the current folder selection can become source citations.
+The tool appends relative Markdown links with PDF page anchors.
+DOCX citation labels contain paragraph numbers and recorded headings. Their links open the source file without a paragraph jump.
+Citations count toward the note size limit.
 Successful results include the saved relative path and UTF-8 byte count.
 Folder changes wait for active file operations. Clearing access preserves saved notes.
 These tools use Electron IPC and Node filesystem APIs. They do not require AUV or desktop input permissions.

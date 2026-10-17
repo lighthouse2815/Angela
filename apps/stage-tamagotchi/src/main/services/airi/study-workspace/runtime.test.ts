@@ -3,6 +3,8 @@ import { copyFile, mkdir, mkdtemp, readdir, readFile, realpath, rm, symlink, wri
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import JSZip from 'jszip'
+
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { StudyWorkspace } from './runtime'
@@ -83,12 +85,12 @@ describe('study workspace access', () => {
     await writeFile(join(root, 'large.txt'), Buffer.alloc(256 * 1024 + 1, 65))
     await writeFile(join(root, 'binary.txt'), Buffer.from([65, 0, 66]))
     await writeFile(join(root, 'invalid.txt'), Buffer.from([255, 254]))
-    await writeFile(join(root, 'book.docx'), 'Word')
+    await writeFile(join(root, 'book.doc'), 'Legacy Word')
     await workspace.select(root)
     await expect(workspace.read({ path: 'large.txt' })).rejects.toThrow('256 KiB')
     await expect(workspace.read({ path: 'binary.txt' })).rejects.toThrow('UTF-8 text')
     await expect(workspace.read({ path: 'invalid.txt' })).rejects.toThrow()
-    await expect(workspace.read({ path: 'book.docx' })).rejects.toThrow('.md, .markdown, .txt, or .pdf')
+    await expect(workspace.read({ path: 'book.doc' })).rejects.toThrow('.md, .markdown, .txt, .pdf, or .docx')
   })
 
   it('marks a bounded listing as truncated', async () => {
@@ -156,6 +158,85 @@ describe('study workspace PDFs', () => {
     await workspace.clear()
     await workspace.select(root)
     await expect(workspace.saveNote({ ...note, filename: 'expired.md' })).rejects.toThrow('Cite only')
+  })
+})
+
+describe('study workspace DOCX', () => {
+  beforeEach(async () => {
+    await copyFile(new URL('./fixtures/lesson.docx', import.meta.url), join(root, 'lesson.docx'))
+    await workspace.select(root)
+  })
+
+  it('reads Vietnamese body paragraphs, headings, and table cells without header or footer text', async () => {
+    expect((await workspace.list({ path: '.' })).entries).toEqual([{ name: 'lesson.docx', kind: 'document' }])
+    const result = await workspace.read({ path: 'lesson.docx' })
+    expect(result).toMatchObject({ path: 'lesson.docx', format: 'docx', warnings: [] })
+    if (!('paragraphs' in result))
+      throw new Error('Expected DOCX paragraphs')
+    expect(result.paragraphs).toEqual([
+      { paragraph: 1, text: 'Python cơ bản', heading: 'Python cơ bản', headingLevel: 1 },
+      { paragraph: 2, text: 'Vòng lặp for giúp duyệt danh sách.', heading: 'Python cơ bản' },
+      { paragraph: 3, text: 'Vòng lặp', heading: 'Vòng lặp', headingLevel: 2 },
+      { paragraph: 4, text: 'Dùng while khi cần lặp theo điều kiện.', heading: 'Vòng lặp' },
+      { paragraph: 5, text: 'Biến', heading: 'Vòng lặp' },
+      { paragraph: 6, text: 'Giá trị', heading: 'Vòng lặp' },
+      { paragraph: 7, text: 'Hàm range(3)\ntạo ba giá trị.', heading: 'Vòng lặp' },
+    ])
+    await expect(workspace.read({ path: 'lesson.docx', startPage: 1 })).rejects.toThrow('only to PDF')
+  })
+
+  it('searches paragraphs with source headings and supports paragraph continuation', async () => {
+    const result = await workspace.search({ path: '.', query: 'vòng lặp' })
+    expect(result.matches).toEqual([
+      { path: 'lesson.docx', paragraph: 2, heading: 'Python cơ bản', excerpt: 'Vòng lặp for giúp duyệt danh sách.' },
+      { path: 'lesson.docx', paragraph: 3, heading: 'Vòng lặp', excerpt: 'Vòng lặp' },
+    ])
+    expect(result.searchedParagraphs).toBe(7)
+    expect(result.truncated).toBe(false)
+    const rest = await workspace.search({ path: 'lesson.docx', query: 'vòng lặp', startParagraph: 3 })
+    expect(rest.matches).toEqual([{ path: 'lesson.docx', paragraph: 3, heading: 'Vòng lặp', excerpt: 'Vòng lặp' }])
+    await expect(workspace.search({ path: '.', query: 'Python', startParagraph: 1 })).rejects.toThrow('single DOCX')
+    await expect(workspace.search({ path: 'lesson.docx', query: 'Python', startPage: 1 })).rejects.toThrow('single PDF')
+  })
+
+  it('resumes after DOCX match and paragraph limits', async () => {
+    await copyFile(new URL('./fixtures/many-paragraphs.docx', import.meta.url), join(root, 'many.docx'))
+    const hits = await workspace.search({ path: 'many.docx', query: 'Lesson' })
+    expect(hits.matches).toHaveLength(20)
+    expect(hits.pending).toEqual([{ path: 'many.docx', startParagraph: 21 }])
+    const first = await workspace.search({ path: 'many.docx', query: 'Absent phrase' })
+    expect(first.searchedParagraphs).toBe(500)
+    expect(first.pending).toEqual([{ path: 'many.docx', startParagraph: 501 }])
+    expect(first.truncated).toBe(true)
+    const last = await workspace.search({ ...first.pending[0], query: 'Lesson 501' })
+    expect(last.matches).toEqual([{ path: 'many.docx', paragraph: 501, heading: undefined, excerpt: 'Lesson 501' }])
+    expect(last.truncated).toBe(false)
+  })
+
+  it('saves recorded paragraph headings only after a read and rejects wrong or expired positions', async () => {
+    await workspace.search({ path: 'lesson.docx', query: 'while' })
+    const note = { filename: 'summary.md', content: '# Ôn tập', sources: [{ path: 'lesson.docx', paragraph: 4 }] }
+    await expect(workspace.saveNote(note)).rejects.toThrow('Cite only DOCX')
+    await workspace.read({ path: 'lesson.docx' })
+    const result = await workspace.saveNote(note)
+    const saved = await readFile(join(root, result.path), 'utf8')
+    expect(saved).toContain('[lesson.docx#paragraph=4 (Vòng lặp)](<../lesson.docx>)')
+    expect(saved).not.toContain('../lesson.docx#paragraph=')
+    expect(result.bytes).toBe(Buffer.byteLength(saved, 'utf8'))
+    await expect(workspace.saveNote({ ...note, sources: [{ path: 'lesson.docx', paragraph: 8 }] })).rejects.toThrow('Cite only DOCX')
+    await expect(workspace.saveNote({ ...note, sources: [{ path: 'lesson.docx', page: 4 }] })).rejects.toThrow('Cite only DOCX')
+    await workspace.clear()
+    await workspace.select(root)
+    await expect(workspace.saveNote(note)).rejects.toThrow('Cite only DOCX')
+  })
+
+  it('rejects malformed packages and excessive archive expansion', async () => {
+    await writeFile(join(root, 'broken.docx'), 'Not a DOCX')
+    await expect(workspace.read({ path: 'broken.docx' })).rejects.toThrow()
+    const archive = await JSZip.loadAsync(await readFile(join(root, 'lesson.docx')))
+    archive.file('padding.bin', Buffer.alloc(20 * 1024 * 1024))
+    await writeFile(join(root, 'expanded.docx'), await archive.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' }))
+    await expect(workspace.read({ path: 'expanded.docx' })).rejects.toThrow('20 MiB')
   })
 })
 

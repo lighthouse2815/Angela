@@ -22,41 +22,52 @@ export interface StudyWorkspaceReadRequest {
   endPage?: number
 }
 
+/** Paragraph numbers identify nonempty body paragraphs, including headings and table cells, in extraction order. */
+export interface StudyWorkspaceDocxDocument {
+  path: string
+  format: 'docx'
+  paragraphs: { paragraph: number, text: string, heading?: string, headingLevel?: number }[]
+  warnings: string[]
+}
+
 /** Text files keep their original response. PDF responses contain only the requested pages. */
-export type StudyWorkspaceDocument = { path: string, text: string } | {
+export type StudyWorkspaceDocument = StudyWorkspaceDocxDocument | { path: string, text: string } | {
   path: string
   totalPages: number
   pages: { page: number, text: string }[]
   truncated: boolean
 }
 
-/** Search scopes stay inside the selected directory. Page continuation applies only to a single PDF. */
+/** Search scopes stay inside the selected directory. Page and paragraph continuation each require a single matching document. */
 export interface StudyWorkspaceSearchRequest {
   path: string
   query: string
   /** @default 1 */
   startPage?: number
+  /** @default 1 */
+  startParagraph?: number
 }
 
 /** Matches contain excerpts, not complete documents. Pending scopes and skipped files make incomplete searches explicit. */
 export interface StudyWorkspaceSearchResult {
   path: string
   query: string
-  matches: { path: string, excerpt: string, page?: number, line?: number }[]
+  matches: { path: string, excerpt: string, page?: number, line?: number, paragraph?: number, heading?: string }[]
   searchedFiles: number
   searchedPages: number
+  searchedParagraphs: number
   truncated: boolean
   /** At most 20 scopes to search next with the same query. This list can also be incomplete. */
-  pending: { path: string, startPage?: number }[]
+  pending: { path: string, startPage?: number, startParagraph?: number }[]
   skipped: { path: string, reason: string }[]
 }
 
-/** Sources refer to documents and PDF pages read during the current folder selection. */
+/** Sources refer to text files, PDF pages, and DOCX paragraphs read during the current folder selection. */
 export interface StudyWorkspaceNoteRequest {
   filename: string
   content: string
   /** @default [] */
-  sources?: { path: string, page?: number }[]
+  sources?: { path: string, page?: number, paragraph?: number }[]
 }
 
 export const studyWorkspaceDirectory = defineInvokeEventa<StudyWorkspaceStatus, { action: 'choose' | 'status' | 'clear' }>('eventa:invoke:study-workspace:directory')

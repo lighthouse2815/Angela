@@ -1,6 +1,6 @@
 import type { ElectronMainContextExtensions, ElectronMainEmitOptions } from '@moeru/eventa/adapters/electron/main'
 
-import { mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises'
+import { copyFile, mkdtemp, readFile, realpath, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -49,6 +49,18 @@ function choose(client: ReturnType<typeof clients>) {
 }
 
 describe('study workspace IPC', () => {
+  it('reads DOCX and saves paragraph sources through the public contracts', async () => {
+    const client = clients()
+    await copyFile(new URL('./fixtures/lesson.docx', import.meta.url), join(directory, 'lesson.docx'))
+    await choose(client)
+    expect(await client.read({ path: 'lesson.docx' })).toMatchObject({ format: 'docx' })
+    const result = await client.saveNote({ filename: 'word.md', content: '# Word', sources: [{ path: 'lesson.docx', paragraph: 4 }] })
+    expect(await readFile(join(directory, result.path), 'utf8')).toContain('lesson.docx#paragraph=4 (Vòng lặp)')
+    expect(await client.search({ path: 'lesson.docx', query: 'while', startParagraph: 4 })).toMatchObject({
+      matches: [{ path: 'lesson.docx', paragraph: 4, heading: 'Vòng lặp', excerpt: 'Dùng while khi cần lặp theo điều kiện.' }],
+    })
+  })
+
   it('reads a real lesson and saves a note through the public IPC contracts', async () => {
     const client = clients()
     await writeFile(join(directory, 'python.md'), '# Vòng lặp\nfor item in items:')

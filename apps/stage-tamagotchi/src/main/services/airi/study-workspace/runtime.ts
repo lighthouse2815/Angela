@@ -11,22 +11,25 @@ import { escapeRegExp } from 'es-toolkit'
 import { getResolvedPDFJS } from 'unpdf'
 import { array, integer, maxLength, minLength, minValue, number, object, optional, parse, pipe, string, trim } from 'valibot'
 
+import { readDocx } from './docx'
+
 const pathSchema = object({ path: pipe(string(), maxLength(1024)) })
-const pageSchema = pipe(number(), integer(), minValue(1))
-const readSchema = object({ ...pathSchema.entries, startPage: optional(pageSchema), endPage: optional(pageSchema) })
+const positionSchema = pipe(number(), integer(), minValue(1))
+const readSchema = object({ ...pathSchema.entries, startPage: optional(positionSchema), endPage: optional(positionSchema) })
 const searchSchema = object({
   ...pathSchema.entries,
   query: pipe(string(), trim(), minLength(1), maxLength(200)),
-  startPage: optional(pageSchema),
+  startPage: optional(positionSchema),
+  startParagraph: optional(positionSchema),
 })
 const noteSchema = object({
   filename: pipe(string(), minLength(1), maxLength(120)),
   content: pipe(string(), minLength(1), maxLength(128 * 1024)),
-  sources: optional(pipe(array(object({ ...pathSchema.entries, page: optional(pageSchema) })), maxLength(20)), () => []),
+  sources: optional(pipe(array(object({ ...pathSchema.entries, page: optional(positionSchema), paragraph: optional(positionSchema) })), maxLength(20)), () => []),
 })
 
 function isDocument(name: string) {
-  return ['.md', '.markdown', '.txt', '.pdf'].includes(extname(name).toLowerCase())
+  return ['.md', '.markdown', '.txt', '.pdf', '.docx'].includes(extname(name).toLowerCase())
 }
 
 async function* pdfPages(data: Uint8Array, start = 1, end?: number) {
@@ -105,7 +108,7 @@ function findExcerpt(text: string, query: RegExp) {
 
 /**
  * Owns session-only folder access. All operations finish before a folder change takes effect.
- * Reads accept UTF-8 documents and PDF text. Writes create new Markdown files inside Angela Notes.
+ * Reads accept UTF-8, PDF, and DOCX text. Writes create new Markdown files inside Angela Notes.
  * Source citations refer to successful reads and reset when folder access changes.
  */
 export class StudyWorkspace {
@@ -113,6 +116,7 @@ export class StudyWorkspace {
   private readonly mutex = new Mutex()
   /** Zero identifies a text document. Positive values identify PDF pages from successful reads. */
   private readonly readSources = new Map<string, Set<number>>()
+  private readonly docxSources = new Map<string, Map<number, string | undefined>>()
 
   async select(directory: string) {
     return this.mutex.runExclusive(async () => {
@@ -121,6 +125,7 @@ export class StudyWorkspace {
         throw new Error('Choose a directory for learning documents.')
       this.directory = canonical
       this.readSources.clear()
+      this.docxSources.clear()
       return this.status()
     })
   }
@@ -133,6 +138,7 @@ export class StudyWorkspace {
     return this.mutex.runExclusive(() => {
       this.directory = undefined
       this.readSources.clear()
+      this.docxSources.clear()
       return this.status()
     })
   }
@@ -201,10 +207,12 @@ export class StudyWorkspace {
   private async loadDocument(path: string) {
     const resolved = await this.resolvePath(path)
     if (!isDocument(resolved.target))
-      throw new Error('Read a .md, .markdown, .txt, or .pdf learning document.')
-    const pdf = extname(resolved.target).toLowerCase() === '.pdf'
-    const limit = pdf ? 10 * 1024 * 1024 : 256 * 1024
-    const sizeLabel = pdf ? '10 MiB' : '256 KiB'
+      throw new Error('Read a .md, .markdown, .txt, .pdf, or .docx learning document.')
+    const extension = extname(resolved.target).toLowerCase()
+    const pdf = extension === '.pdf'
+    const docx = extension === '.docx'
+    const limit = pdf || docx ? 10 * 1024 * 1024 : 256 * 1024
+    const sizeLabel = pdf || docx ? '10 MiB' : '256 KiB'
     // Nonblocking open prevents a replaced document from blocking on a FIFO.
     const file = await open(resolved.target, constants.O_RDONLY | constants.O_NOFOLLOW | constants.O_NONBLOCK)
     try {
@@ -221,7 +229,7 @@ export class StudyWorkspace {
       }
       if (length > limit)
         throw new Error(`Learning documents must be at most ${sizeLabel}.`)
-      return { path: resolved.path, pdf, data: buffer.subarray(0, length) }
+      return { path: resolved.path, pdf, docx, data: buffer.subarray(0, length) }
     }
     finally {
       await file.close()
@@ -231,9 +239,14 @@ export class StudyWorkspace {
   async read(input: unknown): Promise<StudyWorkspaceDocument> {
     const request = parse(readSchema, input)
     return this.mutex.runExclusive(async () => {
-      const { path, pdf, data } = await this.loadDocument(request.path)
+      const { path, pdf, docx, data } = await this.loadDocument(request.path)
       if (!pdf && (request.startPage !== undefined || request.endPage !== undefined))
         throw new Error('Page ranges apply only to PDF documents.')
+      if (docx) {
+        const document = await readDocx(data, path)
+        this.docxSources.set(path, new Map<number, string | undefined>(document.paragraphs.map(entry => [entry.paragraph, entry.heading])))
+        return document
+      }
       if (pdf) {
         const document = await readPdf(data, path, request)
         let pages = this.readSources.get(path)
@@ -251,24 +264,29 @@ export class StudyWorkspace {
     })
   }
 
-  /** Search does not grant note citations. A full document or page read must precede a saved source reference. */
+  /** Search does not grant note citations. A document or PDF page read must precede a saved source reference. */
   async search(input: unknown): Promise<StudyWorkspaceSearchResult> {
     const request = parse(searchSchema, input)
     const query = new RegExp(request.query.normalize('NFC').split(/\s+/u).map(escapeRegExp).join('\\s+'), 'iu')
     return this.mutex.runExclusive(async () => {
       const scope = await this.resolvePath(request.path)
-      if (request.startPage !== undefined && (!(await lstat(scope.target)).isFile() || extname(scope.target).toLowerCase() !== '.pdf'))
+      const scopeInfo = await lstat(scope.target)
+      const extension = extname(scope.target).toLowerCase()
+      if (request.startPage !== undefined && (!scopeInfo.isFile() || extension !== '.pdf' || request.startParagraph !== undefined))
         throw new Error('Search page continuation applies only to a single PDF document.')
-      const queue: StudyWorkspaceSearchResult['pending'] = [{ path: scope.path, startPage: request.startPage }]
+      if (request.startParagraph !== undefined && (!scopeInfo.isFile() || extension !== '.docx'))
+        throw new Error('Search paragraph continuation applies only to a single DOCX document.')
+      const queue: StudyWorkspaceSearchResult['pending'] = [{ path: scope.path, startPage: request.startPage, startParagraph: request.startParagraph }]
       const pending: StudyWorkspaceSearchResult['pending'] = []
       const matches: StudyWorkspaceSearchResult['matches'] = []
       const skipped: StudyWorkspaceSearchResult['skipped'] = []
       let searchedFiles = 0
       let searchedPages = 0
+      let searchedParagraphs = 0
       let directories = 0
       let inspected = 0
       let bytes = 0
-      while (queue.length && matches.length < 20 && searchedFiles < 50 && searchedPages < 100 && directories < 50 && inspected < 200 && bytes < 2 * 1024 * 1024) {
+      while (queue.length && matches.length < 20 && searchedFiles < 50 && searchedPages < 100 && searchedParagraphs < 500 && directories < 50 && inspected < 200 && bytes < 2 * 1024 * 1024) {
         const task = queue.shift()!
         inspected++
         try {
@@ -284,7 +302,32 @@ export class StudyWorkspace {
           }
           const document = await this.loadDocument(resolved.path)
           searchedFiles++
-          if (document.pdf) {
+          if (document.docx) {
+            const parsed = await readDocx(document.data, document.path)
+            if (parsed.warnings.length)
+              skipped.push({ path: document.path, reason: parsed.warnings.join(' ').slice(0, 240) })
+            const start = task.startParagraph ?? 1
+            if (start > parsed.paragraphs.length)
+              throw new Error(`Choose a DOCX paragraph within 1–${parsed.paragraphs.length}.`)
+            for (const entry of parsed.paragraphs.slice(start - 1)) {
+              const size = Buffer.byteLength(entry.text, 'utf8')
+              if (bytes + size > 2 * 1024 * 1024) {
+                pending.push({ path: document.path, startParagraph: entry.paragraph })
+                break
+              }
+              bytes += size
+              searchedParagraphs++
+              const hit = findExcerpt(entry.text, query)
+              if (hit)
+                matches.push({ path: document.path, paragraph: entry.paragraph, heading: entry.heading, excerpt: hit.excerpt })
+              if (matches.length === 20 || searchedParagraphs === 500) {
+                if (entry.paragraph < parsed.paragraphs.length)
+                  pending.push({ path: document.path, startParagraph: entry.paragraph + 1 })
+                break
+              }
+            }
+          }
+          else if (document.pdf) {
             let hasText = false
             for await (const entry of pdfPages(document.data, task.startPage)) {
               hasText ||= Boolean(entry.text)
@@ -335,6 +378,7 @@ export class StudyWorkspace {
         matches,
         searchedFiles,
         searchedPages,
+        searchedParagraphs,
         truncated: queue.length > 0 || pending.length > 0 || skipped.length > 0,
         pending: [...pending, ...queue].slice(0, 20),
         skipped: skipped.slice(0, 20),
@@ -354,10 +398,24 @@ export class StudyWorkspace {
       const citations: string[] = []
       for (const source of sources) {
         const resolved = await this.resolvePath(source.path)
-        if (!this.readSources.get(resolved.path)?.has(source.page ?? 0))
-          throw new Error('Cite only documents and PDF pages read during the current folder selection.')
-        const fragment = source.page === undefined ? '' : `#page=${source.page}`
-        const label = `${resolved.path}${fragment}`.replace(/[\\[\]<>]/g, '\\$&').replace(/[\r\n]/g, ' ')
+        let position = ''
+        let fragment = ''
+        if (extname(resolved.target).toLowerCase() === '.docx') {
+          const paragraphs = this.docxSources.get(resolved.path)
+          if (source.page !== undefined || source.paragraph === undefined || !paragraphs?.has(source.paragraph))
+            throw new Error('Cite only DOCX paragraphs read during the current folder selection.')
+          const heading = paragraphs.get(source.paragraph)
+          position = `#paragraph=${source.paragraph}`
+          if (heading)
+            position += ` (${heading})`
+        }
+        else {
+          if (source.paragraph !== undefined || !this.readSources.get(resolved.path)?.has(source.page ?? 0))
+            throw new Error('Cite only documents and PDF pages read during the current folder selection.')
+          fragment = source.page === undefined ? '' : `#page=${source.page}`
+          position = fragment
+        }
+        const label = `${resolved.path}${position}`.replace(/[\\[\]<>]/g, '\\$&').replace(/\p{Cc}/gu, ' ')
         const url = resolved.path.split('/').map(encodeURIComponent).join('/')
         citations.push(`- [${label}](<../${url}${fragment}>)`)
       }
