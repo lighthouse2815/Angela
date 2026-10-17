@@ -5,6 +5,11 @@
 # Node.js
 node_modules
 
+# Local camera runtime and Python caches
+.venv/
+__pycache__/
+*.pyc
+
 # Logs
 *.log
 *.logs

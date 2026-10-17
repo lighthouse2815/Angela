@@ -98,8 +98,89 @@ An empty model answer reports an error instead of returning silently to the prom
 
 ## Scope
 
-This entry point provides text chat, Linux voice, and a built-in terminal MCP connection.
+This entry point provides text chat, Linux voice, optional local camera cues, and a built-in terminal MCP connection.
 The web and desktop applications provide avatars and visual settings.
+
+## Local camera cues
+
+Camera perception is **OFF on every CLI startup**. No configuration value or saved session turns it on automatically.
+Use this feature for optional conversational or study cues. It does not detect emotions, identity, or whether you understand a lesson.
+
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then create the CPU runtime from the repository root:
+
+```sh
+uv sync --locked --project packages/airi-cli/python/camera-worker
+packages/airi-cli/python/camera-worker/.venv/bin/python packages/airi-cli/python/camera-worker/worker.py --check
+packages/airi-cli/python/camera-worker/.venv/bin/python packages/airi-cli/python/camera-worker/worker.py --smoke
+```
+
+The check and smoke commands do not access a camera. Smoke loads the actual tracking models and processes one synthetic black frame.
+On Windows, replace `.venv/bin/python` with `.venv/Scripts/python.exe`.
+The runtime uses Python 3.11, NumPy, CPU ONNX Runtime, and headless OpenCV with locked versions and hashes.
+See [worker setup](python/camera-worker/README.md) for dependency details and a standalone live test.
+Keep `third_party/openseeface` and the worker directory beside the built CLI in this checkout.
+The built executable finds them independently of the current working directory.
+
+During interactive text or voice chat:
+
+```text
+/camera on
+/camera status
+/camera debug
+/camera off
+```
+
+`on` waits for the first successful capture and inference. A visible `📷 ON` indicator accompanies subsequent input prompts.
+`off` stops the worker and clears temporal state and context cooldowns. Restarting Angela also requires a new explicit `on`.
+These commands run locally and do not require a model request or tool permission approval.
+`debug` shows derived state, tracker confidence, stable duration, invalid events, capture/processed FPS, latency, and dropped frames.
+
+The camera worker processes frames in memory. It does not save images, face crops, or video, or send them over the network.
+Only derived observations cross its validated JSONL boundary. Full landmarks and face IDs remain outside Angela's protocol.
+The TypeScript provider routes validated observations through a private Eventa context.
+Sampling defaults to 10 updates per second. A single replaceable frame slot prevents an unbounded inference queue.
+
+The engine combines a rolling window with independent debouncers for presence, expression, and approximate screen attention.
+It emits `facePresent`, `neutral|smile|unknown`, and `screen|away|unknown`.
+Short spikes do not establish a cue. Weak evidence, uncertain geometry, and missing pose return `unknown`.
+Observations expire after two seconds. Screen attention uses head direction, not eye gaze.
+See [thresholds and timing](src/perception/README.md).
+
+Stable cues enter the next chat request as uncertain advisory context.
+Changed cues have a ten-second cooldown. Unchanged cues refresh at most once per minute.
+Camera updates never trigger model requests or unsolicited chat messages.
+The context tells Angela to favor your words, adapt gently, and avoid factual claims about feelings, understanding, or sensitive traits.
+Observations and injected context do not enter session history, memory files, or summaries.
+Ordinary generated replies still follow normal chat persistence.
+
+Camera errors leave chat available. `/camera debug` retains the latest startup diagnostic code.
+Missing dependencies, model files, device permissions, camera ownership, crashes, and stalled streams have bounded failure handling.
+The provider waits at most 30 seconds for startup and five seconds for stream activity.
+Shutdown sends SIGTERM, then SIGKILL after one second if necessary. There are no automatic restart attempts.
+Runtime failures appear between prompts so they do not overwrite input in progress.
+After fixing an error, use `/camera on` to retry explicitly.
+
+| Environment variable | Default and purpose |
+| --- | --- |
+| `ANGELA_CAMERA_PYTHON` | Worker's `.venv` Python when present, otherwise `python3`. Selects the executable only. |
+| `ANGELA_OPENSEEFACE_DIR` | This checkout's `third_party/openseeface`. Selects the vendored source and models. |
+| `ANGELA_CAMERA_DEVICE` | `0`. Camera device index, 0–99. |
+| `ANGELA_CAMERA_FPS` | `10`. Maximum inference sample rate, 1–30. |
+| `ANGELA_CAMERA_WINDOW_MS` | `1000`. Rolling window, 100–30000 ms, bounded to 300 observations. |
+
+Invalid camera configuration is reported only when you enable the feature. It does not block normal chat startup.
+Defaults are heuristic and uncalibrated. Accuracy depends on facial geometry, lighting, camera position, and tracker quality.
+Personal calibration and voice-prosody fusion are outside this V1. No advanced emotion model, body tracker, or recognition feature is active.
+
+Hardware-free camera checks:
+
+```sh
+python3 -m unittest discover -s packages/airi-cli/python/camera-worker -p test.py
+pnpm -F @proj-airi/airi-cli exec vitest run src/perception
+```
+
+The integration test uses a fixture Python subprocess and a mocked model HTTP boundary.
+Normal camera tests never open a webcam or require OpenCV/ONNX. They require only Node and Python's standard library.
 
 ## Local voice service commands
 
