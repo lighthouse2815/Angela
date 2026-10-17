@@ -24,6 +24,22 @@ it('speaks a complete opening sentence before generation finishes and flushes th
   await stream.cancel()
 })
 
+it('keeps a long sentence with multiple clauses in one audio request', async () => {
+  const { stream, speak } = setup()
+  const opening = 'Mình sẽ giải thích cho bạn, '
+  const continuation = 'bằng một câu đầy đủ để bạn có thể nghe rõ toàn bộ nội dung mà không phải chờ giữa các phần, '
+  const ending = 'rồi chúng ta cùng thực hành nhé.'
+  await stream.push(opening)
+  await stream.push(continuation)
+  await stream.push(`${ending} Câu cuối`)
+
+  await vi.waitFor(() => expect(speak).toHaveBeenCalled())
+  expect(speak.mock.calls.map(([text]) => text)).toEqual([opening + continuation + ending])
+  await stream.finish()
+  expect(speak.mock.calls.map(([text]) => text)).toEqual([opening + continuation + ending, 'Câu cuối'])
+  await stream.cancel()
+})
+
 it('continues accepting text after audio fails and reports failure only when the reply finishes', async () => {
   const { stream, speak } = setup()
   speak.mockRejectedValue(new Error('TTS unavailable'))

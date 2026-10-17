@@ -242,6 +242,8 @@ The audio service must support `audio/transcriptions` and `audio/speech` with WA
 Model and voice names must match your service. A chat-only router does not supply audio automatically.
 Audio goes to the configured service. Temporary audio files are deleted after each operation.
 Angela starts reading complete sentences while the model continues its reply.
+Commas and word counts do not split a sentence into separate audio requests.
+The first audio waits for a sentence boundary. Generation completion releases any final text without punctuation.
 Text waiting for audio is bounded. Slow playback applies backpressure to model event processing.
 Only one audio request and playback run at a time. Ctrl+C cancels all remaining speech.
 Completed replies are saved before the final audio drains. A cancelled generation keeps the existing interrupted-session behavior.

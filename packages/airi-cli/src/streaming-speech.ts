@@ -22,7 +22,8 @@ export class StreamingSpeech {
     this.drain = (async () => {
       let speaking = false
       try {
-        for await (const chunk of chunkTtsInput(this.reader, { boost: 0, minimumWords: 1, maximumWords: 24 })) {
+        // Keep each sentence in one audio request so playback cannot pause between its clauses.
+        for await (const chunk of chunkTtsInput(this.reader, { boost: 0, maximumWords: Number.POSITIVE_INFINITY })) {
           combined.throwIfAborted()
           if (!chunk.text.trim())
             continue

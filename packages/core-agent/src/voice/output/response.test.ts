@@ -9,6 +9,34 @@ import { VoiceController } from '../../index'
 import { keepOpen, pcmSource } from '../../testing/audio'
 
 describe('voiceController output', () => {
+  it('synthesizes and plays a complete sentence without splitting clauses or long text', async () => {
+    const played: string[] = []
+    const synthesize = vi.fn(async (request: TtsRequest) => new Blob([request.text]))
+    const playback = new Playback({ nowMs: () => 0, play: clip => ({
+      done: (clip.audio as Blob).text().then((text) => {
+        played.push(text)
+        return { throughMs: 1 }
+      }),
+      stop: async () => ({ throughMs: 0 }),
+    }) })
+    const controller = new VoiceController({ speech: () => ({ playback, synthesize }) })
+    const response = controller.openResponse({ sessionId: 'alice', turnId: 'complete-sentence' })
+    const speech = response.openSpeech({ purpose: 'answer' })
+    const opening = 'Mình sẽ giải thích cho bạn, '
+    const continuation = 'bằng một câu đầy đủ để bạn có thể nghe rõ toàn bộ nội dung mà không phải chờ giữa các phần, '
+    const ending = 'rồi chúng ta cùng thực hành nhé.'
+    speech.write(opening)
+    speech.write(continuation)
+    speech.write(`${ending} Câu cuối`)
+
+    await expect.poll(() => synthesize.mock.calls.length).toBeGreaterThan(0)
+    expect(synthesize.mock.calls.map(([request]) => request.text)).toEqual([opening + continuation + ending])
+    speech.end()
+    expect(await response.finish()).toBe('finished')
+    expect(played).toEqual([opening + continuation + ending, 'Câu cuối'])
+    await controller.close()
+  })
+
   it('ends the speaking indicator only after cancelled audio becomes silent', async () => {
     const silence = Promise.withResolvers<{ throughMs: number }>()
     const started = vi.fn()

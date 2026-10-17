@@ -2,7 +2,7 @@ import type { AudioPlayback, IntentHandle, PcmBlock, PlaybackGroup, PlaybackItem
 
 import type { TurnRef } from '../turn'
 
-import { createPushStream, createSpeechPipeline } from '@proj-airi/pipelines-audio'
+import { createPushStream, createSpeechPipeline, createTtsSegmentStream } from '@proj-airi/pipelines-audio'
 import { nanoid } from 'nanoid/non-secure'
 
 import { errorFromCause, errorMessageFromValue } from '../../utils/error'
@@ -92,6 +92,8 @@ export class SpeechStream {
     }
     const pending = new Set<PlaybackItem<Blob>>()
     const pipeline = createSpeechPipeline<Blob>({
+      // Keep each sentence in one audio request so playback cannot pause between its clauses.
+      segmenter: (tokens, meta) => createTtsSegmentStream(tokens, meta, { boost: 0, maximumWords: Number.POSITIVE_INFINITY }),
       tts: async (request, signal) => {
         try {
           const audio = await output.synthesize(request, AbortSignal.any([signal, this.signal, response.signal]))

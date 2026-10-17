@@ -179,5 +179,8 @@ await response.finish()
 ```
 
 Producers can synthesize concurrently. Playback follows their reservation order.
+Non-streaming synthesis keeps each sentence in one audio request, including long sentences with commas.
+The first request waits for a sentence boundary. An explicit flush, special token, or producer end also releases pending text.
+Bidirectional providers control their own audio boundaries.
 Cancelling an acknowledgment releases its place without reporting a user interruption.
 Whole-turn interruption aborts generation, synthesis, queued audio, and playback for that response.
