@@ -129,6 +129,8 @@ export class ReminderScheduler {
         await verify()
       })
       await renewing
+      // Cancellation wins over a notifier that settles while stopping. Uncertain presentation remains retryable.
+      signal.throwIfAborted()
       for (const task of claimed) {
         if (task.delivery?.status === 'claimed')
           await this.tasks.delivered(task.id, task.delivery.token)

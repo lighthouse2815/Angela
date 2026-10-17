@@ -169,7 +169,7 @@ it('preserves corrupt data and recovers scheduling after storage repair', async 
 
 it('cancels in-flight notification, drains shutdown and clears subscriptions and timers', async () => {
   const { tasks, notify, scheduler } = await setup()
-  await tasks.create({ title: 'Pending', type: 'reminder', dueAt: new Date(now).toISOString() })
+  const task = await tasks.create({ title: 'Pending', type: 'reminder', dueAt: new Date(now).toISOString() })
   const entered = Promise.withResolvers<void>()
   notify.mockImplementation(async (_tasks, _overdue, signal: AbortSignal) => {
     entered.resolve()
@@ -181,6 +181,8 @@ it('cancels in-flight notification, drains shutdown and clears subscriptions and
   await entered.promise
   await scheduler.close()
   await starting
+  expect((await tasks.find(task.id)).lastNotifiedAt).toBeUndefined()
+  expect((await tasks.find(task.id)).delivery?.status).toBe('pending')
   expect(vi.getTimerCount()).toBe(0)
   await tasks.create({ title: 'After close', type: 'reminder', dueAt: new Date(now).toISOString() })
   await scheduler.refresh()

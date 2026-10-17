@@ -111,3 +111,29 @@ it('prunes only history at the active capacity boundary and rejects extra active
   expect(await readFile(path, 'utf8')).toBe(original)
   expect(await tasks.find(created.id)).toBeDefined()
 })
+
+it('prunes history when claim metadata reaches the storage size bound', async () => {
+  const { tasks, path } = await setup()
+  const task = await tasks.create({ title: 'Keep reminder', type: 'reminder', dueAt: '2026-10-17T10:00:00.000Z' })
+  const state = { version: 1, tasks: [await tasks.find(task.id)] }
+  for (let index = 0; index < 50; index++) {
+    // JSON escaping expands valid task text. Exercise the file's character bound independently of its record cap.
+    const history = { ...task, id: randomUUID(), status: 'cancelled' as const, title: '\u0001'.repeat(200), context: '\u0001'.repeat(300) }
+    state.tasks.push(history)
+    while (JSON.stringify(state).length > 127_990 && history.context.length)
+      history.context = history.context.slice(1)
+    while (JSON.stringify(state).length > 127_990 && history.title.length > 1)
+      history.title = history.title.slice(1)
+    if (JSON.stringify(state).length > 127_990) {
+      state.tasks.pop()
+      break
+    }
+    if (JSON.stringify(state).length > 127_980)
+      break
+  }
+  expect(JSON.stringify(state).length).toBeGreaterThan(127_980)
+  await writeFile(path, JSON.stringify(state))
+  expect((await tasks.claim(task.id, task.dueAt!))?.delivery?.status).toBe('claimed')
+  expect((await tasks.list({ status: 'all' })).length).toBeLessThan(state.tasks.length)
+  expect((await tasks.find(task.id)).status).toBe('pending')
+})

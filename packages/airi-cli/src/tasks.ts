@@ -123,6 +123,7 @@ export class Tasks {
       }
       task.delivery = { status: 'claimed', occurrence, token: randomUUID(), claimedAt: new Date(this.clock()).toISOString(), leaseUntil: new Date(this.clock() + deliveryLeaseMs).toISOString() }
       task.updatedAt = task.delivery.claimedAt
+      this.retain(state)
       claimed = structuredClone(task)
     })
     return claimed
@@ -136,6 +137,7 @@ export class Tasks {
       if (!task || !this.owns(task, token) || task.delivery?.status !== 'claimed')
         return
       task.delivery.leaseUntil = new Date(this.clock() + deliveryLeaseMs).toISOString()
+      this.retain(state)
       renewed = true
     })
     return renewed
@@ -159,6 +161,7 @@ export class Tasks {
           task.dueAt = nextOccurrence(task, Math.max(this.clock(), Date.parse(task.dueAt!)))
         task.snoozedUntil = undefined
       }
+      this.retain(state)
       delivered = true
     })
     return delivered
@@ -171,6 +174,7 @@ export class Tasks {
       if (task?.delivery?.status !== 'claimed' || task.delivery.token !== token)
         return
       task.delivery = { status: 'pending', occurrence: task.delivery.occurrence, retryAt: new Date(this.clock() + (immediate ? 0 : deliveryLeaseMs)).toISOString() }
+      this.retain(state)
     })
   }
 

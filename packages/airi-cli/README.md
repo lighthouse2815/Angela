@@ -695,7 +695,7 @@ This implementation reuses Angela storage, context management, MCP and permissio
 `Tasks` owns everyday todos, reminders, deadlines, routines, and follow-ups across CLI sessions.
 It reuses `MemoryFile` for validated, private, atomic storage at `tasks/tasks.json` under the CLI data directory.
 The store accepts at most 100 pending tasks and retains at most 50 completed or cancelled tasks.
-Each create or edit prunes the oldest inactive records under the same writer lock.
+Each domain mutation, including delivery claims, prunes the oldest inactive records under the same writer lock.
 Inactive records sort by `updatedAt`, then stable task ID. Pending tasks are never pruning candidates.
 History is pruned further to keep the total within 100 records and the existing 128000-character storage bound.
 A valid larger history is read and pruned on the next mutation. Corrupted storage remains untouched.
@@ -734,7 +734,8 @@ Conversational references use the existing chat history and saved tool results.
 `ReminderScheduler` owns one timer and an interchangeable `ReminderNotifier`. It batches overdue occurrences after startup.
 Delivery progresses from pending to claimed to delivered under the existing file lock.
 A unique token fences each claim. Leases expire after 30 seconds and renew every 10 seconds during queued or slow presentation.
-A crashed owner leaves a retryable occurrence. A notifier failure retries after 30 seconds. Clean shutdown releases claims immediately.
+A crashed owner leaves a retryable occurrence. A notifier failure becomes retryable after 30 seconds.
+The scheduler reconciles retries within one minute. Clean shutdown releases claims immediately.
 Only successful text presentation records `lastNotifiedAt` and advances a routine. A queued notification is not delivered.
 The notifier checks ownership immediately before presentation and honors cancellation. Terminal delivery waits for the output stream callback.
 Normal successful delivery does not replay after restart. Delivery failure never marks a task complete.
@@ -766,7 +767,7 @@ To select the CLI timezone through Node's standard environment, run `TZ=Asia/Ho_
 Routine intervals support 1–52 days or weeks. Snooze durations support 1 minute through 366 days.
 
 V1 has no daemon. Closing Angela stops notification delivery. Reopening the CLI surfaces unclaimed overdue occurrences once.
-Date-only tasks have no notification until you choose an alarm time. Completed and cancelled tasks remain in `/tasks all`.
+Date-only tasks have no notification until you choose an alarm time. Retained completed and cancelled tasks appear in `/tasks all`.
 
 ### Validation
 
