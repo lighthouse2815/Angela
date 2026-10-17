@@ -1,4 +1,4 @@
-import type { Discord } from '@proj-airi/server-shared/types'
+import type { Discord, WebSocketEventOf } from '@proj-airi/server-shared/types'
 import type { Interaction } from 'discord.js'
 
 import { env } from 'node:process'
@@ -16,10 +16,14 @@ import { Speech } from '../pipelines/speech'
 
 const log = useLogg('DiscordAdapter').useGlobalConfig()
 
+/** Selects server-channel routing or an in-process CLI responder. Credentials remain runtime configuration. */
 export interface DiscordAdapterConfig {
   discordToken?: string
   airiToken?: string
   airiUrl?: string
+  respond?: (input: WebSocketEventOf<'input:text'>['data'], signal: AbortSignal) => Promise<string>
+  speechEnv?: NodeJS.ProcessEnv
+  locale?: 'en' | 'vi'
 }
 
 const configuration = v.object({ token: v.optional(v.string()), enabled: v.optional(v.boolean()) })
@@ -44,15 +48,18 @@ function normalizeDiscordMetadata(discord?: Discord): Discord | undefined {
 }
 
 export class DiscordAdapter {
-  private airiClient: ServerChannel
+  private airiClient?: ServerChannel
   private discordClient: Client
   private discordToken: string
   private voiceManager: VoiceManager
-  private readonly voiceMessages = (env.ANGELA_LOCALE === 'en' ? cliMessages.en : cliMessages.vi).discordVoice
+  private readonly voiceMessages: typeof cliMessages.en.discordVoice
   private isReconnecting = false
+  private readonly requests = new Set<AbortController>()
+  private closing = false
 
-  constructor(config: DiscordAdapterConfig) {
+  constructor(private readonly config: DiscordAdapterConfig) {
     this.discordToken = config.discordToken || env.DISCORD_TOKEN || ''
+    this.voiceMessages = cliMessages[config.locale ?? (env.ANGELA_LOCALE === 'en' ? 'en' : 'vi')].discordVoice
 
     // Initialize Discord client
     this.discordClient = new Client({
@@ -67,28 +74,30 @@ export class DiscordAdapter {
     })
 
     // Initialize AIRI client
-    this.airiClient = new ServerChannel({
-      name: 'discord',
-      possibleEvents: [
-        'input:text',
-        'input:text:voice',
-        'input:voice',
-        'module:configure',
-        'output:gen-ai:chat:message',
-        'output:gen-ai:chat:complete',
-      ],
-      token: config.airiToken,
-      url: config.airiUrl,
-    })
+    this.airiClient = config.respond
+      ? undefined
+      : new ServerChannel({
+          name: 'discord',
+          possibleEvents: [
+            'input:text',
+            'input:text:voice',
+            'input:voice',
+            'module:configure',
+            'output:gen-ai:chat:message',
+            'output:gen-ai:chat:complete',
+          ],
+          token: config.airiToken,
+          url: config.airiUrl,
+        })
 
-    this.voiceManager = new VoiceManager(this.discordClient, this.airiClient, new Speech(), this.voiceMessages)
+    this.voiceManager = new VoiceManager(this.discordClient, (input, signal) => this.sendInput(input, signal), new Speech(config.speechEnv), this.voiceMessages)
 
     this.setupEventHandlers()
   }
 
   private setupEventHandlers(): void {
     // Handle configuration from UI
-    this.airiClient.onEvent('module:configure', async (event) => {
+    this.airiClient?.onEvent('module:configure', async (event) => {
       if (this.isReconnecting) {
         log.warn('A reconnect is already in progress, skipping this configuration event.')
         return
@@ -146,14 +155,14 @@ export class DiscordAdapter {
     })
 
     // Handle input from AIRI system
-    this.airiClient.onEvent('input:text', async (event) => {
+    this.airiClient?.onEvent('input:text', async (event) => {
       log.log('Received input from AIRI system:', event.data.text)
       // Process Discord-related commands
       // For now, we'll just log the input
     })
 
     // Handle output from AIRI system (IA response)
-    this.airiClient.onEvent('output:gen-ai:chat:message', async (event) => {
+    this.airiClient?.onEvent('output:gen-ai:chat:message', async (event) => {
       try {
         const message = event.data.message
         const discordContext = event.data['gen-ai:chat']?.input?.data.discord
@@ -163,36 +172,7 @@ export class DiscordAdapter {
           return
 
         if (typeof message?.content === 'string' && message.content && discordContext?.channelId) {
-          const channel = await this.discordClient.channels.fetch(discordContext.channelId)
-          if (channel?.isTextBased() && 'send' in channel && typeof channel.send === 'function') {
-            const content = message.content
-            if (content.length <= 2000) {
-              await channel.send(content)
-            }
-            else {
-              let remaining = content
-              while (remaining.length > 0) {
-                let chunkSize = 2000
-                if (remaining.length > 2000) {
-                  // Try to split at the last newline before 2000
-                  const lastNewline = remaining.lastIndexOf('\n', 2000)
-                  if (lastNewline > -1) {
-                    chunkSize = lastNewline
-                  }
-                  else {
-                    // Fallback to last space
-                    const lastSpace = remaining.lastIndexOf(' ', 2000)
-                    if (lastSpace > -1)
-                      chunkSize = lastSpace
-                  }
-                }
-
-                const chunk = remaining.slice(0, chunkSize)
-                await channel.send(chunk)
-                remaining = remaining.slice(chunkSize).trim()
-              }
-            }
-          }
+          await this.sendText(discordContext.channelId, message.content)
         }
       }
       catch (error) {
@@ -200,7 +180,7 @@ export class DiscordAdapter {
       }
     })
 
-    this.airiClient.onEvent('output:gen-ai:chat:complete', async (event) => {
+    this.airiClient?.onEvent('output:gen-ai:chat:complete', async (event) => {
       const context = event.data['gen-ai:chat']?.input?.data.discord
       const content = event.data.message.content
       await this.voiceManager.handleResponse(context, typeof content === 'string' ? content : '')
@@ -267,7 +247,7 @@ export class DiscordAdapter {
           ? `The input is coming from Discord channel ${normalizedDiscord.channelId} (Guild: ${normalizedDiscord.guildId ?? 'unknown'}).`
           : undefined
 
-        this.airiClient.send({
+        await this.sendInput({
           type: 'input:text',
           data: {
             text: content,
@@ -326,6 +306,56 @@ export class DiscordAdapter {
     })
   }
 
+  private async sendText(channelId: string, content: string) {
+    const channel = await this.discordClient.channels.fetch(channelId)
+    if (!channel?.isTextBased() || !('send' in channel) || typeof channel.send !== 'function')
+      return
+    let remaining = content
+    while (remaining.length) {
+      let size = 2000
+      if (remaining.length > size) {
+        const boundary = Math.max(remaining.lastIndexOf('\n', size), remaining.lastIndexOf(' ', size))
+        if (boundary > 0)
+          size = boundary
+      }
+      await channel.send({ content: remaining.slice(0, size), allowedMentions: { parse: [] } })
+      remaining = remaining.slice(size).trim()
+    }
+  }
+
+  private async sendInput(input: WebSocketEventOf<'input:text'>, signal?: AbortSignal) {
+    if (this.closing)
+      return
+    if (this.airiClient) {
+      this.airiClient.send(input)
+      return
+    }
+    const controller = new AbortController()
+    const requestSignal = AbortSignal.any([controller.signal, AbortSignal.timeout(75_000), ...(signal ? [signal] : [])])
+    this.requests.add(controller)
+    try {
+      const reply = await this.config.respond!(input.data, requestSignal)
+      requestSignal.throwIfAborted()
+      // The original room and request IDs let VoiceManager reject responses from interrupted or departed calls.
+      if (input.data.discord && 'voiceRequestId' in input.data.discord)
+        await this.voiceManager.handleResponse(input.data.discord, reply)
+      else if (input.data.discord?.channelId)
+        await this.sendText(input.data.discord.channelId, reply)
+    }
+    catch {
+      if (!requestSignal.aborted) {
+        log.error('Discord reply failed')
+        if (input.data.discord && 'voiceRequestId' in input.data.discord)
+          await this.voiceManager.handleResponse(input.data.discord, '')
+        else if (input.data.discord?.channelId)
+          await this.sendText(input.data.discord.channelId, cliMessages[this.config.locale ?? 'vi'].discordFailed).catch(() => {})
+      }
+    }
+    finally {
+      this.requests.delete(controller)
+    }
+  }
+
   async start(): Promise<void> {
     log.log('Starting Discord adapter...')
 
@@ -348,9 +378,12 @@ export class DiscordAdapter {
   async stop(): Promise<void> {
     log.log('Stopping Discord adapter...')
     try {
+      this.closing = true
+      for (const request of this.requests)
+        request.abort()
       this.voiceManager.close()
       await this.discordClient.destroy()
-      this.airiClient.close()
+      this.airiClient?.close()
       log.log('Discord adapter stopped')
     }
     catch (error) {

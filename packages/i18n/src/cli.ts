@@ -1,4 +1,10 @@
 const en = {
+  discordUsage: 'angela discord [--model ID] [--provider ID] [--config PATH] [--cwd PATH]\nUses the CLI chat provider. Desktop is not required.\nSave DISCORD_TOKEN and speech configuration in ~/.config/angela/discord.env, or select a file with ANGELA_DISCORD_ENV. Environment variables override that file.\nMention Angela or send a DM to chat. Join a voice channel and use /summon for speech. Ctrl+C stops the bot.',
+  discordStarted: 'Angela Discord is running. Mention the bot or use /summon in a voice channel. Ctrl+C stops it.',
+  discordTokenMissing: 'Set DISCORD_TOKEN in ~/.config/angela/discord.env or the environment before starting Discord.',
+  discordEnvFailed: 'Cannot read the Discord configuration. Check ANGELA_DISCORD_ENV and file permissions.',
+  discordFailed: 'Discord failed. Check the bot token, Message Content Intent, channel permissions, and chat provider.',
+  discordBusy: 'This channel has several pending requests. Wait for the replies before sending another request.',
   discordVoice: {
     pingDescription: 'Check whether Angela is online',
     summonDescription: 'Invite Angela to your voice channel',
@@ -256,6 +262,12 @@ const en = {
 }
 
 const vi: typeof en = {
+  discordUsage: 'angela discord [--model ID] [--provider ID] [--config PATH] [--cwd PATH]\nDùng model của CLI, không cần mở desktop.\nLưu DISCORD_TOKEN và cấu hình giọng nói vào ~/.config/angela/discord.env, hoặc chọn file bằng ANGELA_DISCORD_ENV. Biến môi trường ưu tiên hơn file.\nTag Angela hoặc nhắn riêng để chat. Vào kênh thoại rồi dùng /summon để nói chuyện. Ctrl+C dừng bot.',
+  discordStarted: 'Angela Discord đang chạy. Tag bot hoặc dùng /summon trong kênh thoại. Ctrl+C để dừng.',
+  discordTokenMissing: 'Điền DISCORD_TOKEN trong ~/.config/angela/discord.env hoặc biến môi trường trước khi chạy Discord.',
+  discordEnvFailed: 'Không đọc được cấu hình Discord. Kiểm tra ANGELA_DISCORD_ENV và quyền truy cập file.',
+  discordFailed: 'Discord gặp lỗi. Kiểm tra token bot, Message Content Intent, quyền trong kênh và model chat.',
+  discordBusy: 'Kênh này đang chờ nhiều câu trả lời. Đợi bot trả lời rồi gửi yêu cầu tiếp.',
   discordVoice: {
     pingDescription: 'Kiểm tra Angela có trực tuyến không',
     summonDescription: 'Mời Angela vào phòng thoại của bạn',

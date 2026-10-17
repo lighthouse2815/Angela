@@ -102,6 +102,33 @@ An empty model answer reports an error instead of returning silently to the prom
 This entry point provides text chat, Linux voice, optional local camera cues, and a built-in terminal MCP connection.
 The web and desktop applications provide avatars and visual settings.
 
+## Discord chat and voice
+
+Run Angela inside Discord with the CLI's saved chat provider. A desktop or web client is unnecessary.
+
+```sh
+angela discord --help
+angela voice start
+angela discord
+```
+
+Create a Discord bot and enable Message Content Intent in the Developer Portal.
+Invite the bot with `bot` and `applications.commands` scopes.
+Grant View Channel, Send Messages, Connect, and Speak permissions.
+Save `DISCORD_TOKEN` and speech configuration in `~/.config/angela/discord.env` with file mode `600`.
+Use the [Discord template](../../integrations/discord-bot/.env.example) for the local voice service defaults.
+`ANGELA_DISCORD_ENV` selects another file. Environment variables override file values.
+The CLI reads the existing chat provider from `~/.config/angela/config.json`.
+
+Mention Angela or send a direct message for text chat. Join a server voice channel and use `/summon` for speech.
+Use `/listen enabled:false` to pause, `/listen enabled:true` to resume, and `/leave` to disconnect.
+Ctrl+C stops the host and cancels pending responses.
+
+History stays in the CLI data directory's `discord` folder. Channels and text/voice conversations have separate histories.
+Requests in each conversation run in order. At most four requests wait in one conversation, including its active generation.
+This mode provides chat and voice. Terminal tools, Telegram task commands, and local microphone capture are outside its scope.
+See the [Discord guide](../../integrations/discord-bot/README.md) for speech providers and call behavior.
+
 ## Local camera cues
 
 Camera perception is **OFF on every CLI startup**. No configuration value or saved session turns it on automatically.

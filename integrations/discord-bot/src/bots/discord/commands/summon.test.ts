@@ -1,5 +1,4 @@
 import type { AudioPlayer, VoiceConnection } from '@discordjs/voice'
-import type { Client as AiriClient } from '@proj-airi/server-sdk'
 import type { WebSocketEventOf } from '@proj-airi/server-shared/types'
 import type { ChatInputCommandInteraction, Client, VoiceChannel } from 'discord.js'
 
@@ -35,9 +34,9 @@ afterEach(() => {
 })
 
 function setup() {
-  const send = vi.fn<(event: WebSocketEventOf<'input:text'>) => void>()
+  const send = vi.fn<(event: WebSocketEventOf<'input:text'>, signal: AbortSignal) => void>()
   const speech = new Speech({ OPENAI_STT_API_BASE_URL: 'http://speech.test/v1/', OPENAI_STT_MODEL: 'stt', OPENAI_TTS_API_BASE_URL: 'http://speech.test/v1/', OPENAI_TTS_MODEL: 'tts', OPENAI_TTS_VOICE: 'voice' })
-  const manager = new VoiceManager({ user: { id: 'bot' } } as Client, { send } as unknown as AiriClient, speech, cliMessages.vi.discordVoice)
+  const manager = new VoiceManager({ user: { id: 'bot' } } as Client, send, speech, cliMessages.vi.discordVoice)
   managers.push(manager)
   function room(guildId = 'guild-1', channelId = 'room-1') {
     const speaking = new EventEmitter()
@@ -150,6 +149,7 @@ it('suppresses interrupted and duplicated responses and aborts late speech synth
   await vi.waitFor(() => expect(send).toHaveBeenCalledOnce())
   const oldContext = context()
   const capture = await call.say('bob', false)
+  expect(send.mock.calls[0][1].aborted).toBe(true)
   await manager.handleResponse(oldContext, 'Too late')
   expect(Speech.prototype.synthesize).not.toHaveBeenCalled()
   capture.end()
@@ -177,6 +177,7 @@ it('pauses capture and playback, rejects control outside the room, and resumes e
   call.interaction.options.getBoolean.mockReturnValue(false)
   await manager.handleListeningCommand(call.command)
   expect(resource.playStream.destroyed).toBe(true)
+  expect(send.mock.calls[0][1].aborted).toBe(true)
   call.speaking.emit('start', 'bob')
   expect(call.connection.receiver.subscribe).toHaveBeenCalledOnce()
   call.interaction.options.getBoolean.mockReturnValue(true)
@@ -189,6 +190,7 @@ it('pauses capture and playback, rejects control outside the room, and resumes e
   expect(call.interaction.editReply).toHaveBeenCalledWith(cliMessages.vi.discordVoice.sameRoom)
   await manager.handleLeaveChannelCommand(call.command)
   expect(call.connection.destroy).toHaveBeenCalledOnce()
+  expect(send.mock.calls[1][1].aborted).toBe(true)
   expect(call.speaking.listenerCount('start')).toBe(0)
 })
 

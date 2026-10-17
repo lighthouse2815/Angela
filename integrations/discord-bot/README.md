@@ -1,10 +1,44 @@
 # Angela Discord bot
 
 Angela can chat through mentions and direct messages, and join a server voice channel for spoken conversation.
-This adapter uses the existing AIRI server channel. Keep an Angela desktop or web client connected with a working chat provider.
+Run `angela discord` to use the CLI's saved chat provider without a desktop or web client.
+The standalone adapter also supports the existing AIRI server channel with a connected desktop or web client.
 Use this package for voice conversation. The CLI Telegram task, permission, status, and recovery commands are separate features.
 
-## Setup
+## CLI setup
+
+From the repository root, build the CLI and its workspace dependencies:
+
+```sh
+pnpm build:cli
+mkdir -p ~/.config/angela
+cp integrations/discord-bot/.env.example ~/.config/angela/discord.env
+chmod 600 ~/.config/angela/discord.env
+```
+
+Set `DISCORD_TOKEN` in `discord.env`. Keep the speech defaults for the local voice service, or configure another compatible speech provider.
+The CLI reads the chat provider and model from `~/.config/angela/config.json`.
+`AIRI_URL` and `AIRI_TOKEN` are unused in CLI mode.
+`ANGELA_DISCORD_ENV` selects another Discord configuration file. Environment variables override file values.
+
+Start the voice service, then start Discord:
+
+```sh
+angela voice start
+angela discord
+```
+
+Without the installed executable, run `pnpm cli discord` from the repository root.
+Use `angela discord --help` for configuration help. Use Ctrl+C to stop the bot and cancel pending replies.
+Mention Angela in a text channel, or send the bot a direct message.
+For voice, join a server voice channel and use `/summon`.
+
+CLI mode stores history under the CLI data directory's `discord` folder.
+Each channel has separate text and voice conversations. Requests in one conversation run in order.
+CLI mode supports conversation only. It does not expose terminal tools, Telegram task commands, or the local microphone.
+Interrupting speech, pausing, leaving, and shutdown cancel local AI generation.
+
+## Standalone adapter setup
 
 Use the workspace Node.js and pnpm versions. Install dependencies from the repository root.
 Install FFmpeg and put it on PATH. The existing Discord voice and Opus packages handle transport and audio decoding.

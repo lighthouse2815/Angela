@@ -14,7 +14,14 @@
     "url": "https://github.com/moeru-ai/airi.git",
     "directory": "integrations/discord-bot"
   },
+  "exports": {
+    ".": {
+      "types": "./dist/airi-adapter.d.mts",
+      "default": "./dist/airi-adapter.mjs"
+    }
+  },
   "scripts": {
+    "build": "tsdown",
     "start": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.local src/index.ts",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --config vitest.config.ts"

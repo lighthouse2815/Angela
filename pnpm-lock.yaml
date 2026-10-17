@@ -3197,6 +3197,9 @@ importers:
       '@proj-airi/core-agent':
         specifier: workspace:^
         version: link:../core-agent
+      '@proj-airi/discord-bot':
+        specifier: workspace:*
+        version: link:../../integrations/discord-bot
       '@proj-airi/i18n':
         specifier: workspace:^
         version: link:../i18n

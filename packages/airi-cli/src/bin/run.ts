@@ -61,10 +61,15 @@ async function main() {
     await runTelegram(process.argv.slice(3), process.env)
     return
   }
+  if (process.argv[2] === 'discord') {
+    const { runDiscord } = await import('../discord')
+    await runDiscord(process.argv.slice(3), process.env)
+    return
+  }
   const config = await readConfig(process.argv.slice(2), process.env)
   const messages = config.messages
   if (config.help) {
-    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela doctor [--json] [--help]\nangela telegram [--help]\nangela voice start|stop|status [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
+    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela doctor [--json] [--help]\nangela telegram [--help]\nangela discord [--help]\nangela voice start|stop|status [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
       ['--model', messages.model],
       ['--provider', messages.provider],
       ['--config', messages.configFile],

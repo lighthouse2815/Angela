@@ -154,6 +154,23 @@ it('shows Telegram setup help without credentials or contacting Telegram', async
   expect(output.stdout).toContain('ANGELA_TELEGRAM_ALLOWED_USER_IDS')
 })
 
+it('shows Discord setup help without a bot token or model', async () => {
+  const { result } = run(['discord', '--help'], { ANGELA_MODEL: '', DISCORD_TOKEN: '' })
+  const output = await result
+  expect(output.code).toBe(0)
+  expect(output.stdout).toContain('DISCORD_TOKEN')
+  expect(output.stdout).toContain('ANGELA_DISCORD_ENV')
+  expect(output.stdout).toContain('/summon')
+})
+
+it('rejects missing Discord credentials before contacting Discord', async () => {
+  const { result, directory } = run(['discord'], { DISCORD_TOKEN: '', ANGELA_DISCORD_ENV: undefined })
+  const output = await result
+  expect(output.code).toBe(1)
+  expect(output.stderr).toContain('DISCORD_TOKEN')
+  expect(await readdir(directory)).toEqual([])
+})
+
 it.each([
   { token: '', users: '100', message: 'ANGELA_TELEGRAM_BOT_TOKEN' },
   { token: '42:private-test-token', users: '', message: 'ANGELA_TELEGRAM_ALLOWED_USER_IDS' },

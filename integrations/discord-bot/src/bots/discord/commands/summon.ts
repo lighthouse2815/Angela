@@ -1,6 +1,6 @@
 import type { AudioPlayer, AudioResource, VoiceConnection } from '@discordjs/voice'
 import type { cliMessages } from '@proj-airi/i18n/cli'
-import type { Client as AiriClient } from '@proj-airi/server-sdk'
+import type { WebSocketEventOf } from '@proj-airi/server-shared/types'
 import type { ChatInputCommandInteraction, Client as DiscordClient, VoiceChannel } from 'discord.js'
 
 import type { Speech } from '../../../pipelines/speech'
@@ -57,7 +57,7 @@ export class VoiceManager {
 
   constructor(
     private readonly client: DiscordClient,
-    private readonly airiClient: AiriClient,
+    private readonly sendInput: (input: WebSocketEventOf<'input:text'>, signal: AbortSignal) => void | Promise<void>,
     private readonly speech: Speech,
     private readonly messages: typeof cliMessages.en.discordVoice,
   ) {}
@@ -338,7 +338,7 @@ export class VoiceManager {
             guildMember: { id: utterance.userId, displayName: utterance.displayName, nickname: utterance.displayName },
           }
           turn.stage = 'waiting'
-          this.airiClient.send({
+          await this.sendInput({
             type: 'input:text',
             data: {
               text,
@@ -348,7 +348,7 @@ export class VoiceManager {
                 messagePrefix: `[Discord voice ${JSON.stringify({ userId: utterance.userId, displayName: utterance.displayName })}]: `,
               },
             },
-          })
+          }, turn.controller.signal)
           await turn.finished.promise
         }
         catch {

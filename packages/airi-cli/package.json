@@ -31,6 +31,7 @@
     "@moeru/std": "catalog:",
     "@proj-airi/computer-use-mcp": "workspace:^",
     "@proj-airi/core-agent": "workspace:^",
+    "@proj-airi/discord-bot": "workspace:*",
     "@proj-airi/i18n": "workspace:^",
     "@proj-airi/local-config": "workspace:^",
     "@proj-airi/pipelines-audio": "workspace:^",
