@@ -1,4 +1,14 @@
 const en = {
+  reminders: {
+    build: 'Build the CLI, then run angela reminders install using its built executable.',
+    usage: 'angela reminders install|start|stop|status|run [--data-dir PATH] [--locale en|vi]',
+    linux: 'Background desktop reminders require Linux, systemd user services, and notify-send.',
+    running: 'Angela reminders are running. Ctrl+C stops this foreground host.',
+    installed: 'Reminder service installed. Run angela reminders start to enable it at login and start it now.',
+    exists: 'Cannot install the reminder service. Preserve any existing unit and check its contents and directory permissions.',
+    failed: 'Cannot control the reminder service. Check systemctl --user status angela-reminders and install it first.',
+    changed: 'Reminder service updated.',
+  },
   discordUsage: 'angela discord [--model ID] [--provider ID] [--config PATH] [--cwd PATH]\nUses the CLI chat provider. Desktop is not required.\nSave DISCORD_TOKEN and speech configuration in ~/.config/angela/discord.env, or select a file with ANGELA_DISCORD_ENV. Environment variables override that file.\nMention Angela or send a DM to chat. Join a voice channel and use /summon for speech. Ctrl+C stops the bot.',
   discordStarted: 'Angela Discord is running. Mention the bot or use /summon in a voice channel. Ctrl+C stops it.',
   discordTokenMissing: 'Set DISCORD_TOKEN in ~/.config/angela/discord.env or the environment before starting Discord.',
@@ -262,6 +272,16 @@ const en = {
 }
 
 const vi: typeof en = {
+  reminders: {
+    build: 'Build CLI rồi chạy angela reminders install bằng executable đã build.',
+    usage: 'angela reminders install|start|stop|status|run [--data-dir PATH] [--locale en|vi]',
+    linux: 'Nhắc việc nền trên desktop cần Linux, service người dùng systemd và notify-send.',
+    running: 'Angela đang chạy nhắc việc. Ctrl+C dừng tiến trình này.',
+    installed: 'Đã cài service nhắc việc. Chạy angela reminders start để khởi động ngay và tự chạy khi đăng nhập.',
+    exists: 'Không cài được service nhắc việc. Giữ lại unit hiện có và kiểm tra nội dung cùng quyền thư mục.',
+    failed: 'Không điều khiển được service. Kiểm tra systemctl --user status angela-reminders và cài service trước.',
+    changed: 'Đã cập nhật service nhắc việc.',
+  },
   discordUsage: 'angela discord [--model ID] [--provider ID] [--config PATH] [--cwd PATH]\nDùng model của CLI, không cần mở desktop.\nLưu DISCORD_TOKEN và cấu hình giọng nói vào ~/.config/angela/discord.env, hoặc chọn file bằng ANGELA_DISCORD_ENV. Biến môi trường ưu tiên hơn file.\nTag Angela hoặc nhắn riêng để chat. Vào kênh thoại rồi dùng /summon để nói chuyện. Ctrl+C dừng bot.',
   discordStarted: 'Angela Discord đang chạy. Tag bot hoặc dùng /summon trong kênh thoại. Ctrl+C để dừng.',
   discordTokenMissing: 'Điền DISCORD_TOKEN trong ~/.config/angela/discord.env hoặc biến môi trường trước khi chạy Discord.',

@@ -810,8 +810,32 @@ By default, the clock and calendar use the operating system timezone. A task can
 To select the CLI timezone through Node's standard environment, run `TZ=Asia/Ho_Chi_Minh angela`.
 Routine intervals support 1–52 days or weeks. Snooze durations support 1 minute through 366 days.
 
-V1 has no daemon. Closing Angela stops notification delivery. Reopening the CLI surfaces unclaimed overdue occurrences once.
+Closing chat stops terminal delivery. The optional Linux background service continues desktop delivery after chat closes.
 Date-only tasks have no notification until you choose an alarm time. Retained completed and cancelled tasks appear in `/tasks all`.
+
+### Background desktop reminders
+
+Linux desktops with systemd user services and `notify-send` can run the existing scheduler independently of chat:
+
+```sh
+angela reminders install
+angela reminders start
+angela reminders status
+angela reminders stop
+```
+
+Run `install` from the built executable. It writes a private user unit without credentials and reloads systemd.
+It preserves a different existing unit. Review that file before replacing it manually.
+`start` enables the service at login and starts it immediately. `stop` stops it and disables login startup.
+For foreground use, run `angela reminders run`. Ctrl+C releases claims and stops the host.
+`--data-dir` selects task storage. Supply the same directory at install time as your chat configuration.
+The service uses the installed executable and Node path. Keep both available until you replace or remove the unit.
+
+The host needs no chat model, provider credentials, or open terminal. It uses the existing claims, renewal, recurrence, and retries.
+Terminal and background hosts share claims. The first successful owner delivers each occurrence through its own surface.
+Successful desktop submission acknowledges delivery. It does not prove that you read the notification.
+Missing notification support leaves occurrences retryable. Failures appear in `journalctl --user -u angela-reminders`.
+An unlocked graphical login and notification daemon are required. This service does not wake a powered-off computer.
 
 ### Validation
 
