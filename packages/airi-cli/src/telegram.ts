@@ -2,6 +2,8 @@ import type { cliMessages } from '@proj-airi/i18n/cli'
 import type { GenerationProvider } from '@proj-airi/provider-inference'
 import type { Context } from 'grammy'
 
+import type { SavedRequest } from './sessions'
+
 import process from 'node:process'
 
 import { createHash, randomUUID } from 'node:crypto'
@@ -28,6 +30,7 @@ interface ChatState {
   permissions: Permissions
   tools?: McpTools
   output?: Output
+  checkpoint?: (status?: SavedRequest['status']) => Promise<void>
   pending?: { id: string, finish: (approved: boolean) => void }
 }
 
@@ -82,9 +85,18 @@ export class TelegramChat {
       await job.done
     })
     bot.command('status', async (ctx) => {
-      await ctx.reply(`${messages.model}: ${model}\n${messages.session}: ${this.sessionId(ctx.chat.id)}\n${this.jobs.has(ctx.chat.id) ? messages.thinking : messages.telegramIdle}\n${messages.workspace}: ${workspace}\n${this.state(ctx.chat.id).permissions.fullAccess ? messages.permissionFull : messages.permissionAsk}`)
+      await this.status(ctx.chat.id)
+    })
+    bot.command('result', async (ctx) => {
+      const request = await this.request(ctx.chat.id)
+      await this.reply(ctx.chat.id, request?.answer ?? messages.telegramNoResult)
     })
     bot.on('message:text', async (ctx) => {
+      const question = ctx.message.text.normalize('NFD').replace(/\p{M}/gu, '').replace(/đ/gi, 'd').toLowerCase().trim().replace(/[?!.]+$/u, '')
+      if (/^(?:viec (?:luc nay|do) (?:da )?den dau roi|(?:da )?xong chua|den dau roi|status|how is it going|is it done)$/u.test(question)) {
+        await this.status(ctx.chat.id)
+        return
+      }
       if (this.jobs.has(ctx.chat.id)) {
         await ctx.reply(messages.telegramBusy)
         return
@@ -130,6 +142,45 @@ export class TelegramChat {
       this.chats.set(chatId, state)
     }
     return state
+  }
+
+  private async request(chatId: number) {
+    try {
+      const record = await this.sessions.read(this.sessionId(chatId))
+      if (record.workspace !== this.workspace)
+        throw new Error(this.messages.invalidWorkspace)
+      return record.request
+    }
+    catch (error) {
+      // A chat without a saved session has no previous request to report.
+      if (error instanceof Error && 'code' in error && error.code === 'ENOENT')
+        return undefined
+      throw error
+    }
+  }
+
+  private async status(chatId: number) {
+    const request = await this.request(chatId)
+    const lines = [
+      `${this.messages.model}: ${this.model}`,
+      `${this.messages.session}: ${this.sessionId(chatId)}`,
+      this.jobs.has(chatId) ? this.messages.thinking : this.messages.telegramIdle,
+      `${this.messages.workspace}: ${this.workspace}`,
+      this.state(chatId).permissions.fullAccess ? this.messages.permissionFull : this.messages.permissionAsk,
+    ]
+    if (request) {
+      // Persisted active states describe an interruption when this host owns no live job.
+      const interrupted = !this.jobs.has(chatId) && ['running', 'awaiting_approval'].includes(request.status)
+      const status = interrupted ? 'interrupted' : request.status
+      lines.push(`${this.messages.telegramJob}: ${request.id}`, request.text, this.messages.telegramJobStates[status], `${this.messages.telegramUpdated}: ${request.updatedAt}`)
+      if (request.progress)
+        lines.push(request.progress)
+      if (request.failure)
+        lines.push(request.failure)
+      if (request.answer)
+        lines.push(this.messages.telegramResultHint)
+    }
+    await this.reply(chatId, lines.join('\n'))
   }
 
   private async reply(chatId: number, text: string, signal?: AbortSignal) {
@@ -185,7 +236,11 @@ export class TelegramChat {
     const chatId = ctx.chat.id
     const state = this.state(chatId)
     const session = await this.sessions.open(this.workspace, this.sessionId(chatId))
-    const requestSignal = AbortSignal.any([signal, AbortSignal.timeout(300_000)])
+    const persistence = new AbortController()
+    const requestSignal = AbortSignal.any([signal, persistence.signal, AbortSignal.timeout(300_000)])
+    const chat = new Chat(this.model, this.provider, this.workspace, reset ? undefined : session.restore())
+    let request: SavedRequest | undefined
+    let saving: Promise<void> = Promise.resolve()
     let timer: ReturnType<typeof setInterval> | undefined
     let delivering = false
     let progress = ''
@@ -197,6 +252,18 @@ export class TelegramChat {
       callback()
     } })
     const output = new Output(this.messages, sink, sink)
+    // Serialize checkpoints from parallel tool events. A storage failure stops further tool approvals.
+    const checkpoint = (status?: SavedRequest['status']) => {
+      if (!request)
+        return Promise.resolve()
+      request = { ...request, status: status ?? request.status, progress: progress.trim(), updatedAt: new Date().toISOString() }
+      const snapshot = request
+      saving = saving.then(() => session.save(chat.conversation, !['answered', 'delivery_failed', 'delivered'].includes(snapshot.status), snapshot))
+      return saving.catch((error: unknown) => {
+        persistence.abort(error)
+        throw error
+      })
+    }
     const flush = () => {
       if (editing)
         return editing
@@ -212,19 +279,21 @@ export class TelegramChat {
       return editing
     }
     try {
-      const chat = new Chat(this.model, this.provider, this.workspace, reset ? undefined : session.restore())
       if (reset) {
         await state.tools?.close()
         state.tools = undefined
         state.permissions = new Permissions(this.messages)
-        await session.save(chat.conversation, false)
+        await session.save(chat.conversation, false, null)
         await ctx.reply(this.messages.telegramNew)
         return
       }
       requestSignal.throwIfAborted()
-      await session.save(chat.conversation, true)
+      const now = new Date().toISOString()
+      request = { id: randomUUID(), text, status: 'running', startedAt: now, updatedAt: now, progress: '' }
       state.output = output
+      state.checkpoint = checkpoint
       output.start()
+      await checkpoint()
       const status = await ctx.reply(this.messages.thinking)
       progressId = status.message_id
       deliveredProgress = this.messages.thinking
@@ -238,8 +307,10 @@ export class TelegramChat {
       state.tools ??= await this.connectTools(this.sessionId(chatId), async (request, approvalSignal) => {
         state.output?.approval(request)
         try {
+          await state.checkpoint?.('awaiting_approval')
           const approved = await this.confirm(chatId, request, approvalSignal)
           state.output?.decided(approved)
+          await state.checkpoint?.('running')
           return approved
         }
         catch (error) {
@@ -248,25 +319,30 @@ export class TelegramChat {
         }
       }, requestSignal)
       let answer = ''
-      let generated = false
       await chat.send(text, {
         abortSignal: requestSignal,
         tools: state.tools.definitions(),
-        diagnostics: { error() {}, warn() { output.retry() } },
-        onStreamEvent(event) {
-          if (event.type === 'text-delta')
-            answer += event.text
-          else
-            output.event(event)
+        prepareConversation: async (conversation) => {
+          await checkpoint()
+          return conversation
         },
-      }).then(() => {
-        generated = Boolean(answer.trim())
-      }).finally(async () => {
-        await session.save(chat.conversation, requestSignal.aborted || !generated)
+        diagnostics: { error() {}, warn() { output.retry() } },
+        async onStreamEvent(event) {
+          if (event.type === 'text-delta') {
+            answer += event.text
+          }
+          else {
+            output.event(event)
+            if (['tool-call', 'tool-result', 'tool-error'].includes(event.type))
+              await checkpoint()
+          }
+        },
       })
       requestSignal.throwIfAborted()
       if (!answer.trim())
         throw new Error(this.messages.emptyResponse)
+      request.answer = answer
+      await checkpoint('answered')
       clearInterval(timer)
       timer = undefined
       output.stop()
@@ -275,6 +351,7 @@ export class TelegramChat {
       await flush()
       delivering = true
       await this.reply(chatId, answer, requestSignal)
+      await checkpoint('delivered')
     }
     catch (error) {
       if (requestSignal.aborted) {
@@ -284,13 +361,18 @@ export class TelegramChat {
       let failure = this.messages.telegramRequestFailed
       if (signal.aborted)
         failure = this.messages.telegramCancelled
-      else if (requestSignal.aborted)
+      else if (requestSignal.aborted && !persistence.signal.aborted)
         failure = this.messages.providerTimeout
       else if (delivering)
         failure = this.messages.telegramDeliveryFailed
       else if (APICallError.isInstance(error))
         failure = `${this.messages.failed}: ${formatRequestError(error, this.messages)}`
       sink.write(`✗ ${failure}\n`)
+      if (request) {
+        request.failure = failure
+        const status = signal.aborted ? (this.closing ? 'interrupted' : 'cancelled') : delivering ? 'delivery_failed' : 'failed'
+        await checkpoint(status).catch(() => {})
+      }
       await ctx.reply(failure)
     }
     finally {
@@ -298,8 +380,10 @@ export class TelegramChat {
         clearInterval(timer)
       output.stop()
       state.output = undefined
+      state.checkpoint = undefined
       await editing
       await flush()
+      await saving.catch(() => {})
       await session.close()
     }
   }

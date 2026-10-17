@@ -42,6 +42,21 @@ const conversation: Conversation = {
 }
 
 describe('saved terminal sessions', () => {
+  it('saves the request and conversation atomically, preserves it on later saves, and clears it explicitly', async () => {
+    const { sessions } = await setup()
+    const session = await sessions.open('/workspace')
+    const now = new Date().toISOString()
+    const request = { id: randomUUID(), text: 'Run pwd', status: 'running' as const, startedAt: now, updatedAt: now, progress: 'terminal_exec' }
+    await session.save(conversation, true, request)
+    await session.save(conversation, true)
+    expect((await sessions.read(session.record.id)).request).toEqual(request)
+    await expect(session.save(conversation, true, { ...request, progress: 'x'.repeat(3001) })).rejects.toThrow()
+    expect((await sessions.read(session.record.id)).request).toEqual(request)
+    await session.save(conversation, false, null)
+    expect((await sessions.read(session.record.id)).request).toBeUndefined()
+    await session.close()
+  })
+
   it('preserves UTF-8 history and correlated tool calls across a restart', async () => {
     const { sessions, directory } = await setup()
     const first = await sessions.open('/workspace')

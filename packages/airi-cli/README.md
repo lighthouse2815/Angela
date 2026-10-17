@@ -352,7 +352,8 @@ Telegram commands:
 
 - `/start`: introduce Angela.
 - `/help`: list Telegram commands and describe each command.
-- `/status`: show the model, session ID, workspace, permissions, and request status.
+- `/status`: show the model, session ID, workspace, permissions, and latest saved request progress.
+- `/result`: read the latest saved reply without another model or tool call.
 - `/new`: clear the current chat's stored conversation, close its tools, and restore confirmation mode.
 - `/cancel`: cancel the current request, including a pending tool confirmation.
 - `/permistion`: show permissions. Use `/permistion full` for automatic approval or `/permistion ask` for confirmation.
@@ -378,6 +379,11 @@ Only an authorized Telegram command can change permissions. Model output and sav
 
 The bot edits one progress message with thinking, tool status, and compact results.
 Tool previews reuse the CLI's three-line, 600-character limit. The model and saved session retain the full result.
+The latest request, approval state, bounded progress, and final reply share the session's private atomic snapshot.
+`/status` remains available during a request. Short questions such as `việc lúc nãy đến đâu rồi?` also show this status.
+Request status describes generation and delivery. A sent reply does not prove that the requested task succeeded.
+After a restart, saved active states appear as interrupted. `/result` retrieves a saved reply even after its original delivery failed.
+Status and results remain isolated by bot, private chat, and workspace. `/new` clears this request metadata with the conversation.
 Actions that already ran can retain side effects after cancellation. Cancellation closes that chat's MCP connection.
 It does not send existing CLI conversations to Telegram. A failed delivery leaves the generated answer in the saved session.
 Validate routing and authorization with local API tests before you connect a real bot.

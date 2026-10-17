@@ -29,6 +29,20 @@ const messagesSchema: v.GenericSchema<Message[]> = v.array(v.variant('role', [
   }),
   v.object({ role: v.literal('tool'), tool_call_id: v.string(), content: v.string() }),
 ]))
+const requestSchema = v.object({
+  id: v.pipe(v.string(), v.uuid()),
+  text: v.string(),
+  status: v.picklist(['running', 'awaiting_approval', 'interrupted', 'cancelled', 'failed', 'answered', 'delivery_failed', 'delivered']),
+  startedAt: v.pipe(v.string(), v.isoTimestamp()),
+  updatedAt: v.pipe(v.string(), v.isoTimestamp()),
+  progress: v.pipe(v.string(), v.maxLength(3000)),
+  answer: v.optional(v.string()),
+  failure: v.optional(v.string()),
+})
+
+/** The latest Telegram request shares its session's atomic snapshot and exclusive writer lock. */
+export type SavedRequest = v.InferOutput<typeof requestSchema>
+
 const sessionSchema = v.object({
   version: v.literal(1),
   id: v.pipe(v.string(), v.uuid()),
@@ -37,6 +51,7 @@ const sessionSchema = v.object({
   updatedAt: v.string(),
   interrupted: v.boolean(),
   messages: messagesSchema,
+  request: v.optional(requestSchema),
 })
 type Record = v.InferOutput<typeof sessionSchema>
 
@@ -149,13 +164,14 @@ export class Session {
   }
 
   /** Saves the portable conversation with private file permissions. Incomplete turns carry no fabricated assistant response. */
-  async save(conversation: Conversation, interrupted: boolean) {
-    const record: Record = {
+  async save(conversation: Conversation, interrupted: boolean, request: SavedRequest | null | undefined = this.record.request) {
+    const record = v.parse(sessionSchema, {
       ...this.record,
       updatedAt: new Date().toISOString(),
       messages: v.parse(messagesSchema, conversationToChatMessages(conversation, false)),
       interrupted,
-    }
+      request: request ?? undefined,
+    })
     const temporary = join(this.directory, `${record.id}.${randomUUID()}.tmp`)
     try {
       await writeFile(temporary, JSON.stringify(record), { mode: 0o600, flag: 'wx' })

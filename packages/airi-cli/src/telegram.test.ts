@@ -50,8 +50,16 @@ async function connect(fetch = vi.fn<typeof globalThis.fetch>().mockImplementati
     const payload = JSON.parse(body || '{}')
     if (method !== 'getMe')
       calls.push({ method, payload })
-    if (method === 'sendMessage' && 'text' in payload)
-      await reply(String(payload.text))
+    if (method === 'sendMessage' && 'text' in payload) {
+      try {
+        await reply(String(payload.text))
+      }
+      catch {
+        response.writeHead(200, { 'Content-Type': 'application/json' })
+        response.end(JSON.stringify({ ok: false, error_code: 400, description: 'Test delivery failed' }))
+        return
+      }
+    }
     const result = method === 'getMe'
       ? { id: 42, is_bot: true, first_name: 'Angela', username: 'angela_test_bot' }
       : method === 'sendMessage' ? { message_id: calls.length, date: 1, chat: { id: payload.chat_id, type: 'private' }, text: payload.text } : true
@@ -336,3 +344,66 @@ it('runs a Telegram-requested command through the built-in stdio service in the 
   expect(JSON.stringify(reply.mock.calls)).not.toContain('test-provider-secret')
   await host.close()
 }, 20_000)
+
+it('reports saved progress during approval without another generation and keeps chats isolated', async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValueOnce(toolCompletion()).mockResolvedValueOnce(completion('Finished'))
+  const { message, reply, callback, approval, invoke, host } = await connect(fetch)
+  await message('Run pwd')
+  await vi.waitFor(() => expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramApproval))
+  await message('việc lúc nãy đến đâu rồi?')
+  expect(reply.mock.calls.at(-1)?.[0]).toContain(cliMessages.vi.telegramJobStates.awaiting_approval)
+  expect(reply.mock.calls.at(-1)?.[0]).toContain('Run pwd')
+  expect(reply.mock.calls.at(-1)?.[0]).toContain('terminal_exec')
+  expect(fetch).toHaveBeenCalledOnce()
+  expect(invoke).not.toHaveBeenCalled()
+  await message('/status', 200)
+  expect(reply.mock.calls.at(-1)?.[0]).not.toContain('Run pwd')
+  await callback(approval())
+  await vi.waitFor(() => expect(reply).toHaveBeenCalledWith('Finished'))
+  await host.close()
+})
+
+it('restores the latest reply after restart without a model or tool call and clears it on /new', async () => {
+  const first = await connect()
+  await first.message('Remember this request')
+  await vi.waitFor(() => expect(first.reply).toHaveBeenCalledWith('Xin chào'))
+  await first.host.close()
+  const next = await connect(undefined, first.directory)
+  await next.message('/status')
+  expect(next.reply.mock.calls.at(-1)?.[0]).toContain('Remember this request')
+  expect(next.reply.mock.calls.at(-1)?.[0]).toContain(cliMessages.vi.telegramJobStates.delivered)
+  await next.message('/result')
+  expect(next.reply.mock.calls.at(-1)?.[0]).toBe('Xin chào')
+  await next.message('/result', 200)
+  expect(next.reply.mock.calls.at(-1)?.[0]).toBe(cliMessages.vi.telegramNoResult)
+  expect(next.fetch).not.toHaveBeenCalled()
+  expect(next.connectTools).not.toHaveBeenCalled()
+  await next.message('/new')
+  await vi.waitFor(() => expect(next.reply).toHaveBeenCalledWith(cliMessages.vi.telegramNew))
+  await next.host.close()
+  const cleared = await connect(undefined, first.directory)
+  await cleared.message('/result')
+  expect(cleared.reply.mock.calls.at(-1)?.[0]).toBe(cliMessages.vi.telegramNoResult)
+})
+
+it('retains a failed Telegram delivery for /result without repeating the tool action', async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValueOnce(toolCompletion()).mockResolvedValueOnce(completion('Saved result'))
+  const { message, reply, callback, approval, invoke, host } = await connect(fetch)
+  reply.mockImplementation(async (text) => {
+    if (text === 'Saved result')
+      throw new Error('Offline')
+    return text
+  })
+  await message('Run pwd once')
+  await vi.waitFor(() => expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramApproval))
+  await callback(approval())
+  await vi.waitFor(() => expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramDeliveryFailed))
+  await message('/status')
+  expect(reply.mock.calls.at(-1)?.[0]).toContain(cliMessages.vi.telegramJobStates.delivery_failed)
+  reply.mockImplementation(async text => text)
+  await message('/result')
+  expect(reply.mock.calls.at(-1)?.[0]).toBe('Saved result')
+  expect(fetch).toHaveBeenCalledTimes(2)
+  expect(invoke).toHaveBeenCalledOnce()
+  await host.close()
+})
