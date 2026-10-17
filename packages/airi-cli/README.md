@@ -781,4 +781,8 @@ pnpm lint
 
 Task tests cover persistence, validation, tools, management commands, recurrence, fake-clock scheduling, restart recovery, and notification queues.
 CLI tests use a local provider stub with the real generation and tool runtime.
+Conversational tests cover rescheduling, snoozing after notification, completion, clarification between two matches, and restart after interrupted delivery.
+The stub verifies tool integration and session context. It does not evaluate a live model's language understanding.
+Delivery tests use fake clocks for lease expiry, renewal, concurrent claims, notifier errors, acknowledgment errors, and shutdown.
+Retention tests cover large histories, active-task preservation, deterministic pruning, concurrent writers, and invalid-storage preservation.
 POSIX terminal tests use Python 3 and a real PTY to exercise prompt input, cursor positions, wrapping, and command suggestions.

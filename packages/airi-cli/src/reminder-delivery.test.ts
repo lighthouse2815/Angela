@@ -1,4 +1,4 @@
-import { mkdtemp, rm } from 'node:fs/promises'
+import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -148,4 +148,44 @@ it('releases shutdown claims immediately and recovers them in a new host without
   expect((await tasks.find(task.id)).dueAt).toBe('2026-10-18T10:00:00.000Z')
   await next.refresh()
   expect(notify).toHaveBeenCalledTimes(2)
+})
+
+it('does not acknowledge or advance after a task is snoozed while its notification waits', async () => {
+  const { tasks, scheduler, notify } = await setup()
+  const task = await tasks.create({ title: 'Changed during delivery', type: 'routine', dueAt: new Date(now).toISOString(), recurrence: { type: 'daily' } })
+  const entered = Promise.withResolvers<void>()
+  const release = Promise.withResolvers<void>()
+  notify.mockImplementationOnce(async (_tasks, _overdue, _signal, verify: () => Promise<void>) => {
+    entered.resolve()
+    await release.promise
+    await verify()
+  })
+  const starting = scheduler.start()
+  await entered.promise
+  await tasks.snooze(task.id, new Date(now + 900_000).toISOString())
+  release.resolve()
+  await starting
+  expect((await tasks.find(task.id)).dueAt).toBe(task.dueAt)
+  expect((await tasks.find(task.id)).snoozedUntil).toBe(new Date(now + 900_000).toISOString())
+  expect((await tasks.find(task.id)).notifiedFor).toBeUndefined()
+  vi.setSystemTime(now + 900_000)
+  await scheduler.refresh()
+  expect((await tasks.find(task.id)).delivery?.status).toBe('delivered')
+  expect(notify).toHaveBeenCalledTimes(2)
+})
+
+it('retries after an acknowledgment write fails instead of recording delivery early', async () => {
+  const { tasks, scheduler, notify, directory, onError } = await setup()
+  const task = await tasks.create({ title: 'Ack failed', type: 'reminder', dueAt: new Date(now).toISOString() })
+  notify.mockImplementationOnce(async () => {
+    await writeFile(join(directory, 'tasks', 'tasks.lock'), 'competing writer')
+  })
+  await scheduler.start()
+  expect(onError).toHaveBeenCalledOnce()
+  expect((await tasks.find(task.id)).notifiedFor).toBeUndefined()
+  await rm(join(directory, 'tasks', 'tasks.lock'))
+  vi.setSystemTime(now + 60_000)
+  await scheduler.refresh()
+  expect(notify).toHaveBeenCalledTimes(2)
+  expect((await tasks.find(task.id)).delivery?.status).toBe('delivered')
 })
