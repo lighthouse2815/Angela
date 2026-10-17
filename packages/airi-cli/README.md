@@ -355,6 +355,7 @@ Telegram commands:
 - `/help`: list Telegram commands and describe each command.
 - `/status`: show the model, session ID, workspace, permissions, and latest saved request progress.
 - `/result`: read the latest saved reply without another model or tool call.
+- `/resume`: inspect and continue the latest unfinished request with fresh tool approvals.
 - `/new`: clear the current chat's stored conversation, close its tools, and restore confirmation mode.
 - `/cancel`: cancel the current request, including a pending tool confirmation.
 - `/permistion`: show permissions. Use `/permistion full` for automatic approval or `/permistion ask` for confirmation.
@@ -384,6 +385,13 @@ The latest request, approval state, bounded progress, and final reply share the 
 `/status` remains available during a request. Short questions such as `việc lúc nãy đến đâu rồi?` also show this status.
 Request status describes generation and delivery. A sent reply does not prove that the requested task succeeded.
 After a restart, saved active states appear as interrupted. `/result` retrieves a saved reply even after its original delivery failed.
+`/resume` and `tiếp tục việc lúc nãy` reuse the original request and saved progress. They reset tool permissions to confirmation mode.
+The recovery prompt requires current-state inspection before repeated actions. Uncertain previous outcomes require a question to the user.
+This policy depends on the selected model. It cannot guarantee that an external action runs exactly once after a crash.
+Completed replies use `/result` instead of another generation. Recovery never starts automatically after a restart.
+Telegram can reclaim a session lock only when its recorded owner exited on the same host.
+Live owners, unknown owners, and locks from another host remain protected. An interrupted lock recovery can leave a `.lock.recovery` file.
+If this file blocks recovery, first confirm that all writers stopped. Then remove only that recovery marker and retry.
 Status and results remain isolated by bot, private chat, and workspace. `/new` clears this request metadata with the conversation.
 Actions that already ran can retain side effects after cancellation. Cancellation closes that chat's MCP connection.
 It does not send existing CLI conversations to Telegram. A failed delivery leaves the generated answer in the saved session.

@@ -127,7 +127,10 @@ async function connect(fetch = vi.fn<typeof globalThis.fetch>().mockImplementati
     const payload = request.payload as { reply_markup: { inline_keyboard: { callback_data: string }[][] } }
     return payload.reply_markup.inline_keyboard[0][0].callback_data
   }
-  return { host, message, callback, approval, fetch, directory, calls, reply, invoke, connectTools }
+  const idle = async () => await vi.waitFor(async () => {
+    expect((await readdir(directory)).some(file => file.endsWith('.lock'))).toBe(false)
+  })
+  return { host, message, callback, approval, fetch, directory, calls, reply, invoke, connectTools, idle }
 }
 
 it('ignores unauthorized senders and groups before any API call or session write', async () => {
@@ -165,7 +168,7 @@ it('restores each private chat separately after restart and connects isolated te
 })
 
 it('allows local help and status without a model request, and resets only the selected chat', async () => {
-  const { message, reply, fetch, host } = await connect()
+  const { message, reply, fetch, host, idle } = await connect()
   await message('/start')
   await message('/help')
   await message('/status')
@@ -175,8 +178,10 @@ it('allows local help and status without a model request, and resets only the se
   expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramCommands)
   await message('Old conversation')
   await vi.waitFor(() => expect(reply).toHaveBeenCalledWith('Xin chào'))
+  await idle()
   await message('/new')
   await vi.waitFor(() => expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramNew))
+  await idle()
   await message('Fresh question')
   await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2))
   expect(String(fetch.mock.calls[1][1]?.body)).not.toContain('Old conversation')
@@ -406,4 +411,76 @@ it('retains a failed Telegram delivery for /result without repeating the tool ac
   expect(fetch).toHaveBeenCalledTimes(2)
   expect(invoke).toHaveBeenCalledOnce()
   await host.close()
+})
+
+it('continues an interrupted request after inspecting a real side effect and requires fresh approval', async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>()
+    .mockResolvedValueOnce(toolCompletion('printf "effect" >> recovery-proof.txt'))
+    .mockImplementation(async (_url, init) => await new Promise<Response>((_resolve, reject) => {
+      init?.signal?.addEventListener('abort', () => reject(init.signal?.reason), { once: true })
+    }))
+  const first = await connect(fetch)
+  const attach = (connection: Awaited<ReturnType<typeof connect>>) => {
+    connection.connectTools.mockImplementation(async (id, confirm, signal) => await McpTools.connect(
+      { computerUse: true, mcpArgs: [] },
+      connection.directory,
+      join(connection.directory, 'audit', id),
+      confirm,
+      cliMessages.vi,
+      {},
+      signal,
+    ))
+  }
+  attach(first)
+  await first.message('/permission full')
+  await first.message('Write the proof once and report its contents')
+  await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2), { timeout: 15_000 })
+  expect(await readFile(join(first.directory, 'recovery-proof.txt'), 'utf8')).toBe('effect')
+  await first.host.close()
+  const nextFetch = vi.fn<typeof globalThis.fetch>().mockResolvedValueOnce(toolCompletion('cat recovery-proof.txt')).mockResolvedValueOnce(completion('Recovered: effect'))
+  const next = await connect(nextFetch, first.directory)
+  attach(next)
+  await next.message('/status')
+  expect(next.reply.mock.calls.at(-1)?.[0]).toContain(cliMessages.vi.telegramJobStates.interrupted)
+  expect(next.reply.mock.calls.at(-1)?.[0]).toContain(cliMessages.vi.telegramResumeHint)
+  expect(nextFetch).not.toHaveBeenCalled()
+  await next.message('/permission full')
+  await next.message('tiếp tục việc lúc nãy')
+  await vi.waitFor(() => expect(next.reply).toHaveBeenCalledWith(cliMessages.vi.telegramApproval), { timeout: 15_000 })
+  await next.message('/permission')
+  expect(next.reply.mock.calls.at(-1)?.[0]).toContain(cliMessages.vi.permissionAsk)
+  await next.message('/resume')
+  expect(next.reply.mock.calls.at(-1)?.[0]).toBe(cliMessages.vi.telegramBusy)
+  expect(nextFetch).toHaveBeenCalledOnce()
+  const request = String(nextFetch.mock.calls[0][1]?.body)
+  expect(request).toContain('Write the proof once and report its contents')
+  expect(request).toContain('Before repeating an action, inspect the current workspace')
+  expect(request).toContain('printf')
+  const approval = next.approval()
+  await next.callback(approval)
+  await vi.waitFor(() => expect(next.approval()).not.toBe(approval))
+  await next.callback(next.approval())
+  await vi.waitFor(() => expect(next.reply).toHaveBeenCalledWith('Recovered: effect'), { timeout: 15_000 })
+  expect(await readFile(join(first.directory, 'recovery-proof.txt'), 'utf8')).toBe('effect')
+  expect(String(nextFetch.mock.calls[1][1]?.body)).toContain('effect')
+  await next.host.close()
+}, 40_000)
+
+it('does not resume empty, completed, or other-chat requests', async () => {
+  const first = await connect()
+  await first.message('/resume', 999)
+  await first.message('/resume')
+  await vi.waitFor(() => expect(first.reply).toHaveBeenCalledWith(cliMessages.vi.telegramCannotResume))
+  expect(first.fetch).not.toHaveBeenCalled()
+  await first.host.close()
+  const active = await connect(undefined, first.directory)
+  await active.message('Answer once')
+  await vi.waitFor(() => expect(active.reply).toHaveBeenCalledWith('Xin chào'))
+  await active.host.close()
+  const restarted = await connect(undefined, first.directory)
+  await restarted.message('/resume')
+  await vi.waitFor(() => expect(restarted.reply).toHaveBeenCalledWith(cliMessages.vi.telegramCannotResume))
+  await restarted.message('/resume', 200)
+  expect(restarted.fetch).not.toHaveBeenCalled()
+  expect(restarted.connectTools).not.toHaveBeenCalled()
 })
