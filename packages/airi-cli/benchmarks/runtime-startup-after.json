@@ -1,0 +1,79 @@
+{
+  "sourceRevision": "a14ad69",
+  "measuredDate": "2026-10-22",
+  "samples": [
+    {
+      "node": "v26.11.1",
+      "runtimeImportMs": 118.130924,
+      "firstRequestMs": 197.10783800000002,
+      "firstTextMs": 184.74942999999996,
+      "warmRequestMs": {
+        "p50": 10.965868999999998,
+        "p95": 12.37788999999998
+      },
+      "warmFirstTextMs": {
+        "p50": 6.251876000000038,
+        "p95": 6.823611000000028
+      },
+      "resourcesAfterClose": {
+        "states": 0,
+        "listeners": 0,
+        "reminderRoutes": 0,
+        "reminderTimers": 0
+      }
+    },
+    {
+      "node": "v26.11.1",
+      "runtimeImportMs": 20.378496,
+      "firstRequestMs": 158.761968,
+      "firstTextMs": 148.48680700000003,
+      "warmRequestMs": {
+        "p50": 9.18859100000003,
+        "p95": 10.721668000000022
+      },
+      "warmFirstTextMs": {
+        "p50": 5.382408999999996,
+        "p95": 6.297194999999988
+      },
+      "resourcesAfterClose": {
+        "states": 0,
+        "listeners": 0,
+        "reminderRoutes": 0,
+        "reminderTimers": 0
+      }
+    },
+    {
+      "node": "v26.11.1",
+      "runtimeImportMs": 20.314252999999994,
+      "firstRequestMs": 156.94694900000002,
+      "firstTextMs": 146.86585100000002,
+      "warmRequestMs": {
+        "p50": 8.720620999999994,
+        "p95": 10.582605000000001
+      },
+      "warmFirstTextMs": {
+        "p50": 5.043634999999995,
+        "p95": 6.207771000000037
+      },
+      "resourcesAfterClose": {
+        "states": 0,
+        "listeners": 0,
+        "reminderRoutes": 0,
+        "reminderTimers": 0
+      }
+    }
+  ],
+  "median": {
+    "runtimeImportMs": 20.378496,
+    "firstRequestMs": 158.761968,
+    "firstTextMs": 148.48680700000003,
+    "warmRequestMs": {
+      "p50": 9.18859100000003,
+      "p95": 10.721668000000022
+    },
+    "warmFirstTextMs": {
+      "p50": 5.382408999999996,
+      "p95": 6.297194999999988
+    }
+  }
+}

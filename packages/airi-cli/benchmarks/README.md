@@ -1,5 +1,7 @@
 # Angela runtime memory measurements
 
+Memory V2 latency measurements and limitations are in [the Memory V2 report](../../../docs/ai/audits/angela-memory-v2.md).
+
 Run each scenario in a fresh Node process with explicit garbage collection:
 
 ```sh
