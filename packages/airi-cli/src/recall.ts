@@ -173,11 +173,16 @@ export class Recall {
 
   /** Capture honors the existing privacy switches. The handle belongs only to this request and its exact workspace. */
   async capture() {
-    const settings = await this.settings.read()
-    const personal = await this.memory.read()
-    if (!settings.enabled || !personal.enabled || !personal.autoEnabled)
+    if (!await this.automaticMemoryEnabled())
       return undefined
     return new MemoryCapture(this.database().memory, this.workspace, this.sessionId)
+  }
+
+  /** Reads current policy at each durable-write boundary, including changes from another active channel. */
+  async automaticMemoryEnabled() {
+    const settings = await this.settings.read()
+    const personal = await this.memory.read()
+    return settings.enabled && personal.enabled && personal.autoEnabled
   }
 
   private async refresh(signal?: AbortSignal) {
@@ -587,9 +592,16 @@ export class Recall {
 
   /** Native page writes use current-turn evidence. The model cannot assign its own authority. */
   async pageTools(text: string, verified: readonly string[]) {
-    const settings = await this.settings.read()
-    const personal = await this.memory.read()
-    return settings.enabled && personal.enabled ? pageTools(this.database().memory, this.workspace, this.sessionId, text, verified) : []
+    if (!await this.automaticMemoryEnabled())
+      return []
+    return pageTools(this.database().memory, this.workspace, this.sessionId, text, verified).map(tool => ({
+      ...tool,
+      execute: async (input, options) => {
+        if (!await this.automaticMemoryEnabled())
+          return { status: 'rejected', reason: 'automatic-memory-disabled' }
+        return await tool.execute?.(input, options)
+      },
+    } satisfies Tool))
   }
 
   /** Provider failure leaves the rule-based episode intact. Current source and privacy switches are rechecked after generation. */

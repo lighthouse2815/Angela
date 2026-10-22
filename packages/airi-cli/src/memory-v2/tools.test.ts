@@ -30,6 +30,21 @@ async function setup() {
 
 const call = { tier: 'semantic', kind: 'architecture', key: 'database', title: 'Database', body: 'Use SQLite', source_quote: 'Use SQLite', expected_version: null }
 
+it('rechecks automatic-write policy before executing a previously offered page tool', async () => {
+  const { directory, store } = await setup()
+  const recall = new Recall(directory, 'workspace', 'session', cliMessages.en, {}, { apiKey: '' })
+  try {
+    await recall.start()
+    const tools = await recall.pageTools('Use SQLite', [])
+    expect(tools).toHaveLength(1)
+    await new Memory(directory, cliMessages.en).setAutomatic(false)
+    expect(await tools[0]!.execute?.(call, { messages: [], toolCallId: 'test-call' })).toMatchObject({ status: 'rejected', reason: 'automatic-memory-disabled' })
+    expect(await recall.pageTools('Use SQLite', [])).toEqual([])
+    expect(store.current('workspace', 'semantic', 'database')).toBeUndefined()
+  }
+  finally { await recall.close() }
+})
+
 it('retains the authoritative fact when derived cleanup fails so forgetting can be retried', async () => {
   const { directory } = await setup()
   const memory = new Memory(directory, cliMessages.en)

@@ -53,6 +53,7 @@ Each event has a unique ID and request correlation ID, plus its session, channel
 The synchronous typed event bus retains listeners only. It never retains messages or tool results.
 Each request owns a private capture handle. It validates the exact session and workspace before writing an observation.
 Capture honors Personal Memory enable and automatic switches, and the recall enable switch.
+The runtime rechecks those switches at observation boundaries. Previously offered page tools also recheck policy before writing.
 The store sanitizes observation text again before persistence and retains 256 observations per session.
 
 The zero-provider compiler creates an episodic page after each request, including interrupted requests.

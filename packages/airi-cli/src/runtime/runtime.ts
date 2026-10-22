@@ -355,10 +355,13 @@ export class RuntimeSession {
     const started = !this.lastRequest
     this.lastRequest = envelope
     let capture: MemoryCapture | undefined
-    const emit = (payload: EventPayload, evidence = '', verified = false) => {
+    let recall: Recall | undefined
+    const emit = async (payload: EventPayload, evidence = '', verified = false) => {
       const event: AngelaEvent = { ...envelope, ...payload, id: randomUUID(), timestamp: new Date().toISOString() }
       this.runtime.events.emit(event)
       try {
+        if (capture && !await recall?.automaticMemoryEnabled())
+          capture = undefined
         capture?.record(event, evidence, verified)
       }
       catch {
@@ -380,6 +383,7 @@ export class RuntimeSession {
           if (this.options.channel === 'cli' || this.options.channel === 'desktop')
             sources.project = await this.project()
           sources.recall = await this.recall()
+          recall = sources.recall
           envelope.workspace = sources.project?.workspace ?? this.options.workspace
           try {
             capture = await sources.recall?.capture()
@@ -387,8 +391,8 @@ export class RuntimeSession {
           catch { sources.warn(this.runtime.messages.memoryUnavailable) }
         }
         if (started)
-          emit({ type: 'session.started' })
-        emit({ type: 'user.message' }, text)
+          await emit({ type: 'session.started' })
+        await emit({ type: 'user.message' }, text)
         const context = await buildContext(sources, text, signal, extra)
         registry = await buildTools(sources, text, this.options.sessionId, await this.mcp(signal))
         signal.throwIfAborted()
@@ -402,25 +406,25 @@ export class RuntimeSession {
             if (event.type === 'text-delta' && assistant.length < 4000)
               assistant += event.text.slice(0, 4000 - assistant.length)
             if (event.type === 'tool-call')
-              emit({ type: 'tool.call', toolCallId: event.toolCallId, toolName: event.toolName })
+              await emit({ type: 'tool.call', toolCallId: event.toolCallId, toolName: event.toolName })
             else if (event.type === 'tool-error')
-              emit({ type: 'tool.error', toolCallId: event.toolCallId, toolName: observation?.toolName ?? 'unknown' }, observation?.text)
+              await emit({ type: 'tool.error', toolCallId: event.toolCallId, toolName: observation?.toolName ?? 'unknown' }, observation?.text)
             else if (event.type === 'tool-result')
-              emit({ type: 'tool.result', toolCallId: event.toolCallId, toolName: observation?.toolName ?? 'unknown', outcome: observation?.outcome ?? 'unverified' }, observation?.text, observation?.outcome === 'verified')
+              await emit({ type: 'tool.result', toolCallId: event.toolCallId, toolName: observation?.toolName ?? 'unknown', outcome: observation?.outcome ?? 'unverified' }, observation?.text, observation?.outcome === 'verified')
             if (observation?.domain)
-              emit(observation.domain, observation.text, true)
+              await emit(observation.domain, observation.text, true)
             await options.onStreamEvent?.(event)
           },
         }, warnings.length ? [context, ...warnings].filter(Boolean).join('\n\n') : context)
         completed = true
-        emit({ type: 'assistant.message' }, assistant)
+        await emit({ type: 'assistant.message' }, assistant)
       }
       finally {
         if (!completed)
-          emit({ type: 'request.failed', reason: signal.aborted ? 'aborted' : 'failed' }, signal.aborted ? 'Request interrupted' : 'Request failed')
+          await emit({ type: 'request.failed', reason: signal.aborted ? 'aborted' : 'failed' }, signal.aborted ? 'Request interrupted' : 'Request failed')
         this.lastReason = completed ? 'completed' : signal.aborted ? 'aborted' : 'failed'
         if (completed)
-          emit({ type: 'request.completed' })
+          await emit({ type: 'request.completed' })
         try {
           capture?.finish(text)
         }

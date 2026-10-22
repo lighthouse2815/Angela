@@ -1,5 +1,6 @@
 import type { GenerationProvider } from '@proj-airi/provider-inference'
 
+import type { Memory } from '../memory'
 import type { AngelaEvent } from './events'
 
 import { randomUUID } from 'node:crypto'
@@ -53,6 +54,27 @@ it('captures successful task commands without model calls or cross-user observat
   }
   finally { index.close() }
   expect(fetch).not.toHaveBeenCalled()
+  await scope.close()
+})
+
+it('stops durable observations when automatic memory is disabled during a request', async () => {
+  let personal: Memory
+  const fetch = vi.fn<typeof globalThis.fetch>(async () => {
+    await personal.setAutomatic(false)
+    return completion('I will keep this disabled-memory commitment')
+  })
+  const { runtime, options, provider, directory } = await setup(fetch)
+  const scope = runtime.open(options)
+  personal = await scope.memory()
+  await scope.send(new Chat('model', provider, directory), 'Choose the copper release', {})
+  const index = await RecallIndex.open(directory)
+  try {
+    const observations = index.memory.observations(directory, options.sessionId)
+    expect(observations.some(item => item.type === 'user.message')).toBe(true)
+    expect(observations.some(item => item.type === 'assistant.message')).toBe(false)
+    expect(index.memory.current(directory, 'episodic', `session:${options.sessionId}`)).toBeUndefined()
+  }
+  finally { index.close() }
   await scope.close()
 })
 
