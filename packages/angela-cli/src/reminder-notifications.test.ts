@@ -9,7 +9,7 @@ import { ReminderNotifications } from './reminder-notifications'
 
 const messages = cliMessages.en.tasks
 function task(title: string): Task {
-  return { id: randomUUID(), title, type: 'reminder', timezone: 'Asia/Ho_Chi_Minh', status: 'pending', dueAt: '2026-10-17T15:00:00.000Z', createdAt: '2026-10-17T10:00:00.000Z', updatedAt: '2026-10-17T10:00:00.000Z' }
+  return { id: randomUUID(), snoozeCount: 0, title, type: 'reminder', timezone: 'Asia/Ho_Chi_Minh', status: 'pending', dueAt: '2026-10-17T15:00:00.000Z', createdAt: '2026-10-17T10:00:00.000Z', updatedAt: '2026-10-17T10:00:00.000Z' }
 }
 
 it('delivers text before optional speech and retains task IDs for conversational context', async () => {

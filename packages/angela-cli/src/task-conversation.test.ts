@@ -108,38 +108,39 @@ async function setup() {
 
 it('flow A: resumes a conversation, lists tasks, and updates the same stable ID', async () => {
   const { tasks, send, calls, requests } = await setup()
-  await send('10h tối nhắc tao học tiếng Trung')
+  await send('Mai 10h tối nhắc tao học tiếng Trung')
   const task = (await tasks.list())[0]!
   await send('dời nó sang 9h')
-  expect(calls.map(call => call.name)).toEqual(['task_create', 'task_list', 'task_update'])
-  expect(calls[2]!.input.id).toBe(task.id)
+  expect(calls.map(call => call.name)).toEqual(['task_list', 'task_update'])
+  expect(calls[1]!.input.id).toBe(task.id)
   expect((await tasks.find(task.id)).dueAt).toBe('2099-10-17T14:00:00.000Z')
   expect(JSON.stringify(requests.at(-1)?.messages)).toContain('10h tối nhắc tao học tiếng Trung')
 }, 20_000)
 
 it('flow B: includes the delivered reminder in context and snoozes its task for fifteen minutes', async () => {
-  const { tasks, send, calls, requests } = await setup()
+  const { tasks, send, calls } = await setup()
   const task = await tasks.create({ title: 'Học tiếng Trung', type: 'reminder', dueAt: '2026-01-01T22:00:00+07:00' })
   const before = Date.now()
   const result = await send('15 phút nữa nhắc lại')
   const saved = await tasks.find(task.id)
   expect(result.stderr).toContain(cliMessages.vi.tasks.overdue)
-  expect(calls.map(call => call.name)).toEqual(['task_list', 'task_snooze'])
-  expect(calls[1]!.input.id).toBe(task.id)
+  expect(calls).toHaveLength(0)
+  expect(saved.id).toBe(task.id)
+  expect(saved.snoozeCount).toBe(1)
   expect(Date.parse(saved.snoozedUntil!)).toBeGreaterThanOrEqual(before + 900_000)
   expect(Date.parse(saved.snoozedUntil!)).toBeLessThanOrEqual(Date.now() + 900_000)
   expect(saved.dueAt).toBe(task.dueAt)
-  expect(JSON.stringify(requests[0]!.messages)).toContain(task.id)
+  expect(result.stdout).toContain(task.id)
   expect(saved.delivery).toBeUndefined()
 }, 20_000)
 
 it('flow C: completes the task from the previous conversation turn', async () => {
   const { tasks, send, calls } = await setup()
-  await send('10h tối nhắc tao học tiếng Trung')
+  await send('Mai 10h tối nhắc tao học tiếng Trung')
   const task = (await tasks.list())[0]!
   await send('xong rồi')
-  expect(calls.map(call => call.name)).toEqual(['task_create', 'task_list', 'task_complete'])
-  expect(calls[2]!.input.id).toBe(task.id)
+  expect(calls).toHaveLength(0)
+  expect((await tasks.find(task.id)).completedAt).toBeDefined()
   expect((await tasks.find(task.id)).status).toBe('completed')
 }, 20_000)
 

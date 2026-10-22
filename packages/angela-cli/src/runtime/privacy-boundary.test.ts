@@ -220,3 +220,10 @@ it('keeps derived compaction summaries out of durable session checkpoints', asyn
   }
   finally { await session.close() }
 })
+
+it('rejects a model-created reminder when the user only expresses an uncertain plan', async () => {
+  const { scope, chat, options, results } = await setup({ name: 'task_create', arguments: { title: 'Học LINQ', type: 'reminder', dueAt: '2099-10-23T09:00:00+07:00' } })
+  await scope.send(chat, 'Mai chắc tao học LINQ', options)
+  expect(results).toContainEqual({ status: 'rejected', reason: cliMessages.en.tasks.clarifyTime })
+  expect(await (await scope.tasks()).list()).toHaveLength(0)
+})

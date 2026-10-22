@@ -20,6 +20,7 @@ export type AngelaEvent = BaseAngelaEvent & (
   | { type: 'task.updated', taskId: string }
   | { type: 'task.completed', taskId: string }
   | { type: 'reminder.delivered', taskId: string }
+  | { type: 'reminder.due', taskId: string }
   | { type: 'project.changed', revision: number }
   | { type: 'memory.changed', memoryId: string, action: 'saved' | 'deleted' }
   | { type: 'session.started' }

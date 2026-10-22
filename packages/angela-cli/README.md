@@ -966,9 +966,9 @@ Early completion consumes the next undelivered occurrence. A check-in after deli
 ### Conversation and management
 
 Ask Angela to create or change tasks in ordinary conversation. For example: `10h tối nhắc tao học tiếng Trung`.
-The model uses six validated tools: `task_create`, `task_list`, `task_update`, `task_complete`, `task_cancel`, and `task_snooze`.
+Supported Vietnamese requests use local extraction and time parsing before generation. Other requests use six validated model tools: `task_create`, `task_list`, `task_update`, `task_complete`, `task_cancel`, and `task_snooze`.
 Relative times use a fresh clock and the local CLI timezone. Ambiguous times require clarification.
-A request with only a date can create a date-only task without an alarm.
+Reminder requests without an exact alarm time ask for clarification before saving. Explicit date-only task tools retain their separate no-alarm behavior.
 
 Use these commands during interactive chat:
 
@@ -984,6 +984,74 @@ Use these commands during interactive chat:
 Commands use the full task ID printed by `/tasks`. Snooze also accepts durations such as `30m`, `2h`, and `1d`.
 `/tasks all` includes completed and cancelled history. `/today` uses the local calendar date.
 Conversational references use the existing chat history and saved tool results.
+
+### Commitment extraction and follow-up
+
+A commitment is a saved user request with its own status and optional alarm.
+Its state survives conversation compaction, session changes, and process restart.
+Repeated creation with the same pending title, type, timezone, schedule, and recurrence reuses the existing ID.
+Snooze preserves that ID and increments `snoozeCount`.
+
+The extraction layer accepts explicit Vietnamese reminder requests with high confidence.
+Predictions such as `Mai chắc tao học LINQ` do not authorize task creation.
+Quoted examples, negations, hypothetical requests, and multiple actions stay outside automatic extraction.
+The existing model tools handle unsupported wording, with a creation-intent guard before persistence.
+
+Supported time expressions include `10 phút nữa`, `2 tiếng nữa`, `mai lúc 9h`, and `thứ sáu lúc 8h`.
+`ngày 25 lúc 9h`, `25/10 9h`, and `tối nay 9h` also resolve in the reminder timezone.
+`mai`, `tối nay`, `thứ sáu`, `ngày 25`, and `25/10` without an hour require clarification.
+`cuối tuần` requires a precise day and hour. Angela does not invent a weekend alarm.
+A short time reply can complete the immediately preceding date-only request.
+Past times, invalid calendar dates, DST gaps, and repeated DST hours require correction or clarification.
+Weekdays mean the next calendar occurrence. Yearless dates mean their next eligible year.
+
+After a reminder, `2 tiếng nữa nhắc lại`, `Xong rồi`, and `Không cần nhắc cái đó nữa` change that commitment.
+The latest relevant assistant turn or explicit task title identifies the target.
+A notification batch with several candidates requires a title. Angela does not choose an arbitrary pending task.
+
+```text
+> Mai 9h nhắc tao học LINQ.
+Angela: Được, tôi sẽ nhắc bạn: [09:00 ngày mai, học LINQ, ID]
+
+09:00
+Angela: Angela nhắc bạn: [học LINQ, ID]
+
+> 2 tiếng nữa nhắc lại.
+Angela: Được, tôi sẽ nhắc lại: [11:00, học LINQ, cùng ID]
+
+11:00
+Angela: Angela nhắc bạn: [học LINQ, cùng ID]
+
+> Xong rồi.
+Angela: Đã đánh dấu hoàn thành: [học LINQ, cùng ID]
+```
+
+Standalone management does not need a model or an open chat:
+
+```sh
+angela tasks
+angela tasks all
+angela task show ID
+angela task done ID
+angela task snooze ID 2h
+angela task cancel ID
+```
+
+These commands accept `--data-dir` and `--locale`. Mutations also accept `--cwd` for the memory workspace.
+The existing `angela reminders` commands manage the background notification service.
+
+Verified creation, snooze, completion, and cancellation update an episodic memory record keyed by commitment ID.
+Each transition supersedes its previous current record. Session episodes retain dated historical evidence.
+Current task snapshots override historical task descriptions during generation.
+Recall repairs existing commitment records after cross-channel mutations. It does not import the task database into semantic memory.
+Personal-memory switches and request privacy controls still govern automatic memory writes.
+
+`ProactivePolicy` evaluates delivery eligibility separately from presentation.
+Its default delivers due pending tasks and groups offline recovery notifications.
+Runtime hosts can configure `proactive.quietHours` and `proactive.cooldownMs` through `RuntimeOptions`.
+Quiet hours defer an occurrence without acknowledging it. Persisted notification timestamps enforce per-task cooldown after restart.
+Deadlines receive higher priority than regular reminders. Follow-up tasks receive a progress question.
+Relevance scoring and inferred urgency remain extension points.
 
 ### Scheduler and occurrence policy
 
@@ -1009,7 +1077,7 @@ The scheduler reconciles clock changes and other CLI writers within one minute. 
 
 The interactive CLI starts the scheduler automatically. Notifications appear above the editable prompt and retain your text and cursor.
 Notifications wait until streamed replies and tool approvals finish. Their task IDs enter the existing session history.
-This context lets the model resolve conversational references after a reminder.
+Local follow-up handling and model tools use this context to resolve references after a reminder.
 One-shot requests also recover overdue reminders. Their normal exit drains due notifications and saves the session.
 
 In `/voice` mode, text remains the primary notification. Angela speaks queued reminders through the existing TTS and playback service.
@@ -1019,7 +1087,8 @@ Idle microphone capture stops before reminder playback and resumes afterward. TT
 
 Tasks share the CLI data directory across workspaces and sessions. Telegram also supports tasks and reminders in its own private user stores.
 By default, the clock and calendar use the operating system timezone. A task can retain an explicit IANA timezone.
-To select the CLI timezone through Node's standard environment, run `TZ=Asia/Ho_Chi_Minh angela`.
+Use `ANGELA_TIMEZONE=Asia/Ho_Chi_Minh angela` to select the reminder timezone independently of the process timezone.
+The standard `TZ` environment variable also controls the default when `ANGELA_TIMEZONE` is absent.
 Routine intervals support 1–52 days or weeks. Snooze durations support 1 minute through 366 days.
 
 Closing chat stops terminal delivery. The optional Linux background service continues desktop delivery after chat closes.
@@ -1060,7 +1129,9 @@ pnpm -F @angela/cli build
 pnpm lint
 ```
 
-Task tests cover persistence, validation, tools, management commands, recurrence, fake-clock scheduling, restart recovery, and notification queues.
+Task tests cover persistence, extraction, time parsing, contextual follow-up, proactive policy, management commands, recurrence, and notification queues.
+`commitment-scenario.test.ts` runs the full reminder lifecycle with real storage, session restart, current memory, and an injected fake clock.
+Supported Vietnamese creation and follow-up in this scenario require no model requests.
 CLI tests use a local provider stub with the real generation and tool runtime.
 Conversational tests cover rescheduling, snoozing after notification, completion, clarification between two matches, and restart after interrupted delivery.
 The stub verifies tool integration and session context. It does not evaluate a live model's language understanding.

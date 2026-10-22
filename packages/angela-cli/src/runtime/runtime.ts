@@ -3,9 +3,11 @@ import type { cliMessages } from '@angela/i18n/cli'
 import type { GenerationProvider } from '@angela/provider-inference'
 
 import type { Chat } from '../chat'
+import type { Clock } from '../clock'
 import type { McpTools } from '../mcp'
 import type { Memory } from '../memory'
 import type { MemoryCapture } from '../memory-v2/consolidator'
+import type { ProactiveOptions } from '../proactive-policy'
 import type { ProjectMemory } from '../project-memory'
 import type { Recall } from '../recall'
 import type { ReminderNotifier, ReminderScheduler } from '../reminder-scheduler'
@@ -19,13 +21,17 @@ import process from 'node:process'
 
 import { randomUUID } from 'node:crypto'
 
+import { SystemClock } from '../clock'
 import { requestPrivacy } from '../privacy-policy'
+import { ProactivePolicy } from '../proactive-policy'
 import { buildContext } from './context-builder'
 import { EventBus } from './event-bus'
 import { buildTools } from './tool-registry'
 
 /** Telegram retention is independent of the existing eight active-context limit. */
 export interface RuntimeOptions {
+  clock?: Clock
+  proactive?: ProactiveOptions
   /** Receives at most 16 metadata warnings per host. The EventBus retains the latest 16 diagnostics. */
   observerError?: (diagnostic: ObserverDiagnostic) => void
   telegramSessions?: {
@@ -52,8 +58,12 @@ export class AngelaRuntime {
   private readonly remindersByStore = new Map<string, { tasks: Promise<Tasks>, ready: Promise<ReminderScheduler>, targets: Map<object, ReminderTarget>, dueAt: number }>()
   private reminderTimer?: ReturnType<typeof setTimeout>
   private delivering?: Promise<void>
+  private readonly clock: Clock
+  private readonly proactive: ProactivePolicy
 
   constructor(readonly model: string, readonly provider: GenerationProvider, readonly messages: typeof cliMessages.en, readonly env: NodeJS.ProcessEnv = {}, readonly defaults: { baseUrl?: string, apiKey: string } = { apiKey: '' }, options: RuntimeOptions = {}) {
+    this.clock = options.clock ?? new SystemClock()
+    this.proactive = new ProactivePolicy(options.proactive)
     this.events = new EventBus(options.observerError ?? ((diagnostic) => {
       process.stderr.write(`Angela runtime observer failure: type=${diagnostic.eventType} count=${diagnostic.failures}\n`)
     }))
@@ -201,7 +211,7 @@ export class AngelaRuntime {
     if (this.remindersByStore.size >= 128)
       return Promise.reject(new Error('Runtime reminder route limit reached'))
     const targets = new Map<object, ReminderTarget>([[owner, { notifier, onError }]])
-    const tasks = import('../tasks').then(({ Tasks }) => new Tasks(dataDir, this.messages.tasks))
+    const tasks = import('../tasks').then(({ Tasks }) => new Tasks(dataDir, this.messages.tasks, this.clock, this.env.ANGELA_TIMEZONE))
     const ready = (async () => {
       const { ReminderScheduler } = await import('../reminder-scheduler')
       const target = () => {
@@ -215,18 +225,20 @@ export class AngelaRuntime {
           const destination = target()
           if (!destination)
             throw new Error('Reminder destination was released')
-          await destination.notifier.notify(...args)
           const correlationId = randomUUID()
+          for (const task of args[0])
+            this.events.emit({ id: randomUUID(), type: 'reminder.due', timestamp: new Date(this.clock.now()).toISOString(), correlationId, channel: 'system', taskId: task.id })
+          await destination.notifier.notify(...args)
           for (const task of args[0])
             this.events.emit({ id: randomUUID(), type: 'reminder.delivered', timestamp: new Date().toISOString(), correlationId, channel: 'system', taskId: task.id })
         },
       }, error => target()?.onError(error), (delay) => {
         const route = this.remindersByStore.get(dataDir)
         if (route?.ready === ready) {
-          route.dueAt = Date.now() + delay
+          route.dueAt = this.clock.now() + delay
           this.armReminders()
         }
-      })
+      }, this.proactive)
       try {
         await scheduler.start()
         return scheduler
@@ -248,7 +260,7 @@ export class AngelaRuntime {
     if (route)
       return await route.tasks
     const { Tasks } = await import('../tasks')
-    return new Tasks(dataDir, this.messages.tasks)
+    return new Tasks(dataDir, this.messages.tasks, this.clock, this.env.ANGELA_TIMEZONE)
   }
 
   pauseReminders(dataDir: string, owner: object = this) {
@@ -300,7 +312,7 @@ export class AngelaRuntime {
         for (const route of this.remindersByStore.values()) {
           if (this.closing)
             break
-          if (route.dueAt <= Date.now()) {
+          if (route.dueAt <= this.clock.now()) {
             route.dueAt = Number.POSITIVE_INFINITY
             await (await route.ready).refresh()
           }
@@ -310,7 +322,7 @@ export class AngelaRuntime {
         this.armReminders()
       })
       void this.delivering.catch(() => {})
-    }, Math.max(0, next - Date.now()))
+    }, Math.max(0, next - this.clock.now()))
     this.reminderTimer.unref()
   }
 
@@ -461,8 +473,8 @@ export class RuntimeSession {
     if (text === '/memory consolidate')
       return JSON.stringify(await (await this.recall())?.enrich(this.runtime.model, this.runtime.provider, signal))
     if (/^\/(?:tasks|today|done|cancel|snooze)(?:\s|$)/u.test(text)) {
-      const { taskCommand } = await import('../task-commands')
-      return await taskCommand(text, await this.tasks(), this.runtime.messages.tasks, this.options.locale ?? 'en', task => this.recordDomain({ type: text.startsWith('/done ') ? 'task.completed' : 'task.updated', taskId: task.id }, `${task.title} [${task.status}] ${task.id}`))
+      const { taskCommand, taskEvidence } = await import('../task-commands')
+      return await taskCommand(text, await this.tasks(), this.runtime.messages.tasks, this.options.locale ?? 'en', task => this.recordDomain({ type: text.startsWith('/done ') ? 'task.completed' : 'task.updated', taskId: task.id }, taskEvidence(task)))
     }
     if (/^\/project(?:\s|$)/u.test(text) && this.options.channel === 'cli')
       return await (await this.project()).command(text)
@@ -571,6 +583,21 @@ export class RuntimeSession {
           await emit({ type: 'session.started' })
         }
         await emit({ type: this.options.channel === 'zalo' ? 'external.message' : 'user.message' }, text)
+        if (sources.tasks && sources.privacy) {
+          const { CommitmentConversation } = await import('../commitment-conversation')
+          const response = await new CommitmentConversation(sources.tasks, this.runtime.messages.tasks, this.options.locale ?? 'en').handle(text, chat.conversation, sources.privacy)
+          if (response) {
+            if (response.task) {
+              const { taskEvidence } = await import('../task-commands')
+              await emit({ type: response.action === 'created' ? 'task.created' : response.action === 'completed' ? 'task.completed' : 'task.updated', taskId: response.task.id }, taskEvidence(response.task), true)
+            }
+            await chat.respond(text, response.text, options)
+            assistant = response.text
+            completed = true
+            await emit({ type: 'assistant.message' }, assistant)
+            return
+          }
+        }
         const context = await buildContext(sources, text, signal, extra)
         registry = await buildTools(sources, text, this.options.sessionId, this.options.channel === 'zalo' ? undefined : await this.mcp(signal))
         signal.throwIfAborted()

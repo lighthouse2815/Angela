@@ -5,7 +5,7 @@ import type { RequestPrivacy } from './privacy-policy'
 
 import { randomUUID } from 'node:crypto'
 
-import { streamFrom } from '@angela/core-agent'
+import { chatMessagesToTurns, streamFrom } from '@angela/core-agent'
 import { cliMessages } from '@angela/i18n/cli'
 
 import { Context } from './context'
@@ -56,6 +56,15 @@ export class Chat {
 
   get isSending() {
     return this.active
+  }
+
+  /** Saves a host-verified local answer through the same conversation and stream presentation boundary as generation. */
+  async respond(text: string, reply: string, options: StreamOptions) {
+    options.abortSignal?.throwIfAborted()
+    this.applyPrivacy(requestPrivacy(text, true, this.privacyState))
+    this.conversation.turns.push({ type: 'user', id: randomUUID(), content: [{ type: 'text', text }] })
+    this.conversation.turns.push(...chatMessagesToTurns([{ role: 'assistant', content: reply }]))
+    await options.onStreamEvent?.({ type: 'text-delta', text: reply })
   }
 
   /** The caller serializes sends and owns cancellation and event rendering. */

@@ -44,7 +44,7 @@ export class Tasks {
   async create(input: TaskInput): Promise<Task> {
     const parsed = v.parse(taskCreate, input)
     const now = new Date(this.now()).toISOString()
-    const task = v.parse(taskSchema, { ...parsed, id: randomUUID(), status: 'pending', timezone: parsed.timezone ?? this.timezone, createdAt: now, updatedAt: now, recurrenceAnchor: parsed.recurrence ? parsed.dueAt : undefined })
+    const task = v.parse(taskSchema, { ...parsed, id: randomUUID(), status: 'pending', timezone: parsed.timezone ?? this.timezone, snoozeCount: 0, createdAt: now, updatedAt: now, recurrenceAnchor: parsed.recurrence ? parsed.dueAt : undefined })
     let saved = task
     await this.file.edit((state) => {
       // Repeated model calls and retried requests reuse an identical pending commitment under the same storage lock.
@@ -115,6 +115,7 @@ export class Tasks {
     return await this.edit(id, (task) => {
       this.pending(task)
       task.snoozedUntil = target
+      task.snoozeCount = (task.snoozeCount ?? 0) + 1
       task.notifiedFor = undefined
       task.delivery = undefined
     })

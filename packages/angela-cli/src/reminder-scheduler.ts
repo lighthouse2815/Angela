@@ -1,7 +1,8 @@
 import type { Task } from './task-schema'
 import type { Tasks } from './tasks'
 
-import { deliveryDue, taskDue } from './task-time'
+import { ProactivePolicy } from './proactive-policy'
+import { taskDue } from './task-time'
 import { deliveryLeaseMs } from './tasks'
 
 /** Resolution confirms text presentation. Implementations must honor cancellation and run verify immediately before the external side effect. */
@@ -20,7 +21,7 @@ export class ReminderScheduler {
   private startup = true
   private reportedError = false
 
-  constructor(private readonly tasks: Tasks, private readonly notifier: ReminderNotifier, private readonly onError: (error: unknown) => void, private readonly scheduleShared?: (delay: number) => void) {}
+  constructor(private readonly tasks: Tasks, private readonly notifier: ReminderNotifier, private readonly onError: (error: unknown) => void, private readonly scheduleShared?: (delay: number) => void, private readonly policy = new ProactivePolicy()) {}
 
   async start() {
     if (this.started || this.lifetime.signal.aborted)
@@ -75,11 +76,11 @@ export class ReminderScheduler {
   private async run() {
     const claimed: Task[] = []
     try {
-      for (const task of await this.tasks.list()) {
+      const candidates = (await this.tasks.list()).map(task => ({ task, decision: this.policy.evaluate(task, this.tasks.now()) })).sort((a, b) => b.decision.priority - a.decision.priority)
+      for (const { task, decision } of candidates) {
         if (this.lifetime.signal.aborted)
           return
-        const due = deliveryDue(task)
-        if (due === undefined || due > this.tasks.now())
+        if (!decision.notify)
           continue
         const current = await this.tasks.claim(task.id, taskDue(task)!)
         if (current)
@@ -97,7 +98,7 @@ export class ReminderScheduler {
           await this.tasks.retry(task.id, task.delivery.token, this.lifetime.signal.aborted)
       }
     }
-    const next = (await this.tasks.list()).map(deliveryDue).filter(value => value !== undefined).sort((a, b) => a - b)[0]
+    const next = (await this.tasks.list()).map(task => this.policy.evaluate(task, this.tasks.now()).nextAt).filter(value => value !== undefined).sort((a, b) => a - b)[0]
     this.schedule(next === undefined ? 60_000 : Math.min(60_000, Math.max(0, next - this.tasks.now())))
   }
 

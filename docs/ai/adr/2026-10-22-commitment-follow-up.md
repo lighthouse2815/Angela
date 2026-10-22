@@ -48,3 +48,23 @@ Claims and renewable leases prevent two live owners from presenting the same occ
 Offline occurrences collapse into a single recovery batch.
 A crash after external presentation but before acknowledgment can repeat that presentation.
 Exactly-once delivery across that boundary requires an idempotent external notification destination.
+
+## Integrated flow
+
+`RuntimeSession.send` first applies request privacy and initializes the existing task and memory services.
+`CommitmentConversation` handles supported explicit requests before model generation.
+Its result enters `Chat` through the same stream presentation and session persistence boundary.
+Unsupported phrases continue through validated model tools and the existing provider abstraction.
+
+The scheduler evaluates `ProactivePolicy`, claims eligible occurrences, and invokes its notification boundary.
+Runtime metadata events expose due and delivered task IDs without storing message content in the event bus.
+Presentation adds the announced task IDs to the existing conversation.
+Local snooze, completion, and cancellation resolve those references without a global last-task cache.
+
+MemoryCapture writes verified state to a versioned episodic commitment record.
+Current snapshots from Tasks override historical memory during generation.
+Recall reconciles existing commitment records after changes from another channel.
+Memory policy can disable these records without disabling explicitly requested task management.
+
+Standalone task commands use the same service and capture path without constructing a model provider.
+The system remains local-first. No server, broker, or new dependency is required.

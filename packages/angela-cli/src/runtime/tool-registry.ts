@@ -5,8 +5,12 @@ import type { McpTools } from '../mcp'
 import type { ContextSources } from './context-builder'
 import type { EventPayload } from './events'
 
+import * as v from 'valibot'
+
 import { sanitize } from '../memory-v2/sanitize'
 import { durableWriteRejection, requestPrivacy } from '../privacy-policy'
+import { taskEvidence } from '../task-commands'
+import { taskSchema } from '../task-schema'
 import { taskTools } from '../task-tools'
 
 /** Host-verified evidence is separate from raw SDK completion. Result text is bounded before memory capture. */
@@ -76,6 +80,10 @@ export async function buildTools(sources: ContextSources, text: string, sessionI
       const rejection = forgetting ? undefined : durableWriteRejection(current, domain, input)
       if (rejection)
         return rejection
+      if (tool.function.name === 'task_create' && (!/nhắc|(?:tạo|thêm|lưu)\s+(?:việc|lịch|tác vụ)|\b(?:remind|schedule|add|create|save)\b/iu.test(text)
+        || /(?:^|\s)(?:chắc|có lẽ|nếu|ví dụ|đừng|không cần|maybe|perhaps|do not|don't)(?:\s|$)/iu.test(text))) {
+        return { status: 'rejected', reason: sources.messages.tasks.clarifyTime }
+      }
       return await execute(input, options)
     }
   }
@@ -136,7 +144,7 @@ export async function buildTools(sources: ContextSources, text: string, sessionI
               const task = result.result
               const id = String(task.id)
               evidence.domain = { type: toolName === 'task_create' ? 'task.created' : toolName === 'task_complete' ? 'task.completed' : 'task.updated', taskId: id }
-              evidence.text = `${toolName}: ${'title' in task && typeof task.title === 'string' ? sanitize(task.title, 200) : id}`
+              evidence.text = taskEvidence(v.parse(taskSchema, task))
             }
             else if (toolName === 'project_memory' && 'revision' in result && typeof result.revision === 'number') {
               evidence.domain = { type: 'project.changed', revision: result.revision }

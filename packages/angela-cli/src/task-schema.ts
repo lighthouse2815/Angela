@@ -44,6 +44,7 @@ export const taskSchema = v.pipe(v.object({
   createdAt: taskTime,
   updatedAt: taskTime,
   completedAt: v.optional(taskTime),
+  snoozeCount: v.optional(v.pipe(v.number(), v.integer(), v.minValue(0))),
   lastNotifiedAt: v.optional(taskTime),
   notifiedFor: v.optional(taskTime),
   delivery: v.optional(v.variant('status', [

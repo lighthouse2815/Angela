@@ -7,6 +7,11 @@ import { stripVTControlCharacters } from 'node:util'
 
 import { localDate, taskDue, taskDuration } from './task-time'
 
+/** Memory records describe verified task state. The task store remains authoritative for scheduling and later transitions. */
+export function taskEvidence(task: Task) {
+  return JSON.stringify({ id: task.id, title: task.title, status: task.status, remindAt: taskDue(task), completedAt: task.completedAt, timezone: task.timezone })
+}
+
 /** Renders saved data without terminal escape sequences. IDs remain stable across views and restarts. */
 export function formatTask(task: Task, locale: string, messages: typeof cliMessages.en.tasks) {
   const due = taskDue(task)

@@ -11,6 +11,8 @@ import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { parseArgs, promisify } from 'node:util'
 
+import { errorMessageFrom } from '@moeru/std'
+
 import { readConfig } from './config'
 import { ReminderScheduler } from './reminder-scheduler'
 import { formatTask } from './task-commands'
@@ -71,8 +73,8 @@ export async function runReminders(args: string[], env: NodeJS.ProcessEnv) {
     process.once('SIGINT', stop)
     // The scheduler's timers are unref'ed for chat hosts. This foreground host owns its process lifetime explicitly.
     const keepAlive = setInterval(() => {}, 60_000)
-    const scheduler = new ReminderScheduler(new Tasks(config.dataDir, messages.tasks), new DesktopReminders(messages.tasks, locale, env), () => {
-      process.stderr.write(`${messages.tasks.failed}\n`)
+    const scheduler = new ReminderScheduler(new Tasks(config.dataDir, messages.tasks, undefined, env.ANGELA_TIMEZONE), new DesktopReminders(messages.tasks, locale, env), (error) => {
+      process.stderr.write(`${messages.tasks.failed} ${errorMessageFrom(error) ?? ''}\n`)
     })
     try {
       await execute('notify-send', ['--version'], { env, timeout: 5000 })

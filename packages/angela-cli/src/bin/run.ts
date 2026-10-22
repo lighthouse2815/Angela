@@ -28,6 +28,11 @@ import { Terminal } from '../terminal'
  *                    -> McpTools -> MCP client -> tool server
  */
 async function main() {
+  if (process.argv[2] === 'tasks' || process.argv[2] === 'task') {
+    const { runTaskCli } = await import('../task-cli')
+    await runTaskCli(process.argv.slice(3), process.env, process.argv[2] === 'tasks')
+    return
+  }
   if (process.argv[2] === 'zalo' || process.argv[2] === 'away') {
     const { runZalo } = await import('../zalo-command')
     await runZalo(process.argv.slice(3), process.env, process.argv[2] === 'away')
@@ -76,7 +81,7 @@ async function main() {
   const config = await readConfig(process.argv.slice(2), process.env)
   const messages = config.messages
   if (config.help) {
-    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela eval [--help]\nangela setup [--help]\nangela reminders install|start|stop|status|run [--help]\nangela doctor [--json] [--help]\nangela telegram [--help]\nangela discord [--help]\nangela zalo login|logout|status|run [--help]\nangela away on|off|status [--help]\nangela voice start|stop|status [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
+    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela tasks [all]\nangela task show|done|cancel|snooze ID [DURATION]\nangela eval [--help]\nangela setup [--help]\nangela reminders install|start|stop|status|run [--help]\nangela doctor [--json] [--help]\nangela telegram [--help]\nangela discord [--help]\nangela zalo login|logout|status|run [--help]\nangela away on|off|status [--help]\nangela voice start|stop|status [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
       ['--model', messages.model],
       ['--provider', messages.provider],
       ['--config', messages.configFile],

@@ -94,6 +94,10 @@ export class MemoryCapture {
       return
     const observation: Observation = { id: event.id, type: event.type === 'tool.result' && event.outcome === 'failed' ? 'tool.error' : event.type, correlationId: event.correlationId, sessionId: this.sessionId, scope: this.scope, channel: event.channel ?? 'system', timestamp: event.timestamp, text: sanitize(text), verified }
     this.store.observe(observation)
+    if (verified && text && (event.type === 'task.created' || event.type === 'task.updated' || event.type === 'task.completed')) {
+      // Each verified transition supersedes its current record. Session episodes retain historical evidence with explicit dates.
+      this.store.write({ tier: 'episodic', kind: 'commitment', scope: this.scope, key: `commitment:${event.taskId}`, title: `Commitment ${event.taskId}`, body: observation.text, authority: 'verified', sourceSessionId: this.sessionId }, event.timestamp)
+    }
   }
 
   finish(userText: string) {

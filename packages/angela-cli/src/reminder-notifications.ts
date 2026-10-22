@@ -40,7 +40,7 @@ export class ReminderNotifications implements ReminderNotifier {
       signal.throwIfAborted()
     } while (this.paused)
     const heading = overdue ? this.messages.overdue : this.messages.reminder
-    const text = `${heading}\n\n${tasks.map(task => formatTask(task, this.locale, this.messages)).join('\n')}`
+    const text = `${heading}\n\n${tasks.map(task => `${task.type === 'follow_up' ? `${this.messages.followUp}\n` : ''}${formatTask(task, this.locale, this.messages)}`).join('\n')}`
     await this.present(text, tasks, signal)
     if (this.voiceEnabled) {
       if (this.speech.length >= 8)

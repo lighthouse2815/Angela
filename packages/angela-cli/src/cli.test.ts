@@ -368,7 +368,7 @@ it('creates a conversational task through the real CLI tool runtime and restores
   const directory = mkdtempSync(join(tmpdir(), 'angela-cli-tasks-'))
   directories.push(directory)
   const env = { ANGELA_DATA_DIR: directory, ANGELA_BASE_URL: `http://127.0.0.1:${address.port}/v1/` }
-  const first = await run(['--prompt', '10h tối nhắc tao học tiếng Trung'], env).result
+  const first = await run(['--prompt', 'Remind me to study Chinese at 22:00 on January 1, 2026.'], env).result
   expect(first, first.stderr).toMatchObject({ code: 0 })
   expect(bodies[0]).toContain('task_create')
   expect(bodies[0]).toContain('memory_search')
@@ -389,7 +389,9 @@ it('creates a conversational task through the real CLI tool runtime and restores
   const history = JSON.parse(await readFile(join(directory, sessionFile), 'utf8'))
   expect(JSON.stringify(history)).toContain(initial.tasks[0].id)
   expect(history.messages.filter((message: { role: string, content?: string }) => message.role === 'assistant' && (message.content?.includes(cliMessages.vi.tasks.overdue) || message.content?.includes(cliMessages.vi.tasks.reminder)))).toHaveLength(1)
-  expect(bodies[2]).toContain(initial.tasks[0].id)
+  expect(delivered.tasks[0].snoozeCount).toBe(1)
+  expect(delivered.tasks[0].snoozedUntil).toBeTypeOf('string')
+  expect(bodies).toHaveLength(2)
   const third = await run(['--resume', sessionId, '--prompt', 'Hôm nay còn việc gì?'], env).result
   expect(third, third.stderr).toMatchObject({ code: 0 })
   expect(third.stderr).not.toContain(cliMessages.vi.tasks.overdue)

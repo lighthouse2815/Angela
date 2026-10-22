@@ -42,7 +42,7 @@ export function requestPrivacy(text: string, memoryEnabled = true, inherited?: R
     durableMemoryAllowed: !reason,
     reason,
     projectWritesAllowed: independent && inherited?.projectWritesAllowed !== false && (!reason || (!personalFact && /\b(?:project|repo(?:sitory)?|backend|frontend|codebase|workspace)\b|dự án/u.test(normalized))),
-    taskWritesAllowed: independent && inherited?.taskWritesAllowed !== false && (!reason || /\b(?:task|todo|remind|reminder|deadline|schedule|cancel|snooze|complete)\b|nhắc|tạo (?:việc|lịch)|hủy (?:việc|lịch)|hoàn thành/u.test(normalized)),
+    taskWritesAllowed: independent && inherited?.taskWritesAllowed !== false && (!reason || /\b(?:task|todo|remind|reminder|deadline|schedule|cancel|snooze|complete)\b|nhắc|tạo (?:việc|lịch)|hủy (?:việc|lịch)|hoàn thành|xong(?: rồi)?[.!\s]*$/u.test(normalized)),
   })
 }
 

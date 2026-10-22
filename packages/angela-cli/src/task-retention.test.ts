@@ -131,6 +131,10 @@ it('prunes history when claim metadata reaches the storage size bound', async ()
     if (JSON.stringify(state).length > 127_980)
       break
   }
+  const tail = state.tasks[0]!
+  tail.context ??= ''
+  while (JSON.stringify(state).length <= 127_980 && tail.context !== undefined && tail.context.length < 300)
+    tail.context += 'a'
   expect(JSON.stringify(state).length).toBeGreaterThan(127_980)
   await writeFile(path, JSON.stringify(state))
   expect((await tasks.claim(task.id, task.dueAt!))?.delivery?.status).toBe('claimed')

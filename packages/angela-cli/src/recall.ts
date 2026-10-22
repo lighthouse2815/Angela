@@ -6,6 +6,7 @@ import type { Tool } from '@xsai/shared-chat'
 
 import type { RequestPrivacy } from './privacy-policy'
 import type { RecallHit } from './recall-index'
+import type { Task } from './task-schema'
 
 import { watch } from 'node:fs'
 import { readdir, stat } from 'node:fs/promises'
@@ -24,6 +25,7 @@ import { RecallIndex, sourceVersion } from './recall-index'
 import { isConversationRecap } from './recall-query'
 import { Sessions } from './sessions'
 import { Skills } from './skills'
+import { taskEvidence } from './task-commands'
 
 const settingsSchema = v.object({ enabled: v.boolean(), history: v.boolean(), semantic: v.boolean(), budget: v.pipe(v.number(), v.integer(), v.minValue(2000), v.maxValue(24_000)) })
 const searchSchema = v.object({ query: v.pipe(v.string(), v.trim(), v.minLength(1), v.maxLength(4000)), all_workspaces: v.optional(v.boolean(), false) })
@@ -185,6 +187,19 @@ export class Recall {
     const settings = await this.settings.read()
     const personal = await this.memory.read()
     return settings.enabled && personal.enabled && personal.autoEnabled
+  }
+
+  /** Repairs existing commitment records after cross-channel changes or a failed memory write. Task storage stays authoritative. */
+  async refreshCommitments(tasks: readonly Task[]) {
+    if (!await this.automaticMemoryEnabled())
+      return
+    const store = this.database().memory
+    for (const task of tasks) {
+      const key = `commitment:${task.id}`
+      const previous = store.current(this.workspace, 'episodic', key)
+      if (previous && previous.body !== taskEvidence(task))
+        store.write({ tier: 'episodic', kind: 'commitment', scope: this.workspace, key, title: previous.title, body: taskEvidence(task), authority: 'verified', sourceSessionId: this.sessionId }, task.updatedAt)
+    }
   }
 
   private async refresh(signal?: AbortSignal) {
