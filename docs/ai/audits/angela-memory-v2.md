@@ -96,6 +96,8 @@ The local embedding fixture processed 3,082 documents/second before tuning and 3
 
 Warm requests now persist observations and compile an episode. That adds approximately 6.5 ms to the median fixture request. The median first-text cost increases by approximately 2.9 ms.
 This cost preserves crash-safe memory. Production provider latency is excluded from this fixture.
+Those startup samples retain one scope. The Telegram lifecycle measurements below exercise the actual adapter instead.
+
 The [startup samples](../../../packages/airi-cli/benchmarks/runtime-startup-after.json) retain every process result.
 The [legacy samples](../../../packages/airi-cli/benchmarks/runtime-startup-before.json) use the same request fixture.
 
@@ -114,7 +116,7 @@ No unexpected top-five result appeared in this small corpus. Superseded React kn
 These probes establish invariants, not general conversational recall accuracy.
 They do not measure multilingual paraphrase performance or real embedding-model quality.
 
-## Validation
+## Initial core validation (4bece26)
 
 Checks ran sequentially. Vitest used one worker.
 
@@ -195,3 +197,97 @@ SQLite timing includes directory creation, permissions, database open, and schem
 The first mode also pays process module warmup. Warm percentiles exclude each mode's first request.
 This run supports bounded warm reuse. It does not predict real network or model latency.
 Raw measurements: `packages/airi-cli/benchmarks/telegram-lifecycle-before.json`.
+
+## Telegram lifecycle closure
+
+Runtime source for these measurements: `1c9e3d3`, including explicit request deadline cleanup.
+Node 26.11.1. Both modes use the same final runtime and actual Telegram adapter.
+The cold mode configures `maxIdle: 0`. The warm mode uses the production `acquire` path with `maxIdle: 32`.
+Model output is deterministic SSE. Telegram delivery uses a local HTTP API. No paid provider or production user data is involved.
+
+| Operation | Cold lifecycle, ms | Warm lifecycle, ms |
+| --- | ---: | ---: |
+| First message | 111.42 | 10.24 |
+| Second message | 21.29 | 6.85 |
+| 10 subsequent messages, request p50 / p95 | 18.18 / 29.42 | 6.93 / 10.02 |
+| 30 subsequent messages, request p50 / p95 | 15.25 / 21.29 | 7.36 / 13.66 |
+| 30 subsequent messages, first-text p50 / p95 | 9.13 / 13.61 | 4.39 / 7.25 |
+| Recall initialization p50 / p95 | 2.17 / 3.75 | 0.00 / 0.00 |
+| SQLite open/schema p50 / p95 | 2.07 / 3.51 | 0.00 / 0.00 |
+| Context preparation p50 / p95 | 5.32 / 9.52 | 1.77 / 3.82 |
+| Consolidation per request p50 / p95 | 2.27 / 2.83 | 0.88 / 1.36 |
+| 4 users, sequential request p50 / p95 | 13.15 / 15.58 | 8.48 / 11.31 |
+| 4 concurrent users, batch-completion p50 / p95 | 44.05 / 57.78 | 27.42 / 30.65 |
+| SQLite opens / Recall starts, first 51 requests | 51 / 51 | 4 / 4 |
+
+Percentiles cover 30 single-user requests after the first message. The open/start counts cover 51 sequential requests across four users.
+The concurrent result measures completion of each four-user batch. Async-local instrumentation attributes first-text and boundary costs to each request.
+First messages include different module/JIT warmup costs. Their difference does not establish a cold-start improvement.
+Zero initialization timings mean reuse, not zero-cost SQLite queries. Query and capture work remain inside context/request measurements.
+Consolidation includes request completion and immediate session end in cold mode. Warm eviction consolidates the session end later.
+Absolute timings vary between runs. Compare modes within this final run. The original baseline remains available above.
+
+After automatic TTL eviction, the warm case reopened in **13.06 ms**, with first text in **9.10 ms**.
+The request opened SQLite once and started Recall once. Before that request, cached states, indexes, watchers, and Recall timers were zero.
+Reminder routes remained active for notification delivery and closed at host shutdown.
+The benchmark uses a one-second TTL to exercise expiration. The production default remains ten minutes.
+That default matches Telegram's existing permission-state lifetime. The fixture does not identify an optimal TTL for real traffic.
+
+The default idle cap is 32. The internal maximum is 64. LRU applies only after the last reference and active request finish.
+The existing active-context cap remains eight. Active, idle, and retiring entries together cannot exceed `maxIdle + 8`.
+One idle timer belongs to the host. Acquisition waits only for retirement of the same exact identity.
+If total capacity is full, new contexts are rejected.
+The constructor configures TTL/cap through `RuntimeOptions.telegramSessions`. It can disable retention with `maxIdle: 0`.
+
+### Resource ownership
+
+The resource fixture drives direct runtime acquire/send/release cycles with real SQLite and in-memory MCP transports.
+It uses five user stores, five reminder routes, and a four-entry idle LRU. It does not include Telegram HTTP overhead.
+Each closed Recall must report zero resources before the live-owner instrumentation releases its reference.
+The report therefore detects orphaned Recall owners after map eviction, as well as resources in the current cache.
+
+| Checkpoint | Idle / indexes / watchers | Recall timers / idle timers | MCP clients / listeners | Reminder routes / timers | Live Recalls |
+| --- | --- | --- | --- | --- | --- |
+| 100 cycles | 4 / 4 / 4 | 4 / 1 | 0 / 0 | 5 / 1 | 4 |
+| 500 cycles | 4 / 4 / 4 | 4 / 1 | 0 / 0 | 5 / 1 | 4 |
+| 1000 cycles | 4 / 4 / 4 | 4 / 1 | 0 / 0 | 5 / 1 | 4 |
+| Final shutdown | 0 / 0 / 0 | 0 / 0 | 0 / 0 | 0 / 0 | 0 |
+
+The final run completed 1,000 cycles in 8.94 seconds and closed exactly 1,000 MCP clients.
+Requests, runtime controllers, MCP clients/servers, live Recalls, embeddings, retiring entries, listeners, and every owned timer were zero after shutdown.
+Telegram deadline counters were also zero after request release and final adapter shutdown in the adapter benchmark.
+No garbage collection or FinalizationRegistry callback is a correctness condition.
+
+### Correctness and validation
+
+- Full local CLI suite: **384/384 tests, 47 files**, before the final deadline timer adjustment.
+- Telegram/lifecycle follow-up after that adjustment: **34/34 tests**. These include success, cancellation, reset, eviction, and shared-host shutdown.
+- `pnpm -F @proj-airi/airi-cli typecheck`: passed after the deadline adjustment.
+- `pnpm typecheck --concurrency=1`: **53/53 tasks**, 52 cached, with the changed CLI checked again.
+- Root typecheck required the installed native pnpm binary on PATH because the local wrapper lacks a shebang.
+- `pnpm -F @proj-airi/airi-cli build` and the built executable `--help`: passed after the deadline adjustment.
+- `pnpm exec eslint packages/airi-cli/src packages/airi-cli/scripts`: passed with no package errors.
+- `pnpm lint`: passed. ESLint reported 0 errors and 603 warnings. The Oxlint phase reported 12 warnings.
+- `.github/workflows/cli-core.yml` runs the full CLI gate on PR #1 with one job and one Vitest worker.
+- The first [successful core run](https://github.com/lighthouse2815/Angela/actions/runs/39723476242) verified fresh install and prerequisite builds.
+- The [runtime closure run](https://github.com/lighthouse2815/Angela/actions/runs/39724072409) passed the full CLI gate after deadline cleanup.
+- Later branch updates rerun the gate. The PR checks show the result for the current head.
+
+Tests verify one start across multiple Telegram messages, separate users, reset, TTL, LRU, cancellation, and shutdown.
+They also verify the eight-active limit beside a full idle cache and reacquisition while the previous owner retires.
+Warm personal memory and episodes stay isolated by private store. Explicit Recall/search retrieves episodes after warm reuse, TTL eviction, and runtime restart.
+The current-session episode stays excluded from automatic context because persisted working history already owns those turns. That policy remains unchanged.
+The existing Memory V2 quality probes and all existing runtime tests remain part of the full CLI suite.
+
+Observer diagnostics retain at most 16 metadata records and one saturating failure counter.
+Warning delivery is capped at 16 callbacks per host. Neither observer nor diagnostic callback exceptions enter the request failure path.
+Error strings, prompts, and event payloads are excluded. Shutdown clears retained metadata and callback references.
+
+The task changes no Memory V2 storage, authority, purge, compaction, or enrichment implementation.
+The 19 existing root Vitest failures remain outside this task. They were not modified, skipped, or rerun as the core gate.
+Desktop IPC, Discord companion memory expansion, automatic dream, and background LLM work remain deferred.
+Live Telegram transport, real models/embeddings, voice, and camera require separate production checks.
+
+Raw evidence: [Telegram lifecycle](../../../packages/airi-cli/benchmarks/telegram-lifecycle-after.json),
+[resource cycles](../../../packages/airi-cli/benchmarks/session-resources-after.json), and
+[reproduction commands](../../../packages/airi-cli/benchmarks/README.md#telegram-lifecycle-closure).
