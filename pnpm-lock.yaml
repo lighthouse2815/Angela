@@ -2801,6 +2801,9 @@ importers:
 
   evals/companion:
     devDependencies:
+      '@angela/i18n':
+        specifier: workspace:^
+        version: link:../../packages/i18n
       valibot:
         specifier: 'catalog:'
         version: 1.4.2(typescript@6.0.3)

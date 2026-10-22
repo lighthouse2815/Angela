@@ -1,3 +1,5 @@
+import { readFile } from 'node:fs/promises'
+
 import * as v from 'valibot'
 
 export const categories = [
@@ -70,3 +72,19 @@ export const caseSchema = v.pipe(v.strictObject({
 
 /** Labels describe source selection and context evidence. They never describe a generated answer. */
 export type CompanionCase = v.InferOutput<typeof caseSchema>
+
+/** Reads all JSONL lines before execution and rejects duplicate case IDs. */
+export async function loadCases(path: string | URL): Promise<CompanionCase[]> {
+  const lines = (await readFile(path, 'utf8')).trim().split('\n')
+  const cases = lines.map((line, index) => {
+    try {
+      return v.parse(caseSchema, JSON.parse(line))
+    }
+    catch (cause) {
+      throw new Error(`Invalid case at line ${index + 1}`, { cause })
+    }
+  })
+  if (new Set(cases.map(item => item.id)).size !== cases.length)
+    throw new Error('Duplicate case ID')
+  return cases
+}

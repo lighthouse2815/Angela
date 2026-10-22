@@ -9,6 +9,7 @@ export default defineConfig({
       'apps/desktop/vitest.node.config.ts',
       'packages/cap-vite',
       'packages/angela-cli',
+      'evals/companion',
       'integrations/discord-bot',
       'packages/local-config',
       'packages/ccc',

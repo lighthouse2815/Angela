@@ -109,3 +109,60 @@ Một case chỉ pass khi mọi điều kiện nguồn, nội dung, loại ký �
 6. Thêm nguồn gây nhiễu khi cần kiểm tra relevance hoặc isolation.
 7. Chạy schema check và runner. Giữ nguyên expectation nếu phát hiện lỗi thật.
 8. Ghi lỗi trong report, kèm case ID và kết quả quan sát.
+
+## Chạy offline
+
+Dùng Node hỗ trợ `node:sqlite`, tối thiểu Node 22.13. Chạy các lệnh từ repo root.
+Repo hiện dùng pnpm 11. Runner dùng đúng dependencies trong workspace.
+
+```bash
+pnpm -F @angela/evals-companion check:dataset
+pnpm -F @angela/evals-companion typecheck
+pnpm -F @angela/evals-companion test
+pnpm -F @angela/evals-companion eval --output /tmp/companion-report.json
+```
+
+Runner chạy từng case tuần tự. Vitest dùng một worker và tắt file parallelism.
+Mỗi case dùng thư mục tạm riêng, đóng/mở lại SQLite rồi mới truy vấn.
+Mọi index, watcher và timer đều được đóng trong `finally`. Dữ liệu tạm được xóa sau case.
+
+Để chọn một nhóm hoặc một case:
+
+```bash
+pnpm -F @angela/evals-companion eval --category semantic_paraphrase
+pnpm -F @angela/evals-companion eval --id preference_change_001
+```
+
+`--dataset <path>` nhận JSONL khác. Đường dẫn tương đối tính từ thư mục package `evals/companion`.
+`--output <path>` ghi summary và kết quả từng case, gồm nguồn recall, context và failure reason.
+Report ghi source commit, hash dataset, Node version, mode và top K.
+UUID, source version và đường dẫn tạm được chuẩn hóa trong context để dễ so sánh report.
+
+Mặc định, quality failure được ghi vào report và command trả exit code 0.
+Lỗi schema hoặc lỗi thực thi luôn trả exit code 1.
+Khi dùng `--strict`, bất kỳ quality failure nào cũng trả exit code 1.
+Không dùng kết quả quality hiện tại làm gate xanh giả.
+
+```bash
+pnpm -F @angela/evals-companion eval --strict --output /tmp/companion-strict.json
+```
+
+Runner khởi tạo Recall với environment rỗng và không cấu hình embedding hoặc generation provider.
+Nó không gọi mạng hoặc đọc API key từ shell.
+Mode hiện tại là lexical retrieval với mock extraction cố định.
+Semantic paraphrase vẫn được đo, nhưng kết quả không đại diện cho embedding model thật.
+
+`evaluation.test.ts` có positive control và negative control cho scorer.
+Các control ép thiếu recall, sai tier, sai user, ký ức cũ, trải nghiệm chung giả và irrelevant injection.
+Chúng cũng chạy đường capture, archive, supersession, isolation và aging qua API production.
+
+## Giới hạn
+
+Corpus nhỏ và giả lập. Không suy rộng tỷ lệ từ corpus này thành chất lượng trên dữ liệu người dùng thật.
+Page fixture bỏ qua extraction model, authority inference và việc tự chọn key để cập nhật.
+Capture/workflow case dùng compiler deterministic thật. Nó không biến lời người dùng thành tool success.
+Một episode chứa nhiều message. Tham chiếu capture nhận diện episode, còn `must_include` kiểm tra dữ kiện trong context.
+Các tỷ lệ lỗi chỉ chấm nguồn có nhãn. Chúng không dùng LLM judge để đo độ liên quan mở.
+Supersession chấm trạng thái store cùng nguồn retrieval/context, không suy luận câu trả lời model sẽ dùng giá trị nào.
+False-memory và future-event checks kiểm tra bằng chứng/context. Chúng không chấm generation cuối cùng.
+Long-gap chạy aging theo `age_at`, không giả lập hàng triệu turn hoặc throughput production.

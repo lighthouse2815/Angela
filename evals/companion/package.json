@@ -3,9 +3,13 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "check:dataset": "tsx check-dataset.ts"
+    "check:dataset": "tsx check-dataset.ts",
+    "eval": "tsx run.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config vitest.config.ts"
   },
   "devDependencies": {
+    "@angela/i18n": "workspace:^",
     "valibot": "catalog:"
   }
 }
