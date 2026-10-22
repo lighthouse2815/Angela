@@ -28,15 +28,15 @@ jobs:
           cache: pnpm
       # The root postinstall builds the full monorepo. Build only CLI prerequisites below.
       - name: Install locked CLI dependencies
-        run: pnpm --filter @proj-airi/airi-cli... install --frozen-lockfile --ignore-scripts
+        run: pnpm --filter @angela/cli... install --frozen-lockfile --ignore-scripts
       - name: Build CLI prerequisites sequentially
-        run: pnpm --filter '@proj-airi/airi-cli^...' --workspace-concurrency=1 run build
+        run: pnpm --filter '@angela/cli^...' --workspace-concurrency=1 run build
       - name: CLI tests
-        run: pnpm -F @proj-airi/airi-cli exec vitest run --config vitest.config.ts --maxWorkers=1 --testTimeout=30000 --hookTimeout=30000
+        run: pnpm -F @angela/cli exec vitest run --config vitest.config.ts --maxWorkers=1 --testTimeout=30000 --hookTimeout=30000
       - name: CLI typecheck
-        run: pnpm -F @proj-airi/airi-cli typecheck
+        run: pnpm -F @angela/cli typecheck
       - name: CLI build
-        run: pnpm -F @proj-airi/airi-cli build
+        run: pnpm -F @angela/cli build
       - name: CLI lint
         run: pnpm exec eslint packages/airi-cli/src packages/airi-cli/scripts
       - name: Built CLI smoke check
