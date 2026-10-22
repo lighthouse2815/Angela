@@ -988,7 +988,7 @@ Use these commands during interactive chat:
 
 Commands use the full task ID printed by `/tasks`. Snooze also accepts durations such as `30m`, `2h`, and `1d`.
 `/tasks all` includes completed and cancelled history. `/today` uses the local calendar date.
-Conversational references use the existing chat history and saved tool results.
+Conversational references use bounded session state, recent chat history, and verified tool results.
 
 ### Commitment extraction and follow-up
 
@@ -997,22 +997,27 @@ Its state survives conversation compaction, session changes, and process restart
 Repeated creation with the same pending title, type, timezone, schedule, and recurrence reuses the existing ID.
 Snooze preserves that ID and increments `snoozeCount`.
 
-The extraction layer accepts explicit Vietnamese reminder requests with high confidence.
-Predictions such as `Mai chắc tao học LINQ` do not authorize task creation.
-Quoted examples, negations, hypothetical requests, and multiple actions stay outside automatic extraction.
-The existing model tools handle unsupported wording, with a creation-intent guard before persistence.
+Local extraction and `task_create` share `classifyCommitmentIntent`.
+Its outcomes separate create, follow-up, meta, hypothetical, quoted, negative, uncertain, and absent intent.
+Predictions, examples, code, quotations, parser discussion, negation, and hypothetical requests cannot create tasks.
+Multiple actions require clarification. Missing request provenance also rejects model-created tasks.
+Meta and hypothetical discussion cannot mutate an existing task through another task tool.
+The model tools retain supported direct requests that local extraction cannot parse.
 
 Supported time expressions include `10 phút nữa`, `2 tiếng nữa`, `mai lúc 9h`, and `thứ sáu lúc 8h`.
 `ngày 25 lúc 9h`, `25/10 9h`, and `tối nay 9h` also resolve in the reminder timezone.
-`mai`, `tối nay`, `thứ sáu`, `ngày 25`, and `25/10` without an hour require clarification.
+For reminder alarms, `mai`, `tối nay`, `thứ sáu`, `ngày 25`, and `25/10` without an hour require clarification.
 `cuối tuần` requires a precise day and hour. Angela does not invent a weekend alarm.
 A short time reply can complete the immediately preceding date-only request.
 Past times, invalid calendar dates, DST gaps, and repeated DST hours require correction or clarification.
 Weekdays mean the next calendar occurrence. Yearless dates mean their next eligible year.
 
 After a reminder, `2 tiếng nữa nhắc lại`, `Xong rồi`, and `Không cần nhắc cái đó nữa` change that commitment.
-The latest relevant assistant turn or explicit task title identifies the target.
-A notification batch with several candidates requires a title. Angela does not choose an arbitrary pending task.
+`ActiveCommitments` stores at most eight recent task IDs for the exact data directory, workspace, session, and channel.
+References survive unrelated replies and restart. They expire after eight requests or six hours.
+Several recent pending references require a title. Angela never selects an arbitrary pending task.
+CLI and Telegram record references after notification presentation. Session reset clears that session's reference state.
+Reference files contain IDs and timestamps, without task titles or conversation content.
 
 ```text
 > Mai 9h nhắc tao học LINQ.
@@ -1045,18 +1050,47 @@ angela task cancel ID
 These commands accept `--data-dir` and `--locale`. Mutations also accept `--cwd` for the memory workspace.
 The existing `angela reminders` commands manage the background notification service.
 
-Verified creation, snooze, completion, and cancellation update an episodic memory record keyed by commitment ID.
-Each transition supersedes its previous current record. Session episodes retain dated historical evidence.
-Current task snapshots override historical task descriptions during generation.
-Recall repairs existing commitment records after cross-channel mutations. It does not import the task database into semantic memory.
-Personal-memory switches and request privacy controls still govern automatic memory writes.
+Task mutations emit typed events after atomic persistence.
+`CommitmentMemoryProjection` refreshes only the affected `commitment:<taskId>` from the authoritative task store.
+Each transition supersedes one current page. Session episodes retain dated historical evidence.
+Projection failure cannot reject or roll back a saved task.
+Startup and five-minute recovery repair external changes and failed projections. Normal requests do not reconcile commitment memory.
+Host-owned scope and source-session metadata authorize initial projection recovery. Model tool arguments cannot supply this metadata.
+Disabled memory does not grant projection consent. Suppression prevents recovery from recreating forgotten content.
+Explicit task operations retain their existing independent privacy controls.
 
-`ProactivePolicy` evaluates delivery eligibility separately from presentation.
-Its default delivers due pending tasks and groups offline recovery notifications.
-Runtime hosts can configure `proactive.quietHours` and `proactive.cooldownMs` through `RuntimeOptions`.
-Quiet hours defer an occurrence without acknowledging it. Persisted notification timestamps enforce per-task cooldown after restart.
-Deadlines receive higher priority than regular reminders. Follow-up tasks receive a progress question.
-Relevance scoring and inferred urgency remain extension points.
+Normal model context contains at most 8 overdue, 8 due today, 6 upcoming, 5 unscheduled, and 3 recently completed tasks.
+Recent completion means seven days. Cancelled tasks and older completions require `task_list` or explicit memory retrieval.
+The bounded authoritative snapshot never implies that omitted tasks are absent.
+Task history retains the existing inactive retention limit. No full task database enters semantic memory.
+Task timestamps, runtime events, scheduler delivery, references, and commitment projection use the injected clock.
+
+### Proactive companion loop
+
+Explicit requests such as `Mai hỏi tao xem phần auth làm xong chưa` create the existing `follow_up` task type.
+`Chiều mai hỏi lại xem báo cáo tới đâu rồi` and `Ngày mai check xem tôi đã học LINQ chưa` also work locally.
+`Nhớ hỏi tôi lại chuyện này vào tối mai` uses the preceding conversation topic, or asks for a subject.
+Casual statements such as `Tao hơi mệt` never create follow-ups.
+
+Coarse follow-ups use 09:00 local time, afternoon uses 15:00, and evening uses 19:00.
+The saved confirmation displays the chosen time. Explicit hours take precedence. Reminder alarms retain their exact-hour clarification rule.
+
+`ProactiveCandidate` derives a stable task/occurrence identity, subject, reason, confidence, priority, and expiry from authoritative task state.
+Reasons are due commitment, overdue commitment, or explicit follow-up. Candidates have no separate store.
+`ProactivePolicy` checks relevance, completion, confidence, duplicate delivery, expiry, quiet hours, cooldown, and recent activity.
+Deadlines receive higher priority than reminders. Follow-ups wait two minutes after recent conversation activity.
+A store presents at most one follow-up per batch, with a default 30-minute interval between follow-ups.
+Claims enforce this interval and prevent concurrent follow-ups across hosts that share the store.
+`followUp.promptCount`, `lastPromptedAt`, `nextEligibleAt`, `expiresAt`, and `resolvedAt` persist with each task.
+Successful presentation acknowledges that occurrence. Restart does not ask the same question again.
+An unprompted follow-up expires after 48 hours. Expired occurrences become `skipped` and remain manageable through task commands.
+A skipped recurring follow-up advances to its next future calendar occurrence.
+A snooze explicitly opens another occurrence and relevance window.
+
+Runtime hosts can configure `proactive.quietHours`, `cooldownMs`, `recentActivityMs`, and `followUpCooldownMs` through `RuntimeOptions`.
+Quiet hours defer delivery without acknowledging it. Persisted timestamps enforce cooldown after restart.
+Notifications use deterministic English or Vietnamese wording for text, desktop notification, and optional voice output.
+Scheduler delivery requires no model. `proactive.prompted` events expose candidate IDs and reasons without message content.
 
 ### Scheduler and occurrence policy
 
@@ -1136,7 +1170,8 @@ pnpm lint
 
 Task tests cover persistence, extraction, time parsing, contextual follow-up, proactive policy, management commands, recurrence, and notification queues.
 `commitment-scenario.test.ts` runs the full reminder lifecycle with real storage, session restart, current memory, and an injected fake clock.
-Supported Vietnamese creation and follow-up in this scenario require no model requests.
+Task actions require no model requests. Unrelated conversation uses a stub provider to exercise the complete request path.
+Follow-up scenarios cover exact delivery, offline recovery, three restarts, isolated references, completion, and current memory.
 CLI tests use a local provider stub with the real generation and tool runtime.
 Conversational tests cover rescheduling, snoozing after notification, completion, clarification between two matches, and restart after interrupted delivery.
 The stub verifies tool integration and session context. It does not evaluate a live model's language understanding.
@@ -1189,20 +1224,3 @@ Internal `RuntimeOptions.telegramSessions` defaults to 32 idle entries and a ten
 The cache uses exact user storage, workspace, session, and channel identities.
 MCP clients and request callbacks close after each request. Active contexts retain the existing concurrency limit of eight.
 Reset, eviction, and host shutdown end the runtime session segment. Persisted conversation and memory survive eviction and process restart.
-
-## Commitment intent safety
-
-Local extraction and `task_create` share a deterministic intent classifier.
-Only direct requests authorize creation. Meta discussion, examples, quotes, code, predictions, negation, and hypothetical requests cannot create tasks.
-Ambiguous requests with multiple actions require clarification. Missing request provenance also rejects model-created tasks.
-Alarm requests retain their exact-time clarification rules.
-
-Normal prompts contain at most 8 overdue, 8 due today, 6 upcoming, 5 unscheduled, and 3 recently completed tasks.
-Recent completion means seven days. Cancelled tasks and older completions require `task_list`.
-The bounded snapshot does not imply that omitted tasks are absent.
-
-Task mutations emit typed events after atomic persistence. Recall updates only the affected `commitment:<taskId>` page.
-Startup and five-minute recovery repair external mutations and failed projections. Requests do not run commitment reconciliation.
-Host-owned task provenance permits initial projection recovery. Disabled memory never grants this provenance.
-Memory suppression prevents recovery from recreating forgotten pages. Task storage remains authoritative when recall fails.
-Runtime task, delivery, event, and commitment projection timestamps use the injected clock.

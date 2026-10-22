@@ -9,7 +9,13 @@ import { localDate, taskDue, taskDuration } from './task-time'
 
 /** Memory records describe verified task state. The task store remains authoritative for scheduling and later transitions. */
 export function taskEvidence(task: Task) {
-  return JSON.stringify({ id: task.id, title: task.title, status: task.status, remindAt: taskDue(task), completedAt: task.completedAt, timezone: task.timezone })
+  return JSON.stringify({ id: task.id, title: task.title, type: task.type, status: task.status, remindAt: taskDue(task), completedAt: task.completedAt, timezone: task.timezone, followUp: task.followUp, deliveryStatus: task.delivery?.status })
+}
+
+/** Deterministic wording keeps text and voice delivery independent of model availability. */
+export function taskPrompt(task: Task, messages: typeof cliMessages.en.tasks) {
+  const title = stripVTControlCharacters(task.title).replace(/[\r\n]/gu, ' ')
+  return (task.type === 'follow_up' ? messages.followUp : messages.reminderDue).replace('{subject}', title)
 }
 
 /** Renders saved data without terminal escape sequences. IDs remain stable across views and restarts. */

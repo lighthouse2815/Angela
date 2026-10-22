@@ -1,15 +1,18 @@
 import type { GenerationProvider } from '@angela/provider-inference'
 
 import type { Clock } from './clock'
+import type { AngelaEvent } from './runtime/events'
 
+import { randomUUID } from 'node:crypto'
 import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { chatMessagesToTurns } from '@angela/core-agent'
 import { cliMessages } from '@angela/i18n/cli'
-import { afterEach, expect, it } from 'vitest'
+import { afterEach, expect, it, vi } from 'vitest'
 
+import { proactiveCandidate } from './proactive-candidate'
 import { RecallIndex } from './recall-index'
 import { ReminderNotifications } from './reminder-notifications'
 import { AngelaRuntime } from './runtime/runtime'
@@ -29,14 +32,27 @@ afterEach(async () => {
   }
 })
 
-it('runs conversation → disk → restart → reminder → snooze → reminder → complete → current memory without model calls', async () => {
+it('keeps an explicit commitment durable when recall is unavailable', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'angela-recall-failure-'))
+  const clock = new FakeClock(Date.parse('2026-10-22T08:00:00+07:00'))
+  const provider: GenerationProvider = { generation: () => {
+    throw new Error('Local task creation requires no provider')
+  } }
+  const runtime = new AngelaRuntime('unused', provider, cliMessages.vi, { ANGELA_TIMEZONE: 'Asia/Ho_Chi_Minh' }, { apiKey: '' }, { clock })
+  resources.push({ directory, runtimes: [runtime] })
+  const scope = runtime.open({ dataDir: directory, workspace: directory, sessionId: randomUUID(), channel: 'cli' })
+  vi.spyOn(scope, 'recall').mockResolvedValue(undefined)
+  await scope.send(await runtime.createChat(directory), 'Mai 9h nhắc tao học LINQ.', {})
+  expect(await (await scope.tasks()).list()).toMatchObject([{ title: 'học LINQ', status: 'pending', dueAt: '2026-10-23T02:00:00.000Z' }])
+})
+
+it('runs reminder recovery, unrelated conversation, contextual snooze and completion, and current memory', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'angela-scenario-'))
   const runtimes: AngelaRuntime[] = []
   resources.push({ directory, runtimes })
   const clock = new FakeClock(Date.parse('2026-10-22T08:00:00+07:00'))
-  const provider: GenerationProvider = { generation: () => {
-    throw new Error('This supported commitment flow requires no model request')
-  } }
+  const fetch = vi.fn<typeof globalThis.fetch>(async () => new Response(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', content: 'Java dùng JVM. C# dùng .NET.' }, finish_reason: 'stop' }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } }))
+  const provider: GenerationProvider = { generation: model => ({ protocol: 'chat-completions', config: { model, baseURL: 'https://provider.example/v1/', fetch } }) }
   const createRuntime = () => {
     const runtime = new AngelaRuntime('unused', provider, cliMessages.vi, { ANGELA_TIMEZONE: 'Asia/Ho_Chi_Minh' }, { apiKey: '' }, { clock })
     runtimes.push(runtime)
@@ -51,6 +67,7 @@ it('runs conversation → disk → restart → reminder → snooze → reminder 
   const created = (await (await firstScope.tasks()).list())[0]!
   expect(created.title).toBe('học LINQ')
   expect(created.dueAt).toBe('2026-10-23T02:00:00.000Z')
+  expect(fetch).not.toHaveBeenCalled()
   await firstSession.saveChat(chat, false)
   await firstSession.close()
   await first.close()
@@ -62,8 +79,9 @@ it('runs conversation → disk → restart → reminder → snooze → reminder 
   const tasks = await scope.tasks()
   expect((await tasks.find(created.id)).dueAt).toBe(created.dueAt)
   const presented: string[] = []
-  const notifications = new ReminderNotifications(cliMessages.vi.tasks, 'vi', (text) => {
+  const notifications = new ReminderNotifications(cliMessages.vi.tasks, 'vi', async (text, announced) => {
     presented.push(text)
+    await scope.mentionCommitments(announced)
     restoredChat.conversation.turns.push(...chatMessagesToTurns([{ role: 'assistant', content: text }]))
   })
   clock.set('2026-10-23T08:59:00+07:00')
@@ -78,6 +96,8 @@ it('runs conversation → disk → restart → reminder → snooze → reminder 
   expect(presented).toHaveLength(1)
   expect(presented[0]).toContain(created.id)
 
+  await scope.send(restoredChat, 'Java khác C# gì?', {})
+  expect(fetch).toHaveBeenCalledTimes(1)
   await scope.send(restoredChat, '2 tiếng nữa nhắc lại.', {})
   await scheduler.refresh()
   expect((await tasks.find(created.id)).snoozedUntil).toBe('2026-10-23T04:00:00.000Z')
@@ -88,7 +108,9 @@ it('runs conversation → disk → restart → reminder → snooze → reminder 
   clock.set('2026-10-23T11:00:00+07:00')
   await scheduler.refresh()
   expect(presented).toHaveLength(2)
+  await scope.send(restoredChat, 'Cho tao hỏi về C# trước.', {})
   await scope.send(restoredChat, 'Xong rồi.', {})
+  expect(fetch).toHaveBeenCalledTimes(2)
   await scheduler.refresh()
   expect((await tasks.find(created.id)).status).toBe('completed')
   const index = await RecallIndex.open(directory)
@@ -112,4 +134,79 @@ it('runs conversation → disk → restart → reminder → snooze → reminder 
   })
   await recovered.refresh()
   expect(presented).toHaveLength(2)
+}, 15_000)
+
+it.each(['09:00', '10:30'])('recovers an explicit proactive follow-up at %s once, survives three restarts, and resolves from its own session', async (recoveryTime) => {
+  const directory = await mkdtemp(join(tmpdir(), 'angela-follow-up-scenario-'))
+  const runtimes: AngelaRuntime[] = []
+  resources.push({ directory, runtimes })
+  const clock = new FakeClock(Date.parse('2026-10-22T08:00:00+07:00'))
+  const provider: GenerationProvider = { generation: () => {
+    throw new Error('Follow-up delivery requires no provider')
+  } }
+  const events: AngelaEvent[] = []
+  const createRuntime = () => {
+    const runtime = new AngelaRuntime('unused', provider, cliMessages.vi, { ANGELA_TIMEZONE: 'Asia/Ho_Chi_Minh' }, { apiKey: '' }, { clock })
+    runtime.events.on('proactive.prompted', event => events.push(event))
+    runtime.events.on('reminder.delivered', event => events.push(event))
+    runtimes.push(runtime)
+    return runtime
+  }
+  const options = { dataDir: directory, workspace: directory, sessionId: randomUUID(), channel: 'cli' as const }
+  let runtime = createRuntime()
+  let scope = runtime.open(options)
+  await scope.send(await runtime.createChat(directory), 'Mai hỏi tao xem phần refresh token làm xong chưa.', {})
+  const task = (await (await scope.tasks()).list())[0]!
+  expect(task).toMatchObject({ type: 'follow_up', title: 'phần refresh token', dueAt: '2026-10-23T02:00:00.000Z', followUp: { promptCount: 0 } })
+  const candidate = proactiveCandidate(task, clock.now())!
+  expect(candidate).toMatchObject({ sourceId: task.id, reason: 'explicit_follow_up', confidence: 1 })
+  await runtime.close()
+
+  runtime = createRuntime()
+  scope = runtime.open(options)
+  const presented: string[] = []
+  const notifier = () => new ReminderNotifications(cliMessages.vi.tasks, 'vi', async (text, tasks) => {
+    presented.push(text)
+    await runtime.mentionCommitments(options, tasks)
+  })
+  clock.set(recoveryTime === '09:00' ? '2026-10-23T08:59:00+07:00' : '2026-10-23T10:30:00+07:00')
+  let scheduler = await runtime.reminders(directory, notifier(), (error) => {
+    throw error
+  })
+  expect(presented).toHaveLength(recoveryTime === '09:00' ? 0 : 1)
+  clock.set(`2026-10-23T${recoveryTime}:00+07:00`)
+  await scheduler.refresh()
+  await scheduler.refresh()
+  expect(presented).toHaveLength(1)
+  expect(presented[0]).toContain('phần refresh token tới đâu rồi?')
+  expect((await (await scope.tasks()).find(task.id)).followUp).toMatchObject({ promptCount: 1, lastPromptedAt: new Date(clock.now()).toISOString() })
+  expect(events).toHaveLength(2)
+  expect(events.every(event => event.timestamp === new Date(clock.now()).toISOString())).toBe(true)
+  expect(events.find(event => event.type === 'proactive.prompted')).toMatchObject({ candidateId: candidate.id })
+  await runtime.close()
+
+  for (let restart = 0; restart < 3; restart++) {
+    runtime = createRuntime()
+    scope = runtime.open(options)
+    scheduler = await runtime.reminders(directory, notifier(), (error) => {
+      throw error
+    })
+    await scheduler.refresh()
+    expect(presented).toHaveLength(1)
+    if (restart < 2)
+      await runtime.close()
+  }
+  const unrelated = runtime.open({ ...options, sessionId: randomUUID() })
+  await unrelated.send(await runtime.createChat(directory), 'Xong rồi.', {})
+  expect((await (await scope.tasks()).find(task.id)).status).toBe('pending')
+  await scope.send(await runtime.createChat(directory), 'Xong rồi.', {})
+  expect((await (await scope.tasks()).find(task.id))).toMatchObject({ status: 'completed', followUp: { promptCount: 1, resolvedAt: new Date(clock.now()).toISOString() } })
+  const index = await RecallIndex.open(directory)
+  try {
+    expect(JSON.parse(index.memory.current(directory, 'episodic', `commitment:${task.id}`)!.body).status).toBe('completed')
+  }
+  finally { index.close() }
+  clock.set('2026-10-24T12:00:00+07:00')
+  await scheduler.refresh()
+  expect(presented).toHaveLength(1)
 }, 15_000)

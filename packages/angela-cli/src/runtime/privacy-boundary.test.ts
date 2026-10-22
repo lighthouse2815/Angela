@@ -221,9 +221,26 @@ it('keeps derived compaction summaries out of durable session checkpoints', asyn
   finally { await session.close() }
 })
 
-it.each(['Mai chắc tao học LINQ', 'Ví dụ: mai 9h nhắc tôi học LINQ', '"Mai 9h nhắc tôi học LINQ"', 'Đừng nhắc tôi học LINQ'])('rejects model-created reminders without clear creation intent: %s', async (text) => {
+it.each([
+  'Mai chắc tao học LINQ',
+  'Ví dụ: mai 9h nhắc tôi học LINQ',
+  '"Mai 9h nhắc tôi học LINQ"',
+  'Đừng nhắc tôi học LINQ',
+  'Tại sao câu "mai 9h nhắc tao học LINQ" lại tạo reminder?',
+  'Parser xử lý câu mai 9h nhắc tao học LINQ thế nào?',
+  'Nếu user nói mai 9h nhắc tôi học thì hệ thống làm gì?',
+  'Tôi đang test câu mai 9h nhắc tôi học LINQ.',
+  '`Mai 9h nhắc tao học LINQ`',
+  'Mai 9h nhắc tôi học LINQ và 10h nhắc tôi làm auth.',
+])('rejects model-created reminders without clear creation intent: %s', async (text) => {
   const { scope, chat, options, results } = await setup({ name: 'task_create', arguments: { title: 'Học LINQ', type: 'reminder', dueAt: '2099-10-23T09:00:00+07:00' } })
   await scope.send(chat, text, options)
   expect(results).toContainEqual({ status: 'rejected', reason: cliMessages.en.tasks.clarifyTime })
   expect(await (await scope.tasks()).list()).toHaveLength(0)
+})
+
+it.each(['Mai hỏi tao xem auth xong chưa. Đừng lưu.', 'Ngày mai check xem tôi đã học LINQ chưa. Chỉ dùng trong phiên này.'])('prevents protected follow-ups from reaching tasks, projections, or candidates: %s', async (text) => {
+  const { scope, chat, options } = await setup({ name: 'task_create', arguments: { title: 'Auth', type: 'follow_up', dueAt: '2099-10-23T09:00:00+07:00' } })
+  await scope.send(chat, text, options)
+  expect(await (await scope.tasks()).list({ status: 'all' })).toHaveLength(0)
 })

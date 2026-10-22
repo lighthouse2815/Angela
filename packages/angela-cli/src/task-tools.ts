@@ -85,8 +85,15 @@ export function taskTools(tasks: Tasks, messages: typeof cliMessages.en.tasks, p
           return rejection
       }
       options.abortSignal?.throwIfAborted()
-      if (definition.name === 'task_create' && !['create', 'follow_up'].includes(classifyCommitmentIntent(requestText)))
+      const intent = classifyCommitmentIntent(requestText)
+      if (definition.name === 'task_create' && !['create', 'follow_up'].includes(intent))
         return { status: 'rejected', reason: messages.clarifyTime }
+      if (definition.name !== 'task_list' && ['meta', 'hypothetical', 'quoted', 'uncertain'].includes(intent))
+        return { status: 'rejected', reason: messages.clarifyTask }
+      if (intent === 'negative' && definition.name !== 'task_list'
+        && (definition.name !== 'task_cancel' || !/^(?:đừng nhắc|không cần nhắc|hủy|huỷ|bỏ nhắc|cancel|don't remind|do not remind)/iu.test(requestText.trim()))) {
+        return { status: 'rejected', reason: messages.clarifyTask }
+      }
       try {
         return { status: definition.name === 'task_list' ? 'listed' : 'saved', result: await definition.execute(input) }
       }

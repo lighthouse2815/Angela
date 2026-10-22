@@ -24,12 +24,12 @@ afterEach(async () => {
   await Promise.all(directories.splice(0).map(directory => rm(directory, { recursive: true, force: true })))
 })
 
-it('fences simultaneous claims from two OS processes and prevents replay after acknowledgment', async () => {
+it.each(['reminder', 'follow_up'] as const)('fences simultaneous %s claims from two OS processes and prevents replay after acknowledgment', async (type) => {
   const directory = await mkdtemp(join(tmpdir(), 'angela-process-'))
   directories.push(directory)
   const now = Date.parse('2026-10-17T10:00:00Z')
   const tasks = new Tasks(directory, cliMessages.en.tasks, () => now)
-  const task = await tasks.create({ title: 'One delivery owner', type: 'reminder', dueAt: new Date(now).toISOString() })
+  const task = await tasks.create({ title: 'One delivery owner', type, dueAt: new Date(now).toISOString() })
   const fixture = join(directory, 'claim.mts')
   await writeFile(fixture, `
 import process from 'node:process'

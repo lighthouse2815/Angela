@@ -210,8 +210,10 @@ async function main() {
           process.stderr.write(`\n${text}\n`, error => error ? reject(error) : resolve())
         })
       }
-      if (announced.length)
+      if (announced.length) {
+        await scope.mentionCommitments(announced)
         chat.conversation.turns.push(...chatMessagesToTurns([{ role: 'assistant', content: text }]))
+      }
       if (voiceReady && !input?.hasInput)
         reminderWake?.abort()
     })

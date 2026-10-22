@@ -71,6 +71,7 @@ it('asks which task after a batch notification, and rejects invalid snooze witho
   history.turns.push(...chatMessagesToTurns([{ role: 'assistant', content: `${first.id} ${second.id}` }]))
   expect((await send('Xong rồi.'))?.text).toBe(cliMessages.vi.tasks.clarifyTask)
   expect(await tasks.list()).toHaveLength(2)
+  history.turns = []
   history.turns.push(...chatMessagesToTurns([{ role: 'assistant', content: first.id }]))
   expect((await send('0 phút nữa nhắc lại.'))?.text).toBe(cliMessages.vi.tasks.invalidTime)
   expect(await tasks.find(first.id)).toEqual(first)
@@ -84,12 +85,33 @@ it('honors privacy before saving, and leaves weak intent to ordinary conversatio
   expect(await service.handle('Mai chắc tao học LINQ', history, requestPrivacy(''))).toBeUndefined()
 })
 
-it('does not revive a stale reference after an unrelated assistant reply', async () => {
+it('keeps a recent reference across an unrelated assistant reply', async () => {
   const { send, tasks, history } = await setup()
   const created = await send('Mai 9h nhắc tôi học LINQ')
   history.turns.push(...chatMessagesToTurns([{ role: 'assistant', content: 'Bạn muốn cùng giải bài tập nào?' }]))
+  expect((await send('Xong rồi.'))?.task?.id).toBe(created!.task!.id)
+  expect((await tasks.find(created!.task!.id)).status).toBe('completed')
+})
+
+it('expires references after sustained unrelated conversation and refuses multiple recent tasks', async () => {
+  const { send, tasks } = await setup()
+  const created = await send('Mai 9h nhắc tôi học LINQ')
+  for (let index = 0; index < 9; index++)
+    await send(`Trao đổi về C# phần ${index}`)
   expect((await send('Xong rồi.'))?.text).toBe(cliMessages.vi.tasks.clarifyTask)
   expect((await tasks.find(created!.task!.id)).status).toBe('pending')
+  await send('Mai 10h nhắc tôi làm auth')
+  await send('Mai 11h nhắc tôi gửi báo cáo')
+  expect((await send('Xong rồi.'))?.text).toBe(cliMessages.vi.tasks.clarifyTask)
+  expect(await tasks.list()).toHaveLength(3)
+})
+
+it('does not mistake words in the control phrase for an explicitly named task', async () => {
+  const { send, tasks } = await setup()
+  const unrelated = await tasks.create({ title: 'rồi', type: 'todo' })
+  const created = await send('Mai 9h nhắc tôi học LINQ')
+  expect((await send('Xong rồi.'))?.task?.id).toBe(created!.task!.id)
+  expect((await tasks.find(unrelated.id)).status).toBe('pending')
 })
 
 it('keeps explicitly requested task operations available with personal memory disabled', async () => {
@@ -100,4 +122,13 @@ it('keeps explicitly requested task operations available with personal memory di
   const completed = await service.handle('Xong rồi.', history, requestPrivacy('Xong rồi.', false))
   expect(completed?.task?.status).toBe('completed')
   expect(await tasks.list()).toHaveLength(0)
+})
+
+it('resolves an explicit follow-up subject from this conversation and clarifies absent context', async () => {
+  const { send, tasks } = await setup()
+  expect((await send('Nhớ hỏi tôi lại chuyện này vào tối mai.'))?.text).toBe(cliMessages.vi.tasks.clarifyTask)
+  await send('Tao đang làm auth mà bí phần refresh token.')
+  const result = await send('Nhớ hỏi tôi lại chuyện này vào tối mai.')
+  expect(result?.task).toMatchObject({ type: 'follow_up', title: 'làm auth mà bí phần refresh token.', dueAt: '2026-10-23T12:00:00.000Z' })
+  expect(await tasks.list()).toHaveLength(1)
 })

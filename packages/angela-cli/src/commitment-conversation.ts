@@ -5,6 +5,7 @@ import type { RequestPrivacy } from './privacy-policy'
 import type { Task } from './task-schema'
 import type { Tasks } from './tasks'
 
+import { ActiveCommitments } from './active-commitments'
 import { extractCommitment } from './commitment-extraction'
 import { durableWriteRejection } from './privacy-policy'
 import { parseReminderTime } from './reminder-time'
@@ -19,10 +20,12 @@ export interface CommitmentReply {
 
 /** Uses conversation-local task references, including delivered notifications. It never retains a global last-task ID. */
 export class CommitmentConversation {
-  constructor(private readonly tasks: Tasks, private readonly messages: typeof cliMessages.en.tasks, private readonly locale: string, private readonly memoryProjection?: Task['memoryProjection']) {}
+  constructor(private readonly tasks: Tasks, private readonly messages: typeof cliMessages.en.tasks, private readonly locale: string, private readonly memoryProjection?: Task['memoryProjection'], private readonly active = new ActiveCommitments()) {}
 
   async handle(text: string, history: Conversation, privacy: RequestPrivacy): Promise<CommitmentReply | undefined> {
-    if (durableWriteRejection(privacy, 'task', text) && /nhắc|gọi\s+(?:tôi|tao|mình)/iu.test(text))
+    if (!durableWriteRejection(privacy, 'task', text))
+      await this.active.advance(this.tasks.now())
+    if (durableWriteRejection(privacy, 'task', text) && /nhắc|hỏi|check\s+xem|gọi\s+(?:tôi|tao|mình)/iu.test(text))
       return { text: this.messages.protected }
     let extraction = extractCommitment(text, this.tasks.now(), this.tasks.timezone)
     // Only a short time answer can extend the immediately preceding reminder request.
@@ -41,7 +44,14 @@ export class CommitmentConversation {
         return { text: this.messages.protected }
       if (extraction.time.status !== 'resolved')
         return { text: extraction.time.status === 'invalid' ? this.messages.invalidTime : this.messages.clarifyTime }
-      const task = await this.tasks.create({ title: extraction.title, type: 'reminder', dueAt: extraction.time.remindAt, timezone: this.tasks.timezone }, this.memoryProjection)
+      if (extraction.type === 'follow_up' && /^(?:chuyện này|việc này|cái này)$/iu.test(extraction.title)) {
+        const previous = history.turns.findLast(turn => turn.type === 'user')
+        const topic = previous?.content.flatMap(part => part.type === 'text' ? [part.text] : []).join(' ').replace(/^(?:tôi|tao|mình)\s+(?:đang\s+)?/iu, '').trim()
+        if (!topic || topic.length > 200 || durableWriteRejection(privacy, 'task', topic))
+          return { text: this.messages.clarifyTask }
+        extraction.title = topic
+      }
+      const task = await this.tasks.create({ title: extraction.title, type: extraction.type, dueAt: extraction.time.remindAt, timezone: this.tasks.timezone }, this.memoryProjection)
       return this.saved(task, 'created')
     }
     const controlText = text.trim().replace(/[.!]+$/u, '').trim()
@@ -49,20 +59,18 @@ export class CommitmentConversation {
       ? 'completed'
       : /^(?:không cần nhắc (?:cái đó(?: nữa)?|nữa)|(?:hủy|huỷ|bỏ nhắc)(?:\s+\S.*)?)$/iu.test(controlText)
         ? 'cancelled'
-        : /nhắc lại$/iu.test(controlText) ? 'snoozed' : undefined
+        : /^(?:(?:\d+|một|hai|ba|bốn|năm|sáu|bảy|tám|chín|mười)\s*(?:phút|tiếng|giờ)\s+nữa\s+)?nhắc lại$/iu.test(controlText) ? 'snoozed' : undefined
     if (!control)
       return undefined
     const rejection = durableWriteRejection(privacy, 'task', text)
     if (rejection)
       return { text: this.messages.protected }
     const all = await this.tasks.list({ status: 'all' })
-    const named = all.filter(task => text.toLocaleLowerCase().includes(task.title.toLocaleLowerCase()))
+    const selection = /^(?:hoàn thành\s+việc|hủy|huỷ|bỏ nhắc)\s+(.+)$/iu.exec(controlText)?.[1]?.replace(/^việc\s+/iu, '').trim().toLocaleLowerCase()
+    const named = selection ? all.filter(task => task.title.toLocaleLowerCase() === selection) : []
     let candidates = named
-    if (!candidates.length) {
-      const latest = history.turns.findLast(turn => turn.type === 'assistant')
-      const content = latest ? JSON.stringify(latest) : ''
-      candidates = all.filter(task => content.includes(task.id))
-    }
+    if (!candidates.length)
+      candidates = await this.active.resolve(history, all, this.tasks.now())
     if (candidates.length !== 1)
       return { text: this.messages.clarifyTask }
     const selected = candidates[0]!
@@ -78,7 +86,8 @@ export class CommitmentConversation {
     return this.saved(await this.tasks.snooze(selected.id, time.remindAt), 'updated')
   }
 
-  private saved(task: Task, action: CommitmentReply['action']): CommitmentReply {
+  private async saved(task: Task, action: CommitmentReply['action']): Promise<CommitmentReply> {
+    await this.active.mention([task], 'conversation', this.tasks.now())
     const heading = action === 'created' ? this.messages.created : action === 'completed' ? this.messages.completed : task.status === 'cancelled' ? this.messages.cancelled : this.messages.snoozed
     return { text: `${heading}\n${formatTask(task, this.locale, this.messages)}`, task, action }
   }

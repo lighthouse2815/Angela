@@ -50,6 +50,12 @@ export function taskDue(task: Task) {
   return task.snoozedUntil ?? task.dueAt
 }
 
+/** Explicit follow-ups expire after 48 hours without a prompt. Snoozing starts a fresh relevance window. */
+export function followUpExpiry(task: Task) {
+  const due = taskDue(task)
+  return task.type === 'follow_up' && due ? Date.parse(task.followUp?.expiresAt ?? due) + (task.followUp?.expiresAt ? 0 : 48 * 3_600_000) : undefined
+}
+
 /** Local calendar date for task queries, independent of the host process timezone. */
 export function localDate(instant: number, timezone: string) {
   const value = parts(instant, timezone)
@@ -69,6 +75,8 @@ export function deliveryDue(task: Task) {
   if (task.status !== 'pending' || !due || task.notifiedFor === due)
     return undefined
   if (task.delivery?.occurrence === due) {
+    if (task.delivery.status === 'skipped')
+      return undefined
     if (task.delivery.status === 'claimed')
       return Math.max(Date.parse(due), Date.parse(task.delivery.leaseUntil))
     if (task.delivery.status === 'pending')

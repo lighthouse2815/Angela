@@ -15,7 +15,7 @@ import { errorMessageFrom } from '@moeru/std'
 
 import { readConfig } from './config'
 import { ReminderScheduler } from './reminder-scheduler'
-import { formatTask } from './task-commands'
+import { formatTask, taskPrompt } from './task-commands'
 import { Tasks } from './tasks'
 
 const execute = promisify(execFile)
@@ -29,7 +29,7 @@ export class DesktopReminders implements ReminderNotifier {
     await verify?.()
     signal.throwIfAborted()
     // Disable markup so saved titles cannot inject notification formatting or links.
-    const text = tasks.map(task => formatTask(task, this.locale, this.messages)).join('\n\n').replace(/&/gu, '&amp;').replace(/</gu, '&lt;').replace(/>/gu, '&gt;')
+    const text = tasks.map(task => `${taskPrompt(task, this.messages)}\n${formatTask(task, this.locale, this.messages)}`).join('\n\n').replace(/&/gu, '&amp;').replace(/</gu, '&lt;').replace(/>/gu, '&gt;')
     await execute('notify-send', ['--app-name=Angela', '--', overdue ? this.messages.overdue : this.messages.reminder, text], { env: this.env, signal, timeout: 10_000 })
   }
 }

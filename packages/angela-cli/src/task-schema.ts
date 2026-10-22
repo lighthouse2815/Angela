@@ -51,10 +51,18 @@ export const taskSchema = v.pipe(v.object({
     v.object({ status: v.literal('pending'), occurrence: taskTime, retryAt: taskTime }),
     v.object({ status: v.literal('claimed'), occurrence: taskTime, token: taskId, claimedAt: taskTime, leaseUntil: taskTime }),
     v.object({ status: v.literal('delivered'), occurrence: taskTime, deliveredAt: taskTime }),
+    v.object({ status: v.literal('skipped'), occurrence: taskTime, skippedAt: taskTime, reason: v.literal('expired') }),
   ])),
   snoozedUntil: v.optional(taskTime),
   recurrenceAnchor: v.optional(taskTime),
   memoryProjection: v.optional(v.strictObject({ scope: v.pipe(v.string(), v.maxLength(4000)), sourceSessionId: v.pipe(v.string(), v.maxLength(200)) })),
+  followUp: v.optional(v.object({
+    promptCount: v.pipe(v.number(), v.integer(), v.minValue(0)),
+    lastPromptedAt: v.optional(taskTime),
+    nextEligibleAt: v.optional(taskTime),
+    expiresAt: v.optional(taskTime),
+    resolvedAt: v.optional(taskTime),
+  })),
 }), v.check(task => !task.dueAt || !task.dueDate), v.check(task => !task.recurrence || Boolean(task.dueAt && task.recurrenceAnchor)), v.check(task => task.type !== 'routine' || Boolean(task.recurrence)))
 export const taskState = v.pipe(v.object({ version: v.literal(1), tasks: v.array(taskSchema) }), v.check(state => new Set(state.tasks.map(task => task.id)).size === state.tasks.length), v.check(state => JSON.stringify(state).length <= 128_000))
 

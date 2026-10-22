@@ -21,6 +21,7 @@ export type AngelaEvent = BaseAngelaEvent & (
   | { type: 'task.completed', taskId: string }
   | { type: 'reminder.delivered', taskId: string }
   | { type: 'reminder.due', taskId: string }
+  | { type: 'proactive.prompted', taskId: string, candidateId: string, reason: 'due_commitment' | 'overdue_commitment' | 'explicit_follow_up' }
   | { type: 'project.changed', revision: number }
   | { type: 'memory.changed', memoryId: string, action: 'saved' | 'deleted' }
   | { type: 'session.started' }

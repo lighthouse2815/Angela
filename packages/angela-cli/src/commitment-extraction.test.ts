@@ -7,6 +7,17 @@ import { parseReminderTime } from './reminder-time'
 const now = Date.parse('2026-10-22T07:00:00+07:00')
 const zone = 'Asia/Ho_Chi_Minh'
 
+it.each([
+  ['Mai hỏi tao xem phần auth làm xong chưa.', 'phần auth', '2026-10-23T02:00:00.000Z'],
+  ['Chiều mai hỏi lại xem báo cáo tới đâu rồi.', 'báo cáo', '2026-10-23T08:00:00.000Z'],
+  ['Ngày mai check xem tôi đã học LINQ chưa.', 'học LINQ', '2026-10-23T02:00:00.000Z'],
+  ['Nhớ hỏi tôi lại chuyện này vào tối mai.', 'chuyện này', '2026-10-23T12:00:00.000Z'],
+  ['Tao đang làm auth, mai hỏi tao xem xong chưa.', 'làm auth', '2026-10-23T02:00:00.000Z'],
+])('extracts explicit follow-ups with a deterministic local window: %s', (text, title, remindAt) => {
+  expect(classifyCommitmentIntent(text)).toBe('follow_up')
+  expect(extractCommitment(text, now, zone)).toMatchObject({ isCommitment: true, type: 'follow_up', title, time: { status: 'resolved', remindAt } })
+})
+
 it('authorizes a direct task clause after a separate statement without consuming the whole request locally', () => {
   expect(classifyCommitmentIntent('Tôi tên là Lan. Thêm việc học tiếng Trung vào danh sách.')).toBe('create')
   expect(extractCommitment('Tôi tên là Lan. Mai 9h nhắc tôi học.', now, zone).isCommitment).toBe(false)
@@ -33,13 +44,14 @@ it.each([
   expect(extractCommitment(text, now, zone).isCommitment).toBe(false)
 })
 
-it.each(['Nhắc tôi họp lúc 14h.', 'Ngày 25 lúc 9h nhắc tôi đóng học phí.', 'Nhắc tôi gửi báo cáo lúc 8h tối nay.', '10 phút nữa nhắc tôi uống nước.'])('accepts direct requests: %s', (text) => {
+it.each(['Nhắc tôi họp lúc 14h.', 'Ngày 25 lúc 9h nhắc tôi đóng học phí.', 'Nhắc tôi gửi báo cáo lúc 8h tối nay.', '10 phút nữa nhắc tôi uống nước.', 'Mai 9h nhắc tôi chạy test parser.', 'Mai 9h nhắc tôi kiểm tra hệ thống.'])('accepts direct requests: %s', (text) => {
   expect(classifyCommitmentIntent(text)).toBe('create')
   expect(extractCommitment(text, now, zone)).toMatchObject({ isCommitment: true, time: { status: 'resolved' } })
 })
 
 it.each([
   ['Mai 9h nhắc tao học LINQ.', 'học LINQ', '2026-10-23T02:00:00.000Z'],
+  ['Tao đang làm auth, mai 9h nhắc tôi học LINQ.', 'học LINQ', '2026-10-23T02:00:00.000Z'],
   ['Hai tiếng nữa gọi tôi quay lại làm auth.', 'quay lại làm auth', '2026-10-22T02:00:00.000Z'],
   ['10 phút nữa nhắc tôi gửi báo cáo', 'gửi báo cáo', '2026-10-22T00:10:00.000Z'],
   ['thứ sáu lúc 8h nhắc tao gửi báo cáo', 'gửi báo cáo', '2026-10-23T01:00:00.000Z'],

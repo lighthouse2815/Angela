@@ -210,7 +210,7 @@ export class Recall {
     this.unsubscribeTasks = tasks.subscribe(async ({ task }) => {
       try {
         if (!this.closed && await this.automaticMemoryEnabled())
-          new CommitmentMemoryProjection(this.database().memory, this.workspace).apply(task)
+          new CommitmentMemoryProjection(this.database().memory, this.workspace).apply(await tasks.find(task.id))
       }
       catch { this.problem('commitments') }
     })

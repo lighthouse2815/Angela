@@ -33,6 +33,15 @@ it.each([
   expect(await tasks.list()).toHaveLength(0)
 })
 
+it('also prevents meta discussion from mutating an existing task through another tool', async () => {
+  const { tasks } = await setup()
+  const task = await tasks.create({ title: 'Study', type: 'reminder' })
+  const tools = taskTools(tasks, messages, undefined, 'Parser xử lý câu xong rồi như thế nào?')
+  const tool = tools.find(tool => tool.function.name === 'task_complete')!
+  expect(await tool.execute!({ id: task.id }, options)).toMatchObject({ status: 'rejected' })
+  expect((await tasks.find(task.id)).status).toBe('pending')
+})
+
 afterEach(async () => {
   await Promise.all(directories.splice(0).map(directory => rm(directory, { recursive: true, force: true })))
 })

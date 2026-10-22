@@ -4,9 +4,7 @@ import type { ReminderNotifier } from './reminder-scheduler'
 import type { Task } from './task-schema'
 import type { Voice } from './voice'
 
-import { stripVTControlCharacters } from 'node:util'
-
-import { formatTask } from './task-commands'
+import { formatTask, taskPrompt } from './task-commands'
 
 /** Buffers text during chat output. Voice runs only when the host reaches a safe boundary after capture or reply playback. */
 export class ReminderNotifications implements ReminderNotifier {
@@ -40,12 +38,12 @@ export class ReminderNotifications implements ReminderNotifier {
       signal.throwIfAborted()
     } while (this.paused)
     const heading = overdue ? this.messages.overdue : this.messages.reminder
-    const text = `${heading}\n\n${tasks.map(task => `${task.type === 'follow_up' ? `${this.messages.followUp}\n` : ''}${formatTask(task, this.locale, this.messages)}`).join('\n')}`
+    const text = `${heading}\n\n${tasks.map(task => `${taskPrompt(task, this.messages)}\n${formatTask(task, this.locale, this.messages)}`).join('\n')}`
     await this.present(text, tasks, signal)
     if (this.voiceEnabled) {
       if (this.speech.length >= 8)
         this.speech.shift()
-      this.speech.push(`${heading}. ${tasks.map(task => stripVTControlCharacters(task.title)).join('. ')}`.slice(0, 4000))
+      this.speech.push(`${heading}. ${tasks.map(task => taskPrompt(task, this.messages)).join(' ')}`.slice(0, 4000))
     }
   }
 

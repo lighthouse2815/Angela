@@ -1,222 +1,263 @@
-# Commitment and reminder implementation report
+# Reminder, commitment, and proactive companion audit
 
-## 1. Existing architecture
+Source baseline: GitHub `origin/main` at `dc2e7f3`, fetched before implementation on 2026-10-23.
+Target branch: `main`. This report describes the resulting code, not the earlier implementation report.
 
-The active repository is `airi/`, with CLI, messaging, Vue web, and Electron applications.
-The implementation targets `packages/angela-cli` and its existing shared runtime.
+## 1. Before
 
-Terminal input enters `bin/run.ts`, then `RuntimeSession.send`, `Chat.send`, and `core-agent.streamFrom`.
-`provider-inference` owns provider adapters. `Context` owns compaction. `Sessions` owns durable portable conversation history.
-`Tasks` already owns task state. `MemoryFile` owns atomic local JSON storage.
-`ReminderScheduler` already owns claims, leases, retries, recurrence, and overdue recovery.
-Memory-v2 uses SQLite and FTS for episodic, semantic, and procedural memory.
-Runtime lifecycle events use the existing metadata event bus. Electron uses Eventa and injeca at process boundaries.
-`local-config`, environment variables, and CLI flags provide configuration.
+`Tasks` already owned atomic JSON persistence, task transitions, recurrence, deduplication, and notification leases.
+`ReminderScheduler` already renewed leases, retried failures, and recovered overdue reminders.
+`ProactivePolicy` already checked quiet hours, per-task cooldown, and priority.
+`follow_up` already existed in the task schema and task tools.
+`RuntimeSession.send` coordinated privacy, extraction, context, model tools, and memory capture.
+`MemoryCapture` wrote current commitment pages. `buildContext` reconciled every retained task on each request.
+Conversational controls searched the last assistant turn. CLI notifications entered history. Telegram delivery lacked an equivalent durable reference.
 
-## 2. Problems found
+## 2. Problems found in main
 
-Time interpretation depended entirely on model timestamps.
-Repeated creation produced duplicate pending tasks.
-Reminder eligibility lacked a separate proactive policy.
-Memory retained task history without a current per-task record.
-Standalone task commands were absent.
-Task writer locks lacked owner metadata, which blocked automatic recovery after a crashed write.
+- Local extraction and model tools used different regex guards. Meta discussion and code quotations remained vulnerable.
+- Model context serialized all pending, completed, and cancelled tasks on every request.
+- Every normal request compared every task against commitment memory records.
+- An unrelated assistant answer discarded the active task reference.
+- The follow-up type had no local explicit extractor, explainable candidate model, or persisted prompt lifecycle.
+- Offline follow-up eligibility lacked expiry, burst suppression, and recent-activity policy.
+- The delivered reminder event used wall time despite an injected clock.
+- `8h tối nay` overlapped the calendar and hour matches and incorrectly required clarification.
 
-## 3. Resulting architecture
+## 3. Architecture after
 
 ```text
 Conversation
-  -> privacy boundary
-  -> CommitmentConversation
-     -> extractCommitment
-     -> parseReminderTime
-     -> Tasks -> MemoryFile -> atomic JSON
-     -> verified domain event -> MemoryCapture
-     -> Chat.respond -> existing output and session persistence
-
-Unsupported wording
-  -> existing context builder and validated model tools
-  -> intent guard -> Tasks
-
-ReminderScheduler
-  -> ProactivePolicy
-  -> persisted occurrence claim
-  -> notification adapter
-  -> acknowledgment and persisted delivery history
-  -> conversation-local reference
-  -> snooze / complete / cancel
+  -> request privacy
+  -> shared CommitmentIntent guard
+  -> CommitmentConversation / guarded task tools
+  -> Tasks -> locked atomic JSON
+       -> typed task events
+       -> Recall -> CommitmentMemoryProjection -> commitment:<taskId>
+       -> ReminderScheduler
+            -> ProactiveCandidate (task + occurrence identity)
+            -> ProactivePolicy
+            -> fenced renewable claim
+            -> deterministic notification
+            -> atomic delivery acknowledgment and follow-up state
+            -> ActiveCommitments (workspace + session + channel)
+            -> unrelated conversation
+            -> complete / snooze / cancel
+            -> task events -> current memory projection
+            -> next explicitly scheduled occurrence
 ```
 
-No additional database, model provider, broker, service, or dependency was introduced.
-The existing optional Linux reminder service remains available.
+Task storage remains authoritative. Candidates derive from tasks and require no second database.
+The existing task subscription and runtime event bus remain in use.
+No dependency, backend, broker, new event bus, model abstraction, or agent subsystem was added.
 
-## 4. Changed files
+## 4. Exact changed files
 
-Paths are relative to the repository root.
+Paths are relative to the repository root. The list covers all commits from the inspected baseline and this final implementation.
 
 - `docs/ai/adr/2026-10-22-commitment-follow-up.md`
+- `docs/ai/audits/commitment-reminder.md`
 - `packages/angela-cli/README.md`
+- `packages/angela-cli/src/active-commitments.test.ts`
+- `packages/angela-cli/src/active-commitments.ts`
 - `packages/angela-cli/src/bin/run.ts`
-- `packages/angela-cli/src/chat.ts`
-- `packages/angela-cli/src/cli.test.ts`
-- `packages/angela-cli/src/clock.ts`
+- `packages/angela-cli/src/commitment-context.ts`
 - `packages/angela-cli/src/commitment-conversation.test.ts`
 - `packages/angela-cli/src/commitment-conversation.ts`
 - `packages/angela-cli/src/commitment-extraction.test.ts`
 - `packages/angela-cli/src/commitment-extraction.ts`
+- `packages/angela-cli/src/commitment-intent.ts`
 - `packages/angela-cli/src/commitment-scenario.test.ts`
-- `packages/angela-cli/src/file-lock.ts`
-- `packages/angela-cli/src/memory-file.ts`
+- `packages/angela-cli/src/evaluation.ts`
+- `packages/angela-cli/src/memory-v2/commitment-projection.test.ts`
+- `packages/angela-cli/src/memory-v2/commitment-projection.ts`
 - `packages/angela-cli/src/memory-v2/consolidator.ts`
 - `packages/angela-cli/src/privacy-policy.ts`
+- `packages/angela-cli/src/proactive-candidate.ts`
 - `packages/angela-cli/src/proactive-policy.test.ts`
 - `packages/angela-cli/src/proactive-policy.ts`
 - `packages/angela-cli/src/recall.ts`
-- `packages/angela-cli/src/reminder-notifications.test.ts`
 - `packages/angela-cli/src/reminder-notifications.ts`
 - `packages/angela-cli/src/reminder-scheduler.ts`
 - `packages/angela-cli/src/reminder-time.ts`
 - `packages/angela-cli/src/reminders.ts`
+- `packages/angela-cli/src/runtime/context-builder.test.ts`
 - `packages/angela-cli/src/runtime/context-builder.ts`
 - `packages/angela-cli/src/runtime/events.ts`
 - `packages/angela-cli/src/runtime/privacy-boundary.test.ts`
 - `packages/angela-cli/src/runtime/runtime.ts`
 - `packages/angela-cli/src/runtime/tool-registry.ts`
-- `packages/angela-cli/src/sessions.ts`
-- `packages/angela-cli/src/task-cli.test.ts`
 - `packages/angela-cli/src/task-cli.ts`
 - `packages/angela-cli/src/task-commands.ts`
-- `packages/angela-cli/src/task-conversation.test.ts`
 - `packages/angela-cli/src/task-process.test.ts`
-- `packages/angela-cli/src/task-retention.test.ts`
 - `packages/angela-cli/src/task-schema.ts`
 - `packages/angela-cli/src/task-time.ts`
-- `packages/angela-cli/src/tasks.test.ts`
+- `packages/angela-cli/src/task-tools.test.ts`
+- `packages/angela-cli/src/task-tools.ts`
 - `packages/angela-cli/src/tasks.ts`
+- `packages/angela-cli/src/telegram.ts`
 - `packages/i18n/src/cli.ts`
 
-This report is an additional documentation file.
+## 5. Intent protection
 
-## 5. Commitment flow
+`classifyCommitmentIntent` distinguishes create, follow-up, meta, hypothetical, quoted, negative, uncertain, and absent intent.
+Local extraction and `task_create` use the same result. Tool authorization reads the host-owned user request, never model arguments.
+Missing provenance, parser discussion, examples, quotations, code, predictions, hypothetical statements, and multiple actions reject automatic creation.
+Meta, hypothetical, quoted, and uncertain requests also cannot mutate an existing task through another task tool.
+Explicit negative cancellation remains available. A request to avoid cancellation cannot authorize cancellation.
+Technical subjects containing `test`, `parser`, or `hệ thống` remain valid after a direct imperative.
+Separate direct task clauses can use model tools without consuming unrelated user statements locally.
 
-Explicit supported Vietnamese requests create tasks before model generation.
-Date-only requests ask for clarification without saving an alarm.
-Predictions, examples, quotations, and negations cannot authorize model-created tasks.
-A short time answer completes the immediately preceding date-only reminder request.
-Natural controls resolve the latest assistant task reference or an explicit task title.
-Multiple candidates and stale references require clarification.
+## 6. Context optimization
 
-## 6. Persistence
+Before: every retained pending, completed, and cancelled task entered every model request.
+After: `commitmentContext` selects deterministic, bounded groups.
 
-The source of truth remains `<data-dir>/tasks/tasks.json`.
-Each mutation validates the complete state, acquires a writer lock, and atomically renames a private temporary file.
-New writer locks atomically publish complete PID and hostname metadata through a hard link.
-A same-host dead process permits recovery. Active and unknown owners remain protected.
-The existing storage and history bounds remain in force. Pending tasks are never pruned.
-Identical pending creations reuse their saved ID under the storage lock.
-Snooze preserves identity and increments its count.
+| Group | Maximum | Selection |
+| --- | ---: | --- |
+| Overdue | 8 | Pending and past due |
+| Due today | 8 | Pending and not already overdue |
+| Upcoming | 6 | Earliest future local dates |
+| Unscheduled | 5 | Pending without a date or alarm |
+| Recently completed | 3 | Latest completion within seven days |
+| Cancelled | 0 | Explicit tools or retrieval only |
 
-## 7. Scheduler
+The prompt states that omitted tasks are not absent.
+`task_list` still queries retained history. Existing storage retention remains unchanged, including the inactive-history limit.
+The context regression supplies 10 pending, 50 completed, and 30 cancelled records at the storage boundary.
+It checks six relevant upcoming records, queryable omitted history, and zero request-path commitment repair calls.
 
-The existing bounded timer selects due pending occurrences without busy polling.
-Proactive policy supports optional quiet hours, per-task cooldown, and notification priority.
-Deferred occurrences remain pending. Persisted timestamps preserve cooldown after restart.
-The scheduler batches overdue startup reminders, claims each occurrence, renews its lease, and acknowledges successful presentation.
-Completed, cancelled, and acknowledged occurrences cannot fire again during normal operation.
-Local mutations trigger reconciliation. External changes reconcile within one minute.
+## 7. Memory projection
 
-## 8. Memory integration
+Successful task writes publish typed created, updated, completed, cancelled, snoozed, and delivered events.
+Recall reloads the affected authoritative task and projects only its `commitment:<taskId>` key.
+The existing SQL uniqueness constraint permits one current page for each scope, tier, and key.
+Repeated identical events preserve the current version. Transitions supersede the current page instead of duplicating active pages.
+MemoryCapture retains dated observations and episodes. It no longer owns current commitment pages.
 
-Verified transitions write a versioned episodic record keyed by commitment ID.
-Completion supersedes the current pending record. Dated session history remains historical evidence.
-Current task snapshots override old task descriptions during generation.
-Recall repairs existing commitment records after cross-channel state changes.
-Task storage remains separate from semantic and vector memory.
-Automatic-memory switches and protected-request policy still apply.
+Startup, five-minute reconciliation, and `repairCommitments(true)` repair external writes and projection failures.
+Host-owned task scope and source-session metadata authorize recovery of a missing initial page.
+Model arguments cannot supply this provenance. Memory-disabled task creation does not grant it.
+Suppression prevents recovery from recreating forgotten content.
+Projection errors leave the authoritative task intact. A later repair updates its current page.
+Projection follows actual task state even after the injected clock moves backward.
 
-## 9. Commands
+## 8. Active commitment context
 
-```sh
-angela tasks
-angela tasks all
-angela task show ID
-angela task done ID
-angela task snooze ID 2h
-angela task cancel ID
-```
+`ActiveCommitments` retains at most eight task IDs, source labels, timestamps, and bounded request counts.
+Its private file identity includes data directory, workspace, session ID, and channel.
+CLI and Telegram record the destination session after successful presentation, including cold runtime contexts.
+Verified task mutations and current assistant mentions also update that conversation's reference state.
+No protected task title or conversation text enters the reference file.
 
-These standalone commands need no model configuration.
-The existing `/tasks`, `/today`, `/done`, `/cancel`, and `/snooze` chat commands remain available.
-`ANGELA_TIMEZONE` selects the reminder timezone. Each task also retains its own timezone.
+References expire after eight requests or six hours. Oversized batches require clarification.
+An unrelated answer does not discard a recent reference.
+`Xong rồi`, `2 tiếng nữa nhắc lại`, and `Không cần nhắc cái đó nữa` resolve the recent pending reference.
+Several candidates, expired references, and absent references produce the existing clarification response.
+An explicit title must match the selection clause. Generic control words cannot accidentally select a task with the same title.
+Persistent runtime references use their own timestamps. Another channel's task-delivery timestamp cannot revive an expired reference.
+Session reset clears only that session's references.
 
-## 10. Tests
+## 9. Proactive companion
 
-New tests cover extraction, Vietnamese time parsing, ambiguous dates, timezone boundaries, and DST ambiguity.
-Conversation tests cover persistence, clarification, contextual control, privacy, stale references, and inactive tasks.
-Policy tests cover quiet-hour deferral, persisted cooldown, priority, and invalid configuration.
-Standalone command tests run real CLI processes without a model.
-The full scenario uses real task storage, saved sessions, memory, and an injected fake clock.
-It runs creation, restart, 09:00 delivery, two-hour snooze, 11:00 delivery, completion, and memory update.
-The supported scenario makes no model requests.
-A separate process test uses SIGKILL during a locked write, then checks recovery and single delivery.
-Existing scheduler, concurrent-claim, lease, retry, corruption, retention, recurrence, and privacy regressions remain active.
+Explicit Vietnamese follow-up requests use the existing `follow_up` task type.
+Supported requests include all four requested examples, plus an unfinished activity followed by an explicit request to ask tomorrow.
+A contextual subject uses the preceding user topic. Missing context requires clarification.
+Casual conversation never becomes a follow-up candidate automatically.
 
-## 11. Validation
+Coarse follow-ups use 09:00 locally. Afternoon uses 15:00. Evening uses 19:00.
+The saved confirmation exposes the selected time. Explicit hours take precedence.
+Reminder alarms without an hour still require clarification.
 
-Commands used the local pnpm setting `--config.verify-deps-before-run=false`.
-The installed pnpm launcher otherwise triggered unrelated postinstall execution and an `Exec format error`.
-The repository pre-commit command ran explicitly through pnpm with that setting before each commit.
+Candidates carry a stable task/occurrence identity, traceable reason, subject, source ID, priority, confidence, relevance, earliest time, and expiry.
+Policy checks relevance, completion, confidence, duplicate suppression, expiry, quiet hours, cooldown, and recent activity.
+The default recent-activity delay is two minutes. The default shared-store follow-up interval is thirty minutes.
+Each batch contains at most one follow-up. Atomic claims also fence distinct follow-ups across concurrent hosts.
+Active leases defer competing follow-ups without busy polling.
 
-- CLI full suite: 563 tests passed across 64 files.
-- CLI typecheck: passed.
-- i18n typecheck: passed.
-- CLI build: passed.
-- i18n build: passed.
-- Root lint: completed with zero errors and 603 existing warnings.
-- Focused ESLint: passed for changed implementation and tests.
-- Root typecheck: 46 workspaces succeeded before stage-ui exhausted the default Node heap.
-- Diff checks: passed.
+Task state persists `promptCount`, `lastPromptedAt`, `nextEligibleAt`, `expiresAt`, and `resolvedAt`.
+A successful prompt acknowledges its occurrence. It never repeats at each startup.
+Unprompted follow-ups expire after forty-eight hours and persist a skipped occurrence.
+Expired recurring follow-ups advance to their next future calendar occurrence.
+Snooze opens a new occurrence while preserving identity. Completion and cancellation resolve the follow-up.
+Text, voice, and desktop wording use deterministic localized templates. Delivery requires no model.
+`proactive.prompted` exposes candidate identity and reason through metadata-only events.
 
-Commands and results:
+## 10. Restart guarantees
 
-| Command | Result |
+Task creation, occurrence claims, acknowledgment, snooze, and resolution survive normal restart.
+A due follow-up recovers once while relevant. Repeated restart does not repeat an acknowledged prompt.
+Expired work is skipped. Several missed follow-ups cannot produce a startup burst.
+Notification failure does not increment prompt count. The existing backoff and lease expiry retain retryability.
+Renewal and token fencing prevent stale owners from acknowledging changed occurrences.
+Reference state also survives restart under the exact conversation identity.
+
+A crash after external presentation and before acknowledgment can repeat the external notification.
+Exactly-once external presentation requires an idempotent notification destination. The local engine retains at-least-once recovery.
+
+## 11. Tests
+
+New files:
+
+- `active-commitments.test.ts`: restart, workspace/session/channel isolation, TTL, external-channel timestamp revival, and oversized batches.
+- `memory-v2/commitment-projection.test.ts`: one current identity, snooze, completion, memory failure, repair, external writers, clock rollback, and suppression.
+- `runtime/context-builder.test.ts`: 90-record history, bounded prompt, on-demand history, and absence of request-path repair.
+
+Expanded suites:
+
+- `commitment-extraction.test.ts`: requested adversarial categories, positive reminders, explicit follow-ups, day parts, and direct technical subjects.
+- `task-tools.test.ts`: model bypass protection with absent memory capability and rejected meta mutations.
+- `runtime/privacy-boundary.test.ts`: hostile model calls and protected follow-up requests.
+- `commitment-conversation.test.ts`: unrelated replies, stale and ambiguous references, contextual subjects, and explicit memory-disabled tasks.
+- `commitment-scenario.test.ts`: scenarios A, C, D, and E with real storage, injected clocks, unrelated model turns, and three follow-up restarts.
+- `proactive-policy.test.ts`: confidence, relevance, expiry, activity, cooldown, burst suppression, notifier failure, leases, concurrent hosts, and recurring expiry.
+- `task-process.test.ts`: real OS-process claim fencing for both reminders and follow-ups.
+
+Scenario B rejects the meta request both locally and through a malicious model call.
+Scenario F rejects protected durable storage before tasks, memory projection, or candidates can exist.
+Existing busy-storage, corrupt-file, recall-unavailable, crash-during-write, notifier-failure, timezone, quiet-hours, and lease regressions remain active.
+
+## 12. Validation
+
+| Exact command | Result |
 | --- | --- |
-| `pnpm -F @angela/cli exec vitest run --config vitest.config.ts --maxWorkers=2` | 64 files, 563 tests passed |
-| `pnpm -F @angela/cli typecheck` | Passed |
-| `pnpm -F @angela/i18n typecheck` | Passed |
-| `pnpm -F @angela/cli build` | Passed |
-| `pnpm -F @angela/i18n build` | Passed |
-| `pnpm lint` | 0 errors, 603 warnings |
-| `pnpm typecheck --concurrency=2` | 46 successful workspaces, then stage-ui heap exhaustion |
+| `pnpm --config.verify-deps-before-run=false -F @angela/cli test --maxWorkers=2` | Passed: 67 files, 629 tests |
+| `pnpm --config.verify-deps-before-run=false -F @angela/cli typecheck` | Passed |
+| `pnpm --config.verify-deps-before-run=false -F @angela/cli build` | Passed |
+| `pnpm --config.verify-deps-before-run=false -F @angela/i18n typecheck` | Passed |
+| `pnpm --config.verify-deps-before-run=false -F @angela/i18n build` | Passed |
+| `pnpm --config.verify-deps-before-run=false lint` | Passed: zero errors, 603 existing ESLint warnings |
+| `pnpm_config_verify_deps_before_run=false <installed-pnpm> typecheck --concurrency=2` | 46 successful workspaces, then unrelated stage-ui heap exhaustion, exit 129 |
 | `git diff --check` | Passed |
 
-Each pnpm command also included `--config.verify-deps-before-run=false`.
-The root typecheck used the installed native pnpm path to bypass the launcher error.
-Its stage-ui heap failure remains an environment limitation. CLI and i18n checks passed independently.
-No live external-model evaluation, desktop notification daemon, or real audio device was required for these checks.
+`<installed-pnpm>` is the existing executable at:
 
-## 12. Remaining limitations
+```text
+/home/lighthouse2815/.local/share/pnpm/package-manager-store/v11/links/@pnpm/exe/11.24.0/06ccdf6de568f896aaf7e8cb1d131c7165bddd978d4494af0cf8affbb14c0c5b/node_modules/@pnpm/exe/pnpm
+```
 
-Supported local extraction deliberately covers a bounded Vietnamese grammar.
-Unsupported language and complex requests still depend on the existing model tools.
-Weekend dates and missing alarm hours require clarification.
-Quiet hours and cooldown are runtime configuration options. A user-facing configuration screen is outside this change.
+Its directory was prepended to PATH for the root typecheck.
+`stage-ui` failed at the default heap limit near 2 GB. That package has no changes and does not import the CLI.
+Current CLI and i18n package checks passed independently.
+Focused ESLint and the repository pre-commit check also run on the changed code.
 
-Terminal reminders require a running process. The existing optional Linux service can deliver desktop notifications after chat closes.
-No process can display notifications while the computer is powered off.
-A restart handles overdue occurrences once after ordinary acknowledged delivery.
-A crash after external presentation but before acknowledgment can repeat that notification.
-Exactly-once external presentation requires an idempotent notification destination.
+Builds and consuming tests run sequentially to preserve package export artifacts.
+One intermediate run overlapped i18n artifact cleanup and test imports. The final run follows completed builds.
+Root typecheck uses the installed pnpm executable because the global launcher cannot be spawned reliably by Turbo.
+No live model service, physical audio device, or desktop notification daemon is required by these tests.
 
-Unknown locks, foreign-host locks, and abandoned recovery markers require manual inspection.
-Local task storage requires hard-link and atomic-rename support.
-Web and Electron task interfaces remain unchanged.
-The full monorepo typecheck remains incomplete because stage-ui exhausted the available Node heap.
+## 13. Remaining limitations
 
-## 13. Next development step
+The local grammar is intentionally conservative. Unsupported direct requests can use the existing guarded structured tools.
+Automatic companion follow-up comes from explicit authoritative tasks. Unrequested episodic inference remains outside this foundation.
+The existing inactive task retention limit still applies to direct task-history queries.
+Terminal delivery needs a running host. The optional Linux service retains its existing desktop notification behavior.
+Discord and Zalo retain their existing capability and privacy boundaries. Separate web and Electron task interfaces are unchanged.
+Exactly-once presentation across an external side-effect crash boundary remains unavailable without destination idempotency.
+The root workspace typecheck remains blocked by unrelated stage-ui heap exhaustion.
 
-Expose quiet hours and notification preferences through shared configuration.
-Then evaluate unsupported natural-language requests against a fixed live-model scenario set.
-An actionable notification inbox can provide durable user acknowledgment across CLI and future desktop surfaces.
+Reminder milestone: DONE. Proactive companion foundation: DONE.
 
-See [the architecture decision](../adr/2026-10-22-commitment-follow-up.md) and [the CLI guide](../../../packages/angela-cli/README.md#tasks-and-reminders).
+## 14. Next recommended milestone
+
+Voice Interaction Reliability: improve interruption handling and turn-taking in the existing voice conversation flow.

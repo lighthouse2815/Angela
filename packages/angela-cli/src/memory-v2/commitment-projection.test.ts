@@ -48,6 +48,9 @@ it('projects local transitions, repairs external writes, and preserves privacy a
     now += 300_000
     await recall.repairCommitments()
     expect(index.memory.current(directory, 'episodic', `commitment:${other.id}`)).toBeDefined()
+    now -= 60_000
+    await tasks.cancel(other.id)
+    expect(JSON.parse(index.memory.current(directory, 'episodic', `commitment:${other.id}`)!.body).status).toBe('cancelled')
 
     const privateTask = await tasks.create({ title: 'Explicit task with memory disabled', type: 'reminder' })
     await recall.repairCommitments(true)

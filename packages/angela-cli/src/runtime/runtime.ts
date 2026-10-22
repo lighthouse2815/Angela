@@ -12,6 +12,7 @@ import type { ProjectMemory } from '../project-memory'
 import type { Recall } from '../recall'
 import type { ReminderNotifier, ReminderScheduler } from '../reminder-scheduler'
 import type { Skills } from '../skills'
+import type { Task } from '../task-schema'
 import type { Tasks } from '../tasks'
 import type { ContextSources } from './context-builder'
 import type { ObserverDiagnostic } from './event-bus'
@@ -21,8 +22,10 @@ import process from 'node:process'
 
 import { randomUUID } from 'node:crypto'
 
+import { ActiveCommitments } from '../active-commitments'
 import { SystemClock } from '../clock'
 import { requestPrivacy } from '../privacy-policy'
+import { proactiveCandidate } from '../proactive-candidate'
 import { ProactivePolicy } from '../proactive-policy'
 import { buildContext } from './context-builder'
 import { EventBus } from './event-bus'
@@ -119,7 +122,7 @@ export class AngelaRuntime {
         continue
       }
       const deadline = state && this.idle.get(state)
-      if (state && deadline !== undefined && deadline <= Date.now()) {
+      if (state && deadline !== undefined && deadline <= this.clock.now()) {
         await this.evict(state)
         continue
       }
@@ -140,7 +143,7 @@ export class AngelaRuntime {
       return
     }
     this.idle.delete(state)
-    this.idle.set(state, Date.now() + this.idleTtlMs)
+    this.idle.set(state, this.clock.now() + this.idleTtlMs)
     const evictions: Promise<void>[] = []
     while (this.idle.size > this.maxIdle)
       evictions.push(this.evict(this.idle.keys().next().value!))
@@ -157,6 +160,7 @@ export class AngelaRuntime {
       await state.releasePending
       await this.evict(state)
     }
+    await new ActiveCommitments({ ...options, messages: this.messages.tasks }).clear()
   }
 
   private evict(state: RuntimeSession) {
@@ -184,10 +188,10 @@ export class AngelaRuntime {
     const deadline = Math.min(...this.idle.values())
     this.idleTimer = setTimeout(() => {
       this.idleTimer = undefined
-      const expired = [...this.idle].filter(([, expires]) => expires <= Date.now())
+      const expired = [...this.idle].filter(([, expires]) => expires <= this.clock.now())
       void Promise.allSettled(expired.map(([state]) => this.evict(state)))
       this.armIdle()
-    }, Math.max(0, deadline - Date.now()))
+    }, Math.max(0, deadline - this.clock.now()))
     this.idleTimer.unref()
   }
 
@@ -230,8 +234,12 @@ export class AngelaRuntime {
           for (const task of args[0])
             this.events.emit({ id: randomUUID(), type: 'reminder.due', timestamp: new Date(this.clock.now()).toISOString(), correlationId, channel: 'system', taskId: task.id })
           await destination.notifier.notify(...args)
-          for (const task of args[0])
+          for (const task of args[0]) {
             this.events.emit({ id: randomUUID(), type: 'reminder.delivered', timestamp: new Date(this.clock.now()).toISOString(), correlationId, channel: 'system', taskId: task.id })
+            const candidate = proactiveCandidate(task, this.clock.now())
+            if (candidate)
+              this.events.emit({ id: randomUUID(), type: 'proactive.prompted', timestamp: new Date(this.clock.now()).toISOString(), correlationId, channel: 'system', taskId: task.id, candidateId: candidate.id, reason: candidate.reason })
+          }
         },
       }, error => target()?.onError(error), (delay) => {
         const route = this.remindersByStore.get(dataDir)
@@ -266,6 +274,15 @@ export class AngelaRuntime {
       void tasks.catch(() => this.taskStores.delete(dataDir))
     }
     return await tasks
+  }
+
+  /** Notification routing supplies the destination's exact session identity, even while its runtime context is cold. */
+  async mentionCommitments(options: SessionOptions, tasks: readonly Task[]) {
+    await new ActiveCommitments({ ...options, messages: this.messages.tasks }, () => options.warn?.(this.messages.tasks.unavailable)).mention(tasks, 'notification', this.clock.now())
+  }
+
+  noteActivity(dataDir: string) {
+    void this.remindersByStore.get(dataDir)?.ready.then(scheduler => scheduler.noteActivity()).catch(() => {})
   }
 
   pauseReminders(dataDir: string, owner: object = this) {
@@ -370,6 +387,7 @@ export interface SessionOptions {
 
 /** Owns lazy infrastructure, never conversation history. Telegram releases retain Recall while MCP and request callbacks stay request-bound. */
 export class RuntimeSession {
+  private readonly activeCommitments: ActiveCommitments
   private references = 0
   private keepWarm = false
   private releasing?: Promise<void>
@@ -389,7 +407,13 @@ export class RuntimeSession {
   private sessionStarted = false
   private lastReason: 'completed' | 'aborted' | 'failed' = 'completed'
 
-  constructor(private readonly runtime: AngelaRuntime, readonly options: SessionOptions, private readonly removed: () => void) {}
+  constructor(private readonly runtime: AngelaRuntime, readonly options: SessionOptions, private readonly removed: () => void) {
+    this.activeCommitments = new ActiveCommitments({ ...options, messages: runtime.messages.tasks }, () => this.options.warn?.(runtime.messages.tasks.unavailable))
+  }
+
+  async mentionCommitments(tasks: readonly Task[]) {
+    await this.activeCommitments.mention(tasks, 'notification', this.runtime.clock.now())
+  }
 
   /** Acquisitions refresh request-bound connectors only after the previous release completes. */
   configure(options: SessionOptions, keepWarm: boolean) {
@@ -481,7 +505,10 @@ export class RuntimeSession {
       return JSON.stringify(await (await this.recall())?.enrich(this.runtime.model, this.runtime.provider, signal))
     if (/^\/(?:tasks|today|done|cancel|snooze)(?:\s|$)/u.test(text)) {
       const { taskCommand, taskEvidence } = await import('../task-commands')
-      return await taskCommand(text, await this.tasks(), this.runtime.messages.tasks, this.options.locale ?? 'en', task => this.recordDomain({ type: text.startsWith('/done ') ? 'task.completed' : 'task.updated', taskId: task.id }, taskEvidence(task)))
+      return await taskCommand(text, await this.tasks(), this.runtime.messages.tasks, this.options.locale ?? 'en', async (task) => {
+        await this.activeCommitments.mention([task], 'command', this.runtime.clock.now())
+        await this.recordDomain({ type: text.startsWith('/done ') ? 'task.completed' : 'task.updated', taskId: task.id }, taskEvidence(task))
+      })
     }
     if (/^\/project(?:\s|$)/u.test(text) && this.options.channel === 'cli')
       return await (await this.project()).command(text)
@@ -532,6 +559,7 @@ export class RuntimeSession {
     this.lifetime.signal.throwIfAborted()
     if (this.request)
       return Promise.reject(new Error('Context already has an active request'))
+    this.runtime.noteActivity(this.options.dataDir)
     const signal = options.abortSignal ? AbortSignal.any([options.abortSignal, this.lifetime.signal]) : this.lifetime.signal
     const envelope: Omit<BaseAngelaEvent, 'id' | 'timestamp'> = { correlationId: randomUUID(), sessionId: this.options.sessionId, channel: this.options.channel, workspace: this.options.workspace }
     this.lastRequest = envelope
@@ -593,7 +621,7 @@ export class RuntimeSession {
         if (sources.tasks && sources.privacy) {
           const { CommitmentConversation } = await import('../commitment-conversation')
           const projection = capture ? await sources.recall?.commitmentSource() : undefined
-          const response = await new CommitmentConversation(sources.tasks, this.runtime.messages.tasks, this.options.locale ?? 'en', projection).handle(text, chat.conversation, sources.privacy)
+          const response = await new CommitmentConversation(sources.tasks, this.runtime.messages.tasks, this.options.locale ?? 'en', projection, this.activeCommitments).handle(text, chat.conversation, sources.privacy)
           if (response) {
             if (response.task) {
               const { taskEvidence } = await import('../task-commands')
@@ -624,11 +652,25 @@ export class RuntimeSession {
               await emit({ type: 'tool.error', toolCallId: event.toolCallId, toolName: observation?.toolName ?? 'unknown' }, observation?.text)
             else if (event.type === 'tool-result')
               await emit({ type: 'tool.result', toolCallId: event.toolCallId, toolName: observation?.toolName ?? 'unknown', outcome: observation?.outcome ?? 'unverified' }, observation?.text, observation?.outcome === 'verified')
-            if (observation?.domain)
+            if (observation?.domain) {
               await emit(observation.domain, observation.text, true)
+              if ('taskId' in observation.domain && sources.tasks)
+                await this.activeCommitments.mention([await sources.tasks.find(observation.domain.taskId)], 'command', this.runtime.clock.now())
+            }
             await options.onStreamEvent?.(event)
           },
         }, warnings.length ? [context, ...warnings].filter(Boolean).join('\n\n') : context)
+        if (sources.tasks && sources.privacy?.taskWritesAllowed) {
+          const ids = new Set(assistant.match(/[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}/giu)?.map(id => id.toLowerCase()))
+          if (ids.size) {
+            try {
+              const mentioned = (await sources.tasks.list({ status: 'all' })).filter(task => ids.has(task.id))
+              if (mentioned.length)
+                await this.activeCommitments.mention(mentioned, 'conversation', this.runtime.clock.now())
+            }
+            catch { sources.warn(this.runtime.messages.tasks.unavailable) }
+          }
+        }
         completed = true
         await emit({ type: 'assistant.message' }, assistant)
       }

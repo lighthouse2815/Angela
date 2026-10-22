@@ -20,6 +20,7 @@ export class ReminderScheduler {
   private started = false
   private startup = true
   private reportedError = false
+  private lastActivityAt?: number
 
   constructor(private readonly tasks: Tasks, private readonly notifier: ReminderNotifier, private readonly onError: (error: unknown) => void, private readonly scheduleShared?: (delay: number) => void, private readonly policy = new ProactivePolicy()) {}
 
@@ -31,6 +32,17 @@ export class ReminderScheduler {
       void this.refresh()
     })
     await this.refresh()
+  }
+
+  noteActivity() {
+    this.lastActivityAt = this.tasks.now()
+  }
+
+  private activity(tasks: readonly Task[]) {
+    const prompted = tasks.filter(task => task.type === 'follow_up' && task.lastNotifiedAt).map(task => Date.parse(task.lastNotifiedAt!))
+    const claims = tasks.filter(task => task.type === 'follow_up' && task.delivery?.status === 'claimed')
+      .map(task => task.delivery?.status === 'claimed' ? Date.parse(task.delivery.leaseUntil) : 0)
+    return { lastActivityAt: this.lastActivityAt, lastFollowUpAt: prompted.length ? Math.max(...prompted) : undefined, followUpClaimUntil: claims.length ? Math.max(...claims) : undefined }
   }
 
   /** Coalesces local mutations during delivery. External writers and clock changes reconcile within one minute. */
@@ -76,15 +88,25 @@ export class ReminderScheduler {
   private async run() {
     const claimed: Task[] = []
     try {
-      const candidates = (await this.tasks.list()).map(task => ({ task, decision: this.policy.evaluate(task, this.tasks.now()) })).sort((a, b) => b.decision.priority - a.decision.priority)
+      const snapshot = await this.tasks.list({ status: 'all' })
+      const activity = this.activity(snapshot)
+      const candidates = snapshot.filter(task => task.status === 'pending').map(task => ({ task, decision: this.policy.evaluate(task, this.tasks.now(), activity) })).sort((a, b) => b.decision.priority - a.decision.priority)
+      let followUpClaimed = false
       for (const { task, decision } of candidates) {
         if (this.lifetime.signal.aborted)
           return
-        if (!decision.notify)
+        if (decision.reason === 'expired') {
+          await this.tasks.skipExpired(task.id, taskDue(task)!)
           continue
-        const current = await this.tasks.claim(task.id, taskDue(task)!)
-        if (current)
+        }
+        if (!decision.notify || (task.type === 'follow_up' && followUpClaimed))
+          continue
+        const current = await this.tasks.claim(task.id, taskDue(task)!, this.policy.followUpCooldownMs)
+        if (current) {
           claimed.push(current)
+          if (current.type === 'follow_up')
+            followUpClaimed = true
+        }
       }
       const overdue = this.startup
       this.startup = false
@@ -98,7 +120,9 @@ export class ReminderScheduler {
           await this.tasks.retry(task.id, task.delivery.token, this.lifetime.signal.aborted)
       }
     }
-    const next = (await this.tasks.list()).map(task => this.policy.evaluate(task, this.tasks.now()).nextAt).filter(value => value !== undefined).sort((a, b) => a - b)[0]
+    const snapshot = await this.tasks.list({ status: 'all' })
+    const activity = this.activity(snapshot)
+    const next = snapshot.map(task => this.policy.evaluate(task, this.tasks.now(), activity).nextAt).filter(value => value !== undefined).sort((a, b) => a - b)[0]
     this.schedule(next === undefined ? 60_000 : Math.min(60_000, Math.max(0, next - this.tasks.now())))
   }
 

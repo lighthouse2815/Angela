@@ -11,7 +11,7 @@ import * as v from 'valibot'
 import { SystemClock } from './clock'
 import { MemoryFile } from './memory-file'
 import { taskCreate, taskId, taskSchema, taskState, taskTime, taskUpdate, taskZone } from './task-schema'
-import { localDate, nextOccurrence, taskDue } from './task-time'
+import { followUpExpiry, localDate, nextOccurrence, taskDue } from './task-time'
 
 /** Delivery owners renew every ten seconds. Thirty seconds bounds recovery after a crashed process. */
 export const deliveryLeaseMs = 30_000
@@ -51,6 +51,7 @@ export class Tasks {
     const parsed = v.parse(taskCreate, input)
     const now = new Date(this.now()).toISOString()
     const task = v.parse(taskSchema, { ...parsed, memoryProjection, id: randomUUID(), status: 'pending', timezone: parsed.timezone ?? this.timezone, snoozeCount: 0, createdAt: now, updatedAt: now, recurrenceAnchor: parsed.recurrence ? parsed.dueAt : undefined })
+    this.followUpSchedule(task)
     let saved = task
     await this.file.edit((state) => {
       // Repeated model calls and retried requests reuse an identical pending commitment under the same storage lock.
@@ -83,6 +84,8 @@ export class Tasks {
         task.notifiedFor = undefined
         task.delivery = undefined
       }
+      if ('dueAt' in patch || 'type' in patch || 'recurrence' in patch || 'timezone' in patch)
+        this.followUpSchedule(task)
     })
   }
 
@@ -98,9 +101,14 @@ export class Tasks {
         if (!delivered || Date.parse(task.dueAt!) <= this.now())
           task.dueAt = nextOccurrence(task, Math.max(this.now(), Date.parse(task.dueAt!)))
         task.notifiedFor = undefined
+        this.followUpSchedule(task)
       }
       else {
         task.status = 'completed'
+        if (task.followUp) {
+          task.followUp.resolvedAt = task.completedAt
+          task.followUp.nextEligibleAt = undefined
+        }
       }
     }, 'task.completed')
   }
@@ -111,6 +119,10 @@ export class Tasks {
       task.status = 'cancelled'
       task.snoozedUntil = undefined
       task.delivery = undefined
+      if (task.followUp) {
+        task.followUp.resolvedAt = new Date(this.now()).toISOString()
+        task.followUp.nextEligibleAt = undefined
+      }
     }, 'task.cancelled')
   }
 
@@ -124,16 +136,27 @@ export class Tasks {
       task.snoozeCount = (task.snoozeCount ?? 0) + 1
       task.notifiedFor = undefined
       task.delivery = undefined
+      this.followUpSchedule(task)
     }, 'task.snoozed')
   }
 
   /** Claims expire without changing notification history or recurrence. The token fences acknowledgments from stale owners. */
-  async claim(id: string, occurrence: string): Promise<Task | undefined> {
+  async claim(id: string, occurrence: string, followUpCooldownMs = 1_800_000): Promise<Task | undefined> {
     let claimed: Task | undefined
     await this.file.edit((state) => {
       const task = state.tasks.find(task => task.id === id)
       if (!task || task.status !== 'pending' || taskDue(task) !== occurrence || task.notifiedFor === occurrence || Date.parse(occurrence) > this.now())
         return
+      if ((task.delivery?.status === 'skipped' && task.delivery.occurrence === occurrence)
+        || (followUpExpiry(task) ?? Number.POSITIVE_INFINITY) <= this.now()) {
+        return
+      }
+      // Different hosts cannot claim separate follow-ups concurrently or bypass the shared-store cooldown.
+      if (task.type === 'follow_up' && state.tasks.some(item => item.type === 'follow_up'
+        && ((item.lastNotifiedAt && Date.parse(item.lastNotifiedAt) + followUpCooldownMs > this.now())
+          || (item.id !== task.id && item.delivery?.status === 'claimed' && Date.parse(item.delivery.leaseUntil) > this.now())))) {
+        return
+      }
       if (task.delivery?.occurrence === occurrence) {
         if (task.delivery.status === 'claimed' && Date.parse(task.delivery.leaseUntil) > this.now())
           return
@@ -175,11 +198,15 @@ export class Tasks {
       task.lastNotifiedAt = new Date(this.now()).toISOString()
       task.updatedAt = task.lastNotifiedAt
       task.delivery = { status: 'delivered', occurrence, deliveredAt: task.lastNotifiedAt }
+      if (task.type === 'follow_up') {
+        task.followUp = { ...task.followUp, promptCount: (task.followUp?.promptCount ?? 0) + 1, lastPromptedAt: task.lastNotifiedAt, nextEligibleAt: undefined }
+      }
       if (task.recurrence) {
         // A snooze after delivery retains the already advanced next regular occurrence.
         if (!task.snoozedUntil || Date.parse(task.dueAt!) <= this.now())
           task.dueAt = nextOccurrence(task, Math.max(this.now(), Date.parse(task.dueAt!)))
         task.snoozedUntil = undefined
+        this.followUpSchedule(task)
       }
       this.retain(state)
       delivered = true
@@ -188,6 +215,34 @@ export class Tasks {
     if (updated)
       await this.changed(updated, 'task.delivered')
     return delivered
+  }
+
+  /** Expiry never consumes a live lease. A skipped follow-up stays manageable and can be explicitly snoozed. */
+  async skipExpired(id: string, occurrence: string) {
+    let updated: Task | undefined
+    await this.file.edit((state) => {
+      const task = state.tasks.find(task => task.id === id)
+      if (!task || task.type !== 'follow_up' || task.status !== 'pending' || taskDue(task) !== occurrence || task.notifiedFor === occurrence
+        || (task.delivery?.status === 'claimed' && Date.parse(task.delivery.leaseUntil) > this.now())
+        || (task.delivery?.status === 'skipped' && task.delivery.occurrence === occurrence)) {
+        return
+      }
+      if ((followUpExpiry(task) ?? Number.POSITIVE_INFINITY) > this.now())
+        return
+      task.updatedAt = new Date(this.now()).toISOString()
+      task.delivery = { status: 'skipped', occurrence, skippedAt: task.updatedAt, reason: 'expired' }
+      if (task.recurrence) {
+        task.dueAt = nextOccurrence(task, Math.max(this.now(), Date.parse(task.dueAt!)))
+        task.snoozedUntil = undefined
+        this.followUpSchedule(task)
+      }
+      else if (task.followUp) {
+        task.followUp.nextEligibleAt = undefined
+      }
+      updated = structuredClone(task)
+    })
+    if (updated)
+      await this.changed(updated, 'task.updated')
   }
 
   /** Failed or cancelled delivery releases only this owner's claim. A retry waits thirty seconds unless shutdown requests immediate recovery. */
@@ -204,6 +259,7 @@ export class Tasks {
   private owns(task: Task, token: string) {
     return task.status === 'pending' && task.delivery?.status === 'claimed' && task.delivery.token === token
       && taskDue(task) === task.delivery.occurrence && Date.parse(task.delivery.leaseUntil) > this.now()
+      && (followUpExpiry(task) ?? Number.POSITIVE_INFINITY) > this.now()
   }
 
   /** The scheduler owns its subscription lifetime. Cross-process changes are discovered by its bounded timer. */
@@ -219,6 +275,15 @@ export class Tasks {
   private pending(task: Task) {
     if (task.status !== 'pending')
       throw new Error(this.messages.inactive)
+  }
+
+  private followUpSchedule(task: Task) {
+    if (task.type !== 'follow_up') {
+      task.followUp = undefined
+      return
+    }
+    const due = taskDue(task)
+    task.followUp = { ...task.followUp, promptCount: task.followUp?.promptCount ?? 0, nextEligibleAt: due, expiresAt: due ? new Date(Date.parse(due) + 48 * 3_600_000).toISOString() : undefined, resolvedAt: undefined }
   }
 
   private async edit(id: string, change: (task: Task) => void, type: TaskChange['type'] = 'task.updated') {

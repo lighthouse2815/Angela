@@ -14,7 +14,7 @@ export class CommitmentMemoryProjection {
     const sourceSessionId = task.memoryProjection?.scope === this.scope ? task.memoryProjection.sourceSessionId : undefined
     const body = taskEvidence(task)
     const timestamp = task.updatedAt
-    if ((!previous && !sourceSessionId) || previous?.body === body || (previous && previous.updatedAt > timestamp))
+    if ((!previous && !sourceSessionId) || previous?.body === body)
       return previous
     const sessionId = previous?.sourceSessionId ?? sourceSessionId
     if (sessionId && this.store.suppressed(this.scope, sessionId))
