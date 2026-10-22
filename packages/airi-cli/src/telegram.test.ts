@@ -204,6 +204,7 @@ it('keeps polling responsive to busy and cancel commands, and releases the sessi
   await message('/cancel')
   expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramCancelled)
   await host.close()
+  expect(host.stateCounts.deadlineTimers).toBe(0)
   const files = await readdir(directory)
   expect(files.some(file => file.endsWith('.lock'))).toBe(false)
   const record = JSON.parse(await readFile(join(directory, files.find(file => file.endsWith('.json'))!), 'utf8'))
@@ -573,11 +574,12 @@ it('evicts inactive chat state and closes request clients after many sequential 
     await idle()
     await vi.waitFor(() => expect(host.stateCounts.jobs).toBe(0))
     expect(host.stateCounts.runtime).toBe(0)
+    expect(host.stateCounts.deadlineTimers).toBe(0)
     expect(host.stateCounts.chats).toBeLessThanOrEqual(32)
   }
   expect(close).toHaveBeenCalledTimes(40)
   await host.close()
-  expect(host.stateCounts).toEqual({ jobs: 0, chats: 0, runtime: 0 })
+  expect(host.stateCounts).toEqual({ jobs: 0, chats: 0, runtime: 0, deadlineTimers: 0 })
   close.mockRestore()
 }, 15_000)
 

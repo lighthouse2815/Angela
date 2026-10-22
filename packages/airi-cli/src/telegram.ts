@@ -38,6 +38,7 @@ interface ChatState {
 export class TelegramChat {
   private readonly jobs = new Map<number, { controller: AbortController, done: Promise<void> }>()
   private closing = false
+  private deadlineTimers = 0
   private readonly chats = new Map<number, ChatState>()
   private readonly ownsRuntime: boolean
   private readonly runtime: AngelaRuntime
@@ -191,7 +192,7 @@ export class TelegramChat {
   }
 
   get stateCounts() {
-    return { jobs: this.jobs.size, chats: this.chats.size, runtime: this.runtime.activeStateCount }
+    return { jobs: this.jobs.size, chats: this.chats.size, runtime: this.runtime.activeStateCount, deadlineTimers: this.deadlineTimers }
   }
 
   private async startRequest(ctx: Context, text: string, reset: boolean, resume = false) {
@@ -210,7 +211,10 @@ export class TelegramChat {
           process.stderr.write(`${this.messages.telegramDeliveryFailed}\n`)
         })
       })
-      .finally(() => this.jobs.delete(chatId))
+      .finally(() => {
+        controller.abort()
+        this.jobs.delete(chatId)
+      })
     this.jobs.set(chatId, { controller, done })
   }
 
@@ -342,11 +346,13 @@ export class TelegramChat {
     const state = this.state(chatId)
     const session = await this.sessions.open(this.workspace, this.sessionId(chatId), { recoverAbandoned: true })
     const persistence = new AbortController()
-    const requestSignal = AbortSignal.any([signal, persistence.signal, AbortSignal.timeout(300_000)])
+    const deadline = new AbortController()
+    const requestSignal = AbortSignal.any([signal, persistence.signal, deadline.signal])
     const chat = await this.runtime.createChat(this.workspace, reset ? undefined : session.restore())
     let request: SavedRequest | undefined
     let saving: Promise<void> = Promise.resolve()
     let timer: ReturnType<typeof setInterval> | undefined
+    let deadlineTimer: ReturnType<typeof setTimeout> | undefined
     let delivering = false
     let progress = ''
     let deliveredProgress = ''
@@ -385,6 +391,10 @@ export class TelegramChat {
       return editing
     }
     try {
+      // Own the deadline so completed requests release it immediately, without waiting for timeout or garbage collection.
+      deadlineTimer = setTimeout(() => deadline.abort(new DOMException('Request timed out', 'TimeoutError')), 300_000)
+      deadlineTimer.unref()
+      this.deadlineTimers++
       if (reset) {
         await this.runtime.reset({ dataDir: this.root(chatId), workspace: this.workspace, sessionId: session.record.id, channel: 'telegram' })
         state.permissions = new Permissions(this.messages)
@@ -506,6 +516,11 @@ export class TelegramChat {
       await ctx.reply(failure)
     }
     finally {
+      if (deadlineTimer) {
+        clearTimeout(deadlineTimer)
+        this.deadlineTimers--
+      }
+      deadline.abort()
       persistence.abort()
       if (timer)
         clearInterval(timer)

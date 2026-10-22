@@ -163,3 +163,7 @@ The bus also retains at most 16 metadata diagnostics and one saturating failure 
 Each diagnostic contains only the event type and failure count. Error messages, event objects, and private payloads are excluded.
 The runtime writes at most 16 metadata warnings per host. `RuntimeOptions.observerError` can replace this callback.
 A callback failure is isolated. Shutdown clears listeners, diagnostics, and the callback reference.
+
+Telegram also owns a cancellable deadline timer per active request.
+Its `finally` block clears the deadline, aborts persistence and deadline controllers, and closes the persisted session lock.
+The job controller aborts when the job finishes. Successful requests do not wait five minutes for deadline cleanup.
