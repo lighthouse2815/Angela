@@ -13,6 +13,7 @@ export function sanitize(text: string, limit = 4000) {
     .replace(/\b\d{6,10}:[\w-]{30,}\b/gu, '[REDACTED]')
     .replace(/\b[A-Z][A-Z\d+.-]{0,31}:\/\/[^\s/@][^\s/:@]*:[^\s/@]+@\S+/giu, '[REDACTED]')
     .replace(/(["']?\b[\w-]{0,128}(?:password|passwd|secret|token|(?:api|auth|access|secret|private|subscription|account)[_-]?key(?:[_-]?id)?|credentials?|authorization)["']?\s*[:=]\s*)(?:"[^"\n]*(?:"|$)|'[^'\n]*(?:'|$)|[^\s,;}]+)/giu, '$1[REDACTED]')
+    .replace(/((?:\b(?:password|passwd|passphrase|(?:api|auth|access|secret|private)[ _-]?(?:key|token)|credentials?)\b|mật khẩu(?: của (?:tôi|mình))?|khóa API|mã truy cập)\s*(?::|=|\bis\b|là)\s*)\S[^\r\n]*/giu, '$1[REDACTED]')
 
     .replace(/\u001B\[[\d;?]*[\x20-\x2F]*[\x40-\x7E]|\u001B\][^\u0007\u001B]*(?:\u0007|\u001B\\)|[\u0000-\u0008\v\f\u000E-\u001F\u007F-\u009F\u202A-\u202E\u2066-\u2069]/gu, '')
     .slice(0, limit)

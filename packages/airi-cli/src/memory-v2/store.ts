@@ -143,6 +143,8 @@ export class MemoryStore {
   /** Rejects weaker replacements and pinned automatic edits. Exact normalized duplicates share one active identity. */
   write(input: PageInput, now = new Date().toISOString()): MemoryPage {
     const value = v.parse(inputSchema, input)
+    if (sanitize(value.key, 200) !== value.key || sanitize(value.kind, 100) !== value.kind)
+      throw new Error('Memory identity contains sensitive text')
     const title = sanitize(value.title, 200)
     const body = sanitize(value.body, 32_000)
     const abstract = sanitize(value.abstract, 1000)
@@ -306,8 +308,10 @@ export class MemoryStore {
   /** Purges a claim, its version history and downstream derivations. Fresh requests can learn again without replaying forgotten captures. */
   purge(id: string, scope: string) {
     const page = this.read(id, scope, true)
-    if (!page)
+    if (!page) {
+      this.reclaim()
       return
+    }
     this.transaction(() => {
       const roots = this.sql('SELECT id FROM memory_pages WHERE scope=? AND tier=? AND key=?').all(scope, page.tier, page.key)
       this.erasePages(roots.map(row => String(row.id)))

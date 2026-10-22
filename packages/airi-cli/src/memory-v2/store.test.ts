@@ -307,3 +307,38 @@ it('migrates the original identity-only tombstone schema without permitting dele
   index.memory.observe({ ...observation, sessionId: 'new' })
   expect(index.memory.observations('workspace', 'new')).toHaveLength(1)
 })
+
+it('redacts natural credential declarations and rejects credentials in claim identities', async () => {
+  const { store, index } = await setup()
+  const declarations = ['My password is sensitive-value', 'API key is sensitive-value', 'Mật khẩu của tôi là sensitive-value', 'mã truy cập: sensitive-value']
+  for (const [i, text] of declarations.entries()) {
+    expect(sanitize(text)).not.toContain('sensitive-value')
+    store.observe({ ...observation, id: `credential-${i}`, text })
+  }
+  expect(store.observations('workspace', 'session-1').every(item => !item.text.includes('sensitive-value'))).toBe(true)
+  expect(() => store.write({ ...input, key: 'ghp_sensitivecredential' })).toThrow('sensitive')
+  expect(() => store.write({ ...input, kind: 'password=sensitive-value' })).toThrow('sensitive')
+  expect(index.search('sensitive-value', 'workspace')).toEqual([])
+  expect(sanitize('Password reset is disabled. max_tokens=2000')).toBe('Password reset is disabled. max_tokens=2000')
+})
+
+it('retries physical purge after a reader releases its old WAL snapshot', async () => {
+  const { store, directory } = await setup()
+  const phrase = 'forgotten-wal-retry-b20843f7'
+  const page = store.write({ ...input, body: phrase })
+  const reader = new DatabaseSync(join(directory, 'memory', 'recall.sqlite'), { readOnly: true })
+  try {
+    reader.exec('BEGIN')
+    reader.prepare('SELECT id FROM memory_pages').all()
+    expect(() => store.purge(page.id, 'workspace')).toThrow('checkpoint is busy')
+    expect(store.read(page.id, 'workspace', true)).toBeUndefined()
+    reader.exec('ROLLBACK')
+    store.purge(page.id, 'workspace')
+    const paths = await readdir(join(directory, 'memory'))
+    for (const path of paths)
+      expect((await readFile(join(directory, 'memory', path))).includes(Buffer.from(phrase))).toBe(false)
+  }
+  finally {
+    reader.close()
+  }
+})

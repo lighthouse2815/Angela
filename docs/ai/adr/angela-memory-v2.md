@@ -112,3 +112,5 @@ Source-session deletion preserves later independent explicit knowledge.
 Identity-only blocked correlations stop late results. Fresh requests after forgetting remain eligible for capture.
 Destructive operations checkpoint obsolete WAL frames before returning success.
 If an external reader prevents that checkpoint, cleanup reports an error and requires a retry after the reader releases its snapshot.
+An idempotent purge retries physical cleanup even when the earlier call already deleted the page.
+Credential filtering also covers English and Vietnamese declarations. Sensitive claim keys and kinds are rejected before storage.
