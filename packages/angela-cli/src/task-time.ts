@@ -12,7 +12,7 @@ function wallTime(instant: number, timezone: string) {
 }
 
 /** Converts a calendar time with platform timezone data. Gaps move forward. Repeated times select the first occurrence. */
-function localInstant(wall: number, timezone: string) {
+export function localInstant(wall: number, timezone: string) {
   const candidates = [-86_400_000, 0, 86_400_000].map((offset) => {
     const sample = wall + offset
     return wall - (wallTime(sample, timezone) - sample)

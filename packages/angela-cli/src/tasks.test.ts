@@ -157,3 +157,15 @@ it('completes an undelivered routine occurrence early and retains the next occur
   const next = (await tasks.find(delivered.id)).dueAt
   expect((await tasks.complete(delivered.id)).dueAt).toBe(next)
 })
+
+it('deduplicates repeated creation under the storage lock and permits a new commitment after completion', async () => {
+  const { tasks, directory } = await setup()
+  const input = { title: 'Học LINQ', type: 'reminder' as const, dueAt: '2026-10-18T09:00:00+07:00' }
+  const [first, second] = await Promise.all([tasks.create(input), tasks.create({ ...input, title: 'học   LINQ' })])
+  expect(first.id).toBe(second.id)
+  const reloaded = new Tasks(directory, messages, () => now, 'Asia/Ho_Chi_Minh')
+  expect((await reloaded.create(input)).id).toBe(first.id)
+  expect(await reloaded.list()).toHaveLength(1)
+  await reloaded.complete(first.id)
+  expect((await reloaded.create(input)).id).not.toBe(first.id)
+})

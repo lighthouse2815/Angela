@@ -1,5 +1,6 @@
 import type { cliMessages } from '@angela/i18n/cli'
 
+import type { Clock } from './clock'
 import type { Task, TaskInput, TaskPatch } from './task-schema'
 
 import { randomUUID } from 'node:crypto'
@@ -7,8 +8,9 @@ import { join } from 'node:path'
 
 import * as v from 'valibot'
 
+import { SystemClock } from './clock'
 import { MemoryFile } from './memory-file'
-import { taskCreate, taskId, taskSchema, taskState, taskTime, taskUpdate } from './task-schema'
+import { taskCreate, taskId, taskSchema, taskState, taskTime, taskUpdate, taskZone } from './task-schema'
 import { localDate, nextOccurrence, taskDue } from './task-time'
 
 /** Delivery owners renew every ten seconds. Thirty seconds bounds recovery after a crashed process. */
@@ -19,7 +21,8 @@ export class Tasks {
   private readonly file: MemoryFile<v.InferOutput<typeof taskState>>
   private readonly listeners = new Set<() => void>()
 
-  constructor(dataDir: string, private readonly messages: typeof cliMessages.en.tasks, private readonly clock: () => number = Date.now, readonly timezone = Intl.DateTimeFormat().resolvedOptions().timeZone) {
+  constructor(dataDir: string, private readonly messages: typeof cliMessages.en.tasks, private readonly clock: Clock | (() => number) = new SystemClock(), readonly timezone = Intl.DateTimeFormat().resolvedOptions().timeZone) {
+    v.parse(taskZone, timezone)
     this.file = new MemoryFile(join(dataDir, 'tasks'), 'tasks', taskState, () => ({ version: 1 as const, tasks: [] }), { invalid: messages.invalid, locked: messages.locked })
   }
 
@@ -40,14 +43,23 @@ export class Tasks {
 
   async create(input: TaskInput): Promise<Task> {
     const parsed = v.parse(taskCreate, input)
-    const now = new Date(this.clock()).toISOString()
+    const now = new Date(this.now()).toISOString()
     const task = v.parse(taskSchema, { ...parsed, id: randomUUID(), status: 'pending', timezone: parsed.timezone ?? this.timezone, createdAt: now, updatedAt: now, recurrenceAnchor: parsed.recurrence ? parsed.dueAt : undefined })
+    let saved = task
     await this.file.edit((state) => {
-      state.tasks.push(task)
+      // Repeated model calls and retried requests reuse an identical pending commitment under the same storage lock.
+      const existing = state.tasks.find(item => item.status === 'pending' && item.type === task.type
+        && item.title.normalize('NFKC').toLocaleLowerCase().replace(/\s+/gu, ' ') === task.title.normalize('NFKC').toLocaleLowerCase().replace(/\s+/gu, ' ')
+        && item.dueAt === task.dueAt && item.dueDate === task.dueDate && item.timezone === task.timezone
+        && JSON.stringify(item.recurrence) === JSON.stringify(task.recurrence))
+      if (existing)
+        saved = structuredClone(existing)
+      else
+        state.tasks.push(task)
       this.retain(state)
     })
     this.changed()
-    return task
+    return saved
   }
 
   async update(id: string, input: TaskPatch) {
@@ -72,13 +84,13 @@ export class Tasks {
     return await this.edit(id, (task) => {
       this.pending(task)
       const delivered = task.lastNotifiedAt && (!task.completedAt || task.completedAt < task.lastNotifiedAt)
-      task.completedAt = new Date(this.clock()).toISOString()
+      task.completedAt = new Date(this.now()).toISOString()
       task.snoozedUntil = undefined
       task.delivery = undefined
       if (task.recurrence) {
         // Check-ins acknowledge the delivered occurrence. Early completion consumes the next undelivered occurrence.
-        if (!delivered || Date.parse(task.dueAt!) <= this.clock())
-          task.dueAt = nextOccurrence(task, Math.max(this.clock(), Date.parse(task.dueAt!)))
+        if (!delivered || Date.parse(task.dueAt!) <= this.now())
+          task.dueAt = nextOccurrence(task, Math.max(this.now(), Date.parse(task.dueAt!)))
         task.notifiedFor = undefined
       }
       else {
@@ -98,7 +110,7 @@ export class Tasks {
 
   async snooze(id: string, until: string) {
     const target = v.parse(taskTime, until)
-    if (Date.parse(target) <= this.clock())
+    if (Date.parse(target) <= this.now())
       throw new Error(this.messages.future)
     return await this.edit(id, (task) => {
       this.pending(task)
@@ -113,15 +125,15 @@ export class Tasks {
     let claimed: Task | undefined
     await this.file.edit((state) => {
       const task = state.tasks.find(task => task.id === id)
-      if (!task || task.status !== 'pending' || taskDue(task) !== occurrence || task.notifiedFor === occurrence || Date.parse(occurrence) > this.clock())
+      if (!task || task.status !== 'pending' || taskDue(task) !== occurrence || task.notifiedFor === occurrence || Date.parse(occurrence) > this.now())
         return
       if (task.delivery?.occurrence === occurrence) {
-        if (task.delivery.status === 'claimed' && Date.parse(task.delivery.leaseUntil) > this.clock())
+        if (task.delivery.status === 'claimed' && Date.parse(task.delivery.leaseUntil) > this.now())
           return
-        if (task.delivery.status === 'pending' && Date.parse(task.delivery.retryAt) > this.clock())
+        if (task.delivery.status === 'pending' && Date.parse(task.delivery.retryAt) > this.now())
           return
       }
-      task.delivery = { status: 'claimed', occurrence, token: randomUUID(), claimedAt: new Date(this.clock()).toISOString(), leaseUntil: new Date(this.clock() + deliveryLeaseMs).toISOString() }
+      task.delivery = { status: 'claimed', occurrence, token: randomUUID(), claimedAt: new Date(this.now()).toISOString(), leaseUntil: new Date(this.now() + deliveryLeaseMs).toISOString() }
       task.updatedAt = task.delivery.claimedAt
       this.retain(state)
       claimed = structuredClone(task)
@@ -136,7 +148,7 @@ export class Tasks {
       const task = state.tasks.find(task => task.id === id)
       if (!task || !this.owns(task, token) || task.delivery?.status !== 'claimed')
         return
-      task.delivery.leaseUntil = new Date(this.clock() + deliveryLeaseMs).toISOString()
+      task.delivery.leaseUntil = new Date(this.now() + deliveryLeaseMs).toISOString()
       this.retain(state)
       renewed = true
     })
@@ -152,13 +164,13 @@ export class Tasks {
         return
       const occurrence = task.delivery.occurrence
       task.notifiedFor = occurrence
-      task.lastNotifiedAt = new Date(this.clock()).toISOString()
+      task.lastNotifiedAt = new Date(this.now()).toISOString()
       task.updatedAt = task.lastNotifiedAt
       task.delivery = { status: 'delivered', occurrence, deliveredAt: task.lastNotifiedAt }
       if (task.recurrence) {
         // A snooze after delivery retains the already advanced next regular occurrence.
-        if (!task.snoozedUntil || Date.parse(task.dueAt!) <= this.clock())
-          task.dueAt = nextOccurrence(task, Math.max(this.clock(), Date.parse(task.dueAt!)))
+        if (!task.snoozedUntil || Date.parse(task.dueAt!) <= this.now())
+          task.dueAt = nextOccurrence(task, Math.max(this.now(), Date.parse(task.dueAt!)))
         task.snoozedUntil = undefined
       }
       this.retain(state)
@@ -173,14 +185,14 @@ export class Tasks {
       const task = state.tasks.find(task => task.id === id)
       if (task?.delivery?.status !== 'claimed' || task.delivery.token !== token)
         return
-      task.delivery = { status: 'pending', occurrence: task.delivery.occurrence, retryAt: new Date(this.clock() + (immediate ? 0 : deliveryLeaseMs)).toISOString() }
+      task.delivery = { status: 'pending', occurrence: task.delivery.occurrence, retryAt: new Date(this.now() + (immediate ? 0 : deliveryLeaseMs)).toISOString() }
       this.retain(state)
     })
   }
 
   private owns(task: Task, token: string) {
     return task.status === 'pending' && task.delivery?.status === 'claimed' && task.delivery.token === token
-      && taskDue(task) === task.delivery.occurrence && Date.parse(task.delivery.leaseUntil) > this.clock()
+      && taskDue(task) === task.delivery.occurrence && Date.parse(task.delivery.leaseUntil) > this.now()
   }
 
   /** The scheduler owns its subscription lifetime. Cross-process changes are discovered by its bounded timer. */
@@ -190,7 +202,7 @@ export class Tasks {
   }
 
   now() {
-    return this.clock()
+    return typeof this.clock === 'function' ? this.clock() : this.clock.now()
   }
 
   private pending(task: Task) {
@@ -207,7 +219,7 @@ export class Tasks {
         throw new Error(this.messages.missing)
       const task = state.tasks[index]!
       change(task)
-      task.updatedAt = new Date(this.clock()).toISOString()
+      task.updatedAt = new Date(this.now()).toISOString()
       updated = v.parse(taskSchema, task)
       state.tasks[index] = updated
       this.retain(state)
