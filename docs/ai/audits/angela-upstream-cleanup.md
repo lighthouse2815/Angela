@@ -112,3 +112,53 @@ The local pnpm launcher lacks a shebang. A temporary shell shim invokes the same
 
 These builds do not establish Windows/macOS installer acceptance or interactive native behavior.
 All historical and external URLs remained unchanged across the 253 text files initially modified or moved in the path migration.
+
+## Final inventory
+
+The [line inventory](./upstream-reference-inventory.csv) classifies every matching source line with its location, occurrence count, category, and reason.
+The snapshot excludes that generated CSV from its own input. Its copied paths are audit metadata, not additional application dependencies.
+All other tracked text remains in scope, including this report and earlier audits.
+
+| Category | Matching source lines | Retention or remaining work |
+| --- | ---: | --- |
+| Required retention | 2,946 | Authorship, licenses, historical evidence, existing data, and supported integration contracts. |
+| External dependency | 195 | Published packages, hosted providers, external documentation, and upstream installer identities. |
+| Unresolved naming | 584 | Native project names, adapter/API names, implementation identifiers, fixtures, and tooling names that require separate review. |
+| Total | 3,725 | 4,109 non-overlapping occurrences. |
+
+The unresolved category does not claim that every old implementation name is legally required.
+Those names remain unchanged because this cleanup does not establish a safe migration for all consumers or native exports.
+The detailed rows make that limit visible instead of classifying uncertain names as mandatory notices.
+
+To exclude the generated snapshot from the source count, run:
+
+```sh
+git grep -n -I -E 'AIRI|airi|stage-tamagotchi' -- . ':!docs/ai/audits/upstream-reference-inventory.csv'
+```
+
+The final display-label checks passed: 11 CLI MCP tests, CLI typecheck and build, 20 glossary tests, and the Kirie build.
+The updater helper passed `bash -n`. Targeted lint passed. Scene files use the native build because ESLint has no scene parser.
+The final source state also passed the web build, Electron desktop build, and built CLI `--help` command.
+Four updated skills passed the bundled skill validator using the existing workspace YAML parser.
+Their documented scenario path and built Electron entrypoint exist. Existing invocation IDs remain stable.
+
+The standalone backend shortcut and the mobile package example were removed from active documentation.
+Deferred mobile guidance now requires workspace restoration before its commands can run.
+
+The full tracked-text scan, including the CSV, contains 4,208 matching lines and 4,630 occurrences.
+The generated snapshot contributes 483 matching metadata lines. These copied paths belong to the historical audit record.
+
+The filename scan finds 321 tracked paths:
+
+| Path family | Paths | Reason |
+| --- | ---: | --- |
+| Native engine tree | 173 | Project, resource, assembly, and export migration remains separate. |
+| Plugin and VS Code extension trees | 67 | Install layouts remain beside supported public extension identities. |
+| Card modules, pages, stores, and stickers | 43 | Supported routes, exports, data, and asset identities remain stable. |
+| Runtime certificates | 10 | Preserve existing certificate paths and trust. |
+| Exported adapters and bridge modules | 9 | Preserve public APIs until consumer migration is reviewed. |
+| Skill resources | 8 | Preserve stable invocation names and their references. |
+| E2E entrypoints | 4 | Preserve existing caller and report conventions pending a tooling migration. |
+| Desktop extension manifests | 3 | Preserve the supported manifest filename. |
+| Animation source assets | 2 | Preserve source attribution and asset imports. |
+| External installer and documentation helper | 2 | Preserve the identities of actual upstream artifacts. |
