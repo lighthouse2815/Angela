@@ -20,18 +20,41 @@ import { buildContext } from './context-builder'
 import { EventBus } from './event-bus'
 import { buildTools } from './tool-registry'
 
+/** Telegram retention is independent of the existing eight active-context limit. */
+export interface RuntimeOptions {
+  telegramSessions?: {
+    /** @default 32 */
+    maxIdle?: number
+    /** Idle time in milliseconds. Matches Telegram's permission-state lifetime. @default 600000 */
+    idleTtlMs?: number
+  }
+}
+
 interface ReminderTarget { notifier: ReminderNotifier & { pause?: () => void, resume?: () => void }, onError: (error: unknown) => void }
 
-/** Adapters share this host and retain only active logical contexts. Construction performs no IO or capability initialization. */
+/** Adapters share active contexts. Telegram can retain bounded idle contexts through acquire. Construction performs no IO. */
 export class AngelaRuntime {
   readonly events = new EventBus()
   private readonly states = new Map<string, RuntimeSession>()
   private closing?: Promise<void>
+  // Idle entries are ordered by last release. Retiring entries are detached before asynchronous cleanup.
+  private readonly idle = new Map<RuntimeSession, number>()
+  private readonly retiring = new Map<string, { state: RuntimeSession, done: Promise<void> }>()
+  private idleTimer?: ReturnType<typeof setTimeout>
+  private readonly maxIdle: number
+  private readonly idleTtlMs: number
   private readonly remindersByStore = new Map<string, { tasks: Promise<Tasks>, ready: Promise<ReminderScheduler>, targets: Map<object, ReminderTarget>, dueAt: number }>()
   private reminderTimer?: ReturnType<typeof setTimeout>
   private delivering?: Promise<void>
 
-  constructor(readonly model: string, readonly provider: GenerationProvider, readonly messages: typeof cliMessages.en, readonly env: NodeJS.ProcessEnv = {}, readonly defaults: { baseUrl?: string, apiKey: string } = { apiKey: '' }) {}
+  constructor(readonly model: string, readonly provider: GenerationProvider, readonly messages: typeof cliMessages.en, readonly env: NodeJS.ProcessEnv = {}, readonly defaults: { baseUrl?: string, apiKey: string } = { apiKey: '' }, options: RuntimeOptions = {}) {
+    this.maxIdle = options.telegramSessions?.maxIdle ?? 32
+    this.idleTtlMs = options.telegramSessions?.idleTtlMs ?? 10 * 60_000
+    if (!Number.isInteger(this.maxIdle) || this.maxIdle < 0 || this.maxIdle > 64)
+      throw new RangeError('Telegram maxIdle must be an integer from 0 to 64')
+    if (!Number.isSafeInteger(this.idleTtlMs) || this.idleTtlMs < 1 || this.idleTtlMs > 2_147_483_647)
+      throw new RangeError('Telegram idleTtlMs must fit a positive timer delay')
+  }
 
   /** Creates working conversation state with the host's single model/provider configuration. No device or tool client is loaded. */
   async createChat(workspace: string, history?: Conversation, toolsAvailable = true, contextLimit = 32_000) {
@@ -41,24 +64,115 @@ export class AngelaRuntime {
     return new Chat(this.model, this.provider, workspace, history, toolsAvailable, contextLimit, this.messages)
   }
 
-  /** At most eight contexts can run concurrently. Callers release each acquisition in a finally block. */
+  /** At most eight contexts can run concurrently. Direct callers retain immediate release semantics. */
   open(options: SessionOptions) {
     if (this.closing)
       throw new Error('Runtime is closed')
-    const key = JSON.stringify([options.dataDir, options.workspace, options.sessionId, options.channel])
+    const key = this.key(options)
     let state = this.states.get(key)
+    if ((!state || this.idle.has(state)) && this.activeStateCount >= 8)
+      throw new Error('Runtime active context limit reached')
     if (!state) {
-      if (this.states.size >= 8)
-        throw new Error('Runtime active context limit reached')
-      state = new RuntimeSession(this, { ...options }, () => this.states.delete(key))
+      if (this.states.size + this.retiring.size >= this.maxIdle + 8)
+        throw new Error('Runtime context cleanup limit reached')
+      state = new RuntimeSession(this, { ...options }, () => {
+        if (this.states.get(key) === state)
+          this.states.delete(key)
+        this.idle.delete(state!)
+      })
       this.states.set(key, state)
     }
+    this.idle.delete(state)
+    this.armIdle()
     state.retain()
     return state
   }
 
+  /** Telegram callers await retirement and request cleanup before reusing the exact identity. Other channels stay cold. */
+  async acquire(options: SessionOptions) {
+    const key = this.key(options)
+    for (;;) {
+      await this.retiring.get(key)?.done
+      const state = this.states.get(key)
+      if (state?.releasePending) {
+        await state.releasePending
+        continue
+      }
+      const deadline = state && this.idle.get(state)
+      if (state && deadline !== undefined && deadline <= Date.now()) {
+        await this.evict(state)
+        continue
+      }
+      const scope = this.open(options)
+      scope.configure(options, options.channel === 'telegram')
+      return scope
+    }
+  }
+
+  private key(options: SessionOptions) {
+    return JSON.stringify([options.dataDir, options.workspace, options.sessionId, options.channel])
+  }
+
+  /** Only zero-reference sessions with no active request enter the LRU. Overflow cleanup completes before release resolves. */
+  async release(state: RuntimeSession, keepWarm: boolean) {
+    if (this.closing || !keepWarm || !this.maxIdle) {
+      await this.evict(state)
+      return
+    }
+    this.idle.delete(state)
+    this.idle.set(state, Date.now() + this.idleTtlMs)
+    const evictions: Promise<void>[] = []
+    while (this.idle.size > this.maxIdle)
+      evictions.push(this.evict(this.idle.keys().next().value!))
+    this.armIdle()
+    await Promise.all(evictions)
+  }
+
+  /** Reset ends one exact logical session. Another user or channel cannot lose its state. */
+  async reset(options: SessionOptions) {
+    const key = this.key(options)
+    await this.retiring.get(key)?.done
+    const state = this.states.get(key)
+    if (state) {
+      await state.releasePending
+      await this.evict(state)
+    }
+  }
+
+  private evict(state: RuntimeSession) {
+    const key = this.key(state.options)
+    this.idle.delete(state)
+    if (this.states.get(key) === state)
+      this.states.delete(key)
+    const previous = this.retiring.get(key)
+    if (previous)
+      return previous.done
+    const closing = state.dispose().finally(() => {
+      if (this.retiring.get(key)?.done === closing)
+        this.retiring.delete(key)
+    })
+    this.retiring.set(key, { state, done: closing })
+    this.armIdle()
+    return closing
+  }
+
+  private armIdle() {
+    clearTimeout(this.idleTimer)
+    this.idleTimer = undefined
+    if (this.closing || !this.idle.size)
+      return
+    const deadline = Math.min(...this.idle.values())
+    this.idleTimer = setTimeout(() => {
+      this.idleTimer = undefined
+      const expired = [...this.idle].filter(([, expires]) => expires <= Date.now())
+      void Promise.allSettled(expired.map(([state]) => this.evict(state)))
+      this.armIdle()
+    }, Math.max(0, deadline - Date.now()))
+    this.idleTimer.unref()
+  }
+
   get activeStateCount() {
-    return this.states.size
+    return this.states.size - this.idle.size
   }
 
   /** Registers a disk-backed reminder route. A store has one scheduler, and all stores share one reconciliation timer. */
@@ -74,7 +188,7 @@ export class AngelaRuntime {
       }
       return existing.ready
     }
-    // Personal hosts retain small routes for allowed users, never their conversations, recall, or tool clients.
+    // Reminder routes retain notification destinations independently of the bounded conversation infrastructure cache.
     if (this.remindersByStore.size >= 128)
       return Promise.reject(new Error('Runtime reminder route limit reached'))
     const targets = new Map<object, ReminderTarget>([[owner, { notifier, onError }]])
@@ -152,7 +266,13 @@ export class AngelaRuntime {
   }
 
   get resourceCounts() {
-    return { states: this.states.size, listeners: this.events.listenerCount, reminderRoutes: this.remindersByStore.size, reminderTimers: Number(Boolean(this.reminderTimer)) }
+    const resources = { requests: 0, controllers: 0, mcpClients: 0, indexes: 0, watchers: 0, recallTimers: 0, embeddings: 0 }
+    for (const state of [...this.states.values(), ...[...this.retiring.values()].map(entry => entry.state)]) {
+      const counts = state.resourceCounts
+      for (const key of Object.keys(resources) as (keyof typeof resources)[])
+        resources[key] += counts[key]
+    }
+    return { ...resources, states: this.states.size, warmSessions: this.idle.size, retiringSessions: this.retiring.size, idleTimers: Number(Boolean(this.idleTimer)), listeners: this.events.listenerCount, reminderRoutes: this.remindersByStore.size, reminderTimers: Number(Boolean(this.reminderTimer)) }
   }
 
   private armReminders() {
@@ -190,11 +310,16 @@ export class AngelaRuntime {
     this.closing ??= (async () => {
       try {
         clearTimeout(this.reminderTimer)
+        clearTimeout(this.idleTimer)
         await Promise.allSettled([...this.states.values()].map(state => state.dispose()))
+        await Promise.allSettled([...this.retiring.values()].map(entry => entry.done))
         await Promise.allSettled([...this.remindersByStore.values()].map(async route => (await route.ready).close()))
         await this.delivering?.catch(() => {})
       }
       finally {
+        this.idle.clear()
+        this.retiring.clear()
+        this.idleTimer = undefined
         this.remindersByStore.clear()
         this.reminderTimer = undefined
         this.states.clear()
@@ -216,22 +341,41 @@ export interface SessionOptions {
   warn?: (message: string) => void
 }
 
-/** Owns lazy infrastructure, never conversation history or request prompts. Zero references trigger immediate eviction without an idle timer. */
+/** Owns lazy infrastructure, never conversation history. Telegram releases retain Recall while MCP and request callbacks stay request-bound. */
 export class RuntimeSession {
   private references = 0
+  private keepWarm = false
+  private releasing?: Promise<void>
   private readonly lifetime = new AbortController()
   private personal?: Promise<Memory>
   private taskStore?: Promise<Tasks>
   private workflows?: Promise<Skills>
   private checkpoint?: Promise<ProjectMemory>
   private retrieval?: Promise<Recall | undefined>
+  private resolvedRecall?: Recall
   private client?: Promise<McpTools | undefined>
+  private resolvedClient?: McpTools
   private request?: Promise<void>
   private closing?: Promise<void>
   private lastRequest?: Omit<BaseAngelaEvent, 'id' | 'timestamp'>
+  private sessionStarted = false
   private lastReason: 'completed' | 'aborted' | 'failed' = 'completed'
 
   constructor(private readonly runtime: AngelaRuntime, readonly options: SessionOptions, private readonly removed: () => void) {}
+
+  /** Acquisitions refresh request-bound connectors only after the previous release completes. */
+  configure(options: SessionOptions, keepWarm: boolean) {
+    if (this.references !== 1)
+      return
+    this.keepWarm = keepWarm
+    this.options.connectMcp = options.connectMcp
+    this.options.warn = options.warn
+    this.options.locale = options.locale
+  }
+
+  get releasePending() {
+    return this.releasing
+  }
 
   retain() {
     this.lifetime.signal.throwIfAborted()
@@ -268,6 +412,7 @@ export class RuntimeSession {
       const recall = new Recall(this.options.dataDir, workspace, this.options.sessionId, this.runtime.messages, this.runtime.env, this.runtime.defaults, memory, skills)
       try {
         await recall.start()
+        this.resolvedRecall = recall
         return recall
       }
       catch {
@@ -282,7 +427,10 @@ export class RuntimeSession {
     this.lifetime.signal.throwIfAborted()
     // Without an enabled connector, no import, discovery, or client allocation occurs.
     if (!this.client) {
-      this.client = (this.options.connectMcp?.(AbortSignal.any([signal, this.lifetime.signal])) ?? Promise.resolve(undefined)).catch((error: unknown) => {
+      this.client = (this.options.connectMcp?.(AbortSignal.any([signal, this.lifetime.signal])) ?? Promise.resolve(undefined)).then((client) => {
+        this.resolvedClient = client
+        return client
+      }).catch((error: unknown) => {
         this.client = undefined
         throw error
       })
@@ -352,7 +500,6 @@ export class RuntimeSession {
       return Promise.reject(new Error('Context already has an active request'))
     const signal = options.abortSignal ? AbortSignal.any([options.abortSignal, this.lifetime.signal]) : this.lifetime.signal
     const envelope: Omit<BaseAngelaEvent, 'id' | 'timestamp'> = { correlationId: randomUUID(), sessionId: this.options.sessionId, channel: this.options.channel, workspace: this.options.workspace }
-    const started = !this.lastRequest
     this.lastRequest = envelope
     let capture: MemoryCapture | undefined
     let recall: Recall | undefined
@@ -370,11 +517,11 @@ export class RuntimeSession {
       }
     }
     this.request = (async () => {
-      signal.throwIfAborted()
       let registry: Awaited<ReturnType<typeof buildTools>> | undefined
       let completed = false
       let assistant = ''
       try {
+        signal.throwIfAborted()
         const warnings: string[] = []
         const sources: ContextSources = { channel: this.options.channel, messages: this.runtime.messages, warn: message => this.options.warn ? this.options.warn(message) : warnings.push(message) }
         if (this.options.channel !== 'discord') {
@@ -390,8 +537,10 @@ export class RuntimeSession {
           }
           catch { sources.warn(this.runtime.messages.memoryUnavailable) }
         }
-        if (started)
+        if (!this.sessionStarted) {
+          this.sessionStarted = true
           await emit({ type: 'session.started' })
+        }
         await emit({ type: 'user.message' }, text)
         const context = await buildContext(sources, text, signal, extra)
         registry = await buildTools(sources, text, this.options.sessionId, await this.mcp(signal))
@@ -435,17 +584,36 @@ export class RuntimeSession {
         if (signal.aborted) {
           await this.client?.then(client => client?.close()).catch(() => {})
           this.client = undefined
+          this.resolvedClient = undefined
         }
       }
     })().finally(() => { this.request = undefined })
     return this.request
   }
 
-  async close() {
-    if (this.references > 0)
-      this.references--
+  close() {
     if (!this.references)
-      await this.dispose()
+      return this.releasing ?? this.closing ?? Promise.resolve()
+    this.references--
+    if (this.references)
+      return Promise.resolve()
+    this.releasing ??= (async () => {
+      // A caller can release before send settles. Such a request remains active until its finally block completes.
+      await this.request?.catch(() => {})
+      const client = this.client
+      this.client = undefined
+      this.resolvedClient = undefined
+      await client?.then(client => client?.close()).catch(() => {})
+      this.options.connectMcp = undefined
+      this.options.warn = undefined
+      await this.runtime.release(this, this.keepWarm)
+    })().finally(() => { this.releasing = undefined })
+    return this.releasing
+  }
+
+  get resourceCounts() {
+    const recall = this.resolvedRecall?.resourceCounts
+    return { requests: Number(Boolean(this.request)), controllers: Number(!this.lifetime.signal.aborted), mcpClients: Number(Boolean(this.resolvedClient)), indexes: recall?.indexes ?? 0, watchers: recall?.watchers ?? 0, recallTimers: recall?.timers ?? 0, embeddings: recall?.embeddings ?? 0 }
   }
 
   /** Host shutdown ignores outstanding acquisitions and cancels the active generation before closing its resources. */
@@ -454,7 +622,7 @@ export class RuntimeSession {
       this.lifetime.abort()
       try {
         await this.request?.catch(() => {})
-        if (this.lastRequest) {
+        if (this.sessionStarted && this.lastRequest) {
           const event: AngelaEvent = { ...this.lastRequest, id: randomUUID(), timestamp: new Date().toISOString(), type: 'session.ended', reason: this.lastReason }
           this.runtime.events.emit(event)
           try {
@@ -475,7 +643,9 @@ export class RuntimeSession {
         this.workflows = undefined
         this.checkpoint = undefined
         this.retrieval = undefined
+        this.resolvedRecall = undefined
         this.client = undefined
+        this.resolvedClient = undefined
         this.lastRequest = undefined
         this.options.connectMcp = undefined
         this.options.warn = undefined

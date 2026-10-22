@@ -159,7 +159,7 @@ export class TelegramChat {
   }
 
   private async command(chatId: number, text: string) {
-    const scope = this.runtime.open({ dataDir: this.root(chatId), workspace: this.workspace, sessionId: this.sessionId(chatId), channel: 'telegram', locale: this.companionConfig.locale })
+    const scope = await this.runtime.acquire({ dataDir: this.root(chatId), workspace: this.workspace, sessionId: this.sessionId(chatId), channel: 'telegram', locale: this.companionConfig.locale })
     try {
       await this.reminders(chatId)
       return await scope.command(text)
@@ -176,10 +176,15 @@ export class TelegramChat {
       for (const job of this.jobs.values())
         job.controller.abort()
       await Promise.allSettled([...this.jobs.values()].map(job => job.done))
-      if (this.ownsRuntime)
+      if (this.ownsRuntime) {
         await this.runtime.close()
-      else
-        await Promise.allSettled([...this.allowedUsers].map(user => this.runtime.releaseReminders(this.root(user), this)))
+      }
+      else {
+        await Promise.allSettled([...this.allowedUsers].map(async (user) => {
+          await this.runtime.reset({ dataDir: this.root(user), workspace: this.workspace, sessionId: this.sessionId(user), channel: 'telegram' })
+          await this.runtime.releaseReminders(this.root(user), this)
+        }))
+      }
       this.chats.clear()
     })()
     return this.closingPromise
@@ -381,6 +386,7 @@ export class TelegramChat {
     }
     try {
       if (reset) {
+        await this.runtime.reset({ dataDir: this.root(chatId), workspace: this.workspace, sessionId: session.record.id, channel: 'telegram' })
         state.permissions = new Permissions(this.messages)
         await session.save(chat.conversation, false, null)
         await ctx.reply(this.messages.telegramNew)
@@ -426,7 +432,7 @@ export class TelegramChat {
       timer.unref()
       await this.reminders(chatId)
       this.runtime.pauseReminders(this.root(chatId), this)
-      scope = this.runtime.open({
+      scope = await this.runtime.acquire({
         dataDir: this.root(chatId),
         workspace: this.workspace,
         sessionId: session.record.id,

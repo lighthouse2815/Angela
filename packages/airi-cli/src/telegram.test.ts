@@ -18,6 +18,7 @@ import { afterEach, expect, it, vi } from 'vitest'
 
 import { McpTools } from './mcp'
 import { Memory } from './memory'
+import { AngelaRuntime } from './runtime/runtime'
 import { Sessions } from './sessions'
 import { Tasks } from './tasks'
 import { TelegramChat } from './telegram'
@@ -37,7 +38,7 @@ function completion(text: string) {
   return new Response(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', content: text }, finish_reason: 'stop' }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } })
 }
 
-async function connect(fetch = vi.fn<typeof globalThis.fetch>().mockImplementation(async () => completion('Xin chào')), existingDirectory?: string, sharedUserId?: number, users: ReadonlySet<number> = new Set([100, 200])) {
+async function connect(fetch = vi.fn<typeof globalThis.fetch>().mockImplementation(async () => completion('Xin chào')), existingDirectory?: string, sharedUserId?: number, users: ReadonlySet<number> = new Set([100, 200]), runtime?: AngelaRuntime) {
   const directory = existingDirectory ?? await mkdtemp(join(tmpdir(), 'angela-telegram-test-'))
   if (!existingDirectory)
     directories.push(directory)
@@ -92,7 +93,7 @@ async function connect(fetch = vi.fn<typeof globalThis.fetch>().mockImplementati
     await tools.discover(signal)
     return tools
   })
-  const host = new TelegramChat(bot, provider, 'test-model', new Sessions(directory, cliMessages.vi), directory, cliMessages.vi, users, connectTools, { dataDir: directory, env: {}, locale: 'vi', apiKey: '', sharedUserId })
+  const host = new TelegramChat(bot, provider, 'test-model', new Sessions(directory, cliMessages.vi), directory, cliMessages.vi, users, connectTools, { dataDir: directory, env: {}, locale: 'vi', apiKey: '', sharedUserId }, runtime)
   hosts.push(host)
   let updateId = 0
   async function message(text: string, id = 100, group = false) {
@@ -579,3 +580,45 @@ it('evicts inactive chat state and closes request clients after many sequential 
   expect(host.stateCounts).toEqual({ jobs: 0, chats: 0, runtime: 0 })
   close.mockRestore()
 }, 15_000)
+
+it('maps repeated Telegram messages, two users and reset to logical session boundaries', async () => {
+  const runtime = new AngelaRuntime('test-model', { generation: model => ({ protocol: 'chat-completions', config: { model, baseURL: 'https://fixture.invalid/v1/', fetch: async () => completion('Xin chào') } }) }, cliMessages.vi)
+  const started = vi.fn()
+  const ended = vi.fn()
+  runtime.events.on('session.started', started)
+  runtime.events.on('session.ended', ended)
+  try {
+    const { host, message, idle } = await connect(undefined, undefined, undefined, undefined, runtime)
+    await message('Choose copper release for user A')
+    await vi.waitFor(() => expect(host.stateCounts.jobs).toBe(0))
+    await idle()
+    await message('Continue copper release for user A')
+    await vi.waitFor(() => expect(host.stateCounts.jobs).toBe(0))
+    expect(started).toHaveBeenCalledTimes(1)
+    expect(ended).not.toHaveBeenCalled()
+    expect(runtime.resourceCounts.indexes).toBe(1)
+    await message('Choose quartz release for user B', 200)
+    await vi.waitFor(() => expect(host.stateCounts.jobs).toBe(0))
+    expect(started).toHaveBeenCalledTimes(2)
+    expect(runtime.resourceCounts.indexes).toBe(2)
+    const userA = started.mock.calls[0]![0]
+    const userB = started.mock.calls[1]![0]
+    expect(userA.sessionId).not.toBe(userB.sessionId)
+    await message('/new')
+    await vi.waitFor(() => expect(host.stateCounts.jobs).toBe(0))
+    expect(ended).toHaveBeenCalledTimes(1)
+    expect(ended.mock.calls[0]![0].sessionId).toBe(userA.sessionId)
+    expect(runtime.resourceCounts.indexes).toBe(1)
+    await message('Fresh copper request for A')
+    await vi.waitFor(() => expect(host.stateCounts.jobs).toBe(0))
+    expect(started).toHaveBeenCalledTimes(3)
+    await host.close()
+    expect(ended).toHaveBeenCalledTimes(3)
+    // A shared runtime stays open, but this adapter releases all its sessions and reminder destinations.
+    expect(runtime.resourceCounts.states).toBe(0)
+    expect(runtime.resourceCounts.reminderRoutes).toBe(0)
+  }
+  finally {
+    await runtime.close()
+  }
+})

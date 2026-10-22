@@ -208,7 +208,7 @@ it('shares one reminder timer and one store scheduler across channels and releas
     expect(runtime.reminderRouteCount).toBe(20)
     await runtime.close()
     expect(vi.getTimerCount()).toBe(0)
-    expect(runtime.resourceCounts).toEqual({ states: 0, listeners: 0, reminderRoutes: 0, reminderTimers: 0 })
+    expect(Object.values(runtime.resourceCounts).every(count => count === 0)).toBe(true)
   }
   finally {
     vi.useRealTimers()

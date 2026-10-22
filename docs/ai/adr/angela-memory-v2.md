@@ -130,3 +130,28 @@ Identity-only source-version tombstones reject stale personal snapshots from ano
 New explicit facts have new source versions and remain eligible for indexing.
 Model-driven forget also suppresses the active request's captured session, so its assistant confirmation cannot immediately relearn the forgotten fact.
 Personal-memory model tools reject recognized credentials using the same sanitizer. Direct explicit local edits keep their existing storage contract.
+
+## Telegram session retention
+
+The production baseline reopened Recall and SQLite for every message. The measured retained comparison reduced local fixture request latency.
+`AngelaRuntime.acquire` now retains Telegram infrastructure after release. CLI and Discord continue to use immediate release through `open`.
+The cache key contains `dataDir`, workspace, session ID, and channel.
+
+The default idle TTL is ten minutes, matching Telegram's existing permission-state lifetime.
+The default cap is 32 idle sessions. `RuntimeOptions.telegramSessions` configures both values, with a maximum cap of 64.
+The existing eight active-context limit remains separate. Active requests never enter the idle LRU.
+Active, idle, and retiring contexts together cannot exceed `maxIdle + 8`.
+One host timer expires idle entries. LRU overflow closes the least recently released entry before release completes.
+An acquisition awaits pending retirement of the same key. Users with different keys continue concurrently.
+
+Recall, its SQLite index, watcher, and reconciliation timer survive warm release.
+MCP clients close after each request. Their approval callbacks capture request output and persistence, so retaining them risks stale approvals.
+Release clears connector and warning callbacks. A later acquisition supplies fresh callbacks.
+Reset and adapter shutdown close exact Telegram identities, including when a shared runtime serves other channels.
+Host shutdown aborts requests, waits for retiring contexts, and closes all owned resources.
+
+`session.started` occurs on the first request of a runtime session.
+`session.ended` occurs on reset, TTL/LRU eviction, or shutdown.
+A cancelled request does not end a warm session. A later message can reuse its Recall.
+A reopened persistent conversation starts another runtime session segment after eviction or process restart.
+Memory pages stay durable across those segments. No new background LLM work is enabled.
