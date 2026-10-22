@@ -89,3 +89,27 @@ Existing gateway tests also cover routing, streaming, persistence, authenticatio
 
 No personal AI account or paid inference endpoint was accessed. Portable archive packaging was not repeated.
 Pre-existing license deletions remain unstaged, including the source engine license. They are not part of the menu change.
+
+## Arrow-key navigation
+
+All startup menus now use the existing terminal reader for ↑/↓ selection and Enter confirmation.
+Escape returns from a submenu or exits the main menu. Ctrl+C and Ctrl+D release the terminal reader.
+Long lists scroll inside the terminal viewport. Home and End select the first and last entries.
+Menu input never enters the next text question. Cursor visibility and raw mode return to normal after exit.
+No new dependency was added.
+
+`pnpm -F @angela/i18n build` and `pnpm -F @angela/cli build` passed.
+`pnpm -F @angela/cli typecheck` passed.
+The command below passed with four files and 69 tests:
+
+```sh
+pnpm -F @angela/cli exec vitest run --config vitest.config.ts src/terminal.test.ts src/startup.test.ts src/config.test.ts src/cli.test.ts --maxWorkers=1 --no-file-parallelism
+```
+
+PTY coverage includes direction changes, wraparound, Enter, Escape, Ctrl+C, Ctrl+D, and narrow terminals with long lists.
+Startup tests select Custom with arrow keys against the real bundled engine, then interrupt and check host cleanup.
+Manual checks ran the installed `angela` command from the home directory and confirmed arrow navigation and Escape exit.
+`NODE_OPTIONS=--max-old-space-size=6144 pnpm typecheck --concurrency=1` passed all 53 tasks.
+The final menu and terminal rerun passed 45 tests across two files.
+The PTY fixture now waits for the complete menu and drains output after exit. This removes a partial-read assertion race.
+`NODE_OPTIONS=--max-old-space-size=6144 pnpm lint` passed with zero errors and 603 existing ESLint warnings.

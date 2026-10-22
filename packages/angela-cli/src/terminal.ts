@@ -5,7 +5,7 @@ import process from 'node:process'
 import { clearScreenDown, cursorTo, emitKeypressEvents, moveCursor } from 'node:readline'
 import { createInterface } from 'node:readline/promises'
 import { PassThrough } from 'node:stream'
-import { styleText } from 'node:util'
+import { stripVTControlCharacters, styleText } from 'node:util'
 
 /** Owns the terminal reader. EOF releases pending questions, and turn cancellation keeps the reader open. */
 export class Terminal {
@@ -122,6 +122,65 @@ export class Terminal {
       this.selectCommand = undefined
       if (visible)
         process.stderr.write('\u001B7\r\n\u001B[J\u001B8')
+    }
+  }
+
+  /** Owns arrow navigation until Enter, Escape, EOF, or terminal closure. Text entry never reaches the next question. */
+  async select(title: string, entries: string[], hint: string): Promise<number | undefined> {
+    if (!this.interactive || this.closed.signal.aborted || !entries.length)
+      return undefined
+    let selected = 0
+    const text = (value: string) => stripVTControlCharacters(value).replace(/[\r\n]/gu, ' ')
+    const draw = () => {
+      const clip = (value: string) => Array.from(text(value)).slice(0, Math.max(1, (process.stderr.columns || 80) - 1)).join('')
+      // Keep the viewport inside the terminal so its first row remains a stable redraw anchor.
+      const height = Math.max(1, (process.stderr.rows || 24) - 4)
+      const first = Math.min(Math.max(0, selected - height + 1), Math.max(0, entries.length - height))
+      const visible = entries.slice(first, first + height)
+      cursorTo(process.stderr, 0)
+      clearScreenDown(process.stderr)
+      process.stderr.write(`${clip(title)}\n${clip(hint)}\n`)
+      for (const [index, label] of visible.entries()) {
+        const active = first + index === selected
+        process.stderr.write(`${styleText(active ? 'cyan' : 'dim', clip(`${active ? '›' : ' '} ${label}`), { stream: process.stderr })}\n`)
+      }
+      moveCursor(process.stderr, 0, -visible.length - 2)
+    }
+    const result = Promise.withResolvers<number | undefined>()
+    const cancel = () => result.resolve(undefined)
+    process.stderr.write('\n\u001B[?25l')
+    try {
+      this.closed.signal.addEventListener('abort', cancel, { once: true })
+      this.selectCommand = (key) => {
+        if (key.ctrl && (key.name === 'c' || key.name === 'd'))
+          return false
+        if (key.name === 'escape')
+          result.resolve(undefined)
+        if (key.name === 'return')
+          result.resolve(selected)
+        if (!key.ctrl && !key.meta) {
+          if (key.name === 'up' || key.name === 'down')
+            selected = (selected + (key.name === 'up' ? -1 : 1) + entries.length) % entries.length
+          if (key.name === 'home')
+            selected = 0
+          if (key.name === 'end')
+            selected = entries.length - 1
+        }
+        return true
+      }
+      this.redraw = draw
+      process.stderr.on('resize', draw)
+      draw()
+      return await result.promise
+    }
+    finally {
+      this.closed.signal.removeEventListener('abort', cancel)
+      process.stderr.off('resize', draw)
+      this.selectCommand = undefined
+      this.redraw = undefined
+      cursorTo(process.stderr, 0)
+      clearScreenDown(process.stderr)
+      process.stderr.write(`${text(title)}\n\u001B[?25h`)
     }
   }
 

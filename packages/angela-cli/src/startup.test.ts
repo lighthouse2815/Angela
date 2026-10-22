@@ -34,6 +34,10 @@ afterEach(async () => {
 function setup(answers: string[]) {
   const ask = vi.spyOn(Terminal.prototype, 'ask').mockImplementation(async () => answers.shift())
   const output = vi.spyOn(Terminal.prototype, 'notify').mockResolvedValue()
+  const select = vi.spyOn(Terminal.prototype, 'select').mockImplementation(async () => {
+    const answer = answers.shift()
+    return answer === undefined ? undefined : Number(answer) - 1
+  })
   const status = vi.spyOn(Gateway.prototype, 'status').mockResolvedValue({ configured: true, running: true })
   const start = vi.spyOn(Gateway.prototype, 'start').mockRejectedValue(new Error('Unexpected host start'))
   const login = vi.spyOn(Gateway.prototype, 'login').mockImplementation(async provider => `http://127.0.0.1:20129/dashboard/providers/${provider ?? ''}`)
@@ -47,7 +51,7 @@ function setup(answers: string[]) {
   const session = new Startup()
   sessions.push(session)
   const env = { ANGELA_CONFIG: join(directory, 'config.json'), ANGELA_GATEWAY_DATA_DIR: join(directory, 'gateway'), ANGELA_LOCALE: 'en' }
-  return { session, env, ask, output, status, start, login, accounts, models, use, endpoint, password, showKey, keys }
+  return { session, env, ask, select, output, status, start, login, accounts, models, use, endpoint, password, showKey, keys }
 }
 
 it.each([
@@ -62,9 +66,10 @@ it.each([
   ['--base-url', 'http://localhost:1234/v1/'],
   ['--api=responses'],
 ])('preserves explicit and non-chat execution without opening a menu: %j', async (...args) => {
-  const { session, env, ask, start } = setup([])
+  const { session, env, ask, select, start } = setup([])
   expect(await session.open(args, env)).toEqual({ args, env })
   expect(ask).not.toHaveBeenCalled()
+  expect(select).not.toHaveBeenCalled()
   expect(start).not.toHaveBeenCalled()
   expect(await readdir(directory)).toEqual([])
 })
@@ -91,7 +96,7 @@ it.each([
 })
 
 it('keeps secrets hidden until an explicit reveal and exposes all custom gateway actions', async () => {
-  const { session, env, showKey, password, keys, login, output, use } = setup(['4', '4', '5', '6', '7', '1', 'b', '3', 'gemini', '1'])
+  const { session, env, showKey, password, keys, login, output, use, select } = setup(['4', '4', '5', '6', '7', '1', 'b', '3', 'gemini', '1'])
   const selected = await session.open([], env)
   expect(keys).toHaveBeenCalledOnce()
   expect(showKey).toHaveBeenCalledOnce()
@@ -103,7 +108,7 @@ it('keeps secrets hidden until an explicit reveal and exposes all custom gateway
   expect(text).toContain('private-shared-key')
   expect(text).toContain('private-dashboard-password')
   expect(text).toContain('http://127.0.0.1:20129/dashboard')
-  expect(text).toContain(cliMessages.en.startup.accounts)
+  expect(select).toHaveBeenCalledWith(cliMessages.en.startup.custom, expect.arrayContaining([cliMessages.en.startup.accounts]), cliMessages.en.startup.choice)
 })
 
 it('tests, disables and enables accounts without printing credentials', async () => {
@@ -156,12 +161,11 @@ it('starts a saved local gateway when continuing, without changing provider conf
   expect(await file.read()).toEqual(saved)
 })
 
-it('handles invalid choices, empty models, pagination, errors and back navigation', async () => {
-  const { session, env, accounts, models, use, output } = setup(['invalid', '0', '4', '2', '3', '3', '', '16', '1'])
+it('handles empty models, pagination, errors and back navigation', async () => {
+  const { session, env, accounts, models, use, output } = setup(['4', '2', '3', '3', '', '16', '1'])
   accounts.mockResolvedValueOnce([]).mockResolvedValueOnce([])
   models.mockResolvedValue(Array.from({ length: 16 }, (_, index) => ({ id: `cx/model-${index}` })))
   await session.open([], env)
-  expect(output.mock.calls.flat().join('\n')).toContain(cliMessages.en.startup.invalid)
   expect(output.mock.calls.flat().join('\n')).toContain(cliMessages.en.startup.empty)
   expect(use).toHaveBeenCalledWith('cx/model-15', env.ANGELA_CONFIG)
 })
@@ -194,8 +198,11 @@ async function prepareGateway() {
 it('starts and stops the bundled engine through the custom menu without exposing its key or password', async () => {
   const { port, password } = await prepareGateway()
   const answers = ['4', '4', '8', '6']
-  vi.spyOn(Terminal.prototype, 'ask').mockImplementation(async () => answers.shift())
   const output = vi.spyOn(Terminal.prototype, 'notify').mockResolvedValue()
+  vi.spyOn(Terminal.prototype, 'select').mockImplementation(async () => {
+    const answer = answers.shift()
+    return answer === undefined ? undefined : Number(answer) - 1
+  })
   const session = new Startup()
   sessions.push(session)
   const env = { ...process.env, ANGELA_CONFIG: join(directory, 'config.json'), ANGELA_GATEWAY_DATA_DIR: directory, ANGELA_LOCALE: 'en' }
@@ -229,14 +236,22 @@ def until(marker):
             raise RuntimeError(bytes(output).decode(errors='replace'))
         output.extend(os.read(master, 65536))
 try:
-    until(b'Choose a number:')
+    until(b'  Exit')
     if sys.argv[1] == 'exit':
-        os.write(master, b'6\\n')
+        os.write(master, b'\\x1b[A\\r')
     else:
-        os.write(master, b'4\\n')
+        os.write(master, b'\\x1b[B\\x1b[B\\x1b[B\\r')
         until(b'Full dashboard:')
         child.send_signal(signal.SIGINT)
     child.wait(timeout=10)
+    while select.select([master], [], [], 0)[0]:
+        try:
+            chunk = os.read(master, 65536)
+        except OSError:
+            break
+        if not chunk:
+            break
+        output.extend(chunk)
     print(bytes(output).decode(errors='replace'))
     sys.exit(child.returncode)
 finally:

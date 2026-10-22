@@ -6,7 +6,8 @@ Angela can manage everyday tasks and deliver reminders while the terminal proces
 ## Interactive provider menu
 
 Run `angela` in a terminal to choose GPT, Gemini, Claude, or Custom · Angela Gateway.
-Enter the number beside an action. The menu uses English or Vietnamese through `--locale` or `ANGELA_LOCALE`.
+Use ↑/↓ to select an action. Press Enter to confirm, or Esc to return.
+The menu uses English or Vietnamese through `--locale` or `ANGELA_LOCALE`.
 GPT opens the Codex account page. Gemini opens Gemini CLI. Claude opens the Claude account page.
 Account authentication uses the bundled local dashboard in your browser, not a separate gateway installation.
 At the login prompt, enter `p` to show the initial dashboard password. Enter `b` to return.

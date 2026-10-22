@@ -2,7 +2,7 @@ import process from 'node:process'
 
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
-import { parseArgs, stripVTControlCharacters } from 'node:util'
+import { parseArgs } from 'node:util'
 
 import { cliMessages } from '@angela/i18n/cli'
 import { resolveLocalConfigPath } from '@angela/local-config/node'
@@ -113,16 +113,7 @@ export class Startup {
   }
 
   private async choose(title: string, entries: string[]) {
-    await this.terminal?.notify(`${title}\n${entries.map((label, index) => `${index + 1}. ${stripVTControlCharacters(label).replace(/[\r\n]/gu, ' ')}`).join('\n')}`)
-    while (!this.lifetime.signal.aborted) {
-      const answer = await this.terminal?.ask(this.messages.startup.choice)
-      if (answer === undefined)
-        return
-      const number = Number(answer.trim())
-      if (Number.isInteger(number) && number >= 1 && number <= entries.length)
-        return number - 1
-      await this.terminal?.notify(this.messages.startup.invalid)
-    }
+    return await this.terminal?.select(title, entries, this.messages.startup.choice)
   }
 
   private async ensureHost(gateway: Gateway) {
