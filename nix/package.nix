@@ -39,7 +39,7 @@ in
 
   desktopItems = [
     (makeDesktopItem {
-      desktopName = "AIRI";
+      desktopName = "Angela";
       comment = final.meta.description;
       categories = [
         "AudioVideo"
@@ -67,7 +67,7 @@ in
   buildPhase = ''
     runHook preBuild
 
-    pnpm -F @proj-airi/stage-tamagotchi... run build
+    pnpm -F @angela/desktop... run build
     cd apps/stage-tamagotchi
     pnpm exec electron-builder build \
       --dir --${if stdenvNoCC.isLinux then "linux" else "mac"} \
@@ -81,19 +81,19 @@ in
     runHook preInstall
 
     mkdir -p "$out/opt"
-    cp -r dist/*-unpacked "$out/opt/AIRI"
+    cp -r dist/*-unpacked "$out/opt/Angela"
     # The icon is actually 1500x1500... install it anyway
-    install -Dm644 resources/icon.png "$out/share/icons/hicolor/64x64/apps/airi.png"
+    install -Dm644 resources/icon.png "$out/share/icons/hicolor/64x64/apps/angela.png"
 
     # Patch the asar to include the assets
-    cd "$out/opt/AIRI/resources"
+    cd "$out/opt/Angela/resources"
     asar extract app.asar app
     rm -r app.asar.unpacked
     cp -r "$assets"/{vrm,live2d} app/out/renderer/assets
     asar pack app app.asar
 
-    makeWrapper "${lib.getExe electron}" "$out/bin/airi" \
-      --add-flags "$out/opt/AIRI/resources/app.asar" \
+    makeWrapper "${lib.getExe electron}" "$out/bin/angela" \
+      --add-flags "$out/opt/Angela/resources/app.asar" \
       --add-flags "\''${NIXOS_OZONE_WL:+\''${WAYLAND_DISPLAY:+--enable-wayland-ime=true --wayland-text-input-version=3}}" \
       --prefix LD_LIBRARY_PATH : "${libraryPath}"
 
