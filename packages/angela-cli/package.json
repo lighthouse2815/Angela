@@ -42,7 +42,8 @@
     "grammy": "catalog:",
     "valibot": "catalog:",
     "ws": "catalog:",
-    "yaml": "catalog:"
+    "yaml": "catalog:",
+    "zca-js": "catalog:"
   },
   "devDependencies": {
     "@types/ws": "catalog:"
