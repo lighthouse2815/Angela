@@ -35,6 +35,14 @@ export interface ExternalMessageRecord extends ExternalMessage {
   pendingRequest?: { content: string, status: 'pending' }
 }
 
+/** A bounded owner-visible contact audit contains no message text and grants no sender privileges. */
+export interface RecentZaloContact {
+  senderId: string
+  senderName?: string
+  lastSeen: string
+  messageCount: number
+}
+
 /** Storage implementations own paths, atomic claims, and durable message identity. */
 export interface AwayModeStore {
   state: () => Promise<AwayModeState>
@@ -42,6 +50,10 @@ export interface AwayModeStore {
   claim: (record: ExternalMessageRecord) => Promise<boolean>
   update: (id: string, change: Partial<ExternalMessageRecord>) => Promise<void>
   records: (sessionId?: string) => Promise<ExternalMessageRecord[]>
+  maintain: () => Promise<void>
+  reserveReply: (senderId: string, now: number) => Promise<boolean>
+  observeContact: (message: ExternalMessage) => Promise<void>
+  recentContacts: () => Promise<RecentZaloContact[]>
 }
 
 export type AwayLog = (event: string, fields?: { messageId?: string, reason?: string }) => void

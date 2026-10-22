@@ -86,9 +86,9 @@ This includes ordinary conversation because the MVP does not infer owner intent 
 No user task, deadline, financial promise, or personal decision is created.
 
 Turning Away Mode off produces a deterministic summary for that away session.
-It counts messages and successful replies by stable sender ID, including denied inbound messages.
+It counts retained authorized messages and successful replies by stable sender ID. Denied contacts have metadata only.
 It quotes up to 20 recent messages per sender, with 500 characters per quote.
-Complete original text remains in the private audit store.
+Original authorized text remains in the private audit store until retention removes its record.
 Control characters are JSON-escaped before terminal display.
 
 ## Storage and delivery
@@ -96,7 +96,26 @@ Control characters are JSON-escaped before terminal display.
 `AwayModeStore` and `ZaloCredentialStore` are the business-facing persistence boundaries.
 Local implementations reuse `MemoryFile`, including validation, atomic rename, private files, and cross-process write locks.
 There is no new database or memory pipeline.
-Each message has a separate file. The existing 128,000-character file limit applies to individual writes.
+Only authorized messages create full per-message files. The existing 128,000-character file limit applies to individual writes.
+`away_disabled`, `replay_message`, `unsupported_message`, and `self_message` do not persist message records or contact metadata.
+`whitelist_denied` stores only contact ID, bounded display name, last seen, and callback count.
+The contact audit retains at most 20 contacts per account and never stores message text.
+Repeated denied callbacks can increase this metadata count. It is not an exact count of unique messages.
+
+Retention runs under the single host lease on startup and before authorized claims.
+The store reads record metadata once when the host starts. It does not rescan history on every incoming message.
+Terminal records expire after 30 days. Capacity pruning removes the oldest eligible records first, with message hash as the tie-breaker.
+The account cap is 500 records. This deliberately fits a small local MVP and bounds future per-account file growth.
+Records younger than six minutes remain protected, beyond the five-minute inbound replay window and its future-clock allowance.
+`received` and `sending` records remain protected regardless of age because their side effects can be uncertain.
+If all 500 slots are protected, new claims fail closed without model calls or sends.
+Existing accounts with over 500 protected records accept no new claims until owner review frees capacity.
+Retention never deletes an active record to satisfy the cap. Such existing overflow is preserved rather than silently discarded.
+An idle host cleans age-expired files on its next claim or restart. No timer or distributed cleanup worker is added.
+
+Deleting older terminal claims shortens audit and summary history.
+Recent duplicates retain their claims. Replays of deleted records still fail the timestamp policy before persistence.
+Expired pending request candidates are also removed with their records. The owner must review summaries within the retention period.
 
 Message identity hashes the authenticated account, conversation, and server message ID.
 Claims persist across restart. Duplicate and already-claimed records never generate another reply.
@@ -105,7 +124,14 @@ Old-message listener events are not consumed.
 
 Rate limits permit at most three reply attempts per sender in 60 seconds.
 Durable attempts include successful, failed, and uncertain sends, across restarts and away sessions.
-Rate checks read the private log. This favors a small local MVP over large-volume throughput.
+`reply-rates.json` holds at most 512 sender windows with three timestamps per window.
+Each reservation atomically prunes elapsed timestamps, checks the sender, and persists the attempt before generation or send.
+This costs at most 512 small windows, independent of historical message count.
+Active windows are never evicted to admit another sender. A full rate file fails closed.
+The initial rate file seeds recent attempts from the startup record index once for existing session data.
+Subsequent reservations never call `records()` or read message history.
+State remains account-scoped and survives host restart, Away Mode changes, and whitelist changes.
+A backward clock shift retains reservations until their windows expire under the current clock.
 One local host lease prevents competing listeners and rate-check races.
 
 The inbound queue holds at most 32 messages and processes them serially.
@@ -193,7 +219,7 @@ node packages/angela-cli/dist/bin/run.mjs zalo run
 ```
 
 Replace `123456789` with the contact's stable Zalo sender ID.
-Denied inbound DMs appear in the private audit records with their sender IDs.
+Denied inbound DMs appear in the bounded contact audit with their sender IDs, without message text.
 The MVP does not resolve names or scan a friend directory.
 Keep the foreground host running while the owner is away.
 This can run beside the regular Angela terminal process.
@@ -244,6 +270,8 @@ The local storage implementations own all paths:
   <sha256(account-id)>/
     away.json
     messages/<sha256(message-identity)>.json
+    reply-rates.json             # bounded durable rate windows
+    recent-contacts.json         # at most 20 contacts, no message text
 ```
 
 Local today: one Angela process with a local store and a private Zalo session.
@@ -264,7 +292,7 @@ Before VPS deployment:
 7. Configure supervised shutdown and visible disconnect alerts.
 8. Review session revocation, protocol compatibility, and the risk of account suspension.
 
-Do not delete message tombstones to free space without reviewing duplicate-delivery consequences.
+Use the built-in retention policy. Do not manually delete recent or unfinished claims without reviewing duplicate-delivery consequences.
 
 ## Real-account acceptance
 

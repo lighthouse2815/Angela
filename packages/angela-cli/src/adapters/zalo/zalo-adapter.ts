@@ -19,6 +19,7 @@ export class ZaloAdapter {
     if (this.started || this.lifetime.signal.aborted)
       throw new Error('Zalo adapter already started or stopped')
     this.started = true
+    await this.away.store.maintain()
     await this.connect()
   }
 

@@ -8,7 +8,6 @@ import { evaluateAway } from './away-policy'
 
 /** Owns durable idempotency, authorization, rate limits, owner commands, and summaries. No transport or filesystem access. */
 export class AwayModeService {
-  private readonly replies = new Map<string, number[]>()
   private active = false
 
   constructor(
@@ -22,35 +21,28 @@ export class AwayModeService {
   async receive(message: ExternalMessage, send: (text: string) => Promise<string>, signal: AbortSignal) {
     const state = await this.store.state()
     const reason = evaluateAway(state, message, Date.now())
-    if (reason === 'self_message') {
-      this.log('ignored', { messageId: message.messageId, reason })
+    if (reason !== 'allowed') {
+      // Denied contacts retain metadata only. Replays, self messages, unsupported text, and disabled mode retain no content.
+      if (reason === 'whitelist_denied')
+        await this.store.observeContact(message)
+      this.log(reason === 'whitelist_denied' ? reason : 'ignored', { messageId: message.messageId, reason })
       return
     }
     const id = createHash('sha256').update(JSON.stringify([message.accountId, message.conversationId, message.messageId])).digest('hex')
     const record: ExternalMessageRecord = { ...message, id, awaySessionId: state.enabled ? state.sessionId : undefined, replyStatus: 'received' }
     if (!await this.store.claim(record)) {
-      this.log('ignored', { messageId: message.messageId, reason: 'duplicate' })
+      this.log('ignored', { messageId: message.messageId, reason: 'duplicate_or_storage_capacity' })
       return
     }
+    await this.store.observeContact(message)
     this.log('received', { messageId: message.messageId })
-    if (reason !== 'allowed') {
-      const replyStatus = reason === 'whitelist_denied' ? reason : 'ignored'
-      await this.store.update(id, { replyStatus, reason, processedAt: new Date().toISOString() })
-      this.log(replyStatus, { messageId: message.messageId, reason })
-      return
-    }
     const now = Date.now()
-    // Persisted attempts retain rate limits across host restarts and include uncertain sends.
-    const attempts = (await this.store.records()).filter(item => item.senderId === message.senderId
-      && ['sending', 'sent', 'failed'].includes(item.replyStatus) && Date.parse(item.processedAt ?? '') > now - 60_000)
-    const recent = this.replies.get(message.senderId)?.filter(time => time > now - 60_000) ?? []
-    if (this.active || Math.max(recent.length, attempts.length) >= 3) {
+    if (this.active || !await this.store.reserveReply(message.senderId, now)) {
       await this.store.update(id, { replyStatus: 'rate_limited', reason: 'rate_limited', processedAt: new Date().toISOString() })
       this.log('rate_limited', { messageId: message.messageId })
       return
     }
     this.active = true
-    this.replies.set(message.senderId, [...recent, now])
     try {
       // Every accepted message is a request candidate for owner review. No task or commitment is created.
       await this.store.update(id, { replyStatus: 'sending', processedAt: new Date().toISOString(), pendingRequest: { content: message.text, status: 'pending' } })
@@ -91,6 +83,8 @@ export class AwayModeService {
     if (rest.length)
       return this.messages.invalid
     if (command === '/zalo') {
+      if (action === 'recent' && value === undefined)
+        return JSON.stringify(await this.store.recentContacts())
       if (action === 'allowed' && value === undefined)
         return JSON.stringify((await this.store.state()).allowedUsers)
       if (!['allow', 'deny'].includes(action ?? '') || !value || !/^\d{1,30}$/u.test(value))

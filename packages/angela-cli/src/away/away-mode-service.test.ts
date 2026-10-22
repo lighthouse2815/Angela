@@ -60,11 +60,12 @@ it('persists owner on/off/status commands and returns an attributed summary with
 })
 
 it.each([
-  { name: 'away disabled', enabled: false, allow: true, overrides: {}, status: 'ignored' },
-  { name: 'non-whitelisted sender', enabled: true, allow: false, overrides: {}, status: 'whitelist_denied' },
-  { name: 'stale replay', enabled: true, allow: true, overrides: { receivedAt: '2020-01-01T00:00:00.000Z' }, status: 'ignored' },
-  { name: 'future replay', enabled: true, allow: true, overrides: { receivedAt: '2100-01-01T00:00:00.000Z' }, status: 'ignored' },
-])('does not reply or call a model for $name', async ({ enabled, allow, overrides, status }) => {
+  { name: 'away disabled', enabled: false, allow: true, overrides: {} },
+  { name: 'non-whitelisted sender', enabled: true, allow: false, overrides: {} },
+  { name: 'stale replay', enabled: true, allow: true, overrides: { receivedAt: '2020-01-01T00:00:00.000Z' } },
+  { name: 'unsupported empty text', enabled: true, allow: true, overrides: { text: '  ' } },
+  { name: 'future replay', enabled: true, allow: true, overrides: { receivedAt: '2100-01-01T00:00:00.000Z' } },
+])('does not reply or call a model for $name', async ({ enabled, allow, overrides }) => {
   const { service, receive, store, send, reply } = await setup()
   if (enabled)
     await service.command('/away on')
@@ -74,7 +75,7 @@ it.each([
   await receive(overrides)
   expect(send).not.toHaveBeenCalled()
   expect(reply).not.toHaveBeenCalled()
-  expect((await store.records())[0]?.replyStatus).toBe(status)
+  expect(await store.records()).toEqual([])
 })
 
 it('ignores self messages without logging message content or persisting owner speech', async () => {
@@ -174,4 +175,17 @@ it('keeps account whitelists isolated and denies display-name authorization', as
   expect((await new LocalAwayModeStore(root, '333').state()).allowedUsers).toEqual([])
   await service.command('/zalo deny 222')
   expect(await service.command('/zalo allowed')).toBe('[]')
+})
+
+it('does not read historical records to rate limit incoming messages and isolates senders', async () => {
+  const { service, receive, store, send } = await setup()
+  await service.command('/away on')
+  await service.command('/zalo allow 222')
+  await service.command('/zalo allow 333')
+  const history = vi.spyOn(store, 'records').mockRejectedValue(new Error('Full history cannot enter rate limiting'))
+  for (let index = 0; index < 4; index++)
+    await receive({ messageId: String(index) })
+  await receive({ messageId: 'other', senderId: '333', conversationId: '333' })
+  expect(history).not.toHaveBeenCalled()
+  expect(send).toHaveBeenCalledTimes(4)
 })
