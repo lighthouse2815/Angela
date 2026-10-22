@@ -81,7 +81,7 @@ export async function buildTools(sources: ContextSources, text: string, sessionI
       if (rejection)
         return rejection
       if (tool.function.name === 'task_create' && (!/nhắc|(?:tạo|thêm|lưu)\s+(?:việc|lịch|tác vụ)|\b(?:remind|schedule|add|create|save)\b/iu.test(text)
-        || /(?:^|\s)(?:chắc|có lẽ|nếu|ví dụ|đừng|không cần|maybe|perhaps|do not|don't)(?:\s|$)/iu.test(text))) {
+        || /(?:^|[\s,:;.!?])(?:chắc|có lẽ|nếu|ví dụ|đừng|không cần|maybe|perhaps|do not|don't)(?:$|[\s,:;.!?])|["“”]/iu.test(text))) {
         return { status: 'rejected', reason: sources.messages.tasks.clarifyTime }
       }
       return await execute(input, options)
