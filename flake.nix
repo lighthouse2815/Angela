@@ -23,13 +23,13 @@
 
       packages = forAllSystems (
         system:
-        { default = self.packages.${system}.airi; } // self.overlays.airi (pkgsForSystem system) null
+        { default = self.packages.${system}.angela; } // self.overlays.angela (pkgsForSystem system) null
       );
 
       overlays = {
-        default = self.overlays.airi;
-        airi = final: _: {
-          airi = final.callPackage ./nix/package.nix { };
+        default = self.overlays.angela;
+        angela = final: _: {
+          angela = final.callPackage ./nix/package.nix { };
         };
       };
 
@@ -41,7 +41,7 @@
         with pkgs;
         {
           default = mkShell {
-            inputsFrom = [ self.packages.${system}.airi ];
+            inputsFrom = [ self.packages.${system}.angela ];
             packages = [
               nixd
               nixfmt
@@ -55,7 +55,7 @@
           # Usage: nix develop .#fhs
           fhs = (
             buildFHSEnv {
-              name = "airi-electron-fhs";
+              name = "angela-electron-fhs";
               targetPkgs =
                 p: with p; [
                   nodejs_24
