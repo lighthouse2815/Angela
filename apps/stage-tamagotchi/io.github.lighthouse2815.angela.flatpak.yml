@@ -1,0 +1,76 @@
+app-id: io.github.lighthouse2815.angela
+runtime: org.freedesktop.Platform
+runtime-version: '24.08'
+sdk: org.freedesktop.Sdk
+base: org.electronjs.Electron2.BaseApp
+base-version: '24.08'
+command: angela.sh
+
+finish-args:
+  # GUI environment
+  - --share=network
+  - --socket=x11
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+  - --device=all
+  - --socket=pulseaudio
+  - --socket=system-bus
+  - --socket=session-bus
+  - --share=ipc
+
+  # DBus
+  - --talk-name=org.freedesktop.Notifications
+  - --talk-name=org.freedesktop.portal.Desktop
+  - --system-talk-name=org.freedesktop.login1
+  - --system-talk-name=org.freedesktop.UPower
+
+  # Filesystem permissions used by desktop and shared local configuration.
+  - --filesystem=xdg-download:rw
+  - --filesystem=xdg-config/angela:create
+  - --filesystem=xdg-config/Angela:create
+
+modules:
+  - name: Angela-App
+    buildsystem: simple
+    build-commands:
+      - mkdir -p /app/bin
+      - mkdir -p /app/lib/angela
+      - cp -r payload/. /app/lib/angela/
+      - install angela.sh /app/bin/angela.sh
+      - chmod +x /app/lib/angela/angela
+      # Desktop-file launches run Exec=angela inside the sandbox, so expose a
+      # stable entry point that resolves to the zypak wrapper script.
+      - ln -s /app/bin/angela.sh /app/bin/angela
+      - install -Dm644 io.github.lighthouse2815.angela.desktop /app/share/applications/io.github.lighthouse2815.angela.desktop
+      - install -Dm644 io.github.lighthouse2815.angela.metainfo.xml /app/share/metainfo/io.github.lighthouse2815.angela.metainfo.xml
+      # build-export rejects icons larger than the hicolor size directory they land in.
+      - install -Dm644 build/icon-512.png /app/share/icons/hicolor/512x512/apps/io.github.lighthouse2815.angela.png
+    sources:
+      - type: dir
+        only-arches: [x86_64]
+        path: dist/linux-unpacked
+        dest: payload
+      - type: dir
+        only-arches: [aarch64]
+        path: dist/linux-arm64-unpacked
+        dest: payload
+      - type: file
+        path: io.github.lighthouse2815.angela.desktop
+      - type: file
+        path: io.github.lighthouse2815.angela.metainfo.xml
+      - type: file
+        path: build/icon-512.png
+        dest: build
+      # Electron inside Flatpak requires the zypak wrapper rather than launching
+      # the Chromium sandbox directly.
+      - type: script
+        dest-filename: angela.sh
+        commands:
+          - ulimit -c 0
+          - export TMPDIR="$XDG_RUNTIME_DIR/app/$FLATPAK_ID"
+          - |
+            if [ -n "$WAYLAND_DISPLAY" ]; then
+              export ELECTRON_OZONE_PLATFORM_HINT=auto
+            fi
+          - exec zypak-wrapper /app/lib/angela/angela "$@"
