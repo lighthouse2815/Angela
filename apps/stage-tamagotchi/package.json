@@ -5,11 +5,10 @@
   "private": true,
   "description": "Angela — AI companion for conversation and learning",
   "author": {
-    "name": "Moeru AI",
-    "email": "airi@moeru.ai",
-    "url": "https://github.com/moeru-ai"
+    "name": "lighthouse2815",
+    "url": "https://github.com/lighthouse2815"
   },
-  "homepage": "https://airi.moeru.ai/docs/",
+  "homepage": "https://github.com/lighthouse2815/Angela",
   "main": "./out/main/index.js",
   "scripts": {
     "lint": "eslint --cache .",
