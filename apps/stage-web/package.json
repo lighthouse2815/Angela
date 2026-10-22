@@ -1,12 +1,11 @@
 {
-  "name": "@proj-airi/stage-web",
+  "name": "@angela/web",
   "type": "module",
   "private": true,
-  "description": "LLM powered virtual character",
+  "description": "Angela web companion application",
   "author": {
-    "name": "Moeru AI Project AIRI Team",
-    "email": "airi@moeru.ai",
-    "url": "https://github.com/moeru-ai"
+    "name": "lighthouse2815",
+    "url": "https://github.com/lighthouse2815"
   },
   "license": "MIT",
   "scripts": {
