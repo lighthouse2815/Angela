@@ -123,8 +123,8 @@ It removes two obsolete Electron test cases and the static updater test file. No
 | Command | Result |
 | --- | --- |
 | `mise x -- pnpm typecheck` | Passed, 54 tasks including the Kirie application. |
-| `mise x -- pnpm -F @proj-airi/stage-tamagotchi-kirie test:unit` | Passed, 12 files and 38 existing tests. |
-| `mise x -- pnpm -F @proj-airi/stage-tamagotchi-kirie build` | Passed, Web assets and C# assembly. C# reported no warnings or errors. Existing Web build warnings remain. |
+| `mise x -- pnpm -F @angela/desktop-kirie test:unit` | Passed, 12 files and 38 existing tests. |
+| `mise x -- pnpm -F @angela/desktop-kirie build` | Passed, Web assets and C# assembly. C# reported no warnings or errors. Existing Web build warnings remain. |
 | `mise x -- dotnet run --project tests/StageTamagotchiKirie.Tests` | Passed from the application directory. |
 | `mise x -- pnpm kirie dev` | Native macOS session started with Metal Forward+ and accelerated OSR. Application quit returned process code 0 and four ObjectDB leaks. |
 | `git diff --name-only --diff-filter=ACMR -z \| xargs -0 mise x -- pnpm exec moeru-lint` | Passed with no errors and seven existing warnings. |

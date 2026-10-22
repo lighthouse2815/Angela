@@ -1,4 +1,4 @@
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { GenerationProvider } from '@angela/provider-inference'
 import type { Message } from '@xsai/shared-chat'
 
 import type { Conversation } from '../messages/types'
@@ -6,7 +6,7 @@ import type { ChatHistoryItem, ContextMessage, StreamingAssistantMessage } from 
 import type { StreamEvent, StreamOptions } from '../types/llm'
 import type { ChatOrchestratorSessionPort } from './chat-orchestrator-runtime'
 
-import { ContextUpdateStrategy } from '@proj-airi/server-shared/types'
+import { ContextUpdateStrategy } from '@angela/server-shared/types'
 import { describe, expect, it, vi } from 'vitest'
 
 import { chatMessagesToTurns, conversationToChatMessages } from '../messages/chat-completions'

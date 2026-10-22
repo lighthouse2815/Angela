@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { CardSyncState } from '@proj-airi/stage-ui/stores/modules/airi-card'
+import type { CardSyncState } from '@angela/stage-ui/stores/modules/airi-card'
 
-import { CursorFloating } from '@proj-airi/stage-ui/components'
+import { CursorFloating } from '@angela/stage-ui/components'
 import { computed } from 'vue'
 
 interface Props {

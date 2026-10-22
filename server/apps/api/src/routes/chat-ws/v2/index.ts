@@ -6,9 +6,9 @@ import type { ChatService } from '../../../services/domain/chats'
 import type { ChatWsRuntime } from '../runtime'
 import type { ChatWsAuthResolver } from './auth'
 
+import { authenticate } from '@angela/server-sdk-shared/v2'
 import { defineInvokeHandler } from '@moeru/eventa'
 import { createPeerHooks, wsDisconnectedEvent } from '@moeru/eventa/adapters/websocket/hono'
-import { authenticate } from '@proj-airi/server-sdk-shared/v2'
 
 import { WS_CLOSE_TRY_AGAIN_LATER, WS_CLOSE_UNAUTHORIZED } from '../../../libs/ws-auth'
 import { registerChatWsPeer } from '../peer'

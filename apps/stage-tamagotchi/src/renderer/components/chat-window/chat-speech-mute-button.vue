@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { useStopSpeakingButton } from '@angela/stage-layouts/composables/useStopSpeakingButton'
+import { getSpeechBusContext, speechOutputGetPlaybackState } from '@angela/stage-ui/services/speech/bus'
 import { defineInvoke } from '@moeru/eventa'
-import { useStopSpeakingButton } from '@proj-airi/stage-layouts/composables/useStopSpeakingButton'
-import { getSpeechBusContext, speechOutputGetPlaybackState } from '@proj-airi/stage-ui/services/speech/bus'
 import { useI18n } from 'vue-i18n'
 
 const getOutputPlaybackState = defineInvoke(getSpeechBusContext(), speechOutputGetPlaybackState)

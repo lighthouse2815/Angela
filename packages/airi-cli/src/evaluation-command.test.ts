@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { cliMessages } from '@proj-airi/i18n/cli'
+import { cliMessages } from '@angela/i18n/cli'
 import { expect, it } from 'vitest'
 
 it('prints a failure report after a provider retry deadline instead of exiting successfully without output', async () => {

@@ -10,9 +10,9 @@ import type { WidgetsWindowManager } from '../widgets'
 
 import { join, resolve } from 'node:path'
 
+import { isRendererUnavailable } from '@angela/electron-vueuse/main'
 import { defineInvoke, defineInvokeHandler } from '@moeru/eventa'
 import { createContext as createElectronContext } from '@moeru/eventa/adapters/electron/main'
-import { isRendererUnavailable } from '@proj-airi/electron-vueuse/main'
 import { BrowserWindow, ipcMain } from 'electron'
 import { boolean, number, object, optional, picklist } from 'valibot'
 

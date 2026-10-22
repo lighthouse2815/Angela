@@ -1,1 +1,1 @@
-console.warn('import @proj-airi/plugin-protocol/types instead')
+console.warn('import @angela/plugin-protocol/types instead')

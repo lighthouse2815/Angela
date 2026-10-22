@@ -1,7 +1,7 @@
 import type { Writable } from 'node:stream'
 
-import type { StreamEvent } from '@proj-airi/core-agent'
-import type { cliMessages } from '@proj-airi/i18n/cli'
+import type { StreamEvent } from '@angela/core-agent'
+import type { cliMessages } from '@angela/i18n/cli'
 
 import process from 'node:process'
 

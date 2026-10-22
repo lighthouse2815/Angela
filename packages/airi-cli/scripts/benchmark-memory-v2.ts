@@ -9,7 +9,7 @@ import { DatabaseSync } from 'node:sqlite'
 import { pathToFileURL } from 'node:url'
 import { Worker } from 'node:worker_threads'
 
-import { cliMessages } from '@proj-airi/i18n/cli'
+import { cliMessages } from '@angela/i18n/cli'
 
 const source = process.env.ANGELA_BENCH_SOURCE ?? join(import.meta.dirname, '../src')
 const { Recall }: typeof import('../src/recall') = await import(pathToFileURL(join(source, 'recall.ts')).href)

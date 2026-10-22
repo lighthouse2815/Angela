@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/airi-plugin-web-extension",
+  "name": "@angela/plugin-web-extension",
   "type": "module",
   "version": "0.12.0-beta.5",
   "private": true,
@@ -15,12 +15,12 @@
     "postinstall": "wxt prepare"
   },
   "devDependencies": {
+    "@angela/server-sdk": "workspace:^",
+    "@angela/ui": "workspace:^",
     "@iconify-json/solar": "catalog:",
     "@iconify-json/svg-spinners": "catalog:",
     "@moeru/eventa": "catalog:",
     "@moeru/std": "catalog:",
-    "@proj-airi/server-sdk": "workspace:^",
-    "@proj-airi/ui": "workspace:^",
     "@unocss/reset": "catalog:",
     "@vueuse/core": "catalog:",
     "@wxt-dev/module-vue": "catalog:",

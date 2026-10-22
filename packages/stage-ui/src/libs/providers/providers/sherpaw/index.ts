@@ -1,15 +1,15 @@
-import messages from '@proj-airi/i18n/locales'
+import messages from '@angela/i18n/locales'
 import workerURL from '@sherpaw/xsai-transcription/worker?worker&url'
 
-import { resolveSupportedLocale } from '@proj-airi/i18n'
-import { createSherpawTranscriptionDefinition } from '@proj-airi/provider-inference'
-import { isStageCapacitor } from '@proj-airi/stage-shared'
+import { resolveSupportedLocale } from '@angela/i18n'
+import { createSherpawTranscriptionDefinition } from '@angela/provider-inference'
+import { isStageCapacitor } from '@angela/stage-shared'
 
 import { defineProvider } from '../registry'
 import { fetchSherpawModel } from './model-assets'
 import { sherpawModelResources } from './model-resources'
 
-export { executeSherpawStream, SHERPAW_TRANSCRIPTION_PROVIDER_ID } from '@proj-airi/provider-inference'
+export { executeSherpawStream, SHERPAW_TRANSCRIPTION_PROVIDER_ID } from '@angela/provider-inference'
 
 function getInterfaceLanguage(): string {
   const language = globalThis.localStorage?.getItem('settings/language') || globalThis.navigator?.language || 'en'

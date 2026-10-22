@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/plugin-protocol",
+  "name": "@angela/plugin-protocol",
   "type": "module",
   "version": "0.12.0-beta.5",
   "description": "Plugin protocol event definitions and shared websocket types for Angela",

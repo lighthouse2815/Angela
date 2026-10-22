@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useHostMicrophonePermission } from '@proj-airi/stage-host-context'
-import { HearingConfigDialog } from '@proj-airi/stage-ui/components'
-import { useAudioAnalyzer, useAudioContextFromStream } from '@proj-airi/stage-ui/composables'
-import { useSettingsAudioDevice } from '@proj-airi/stage-ui/stores/settings'
+import { useHostMicrophonePermission } from '@angela/stage-host-context'
+import { HearingConfigDialog } from '@angela/stage-ui/components'
+import { useAudioAnalyzer, useAudioContextFromStream } from '@angela/stage-ui/composables'
+import { useSettingsAudioDevice } from '@angela/stage-ui/stores/settings'
 import { storeToRefs } from 'pinia'
 import { onMounted, onUnmounted, watch } from 'vue'
 

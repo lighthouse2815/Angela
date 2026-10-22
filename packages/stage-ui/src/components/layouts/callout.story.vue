@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Callout } from '@proj-airi/ui'
+import { Callout } from '@angela/ui'
 </script>
 
 <template>

@@ -49,8 +49,8 @@ vi.mock('../coordinator', () => ({
   MODEL_VRAM_ESTIMATES: {},
 }))
 
-vi.mock('@proj-airi/stage-shared', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@proj-airi/stage-shared')>()
+vi.mock('@angela/stage-shared', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@angela/stage-shared')>()
 
   return {
     ...actual,

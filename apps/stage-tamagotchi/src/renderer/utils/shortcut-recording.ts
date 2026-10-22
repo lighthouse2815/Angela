@@ -1,4 +1,4 @@
-import type { ShortcutAccelerator } from '@proj-airi/stage-shared/global-shortcut'
+import type { ShortcutAccelerator } from '@angela/stage-shared/global-shortcut'
 
 import { isMacOS } from 'std-env'
 

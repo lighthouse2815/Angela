@@ -1,11 +1,11 @@
-import type { TurnRef } from '@proj-airi/core-agent'
-import type { AudioInput, AudioWindow, Observer } from '@proj-airi/pipelines-audio'
+import type { TurnRef } from '@angela/core-agent'
+import type { AudioInput, AudioWindow, Observer } from '@angela/pipelines-audio'
 import type { KeywordEntry, KeywordSpotter } from '@sherpaw/kws'
 
 import type { WakePronunciation } from './wake-words'
 
+import { observe } from '@angela/pipelines-audio'
 import { errorMessageFrom } from '@moeru/std'
-import { observe } from '@proj-airi/pipelines-audio'
 
 /** The session that a wake selects. The voice activity plugin starts one input for it. */
 export interface WakeTarget {

@@ -15,9 +15,9 @@ COPY . .
 RUN --mount=type=cache,id=pnpm-store,target=/root/.pnpm-store \
     pnpm install --frozen-lockfile
 
-RUN pnpm -F @proj-airi/stage-web run build && \
+RUN pnpm -F @angela/web run build && \
     ./scripts/build-airi-docs.sh ./apps/stage-web/dist/docs && \
-    pnpm -F @proj-airi/stage-ui run story:build && \
+    pnpm -F @angela/stage-ui run story:build && \
     mv ./packages/stage-ui/.histoire/dist ./apps/stage-web/dist/ui
 
 FROM nginx:stable-alpine AS production-stage

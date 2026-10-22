@@ -1,4 +1,4 @@
-# @proj-airi/pipelines-audio
+# @angela/pipelines-audio
 
 Shared audio-pipeline orchestration for AIRI. The package owns input sharing, capture intervals, detector windows, playback groups, and text chunking. It does not depend on a UI.
 
@@ -12,7 +12,7 @@ Shared audio-pipeline orchestration for AIRI. The package owns input sharing, ca
 
 - Vue or Electron lifecycle state.
 - Provider credentials and product-specific error UI.
-- Browser sources and file encoding, which belong in `@proj-airi/audio`.
+- Browser sources and file encoding, which belong in `@angela/audio`.
 
 ## Input, capture, and observation
 
@@ -65,5 +65,5 @@ Playback knows no chat session, turn, or agent notification contract.
 
 ## Checks
 
-Run `pnpm -F @proj-airi/pipelines-audio typecheck` and `pnpm -F @proj-airi/pipelines-audio test:run`.
+Run `pnpm -F @angela/pipelines-audio typecheck` and `pnpm -F @angela/pipelines-audio test:run`.
 Public tests cover capture independence, delayed history use, source gaps, file finalization, cancellation, and playback receipts.

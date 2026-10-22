@@ -15,7 +15,7 @@ See [local configuration](../../packages/local-config/README.md) for the file co
 ## Development
 
 From the repository root, run `pnpm install`, then `pnpm dev:tamagotchi`.
-Run `pnpm -F @proj-airi/stage-tamagotchi build` to build the app.
+Run `pnpm -F @angela/desktop build` to build the app.
 
 ## Local model files
 
@@ -79,7 +79,7 @@ Existing calls without `windowId` retain their current foreground behavior.
 If the bundled Linux CLI reports a missing shared library, build against the system libraries:
 
 ```sh
-pnpm -F @proj-airi/stage-tamagotchi setup:computer-use
+pnpm -F @angela/desktop setup:computer-use
 pnpm dev:tamagotchi
 ```
 
@@ -176,7 +176,7 @@ pnpm exec vitest run --config apps/stage-tamagotchi/vitest.config.ts --project b
 Run the focused runtime tests:
 
 ```sh
-pnpm -F @proj-airi/stage-tamagotchi exec vitest run src/main/services/airi/computer-use/runtime.test.ts
+pnpm -F @angela/desktop exec vitest run src/main/services/airi/computer-use/runtime.test.ts
 ```
 
 For learning directory access, IPC, and request selection, run from the repository root:
@@ -194,7 +194,7 @@ For renderer verification, launch with `APP_REMOTE_DEBUG=true` and an unused `AP
 Run the smoke on an unlocked Wayland session with one output and temporary uinput access:
 
 ```sh
-AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AUV_LINUX_INPUT_BACKEND=uinput pnpm -F @proj-airi/stage-tamagotchi smoke:computer-use-input
+AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AUV_LINUX_INPUT_BACKEND=uinput pnpm -F @angela/desktop smoke:computer-use-input
 ```
 
 If the shell sets `ELECTRON_RUN_AS_NODE`, unset it before launch. The script never grants device permissions.

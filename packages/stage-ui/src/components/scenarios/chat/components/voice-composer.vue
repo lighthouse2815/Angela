@@ -2,7 +2,7 @@
 import type { ChatToolReference } from '../../../../types/chat'
 import type { VoiceComposerMode } from '../composables/use-voice-composer'
 
-import { BasicButton } from '@proj-airi/ui'
+import { BasicButton } from '@angela/ui'
 import { onLongPress, useElementBounding, useEventListener, useLocalStorage, useNow, useWindowSize } from '@vueuse/core'
 import { computed, onBeforeUnmount, shallowRef, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

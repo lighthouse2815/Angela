@@ -1,8 +1,8 @@
-import type { SpeechSubmission } from '@proj-airi/core-agent'
+import type { SpeechSubmission } from '@angela/core-agent'
 
 import type { VoiceDraft } from '../services/speech/bus'
 
-import { joinTranscriptSegments } from '@proj-airi/provider-inference'
+import { joinTranscriptSegments } from '@angela/provider-inference'
 import { ref } from 'vue'
 
 import { useChatStore } from '../stores/chat'

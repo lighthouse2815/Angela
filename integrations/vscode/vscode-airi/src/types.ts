@@ -46,7 +46,7 @@ export interface CodingContext {
    * @example {
    *   "before": [
    *     "{",
-   *     "  \"name\": \"@proj-airi/root\",",
+   *     "  \"name\": \"@angela/root\",",
    *     "  \"type\": \"module\",",
    *     "  \"version\": \"0.8.1-beta.12\",",
    *     "  \"private\": true,"

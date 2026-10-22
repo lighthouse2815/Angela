@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { ChatWindowPreferences } from '../../../shared/eventa'
 
-import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { DropdownMenu } from '@proj-airi/ui'
+import { useElectronEventaInvoke } from '@angela/electron-vueuse'
+import { DropdownMenu } from '@angela/ui'
 import {
   DropdownMenuCheckboxItem,
   DropdownMenuItemIndicator,

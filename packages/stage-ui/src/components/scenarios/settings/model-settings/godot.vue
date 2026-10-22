@@ -4,11 +4,11 @@ import type {
   StageViewPatch,
   StageViewSnapshotPayload,
   StageViewState,
-} from '@proj-airi/stage-shared/godot-stage'
+} from '@angela/stage-shared/godot-stage'
 
 import type { ModelSettingsRuntimeSnapshot } from './runtime'
 
-import { Callout } from '@proj-airi/ui'
+import { Callout } from '@angela/ui'
 import { computed, ref, shallowRef, watch } from 'vue'
 
 import { Container, PropertyNumber } from '../../../data-pane'

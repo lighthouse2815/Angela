@@ -1,4 +1,4 @@
-import type { Client } from '@proj-airi/server-sdk'
+import type { Client } from '@angela/server-sdk'
 
 import type { EventBus } from '../cognitive/event-bus'
 

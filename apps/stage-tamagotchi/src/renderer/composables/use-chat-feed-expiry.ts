@@ -1,7 +1,7 @@
-import type { ChatHistoryItem } from '@proj-airi/stage-ui/types/chat'
+import type { ChatHistoryItem } from '@angela/stage-ui/types/chat'
 import type { MaybeRefOrGetter } from 'vue'
 
-import { getChatHistoryItemCopyText } from '@proj-airi/stage-ui/components/scenarios/chat/utils'
+import { getChatHistoryItemCopyText } from '@angela/stage-ui/components/scenarios/chat/utils'
 import { computed, onScopeDispose, shallowReactive, shallowRef, toValue, watch } from 'vue'
 
 const graphemeSegmenter = new Intl.Segmenter(undefined, { granularity: 'grapheme' })

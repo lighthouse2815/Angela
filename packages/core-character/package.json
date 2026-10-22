@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/core-character",
+  "name": "@angela/core-character",
   "type": "module",
   "version": "0.12.0-beta.5",
   "private": true,
@@ -32,8 +32,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@angela/stream-kit": "workspace:^",
     "@moeru/std": "catalog:",
-    "@proj-airi/stream-kit": "workspace:^",
     "clustr": "catalog:"
   },
   "devDependencies": {}

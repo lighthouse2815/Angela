@@ -1,7 +1,7 @@
 import type { MaybeRefOrGetter } from 'vue'
 
-import { electron } from '@proj-airi/electron-eventa'
-import { useElectronEventaInvoke, useElectronMouse, useElectronRelativeMouse } from '@proj-airi/electron-vueuse'
+import { electron } from '@angela/electron-eventa'
+import { useElectronEventaInvoke, useElectronMouse, useElectronRelativeMouse } from '@angela/electron-vueuse'
 import { useEventListener, useMutationObserver } from '@vueuse/core'
 import { parse } from 'culori'
 import { nextTick, shallowRef, toValue, watch } from 'vue'

@@ -1,8 +1,8 @@
-import type { ContextUpdate } from '@proj-airi/server-sdk'
+import type { ContextUpdate } from '@angela/server-sdk'
 
 import type { ExtensionSettings, ExtensionStatus, PageContextPayload, SubtitlePayload, VideoContextPayload } from '../shared/types'
 
-import { Client, ContextUpdateStrategy } from '@proj-airi/server-sdk'
+import { Client, ContextUpdateStrategy } from '@angela/server-sdk'
 import { nanoid } from 'nanoid'
 
 import packageJSON from '../../package.json'

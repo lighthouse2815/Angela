@@ -1,9 +1,9 @@
 import type { createContext } from '@moeru/eventa/adapters/electron/main'
 import type { BrowserWindow } from 'electron'
 
+import { cursorScreenPoint, startLoopGetCursorScreenPoint } from '@angela/electron-eventa'
+import { createRendererLoop } from '@angela/electron-vueuse/main'
 import { defineInvokeHandler } from '@moeru/eventa'
-import { cursorScreenPoint, startLoopGetCursorScreenPoint } from '@proj-airi/electron-eventa'
-import { createRendererLoop } from '@proj-airi/electron-vueuse/main'
 import { screen } from 'electron'
 
 import { electron } from '../../../shared/eventa'

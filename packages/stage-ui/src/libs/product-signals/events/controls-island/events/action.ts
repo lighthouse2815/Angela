@@ -1,4 +1,4 @@
-import type { StageEnvironment } from '@proj-airi/stage-shared'
+import type { StageEnvironment } from '@angela/stage-shared'
 
 import { defineEvent } from '../../../utils/dsl'
 

@@ -1,12 +1,12 @@
-import type { DiscordAdapterConfig } from '@proj-airi/discord-bot'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { DiscordAdapterConfig } from '@angela/discord-bot'
+import type { GenerationProvider } from '@angela/provider-inference'
 
 import { mkdtemp, readdir, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { chatMessagesToTurns } from '@proj-airi/core-agent'
-import { cliMessages } from '@proj-airi/i18n/cli'
+import { chatMessagesToTurns } from '@angela/core-agent'
+import { cliMessages } from '@angela/i18n/cli'
 import { afterEach, expect, it, vi } from 'vitest'
 
 import { DiscordChat } from './discord'

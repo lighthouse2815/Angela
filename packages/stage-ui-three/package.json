@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/stage-ui-three",
+  "name": "@angela/stage-ui-three",
   "type": "module",
   "private": true,
   "description": "A collection of 3D scene components that used by Project AIRI",
@@ -25,13 +25,13 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@angela/model-driver-lipsync": "workspace:*",
+    "@angela/stage-shared": "workspace:*",
+    "@angela/ui": "workspace:*",
     "@moeru/eventa": "catalog:",
     "@pixiv/three-vrm": "catalog:",
     "@pixiv/three-vrm-animation": "catalog:",
     "@pixiv/three-vrm-core": "catalog:",
-    "@proj-airi/model-driver-lipsync": "workspace:*",
-    "@proj-airi/stage-shared": "workspace:*",
-    "@proj-airi/ui": "workspace:*",
     "@tresjs/cientos": "catalog:",
     "@tresjs/core": "catalog:",
     "@tresjs/post-processing": "catalog:",

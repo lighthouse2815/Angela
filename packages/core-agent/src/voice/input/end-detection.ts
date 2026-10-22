@@ -1,4 +1,4 @@
-import type { AudioRange, AudioWindow } from '@proj-airi/pipelines-audio'
+import type { AudioRange, AudioWindow } from '@angela/pipelines-audio'
 
 /** End detection binds audio evidence to the transcript and activity revisions read by its model. */
 export interface TurnEvidence {

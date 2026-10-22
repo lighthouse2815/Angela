@@ -3,8 +3,8 @@ import type { JsonSchema } from 'xsschema'
 
 import type { WidgetWindowSize } from '../../../../shared/eventa'
 
+import { getHostEventaContext } from '@angela/stage-host-context'
 import { defineInvoke } from '@moeru/eventa'
-import { getHostEventaContext } from '@proj-airi/stage-host-context'
 import { rawTool } from '@xsai/tool'
 import { toJsonSchema } from 'xsschema'
 import { z } from 'zod'

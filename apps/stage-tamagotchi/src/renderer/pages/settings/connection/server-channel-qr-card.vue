@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { ServerChannelQrPayload } from '@proj-airi/stage-shared/server-channel-qr'
+import type { ServerChannelQrPayload } from '@angela/stage-shared/server-channel-qr'
 
+import { useElectronEventaInvoke } from '@angela/electron-vueuse'
+import { useAnalytics } from '@angela/stage-ui/composables'
+import { Callout, Collapsible, GhostButton } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { useAnalytics } from '@proj-airi/stage-ui/composables'
-import { Callout, Collapsible, GhostButton } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
 import { renderSVG } from 'uqr'
 import { computed, shallowRef, watch } from 'vue'

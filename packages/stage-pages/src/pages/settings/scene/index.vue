@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Section } from '@proj-airi/stage-ui/components'
-import { useAnalytics } from '@proj-airi/stage-ui/composables'
-import { useAiriCardStore, useBackgroundStore } from '@proj-airi/stage-ui/stores'
-import { Button, Callout } from '@proj-airi/ui'
+import { Section } from '@angela/stage-ui/components'
+import { useAnalytics } from '@angela/stage-ui/composables'
+import { useAiriCardStore, useBackgroundStore } from '@angela/stage-ui/stores'
+import { Button, Callout } from '@angela/ui'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 

@@ -1,4 +1,4 @@
-import type { Conversation } from '@proj-airi/core-agent'
+import type { Conversation } from '@angela/core-agent'
 
 import { describe, expect, it, vi } from 'vitest'
 

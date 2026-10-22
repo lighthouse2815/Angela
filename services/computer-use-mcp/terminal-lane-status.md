@@ -116,8 +116,8 @@ The latest successful reports live under:
 
 The current package commands are:
 
-- `pnpm -F @proj-airi/computer-use-mcp e2e:airi-chat-terminal-self-acquire`
-- `pnpm -F @proj-airi/computer-use-mcp demo:terminal-self-acquire`
+- `pnpm -F @angela/computer-use-mcp e2e:airi-chat-terminal-self-acquire`
+- `pnpm -F @angela/computer-use-mcp demo:terminal-self-acquire`
 
 ### 6. Support matrix already reflects the new direction
 
@@ -132,11 +132,11 @@ Relevant entries in `src/support-matrix.ts`:
 
 The current strict release gates are:
 
-- `pnpm -F @proj-airi/computer-use-mcp e2e:developer-workflow`
-- `pnpm -F @proj-airi/computer-use-mcp e2e:terminal-exec`
-- `pnpm -F @proj-airi/computer-use-mcp e2e:terminal-pty`
-- `pnpm -F @proj-airi/computer-use-mcp e2e:terminal-self-acquire`
-- `pnpm -F @proj-airi/computer-use-mcp e2e:airi-chat-terminal-self-acquire`
+- `pnpm -F @angela/computer-use-mcp e2e:developer-workflow`
+- `pnpm -F @angela/computer-use-mcp e2e:terminal-exec`
+- `pnpm -F @angela/computer-use-mcp e2e:terminal-pty`
+- `pnpm -F @angela/computer-use-mcp e2e:terminal-self-acquire`
+- `pnpm -F @angela/computer-use-mcp e2e:airi-chat-terminal-self-acquire`
 
 ## What Is Still Not Finished
 
@@ -180,24 +180,24 @@ Use these as the baseline checks for terminal lane work:
 
 ### Service-level terminal lane
 
-- `pnpm -F @proj-airi/computer-use-mcp e2e:terminal-exec`
-- `pnpm -F @proj-airi/computer-use-mcp e2e:terminal-pty`
-- `pnpm -F @proj-airi/computer-use-mcp e2e:terminal-self-acquire`
-- `pnpm -F @proj-airi/computer-use-mcp e2e:airi-chat-terminal-self-acquire`
+- `pnpm -F @angela/computer-use-mcp e2e:terminal-exec`
+- `pnpm -F @angela/computer-use-mcp e2e:terminal-pty`
+- `pnpm -F @angela/computer-use-mcp e2e:terminal-self-acquire`
+- `pnpm -F @angela/computer-use-mcp e2e:airi-chat-terminal-self-acquire`
 
 ### Core test coverage
 
-- `pnpm -F @proj-airi/computer-use-mcp exec vitest run --config ./vitest.config.ts`
+- `pnpm -F @angela/computer-use-mcp exec vitest run --config ./vitest.config.ts`
 
 ### Typecheck
 
-- `pnpm -F @proj-airi/computer-use-mcp typecheck`
-- `pnpm -F @proj-airi/stage-ui typecheck`
+- `pnpm -F @angela/computer-use-mcp typecheck`
+- `pnpm -F @angela/stage-ui typecheck`
 
-If `pnpm -F @proj-airi/stage-tamagotchi typecheck` behaves oddly in the current environment, run the two underlying commands directly:
+If `pnpm -F @angela/desktop typecheck` behaves oddly in the current environment, run the two underlying commands directly:
 
-- `pnpm -F @proj-airi/stage-tamagotchi run typecheck:node`
-- `pnpm -F @proj-airi/stage-tamagotchi run typecheck:web`
+- `pnpm -F @angela/desktop run typecheck:node`
+- `pnpm -F @angela/desktop run typecheck:web`
 
 ## Handoff Rules
 

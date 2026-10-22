@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/server-shared",
+  "name": "@angela/server-shared",
   "type": "module",
   "version": "0.12.0-beta.5",
   "description": "Shared types and utilities for Angela server components and runtimes",
@@ -36,6 +36,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@proj-airi/plugin-protocol": "workspace:*"
+    "@angela/plugin-protocol": "workspace:*"
   }
 }

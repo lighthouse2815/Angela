@@ -1,4 +1,4 @@
-import type { DeliveryConfig } from '@proj-airi/server-shared/types'
+import type { DeliveryConfig } from '@angela/server-shared/types'
 
 const DEFAULT_CONSUMER_GROUP = 'default'
 

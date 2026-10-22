@@ -1,8 +1,8 @@
-import type { MicrophoneSource } from '@proj-airi/audio/browser'
+import type { MicrophoneSource } from '@angela/audio/browser'
 import type { Ref } from 'vue'
 
-import { microphoneSource } from '@proj-airi/audio/browser'
-import { AudioInput } from '@proj-airi/pipelines-audio'
+import { microphoneSource } from '@angela/audio/browser'
+import { AudioInput } from '@angela/pipelines-audio'
 import { useDevicesList } from '@vueuse/core'
 import { computed, markRaw, onScopeDispose, ref, shallowRef, watch } from 'vue'
 

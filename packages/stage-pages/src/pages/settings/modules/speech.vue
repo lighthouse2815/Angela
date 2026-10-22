@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import type { VoiceType } from '@proj-airi/stage-ui/composables'
+import type { VoiceType } from '@angela/stage-ui/composables'
 import type { SpeechProviderWithExtraOptions } from '@xsai-ext/providers/utils'
 
-import { errorMessageFrom } from '@moeru/std'
 import {
   Alert,
   ErrorContainer,
@@ -10,13 +9,13 @@ import {
   RadioCardSimple,
   TestDummyMarker,
   VoiceCardManySelect,
-} from '@proj-airi/stage-ui/components'
-import { useAnalytics } from '@proj-airi/stage-ui/composables'
-import { OFFICIAL_SPEECH_PROVIDER_ID, OFFICIAL_SPEECH_STREAMING_PROVIDER_ID } from '@proj-airi/stage-ui/libs/providers/providers/official'
-import { useAiriCardStore } from '@proj-airi/stage-ui/stores'
-import { useSpeechStore } from '@proj-airi/stage-ui/stores/modules/speech'
-import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
-import { useProviderStore } from '@proj-airi/stage-ui/stores/providers/provider'
+} from '@angela/stage-ui/components'
+import { useAnalytics } from '@angela/stage-ui/composables'
+import { OFFICIAL_SPEECH_PROVIDER_ID, OFFICIAL_SPEECH_STREAMING_PROVIDER_ID } from '@angela/stage-ui/libs/providers/providers/official'
+import { useAiriCardStore } from '@angela/stage-ui/stores'
+import { useSpeechStore } from '@angela/stage-ui/stores/modules/speech'
+import { useProviderConfigStore } from '@angela/stage-ui/stores/providers/config'
+import { useProviderStore } from '@angela/stage-ui/stores/providers/provider'
 import {
   FieldCheckbox,
   FieldInput,
@@ -24,7 +23,8 @@ import {
   SettingsCard,
   Skeleton,
   Textarea,
-} from '@proj-airi/ui'
+} from '@angela/ui'
+import { errorMessageFrom } from '@moeru/std'
 import { generateSpeech } from '@xsai/generate-speech'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'

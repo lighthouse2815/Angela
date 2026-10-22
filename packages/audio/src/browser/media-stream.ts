@@ -1,6 +1,6 @@
-import type { PcmBlock } from '@proj-airi/pipelines-audio'
+import type { PcmBlock } from '@angela/pipelines-audio'
 
-import { createScope } from '@proj-airi/pipelines-audio'
+import { createScope } from '@angela/pipelines-audio'
 
 import { AudioOutput } from './audio-output'
 

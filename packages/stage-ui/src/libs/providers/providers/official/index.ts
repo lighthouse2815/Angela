@@ -1,8 +1,8 @@
-import type { ChatRequestOptions, GenerationRequest } from '@proj-airi/provider-inference'
+import type { ChatRequestOptions, GenerationRequest } from '@angela/provider-inference'
 
 import type { ModelInfo, ProviderModelCatalog, VoiceInfo } from '../../types'
 
-import { compatibleProtocols, generationProtocolOptions } from '@proj-airi/provider-inference'
+import { compatibleProtocols, generationProtocolOptions } from '@angela/provider-inference'
 import { z } from 'zod'
 
 import { getAuthToken } from '../../../../libs/auth'

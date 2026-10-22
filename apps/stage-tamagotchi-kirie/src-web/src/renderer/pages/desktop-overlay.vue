@@ -16,8 +16,8 @@ import type { Rect } from './desktop-overlay-coordinates'
  */
 import type { OverlayState } from './desktop-overlay-polling'
 
-import { electron } from '@proj-airi/electron-eventa'
-import { useHostEventaInvoke } from '@proj-airi/stage-host-context'
+import { electron } from '@angela/electron-eventa'
+import { useHostEventaInvoke } from '@angela/stage-host-context'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 import { electronMcpApplyAndRestart, electronMcpCallTool, electronMcpGetRuntimeStatus, electronMcpListTools, getDesktopOverlayReadinessContract } from '../../shared/eventa'

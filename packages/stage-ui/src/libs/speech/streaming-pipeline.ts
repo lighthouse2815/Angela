@@ -1,7 +1,7 @@
-import type { SpeechAudio } from '@proj-airi/core-agent'
-import type { PcmBlock } from '@proj-airi/pipelines-audio'
+import type { SpeechAudio } from '@angela/core-agent'
+import type { PcmBlock } from '@angela/pipelines-audio'
 
-import { createPushStream } from '@proj-airi/pipelines-audio'
+import { createPushStream } from '@angela/pipelines-audio'
 import { nanoid } from 'nanoid/non-secure'
 
 import { getAuthToken } from '../auth'

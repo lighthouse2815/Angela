@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/cap-vite",
+  "name": "@angela/cap-vite",
   "type": "module",
   "version": "0.12.0-beta.5",
   "description": "CLI that starts a Vite dev server and runs Capacitor live reload",

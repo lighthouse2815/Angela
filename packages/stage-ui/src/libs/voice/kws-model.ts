@@ -1,6 +1,6 @@
 import type { KeywordEntry, KeywordSpotter, KWSModelPack } from '@sherpaw/kws'
 
-import { assets } from '@proj-airi/vite-plugin-sherpaw/assets'
+import { assets } from '@angela/vite-plugin-sherpaw/assets'
 import { array, number, object, parse, string } from 'valibot'
 
 import modelTokens from './kws-vocabulary.json'

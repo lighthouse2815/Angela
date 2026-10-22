@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { NormalizedRectangle } from '@proj-airi/stage-shared/screen-ambient-light'
+import type { NormalizedRectangle } from '@angela/stage-shared/screen-ambient-light'
 
 import type { DisplayPixelRectangle, ScreenAmbientLightDiagnosticsSnapshot } from '../../../../shared/screen-ambient-light-diagnostics'
 

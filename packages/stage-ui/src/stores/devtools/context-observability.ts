@@ -1,4 +1,4 @@
-import type { ContextUpdateStrategy } from '@proj-airi/server-sdk'
+import type { ContextUpdateStrategy } from '@angela/server-sdk'
 import type { Message } from '@xsai/shared-chat'
 
 import type { ContextMessage } from '../../types/chat'

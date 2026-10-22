@@ -8,10 +8,10 @@ import {
   ProviderBasicSettings,
   ProviderSettingsContainer,
   ProviderSettingsLayout,
-} from '@proj-airi/stage-ui/components'
-import { useProviderValidation } from '@proj-airi/stage-ui/composables/use-provider-validation'
-import { useConsciousnessStore } from '@proj-airi/stage-ui/stores/modules/consciousness'
-import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
+} from '@angela/stage-ui/components'
+import { useProviderValidation } from '@angela/stage-ui/composables/use-provider-validation'
+import { useConsciousnessStore } from '@angela/stage-ui/stores/modules/consciousness'
+import { useProviderConfigStore } from '@angela/stage-ui/stores/providers/config'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 

@@ -1,5 +1,5 @@
+import { electron } from '@angela/electron-eventa'
 import { defineInvoke } from '@moeru/eventa'
-import { electron } from '@proj-airi/electron-eventa'
 import { useAsyncState, useIntervalFn } from '@vueuse/core'
 
 import { useElectronEventaContext } from './use-electron-eventa-context'

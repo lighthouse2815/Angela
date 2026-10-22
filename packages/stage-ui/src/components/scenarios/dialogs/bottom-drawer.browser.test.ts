@@ -1,4 +1,4 @@
-import { BottomDrawer, GhostButton } from '@proj-airi/ui'
+import { BottomDrawer, GhostButton } from '@angela/ui'
 import { describe, expect, it } from 'vitest'
 import { render } from 'vitest-browser-vue'
 import { userEvent } from 'vitest/browser'

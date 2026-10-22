@@ -1,5 +1,5 @@
-import type { ChatAssistantMessage, ChatHistoryItem } from '@proj-airi/core-agent'
-import type { NewMessagesPayload, WireMessage } from '@proj-airi/server-sdk-shared'
+import type { ChatAssistantMessage, ChatHistoryItem } from '@angela/core-agent'
+import type { NewMessagesPayload, WireMessage } from '@angela/server-sdk-shared'
 
 /**
  * Extract a plain-text payload from a local `ChatHistoryItem` for upload.

@@ -1,12 +1,12 @@
-import type { SpeechOutput, TurnRef } from '@proj-airi/core-agent'
+import type { SpeechOutput, TurnRef } from '@angela/core-agent'
 import type { SpeechProviderWithExtraOptions } from '@xsai-ext/providers/utils'
 import type {} from 'pinia-plugin-synced'
 
 import type { AiriExtension } from '../../types/airiCard'
 import type { VoiceCatalogConfiguration, VoiceCatalogIdentity, VoiceInfo } from '../providers/provider'
 
+import { useLocalStorageManualReset } from '@angela/stage-shared/composables'
 import { errorMessageFrom } from '@moeru/std'
-import { useLocalStorageManualReset } from '@proj-airi/stage-shared/composables'
 import { refManualReset } from '@vueuse/core'
 import { generateSpeech } from '@xsai/generate-speech'
 import { isEqual } from 'es-toolkit'

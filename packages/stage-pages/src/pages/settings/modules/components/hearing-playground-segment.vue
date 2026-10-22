@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { HearingPlaygroundSegment } from '@proj-airi/stage-ui/composables'
+import type { HearingPlaygroundSegment } from '@angela/stage-ui/composables'
 
 import { useObjectUrl } from '@vueuse/core'
 import { computed } from 'vue'

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { StandardGamepadSnapshot } from '@proj-airi/input-gamepad'
-import type { Live2DMotionControlDynamics, Live2DMotionControlPose } from '@proj-airi/stage-ui-live2d/stores'
+import type { StandardGamepadSnapshot } from '@angela/input-gamepad'
+import type { Live2DMotionControlDynamics, Live2DMotionControlPose } from '@angela/stage-ui-live2d/stores'
 
-import { getGamepadButtonLabel } from '@proj-airi/input-gamepad'
-import { defaultLive2DMotionControlDynamics, neutralLive2DMotionControlPose } from '@proj-airi/stage-ui-live2d/stores'
-import { BasicButton, Button, FieldRange } from '@proj-airi/ui'
+import { getGamepadButtonLabel } from '@angela/input-gamepad'
+import { defaultLive2DMotionControlDynamics, neutralLive2DMotionControlPose } from '@angela/stage-ui-live2d/stores'
+import { BasicButton, Button, FieldRange } from '@angela/ui'
 import { useRafFn } from '@vueuse/core'
 import { computed, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

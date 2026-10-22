@@ -8,7 +8,7 @@ import * as fs from 'node:fs/promises'
  * Airi Adapter
  * Adapts the X service as an Airi module
  */
-import { Client } from '@proj-airi/server-sdk'
+import { Client } from '@angela/server-sdk'
 
 import { getDefaultConfig } from '../config/types'
 import { initBrowser, useContext, useSessionFileAsync } from '../core/browser/context'

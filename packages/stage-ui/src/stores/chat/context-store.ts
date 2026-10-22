@@ -1,12 +1,12 @@
-import type { ContextHistoryEntry, ContextIngestResult, ContextMessage } from '@proj-airi/core-agent'
+import type { ContextHistoryEntry, ContextIngestResult, ContextMessage } from '@angela/core-agent'
 
-import { createContextRegistry } from '@proj-airi/core-agent'
+import { createContextRegistry } from '@angela/core-agent'
 import { defineStore } from 'pinia'
 import { readonly, ref, toRaw } from 'vue'
 
 import { getEventSourceKey } from '../../utils/event-source'
 
-export type { ContextHistoryEntry, ContextIngestResult } from '@proj-airi/core-agent'
+export type { ContextHistoryEntry, ContextIngestResult } from '@angela/core-agent'
 
 /**
  * UI-facing view of one active context source bucket.

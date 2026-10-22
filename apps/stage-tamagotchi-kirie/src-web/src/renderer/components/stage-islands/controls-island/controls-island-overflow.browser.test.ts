@@ -1,16 +1,16 @@
-import type { AiriCard } from '@proj-airi/stage-ui/stores/modules/airi-card'
+import type { AiriCard } from '@angela/stage-ui/stores/modules/airi-card'
 
 import type { ControlsIslandDock } from './use-controls-island-placement'
 
-import en from '@proj-airi/i18n/locales/en'
+import en from '@angela/i18n/locales/en'
 
-import { useAiriCardStore } from '@proj-airi/stage-ui/stores/modules/airi-card'
-import { useArtistryStore } from '@proj-airi/stage-ui/stores/modules/artistry'
-import { useConsciousnessStore } from '@proj-airi/stage-ui/stores/modules/consciousness'
-import { useSpeechStore } from '@proj-airi/stage-ui/stores/modules/speech'
-import { useVisionStore } from '@proj-airi/stage-ui/stores/modules/vision/store'
-import { useSettings } from '@proj-airi/stage-ui/stores/settings'
-import { useSettingsStageModel } from '@proj-airi/stage-ui/stores/settings/stage-model'
+import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useArtistryStore } from '@angela/stage-ui/stores/modules/artistry'
+import { useConsciousnessStore } from '@angela/stage-ui/stores/modules/consciousness'
+import { useSpeechStore } from '@angela/stage-ui/stores/modules/speech'
+import { useVisionStore } from '@angela/stage-ui/stores/modules/vision/store'
+import { useSettings } from '@angela/stage-ui/stores/settings'
+import { useSettingsStageModel } from '@angela/stage-ui/stores/settings/stage-model'
 import { createPinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-vue'
@@ -37,7 +37,7 @@ const authState = vi.hoisted(() => ({
   userId: { value: 'local' },
 }))
 
-vi.mock('@proj-airi/stage-host-context', () => ({
+vi.mock('@angela/stage-host-context', () => ({
   useHostEventaContext: () => ref({ on: vi.fn(() => vi.fn()), emit: vi.fn() }),
   useHostAlwaysOnTop: () => vi.fn().mockResolvedValue(undefined),
   useHostAppQuit: () => vi.fn().mockResolvedValue(undefined),
@@ -62,7 +62,7 @@ vi.mock('@moeru/eventa', async importOriginal => ({
   defineInvoke: () => vi.fn(),
 }))
 
-vi.mock('@proj-airi/stage-ui/stores/auth', async () => {
+vi.mock('@angela/stage-ui/stores/auth', async () => {
   const { ref } = await import('vue')
   authState.credits = ref(0)
   authState.isAuthenticated = ref(false)

@@ -1,6 +1,6 @@
 import type { Tool } from '@xsai/shared-chat'
 
-import { useLlmToolsStore } from '@proj-airi/stage-ui/stores/ai/chat-llm/tools'
+import { useLlmToolsStore } from '@angela/stage-ui/stores/ai/chat-llm/tools'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -21,7 +21,7 @@ const invokeMocks = vi.hoisted(() => ({
   }]),
 }))
 
-vi.mock('@proj-airi/stage-host-context', () => ({
+vi.mock('@angela/stage-host-context', () => ({
   useHostEventaInvoke: (event: { receiveEvent?: { id?: string } }) => {
     if (event?.receiveEvent?.id === 'eventa:invoke:electron:mcp:list-tools-receive')
       return invokeMocks.listMcpTools

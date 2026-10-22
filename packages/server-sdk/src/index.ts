@@ -1,5 +1,5 @@
 export * from './client'
 export * from './codec'
 export * from './extension-peer'
-export type * from '@proj-airi/server-shared/types'
-export { ASSET_REF_PREFIX, ContextUpdateStrategy, WebSocketEventSource } from '@proj-airi/server-shared/types'
+export type * from '@angela/server-shared/types'
+export { ASSET_REF_PREFIX, ContextUpdateStrategy, WebSocketEventSource } from '@angela/server-shared/types'

@@ -1,4 +1,4 @@
-import type { ShortcutAccelerator, ShortcutBinding } from '@proj-airi/stage-shared/global-shortcut'
+import type { ShortcutAccelerator, ShortcutBinding } from '@angela/stage-shared/global-shortcut'
 
 import type { globalAppConfigSchema } from '../../configs/global'
 import type { Config } from '../../libs/electron/persistence'
@@ -9,10 +9,10 @@ import type { ChatWindowManager } from '../chat'
 
 import { join, resolve } from 'node:path'
 
+import { ShortcutFailureReasons } from '@angela/stage-shared/global-shortcut'
 import { useLogg } from '@guiiai/logg'
 import { defineInvokeHandler } from '@moeru/eventa'
 import { createContext } from '@moeru/eventa/adapters/electron/main'
-import { ShortcutFailureReasons } from '@proj-airi/stage-shared/global-shortcut'
 import { BrowserWindow, ipcMain, Notification, screen } from 'electron'
 import { isMacOS } from 'std-env'
 

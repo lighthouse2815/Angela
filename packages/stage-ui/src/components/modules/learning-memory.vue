@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { LearningCategory, LearningMemory, ReviewInterval } from '../../stores/modules/learning-memory'
 
+import { isStageTamagotchi } from '@angela/stage-shared'
+import { Button, FieldCheckbox, FieldInput, FieldSelect, GhostButton, SettingsCard } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { isStageTamagotchi } from '@proj-airi/stage-shared'
-import { Button, FieldCheckbox, FieldInput, FieldSelect, GhostButton, SettingsCard } from '@proj-airi/ui'
 import { useNow } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

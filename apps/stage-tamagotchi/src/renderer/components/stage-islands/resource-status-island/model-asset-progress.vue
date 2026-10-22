@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { ModelAssetStatus } from '@proj-airi/stage-shared/model-assets'
+import type { ModelAssetStatus } from '@angela/stage-shared/model-assets'
 
-import { formatSherpawModelName, sherpawModels } from '@proj-airi/provider-inference'
-import { formatBytes } from '@proj-airi/stage-ui/libs/inference'
-import { Progress } from '@proj-airi/ui'
+import { formatSherpawModelName, sherpawModels } from '@angela/provider-inference'
+import { formatBytes } from '@angela/stage-ui/libs/inference'
+import { Progress } from '@angela/ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

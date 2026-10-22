@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useHostAuth, useHostOnboarding } from '@proj-airi/stage-host-context'
-import { OnboardingScreen, OnboardingStepAnalyticsNotice } from '@proj-airi/stage-ui/components'
-import { isAnalyticsAvailableInBuild } from '@proj-airi/stage-ui/libs/product-signals'
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
-import { useOnboardingStore } from '@proj-airi/stage-ui/stores/onboarding'
-import { useTheme } from '@proj-airi/ui'
+import { useHostAuth, useHostOnboarding } from '@angela/stage-host-context'
+import { OnboardingScreen, OnboardingStepAnalyticsNotice } from '@angela/stage-ui/components'
+import { isAnalyticsAvailableInBuild } from '@angela/stage-ui/libs/product-signals'
+import { useAuthStore } from '@angela/stage-ui/stores/auth'
+import { useOnboardingStore } from '@angela/stage-ui/stores/onboarding'
+import { useTheme } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 

@@ -4,12 +4,12 @@ import type {
   KitClientRuntime,
   KitRef,
   KitUseResult,
-} from '@proj-airi/plugin-sdk'
-import type { HostDataRecord } from '@proj-airi/plugin-sdk/plugin-host'
+} from '@angela/plugin-sdk'
+import type { HostDataRecord } from '@angela/plugin-sdk/plugin-host'
 
 import type { ToolKitRuntime } from './tools'
 
-import { DisposableStore } from '@proj-airi/plugin-sdk'
+import { DisposableStore } from '@angela/plugin-sdk'
 import { object, optional, picklist, string } from 'valibot'
 import { describe, expect, it, vi } from 'vitest'
 

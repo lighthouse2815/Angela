@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useHostAlwaysOnTop, useHostAppQuit, useHostChat, useHostEventaInvoke, useHostMouseInElement, useHostWindowCenter, useHostWindowMove } from '@proj-airi/stage-host-context'
-import { IS_DEV } from '@proj-airi/stage-shared'
-import { useSettings, useSettingsAudioDevice } from '@proj-airi/stage-ui/stores/settings'
-import { ScrollableArea, useTheme } from '@proj-airi/ui'
+import { useHostAlwaysOnTop, useHostAppQuit, useHostChat, useHostEventaInvoke, useHostMouseInElement, useHostWindowCenter, useHostWindowMove } from '@angela/stage-host-context'
+import { IS_DEV } from '@angela/stage-shared'
+import { useSettings, useSettingsAudioDevice } from '@angela/stage-ui/stores/settings'
+import { ScrollableArea, useTheme } from '@angela/ui'
 import { refDebounced, useIntervalFn, useMouseInElement, useMousePressed } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, reactive, ref, useId, useTemplateRef, watch } from 'vue'

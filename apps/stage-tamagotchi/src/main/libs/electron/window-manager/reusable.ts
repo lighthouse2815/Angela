@@ -1,6 +1,6 @@
 import type { BrowserWindow } from 'electron'
 
-import { isRendererUnavailable } from '@proj-airi/electron-vueuse/main'
+import { isRendererUnavailable } from '@angela/electron-vueuse/main'
 
 /** One window that is created on demand and created again after it closes. */
 export interface ReusableWindow {

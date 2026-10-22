@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BasicButton, DropdownMenu } from '@proj-airi/ui'
+import { BasicButton, DropdownMenu } from '@angela/ui'
 import {
   DropdownMenuItemIndicator,
   DropdownMenuLabel,

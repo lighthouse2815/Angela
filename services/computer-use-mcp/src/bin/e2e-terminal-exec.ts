@@ -13,7 +13,7 @@
  * `createLocalShellRunner` backed by `child_process.spawn`.
  *
  * Usage:
- *   pnpm -F @proj-airi/computer-use-mcp e2e:terminal-exec
+ *   pnpm -F @angela/computer-use-mcp e2e:terminal-exec
  */
 
 import { mkdtempSync, writeFileSync } from 'node:fs'

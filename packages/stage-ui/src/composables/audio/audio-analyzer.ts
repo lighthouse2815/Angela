@@ -1,4 +1,4 @@
-import { errorMessageFromValue } from '@proj-airi/stage-shared'
+import { errorMessageFromValue } from '@angela/stage-shared'
 import { onUnmounted, ref } from 'vue'
 
 const amplification = 3 // Amplification factor for volume visualization

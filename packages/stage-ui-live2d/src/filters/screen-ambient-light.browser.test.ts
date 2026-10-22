@@ -3,13 +3,8 @@ import type {
   AmbientLightFilterOptions,
   AmbientLightMap,
   ScreenAmbientLightMode,
-} from '@proj-airi/stage-shared/screen-ambient-light'
+} from '@angela/stage-shared/screen-ambient-light'
 
-import { Application } from '@pixi/app'
-import { BatchRenderer, Renderer, Texture } from '@pixi/core'
-import { extensions } from '@pixi/extensions'
-import { Sprite } from '@pixi/sprite'
-import { TickerPlugin } from '@pixi/ticker'
 import {
   ambientLightDefaults,
   ambientLightMapSize,
@@ -18,7 +13,12 @@ import {
   createAmbientLightMap,
   relativeLuminance,
   srgbToLinear,
-} from '@proj-airi/stage-shared/screen-ambient-light'
+} from '@angela/stage-shared/screen-ambient-light'
+import { Application } from '@pixi/app'
+import { BatchRenderer, Renderer, Texture } from '@pixi/core'
+import { extensions } from '@pixi/extensions'
+import { Sprite } from '@pixi/sprite'
+import { TickerPlugin } from '@pixi/ticker'
 import { afterAll, describe, expect, it } from 'vitest'
 
 import { ScreenAmbientLightFilter } from './screen-ambient-light'

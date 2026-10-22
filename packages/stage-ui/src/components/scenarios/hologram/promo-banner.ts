@@ -1,4 +1,4 @@
-import { isFluxPurchaseDisabled } from '@proj-airi/stage-shared'
+import { isFluxPurchaseDisabled } from '@angela/stage-shared'
 
 import factorioPoster from '../../../assets/factorio-simple.png'
 import onboardingPoster from '../../../assets/onboarding.avif'

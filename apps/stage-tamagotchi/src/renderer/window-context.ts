@@ -1,4 +1,4 @@
-import type { LeadershipMode } from '@proj-airi/stage-ui/libs/pinia'
+import type { LeadershipMode } from '@angela/stage-ui/libs/pinia'
 
 /** Describes the synchronization and Stage runtime policy for one renderer. */
 export interface RendererWindowContext {

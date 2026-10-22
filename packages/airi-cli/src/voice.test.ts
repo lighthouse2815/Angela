@@ -7,7 +7,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { PassThrough } from 'node:stream'
 
-import { cliMessages } from '@proj-airi/i18n/cli'
+import { cliMessages } from '@angela/i18n/cli'
 import { afterEach, expect, it, vi } from 'vitest'
 import { WebSocketServer } from 'ws'
 

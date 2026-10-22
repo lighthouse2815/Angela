@@ -4,9 +4,9 @@ import type { EngagementMetrics } from '../../otel'
 import type { ChatService } from '../../services/domain/chats'
 import type { ChatWsRuntime } from './runtime'
 
+import { newMessages } from '@angela/server-sdk-shared'
 import { useLogger } from '@guiiai/logg'
 import { wsDisconnectedEvent } from '@moeru/eventa/adapters/websocket/hono'
-import { newMessages } from '@proj-airi/server-sdk-shared'
 
 import { nanoid } from '../../utils/id'
 import { registerChatRpcHandlers } from './rpc'

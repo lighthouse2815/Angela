@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button, Callout, GhostButton } from '@proj-airi/ui'
+import { Button, Callout, GhostButton } from '@angela/ui'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{

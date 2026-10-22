@@ -2,7 +2,7 @@ import type { TranscriptionProvider } from '@xsai-ext/providers/utils'
 import type { LeadershipMode, SyncedPiniaRuntime } from 'pinia-plugin-synced'
 import type { App } from 'vue'
 
-import en from '@proj-airi/i18n/locales/en'
+import en from '@angela/i18n/locales/en'
 
 import { createPinia, disposePinia } from 'pinia'
 import { createSyncedPiniaPlugin } from 'pinia-plugin-synced'

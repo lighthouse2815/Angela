@@ -1,4 +1,4 @@
-import type { AudioInput, AudioRange, Capture, Observer, Position } from '@proj-airi/pipelines-audio'
+import type { AudioInput, AudioRange, Capture, Observer, Position } from '@angela/pipelines-audio'
 
 import type { Interruption } from '../interruption'
 import type { SpeechSubscription } from '../plugins/types'
@@ -8,7 +8,7 @@ import type { EndDetectionOptions, EndDetector, SpeechActivityEvidence } from '.
 import type { SpeechInputPorts, StreamingTranscriber } from './submission'
 import type { TranscriptionEvent } from './transcript'
 
-import { capture, observe } from '@proj-airi/pipelines-audio'
+import { capture, observe } from '@angela/pipelines-audio'
 import { nanoid } from 'nanoid/non-secure'
 
 import { errorFromCause } from '../../utils/error'

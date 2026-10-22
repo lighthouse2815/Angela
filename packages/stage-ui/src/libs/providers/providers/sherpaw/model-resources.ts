@@ -1,7 +1,7 @@
-import type { SherpawModelResource } from '@proj-airi/provider-inference'
+import type { SherpawModelResource } from '@angela/provider-inference'
 
-import { sherpawModels } from '@proj-airi/provider-inference'
-import { assets } from '@proj-airi/vite-plugin-sherpaw/assets'
+import { sherpawModels } from '@angela/provider-inference'
+import { assets } from '@angela/vite-plugin-sherpaw/assets'
 
 /** Models that the host exposes as bundled files or pinned remote downloads. */
 export const sherpawModelResources: SherpawModelResource[] = Object.values(sherpawModels).flatMap((model) => {

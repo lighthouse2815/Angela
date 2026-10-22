@@ -9,9 +9,9 @@ import type { AIRIStreamTranscriptionResult, StreamTranscriptionOptions } from '
 import type { ProviderConfigContext } from '../../types'
 import type { AppleSpeechConfig } from './provider'
 
+import { toFloat32FromPCM16 } from '@angela/audio/encoding'
+import { isElectronWindow, isStageTamagotchi } from '@angela/stage-shared'
 import { createContext } from '@moeru/eventa/adapters/electron/renderer'
-import { toFloat32FromPCM16 } from '@proj-airi/audio/encoding'
-import { isElectronWindow, isStageTamagotchi } from '@proj-airi/stage-shared'
 import { streamTranscription as streamAppleSpeechTranscription } from '@xsai-apple-speech/transcription'
 import { createAppleSpeechProvider as createElectronAppleSpeechProvider } from '@xsai-apple-speech/transcription-electron-plugin'
 

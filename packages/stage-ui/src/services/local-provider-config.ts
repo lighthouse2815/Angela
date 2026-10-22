@@ -1,6 +1,6 @@
-import type { LocalConfig, LocalConfigPatch, LocalConfigSnapshot, LocalConfigTransport } from '@proj-airi/local-config'
+import type { LocalConfig, LocalConfigPatch, LocalConfigSnapshot, LocalConfigTransport } from '@angela/local-config'
 
-import { emptyLocalConfig, localConfigSchema } from '@proj-airi/local-config'
+import { emptyLocalConfig, localConfigSchema } from '@angela/local-config'
 import { isEqual } from 'es-toolkit'
 
 import * as v from 'valibot'

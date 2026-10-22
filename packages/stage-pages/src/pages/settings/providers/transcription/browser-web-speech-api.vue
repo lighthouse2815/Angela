@@ -5,14 +5,14 @@ import {
   ProviderBasicSettings,
   ProviderSettingsContainer,
   ProviderSettingsLayout,
-} from '@proj-airi/stage-ui/components'
-import { useVoiceController } from '@proj-airi/stage-ui/composables/audio/voice-controller'
-import { selectProviderMetadata } from '@proj-airi/stage-ui/libs'
-import { useHearingStore } from '@proj-airi/stage-ui/stores/modules/hearing'
-import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
-import { useProviderStore } from '@proj-airi/stage-ui/stores/providers/provider'
-import { useSettingsAudioDevice } from '@proj-airi/stage-ui/stores/settings'
-import { Button, FieldCombobox } from '@proj-airi/ui'
+} from '@angela/stage-ui/components'
+import { useVoiceController } from '@angela/stage-ui/composables/audio/voice-controller'
+import { selectProviderMetadata } from '@angela/stage-ui/libs'
+import { useHearingStore } from '@angela/stage-ui/stores/modules/hearing'
+import { useProviderConfigStore } from '@angela/stage-ui/stores/providers/config'
+import { useProviderStore } from '@angela/stage-ui/stores/providers/provider'
+import { useSettingsAudioDevice } from '@angela/stage-ui/stores/settings'
+import { Button, FieldCombobox } from '@angela/ui'
 import { computedAsync } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref } from 'vue'

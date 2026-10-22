@@ -7,7 +7,7 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 
-import { LocalConfigFile } from '@proj-airi/local-config/node'
+import { LocalConfigFile } from '@angela/local-config/node'
 import { afterEach, expect, it } from 'vitest'
 
 const execute = promisify(execFile)

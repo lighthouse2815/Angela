@@ -12,10 +12,10 @@ import type { WidgetsWindowManager } from '../windows/widgets'
 
 import { env } from 'node:process'
 
+import { isRendererUnavailable } from '@angela/electron-vueuse/main'
 import { is } from '@electron-toolkit/utils'
 import { defineInvokeHandler } from '@moeru/eventa'
 import { createContext } from '@moeru/eventa/adapters/electron/main'
-import { isRendererUnavailable } from '@proj-airi/electron-vueuse/main'
 import { effect } from 'alien-signals'
 import { app, ipcMain, Menu, nativeImage, screen, Tray } from 'electron'
 import { debounce, once } from 'es-toolkit'

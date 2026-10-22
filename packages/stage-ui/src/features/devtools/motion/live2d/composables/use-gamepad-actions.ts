@@ -1,4 +1,4 @@
-import type { StandardGamepadSnapshot } from '@proj-airi/input-gamepad'
+import type { StandardGamepadSnapshot } from '@angela/input-gamepad'
 
 import { tryOnBeforeUnmount, useIntervalFn, useTimeoutFn } from '@vueuse/core'
 import { watch } from 'vue'

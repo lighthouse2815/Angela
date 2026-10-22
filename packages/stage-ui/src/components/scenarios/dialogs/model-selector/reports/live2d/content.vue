@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Live2DValidationIssue, Live2DValidationReport } from '@proj-airi/stage-ui-live2d'
+import type { Live2DValidationIssue, Live2DValidationReport } from '@angela/stage-ui-live2d'
 
-import { Button } from '@proj-airi/ui'
+import { Button } from '@angela/ui'
 import { TooltipArrow, TooltipContent, TooltipPortal, TooltipProvider, TooltipRoot, TooltipTrigger } from 'reka-ui'
 import { DrawerContent, DrawerDescription, DrawerHandle, DrawerOverlay, DrawerPortal, DrawerRootNested, DrawerTitle } from 'vaul-vue'
 import { computed, shallowRef, watch } from 'vue'

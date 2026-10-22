@@ -3,13 +3,13 @@ import type {
   StageViewErrorPayload,
   StageViewPatch,
   StageViewSnapshotPayload,
-} from '@proj-airi/stage-shared/godot-stage'
-import type { Live2DExpressionSettingsCommand } from '@proj-airi/stage-ui-live2d/stores/expression-store'
+} from '@angela/stage-shared/godot-stage'
+import type { Live2DExpressionSettingsCommand } from '@angela/stage-ui-live2d/stores/expression-store'
 
 import type { DisplayModel } from '../../../../stores/display-models'
 import type { ModelSettingsRuntimeSnapshot } from './runtime'
 
-import { Button, Callout, ScrollableArea } from '@proj-airi/ui'
+import { Button, Callout, ScrollableArea } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'

@@ -3,7 +3,7 @@ import type EventEmitter from 'node:events'
 import type { createContext } from '@moeru/eventa/adapters/electron/main'
 import type { BrowserWindow } from 'electron'
 
-import { electronEvents } from '@proj-airi/electron-eventa'
+import { electronEvents } from '@angela/electron-eventa'
 import { powerMonitor } from 'electron'
 
 import { onAppBeforeQuit } from '../../libs/bootkit/lifecycle'

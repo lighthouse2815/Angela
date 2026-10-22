@@ -9,8 +9,8 @@
       "dependsOn": ["^typecheck"],
       "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/tsconfig.json"]
     },
-    "@proj-airi/electron-vueuse#build": {
-      "dependsOn": ["@proj-airi/electron-eventa#build"],
+    "@angela/electron-vueuse#build": {
+      "dependsOn": ["@angela/electron-eventa#build"],
       "outputs": ["dist/**"]
     }
   }

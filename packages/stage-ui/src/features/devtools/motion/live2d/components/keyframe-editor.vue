@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { StandardGamepadSnapshot } from '@proj-airi/input-gamepad'
+import type { StandardGamepadSnapshot } from '@angela/input-gamepad'
 
 import type {
   Live2DMotionEditableTrackId,
@@ -11,9 +11,9 @@ import type {
 } from '../composables/keyframes'
 import type { Live2DMotionRecording, ReadonlyLive2DMotionRecording } from '../composables/recording'
 
+import { getGamepadButtonLabel } from '@angela/input-gamepad'
+import { BasicButton } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { getGamepadButtonLabel } from '@proj-airi/input-gamepad'
-import { BasicButton } from '@proj-airi/ui'
 import { useManualRefHistory } from '@vueuse/core'
 import { computed, nextTick, onUnmounted, shallowRef, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

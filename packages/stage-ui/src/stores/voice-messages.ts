@@ -1,4 +1,4 @@
-import type { PcmBlock } from '@proj-airi/pipelines-audio'
+import type { PcmBlock } from '@angela/pipelines-audio'
 
 import type { VoiceMessageCommand } from '../services/speech/bus'
 

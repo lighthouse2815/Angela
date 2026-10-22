@@ -7,8 +7,8 @@
   * - Src of model is obtained from stage-ui via props, which is NOT a part of stage-ui-three package
 */
 
+import type { PresenceBubblePalette, PresenceBubbleState } from '@angela/stage-shared'
 import type { VRM } from '@pixiv/three-vrm'
-import type { PresenceBubblePalette, PresenceBubbleState } from '@proj-airi/stage-shared'
 import type { TresContext } from '@tresjs/core'
 import type { DirectionalLight, SphericalHarmonics3, Texture, WebGLRenderer, WebGLRenderTarget } from 'three'
 
@@ -16,8 +16,8 @@ import type { VrmInteractionTarget } from '../composables/vrm/interaction'
 import type { SceneBootstrap, ScenePhase, Vec3 } from '../stores/model-store'
 import type { VrmLifecycleReason } from '../trace'
 
-import { coverRect, presenceBubbleIdle } from '@proj-airi/stage-shared'
-import { Screen } from '@proj-airi/ui'
+import { coverRect, presenceBubbleIdle } from '@angela/stage-shared'
+import { Screen } from '@angela/ui'
 import { TresCanvas } from '@tresjs/core'
 import { EffectComposerPmndrs, HueSaturationPmndrs } from '@tresjs/post-processing'
 import { defaultWindow, useElementBounding, useEventListener, useResizeObserver } from '@vueuse/core'

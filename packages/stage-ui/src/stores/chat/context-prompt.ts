@@ -1,2 +1,2 @@
-export type { ContextSnapshot } from '@proj-airi/core-agent'
-export { buildContextPromptMessage, formatContextPromptText } from '@proj-airi/core-agent'
+export type { ContextSnapshot } from '@angela/core-agent'
+export { buildContextPromptMessage, formatContextPromptText } from '@angela/core-agent'

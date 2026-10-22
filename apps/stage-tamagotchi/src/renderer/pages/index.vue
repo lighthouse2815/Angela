@@ -1,28 +1,28 @@
 <script setup lang="ts">
-import type { ModelSettingsRuntimeSnapshot } from '@proj-airi/stage-ui/components/scenarios/settings/model-settings/runtime'
+import type { ModelSettingsRuntimeSnapshot } from '@angela/stage-ui/components/scenarios/settings/model-settings/runtime'
 
-import { errorMessageFrom } from '@moeru/std'
-import { electron } from '@proj-airi/electron-eventa'
+import { electron } from '@angela/electron-eventa'
 import {
   useElectronEventaInvoke,
   useElectronMouseAroundWindowBorder,
   useElectronMouseInElement,
   useElectronMouseInWindow,
   useElectronRelativeMouse,
-} from '@proj-airi/electron-vueuse'
-import { useExpressionStore } from '@proj-airi/stage-ui-live2d/stores/expression-store'
-import { useModelStore, useThreeSceneIsTransparentAtPoint } from '@proj-airi/stage-ui-three'
-import { HearingStatus, HoloCoupon } from '@proj-airi/stage-ui/components'
+} from '@angela/electron-vueuse'
+import { useExpressionStore } from '@angela/stage-ui-live2d/stores/expression-store'
+import { useModelStore, useThreeSceneIsTransparentAtPoint } from '@angela/stage-ui-three'
+import { HearingStatus, HoloCoupon } from '@angela/stage-ui/components'
 import {
   createEmptyModelSettingsRuntimeSnapshot,
   resolveComponentStateToRuntimePhase,
-} from '@proj-airi/stage-ui/components/scenarios/settings/model-settings/runtime'
-import { WidgetStage } from '@proj-airi/stage-ui/components/scenes'
-import { useCanvasPixelIsTransparentAtPoint } from '@proj-airi/stage-ui/composables/canvas-alpha'
-import { useVoiceListening } from '@proj-airi/stage-ui/composables/voice-input-mode'
-import { useOnboardingStore } from '@proj-airi/stage-ui/stores/onboarding'
-import { useSettings } from '@proj-airi/stage-ui/stores/settings'
-import { useVoiceStore } from '@proj-airi/stage-ui/stores/voice'
+} from '@angela/stage-ui/components/scenarios/settings/model-settings/runtime'
+import { WidgetStage } from '@angela/stage-ui/components/scenes'
+import { useCanvasPixelIsTransparentAtPoint } from '@angela/stage-ui/composables/canvas-alpha'
+import { useVoiceListening } from '@angela/stage-ui/composables/voice-input-mode'
+import { useOnboardingStore } from '@angela/stage-ui/stores/onboarding'
+import { useSettings } from '@angela/stage-ui/stores/settings'
+import { useVoiceStore } from '@angela/stage-ui/stores/voice'
+import { errorMessageFrom } from '@moeru/std'
 import { refDebounced } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref, shallowRef, toRef, watch } from 'vue'

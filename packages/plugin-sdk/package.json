@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/plugin-sdk",
+  "name": "@angela/plugin-sdk",
   "type": "module",
   "version": "0.12.0-beta.5",
   "private": true,
@@ -40,9 +40,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@angela/plugin-protocol": "workspace:*",
     "@moeru/eventa": "catalog:",
     "@moeru/std": "catalog:",
-    "@proj-airi/plugin-protocol": "workspace:*",
     "nanoid": "catalog:",
     "semver": "catalog:",
     "valibot": "catalog:"

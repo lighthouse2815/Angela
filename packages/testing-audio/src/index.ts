@@ -17,4 +17,4 @@ export type {
   AudioInputVoiceInput,
 } from './types'
 
-export type { PiniaActionEvent, PiniaActionEventStatus } from '@proj-airi/stage-shared/types/pinia-action-event'
+export type { PiniaActionEvent, PiniaActionEventStatus } from '@angela/stage-shared/types/pinia-action-event'

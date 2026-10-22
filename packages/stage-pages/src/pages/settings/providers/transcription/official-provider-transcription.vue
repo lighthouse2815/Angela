@@ -4,10 +4,10 @@ import type { TranscriptionProviderWithExtraOptions } from '@xsai-ext/providers/
 import {
   TranscriptionPlayground,
   TranscriptionProviderSettings,
-} from '@proj-airi/stage-ui/components'
-import { OFFICIAL_TRANSCRIPTION_PROVIDER_ID } from '@proj-airi/stage-ui/libs/providers'
-import { useHearingStore } from '@proj-airi/stage-ui/stores/modules/hearing'
-import { useProviderStore } from '@proj-airi/stage-ui/stores/providers/provider'
+} from '@angela/stage-ui/components'
+import { OFFICIAL_TRANSCRIPTION_PROVIDER_ID } from '@angela/stage-ui/libs/providers'
+import { useHearingStore } from '@angela/stage-ui/stores/modules/hearing'
+import { useProviderStore } from '@angela/stage-ui/stores/providers/provider'
 
 const hearingStore = useHearingStore()
 const providersStore = useProviderStore()

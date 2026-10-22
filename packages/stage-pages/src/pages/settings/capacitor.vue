@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { CapacitorPackage } from '@proj-airi/stage-ui/composables/use-subscription'
+import type { CapacitorPackage } from '@angela/stage-ui/composables/use-subscription'
 
-import { isFluxPurchaseDisabled } from '@proj-airi/stage-shared'
-import { useSubscription } from '@proj-airi/stage-ui/composables/use-subscription'
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
-import { Button, FieldCheckbox, Skeleton } from '@proj-airi/ui'
+import { isFluxPurchaseDisabled } from '@angela/stage-shared'
+import { useSubscription } from '@angela/stage-ui/composables/use-subscription'
+import { useAuthStore } from '@angela/stage-ui/stores/auth'
+import { Button, FieldCheckbox, Skeleton } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

@@ -1,6 +1,6 @@
-import type { PiniaActionEvent } from '@proj-airi/stage-shared/types/pinia-action-event'
+import type { PiniaActionEvent } from '@angela/stage-shared/types/pinia-action-event'
 
-import { piniaActionTracingChannelName } from '@proj-airi/stage-shared/types/pinia-action-event'
+import { piniaActionTracingChannelName } from '@angela/stage-shared/types/pinia-action-event'
 import { createPinia, defineStore } from 'pinia'
 import { describe, expect, it } from 'vitest'
 import { createApp } from 'vue'

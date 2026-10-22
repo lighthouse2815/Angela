@@ -13,11 +13,11 @@ import Layouts from 'vite-plugin-vue-layouts'
 import VueMacros from 'vue-macros/vite'
 import VueRouter from 'vue-router/vite'
 
-import { paraformerBilingualZhEn, xAsrBilingualZhEnInt8, zipformerMultilingual } from '@proj-airi/provider-inference/sherpaw-transcription/models'
-import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
+import { paraformerBilingualZhEn, xAsrBilingualZhEnInt8, zipformerMultilingual } from '@angela/provider-inference/sherpaw-transcription/models'
+import { kwsModel } from '@angela/stage-ui/libs/voice/kws-model-info'
+import { resolveModelEndpoint, Sherpaw } from '@angela/vite-plugin-sherpaw'
 import { Download } from '@proj-airi/unplugin-fetch'
 import { DownloadLive2DSDK } from '@proj-airi/unplugin-live2d-sdk'
-import { resolveModelEndpoint, Sherpaw } from '@proj-airi/vite-plugin-sherpaw'
 import { defineConfig } from 'electron-vite'
 
 const stageUIAssetsRoot = resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src', 'assets'))
@@ -86,9 +86,9 @@ export default defineConfig({
 
     resolve: {
       alias: {
-        '@proj-airi/i18n': resolve(join(import.meta.dirname, '..', '..', 'packages', 'i18n', 'src')),
-        '@proj-airi/server-runtime/server': resolve(join(import.meta.dirname, '..', '..', 'packages', 'server-runtime', 'src', 'server', 'index.ts')),
-        '@proj-airi/server-runtime': resolve(join(import.meta.dirname, '..', '..', 'packages', 'server-runtime', 'src', 'index.ts')),
+        '@angela/i18n': resolve(join(import.meta.dirname, '..', '..', 'packages', 'i18n', 'src')),
+        '@angela/server-runtime/server': resolve(join(import.meta.dirname, '..', '..', 'packages', 'server-runtime', 'src', 'server', 'index.ts')),
+        '@angela/server-runtime': resolve(join(import.meta.dirname, '..', '..', 'packages', 'server-runtime', 'src', 'index.ts')),
       },
     },
   },
@@ -130,10 +130,10 @@ export default defineConfig({
     optimizeDeps: {
       exclude: [
         // Internal Packages
-        '@proj-airi/stage-ui/*',
+        '@angela/stage-ui/*',
         '@proj-airi/drizzle-duckdb-wasm',
         '@proj-airi/drizzle-duckdb-wasm/*',
-        '@proj-airi/electron-screen-capture',
+        '@angela/electron-screen-capture',
 
         // Static Assets: Models, Images, etc.
         'src/renderer/public/assets/*',
@@ -158,16 +158,16 @@ export default defineConfig({
 
     resolve: {
       alias: {
-        '@proj-airi/server-sdk': resolve(join(import.meta.dirname, '..', '..', 'packages', 'server-sdk', 'src')),
-        '@proj-airi/i18n': resolve(join(import.meta.dirname, '..', '..', 'packages', 'i18n', 'src')),
-        // NOTICE: the @proj-airi/stage-ui alias resolves to a directory; rolldown
+        '@angela/server-sdk': resolve(join(import.meta.dirname, '..', '..', 'packages', 'server-sdk', 'src')),
+        '@angela/i18n': resolve(join(import.meta.dirname, '..', '..', 'packages', 'i18n', 'src')),
+        // NOTICE: the @angela/stage-ui alias resolves to a directory; rolldown
         // concatenates sub-paths without a file extension, so bare .ts files at the
         // stores/ root (e.g. mcp-tool-bridge.ts) are not found.  Add explicit aliases
-        // for each such file that the renderer imports from @proj-airi/stage-ui.
-        '@proj-airi/stage-ui/stores/mcp-tool-bridge': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src', 'stores', 'mcp-tool-bridge.ts')),
-        '@proj-airi/stage-ui': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src')),
-        '@proj-airi/stage-pages': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-pages', 'src')),
-        '@proj-airi/stage-shared': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-shared', 'src')),
+        // for each such file that the renderer imports from @angela/stage-ui.
+        '@angela/stage-ui/stores/mcp-tool-bridge': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src', 'stores', 'mcp-tool-bridge.ts')),
+        '@angela/stage-ui': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src')),
+        '@angela/stage-pages': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-pages', 'src')),
+        '@angela/stage-shared': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-shared', 'src')),
       },
     },
 

@@ -1,4 +1,4 @@
-import type { Conversation, TurnEvidence } from '@proj-airi/core-agent'
+import type { Conversation, TurnEvidence } from '@angela/core-agent'
 
 import type { EndJudgement } from '../libs/voice/voice-end-judge-plugin'
 

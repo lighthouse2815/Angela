@@ -1,4 +1,4 @@
-import type { ModulePermissionDeclaration } from '@proj-airi/plugin-protocol/types'
+import type { ModulePermissionDeclaration } from '@angela/plugin-protocol/types'
 
 import { describe, expect, it } from 'vitest'
 

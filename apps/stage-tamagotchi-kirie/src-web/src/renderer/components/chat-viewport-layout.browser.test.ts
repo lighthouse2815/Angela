@@ -1,9 +1,9 @@
-import type { ChatHistoryItem, StreamingAssistantMessage } from '@proj-airi/stage-ui/types/chat'
+import type { ChatHistoryItem, StreamingAssistantMessage } from '@angela/stage-ui/types/chat'
 
-import en from '@proj-airi/i18n/locales/en'
+import en from '@angela/i18n/locales/en'
 
-import { ChatHistory } from '@proj-airi/stage-ui/components'
-import { ScrollableArea } from '@proj-airi/ui'
+import { ChatHistory } from '@angela/stage-ui/components'
+import { ScrollableArea } from '@angela/ui'
 import { describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-vue'
 import { defineComponent, shallowRef } from 'vue'

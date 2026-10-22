@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ChatHistoryReplyPayload } from '../reply'
 
-import { IconButton } from '@proj-airi/ui'
+import { IconButton } from '@angela/ui'
 import { computed, nextTick, shallowRef, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 

@@ -1,4 +1,4 @@
-import type { GenerationProvider, GenerationRequest } from '@proj-airi/provider-inference'
+import type { GenerationProvider, GenerationRequest } from '@angela/provider-inference'
 import type { CommonContentPart, CompletionToolCall, Tool, ToolChoice } from '@xsai/shared-chat'
 
 import type { AssistantTurn, Conversation } from '../messages/types'

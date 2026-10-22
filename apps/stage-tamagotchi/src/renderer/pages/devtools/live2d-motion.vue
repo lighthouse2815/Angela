@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useStandardGamepad } from '@proj-airi/input-gamepad-vueuse'
-import { Live2DMotionDevtools } from '@proj-airi/stage-ui/features/devtools/motion/live2d'
-import { useSystemAudioLipSyncStore } from '@proj-airi/stage-ui/stores/system-audio-lipsync'
-import { BasicButton } from '@proj-airi/ui'
+import { useStandardGamepad } from '@angela/input-gamepad-vueuse'
+import { Live2DMotionDevtools } from '@angela/stage-ui/features/devtools/motion/live2d'
+import { useSystemAudioLipSyncStore } from '@angela/stage-ui/stores/system-audio-lipsync'
+import { BasicButton } from '@angela/ui'
 import { onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'

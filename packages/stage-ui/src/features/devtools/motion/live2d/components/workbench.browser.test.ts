@@ -4,7 +4,7 @@ import { createI18n } from 'vue-i18n'
 
 import Workbench from './workbench.vue'
 
-import '@proj-airi/ui/main.css'
+import '@angela/ui/main.css'
 
 function createTestI18n() {
   return createI18n({

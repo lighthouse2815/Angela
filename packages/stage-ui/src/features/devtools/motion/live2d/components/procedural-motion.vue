@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { Pose } from '@proj-airi/model-driver-magic-live2d'
-import type { SelectTabOption } from '@proj-airi/ui'
+import type { Pose } from '@angela/model-driver-magic-live2d'
+import type { SelectTabOption } from '@angela/ui'
 
 import type { Live2DMotionMagicMethod } from '../../../../motions/live2d'
 import type { ReadonlyLive2DMotionRecording } from '../composables/recording'
 
-import { BasicButton, FieldRange, SelectTab } from '@proj-airi/ui'
+import { BasicButton, FieldRange, SelectTab } from '@angela/ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

@@ -1,6 +1,6 @@
 import { once } from 'node:events'
 
-import { Client, parseEvent } from '@proj-airi/server-sdk'
+import { Client, parseEvent } from '@angela/server-sdk'
 import { describe, expect, it, vi } from 'vitest'
 import { WebSocketServer } from 'ws'
 

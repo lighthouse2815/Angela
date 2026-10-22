@@ -1,4 +1,4 @@
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { GenerationProvider } from '@angela/provider-inference'
 import type { CompletionStep, Message, Tool } from '@xsai/shared-chat'
 
 import type { Conversation } from '../messages/types'

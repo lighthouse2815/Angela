@@ -11,13 +11,13 @@ import {
   ProviderSettingsContainer,
   ProviderSettingsLayout,
   TranscriptionPlayground,
-} from '@proj-airi/stage-ui/components'
-import { useProviderValidation } from '@proj-airi/stage-ui/composables/use-provider-validation'
-import { getDefinedProvider } from '@proj-airi/stage-ui/libs'
-import { useHearingStore } from '@proj-airi/stage-ui/stores/modules/hearing'
-import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
-import { useProviderStore } from '@proj-airi/stage-ui/stores/providers/provider'
-import { FieldCombobox, FieldInput } from '@proj-airi/ui'
+} from '@angela/stage-ui/components'
+import { useProviderValidation } from '@angela/stage-ui/composables/use-provider-validation'
+import { getDefinedProvider } from '@angela/stage-ui/libs'
+import { useHearingStore } from '@angela/stage-ui/stores/modules/hearing'
+import { useProviderConfigStore } from '@angela/stage-ui/stores/providers/config'
+import { useProviderStore } from '@angela/stage-ui/stores/providers/provider'
+import { FieldCombobox, FieldInput } from '@angela/ui'
 import { computedAsync } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, watch } from 'vue'

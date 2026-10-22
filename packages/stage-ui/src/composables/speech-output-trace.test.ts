@@ -1,10 +1,10 @@
-import type { SpeechOutput } from '@proj-airi/core-agent'
-import type { TtsRequest } from '@proj-airi/pipelines-audio'
+import type { SpeechOutput } from '@angela/core-agent'
+import type { TtsRequest } from '@angela/pipelines-audio'
 
 import type { ReadableSpan } from './use-io-tracer'
 
-import { Playback } from '@proj-airi/pipelines-audio'
-import { IOAttributes, IOSpanNames } from '@proj-airi/stage-shared'
+import { Playback } from '@angela/pipelines-audio'
+import { IOAttributes, IOSpanNames } from '@angela/stage-shared'
 import { afterEach, expect, it, vi } from 'vitest'
 
 import { traceSpeechOutput } from './speech-output-trace'

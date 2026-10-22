@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FieldButton, FieldTextArea, FieldValues } from '@proj-airi/ui'
+import { FieldButton, FieldTextArea, FieldValues } from '@angela/ui'
 import { ref, shallowRef } from 'vue'
 
 const text = shallowRef('Describe your character.')

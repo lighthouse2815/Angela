@@ -1,6 +1,6 @@
+import { getHostEventaContext } from '@angela/stage-host-context'
+import { useAuthStore } from '@angela/stage-ui/stores/auth'
 import { errorMessageFrom } from '@moeru/std'
-import { getHostEventaContext } from '@proj-airi/stage-host-context'
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
 import { toast } from 'vue-sonner'
 
 import { desktopAuthConfiguration } from '../../shared/auth-config'

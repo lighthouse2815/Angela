@@ -1,4 +1,4 @@
-import type { cliMessages } from '@proj-airi/i18n/cli'
+import type { cliMessages } from '@angela/i18n/cli'
 import type { Tool } from '@xsai/shared-chat'
 
 import type { Tasks } from './tasks'

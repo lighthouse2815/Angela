@@ -1,4 +1,4 @@
-import type { TrainingSequence } from '@proj-airi/motion-driver-magic'
+import type { TrainingSequence } from '@angela/motion-driver-magic'
 
 /** A normalized pose that the MAGIC Live2D driver can apply. */
 export interface Pose {

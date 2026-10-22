@@ -1,4 +1,4 @@
-import type { PcmBlock } from '@proj-airi/pipelines-audio'
+import type { PcmBlock } from '@angela/pipelines-audio'
 
 import type { SpeakerEvidence, SpeechSnapshot } from './snapshot'
 import type { TranscriptionEvent, TranscriptPatch, TranscriptSnapshot } from './transcript'

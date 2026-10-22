@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/stage-ui-tachie",
+  "name": "@angela/stage-ui-tachie",
   "type": "module",
   "private": true,
   "description": "Tachie static image scene components and stores for Project AIRI",
@@ -30,13 +30,13 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@angela/stage-shared": "workspace:^",
+    "@angela/ui": "workspace:^",
     "@moeru/std": "catalog:",
     "@pixi/app": "catalog:",
     "@pixi/core": "catalog:",
     "@pixi/extensions": "catalog:",
     "@pixi/sprite": "catalog:",
-    "@proj-airi/stage-shared": "workspace:^",
-    "@proj-airi/ui": "workspace:^",
     "culori": "catalog:",
     "fflate": "catalog:",
     "pinia": "catalog:",

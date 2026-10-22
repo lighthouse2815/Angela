@@ -1,6 +1,6 @@
 import type { Voice } from './voice'
 
-import { chunkTtsInput } from '@proj-airi/pipelines-audio'
+import { chunkTtsInput } from '@angela/pipelines-audio'
 
 /** Owns one bounded text stream and serial TTS playback. Audio failure never cancels text generation. */
 export class StreamingSpeech {

@@ -1,4 +1,4 @@
-import type { SpeechSubmission } from '@proj-airi/core-agent'
+import type { SpeechSubmission } from '@angela/core-agent'
 
 import { createTestingPinia } from '@pinia/testing'
 import { setActivePinia } from 'pinia'

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { PresenceBubblePalette, PresenceBubbleState } from '@proj-airi/stage-shared'
+import type { PresenceBubblePalette, PresenceBubbleState } from '@angela/stage-shared'
 import type { PerspectiveCamera, Vector3 } from 'three'
 
 import {
   PresenceBubbleAdvancer,
-} from '@proj-airi/stage-shared'
+} from '@angela/stage-shared'
 import { useLoop, useTresContext } from '@tresjs/core'
 import { usePreferredReducedMotion } from '@vueuse/core'
 import { CanvasTexture, Sprite, SpriteMaterial, SRGBColorSpace, Vector3 as ThreeVector3 } from 'three'

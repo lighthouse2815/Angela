@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { isCustomProvidersDisabled } from '@proj-airi/stage-shared'
-import { RadioCardSimple } from '@proj-airi/stage-ui/components'
-import { useArtistryStore } from '@proj-airi/stage-ui/stores/modules/artistry'
-import { SettingsCard } from '@proj-airi/ui'
+import { isCustomProvidersDisabled } from '@angela/stage-shared'
+import { RadioCardSimple } from '@angela/stage-ui/components'
+import { useArtistryStore } from '@angela/stage-ui/stores/modules/artistry'
+import { SettingsCard } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

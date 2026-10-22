@@ -1,4 +1,4 @@
-import type { StageViewPatch, StageViewVec3 } from '@proj-airi/stage-shared/godot-stage'
+import type { StageViewPatch, StageViewVec3 } from '@angela/stage-shared/godot-stage'
 
 /**
  * Queue responsible for user-driven Godot view patch delivery.

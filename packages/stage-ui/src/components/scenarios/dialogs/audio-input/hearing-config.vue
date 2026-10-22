@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Callout, FieldCheckbox, FieldCombobox, FieldSelect } from '@proj-airi/ui'
+import { Callout, FieldCheckbox, FieldCombobox, FieldSelect } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'

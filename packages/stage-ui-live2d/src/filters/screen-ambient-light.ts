@@ -1,14 +1,12 @@
-import type { FilterSystem, RenderTexture } from '@pixi/core'
 import type {
   AmbientLightEnvironment,
   AmbientLightFilterOptions,
   AmbientLightMap,
   NormalizedRectangle,
   ScreenAmbientLightMode,
-} from '@proj-airi/stage-shared/screen-ambient-light'
+} from '@angela/stage-shared/screen-ambient-light'
+import type { FilterSystem, RenderTexture } from '@pixi/core'
 
-import { ALPHA_MODES, CLEAR_MODES, MIPMAP_MODES, SCALE_MODES, WRAP_MODES } from '@pixi/constants'
-import { BaseTexture, Filter, Texture } from '@pixi/core'
 import {
   ambientLightDefaults,
   ambientLightMapSize,
@@ -16,7 +14,9 @@ import {
   averageAmbientLightMap,
   linearToSrgbByte,
   wholeWindowRectangle,
-} from '@proj-airi/stage-shared/screen-ambient-light'
+} from '@angela/stage-shared/screen-ambient-light'
+import { ALPHA_MODES, CLEAR_MODES, MIPMAP_MODES, SCALE_MODES, WRAP_MODES } from '@pixi/constants'
+import { BaseTexture, Filter, Texture } from '@pixi/core'
 import { clamp } from 'es-toolkit'
 
 /**

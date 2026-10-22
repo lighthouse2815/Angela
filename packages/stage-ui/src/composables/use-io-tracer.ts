@@ -1,6 +1,6 @@
+import type { SerializedIOSpan } from '@angela/stage-shared/types/io-trace'
 import type { Span, SpanContext, SpanStatusCode } from '@opentelemetry/api'
 import type { ReadableSpan, SpanExporter } from '@opentelemetry/sdk-trace-base'
-import type { SerializedIOSpan } from '@proj-airi/stage-shared/types/io-trace'
 
 import { context, trace } from '@opentelemetry/api'
 import { hrTimeToNanoseconds } from '@opentelemetry/core'

@@ -1,4 +1,4 @@
-import type { McpCallToolResult } from '@proj-airi/stage-ui/stores/mcp-tool-bridge'
+import type { McpCallToolResult } from '@angela/stage-ui/stores/mcp-tool-bridge'
 
 import type { OverlayState } from './desktop-overlay-polling'
 

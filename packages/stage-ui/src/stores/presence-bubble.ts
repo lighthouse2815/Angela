@@ -1,4 +1,4 @@
-import type { PresenceBubbleState } from '@proj-airi/stage-shared'
+import type { PresenceBubbleState } from '@angela/stage-shared'
 
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'

@@ -1,4 +1,4 @@
-import { defineExtension } from '@proj-airi/plugin-sdk'
+import { defineExtension } from '@angela/plugin-sdk'
 
 /**
  * Requires the example Provider through a static Kit declaration.

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { VoiceDraft } from '../../../../services/speech/bus'
 
-import { joinTranscriptSegments } from '@proj-airi/provider-inference'
-import { BasicButton, BasicTextarea, Button, GhostButton } from '@proj-airi/ui'
+import { joinTranscriptSegments } from '@angela/provider-inference'
+import { BasicButton, BasicTextarea, Button, GhostButton } from '@angela/ui'
 import { computed, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 

@@ -6,8 +6,8 @@ import { argv, exit, stdin } from 'node:process'
 
 import debug from 'debug'
 
+import { Client } from '@angela/server-sdk'
 import { Format, LogLevel, LogLevelString, useLogg } from '@guiiai/logg'
-import { Client } from '@proj-airi/server-sdk'
 import { cac } from 'cac'
 
 import { name, version } from '../package.json'

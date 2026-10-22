@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { promisify } from 'node:util'
 
-import { cliMessages } from '@proj-airi/i18n/cli'
+import { cliMessages } from '@angela/i18n/cli'
 import { afterEach, expect, it } from 'vitest'
 
 import { Memory } from './memory'

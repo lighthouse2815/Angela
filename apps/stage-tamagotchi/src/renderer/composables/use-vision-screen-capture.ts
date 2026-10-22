@@ -1,8 +1,8 @@
-import type { SerializableDesktopCapturerSource } from '@proj-airi/electron-screen-capture'
+import type { SerializableDesktopCapturerSource } from '@angela/electron-screen-capture'
 import type { SourcesOptions } from 'electron'
 import type { MaybeRefOrGetter } from 'vue'
 
-import { useElectronScreenCapture } from '@proj-airi/electron-screen-capture/vue'
+import { useElectronScreenCapture } from '@angela/electron-screen-capture/vue'
 import { computed, ref, shallowRef, watch } from 'vue'
 
 import { createObjectUrlFromBytes } from '../utils/create-object-url-from-bytes'

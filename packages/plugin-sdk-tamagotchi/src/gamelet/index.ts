@@ -1,7 +1,7 @@
-import type { KitClientRuntime } from '@proj-airi/plugin-sdk'
-import type { HostDataRecord } from '@proj-airi/plugin-sdk/plugin-host'
+import type { KitClientRuntime } from '@angela/plugin-sdk'
+import type { HostDataRecord } from '@angela/plugin-sdk/plugin-host'
 
-import { defineKit } from '@proj-airi/plugin-sdk'
+import { defineKit } from '@angela/plugin-sdk'
 
 export * from './events'
 

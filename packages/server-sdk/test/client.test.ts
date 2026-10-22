@@ -1,5 +1,5 @@
-import type { ClientConnection, ClientConnector, ClientEvents } from '@proj-airi/better-ws'
-import type { WebSocketEvent, WebSocketEventOf } from '@proj-airi/server-shared/types'
+import type { ClientConnection, ClientConnector, ClientEvents } from '@angela/better-ws'
+import type { WebSocketEvent, WebSocketEventOf } from '@angela/server-shared/types'
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 

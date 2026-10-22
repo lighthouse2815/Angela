@@ -1,12 +1,12 @@
-# `@proj-airi/input-gamepad-vueuse`
+# `@angela/input-gamepad-vueuse`
 
-This package provides Vue composables for `@proj-airi/input-gamepad`.
+This package provides Vue composables for `@angela/input-gamepad`.
 It owns the monitor lifecycle and exposes readonly reactive controller state.
 
 ## Use the package
 
 ```ts
-import { useStandardGamepad } from '@proj-airi/input-gamepad-vueuse'
+import { useStandardGamepad } from '@angela/input-gamepad-vueuse'
 import { whenever } from '@vueuse/core'
 import { watchEffect } from 'vue'
 
@@ -31,7 +31,7 @@ Use `pause()` and `resume()` when a mounted feature must stop input temporarily.
 ## When to use it
 
 Use this package in Vue browser and Electron renderer code.
-Use `@proj-airi/input-gamepad` in framework-independent code.
+Use `@angela/input-gamepad` in framework-independent code.
 
 This package exposes standard buttons, sticks, and analog triggers.
 It does not expose motion sensors, touchpads, lights, or adaptive triggers.

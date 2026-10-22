@@ -1418,70 +1418,70 @@ importers:
       '@pinia/colada':
         specifier: 'catalog:'
         version: 1.4.2(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.41(typescript@6.0.3)))(vue@3.5.41(typescript@6.0.3))
-      '@proj-airi/audio':
+      '@angela/audio':
         specifier: workspace:^
         version: link:../../packages/audio
-      '@proj-airi/ccc':
+      '@angela/ccc':
         specifier: workspace:^
         version: link:../../packages/ccc
       '@proj-airi/drizzle-duckdb-wasm':
         specifier: 'catalog:'
         version: 0.6.0(drizzle-orm@0.45.2(@electric-sql/pglite@0.5.6)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0)(@types/pg@8.23.1)(better-sqlite3@12.11.1)(kysely@0.29.5)(pg@8.23.0)(postgres@3.4.9))(web-worker@1.5.0)
-      '@proj-airi/font-chillroundm':
+      '@angela/font-chillroundm':
         specifier: workspace:^
         version: link:../../packages/font-chillroundm
-      '@proj-airi/font-cjkfonts-allseto':
+      '@angela/font-cjkfonts-allseto':
         specifier: workspace:^
         version: link:../../packages/font-cjkfonts-allseto
-      '@proj-airi/font-xiaolai':
+      '@angela/font-xiaolai':
         specifier: workspace:^
         version: link:../../packages/font-xiaolai
-      '@proj-airi/i18n':
+      '@angela/i18n':
         specifier: workspace:^
         version: link:../../packages/i18n
-      '@proj-airi/input-gamepad-vueuse':
+      '@angela/input-gamepad-vueuse':
         specifier: workspace:^
         version: link:../../packages/input-gamepad-vueuse
-      '@proj-airi/local-config':
+      '@angela/local-config':
         specifier: workspace:^
         version: link:../../packages/local-config
-      '@proj-airi/model-driver-lipsync':
+      '@angela/model-driver-lipsync':
         specifier: workspace:^
         version: link:../../packages/model-driver-lipsync
-      '@proj-airi/pipelines-audio':
+      '@angela/pipelines-audio':
         specifier: workspace:^
         version: link:../../packages/pipelines-audio
-      '@proj-airi/plugin-sdk-tamagotchi':
+      '@angela/plugin-sdk-tamagotchi':
         specifier: workspace:^
         version: link:../../packages/plugin-sdk-tamagotchi
-      '@proj-airi/provider-inference':
+      '@angela/provider-inference':
         specifier: workspace:^
         version: link:../../packages/provider-inference
-      '@proj-airi/server-sdk':
+      '@angela/server-sdk':
         specifier: workspace:*
         version: link:../../packages/server-sdk
-      '@proj-airi/stage-layouts':
+      '@angela/stage-layouts':
         specifier: workspace:^
         version: link:../../packages/stage-layouts
-      '@proj-airi/stage-pages':
+      '@angela/stage-pages':
         specifier: workspace:^
         version: link:../../packages/stage-pages
-      '@proj-airi/stage-ui':
+      '@angela/stage-ui':
         specifier: workspace:^
         version: link:../../packages/stage-ui
-      '@proj-airi/stage-ui-live2d':
+      '@angela/stage-ui-live2d':
         specifier: workspace:^
         version: link:../../packages/stage-ui-live2d
-      '@proj-airi/stage-ui-mmd':
+      '@angela/stage-ui-mmd':
         specifier: workspace:^
         version: link:../../packages/stage-ui-mmd
-      '@proj-airi/stage-ui-spine':
+      '@angela/stage-ui-spine':
         specifier: workspace:^
         version: link:../../packages/stage-ui-spine
-      '@proj-airi/stage-ui-three':
+      '@angela/stage-ui-three':
         specifier: workspace:^
         version: link:../../packages/stage-ui-three
-      '@proj-airi/ui':
+      '@angela/ui':
         specifier: workspace:^
         version: link:../../packages/ui
       '@shikijs/markdown-it':
@@ -1758,13 +1758,13 @@ importers:
       '@pnpm/find-workspace-dir':
         specifier: 'catalog:'
         version: 1000.1.5
-      '@proj-airi/electron-eventa':
+      '@angela/electron-eventa':
         specifier: workspace:^
         version: link:../../packages/electron-eventa
-      '@proj-airi/electron-screen-capture':
+      '@angela/electron-screen-capture':
         specifier: workspace:^
         version: link:../../packages/electron-screen-capture
-      '@proj-airi/electron-vueuse':
+      '@angela/electron-vueuse':
         specifier: workspace:^
         version: link:../../packages/electron-vueuse
       '@proj-airi/iconify-meteocons':
@@ -1773,16 +1773,16 @@ importers:
       '@proj-airi/lobe-icons':
         specifier: 'catalog:'
         version: 1.0.19
-      '@proj-airi/plugin-sdk':
+      '@angela/plugin-sdk':
         specifier: workspace:^
         version: link:../../packages/plugin-sdk
-      '@proj-airi/server-runtime':
+      '@angela/server-runtime':
         specifier: workspace:^
         version: link:../../packages/server-runtime
-      '@proj-airi/stage-shared':
+      '@angela/stage-shared':
         specifier: workspace:^
         version: link:../../packages/stage-shared
-      '@proj-airi/ui-transitions':
+      '@angela/ui-transitions':
         specifier: workspace:^
         version: link:../../packages/ui-transitions
       '@proj-airi/unplugin-fetch':
@@ -1791,7 +1791,7 @@ importers:
       '@proj-airi/unplugin-live2d-sdk':
         specifier: 'catalog:'
         version: 0.1.7(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0)
-      '@proj-airi/vite-plugin-sherpaw':
+      '@angela/vite-plugin-sherpaw':
         specifier: workspace:^
         version: link:../../packages/vite-plugin-sherpaw
       '@types/audioworklet':
@@ -1984,64 +1984,64 @@ importers:
       '@pinia/colada':
         specifier: 'catalog:'
         version: 1.4.2(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.41(typescript@6.0.3)))(vue@3.5.41(typescript@6.0.3))
-      '@proj-airi/audio':
+      '@angela/audio':
         specifier: workspace:^
         version: link:../../packages/audio
-      '@proj-airi/ccc':
+      '@angela/ccc':
         specifier: workspace:^
         version: link:../../packages/ccc
       '@proj-airi/drizzle-duckdb-wasm':
         specifier: 'catalog:'
         version: 0.6.0(drizzle-orm@0.45.2(@electric-sql/pglite@0.5.6)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0)(@types/pg@8.23.1)(better-sqlite3@12.11.1)(kysely@0.29.5)(pg@8.23.0)(postgres@3.4.9))(web-worker@1.5.0)
-      '@proj-airi/font-chillroundm':
+      '@angela/font-chillroundm':
         specifier: workspace:^
         version: link:../../packages/font-chillroundm
-      '@proj-airi/font-cjkfonts-allseto':
+      '@angela/font-cjkfonts-allseto':
         specifier: workspace:^
         version: link:../../packages/font-cjkfonts-allseto
-      '@proj-airi/font-xiaolai':
+      '@angela/font-xiaolai':
         specifier: workspace:^
         version: link:../../packages/font-xiaolai
-      '@proj-airi/i18n':
+      '@angela/i18n':
         specifier: workspace:^
         version: link:../../packages/i18n
-      '@proj-airi/input-gamepad-vueuse':
+      '@angela/input-gamepad-vueuse':
         specifier: workspace:^
         version: link:../../packages/input-gamepad-vueuse
-      '@proj-airi/model-driver-lipsync':
+      '@angela/model-driver-lipsync':
         specifier: workspace:^
         version: link:../../packages/model-driver-lipsync
-      '@proj-airi/pipelines-audio':
+      '@angela/pipelines-audio':
         specifier: workspace:^
         version: link:../../packages/pipelines-audio
-      '@proj-airi/plugin-sdk-tamagotchi':
+      '@angela/plugin-sdk-tamagotchi':
         specifier: workspace:^
         version: link:../../packages/plugin-sdk-tamagotchi
-      '@proj-airi/server-sdk':
+      '@angela/server-sdk':
         specifier: workspace:*
         version: link:../../packages/server-sdk
-      '@proj-airi/stage-layouts':
+      '@angela/stage-layouts':
         specifier: workspace:^
         version: link:../../packages/stage-layouts
-      '@proj-airi/stage-pages':
+      '@angela/stage-pages':
         specifier: workspace:^
         version: link:../../packages/stage-pages
-      '@proj-airi/stage-ui':
+      '@angela/stage-ui':
         specifier: workspace:^
         version: link:../../packages/stage-ui
-      '@proj-airi/stage-ui-live2d':
+      '@angela/stage-ui-live2d':
         specifier: workspace:^
         version: link:../../packages/stage-ui-live2d
-      '@proj-airi/stage-ui-mmd':
+      '@angela/stage-ui-mmd':
         specifier: workspace:^
         version: link:../../packages/stage-ui-mmd
-      '@proj-airi/stage-ui-spine':
+      '@angela/stage-ui-spine':
         specifier: workspace:^
         version: link:../../packages/stage-ui-spine
-      '@proj-airi/stage-ui-three':
+      '@angela/stage-ui-three':
         specifier: workspace:^
         version: link:../../packages/stage-ui-three
-      '@proj-airi/ui':
+      '@angela/ui':
         specifier: workspace:^
         version: link:../../packages/ui
       '@shikijs/markdown-it':
@@ -2291,13 +2291,13 @@ importers:
       '@pnpm/find-workspace-dir':
         specifier: 'catalog:'
         version: 1000.1.5
-      '@proj-airi/electron-eventa':
+      '@angela/electron-eventa':
         specifier: workspace:^
         version: link:../../packages/electron-eventa
-      '@proj-airi/electron-screen-capture':
+      '@angela/electron-screen-capture':
         specifier: workspace:^
         version: link:../../packages/electron-screen-capture
-      '@proj-airi/electron-vueuse':
+      '@angela/electron-vueuse':
         specifier: workspace:^
         version: link:../../packages/electron-vueuse
       '@proj-airi/iconify-meteocons':
@@ -2306,16 +2306,16 @@ importers:
       '@proj-airi/lobe-icons':
         specifier: 'catalog:'
         version: 1.0.19
-      '@proj-airi/plugin-sdk':
+      '@angela/plugin-sdk':
         specifier: workspace:^
         version: link:../../packages/plugin-sdk
-      '@proj-airi/server-runtime':
+      '@angela/server-runtime':
         specifier: workspace:^
         version: link:../../packages/server-runtime
-      '@proj-airi/stage-shared':
+      '@angela/stage-shared':
         specifier: workspace:^
         version: link:../../packages/stage-shared
-      '@proj-airi/ui-transitions':
+      '@angela/ui-transitions':
         specifier: workspace:^
         version: link:../../packages/ui-transitions
       '@proj-airi/unplugin-fetch':
@@ -2426,70 +2426,70 @@ importers:
       '@pinia/colada':
         specifier: 'catalog:'
         version: 1.4.2(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.41(typescript@6.0.3)))(vue@3.5.41(typescript@6.0.3))
-      '@proj-airi/audio':
+      '@angela/audio':
         specifier: workspace:^
         version: link:../../packages/audio
-      '@proj-airi/ccc':
+      '@angela/ccc':
         specifier: workspace:^
         version: link:../../packages/ccc
       '@proj-airi/drizzle-duckdb-wasm':
         specifier: 'catalog:'
         version: 0.6.0(drizzle-orm@0.45.2(@electric-sql/pglite@0.5.6)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0)(@types/pg@8.23.1)(better-sqlite3@12.11.1)(kysely@0.29.5)(pg@8.23.0)(postgres@3.4.9))(web-worker@1.5.0)
-      '@proj-airi/font-chillroundm':
+      '@angela/font-chillroundm':
         specifier: workspace:^
         version: link:../../packages/font-chillroundm
-      '@proj-airi/font-cjkfonts-allseto':
+      '@angela/font-cjkfonts-allseto':
         specifier: workspace:^
         version: link:../../packages/font-cjkfonts-allseto
-      '@proj-airi/font-xiaolai':
+      '@angela/font-xiaolai':
         specifier: workspace:^
         version: link:../../packages/font-xiaolai
-      '@proj-airi/i18n':
+      '@angela/i18n':
         specifier: workspace:^
         version: link:../../packages/i18n
-      '@proj-airi/local-config':
+      '@angela/local-config':
         specifier: workspace:^
         version: link:../../packages/local-config
-      '@proj-airi/model-driver-mediapipe':
+      '@angela/model-driver-mediapipe':
         specifier: workspace:^
         version: link:../../packages/model-driver-mediapipe
-      '@proj-airi/pipelines-audio':
+      '@angela/pipelines-audio':
         specifier: workspace:^
         version: link:../../packages/pipelines-audio
-      '@proj-airi/provider-inference':
+      '@angela/provider-inference':
         specifier: workspace:^
         version: link:../../packages/provider-inference
-      '@proj-airi/server-sdk':
+      '@angela/server-sdk':
         specifier: workspace:^
         version: link:../../packages/server-sdk
-      '@proj-airi/stage-layouts':
+      '@angela/stage-layouts':
         specifier: workspace:^
         version: link:../../packages/stage-layouts
-      '@proj-airi/stage-pages':
+      '@angela/stage-pages':
         specifier: workspace:^
         version: link:../../packages/stage-pages
-      '@proj-airi/stage-shared':
+      '@angela/stage-shared':
         specifier: workspace:^
         version: link:../../packages/stage-shared
-      '@proj-airi/stage-ui':
+      '@angela/stage-ui':
         specifier: workspace:^
         version: link:../../packages/stage-ui
-      '@proj-airi/stage-ui-live2d':
+      '@angela/stage-ui-live2d':
         specifier: workspace:^
         version: link:../../packages/stage-ui-live2d
-      '@proj-airi/stage-ui-three':
+      '@angela/stage-ui-three':
         specifier: workspace:^
         version: link:../../packages/stage-ui-three
-      '@proj-airi/stream-kit':
+      '@angela/stream-kit':
         specifier: workspace:^
         version: link:../../packages/stream-kit
-      '@proj-airi/ui':
+      '@angela/ui':
         specifier: workspace:^
         version: link:../../packages/ui
-      '@proj-airi/ui-loading-screens':
+      '@angela/ui-loading-screens':
         specifier: workspace:^
         version: link:../../packages/ui-loading-screens
-      '@proj-airi/ui-transitions':
+      '@angela/ui-transitions':
         specifier: workspace:^
         version: link:../../packages/ui-transitions
       '@tresjs/cientos':
@@ -2718,7 +2718,7 @@ importers:
       '@proj-airi/unplugin-live2d-sdk':
         specifier: 'catalog:'
         version: 0.1.7(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0)
-      '@proj-airi/vite-plugin-sherpaw':
+      '@angela/vite-plugin-sherpaw':
         specifier: workspace:^
         version: link:../../packages/vite-plugin-sherpaw
       '@shikijs/markdown-it':
@@ -2810,16 +2810,16 @@ importers:
       '@huggingface/transformers':
         specifier: 'catalog:'
         version: 3.8.1
-      '@proj-airi/audio':
+      '@angela/audio':
         specifier: workspace:^
         version: link:../../packages/audio
-      '@proj-airi/i18n':
+      '@angela/i18n':
         specifier: workspace:^
         version: link:../../packages/i18n
-      '@proj-airi/server-sdk':
+      '@angela/server-sdk':
         specifier: workspace:^
         version: link:../../packages/server-sdk
-      '@proj-airi/server-shared':
+      '@angela/server-shared':
         specifier: workspace:^
         version: link:../../packages/server-shared
       '@snazzah/davey':
@@ -2870,10 +2870,10 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/server-sdk':
+      '@angela/server-sdk':
         specifier: workspace:*
         version: link:../../packages/server-sdk
-      '@proj-airi/server-shared':
+      '@angela/server-shared':
         specifier: workspace:*
         version: link:../../packages/server-shared
       '@xsai/generate-text':
@@ -3143,7 +3143,7 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/server-sdk':
+      '@angela/server-sdk':
         specifier: workspace:*
         version: link:../../packages/server-sdk
       h3:
@@ -3158,7 +3158,7 @@ importers:
 
   integrations/vscode/airi-plugin-vscode:
     devDependencies:
-      '@proj-airi/plugin-sdk':
+      '@angela/plugin-sdk':
         specifier: workspace:*
         version: link:../../../packages/plugin-sdk
 
@@ -3170,7 +3170,7 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/server-sdk':
+      '@angela/server-sdk':
         specifier: workspace:*
         version: link:../../../packages/server-sdk
       '@types/vscode':
@@ -3203,25 +3203,25 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/computer-use-mcp':
+      '@angela/computer-use-mcp':
         specifier: workspace:^
         version: link:../../services/computer-use-mcp
-      '@proj-airi/core-agent':
+      '@angela/core-agent':
         specifier: workspace:^
         version: link:../core-agent
-      '@proj-airi/discord-bot':
+      '@angela/discord-bot':
         specifier: workspace:*
         version: link:../../integrations/discord-bot
-      '@proj-airi/i18n':
+      '@angela/i18n':
         specifier: workspace:^
         version: link:../i18n
-      '@proj-airi/local-config':
+      '@angela/local-config':
         specifier: workspace:^
         version: link:../local-config
-      '@proj-airi/pipelines-audio':
+      '@angela/pipelines-audio':
         specifier: workspace:^
         version: link:../pipelines-audio
-      '@proj-airi/provider-inference':
+      '@angela/provider-inference':
         specifier: workspace:^
         version: link:../provider-inference
       '@xsai/shared':
@@ -3258,7 +3258,7 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/pipelines-audio':
+      '@angela/pipelines-audio':
         specifier: workspace:*
         version: link:../pipelines-audio
       mediabunny:
@@ -3322,22 +3322,22 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/pipelines-audio':
+      '@angela/pipelines-audio':
         specifier: workspace:^
         version: link:../pipelines-audio
-      '@proj-airi/plugin-protocol':
+      '@angela/plugin-protocol':
         specifier: workspace:^
         version: link:../plugin-protocol
-      '@proj-airi/provider-inference':
+      '@angela/provider-inference':
         specifier: workspace:^
         version: link:../provider-inference
-      '@proj-airi/server-sdk':
+      '@angela/server-sdk':
         specifier: workspace:^
         version: link:../server-sdk
-      '@proj-airi/server-shared':
+      '@angela/server-shared':
         specifier: workspace:^
         version: link:../server-shared
-      '@proj-airi/stream-kit':
+      '@angela/stream-kit':
         specifier: workspace:^
         version: link:../stream-kit
       '@xsai-ext/providers':
@@ -3413,7 +3413,7 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/stream-kit':
+      '@angela/stream-kit':
         specifier: workspace:^
         version: link:../stream-kit
       clustr:
@@ -3487,7 +3487,7 @@ importers:
         specifier: 'catalog:'
         version: 4.2.0
     devDependencies:
-      '@proj-airi/electron-eventa':
+      '@angela/electron-eventa':
         specifier: workspace:^
         version: link:../electron-eventa
       vue:
@@ -3524,7 +3524,7 @@ importers:
 
   packages/input-gamepad-vueuse:
     dependencies:
-      '@proj-airi/input-gamepad':
+      '@angela/input-gamepad':
         specifier: workspace:^
         version: link:../input-gamepad
       '@vueuse/core':
@@ -3543,7 +3543,7 @@ importers:
 
   packages/local-config:
     dependencies:
-      '@proj-airi/provider-inference':
+      '@angela/provider-inference':
         specifier: workspace:^
         version: link:../provider-inference
       valibot:
@@ -3559,7 +3559,7 @@ importers:
       '@guiiai/logg':
         specifier: 'catalog:'
         version: 1.2.12
-      '@proj-airi/server-sdk':
+      '@angela/server-sdk':
         specifier: workspace:^
         version: link:../server-sdk
       drizzle-orm:
@@ -3585,7 +3585,7 @@ importers:
 
   packages/model-driver-magic-live2d:
     dependencies:
-      '@proj-airi/motion-driver-magic':
+      '@angela/motion-driver-magic':
         specifier: workspace:^
         version: link:../motion-driver-magic
       es-toolkit:
@@ -3658,7 +3658,7 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/plugin-protocol':
+      '@angela/plugin-protocol':
         specifier: workspace:*
         version: link:../plugin-protocol
       nanoid:
@@ -3683,7 +3683,7 @@ importers:
       '@moeru/eventa':
         specifier: 'catalog:'
         version: 1.0.2(electron@43.4.1(supports-color@10.2.2))(h3@2.0.1-rc.29(crossws@0.4.12(srvx@0.12.7)))(hono@4.13.3)(web-worker@1.5.0)
-      '@proj-airi/plugin-sdk':
+      '@angela/plugin-sdk':
         specifier: workspace:*
         version: link:../plugin-sdk
       nanoid:
@@ -3701,7 +3701,7 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/audio':
+      '@angela/audio':
         specifier: workspace:^
         version: link:../audio
       '@sherpaw/asr':
@@ -3853,10 +3853,10 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/better-ws':
+      '@angela/better-ws':
         specifier: workspace:^
         version: link:../better-ws
-      '@proj-airi/server-shared':
+      '@angela/server-shared':
         specifier: workspace:^
         version: link:../server-shared
       crossws:
@@ -3883,10 +3883,10 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/better-ws':
+      '@angela/better-ws':
         specifier: workspace:^
         version: link:../better-ws
-      '@proj-airi/server-shared':
+      '@angela/server-shared':
         specifier: workspace:^
         version: link:../server-shared
       superjson:
@@ -3898,7 +3898,7 @@ importers:
 
   packages/server-shared:
     dependencies:
-      '@proj-airi/plugin-protocol':
+      '@angela/plugin-protocol':
         specifier: workspace:*
         version: link:../plugin-protocol
 
@@ -3910,22 +3910,22 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/ccc':
+      '@angela/ccc':
         specifier: workspace:*
         version: link:../ccc
-      '@proj-airi/i18n':
+      '@angela/i18n':
         specifier: workspace:*
         version: link:../i18n
-      '@proj-airi/server-sdk':
+      '@angela/server-sdk':
         specifier: workspace:*
         version: link:../server-sdk
-      '@proj-airi/stage-ui':
+      '@angela/stage-ui':
         specifier: workspace:*
         version: link:../stage-ui
-      '@proj-airi/stage-ui-three':
+      '@angela/stage-ui-three':
         specifier: workspace:*
         version: link:../stage-ui-three
-      '@proj-airi/ui':
+      '@angela/ui':
         specifier: workspace:*
         version: link:../ui
       '@vueuse/core':
@@ -3986,7 +3986,7 @@ importers:
       '@nekopaw/tempora':
         specifier: 'catalog:'
         version: 0.4.0-alpha.1
-      '@proj-airi/stage-shared':
+      '@angela/stage-shared':
         specifier: workspace:^
         version: link:../stage-shared
       '@types/audioworklet':
@@ -4019,40 +4019,40 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/audio':
+      '@angela/audio':
         specifier: workspace:^
         version: link:../audio
-      '@proj-airi/ccc':
+      '@angela/ccc':
         specifier: workspace:*
         version: link:../ccc
-      '@proj-airi/core-agent':
+      '@angela/core-agent':
         specifier: workspace:^
         version: link:../core-agent
-      '@proj-airi/i18n':
+      '@angela/i18n':
         specifier: workspace:*
         version: link:../i18n
-      '@proj-airi/provider-inference':
+      '@angela/provider-inference':
         specifier: workspace:^
         version: link:../provider-inference
-      '@proj-airi/server-sdk':
+      '@angela/server-sdk':
         specifier: workspace:*
         version: link:../server-sdk
-      '@proj-airi/stage-ui':
+      '@angela/stage-ui':
         specifier: workspace:*
         version: link:../stage-ui
-      '@proj-airi/stage-ui-live2d':
+      '@angela/stage-ui-live2d':
         specifier: workspace:*
         version: link:../stage-ui-live2d
-      '@proj-airi/stage-ui-mmd':
+      '@angela/stage-ui-mmd':
         specifier: workspace:*
         version: link:../stage-ui-mmd
-      '@proj-airi/stage-ui-spine':
+      '@angela/stage-ui-spine':
         specifier: workspace:*
         version: link:../stage-ui-spine
-      '@proj-airi/stage-ui-three':
+      '@angela/stage-ui-three':
         specifier: workspace:*
         version: link:../stage-ui-three
-      '@proj-airi/ui':
+      '@angela/ui':
         specifier: workspace:*
         version: link:../ui
       '@shopify/draggable':
@@ -4131,7 +4131,7 @@ importers:
       '@pinia/colada':
         specifier: 'catalog:'
         version: 1.4.2(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.41(typescript@6.0.3)))(vue@3.5.41(typescript@6.0.3))
-      '@proj-airi/stage-shared':
+      '@angela/stage-shared':
         specifier: workspace:^
         version: link:../stage-shared
       '@types/audioworklet':
@@ -4195,7 +4195,7 @@ importers:
       '@nekopaw/tempora':
         specifier: 'catalog:'
         version: 0.4.0-alpha.1
-      '@proj-airi/electron-screen-capture':
+      '@angela/electron-screen-capture':
         specifier: workspace:^
         version: link:../electron-screen-capture
       '@types/audioworklet':
@@ -4237,88 +4237,88 @@ importers:
       '@pinia/colada':
         specifier: 'catalog:'
         version: 1.4.2(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.41(typescript@6.0.3)))(vue@3.5.41(typescript@6.0.3))
-      '@proj-airi/audio':
+      '@angela/audio':
         specifier: workspace:^
         version: link:../audio
-      '@proj-airi/ccc':
+      '@angela/ccc':
         specifier: workspace:^
         version: link:../ccc
       '@proj-airi/chromatic':
         specifier: 'catalog:'
         version: 1.1.4
-      '@proj-airi/core-agent':
+      '@angela/core-agent':
         specifier: workspace:^
         version: link:../core-agent
-      '@proj-airi/core-character':
+      '@angela/core-character':
         specifier: workspace:^
         version: link:../core-character
       '@proj-airi/drizzle-duckdb-wasm':
         specifier: 'catalog:'
         version: 0.6.0(drizzle-orm@0.45.2(@electric-sql/pglite@0.5.6)(@opentelemetry/api@1.9.1)(@prisma/client@5.22.0)(@types/pg@8.23.1)(better-sqlite3@12.11.1)(kysely@0.29.5)(pg@8.23.0)(postgres@3.4.9))(web-worker@1.5.0)
-      '@proj-airi/font-chillroundm':
+      '@angela/font-chillroundm':
         specifier: workspace:^
         version: link:../font-chillroundm
-      '@proj-airi/font-cjkfonts-allseto':
+      '@angela/font-cjkfonts-allseto':
         specifier: workspace:^
         version: link:../font-cjkfonts-allseto
-      '@proj-airi/font-xiaolai':
+      '@angela/font-xiaolai':
         specifier: workspace:^
         version: link:../font-xiaolai
-      '@proj-airi/i18n':
+      '@angela/i18n':
         specifier: workspace:^
         version: link:../i18n
-      '@proj-airi/input-gamepad':
+      '@angela/input-gamepad':
         specifier: workspace:^
         version: link:../input-gamepad
-      '@proj-airi/local-config':
+      '@angela/local-config':
         specifier: workspace:^
         version: link:../local-config
-      '@proj-airi/model-driver-lipsync':
+      '@angela/model-driver-lipsync':
         specifier: workspace:^
         version: link:../model-driver-lipsync
-      '@proj-airi/model-driver-magic-live2d':
+      '@angela/model-driver-magic-live2d':
         specifier: workspace:^
         version: link:../model-driver-magic-live2d
-      '@proj-airi/motion-driver-magic':
+      '@angela/motion-driver-magic':
         specifier: workspace:^
         version: link:../motion-driver-magic
-      '@proj-airi/pipelines-audio':
+      '@angela/pipelines-audio':
         specifier: workspace:^
         version: link:../pipelines-audio
-      '@proj-airi/provider-inference':
+      '@angela/provider-inference':
         specifier: workspace:^
         version: link:../provider-inference
-      '@proj-airi/server-sdk':
+      '@angela/server-sdk':
         specifier: workspace:^
         version: link:../server-sdk
-      '@proj-airi/server-sdk-shared':
+      '@angela/server-sdk-shared':
         specifier: workspace:^
         version: link:../../server/packages/server-sdk-shared
-      '@proj-airi/stage-shared':
+      '@angela/stage-shared':
         specifier: workspace:^
         version: link:../stage-shared
-      '@proj-airi/stage-ui-live2d':
+      '@angela/stage-ui-live2d':
         specifier: workspace:^
         version: link:../stage-ui-live2d
-      '@proj-airi/stage-ui-mmd':
+      '@angela/stage-ui-mmd':
         specifier: workspace:^
         version: link:../stage-ui-mmd
-      '@proj-airi/stage-ui-spine':
+      '@angela/stage-ui-spine':
         specifier: workspace:^
         version: link:../stage-ui-spine
-      '@proj-airi/stage-ui-tachie':
+      '@angela/stage-ui-tachie':
         specifier: workspace:^
         version: link:../stage-ui-tachie
-      '@proj-airi/stage-ui-three':
+      '@angela/stage-ui-three':
         specifier: workspace:^
         version: link:../stage-ui-three
-      '@proj-airi/ui':
+      '@angela/ui':
         specifier: workspace:^
         version: link:../ui
-      '@proj-airi/ui-loading-screens':
+      '@angela/ui-loading-screens':
         specifier: workspace:^
         version: link:../ui-loading-screens
-      '@proj-airi/vite-plugin-sherpaw':
+      '@angela/vite-plugin-sherpaw':
         specifier: workspace:^
         version: link:../vite-plugin-sherpaw
       '@revenuecat/purchases-js':
@@ -4619,13 +4619,13 @@ importers:
       '@pinia/testing':
         specifier: 'catalog:'
         version: 2.0.1(pinia@4.0.3(@vue/devtools-api@8.2.1)(typescript@6.0.3)(vue@3.5.41(typescript@6.0.3)))
-      '@proj-airi/api-server':
+      '@angela/api-server':
         specifier: workspace:*
         version: link:../../server/apps/api
       '@proj-airi/lobe-icons':
         specifier: 'catalog:'
         version: 1.0.19
-      '@proj-airi/stream-kit':
+      '@angela/stream-kit':
         specifier: workspace:*
         version: link:../stream-kit
       '@types/audioworklet':
@@ -4745,13 +4745,13 @@ importers:
       '@pixi/utils':
         specifier: 'catalog:'
         version: 6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))
-      '@proj-airi/model-driver-magic-live2d':
+      '@angela/model-driver-magic-live2d':
         specifier: workspace:^
         version: link:../model-driver-magic-live2d
-      '@proj-airi/stage-shared':
+      '@angela/stage-shared':
         specifier: workspace:^
         version: link:../stage-shared
-      '@proj-airi/ui':
+      '@angela/ui':
         specifier: workspace:^
         version: link:../ui
       '@vueuse/core':
@@ -4818,13 +4818,13 @@ importers:
       '@moeru/three-mmd-physics-ammo':
         specifier: 'catalog:'
         version: 0.2.0-beta.2(@moeru/three-mmd@0.2.0-beta.2(@types/three@0.185.4)(three@0.185.1))(@types/three@0.185.4)(three@0.185.1)
-      '@proj-airi/model-driver-lipsync':
+      '@angela/model-driver-lipsync':
         specifier: workspace:^
         version: link:../model-driver-lipsync
-      '@proj-airi/stage-shared':
+      '@angela/stage-shared':
         specifier: workspace:^
         version: link:../stage-shared
-      '@proj-airi/ui':
+      '@angela/ui':
         specifier: workspace:^
         version: link:../ui
       '@vueuse/core':
@@ -4891,10 +4891,10 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/stage-shared':
+      '@angela/stage-shared':
         specifier: workspace:^
         version: link:../stage-shared
-      '@proj-airi/ui':
+      '@angela/ui':
         specifier: workspace:^
         version: link:../ui
       '@vueuse/core':
@@ -4940,10 +4940,10 @@ importers:
       '@pixi/sprite':
         specifier: 'catalog:'
         version: 6.5.10(@pixi/constants@6.5.10)(@pixi/core@6.5.10(@pixi/constants@6.5.10)(@pixi/extensions@6.5.10)(@pixi/math@6.5.10)(@pixi/runner@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/ticker@6.5.10(@pixi/extensions@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))))(@pixi/display@6.5.10(@pixi/constants@6.5.10)(@pixi/math@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))))(@pixi/math@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10))(@pixi/utils@6.5.10(@pixi/constants@6.5.10)(@pixi/settings@6.5.10(@pixi/constants@6.5.10)))
-      '@proj-airi/stage-shared':
+      '@angela/stage-shared':
         specifier: workspace:^
         version: link:../stage-shared
-      '@proj-airi/ui':
+      '@angela/ui':
         specifier: workspace:^
         version: link:../ui
       culori:
@@ -4986,13 +4986,13 @@ importers:
       '@pixiv/three-vrm-core':
         specifier: 'catalog:'
         version: 3.5.5(@types/three@0.185.4)(three@0.185.1)
-      '@proj-airi/model-driver-lipsync':
+      '@angela/model-driver-lipsync':
         specifier: workspace:*
         version: link:../model-driver-lipsync
-      '@proj-airi/stage-shared':
+      '@angela/stage-shared':
         specifier: workspace:*
         version: link:../stage-shared
-      '@proj-airi/ui':
+      '@angela/ui':
         specifier: workspace:*
         version: link:../ui
       '@tresjs/cientos':
@@ -5049,16 +5049,16 @@ importers:
       '@pnpm/find-workspace-dir':
         specifier: 'catalog:'
         version: 1000.1.5
-      '@proj-airi/provider-inference':
+      '@angela/provider-inference':
         specifier: workspace:^
         version: link:../provider-inference
-      '@proj-airi/stage-shared':
+      '@angela/stage-shared':
         specifier: workspace:^
         version: link:../stage-shared
-      '@proj-airi/stage-ui':
+      '@angela/stage-ui':
         specifier: workspace:^
         version: link:../stage-ui
-      '@proj-airi/vitest-plugin-fakemic':
+      '@angela/vitest-plugin-fakemic':
         specifier: workspace:^
         version: link:../vitest-plugin-fakemic
       playwright:
@@ -5071,10 +5071,10 @@ importers:
         specifier: catalog:vitest
         version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/browser-playwright@4.1.11)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@2.3.0)(canvas@3.2.3))(vite@8.2.2(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
     devDependencies:
-      '@proj-airi/audio':
+      '@angela/audio':
         specifier: workspace:^
         version: link:../audio
-      '@proj-airi/pipelines-audio':
+      '@angela/pipelines-audio':
         specifier: workspace:^
         version: link:../pipelines-audio
       '@types/node':
@@ -5117,10 +5117,10 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/font-departure-mono':
+      '@angela/font-departure-mono':
         specifier: workspace:^
         version: link:../font-departure-mono
-      '@proj-airi/ui':
+      '@angela/ui':
         specifier: workspace:^
         version: link:../ui
       '@rive-app/canvas-lite':
@@ -5191,13 +5191,13 @@ importers:
 
   packages/unocss-preset-fonts:
     dependencies:
-      '@proj-airi/font-cjkfonts-allseto':
+      '@angela/font-cjkfonts-allseto':
         specifier: workspace:^
         version: link:../font-cjkfonts-allseto
-      '@proj-airi/font-departure-mono':
+      '@angela/font-departure-mono':
         specifier: workspace:^
         version: link:../font-departure-mono
-      '@proj-airi/font-xiaolai':
+      '@angela/font-xiaolai':
         specifier: workspace:^
         version: link:../font-xiaolai
       '@unocss/core':
@@ -5209,7 +5209,7 @@ importers:
 
   packages/vite-plugin-sherpaw:
     dependencies:
-      '@proj-airi/provider-inference':
+      '@angela/provider-inference':
         specifier: workspace:^
         version: link:../provider-inference
       '@proj-airi/unplugin-fetch':
@@ -5262,7 +5262,7 @@ importers:
       '@laplace.live/event-types':
         specifier: 'catalog:'
         version: 2.0.21(typescript@6.0.3)
-      '@proj-airi/server-sdk':
+      '@angela/server-sdk':
         specifier: workspace:*
         version: link:../../packages/server-sdk
 
@@ -5271,7 +5271,7 @@ importers:
       '@guiiai/logg':
         specifier: 'catalog:'
         version: 1.2.12
-      '@proj-airi/server-sdk':
+      '@angela/server-sdk':
         specifier: workspace:*
         version: link:../../packages/server-sdk
       cac:
@@ -5305,16 +5305,16 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/plugin-protocol':
+      '@angela/plugin-protocol':
         specifier: workspace:*
         version: link:../../packages/plugin-protocol
-      '@proj-airi/plugin-sdk':
+      '@angela/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
-      '@proj-airi/plugin-sdk-tamagotchi':
+      '@angela/plugin-sdk-tamagotchi':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk-tamagotchi
-      '@proj-airi/ui':
+      '@angela/ui':
         specifier: workspace:^
         version: link:../../packages/ui
       animejs:
@@ -5339,10 +5339,10 @@ importers:
       '@ax-llm/ax':
         specifier: 'catalog:'
         version: 24.0.5(zod@4.4.3)
-      '@proj-airi/core-agent':
+      '@angela/core-agent':
         specifier: workspace:^
         version: link:../../packages/core-agent
-      '@proj-airi/stage-ui':
+      '@angela/stage-ui':
         specifier: workspace:^
         version: link:../../packages/stage-ui
       '@proj-airi/unocss-preset-chromatic':
@@ -5393,10 +5393,10 @@ importers:
       '@moeru/std':
         specifier: 'catalog:'
         version: 0.1.0-beta.17
-      '@proj-airi/server-sdk':
+      '@angela/server-sdk':
         specifier: workspace:^
         version: link:../../packages/server-sdk
-      '@proj-airi/ui':
+      '@angela/ui':
         specifier: workspace:^
         version: link:../../packages/ui
       '@unocss/reset':
@@ -5513,10 +5513,10 @@ importers:
       '@opentelemetry/semantic-conventions':
         specifier: 'catalog:'
         version: 1.43.0
-      '@proj-airi/auth-shared':
+      '@angela/auth-shared':
         specifier: workspace:*
         version: link:../../packages/auth-shared
-      '@proj-airi/server-sdk-shared':
+      '@angela/server-sdk-shared':
         specifier: workspace:*
         version: link:../../packages/server-sdk-shared
       '@xsai/shared-stream':

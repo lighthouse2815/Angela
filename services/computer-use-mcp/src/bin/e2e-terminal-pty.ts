@@ -15,7 +15,7 @@
  * Node.js process on the host machine.
  *
  * Usage:
- *   pnpm -F @proj-airi/computer-use-mcp e2e:terminal-pty
+ *   pnpm -F @angela/computer-use-mcp e2e:terminal-pty
  */
 
 import { dirname, resolve } from 'node:path'

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useStopSpeakingButton } from '@proj-airi/stage-layouts/composables/useStopSpeakingButton'
+import { useStopSpeakingButton } from '@angela/stage-layouts/composables/useStopSpeakingButton'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

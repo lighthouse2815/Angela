@@ -1,18 +1,18 @@
-import type { AuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
-import type { ChatSessionMeta } from '@proj-airi/stage-ui/types/chat-session'
+import type { AuthorizationHandler } from '@angela/stage-ui/libs/auth'
+import type { ChatSessionMeta } from '@angela/stage-ui/types/chat-session'
 import type { Component } from 'vue'
 
-import SharedInteractiveArea from '@proj-airi/stage-layouts/components/Layouts/InteractiveArea'
-import MobileInteractiveArea from '@proj-airi/stage-layouts/components/Layouts/MobileInteractiveArea'
+import SharedInteractiveArea from '@angela/stage-layouts/components/Layouts/InteractiveArea'
+import MobileInteractiveArea from '@angela/stage-layouts/components/Layouts/MobileInteractiveArea'
 
+import { useThreeViewControl } from '@angela/stage-ui-three'
+import { browserAuthorizationHandler, registerAuthorizationHandler } from '@angela/stage-ui/libs/auth'
+import { useChatStore } from '@angela/stage-ui/stores/chat'
+import { useChatSessionStore } from '@angela/stage-ui/stores/chat/session-store'
+import { useChatStreamStore } from '@angela/stage-ui/stores/chat/stream-store'
+import { useL2dViewControl } from '@angela/stage-ui/stores/live2d'
+import { useSettingsStageModel } from '@angela/stage-ui/stores/settings/stage-model'
 import { PiniaColada } from '@pinia/colada'
-import { useThreeViewControl } from '@proj-airi/stage-ui-three'
-import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
-import { useChatStore } from '@proj-airi/stage-ui/stores/chat'
-import { useChatSessionStore } from '@proj-airi/stage-ui/stores/chat/session-store'
-import { useChatStreamStore } from '@proj-airi/stage-ui/stores/chat/stream-store'
-import { useL2dViewControl } from '@proj-airi/stage-ui/stores/live2d'
-import { useSettingsStageModel } from '@proj-airi/stage-ui/stores/settings/stage-model'
 import { createPinia, disposePinia } from 'pinia'
 import { beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
 import { render } from 'vitest-browser-vue'
@@ -28,7 +28,7 @@ import 'virtual:uno.css'
 
 const openSettings = vi.hoisted(() => vi.fn())
 
-vi.mock('@proj-airi/electron-vueuse', () => ({
+vi.mock('@angela/electron-vueuse', () => ({
   useElectronEventaInvoke: () => openSettings,
 }))
 

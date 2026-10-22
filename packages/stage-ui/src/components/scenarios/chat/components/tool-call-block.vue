@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ContainerError } from '@proj-airi/ui'
+import { ContainerError } from '@angela/ui'
 import { computed } from 'vue'
 
 import ChatToolCallShell from './tool-call-shell.vue'

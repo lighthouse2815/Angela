@@ -1,6 +1,6 @@
-import type { ProviderTranslator } from '@proj-airi/provider-inference'
+import type { ProviderTranslator } from '@angela/provider-inference'
 
-import { getGenerationProvider } from '@proj-airi/provider-inference'
+import { getGenerationProvider } from '@angela/provider-inference'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { providerAppleVision } from '.'
@@ -16,7 +16,7 @@ vi.mock('@moeru/eventa/adapters/electron/renderer', () => ({
   createContext: () => ({ context: {}, dispose: mocks.dispose }),
 }))
 
-vi.mock('@proj-airi/stage-shared', () => ({
+vi.mock('@angela/stage-shared', () => ({
   isElectronWindow: () => true,
   isStageTamagotchi: () => true,
 }))

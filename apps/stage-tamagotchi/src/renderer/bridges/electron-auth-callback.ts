@@ -1,7 +1,7 @@
+import { getElectronEventaContext } from '@angela/electron-vueuse'
+import { useAuthStore } from '@angela/stage-ui/stores/auth'
 import { defineInvoke } from '@moeru/eventa'
 import { errorMessageFrom } from '@moeru/std'
-import { getElectronEventaContext } from '@proj-airi/electron-vueuse'
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
 import { toast } from 'vue-sonner'
 
 import {

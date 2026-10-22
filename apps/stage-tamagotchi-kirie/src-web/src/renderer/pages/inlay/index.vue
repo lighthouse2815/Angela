@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { BackgroundMaterialType, VibrancyType } from '@proj-airi/electron-eventa'
+import type { BackgroundMaterialType, VibrancyType } from '@angela/electron-eventa'
 
-import { electron } from '@proj-airi/electron-eventa'
-import { useHostEventaInvoke } from '@proj-airi/stage-host-context'
-import { FieldCombobox } from '@proj-airi/ui'
+import { electron } from '@angela/electron-eventa'
+import { useHostEventaInvoke } from '@angela/stage-host-context'
+import { FieldCombobox } from '@angela/ui'
 import { useAsyncState } from '@vueuse/core'
 import { ref, watch } from 'vue'
 

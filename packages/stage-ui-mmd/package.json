@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/stage-ui-mmd",
+  "name": "@angela/stage-ui-mmd",
   "type": "module",
   "private": true,
   "description": "MMD (MikuMikuDance) scene components and stores for Project AIRI",
@@ -33,12 +33,12 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@angela/model-driver-lipsync": "workspace:^",
+    "@angela/stage-shared": "workspace:^",
+    "@angela/ui": "workspace:^",
     "@moeru/std": "catalog:",
     "@moeru/three-mmd": "catalog:",
     "@moeru/three-mmd-physics-ammo": "catalog:",
-    "@proj-airi/model-driver-lipsync": "workspace:^",
-    "@proj-airi/stage-shared": "workspace:^",
-    "@proj-airi/ui": "workspace:^",
     "@vueuse/core": "catalog:",
     "@xsai/tool": "catalog:",
     "culori": "catalog:",

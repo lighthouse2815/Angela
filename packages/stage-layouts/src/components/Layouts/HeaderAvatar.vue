@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { isCapacitorAvailable } from '@proj-airi/stage-shared'
-import { signOut } from '@proj-airi/stage-ui/libs/auth'
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
-import { Avatar, DropdownMenu } from '@proj-airi/ui'
+import { isCapacitorAvailable } from '@angela/stage-shared'
+import { signOut } from '@angela/stage-ui/libs/auth'
+import { useAuthStore } from '@angela/stage-ui/stores/auth'
+import { Avatar, DropdownMenu } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import {
   DropdownMenuItem,

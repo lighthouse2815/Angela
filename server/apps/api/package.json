@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/api-server",
+  "name": "@angela/api-server",
   "type": "module",
   "version": "0.12.0-beta.5",
   "private": true,
@@ -16,6 +16,8 @@
     "db:push": "pnpm run apply:env -- drizzle-kit push"
   },
   "dependencies": {
+    "@angela/auth-shared": "workspace:*",
+    "@angela/server-sdk-shared": "workspace:*",
     "@apple/app-store-server-library": "catalog:",
     "@aws-sdk/client-s3": "catalog:",
     "@aws-sdk/s3-request-presigner": "catalog:",
@@ -46,8 +48,6 @@
     "@opentelemetry/sdk-node": "catalog:",
     "@opentelemetry/sdk-trace-node": "catalog:",
     "@opentelemetry/semantic-conventions": "catalog:",
-    "@proj-airi/auth-shared": "workspace:*",
-    "@proj-airi/server-sdk-shared": "workspace:*",
     "@xsai/shared-stream": "catalog:",
     "drizzle-orm": "catalog:",
     "drizzle-valibot": "catalog:",

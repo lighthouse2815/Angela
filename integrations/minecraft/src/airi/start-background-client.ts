@@ -1,5 +1,5 @@
+import { isAuthenticationServerErrorMessage } from '@angela/server-shared'
 import { errorMessageFrom } from '@moeru/std'
-import { isAuthenticationServerErrorMessage } from '@proj-airi/server-shared'
 
 interface AiriClientLike {
   connect: () => Promise<void>

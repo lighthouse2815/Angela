@@ -1,4 +1,4 @@
-import type { ShortcutAccelerator, ShortcutModifier } from '@proj-airi/stage-shared/global-shortcut'
+import type { ShortcutAccelerator, ShortcutModifier } from '@angela/stage-shared/global-shortcut'
 
 const safeModifiers = new Set<ShortcutModifier>(['cmd', 'ctrl', 'alt', 'super'])
 

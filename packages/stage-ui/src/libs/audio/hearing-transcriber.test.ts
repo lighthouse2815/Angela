@@ -1,9 +1,9 @@
-import type { PcmBlock } from '@proj-airi/pipelines-audio'
+import type { PcmBlock } from '@angela/pipelines-audio'
 
 import type { AIRIStreamTranscriptionDelta } from '../providers/stream-transcription'
 
-import { VoiceController } from '@proj-airi/core-agent'
-import { AudioInput, createPushStream } from '@proj-airi/pipelines-audio'
+import { VoiceController } from '@angela/core-agent'
+import { AudioInput, createPushStream } from '@angela/pipelines-audio'
 import { expect, it, vi } from 'vitest'
 
 import { createHearingTranscriber } from './hearing-transcriber'

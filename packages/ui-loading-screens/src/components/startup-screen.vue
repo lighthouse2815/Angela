@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button, Progress } from '@proj-airi/ui'
+import { Button, Progress } from '@angela/ui'
 import { nextTick, useTemplateRef, watch } from 'vue'
 
 import StartupErrorDetails from './startup-error-details.vue'

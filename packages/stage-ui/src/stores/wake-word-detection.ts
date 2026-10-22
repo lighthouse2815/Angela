@@ -1,4 +1,4 @@
-import type { AudioWindow } from '@proj-airi/pipelines-audio'
+import type { AudioWindow } from '@angela/pipelines-audio'
 
 import type { WakeActivity, WakeTarget, WakeWordPreparation } from '../libs/voice/wake-word-detector'
 

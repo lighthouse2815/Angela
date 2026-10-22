@@ -1,4 +1,4 @@
-import { defineExtension } from '@proj-airi/plugin-sdk'
+import { defineExtension } from '@angela/plugin-sdk'
 
 /**
  * Declares a Kit that the Activation Planner can use for static dependency planning.

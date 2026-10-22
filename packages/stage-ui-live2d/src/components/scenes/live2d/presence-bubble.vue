@@ -1,17 +1,17 @@
 <script setup lang="ts">
+import type { PresenceBubblePalette, PresenceBubbleState } from '@angela/stage-shared'
 import type { Application } from '@pixi/app'
 import type { Sprite as PixiSprite } from '@pixi/sprite'
-import type { PresenceBubblePalette, PresenceBubbleState } from '@proj-airi/stage-shared'
 
 import type { Live2DModelCanvasRect } from '../../../composables/live2d'
 
-import { Texture } from '@pixi/core'
-import { Sprite } from '@pixi/sprite'
-import { UPDATE_PRIORITY } from '@pixi/ticker'
 import {
   createPresenceFrameClock,
   PresenceBubbleAdvancer,
-} from '@proj-airi/stage-shared'
+} from '@angela/stage-shared'
+import { Texture } from '@pixi/core'
+import { Sprite } from '@pixi/sprite'
+import { UPDATE_PRIORITY } from '@pixi/ticker'
 import { usePreferredReducedMotion } from '@vueuse/core'
 import { formatHex } from 'culori'
 import { onMounted, onUnmounted, shallowRef, useTemplateRef, watch } from 'vue'

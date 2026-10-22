@@ -1,4 +1,4 @@
-import type { AiriCard, AiriExtension } from '@proj-airi/stage-ui/types'
+import type { AiriCard, AiriExtension } from '@angela/stage-ui/types'
 
 import type { AudioInputSession } from '../../../src/types'
 

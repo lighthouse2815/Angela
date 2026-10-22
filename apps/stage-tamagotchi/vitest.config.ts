@@ -16,7 +16,7 @@ export default defineConfig({
   root: import.meta.dirname,
   // Prebundle runtime stores before browser tests mount synchronized renderers.
   optimizeDeps: {
-    include: ['@moeru/std', '@proj-airi/stage-ui > pinia-plugin-synced', 'nanoid', 'nanoid/non-secure', 'pinia', 'valibot', 'vue'],
+    include: ['@moeru/std', '@angela/stage-ui > pinia-plugin-synced', 'nanoid', 'nanoid/non-secure', 'pinia', 'valibot', 'vue'],
   },
   plugins: [
     Info(),

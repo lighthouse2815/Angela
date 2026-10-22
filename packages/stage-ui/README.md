@@ -5,7 +5,7 @@ Shared core for stage
 ## Shared local provider settings
 
 `connectLocalProviderConfig` connects existing provider and card actions to a host-owned configuration transport.
-Desktop supplies Eventa IPC. Local web supplies the Vite HTTP transport from `@proj-airi/local-config`.
+Desktop supplies Eventa IPC. Local web supplies the Vite HTTP transport from `@angela/local-config`.
 Only the Pinia leader reads and writes the file. Followers send explicit actions through existing synchronized stores.
 Remote snapshots apply without persistence echoes. Each profile imports its existing direct providers once per configuration file.
 Local storage retains interface state and cached provider snapshots. The shared file owns direct providers and the selected chat model.
@@ -229,7 +229,7 @@ Each concurrent turn owns its IO trace. `activeTurnSpan` points to the most rece
 Register the shared plugin once in each Vue application:
 
 ```ts
-import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
+import { trackButtonPlugin } from '@angela/stage-ui/directives/track-button'
 
 createApp(App)
   .use(trackButtonPlugin)
@@ -254,7 +254,7 @@ in their owning business flows instead of attaching them to the initial click.
 https://histoire.dev/
 
 ```shell
-pnpm -F @proj-airi/stage-ui run story:dev
+pnpm -F @angela/stage-ui run story:dev
 ```
 
 The **Misc → Swipe Actions** story renders one row with two start actions and three end actions. Its **Show labels** control switches between
@@ -276,7 +276,7 @@ The model detects one of its supported languages. Changing the model saves
 the Provider configuration and replaces its runtime.
 Each speech session currently owns a Worker, released when the session ends or is cancelled.
 
-Hosts must enable `@proj-airi/vite-plugin-sherpaw` to expose model assets.
+Hosts must enable `@angela/vite-plugin-sherpaw` to expose model assets.
 `provider-inference` owns recognition and Worker cleanup. `stage-ui` supplies model URLs, local asset fetching, the Worker URL, and the Hearing view.
 The Provider is unavailable when the host does not include models.
 Use this Provider for local streaming recognition without API credentials.

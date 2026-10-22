@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { ComfyUIWorkflowTemplate } from '@proj-airi/stage-ui/stores/modules/artistry'
+import type { ComfyUIWorkflowTemplate } from '@angela/stage-ui/stores/modules/artistry'
 
+import { artistryTestComfyUIConnection, isStageTamagotchi } from '@angela/stage-shared'
+import { useArtistryStore } from '@angela/stage-ui/stores/modules/artistry'
+import { Button, FieldInput, GhostButton, ScrollableArea } from '@angela/ui'
 import { defineInvoke } from '@moeru/eventa'
 import { createContext } from '@moeru/eventa/adapters/electron/renderer'
 import { errorMessageFrom } from '@moeru/std'
-import { artistryTestComfyUIConnection, isStageTamagotchi } from '@proj-airi/stage-shared'
-import { useArtistryStore } from '@proj-airi/stage-ui/stores/modules/artistry'
-import { Button, FieldInput, GhostButton, ScrollableArea } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'

@@ -4,7 +4,7 @@ import type { ChatAssistantMessage, ChatHistoryItem, ChatSlices, ChatSlicesText,
 import type { ChatHistoryReplyPayload } from '../reply'
 import type { ChatToolCallRendererRegistry } from './tool-call-renderer'
 
-import { isStageCapacitor, isStageWeb } from '@proj-airi/stage-shared'
+import { isStageCapacitor, isStageWeb } from '@angela/stage-shared'
 import { computed } from 'vue'
 
 import ChatReplyQuote from './reply-quote.vue'

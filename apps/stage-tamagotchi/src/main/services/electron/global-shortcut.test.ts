@@ -1,9 +1,9 @@
-import type { ShortcutBinding } from '@proj-airi/stage-shared/global-shortcut'
+import type { ShortcutBinding } from '@angela/stage-shared/global-shortcut'
 import type { BrowserWindow } from 'electron'
 
 import type { EventaContext } from './global-shortcut'
 
-import { ShortcutFailureReasons } from '@proj-airi/stage-shared/global-shortcut'
+import { ShortcutFailureReasons } from '@angela/stage-shared/global-shortcut'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 function exampleBinding(id: string, key = 'KeyK'): ShortcutBinding {

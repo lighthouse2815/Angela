@@ -1,7 +1,7 @@
 import type { LeadershipMode, SyncedPiniaRuntime } from 'pinia-plugin-synced'
 import type { App } from 'vue'
 
-import en from '@proj-airi/i18n/locales/en'
+import en from '@angela/i18n/locales/en'
 
 import { PiniaColada } from '@pinia/colada'
 import { createPinia, disposePinia } from 'pinia'

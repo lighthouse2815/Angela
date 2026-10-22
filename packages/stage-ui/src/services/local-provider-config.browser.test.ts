@@ -1,8 +1,8 @@
-import type { LocalConfig, LocalConfigPatch, LocalConfigTransport } from '@proj-airi/local-config'
+import type { LocalConfig, LocalConfigPatch, LocalConfigTransport } from '@angela/local-config'
 import type { SyncedPiniaRuntime } from 'pinia-plugin-synced'
 
+import { emptyLocalConfig } from '@angela/local-config'
 import { PiniaColada } from '@pinia/colada'
-import { emptyLocalConfig } from '@proj-airi/local-config'
 import { createPinia, disposePinia, setActivePinia } from 'pinia'
 import { createSyncedPiniaPlugin } from 'pinia-plugin-synced'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'

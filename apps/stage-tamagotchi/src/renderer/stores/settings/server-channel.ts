@@ -1,7 +1,7 @@
 import type { ElectronServerChannelConfig } from '../../../shared/eventa'
 
+import { useElectronEventaInvoke } from '@angela/electron-vueuse'
 import { errorMessageFrom } from '@moeru/std'
-import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
 import { useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { shallowRef, watch } from 'vue'

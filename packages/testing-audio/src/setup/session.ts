@@ -1,13 +1,13 @@
-import type { PiniaActionEvent } from '@proj-airi/stage-shared/types/pinia-action-event'
-import type { AudioCapture } from '@proj-airi/vitest-plugin-fakemic'
+import type { PiniaActionEvent } from '@angela/stage-shared/types/pinia-action-event'
+import type { AudioCapture } from '@angela/vitest-plugin-fakemic'
 import type { ElectronApplication, Page } from 'playwright'
 
 import type { AudioInputChatMessage, AudioInputSession, AudioInputTarget, AudioInputTurn } from '../types'
 
 import { Buffer } from 'node:buffer'
 
-import { IOAttributes, IOSpanNames } from '@proj-airi/stage-shared/perf/io-trace'
-import { piniaActionTracingChannelName } from '@proj-airi/stage-shared/types/pinia-action-event'
+import { IOAttributes, IOSpanNames } from '@angela/stage-shared/perf/io-trace'
+import { piniaActionTracingChannelName } from '@angela/stage-shared/types/pinia-action-event'
 
 import { readCompletedSpans } from './browser-probe'
 

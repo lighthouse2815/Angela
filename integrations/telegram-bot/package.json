@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/telegram-bot",
+  "name": "@angela/telegram-bot",
   "type": "module",
   "private": true,
   "description": "Telegram bot for AIRI",

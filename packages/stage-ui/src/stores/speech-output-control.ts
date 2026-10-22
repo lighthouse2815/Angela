@@ -1,4 +1,4 @@
-import type { TurnRef } from '@proj-airi/core-agent'
+import type { TurnRef } from '@angela/core-agent'
 
 import { defineInvoke } from '@moeru/eventa'
 import { useLocalStorage } from '@vueuse/core'

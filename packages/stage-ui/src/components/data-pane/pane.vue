@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ScrollableArea } from '@proj-airi/ui'
+import { ScrollableArea } from '@angela/ui'
 </script>
 
 <template>

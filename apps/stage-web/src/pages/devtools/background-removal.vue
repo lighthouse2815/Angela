@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { createBackgroundRemovalAdapter } from '@proj-airi/stage-ui/libs/inference/adapters/background-removal'
-import { Button, Checkbox, GhostButton, InputFile } from '@proj-airi/ui'
+import { createBackgroundRemovalAdapter } from '@angela/stage-ui/libs/inference/adapters/background-removal'
+import { Button, Checkbox, GhostButton, InputFile } from '@angela/ui'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 
 const adapter = createBackgroundRemovalAdapter()

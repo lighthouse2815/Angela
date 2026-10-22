@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button, ErrorBoundary } from '@proj-airi/ui'
+import { Button, ErrorBoundary } from '@angela/ui'
 import { defineComponent, h, shallowRef } from 'vue'
 
 const fail = shallowRef(false)

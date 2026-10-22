@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { isStageTamagotchi } from '@proj-airi/stage-shared'
-import { ConnectionSettings } from '@proj-airi/stage-ui/components'
-import { Callout, FieldCheckbox, IconButton, Input } from '@proj-airi/ui'
+import { isStageTamagotchi } from '@angela/stage-shared'
+import { ConnectionSettings } from '@angela/stage-ui/components'
+import { Callout, FieldCheckbox, IconButton, Input } from '@angela/ui'
 import { refDebounced, useClipboard } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, shallowRef, watch } from 'vue'

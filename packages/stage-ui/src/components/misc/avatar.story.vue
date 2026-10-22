@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Avatar } from '@proj-airi/ui'
+import { Avatar } from '@angela/ui'
 
 const logoUrl = `${import.meta.env.BASE_URL}logo.svg`
 </script>

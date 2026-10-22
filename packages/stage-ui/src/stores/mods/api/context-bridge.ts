@@ -1,13 +1,13 @@
-import type { LlmStreamingControlCallManifest } from '@proj-airi/pipelines-audio'
-import type { WebSocketEventOf } from '@proj-airi/server-sdk'
+import type { LlmStreamingControlCallManifest } from '@angela/pipelines-audio'
+import type { WebSocketEventOf } from '@angela/server-sdk'
 import type { UserMessage } from '@xsai/shared-chat'
 
 import type { ChatStreamEventContext, ContextMessage } from '../../../types/chat'
 import type { SparkNotifyPerformanceResult, SparkNotifyReactionOptions } from './spark-notify-reaction'
 
+import { isStageTamagotchi, isStageWeb } from '@angela/stage-shared'
 import { errorMessageFrom } from '@moeru/std'
 import { encodeBase64 } from '@moeru/std/base64'
-import { isStageTamagotchi, isStageWeb } from '@proj-airi/stage-shared'
 import { useBroadcastChannel } from '@vueuse/core'
 import { Mutex } from 'es-toolkit'
 import { nanoid } from 'nanoid'

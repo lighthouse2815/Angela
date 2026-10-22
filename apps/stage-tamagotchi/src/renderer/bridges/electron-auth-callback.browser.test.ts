@@ -1,7 +1,7 @@
 import type { ElectronAuthStatus } from '../../shared/eventa'
 
+import { useAuthStore } from '@angela/stage-ui/stores/auth'
 import { createContext, defineInvokeHandler } from '@moeru/eventa'
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
 import { createPinia, disposePinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -13,9 +13,9 @@ const boundary = vi.hoisted(() => ({
   context: undefined as ReturnType<typeof createContext<unknown, { raw?: unknown }>> | undefined,
   session: vi.fn(),
 }))
-vi.mock('@proj-airi/electron-vueuse', () => ({ getElectronEventaContext: () => boundary.context }))
-vi.mock('@proj-airi/stage-ui/libs/auth-client', async importOriginal => ({
-  ...await importOriginal<typeof import('@proj-airi/stage-ui/libs/auth-client')>(),
+vi.mock('@angela/electron-vueuse', () => ({ getElectronEventaContext: () => boundary.context }))
+vi.mock('@angela/stage-ui/libs/auth-client', async importOriginal => ({
+  ...await importOriginal<typeof import('@angela/stage-ui/libs/auth-client')>(),
   requestAuthSession: boundary.session,
 }))
 

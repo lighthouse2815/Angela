@@ -1,6 +1,6 @@
-import type { AudioInput, Observer } from '@proj-airi/pipelines-audio'
+import type { AudioInput, Observer } from '@angela/pipelines-audio'
 
-import { observe } from '@proj-airi/pipelines-audio'
+import { observe } from '@angela/pipelines-audio'
 
 /** One level per window gives a 20 Hz meter, which is smooth enough for a volume halo. */
 const LEVEL_WINDOW_MS = 50

@@ -6,8 +6,8 @@ import type { ServerChannel } from '../../services/airi/channel-server'
 
 import { join, resolve } from 'node:path'
 
+import { safeClose } from '@angela/electron-vueuse/main'
 import { defineInvokeHandler } from '@moeru/eventa'
-import { safeClose } from '@proj-airi/electron-vueuse/main'
 import { BrowserWindow as ElectronBrowserWindow } from 'electron'
 
 import icon from '../../../../resources/icon.png?asset'

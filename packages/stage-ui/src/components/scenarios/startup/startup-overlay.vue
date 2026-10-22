@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import StartupScreen from '@proj-airi/ui-loading-screens/startup-screen'
+import StartupScreen from '@angela/ui-loading-screens/startup-screen'
 
 import { storeToRefs } from 'pinia'
 import { computed, nextTick, onMounted, ref, watch } from 'vue'

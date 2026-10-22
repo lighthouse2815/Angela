@@ -1,4 +1,4 @@
-import { IOAttributes, IOSpanNames, IOSubsystems } from '@proj-airi/stage-shared'
+import { IOAttributes, IOSpanNames, IOSubsystems } from '@angela/stage-shared'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { resolveVADConfig } from './vad'

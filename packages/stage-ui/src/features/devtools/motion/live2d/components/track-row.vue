@@ -9,7 +9,7 @@ import type {
   Live2DMotionProject,
 } from '../composables/keyframes'
 
-import { BasicButton, Range, Select } from '@proj-airi/ui'
+import { BasicButton, Range, Select } from '@angela/ui'
 import { curveLinear, curveStepAfter, drag, line, pointer, scaleLinear, select } from 'd3'
 import { computed, nextTick, onMounted, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

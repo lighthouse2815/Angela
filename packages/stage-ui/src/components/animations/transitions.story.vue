@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { AnimatedContent, Button, TransitionBidirectional, TransitionHorizontal, TransitionVertical } from '@proj-airi/ui'
+import { AnimatedContent, Button, TransitionBidirectional, TransitionHorizontal, TransitionVertical } from '@angela/ui'
 import { CollapsibleContent, CollapsibleRoot, CollapsibleTrigger } from 'reka-ui'
 import { shallowRef } from 'vue'
 

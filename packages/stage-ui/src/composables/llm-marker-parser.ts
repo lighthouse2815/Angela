@@ -1,1 +1,1 @@
-export { useLlmmarkerParser } from '@proj-airi/core-agent'
+export { useLlmmarkerParser } from '@angela/core-agent'

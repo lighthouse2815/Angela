@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Avatar, BasicButton, BottomDrawer, GhostButton } from '@proj-airi/ui'
+import { Avatar, BasicButton, BottomDrawer, GhostButton } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'

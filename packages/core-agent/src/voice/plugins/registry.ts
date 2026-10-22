@@ -1,4 +1,4 @@
-import type { AudioInput, Observer, Scope } from '@proj-airi/pipelines-audio'
+import type { AudioInput, Observer, Scope } from '@angela/pipelines-audio'
 
 import type { SpeechInputAttempt } from '../input/attempt'
 import type { BeginSpeechInput } from '../input/attempt-types'
@@ -17,7 +17,7 @@ import type {
   VoicePluginSettings,
 } from './types'
 
-import { createScope, observe } from '@proj-airi/pipelines-audio'
+import { createScope, observe } from '@angela/pipelines-audio'
 
 import { errorFromCause } from '../../utils/error'
 import { InputPlugins } from './input-plugins'

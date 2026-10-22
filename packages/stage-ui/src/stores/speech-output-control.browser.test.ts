@@ -1,4 +1,4 @@
-import type { TurnRef } from '@proj-airi/core-agent'
+import type { TurnRef } from '@angela/core-agent'
 
 import { defineInvokeHandler } from '@moeru/eventa'
 import { createPinia, disposePinia, setActivePinia } from 'pinia'

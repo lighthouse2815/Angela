@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { VoicevoxFamilySettings } from '@proj-airi/stage-ui/components'
+import { VoicevoxFamilySettings } from '@angela/stage-ui/components'
 
 const providerId = 'aivis-speech'
 </script>

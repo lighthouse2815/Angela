@@ -96,7 +96,7 @@ vi.mock('@moeru/eventa/adapters/electron/main', () => ({
   })),
 }))
 
-vi.mock('@proj-airi/electron-vueuse/main', () => ({
+vi.mock('@angela/electron-vueuse/main', () => ({
   safeClose: vi.fn((window: BrowserWindow) => {
     window.close()
     return true

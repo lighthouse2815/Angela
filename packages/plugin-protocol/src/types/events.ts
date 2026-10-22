@@ -1184,7 +1184,7 @@ interface SparkCommandEvent {
    *
    * An omitted list reaches every authenticated peer. An explicit empty list
    * reaches no peer. The delivery loop reads the rule from `collectDestinations`
-   * in `@proj-airi/server-runtime`, which preserves an array-shaped `destinations`
+   * in `@angela/server-runtime`, which preserves an array-shaped `destinations`
    * and returns `undefined` when the field is absent.
    */
   destinations?: Array<string>

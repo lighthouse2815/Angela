@@ -1,4 +1,4 @@
-import type { Live2DMotionControlPose } from '@proj-airi/stage-ui-live2d/stores'
+import type { Live2DMotionControlPose } from '@angela/stage-ui-live2d/stores'
 import type { InferOutput } from 'valibot'
 import type { DeepReadonly, ShallowRef } from 'vue'
 

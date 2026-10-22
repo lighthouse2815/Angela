@@ -2,8 +2,8 @@ import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 
-import { cliMessages } from '@proj-airi/i18n/cli'
-import { LocalConfigFile, resolveLocalConfigPath } from '@proj-airi/local-config/node'
+import { cliMessages } from '@angela/i18n/cli'
+import { LocalConfigFile, resolveLocalConfigPath } from '@angela/local-config/node'
 
 import * as v from 'valibot'
 

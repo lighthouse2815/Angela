@@ -1,4 +1,4 @@
-import { neutralPose } from '@proj-airi/model-driver-magic-live2d'
+import { neutralPose } from '@angela/model-driver-magic-live2d'
 import { describe, expect, it, vi } from 'vitest'
 import { effectScope } from 'vue'
 

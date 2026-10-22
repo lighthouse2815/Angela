@@ -1,6 +1,6 @@
 import { join } from 'node:path'
 
-import fakemic, { electron, web } from '@proj-airi/vitest-plugin-fakemic'
+import fakemic, { electron, web } from '@angela/vitest-plugin-fakemic'
 
 import { defineConfig } from 'vitest/config'
 

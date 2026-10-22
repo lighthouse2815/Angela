@@ -2,7 +2,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick, ref } from 'vue'
 
-vi.mock('@proj-airi/stage-shared/composables', () => {
+vi.mock('@angela/stage-shared/composables', () => {
   function useLocalStorageManualReset<T>(_key: string, initialValue: T) {
     const state = ref(initialValue)
     return Object.assign(state, {

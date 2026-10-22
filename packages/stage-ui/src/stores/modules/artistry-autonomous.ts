@@ -1,9 +1,9 @@
 import type { Message } from '@xsai/shared-chat'
 
+import { chatMessagesToTurns, streamFrom } from '@angela/core-agent'
+import { artistryGenerateHeadless } from '@angela/stage-shared'
 import { defineInvoke, defineInvokeEventa } from '@moeru/eventa'
 import { createContext } from '@moeru/eventa/adapters/electron/renderer'
-import { chatMessagesToTurns, streamFrom } from '@proj-airi/core-agent'
-import { artistryGenerateHeadless } from '@proj-airi/stage-shared'
 import { cloneDeep } from 'es-toolkit'
 import { defineStore } from 'pinia'
 import { ref, toRaw } from 'vue'

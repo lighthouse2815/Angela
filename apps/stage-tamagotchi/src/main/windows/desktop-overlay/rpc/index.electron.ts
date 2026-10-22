@@ -16,9 +16,9 @@ import type { ServerChannel } from '../../../services/airi/channel-server'
 import type { McpManager } from '../../../services/airi/mcp-servers'
 import type { DesktopOverlayReadiness } from './contracts'
 
+import { errorMessageFromValue } from '@angela/stage-shared'
 import { defineInvokeHandler } from '@moeru/eventa'
 import { createContext } from '@moeru/eventa/adapters/electron/main'
-import { errorMessageFromValue } from '@proj-airi/stage-shared'
 import { ipcMain } from 'electron'
 
 import { getDesktopOverlayReadinessContract } from '../../../../shared/eventa'

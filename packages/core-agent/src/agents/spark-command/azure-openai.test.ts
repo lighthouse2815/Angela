@@ -1,7 +1,7 @@
 import type { JsonSchema } from 'xsschema'
 
-import { createSparkCommandTool } from '@proj-airi/core-agent/agents/spark-command'
-import { getDefinedProvider } from '@proj-airi/provider-inference'
+import { createSparkCommandTool } from '@angela/core-agent/agents/spark-command'
+import { getDefinedProvider } from '@angela/provider-inference'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 const providerAzureOpenAI = getDefinedProvider('azure-openai')!

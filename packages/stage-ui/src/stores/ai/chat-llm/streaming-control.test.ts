@@ -1,4 +1,4 @@
-import { IOAttributes, IOEvents, IOSpanNames, IOSubsystems } from '@proj-airi/stage-shared'
+import { IOAttributes, IOEvents, IOSpanNames, IOSubsystems } from '@angela/stage-shared'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { shallowRef } from 'vue'

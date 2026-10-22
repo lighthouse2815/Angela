@@ -1,11 +1,11 @@
-import type { StreamingTranscriber, TranscriptionEvent, TranscriptSegment } from '@proj-airi/core-agent'
+import type { StreamingTranscriber, TranscriptionEvent, TranscriptSegment } from '@angela/core-agent'
 
 import type { AIRIStreamTranscriptionDelta } from '../providers/stream-transcription'
 import type { HearingTranscriptionResult } from '../providers/transcription-types'
 
+import { IOAttributes, IOSpanNames, IOSubsystems } from '@angela/stage-shared'
 import { errorMessageFrom } from '@moeru/std'
 import { SpanStatusCode } from '@opentelemetry/api'
-import { IOAttributes, IOSpanNames, IOSubsystems } from '@proj-airi/stage-shared'
 
 import { activeTurnSpan, startSpan } from '../../composables/use-io-tracer'
 

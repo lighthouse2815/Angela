@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useStopSpeakingButton } from '@proj-airi/stage-layouts/composables/useStopSpeakingButton'
-import { useSpeakingStore } from '@proj-airi/stage-ui/stores/audio'
+import { useStopSpeakingButton } from '@angela/stage-layouts/composables/useStopSpeakingButton'
+import { useSpeakingStore } from '@angela/stage-ui/stores/audio'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 

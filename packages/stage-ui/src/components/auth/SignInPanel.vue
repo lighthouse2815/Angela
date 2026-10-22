@@ -2,7 +2,7 @@
 import type { OAuthProvider } from '../../libs/auth'
 import type { SignInProviderDefinition } from './providers'
 
-import { Button, Callout } from '@proj-airi/ui'
+import { Button, Callout } from '@angela/ui'
 import { computed } from 'vue'
 
 import Alert from '../misc/alert.vue'

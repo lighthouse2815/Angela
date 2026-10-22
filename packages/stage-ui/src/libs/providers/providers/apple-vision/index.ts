@@ -1,8 +1,8 @@
 import type { ProviderModelCatalog } from '../../types'
 
+import { isElectronWindow, isStageTamagotchi } from '@angela/stage-shared'
 import { createContext } from '@moeru/eventa/adapters/electron/renderer'
 import { errorMessageFrom } from '@moeru/std'
-import { isElectronWindow, isStageTamagotchi } from '@proj-airi/stage-shared'
 import { APPLE_VISION_MODEL, createAppleVisionProvider as createElectronProvider } from '@xsai-apple-vision/vision-electron-plugin'
 import { z } from 'zod'
 

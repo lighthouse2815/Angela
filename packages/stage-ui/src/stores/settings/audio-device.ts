@@ -1,5 +1,5 @@
+import { useLocalStorageManualReset } from '@angela/stage-shared/composables'
 import { errorMessageFrom } from '@moeru/std'
-import { useLocalStorageManualReset } from '@proj-airi/stage-shared/composables'
 import { defineStore } from 'pinia'
 import { onScopeDispose, ref, watch } from 'vue'
 

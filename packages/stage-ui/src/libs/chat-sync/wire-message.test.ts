@@ -1,5 +1,5 @@
-import type { ChatAssistantMessage, ChatHistoryItem } from '@proj-airi/core-agent'
-import type { WireMessage } from '@proj-airi/server-sdk-shared'
+import type { ChatAssistantMessage, ChatHistoryItem } from '@angela/core-agent'
+import type { WireMessage } from '@angela/server-sdk-shared'
 
 import { describe, expect, it } from 'vitest'
 

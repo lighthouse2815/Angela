@@ -1,8 +1,8 @@
-import type { SpeechInputAttempt, TranscriptionEvent } from '@proj-airi/core-agent'
-import type { PcmBlock } from '@proj-airi/pipelines-audio'
+import type { SpeechInputAttempt, TranscriptionEvent } from '@angela/core-agent'
+import type { PcmBlock } from '@angela/pipelines-audio'
 
-import { VoiceController } from '@proj-airi/core-agent'
-import { AudioInput, createPushStream, Playback } from '@proj-airi/pipelines-audio'
+import { VoiceController } from '@angela/core-agent'
+import { AudioInput, createPushStream, Playback } from '@angela/pipelines-audio'
 import { expect, it, vi } from 'vitest'
 
 import { listensContinuously, startsInputOnSpeech } from '../../stores/modules/hearing'

@@ -1,4 +1,4 @@
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { GenerationProvider } from '@angela/provider-inference'
 import type { CommonContentPart, Message, ToolMessage } from '@xsai/shared-chat'
 
 import type { AgentContextPort } from '../contracts/context-port'
@@ -8,7 +8,7 @@ import type { AssistantTurn, Conversation, Turn } from '../messages/types'
 import type { ChatHistoryItem, ChatSlices, ChatStreamEventContext, ChatToolReference, ContextMessage, StreamingAssistantMessage } from '../types/chat'
 import type { LlmUsage, StreamEvent, StreamOptions } from '../types/llm'
 
-import { createQueue } from '@proj-airi/stream-kit'
+import { createQueue } from '@angela/stream-kit'
 
 import { chatMessagesToTurns } from '../messages/chat-completions'
 import { formatTimePrefix } from '../messages/datetime-prefix'

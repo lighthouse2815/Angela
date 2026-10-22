@@ -17,7 +17,7 @@ const placement: ControlsIslandPlacement = {
   motionPhase: shallowRef('idle'),
 }
 
-vi.mock('@proj-airi/stage-layouts/composables/useStopSpeakingButton', () => ({
+vi.mock('@angela/stage-layouts/composables/useStopSpeakingButton', () => ({
   useStopSpeakingButton: () => ({
     speechMuted,
     toggleSpeechMuted: toggleSpeechMutedMock,

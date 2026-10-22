@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { InputFileCard } from '@proj-airi/ui'
+import { InputFileCard } from '@angela/ui'
 import { ref } from 'vue'
 
 const files = ref<File[]>([])

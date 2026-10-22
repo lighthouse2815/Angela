@@ -4,9 +4,9 @@ import type { createRequestWindowEventa, RequestWindowPayload } from '../../../s
 import type { I18n } from '../../libs/i18n'
 import type { ServerChannel } from '../../services/airi/channel-server'
 
+import { safeClose } from '@angela/electron-vueuse/main'
 import { defineInvokeHandler } from '@moeru/eventa'
 import { createContext } from '@moeru/eventa/adapters/electron/main'
-import { safeClose } from '@proj-airi/electron-vueuse/main'
 import { ipcMain } from 'electron'
 
 import { setupBaseWindowElectronInvokes } from './window'

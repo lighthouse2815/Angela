@@ -1,4 +1,4 @@
-import { useLocalStorageManualReset } from '@proj-airi/stage-shared/composables'
+import { useLocalStorageManualReset } from '@angela/stage-shared/composables'
 import { defineStore } from 'pinia'
 
 /** Supported ranges and defaults for persisted Tachie appearance controls. */

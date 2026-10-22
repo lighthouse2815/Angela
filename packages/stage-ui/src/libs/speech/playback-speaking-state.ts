@@ -3,7 +3,7 @@ import type {
   PlaybackInterruptEvent,
   PlaybackRejectEvent,
   PlaybackStartEvent,
-} from '@proj-airi/pipelines-audio'
+} from '@angela/pipelines-audio'
 
 export interface PlaybackSpeakingStateManager<TAudio> {
   onStart: (listener: (event: PlaybackStartEvent<TAudio>) => void) => void

@@ -1,14 +1,14 @@
-import type { Discord, WebSocketEventOf } from '@proj-airi/server-shared/types'
+import type { Discord, WebSocketEventOf } from '@angela/server-shared/types'
 import type { Interaction } from 'discord.js'
 
 import type { VoiceManager } from '../bots/discord/commands/summon'
 
 import { env } from 'node:process'
 
+import { cliMessages } from '@angela/i18n/cli'
+import { Client as ServerChannel } from '@angela/server-sdk'
+import { ContextUpdateStrategy } from '@angela/server-shared/types'
 import { useLogg } from '@guiiai/logg'
-import { cliMessages } from '@proj-airi/i18n/cli'
-import { Client as ServerChannel } from '@proj-airi/server-sdk'
-import { ContextUpdateStrategy } from '@proj-airi/server-shared/types'
 import { Client, Events, GatewayIntentBits, MessageFlags, Options, Partials } from 'discord.js'
 
 import * as v from 'valibot'

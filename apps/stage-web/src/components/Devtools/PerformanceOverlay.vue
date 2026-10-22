@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { LagMetric } from '../../stores/devtools-lag'
 
-import { Button, IconButton } from '@proj-airi/ui'
+import { Button, IconButton } from '@angela/ui'
 import { useDraggable, useElementBounding } from '@vueuse/core'
 import { clamp } from 'es-toolkit/math'
 import { storeToRefs } from 'pinia'

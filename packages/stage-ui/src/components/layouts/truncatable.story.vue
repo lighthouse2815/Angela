@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Truncatable } from '@proj-airi/ui'
+import { Truncatable } from '@angela/ui'
 </script>
 
 <template>

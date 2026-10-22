@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ServerForm } from '../mcp-config'
 
-import { Button, FieldInput, FieldKeyValues, FieldSelect, GhostButton } from '@proj-airi/ui'
+import { Button, FieldInput, FieldKeyValues, FieldSelect, GhostButton } from '@angela/ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

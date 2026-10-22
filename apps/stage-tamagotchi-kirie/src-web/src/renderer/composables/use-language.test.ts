@@ -21,7 +21,7 @@ const localStorageMock = (() => {
 
 Object.defineProperty(globalThis, 'localStorage', { value: localStorageMock })
 
-vi.mock('@proj-airi/stage-shared/composables', () => ({
+vi.mock('@angela/stage-shared/composables', () => ({
   useLocalStorageManualReset: vi.fn((key: string, initialValue: string) => {
     // Tests control persisted state by pre-seeding localStorage before each case
     const stored = localStorageMock.getItem(key)

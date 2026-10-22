@@ -1,4 +1,4 @@
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { GenerationProvider } from '@angela/provider-inference'
 
 import process from 'node:process'
 
@@ -13,7 +13,7 @@ const started = performance.now()
 const { AngelaRuntime }: typeof import('../src/runtime/runtime') = await import(pathToFileURL(join(source, 'runtime/runtime.ts')).href)
 const runtimeImportMs = performance.now() - started
 const { Chat }: typeof import('../src/chat') = await import(pathToFileURL(join(source, 'chat.ts')).href)
-const { cliMessages } = await import('@proj-airi/i18n/cli')
+const { cliMessages } = await import('@angela/i18n/cli')
 const directory = await mkdtemp(join(tmpdir(), 'angela-startup-'))
 const provider: GenerationProvider = { generation: model => ({ protocol: 'chat-completions', config: { model, baseURL: 'https://fixture.invalid/v1/', fetch: async () => new Response(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', content: 'Understood.' }, finish_reason: 'stop' }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } }) } }) }
 const runtime = new AngelaRuntime('fixture', provider, cliMessages.en)

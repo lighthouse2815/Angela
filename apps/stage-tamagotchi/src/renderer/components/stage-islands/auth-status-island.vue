@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { StatusCapsule } from '@proj-airi/stage-ui/components'
-import { Button } from '@proj-airi/ui'
+import { useElectronEventaInvoke } from '@angela/electron-vueuse'
+import { StatusCapsule } from '@angela/stage-ui/components'
+import { Button } from '@angela/ui'
 import { useTimeoutFn } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, ref, watch } from 'vue'

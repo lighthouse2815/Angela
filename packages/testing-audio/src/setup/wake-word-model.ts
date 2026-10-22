@@ -2,9 +2,9 @@ import { createHash, randomUUID } from 'node:crypto'
 import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
+import { sherpawModelArtifactUrl, sherpawModelPath } from '@angela/provider-inference/sherpaw-transcription/models'
+import { kwsModel } from '@angela/stage-ui/libs/voice/kws-model-info'
 import { findWorkspaceDir } from '@pnpm/find-workspace-dir'
-import { sherpawModelArtifactUrl, sherpawModelPath } from '@proj-airi/provider-inference/sherpaw-transcription/models'
-import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
 
 /**
  * Checksums of the pinned `kwsModel` revision.

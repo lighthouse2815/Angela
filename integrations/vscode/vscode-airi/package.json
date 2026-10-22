@@ -68,9 +68,9 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
+    "@angela/server-sdk": "workspace:*",
     "@guiiai/logg": "catalog:",
     "@moeru/std": "catalog:",
-    "@proj-airi/server-sdk": "workspace:*",
     "@types/vscode": "catalog:",
     "es-toolkit": "catalog:",
     "injeca": "catalog:",

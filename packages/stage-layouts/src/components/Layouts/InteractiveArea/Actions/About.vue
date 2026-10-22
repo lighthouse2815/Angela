@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { isStageCapacitor, isStageTamagotchi } from '@proj-airi/stage-shared'
-import { AboutContent, AboutDialog } from '@proj-airi/stage-ui/components'
-import { useBuildInfo } from '@proj-airi/stage-ui/composables'
+import { isStageCapacitor, isStageTamagotchi } from '@angela/stage-shared'
+import { AboutContent, AboutDialog } from '@angela/stage-ui/components'
+import { useBuildInfo } from '@angela/stage-ui/composables'
 import { useI18n } from 'vue-i18n'
 
 defineProps<{

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useAiriCardStore } from '@proj-airi/stage-ui/stores/modules/airi-card'
-import { useWakeWordsStore } from '@proj-airi/stage-ui/stores/wake-words'
-import { Button, SettingsCard } from '@proj-airi/ui'
+import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useWakeWordsStore } from '@angela/stage-ui/stores/wake-words'
+import { Button, SettingsCard } from '@angela/ui'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

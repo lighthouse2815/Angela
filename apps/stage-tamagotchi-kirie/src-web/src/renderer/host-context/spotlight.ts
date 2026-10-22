@@ -1,5 +1,5 @@
+import type { ShortcutAccelerator, ShortcutRegistrationResult } from '@angela/stage-shared/global-shortcut'
 import type { GlobalShortcut } from '@gd-kirie/platform'
-import type { ShortcutAccelerator, ShortcutRegistrationResult } from '@proj-airi/stage-shared/global-shortcut'
 
 import { notificationActivated } from '@gd-kirie/platform'
 import { defineInvoke, defineInvokeEventa } from '@moeru/eventa'

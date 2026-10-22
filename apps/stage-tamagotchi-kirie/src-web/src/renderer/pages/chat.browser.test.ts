@@ -1,4 +1,4 @@
-import { ScrollableArea } from '@proj-airi/ui'
+import { ScrollableArea } from '@angela/ui'
 import { describe, expect, it } from 'vitest'
 import { render } from 'vitest-browser-vue'
 import { defineComponent } from 'vue'

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ChatToolCallShell, createToolResultError, MarkdownRenderer, normalizeToolResultText } from '@proj-airi/stage-ui/components'
-import { useJournalPreviewStore } from '@proj-airi/stage-ui/stores/journal-preview'
-import { ContainerError } from '@proj-airi/ui'
+import { ChatToolCallShell, createToolResultError, MarkdownRenderer, normalizeToolResultText } from '@angela/stage-ui/components'
+import { useJournalPreviewStore } from '@angela/stage-ui/stores/journal-preview'
+import { ContainerError } from '@angela/ui'
 import { computed } from 'vue'
 
 const props = defineProps<{

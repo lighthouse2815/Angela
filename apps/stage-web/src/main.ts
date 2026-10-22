@@ -4,14 +4,14 @@ import type { Router, RouteRecordRaw } from 'vue-router'
 import Tres from '@tresjs/core'
 import NProgress from 'nprogress'
 
+import { isEnvTruthy } from '@angela/stage-shared'
+import { pushToTalkTriggerKey } from '@angela/stage-ui/composables/push-to-talk-trigger'
+import { trackButtonPlugin } from '@angela/stage-ui/directives/track-button'
+import { browserAuthorizationHandler, registerAuthorizationHandler } from '@angela/stage-ui/libs/auth'
+import { piniaPluginTracing, setupSynced } from '@angela/stage-ui/libs/pinia'
+import { configureAnalyticsAdapter } from '@angela/stage-ui/libs/product-signals'
 import { autoAnimatePlugin } from '@formkit/auto-animate/vue'
 import { PiniaColada } from '@pinia/colada'
-import { isEnvTruthy } from '@proj-airi/stage-shared'
-import { pushToTalkTriggerKey } from '@proj-airi/stage-ui/composables/push-to-talk-trigger'
-import { trackButtonPlugin } from '@proj-airi/stage-ui/directives/track-button'
-import { browserAuthorizationHandler, registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
-import { piniaPluginTracing, setupSynced } from '@proj-airi/stage-ui/libs/pinia'
-import { configureAnalyticsAdapter } from '@proj-airi/stage-ui/libs/product-signals'
 import { useMediaQuery } from '@vueuse/core'
 import { MotionPlugin } from '@vueuse/motion'
 import { createPinia } from 'pinia'
@@ -24,8 +24,8 @@ import App from './App.vue'
 
 import { i18n } from './modules/i18n'
 
-import '@proj-airi/font-cjkfonts-allseto/index.css'
-import '@proj-airi/font-xiaolai/index.css'
+import '@angela/font-cjkfonts-allseto/index.css'
+import '@angela/font-xiaolai/index.css'
 import '@unocss/reset/tailwind.css'
 import 'splitpanes/dist/splitpanes.css'
 import 'vue-sonner/style.css'
@@ -33,7 +33,7 @@ import './styles/main.css'
 import 'uno.css'
 
 configureAnalyticsAdapter(async (options) => {
-  const { createOpenpanelAdapter } = await import('@proj-airi/stage-ui/libs/product-signals/openpanel')
+  const { createOpenpanelAdapter } = await import('@angela/stage-ui/libs/product-signals/openpanel')
   return createOpenpanelAdapter(options)
 })
 registerAuthorizationHandler(browserAuthorizationHandler)

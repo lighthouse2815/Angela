@@ -1,4 +1,4 @@
-import type { FakemicElectronPrepareContext } from '@proj-airi/vitest-plugin-fakemic'
+import type { FakemicElectronPrepareContext } from '@angela/vitest-plugin-fakemic'
 import type { Page } from 'playwright'
 
 import type { AudioInputSession } from '../types'

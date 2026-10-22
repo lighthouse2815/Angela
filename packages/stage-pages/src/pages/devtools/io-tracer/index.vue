@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { IOSubsystem } from '@proj-airi/stage-shared'
+import type { IOSubsystem } from '@angela/stage-shared'
 
-import { useIOTracerStore } from '@proj-airi/stage-ui/stores/devtools/io-tracer'
+import { useIOTracerStore } from '@angela/stage-ui/stores/devtools/io-tracer'
 import { storeToRefs } from 'pinia'
 import { onUnmounted, ref } from 'vue'
 

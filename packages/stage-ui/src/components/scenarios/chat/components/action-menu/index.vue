@@ -3,7 +3,7 @@ import type { ComponentPublicInstance, ComputedRef, ShallowRef } from 'vue'
 
 import type { ChatActionMenuAction } from '.'
 
-import { errorMessageFromValue, isStageCapacitor, isStageWeb } from '@proj-airi/stage-shared'
+import { errorMessageFromValue, isStageCapacitor, isStageWeb } from '@angela/stage-shared'
 import { useElementVisibility, useEventListener } from '@vueuse/core'
 import { animate } from 'animejs'
 import { clamp } from 'es-toolkit'

@@ -1,6 +1,6 @@
-import type { BeatSyncDetectorState } from '@proj-airi/stage-shared/beat-sync'
+import type { BeatSyncDetectorState } from '@angela/stage-shared/beat-sync'
 
-import { getBeatSyncState, isBeatSyncSupported, listenBeatSyncStateChange } from '@proj-airi/stage-shared/beat-sync'
+import { getBeatSyncState, isBeatSyncSupported, listenBeatSyncStateChange } from '@angela/stage-shared/beat-sync'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 

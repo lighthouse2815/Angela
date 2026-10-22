@@ -3,14 +3,14 @@ import type { BrowserWindow } from 'electron'
 
 import type { ElectronAuthStatus } from '../../../shared/eventa'
 
-import { useLogg } from '@guiiai/logg'
-import { defineInvokeHandler } from '@moeru/eventa'
-import { errorMessageFrom } from '@moeru/std'
 import {
   generateCodeChallenge,
   generateCodeVerifier,
   generateState,
-} from '@proj-airi/stage-shared/auth'
+} from '@angela/stage-shared/auth'
+import { useLogg } from '@guiiai/logg'
+import { defineInvokeHandler } from '@moeru/eventa'
+import { errorMessageFrom } from '@moeru/std'
 import { shell } from 'electron'
 
 import {

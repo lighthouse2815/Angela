@@ -1,8 +1,8 @@
-import type { PortableProviderId } from '@proj-airi/provider-inference'
+import type { PortableProviderId } from '@angela/provider-inference'
 
 import type { ProviderConfiguration } from '../configurations/provider'
 
-import { getDefinedProvider } from '@proj-airi/provider-inference'
+import { getDefinedProvider } from '@angela/provider-inference'
 
 /** Configuration for an OpenAI-compatible Provider selected by one case. */
 export interface OpenAIProviderOptions {

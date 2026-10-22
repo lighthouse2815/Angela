@@ -3,8 +3,8 @@ import process, { cwd, env } from 'node:process'
 import { execSync } from 'node:child_process'
 import { join, resolve } from 'node:path'
 
+import messages from '@angela/i18n/locales'
 import VueI18n from '@intlify/unplugin-vue-i18n/vite'
-import messages from '@proj-airi/i18n/locales'
 import templateCompilerOptions from '@tresjs/core/template-compiler-options'
 import Vue from '@vitejs/plugin-vue'
 import Unocss from 'unocss/vite'
@@ -17,14 +17,14 @@ import Layouts from 'vite-plugin-vue-layouts'
 import VueMacros from 'vue-macros/vite'
 import VueRouter from 'vue-router/vite'
 
+import { localeRemap, serializeStartupFallbackLocales } from '@angela/i18n'
+import { localConfigPlugin } from '@angela/local-config/vite'
+import { paraformerBilingualZhEn, xAsrBilingualZhEnInt8, zipformerMultilingual } from '@angela/provider-inference/sherpaw-transcription/models'
+import { kwsModel } from '@angela/stage-ui/libs/voice/kws-model-info'
+import { Sherpaw } from '@angela/vite-plugin-sherpaw'
 import { tryCatch } from '@moeru/std'
-import { localeRemap, serializeStartupFallbackLocales } from '@proj-airi/i18n'
-import { localConfigPlugin } from '@proj-airi/local-config/vite'
-import { paraformerBilingualZhEn, xAsrBilingualZhEnInt8, zipformerMultilingual } from '@proj-airi/provider-inference/sherpaw-transcription/models'
-import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
 import { Download } from '@proj-airi/unplugin-fetch/vite'
 import { DownloadLive2DSDK } from '@proj-airi/unplugin-live2d-sdk/vite'
-import { Sherpaw } from '@proj-airi/vite-plugin-sherpaw'
 import { LFS, SpaceCard } from 'hfup/vite'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -47,7 +47,7 @@ export default defineConfig({
   optimizeDeps: {
     exclude: [
       // Internal Packages
-      '@proj-airi/stage-ui/*',
+      '@angela/stage-ui/*',
       '@proj-airi/drizzle-duckdb-wasm',
       '@proj-airi/drizzle-duckdb-wasm/*',
 
@@ -73,12 +73,12 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@proj-airi/server-sdk': resolve(join(import.meta.dirname, '..', '..', 'packages', 'server-sdk', 'src')),
-      '@proj-airi/i18n': resolve(join(import.meta.dirname, '..', '..', 'packages', 'i18n', 'src')),
-      '@proj-airi/stage-ui': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src')),
-      '@proj-airi/stage-pages': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-pages', 'src')),
-      '@proj-airi/stage-shared': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-shared', 'src')),
-      '@proj-airi/stage-layouts': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-layouts', 'src')),
+      '@angela/server-sdk': resolve(join(import.meta.dirname, '..', '..', 'packages', 'server-sdk', 'src')),
+      '@angela/i18n': resolve(join(import.meta.dirname, '..', '..', 'packages', 'i18n', 'src')),
+      '@angela/stage-ui': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src')),
+      '@angela/stage-pages': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-pages', 'src')),
+      '@angela/stage-shared': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-shared', 'src')),
+      '@angela/stage-layouts': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-layouts', 'src')),
     },
   },
   server: {

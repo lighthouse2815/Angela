@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { MMDGazeMode, MorphSlot } from '@proj-airi/stage-ui-mmd'
+import type { MMDGazeMode, MorphSlot } from '@angela/stage-ui-mmd'
 
 import type { ModelSettingsRuntimeSnapshot } from './runtime'
 
-import { controlConfig, useMMD } from '@proj-airi/stage-ui-mmd'
-import { Button, FieldCheckbox, FieldCombobox, FieldRange, GhostButton } from '@proj-airi/ui'
+import { controlConfig, useMMD } from '@angela/stage-ui-mmd'
+import { Button, FieldCheckbox, FieldCombobox, FieldRange, GhostButton } from '@angela/ui'
 import { useFileDialog } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'

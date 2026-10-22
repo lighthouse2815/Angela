@@ -1,6 +1,6 @@
-import messages from '@proj-airi/i18n/locales'
+import messages from '@angela/i18n/locales'
 
-import { createFallbackOptions, resolveSupportedLocale } from '@proj-airi/i18n'
+import { createFallbackOptions, resolveSupportedLocale } from '@angela/i18n'
 import { createI18n } from 'vue-i18n'
 
 function getLocale() {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { OverlayButton } from '@proj-airi/ui'
+import { OverlayButton } from '@angela/ui'
 
 const props = defineProps<{ buttonStyle?: string }>()
 </script>

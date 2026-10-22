@@ -1,4 +1,4 @@
-import type { ModelAsset, ModelAssetFile, ModelAssetProgress, ModelAssetStorage } from '@proj-airi/stage-shared/model-assets'
+import type { ModelAsset, ModelAssetFile, ModelAssetProgress, ModelAssetStorage } from '@angela/stage-shared/model-assets'
 
 import * as v from 'valibot'
 

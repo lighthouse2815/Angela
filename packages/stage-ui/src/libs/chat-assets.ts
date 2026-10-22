@@ -1,10 +1,10 @@
-import type { ChatAttachment, Conversation } from '@proj-airi/core-agent'
-import type { ChatEventAttachment } from '@proj-airi/server-sdk'
+import type { ChatAttachment, Conversation } from '@angela/core-agent'
+import type { ChatEventAttachment } from '@angela/server-sdk'
 
 import type { ChatHistoryItem } from '../types/chat'
 
+import { ASSET_REF_PREFIX } from '@angela/server-sdk'
 import { decodeBase64, encodeBase64 } from '@moeru/std/base64'
-import { ASSET_REF_PREFIX } from '@proj-airi/server-sdk'
 
 import { chatAssetsRepo } from '../database/repos/chat-assets.repo'
 

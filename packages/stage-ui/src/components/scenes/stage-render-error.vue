@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { BugReportDialogSubmitPayload } from '../scenarios/dialogs/bug-report/types'
 
+import { Button, ContainerError } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { Button, ContainerError } from '@proj-airi/ui'
 import { useClipboard } from '@vueuse/core'
 import { shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'

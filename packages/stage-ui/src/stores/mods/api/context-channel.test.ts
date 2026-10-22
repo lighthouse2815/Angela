@@ -1,4 +1,4 @@
-import { ContextUpdateStrategy } from '@proj-airi/server-sdk'
+import { ContextUpdateStrategy } from '@angela/server-sdk'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { createContextChannel } from './context-channel'

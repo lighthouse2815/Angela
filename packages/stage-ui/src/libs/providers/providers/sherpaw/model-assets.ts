@@ -1,7 +1,7 @@
-import type { ModelAsset, ModelAssetStatus } from '@proj-airi/stage-shared/model-assets'
+import type { ModelAsset, ModelAssetStatus } from '@angela/stage-shared/model-assets'
 
-import { ModelAssetRepository } from '@proj-airi/stage-shared/model-assets'
-import { assets } from '@proj-airi/vite-plugin-sherpaw/assets'
+import { ModelAssetRepository } from '@angela/stage-shared/model-assets'
+import { assets } from '@angela/vite-plugin-sherpaw/assets'
 
 import { updateModelAssetStatus } from '../../../../composables/use-model-asset-status'
 import { OpfsModelAssetStorage } from '../../../inference/model-assets-opfs'

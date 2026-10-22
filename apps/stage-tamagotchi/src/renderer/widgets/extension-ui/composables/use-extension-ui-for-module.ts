@@ -1,4 +1,4 @@
-import type { PluginHostModuleSummary } from '@proj-airi/stage-shared/plugin-host'
+import type { PluginHostModuleSummary } from '@angela/stage-shared/plugin-host'
 import type { ComputedRef } from 'vue'
 
 import { errorMessageFrom } from '@moeru/std'

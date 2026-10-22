@@ -1,4 +1,4 @@
-import type { SerializedIOSpan } from '@proj-airi/stage-shared/types/io-trace'
+import type { SerializedIOSpan } from '@angela/stage-shared/types/io-trace'
 
 import { mkdtemp, readdir, readFile, rm, utimes, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'

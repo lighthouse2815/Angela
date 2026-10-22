@@ -1,5 +1,5 @@
-import type { KitClientRuntime } from '@proj-airi/plugin-sdk'
-import type { HostDataRecord } from '@proj-airi/plugin-sdk/plugin-host'
+import type { KitClientRuntime } from '@angela/plugin-sdk'
+import type { HostDataRecord } from '@angela/plugin-sdk/plugin-host'
 import type { JsonSchema, Schema as StandardSchemaV1 } from 'xsschema'
 
 import type {
@@ -8,8 +8,8 @@ import type {
   ToolsetPromptManifest,
 } from './registry'
 
-import { defineKit } from '@proj-airi/plugin-sdk'
-import { hostDataRecordSchema } from '@proj-airi/plugin-sdk/plugin-host'
+import { defineKit } from '@angela/plugin-sdk'
+import { hostDataRecordSchema } from '@angela/plugin-sdk/plugin-host'
 import { parse } from 'valibot'
 import { toJsonSchema } from 'xsschema'
 

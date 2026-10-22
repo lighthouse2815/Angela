@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useHostRelativeMouse, useHostWindowBounds } from '@proj-airi/stage-host-context'
+import { useHostRelativeMouse, useHostWindowBounds } from '@angela/stage-host-context'
 import { computed } from 'vue'
 
 const windowRelativeMouse = useHostRelativeMouse()

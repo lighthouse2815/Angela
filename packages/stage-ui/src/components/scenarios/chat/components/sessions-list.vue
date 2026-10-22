@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { ChatSessionMeta } from '../../../../types/chat-session'
 
-import { BasicButton, Button, GhostButton, ScrollableArea, SwipeActionButton, SwipeActionsContent, SwipeActionsItem, SwipeActionsList, SwipeActionsRoot } from '@proj-airi/ui'
+import { BasicButton, Button, GhostButton, ScrollableArea, SwipeActionButton, SwipeActionsContent, SwipeActionsItem, SwipeActionsList, SwipeActionsRoot } from '@angela/ui'
 import { shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 

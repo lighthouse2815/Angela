@@ -2,7 +2,7 @@ import type {
   StandardGamepadButtonName,
   StandardGamepadButtonState,
   StandardGamepadSnapshot,
-} from '@proj-airi/input-gamepad'
+} from '@angela/input-gamepad'
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { effectScope, shallowRef } from 'vue'

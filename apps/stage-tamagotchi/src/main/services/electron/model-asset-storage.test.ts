@@ -1,4 +1,4 @@
-import type { ModelAsset } from '@proj-airi/stage-shared/model-assets'
+import type { ModelAsset } from '@angela/stage-shared/model-assets'
 
 import { mkdir, mkdtemp, readdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'

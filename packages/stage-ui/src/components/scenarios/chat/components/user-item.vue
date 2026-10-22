@@ -2,7 +2,7 @@
 import type { ChatHistoryItem } from '../../../../types/chat'
 import type { ChatHistoryReplyPayload } from '../reply'
 
-import { isStageCapacitor, isStageWeb } from '@proj-airi/stage-shared'
+import { isStageCapacitor, isStageWeb } from '@angela/stage-shared'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

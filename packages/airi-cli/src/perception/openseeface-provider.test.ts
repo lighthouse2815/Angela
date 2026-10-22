@@ -1,7 +1,7 @@
 import type { ChildProcessWithoutNullStreams } from 'node:child_process'
 
-import type { StreamOptions } from '@proj-airi/core-agent'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { StreamOptions } from '@angela/core-agent'
+import type { GenerationProvider } from '@angela/provider-inference'
 import type { Tool } from '@xsai/shared-chat'
 
 import { ChildProcess, spawn } from 'node:child_process'
@@ -10,7 +10,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { PassThrough } from 'node:stream'
 
-import { cliMessages } from '@proj-airi/i18n/cli'
+import { cliMessages } from '@angela/i18n/cli'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Chat } from '../chat'

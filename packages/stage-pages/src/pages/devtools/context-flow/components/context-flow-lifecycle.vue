@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { ContextLifecycleRecord } from '@proj-airi/stage-ui/stores/devtools/context-observability'
+import type { ContextLifecycleRecord } from '@angela/stage-ui/stores/devtools/context-observability'
 
-import { Section } from '@proj-airi/stage-ui/components'
+import { Section } from '@angela/stage-ui/components'
 import { computed } from 'vue'
 
 const props = defineProps<{

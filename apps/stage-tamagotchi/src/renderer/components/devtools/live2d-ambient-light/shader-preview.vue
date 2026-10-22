@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { AmbientLightEnvironment, AmbientLightFilterOptions } from '@proj-airi/stage-shared/screen-ambient-light'
+import type { AmbientLightEnvironment, AmbientLightFilterOptions } from '@angela/stage-shared/screen-ambient-light'
 
-import ScreenAmbientLightPreview from '@proj-airi/stage-ui-live2d/components/diagnostics/screen-ambient-light-preview.vue'
+import ScreenAmbientLightPreview from '@angela/stage-ui-live2d/components/diagnostics/screen-ambient-light-preview.vue'
 
-import { ambientLightNeutralEnvironment } from '@proj-airi/stage-shared/screen-ambient-light'
-import { useSettingsScreenAmbientLight } from '@proj-airi/stage-shared/stores/screen-ambient-light'
-import { ambientLightTestCard } from '@proj-airi/stage-ui-live2d/utils/ambient-light-test-card'
-import { Section } from '@proj-airi/stage-ui/components'
+import { ambientLightNeutralEnvironment } from '@angela/stage-shared/screen-ambient-light'
+import { useSettingsScreenAmbientLight } from '@angela/stage-shared/stores/screen-ambient-light'
+import { ambientLightTestCard } from '@angela/stage-ui-live2d/utils/ambient-light-test-card'
+import { Section } from '@angela/stage-ui/components'
 import { storeToRefs } from 'pinia'
 import { computed, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'

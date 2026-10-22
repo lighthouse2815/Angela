@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BottomDrawer, Button, GhostButton, Input } from '@proj-airi/ui'
+import { BottomDrawer, Button, GhostButton, Input } from '@angela/ui'
 import { shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 

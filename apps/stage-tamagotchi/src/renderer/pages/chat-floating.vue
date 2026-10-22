@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { ChatFloatingState } from '../../shared/eventa'
 
-import { getElectronEventaContext, useElectronEventaInvoke, useElectronMouseInElement } from '@proj-airi/electron-vueuse'
-import { ChatSessionsDrawer } from '@proj-airi/stage-ui/components'
-import { useAiriCardStore } from '@proj-airi/stage-ui/stores/modules/airi-card'
+import { getElectronEventaContext, useElectronEventaInvoke, useElectronMouseInElement } from '@angela/electron-vueuse'
+import { ChatSessionsDrawer } from '@angela/stage-ui/components'
+import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
 import { useEventListener, useLocalStorage } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, onScopeDispose, shallowRef, useTemplateRef, watch } from 'vue'

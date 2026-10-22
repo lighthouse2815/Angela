@@ -1,4 +1,4 @@
-import { defineExtension } from '@proj-airi/plugin-sdk'
+import { defineExtension } from '@angela/plugin-sdk'
 
 function nowIso() {
   return new Date().toISOString()

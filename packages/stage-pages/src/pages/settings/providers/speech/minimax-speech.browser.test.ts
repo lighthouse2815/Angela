@@ -1,8 +1,8 @@
-import en from '@proj-airi/i18n/locales/en'
+import en from '@angela/i18n/locales/en'
 
+import { useSpeechStore } from '@angela/stage-ui/stores/modules/speech'
+import { useProviderConfigStore } from '@angela/stage-ui/stores/providers/config'
 import { PiniaColada } from '@pinia/colada'
-import { useSpeechStore } from '@proj-airi/stage-ui/stores/modules/speech'
-import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
 import { createPinia, disposePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-vue'

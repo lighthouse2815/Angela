@@ -1,6 +1,6 @@
 import type { ContextMessage } from '../../../types/chat'
 
-import { ContextUpdateStrategy } from '@proj-airi/server-sdk'
+import { ContextUpdateStrategy } from '@angela/server-sdk'
 import { nanoid } from 'nanoid'
 
 const RUNTIME_PROMPT_CONTEXT_ID = 'system:airi-runtime-prompt'

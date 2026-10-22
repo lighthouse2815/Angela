@@ -1,10 +1,10 @@
-import type { TamagotchiToolRegistry } from '@proj-airi/plugin-sdk-tamagotchi/tools'
-import type { ExtensionActivationPlan } from '@proj-airi/plugin-sdk/plugin-host'
+import type { TamagotchiToolRegistry } from '@angela/plugin-sdk-tamagotchi/tools'
+import type { ExtensionActivationPlan } from '@angela/plugin-sdk/plugin-host'
 import type {
   ExtensionDirectoryImportPlan,
   PluginHostDebugSnapshot,
   PluginRegistrySnapshot,
-} from '@proj-airi/stage-shared/plugin-host'
+} from '@angela/stage-shared/plugin-host'
 
 import type {
   ExtensionAssetCookie,
@@ -16,9 +16,9 @@ import type { SessionCleanupReport } from './managed-sessions'
 
 import { dirname, join } from 'node:path'
 
+import { ExtensionHost, planExtensionActivation } from '@angela/plugin-sdk/plugin-host'
 import { useLogg } from '@guiiai/logg'
 import { errorMessageFrom } from '@moeru/std'
-import { ExtensionHost, planExtensionActivation } from '@proj-airi/plugin-sdk/plugin-host'
 import { Mutex } from 'async-mutex'
 import { app, session as electronSession } from 'electron'
 

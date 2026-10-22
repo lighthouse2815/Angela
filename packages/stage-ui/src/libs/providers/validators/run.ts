@@ -1,1 +1,1 @@
-export * from '@proj-airi/provider-inference'
+export * from '@angela/provider-inference'

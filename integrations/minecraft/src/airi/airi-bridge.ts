@@ -1,9 +1,9 @@
-import type { Client, ContextUpdate, ModuleAnnouncedEvent } from '@proj-airi/server-sdk'
+import type { Client, ContextUpdate, ModuleAnnouncedEvent } from '@angela/server-sdk'
 
 import type { EventBus } from '../cognitive/event-bus'
 
+import { ContextUpdateStrategy } from '@angela/server-sdk'
 import { useLogg } from '@guiiai/logg'
-import { ContextUpdateStrategy } from '@proj-airi/server-sdk'
 import { nanoid } from 'nanoid'
 
 interface SparkCommandData {

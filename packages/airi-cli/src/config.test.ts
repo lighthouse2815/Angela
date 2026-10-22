@@ -3,7 +3,7 @@ import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { LocalConfigFile } from '@proj-airi/local-config/node'
+import { LocalConfigFile } from '@angela/local-config/node'
 import { describe, expect, it } from 'vitest'
 
 import { readConfig } from './config'

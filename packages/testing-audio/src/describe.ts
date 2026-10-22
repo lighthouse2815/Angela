@@ -1,12 +1,12 @@
-import type { AudioTestTask } from '@proj-airi/vitest-plugin-fakemic'
+import type { AudioTestTask } from '@angela/vitest-plugin-fakemic'
 
 import type { AudioInputPipeline, AudioInputPreflightContext, AudioInputSession, AudioInputTestCase } from './types'
 
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 
+import { createAudioTestAPI, createAudioTestTask, runAudioTestSession, startFakemicRuntime } from '@angela/vitest-plugin-fakemic'
 import { errorMessageFrom } from '@moeru/std'
-import { createAudioTestAPI, createAudioTestTask, runAudioTestSession, startFakemicRuntime } from '@proj-airi/vitest-plugin-fakemic'
 import { inject } from 'vitest'
 
 import { expect, installAudioInputMatchers } from './expect-extend'

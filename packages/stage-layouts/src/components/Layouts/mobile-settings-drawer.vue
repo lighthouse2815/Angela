@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
-import { Avatar, BasicButton, BottomDrawer, Checkbox, GhostButton, SelectTab, useTheme } from '@proj-airi/ui'
+import { useAuthStore } from '@angela/stage-ui/stores/auth'
+import { Avatar, BasicButton, BottomDrawer, Checkbox, GhostButton, SelectTab, useTheme } from '@angela/ui'
 import { useEventListener } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { shallowRef } from 'vue'

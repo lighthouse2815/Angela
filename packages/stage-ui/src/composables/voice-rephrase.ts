@@ -1,4 +1,4 @@
-import type { Conversation } from '@proj-airi/core-agent'
+import type { Conversation } from '@angela/core-agent'
 
 import { parseRephrasedSegments } from '../libs/voice/voice-rephrase-plugin'
 import { useLLM } from '../stores/ai/chat-llm/llm'

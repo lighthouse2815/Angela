@@ -16,7 +16,7 @@ It does not launch Electron itself and it does not own browser-scene composition
 
 This package is step 1 of the docs screenshot pipeline.
 
-1. Build `@proj-airi/stage-tamagotchi`.
+1. Build `@angela/desktop`.
 2. Run this scenario through `@vishot/cli`.
 3. Write raw outputs to `packages/scenarios-stage-tamagotchi-browser/artifacts/raw`.
 4. Then run the browser package capture (step 2, documented in that package README).
@@ -26,7 +26,7 @@ This package is step 1 of the docs screenshot pipeline.
 From repo root, run:
 
 ```bash
-pnpm -F @proj-airi/stage-tamagotchi build
+pnpm -F @angela/desktop build
 pnpm exec vishot capture --target electron ./packages/scenarios-stage-tamagotchi-electron/src/scenarios/demo-controls-settings-chat-websocket/index.ts --app-entrypoint ./apps/stage-tamagotchi/out/main/index.js --cwd . --output-dir ./packages/scenarios-stage-tamagotchi-browser/artifacts/raw --format avif
 ```
 
@@ -118,7 +118,7 @@ Important:
 When running scenarios through Vishot's generic Electron source capture, the built Electron app can use a different `userData` profile than `dev:tamagotchi`.
 
 - `dev:tamagotchi` plugin root commonly resolves to:
-  - `~/Library/Application Support/@proj-airi/stage-tamagotchi/plugins/v1`
+  - `~/Library/Application Support/@angela/desktop/plugins/v1`
 - Vishot/Electron capture runs can resolve plugin root to:
   - `~/Library/Application Support/Electron/plugins/v1`
 

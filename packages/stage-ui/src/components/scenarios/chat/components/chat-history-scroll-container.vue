@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ScrollableArea } from '@proj-airi/ui'
+import { ScrollableArea } from '@angela/ui'
 import { computed, useTemplateRef } from 'vue'
 
 defineOptions({

@@ -1,22 +1,21 @@
-import type { Locale } from '@intlify/core'
 import type {
   GameletIframeRequestPayload as GameletIframeInvokePayload,
   GameletIframeResponsePayload,
-} from '@proj-airi/plugin-sdk-tamagotchi/gamelet'
-import type { ServerOptions } from '@proj-airi/server-runtime/server'
+} from '@angela/plugin-sdk-tamagotchi/gamelet'
+import type { ServerOptions } from '@angela/server-runtime/server'
 import type {
   ShortcutAccelerator,
   ShortcutBinding,
   ShortcutRegistrationResult,
-} from '@proj-airi/stage-shared/global-shortcut'
+} from '@angela/stage-shared/global-shortcut'
 import type {
   StageViewErrorPayload,
   StageViewPatch,
   StageViewRequestAckPayload,
   StageViewSnapshotPayload,
-} from '@proj-airi/stage-shared/godot-stage'
-import type { ServerChannelQrPayload } from '@proj-airi/stage-shared/server-channel-qr'
-import type { IOTraceRecordingState, SerializedIOSpan } from '@proj-airi/stage-shared/types/io-trace'
+} from '@angela/stage-shared/godot-stage'
+import type { ServerChannelQrPayload } from '@angela/stage-shared/server-channel-qr'
+import type { IOTraceRecordingState, SerializedIOSpan } from '@angela/stage-shared/types/io-trace'
 import type {
   ThreeHitTestReadTracePayload,
   ThreeSceneRenderInfoTracePayload,
@@ -26,8 +25,9 @@ import type {
   VrmLoadErrorTracePayload,
   VrmLoadStartTracePayload,
   VrmUpdateFrameTracePayload,
-} from '@proj-airi/stage-ui-three/trace'
-import type { ChatHistoryReplyPayload } from '@proj-airi/stage-ui/components/scenarios/chat'
+} from '@angela/stage-ui-three/trace'
+import type { ChatHistoryReplyPayload } from '@angela/stage-ui/components/scenarios/chat'
+import type { Locale } from '@intlify/core'
 import type { Rectangle } from 'electron'
 
 import { defineEventa, defineInvokeEventa } from '@moeru/eventa'
@@ -654,5 +654,5 @@ export const electronAuthLogout = defineInvokeEventa<void>('eventa:invoke:electr
 export const i18nSetLocale = defineInvokeEventa<void, Locale>('eventa:invoke:electron:i18n:set-locale')
 export const i18nGetLocale = defineInvokeEventa<string | undefined>('eventa:invoke:electron:i18n:get-locale')
 
-export { electron } from '@proj-airi/electron-eventa'
-export * from '@proj-airi/electron-eventa/electron-updater'
+export { electron } from '@angela/electron-eventa'
+export * from '@angela/electron-eventa/electron-updater'

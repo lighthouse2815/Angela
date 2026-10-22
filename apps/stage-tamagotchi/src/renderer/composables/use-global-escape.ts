@@ -1,7 +1,7 @@
 import type { MaybeRefOrGetter } from 'vue'
 
+import { getElectronEventaContext, useElectronEventaInvoke } from '@angela/electron-vueuse'
 import { errorMessageFrom } from '@moeru/std'
-import { getElectronEventaContext, useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
 import { onScopeDispose, toValue, watch } from 'vue'
 
 import { electronShortcutRegister, electronShortcutTriggered, electronShortcutUnregister } from '../../shared/eventa'

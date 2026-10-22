@@ -1,13 +1,13 @@
+import type { Profile, WLipSyncAudioNode, WLipSyncVowel } from '@angela/model-driver-lipsync/shared/wlipsync'
 import type { VRMCore } from '@pixiv/three-vrm-core'
-import type { Profile, WLipSyncAudioNode, WLipSyncVowel } from '@proj-airi/model-driver-lipsync/shared/wlipsync'
 import type { Ref } from 'vue'
 
-import { createWLipSyncNode } from '@proj-airi/model-driver-lipsync/runtime/wlipsync'
+import { createWLipSyncNode } from '@angela/model-driver-lipsync/runtime/wlipsync'
 import {
   createWLipSyncVowelDriver,
   WLIP_SYNC_VOWELS,
   wlipsyncProfile,
-} from '@proj-airi/model-driver-lipsync/shared/wlipsync'
+} from '@angela/model-driver-lipsync/shared/wlipsync'
 import { ref, shallowRef, watch } from 'vue'
 
 const VRM_EXPRESSION_BY_VOWEL: Record<WLipSyncVowel, string> = {

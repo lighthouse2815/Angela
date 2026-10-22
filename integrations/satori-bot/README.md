@@ -63,10 +63,10 @@ LLM_OLLAMA_DISABLE_THINK=false
 
 ```bash
 # Development (Hot-reload)
-pnpm --filter @proj-airi/satori-bot dev
+pnpm --filter @angela/satori-bot dev
 
 # Production
-pnpm --filter @proj-airi/satori-bot start
+pnpm --filter @angela/satori-bot start
 ```
 
 ## Key Locations

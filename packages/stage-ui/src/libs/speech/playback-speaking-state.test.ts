@@ -4,7 +4,7 @@ import type {
   PlaybackItem,
   PlaybackRejectEvent,
   PlaybackStartEvent,
-} from '@proj-airi/pipelines-audio'
+} from '@angela/pipelines-audio'
 
 import { describe, expect, it } from 'vitest'
 

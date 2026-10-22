@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ChatAssistantMessage } from '../../../../types/chat'
 
-import { Truncatable } from '@proj-airi/ui'
+import { Truncatable } from '@angela/ui'
 import { computed } from 'vue'
 
 import { MarkdownRenderer } from '../../../markdown'

@@ -5,7 +5,7 @@ import { nextTick } from 'vue'
 it('persists VRM frame limits without changing the model view', async () => {
   const key = 'settings/stage-ui-three/max-fps'
   localStorage.removeItem(key)
-  const { useModelStore } = await import('@proj-airi/stage-ui-three')
+  const { useModelStore } = await import('@angela/stage-ui-three')
   const pinia = createPinia()
   setActivePinia(pinia)
 

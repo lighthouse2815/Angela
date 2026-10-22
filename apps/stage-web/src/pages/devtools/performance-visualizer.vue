@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { LagMetric } from '../../stores/devtools-lag'
 
-import { Button, FieldCheckbox } from '@proj-airi/ui'
+import { Button, FieldCheckbox } from '@angela/ui'
 import { useMagicKeys, whenever } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'

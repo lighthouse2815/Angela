@@ -2,7 +2,7 @@ import type { Task } from './task-schema'
 
 import { randomUUID } from 'node:crypto'
 
-import { cliMessages } from '@proj-airi/i18n/cli'
+import { cliMessages } from '@angela/i18n/cli'
 import { expect, it, vi } from 'vitest'
 
 import { ReminderNotifications } from './reminder-notifications'

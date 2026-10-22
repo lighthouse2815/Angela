@@ -1,4 +1,4 @@
-import type { CaptionChannelEvent } from '@proj-airi/stage-shared'
+import type { CaptionChannelEvent } from '@angela/stage-shared'
 
 import { readonly, shallowRef } from 'vue'
 

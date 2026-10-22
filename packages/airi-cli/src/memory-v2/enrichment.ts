@@ -1,11 +1,11 @@
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { GenerationProvider } from '@angela/provider-inference'
 import type { Tool } from '@xsai/shared-chat'
 
 import type { MemoryPage } from './types'
 
 import { randomUUID } from 'node:crypto'
 
-import { streamFrom } from '@proj-airi/core-agent'
+import { streamFrom } from '@angela/core-agent'
 
 import * as v from 'valibot'
 

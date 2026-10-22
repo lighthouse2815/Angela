@@ -1,4 +1,4 @@
-import type { AutoUpdaterState } from '@proj-airi/electron-eventa/electron-updater'
+import type { AutoUpdaterState } from '@angela/electron-eventa/electron-updater'
 
 import { computed, shallowRef } from 'vue'
 

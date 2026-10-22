@@ -1,7 +1,7 @@
 import type { UseMouseOptions } from '@vueuse/core'
 
+import { cursorScreenPoint, startLoopGetCursorScreenPoint } from '@angela/electron-eventa'
 import { defineInvoke } from '@moeru/eventa'
-import { cursorScreenPoint, startLoopGetCursorScreenPoint } from '@proj-airi/electron-eventa'
 import { useMouse } from '@vueuse/core'
 import { ref } from 'vue'
 

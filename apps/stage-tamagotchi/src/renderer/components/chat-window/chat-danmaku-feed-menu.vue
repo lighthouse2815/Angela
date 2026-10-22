@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Checkbox, Range } from '@proj-airi/ui'
+import { Checkbox, Range } from '@angela/ui'
 import { PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'reka-ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

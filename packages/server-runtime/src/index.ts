@@ -1,5 +1,5 @@
-import type { WsCloseDetails } from '@proj-airi/better-ws'
-import type { WsPeer } from '@proj-airi/better-ws/server'
+import type { WsCloseDetails } from '@angela/better-ws'
+import type { WsPeer } from '@angela/better-ws/server'
 import type {
   DeliveryConfig,
   ExtensionIdentity,
@@ -7,7 +7,7 @@ import type {
   MetadataEventSource,
   WebSocketBaseEvent,
   WebSocketEvent,
-} from '@proj-airi/server-shared/types'
+} from '@angela/server-shared/types'
 import type { Message as CrossWsMessage, Peer as CrossWsPeer } from 'crossws'
 
 import type {
@@ -19,18 +19,18 @@ import type { AuthenticatedPeer, Peer, RegisteredExtensionModule } from './types
 import { Buffer } from 'node:buffer'
 import { timingSafeEqual } from 'node:crypto'
 
-import { availableLogLevelStrings, Format, LogLevelString, logLevelStringToLogLevelMap, useLogg } from '@guiiai/logg'
-import { errorMessageFrom } from '@moeru/std'
-import { createServer as createWsServer } from '@proj-airi/better-ws/server'
-import { toH3Handler } from '@proj-airi/better-ws/server/h3'
+import { createServer as createWsServer } from '@angela/better-ws/server'
+import { toH3Handler } from '@angela/better-ws/server/h3'
 import {
   createInvalidJsonServerErrorMessage,
   ServerErrorMessages,
-} from '@proj-airi/server-shared'
+} from '@angela/server-shared'
 import {
   MessageHeartbeat,
   MessageHeartbeatKind,
-} from '@proj-airi/server-shared/types'
+} from '@angela/server-shared/types'
+import { availableLogLevelStrings, Format, LogLevelString, logLevelStringToLogLevelMap, useLogg } from '@guiiai/logg'
+import { errorMessageFrom } from '@moeru/std'
 import { H3 } from 'h3'
 import { nanoid } from 'nanoid'
 
@@ -219,8 +219,8 @@ export function setupApp(options?: AppOptions): { app: H3, closeAllPeers: () => 
 
   const { appLogLevel, appLogFormat, websocketLogLevel, websocketLogFormat } = normalizeLoggerConfig(options)
 
-  const appLogger = useLogg('@proj-airi/server-runtime').withLogLevel(logLevelStringToLogLevelMap[appLogLevel]).withFormat(appLogFormat)
-  const logger = useLogg('@proj-airi/server-runtime:websocket').withLogLevel(logLevelStringToLogLevelMap[websocketLogLevel]).withFormat(websocketLogFormat)
+  const appLogger = useLogg('@angela/server-runtime').withLogLevel(logLevelStringToLogLevelMap[appLogLevel]).withFormat(appLogFormat)
+  const logger = useLogg('@angela/server-runtime:websocket').withLogLevel(logLevelStringToLogLevelMap[websocketLogLevel]).withFormat(websocketLogFormat)
 
   const app = new H3({
     onError: error => appLogger.withError(error).error('an error occurred'),
@@ -228,7 +228,7 @@ export function setupApp(options?: AppOptions): { app: H3, closeAllPeers: () => 
 
   // === Registries & Orchestrators ===
   // TODO: Move protocol-neutral peer registry, consumer selection, and heartbeat
-  // primitives into `@proj-airi/better-ws/server` so server-runtime only owns
+  // primitives into `@angela/better-ws/server` so server-runtime only owns
   // AIRI authentication, registry sync, route policy, and extension events.
   const peers = new Map<string, AuthenticatedPeer>()
   const peersByModule = new Map<string, Map<number | string | undefined, AuthenticatedPeer>>()

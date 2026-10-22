@@ -5,7 +5,7 @@ import type { StreamTranscriptionSnapshot } from '../../../types'
 import type { SherpawTranscriptionHost } from './index'
 import type { SherpawModelId } from './models'
 
-import { toFloat32FromPCM16 } from '@proj-airi/audio/encoding'
+import { toFloat32FromPCM16 } from '@angela/audio/encoding'
 import { OnlineRecognizerTypes } from '@sherpaw/asr'
 import { asRemoteUrl, createSherpawProvider, streamTranscription } from '@sherpaw/xsai-transcription'
 

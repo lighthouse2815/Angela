@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import type { ServerEvent, ServerEvents } from '@proj-airi/stage-ui/libs/providers/providers/aliyun-nls'
-import type { HearingTranscriptionResult } from '@proj-airi/stage-ui/stores/modules/hearing'
+import type { ServerEvent, ServerEvents } from '@angela/stage-ui/libs/providers/providers/aliyun-nls'
+import type { HearingTranscriptionResult } from '@angela/stage-ui/stores/modules/hearing'
 import type { RemovableRef } from '@vueuse/core'
 import type { TranscriptionProviderWithExtraOptions } from '@xsai-ext/providers/utils'
 
-import vadWorkletUrl from '@proj-airi/stage-ui/workers/vad/process.worklet?worker&url'
+import vadWorkletUrl from '@angela/stage-ui/workers/vad/process.worklet?worker&url'
 
-import { toPCM16FromFloat32 } from '@proj-airi/audio/encoding'
-import { errorMessageFromValue } from '@proj-airi/stage-shared'
+import { toPCM16FromFloat32 } from '@angela/audio/encoding'
+import { errorMessageFromValue } from '@angela/stage-shared'
 import {
   Alert,
   ProviderBasicSettings,
   ProviderSettingsContainer,
   ProviderSettingsLayout,
-} from '@proj-airi/stage-ui/components'
-import { useProviderValidation } from '@proj-airi/stage-ui/composables/use-provider-validation'
-import { useHearingStore } from '@proj-airi/stage-ui/stores/modules/hearing'
-import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
-import { useProviderStore } from '@proj-airi/stage-ui/stores/providers/provider'
-import { Button, FieldCombobox, FieldInput } from '@proj-airi/ui'
+} from '@angela/stage-ui/components'
+import { useProviderValidation } from '@angela/stage-ui/composables/use-provider-validation'
+import { useHearingStore } from '@angela/stage-ui/stores/modules/hearing'
+import { useProviderConfigStore } from '@angela/stage-ui/stores/providers/config'
+import { useProviderStore } from '@angela/stage-ui/stores/providers/provider'
+import { Button, FieldCombobox, FieldInput } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed, onBeforeUnmount, onMounted, reactive, ref, shallowRef } from 'vue'
 

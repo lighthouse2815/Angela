@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useHostEventaInvoke } from '@proj-airi/stage-host-context'
-import { useBackgroundStore } from '@proj-airi/stage-ui/stores/background'
-import { useAiriCardStore } from '@proj-airi/stage-ui/stores/modules/airi-card'
-import { ScrollableArea } from '@proj-airi/ui'
+import { useHostEventaInvoke } from '@angela/stage-host-context'
+import { useBackgroundStore } from '@angela/stage-ui/stores/background'
+import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { ScrollableArea } from '@angela/ui'
 import { computed, ref, watch } from 'vue'
 
 import { widgetsHideWindow, widgetsRemove } from '../../../../shared/eventa'

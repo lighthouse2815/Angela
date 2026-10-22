@@ -1,4 +1,4 @@
-import type { Client } from '@proj-airi/server-sdk'
+import type { Client } from '@angela/server-sdk'
 
 import type { Mineflayer } from '../../libs/mineflayer'
 import type { ReflexManager } from '../reflex/reflex-manager'

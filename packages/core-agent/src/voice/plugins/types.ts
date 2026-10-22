@@ -1,4 +1,4 @@
-import type { AudioRange, AudioWindow, Observer, WindowOptions } from '@proj-airi/pipelines-audio'
+import type { AudioRange, AudioWindow, Observer, WindowOptions } from '@angela/pipelines-audio'
 
 import type { BeginSpeechInput, SpeechInputAttemptOutcome } from '../input/attempt-types'
 import type { EndDetectionOptions, EndDetector, SpeechActivityEvidence } from '../input/end-detection'

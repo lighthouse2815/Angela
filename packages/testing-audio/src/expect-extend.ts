@@ -1,8 +1,8 @@
-import type { SerializedIOSpan } from '@proj-airi/stage-shared/types/io-trace'
+import type { SerializedIOSpan } from '@angela/stage-shared/types/io-trace'
 
 import type { AudioInputObservations } from './types'
 
-import { IOAttributes, IOSpanNames } from '@proj-airi/stage-shared/perf/io-trace'
+import { IOAttributes, IOSpanNames } from '@angela/stage-shared/perf/io-trace'
 import { expect as vitestExpect } from 'vitest'
 
 export interface CapturedTranscriptionAudioExpectation {

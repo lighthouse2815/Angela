@@ -1,6 +1,6 @@
 import type { ContextMessage } from '../../types/chat'
 
-import { ContextUpdateStrategy } from '@proj-airi/server-sdk'
+import { ContextUpdateStrategy } from '@angela/server-sdk'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { isReadonly, reactive } from 'vue'

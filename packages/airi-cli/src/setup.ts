@@ -2,8 +2,8 @@ import process from 'node:process'
 
 import { parseArgs } from 'node:util'
 
-import { LocalConfigFile, resolveLocalConfigPath } from '@proj-airi/local-config/node'
-import { getGenerationProvider, listProviders } from '@proj-airi/provider-inference'
+import { LocalConfigFile, resolveLocalConfigPath } from '@angela/local-config/node'
+import { getGenerationProvider, listProviders } from '@angela/provider-inference'
 
 import { readConfig } from './config'
 import { Terminal } from './terminal'

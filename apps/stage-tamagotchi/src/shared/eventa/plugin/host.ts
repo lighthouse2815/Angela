@@ -2,7 +2,7 @@ import type {
   ExtensionDirectoryImportPrepareResult,
   PluginHostDebugSnapshot,
   PluginRegistrySnapshot,
-} from '@proj-airi/stage-shared/plugin-host'
+} from '@angela/stage-shared/plugin-host'
 
 import { defineInvokeEventa } from '@moeru/eventa'
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IOSubsystem, IOTurn } from '@proj-airi/stage-shared'
+import type { IOSubsystem, IOTurn } from '@angela/stage-shared'
 
 import { computed } from 'vue'
 

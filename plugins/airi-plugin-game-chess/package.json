@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/airi-plugin-game-chess",
+  "name": "@angela/plugin-game-chess",
   "type": "module",
   "version": "0.12.0-beta.5",
   "private": true,
@@ -12,12 +12,12 @@
     "build": "vite build && tsdown"
   },
   "dependencies": {
+    "@angela/plugin-protocol": "workspace:*",
+    "@angela/plugin-sdk": "workspace:*",
+    "@angela/plugin-sdk-tamagotchi": "workspace:*",
+    "@angela/ui": "workspace:^",
     "@moeru/eventa": "catalog:",
     "@moeru/std": "catalog:",
-    "@proj-airi/plugin-protocol": "workspace:*",
-    "@proj-airi/plugin-sdk": "workspace:*",
-    "@proj-airi/plugin-sdk-tamagotchi": "workspace:*",
-    "@proj-airi/ui": "workspace:^",
     "animejs": "catalog:",
     "chess.js": "catalog:",
     "reka-ui": "catalog:",
@@ -26,9 +26,9 @@
     "vue": "catalog:"
   },
   "devDependencies": {
+    "@angela/core-agent": "workspace:^",
+    "@angela/stage-ui": "workspace:^",
     "@ax-llm/ax": "catalog:",
-    "@proj-airi/core-agent": "workspace:^",
-    "@proj-airi/stage-ui": "workspace:^",
     "@proj-airi/unocss-preset-chromatic": "catalog:",
     "@unocss/reset": "catalog:",
     "@vitejs/plugin-vue": "catalog:",

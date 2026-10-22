@@ -302,7 +302,7 @@ Hardware-free camera checks:
 
 ```sh
 python3 -m unittest discover -s packages/airi-cli/python/camera-worker -p test.py
-pnpm -F @proj-airi/airi-cli exec vitest run src/perception
+pnpm -F @angela/cli exec vitest run src/perception
 ```
 
 The integration test uses a fixture Python subprocess and a mocked model HTTP boundary.
@@ -376,7 +376,7 @@ Audio failures stop speech for that reply while text generation and history cont
 Build the service before the first run. The CLI connects its terminal tools automatically:
 
 ```sh
-pnpm -F @proj-airi/computer-use-mcp build
+pnpm -F @angela/computer-use-mcp build
 angela --cwd ./packages/core-agent
 ```
 
@@ -399,7 +399,7 @@ Cancellation stops the model request and MCP wait. Completed or running external
 To connect another trusted stdio MCP server, supply its executable and arguments separately:
 
 ```sh
-pnpm cli --mcp-command pnpm --mcp-arg=-F --mcp-arg=@proj-airi/computer-use-mcp --mcp-arg=start
+pnpm cli --mcp-command pnpm --mcp-arg=-F --mcp-arg=@angela/computer-use-mcp --mcp-arg=start
 ```
 
 The server starts in `--cwd`. Its stderr goes to the terminal. CLI output never mixes with the server protocol.
@@ -553,9 +553,9 @@ Shared terminal and Telegram tasks use one delivery claim, so the first successf
 ## Checks
 
 ```sh
-pnpm -F @proj-airi/airi-cli typecheck
-pnpm -F @proj-airi/airi-cli test
-pnpm -F @proj-airi/airi-cli build
+pnpm -F @angela/cli typecheck
+pnpm -F @angela/cli test
+pnpm -F @angela/cli build
 ```
 
 ## Audio device selection
@@ -999,9 +999,9 @@ An unlocked graphical login and notification daemon are required. This service d
 Run the package checks from the repository root:
 
 ```sh
-pnpm -F @proj-airi/airi-cli typecheck
-pnpm -F @proj-airi/airi-cli test
-pnpm -F @proj-airi/airi-cli build
+pnpm -F @angela/cli typecheck
+pnpm -F @angela/cli test
+pnpm -F @angela/cli build
 pnpm lint
 ```
 

@@ -2,10 +2,10 @@
 import type {
   OutputFilterFrame,
   OutputFilterOptions,
-} from '@proj-airi/model-driver-magic-live2d'
+} from '@angela/model-driver-magic-live2d'
 
-import { defaultOutputFilterOptions } from '@proj-airi/model-driver-magic-live2d'
-import { BasicButton, FieldRange } from '@proj-airi/ui'
+import { defaultOutputFilterOptions } from '@angela/model-driver-magic-live2d'
+import { BasicButton, FieldRange } from '@angela/ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

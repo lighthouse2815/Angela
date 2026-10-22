@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { SourcesOptions } from 'electron'
 
-import { useHostScreenCapture } from '@proj-airi/stage-host-context'
-import { Button, Callout } from '@proj-airi/ui'
+import { useHostScreenCapture } from '@angela/stage-host-context'
+import { Button, Callout } from '@angela/ui'
 import { useWindowFocus } from '@vueuse/core'
 import { DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'reka-ui'
 import { onMounted, ref, toRef, watch } from 'vue'

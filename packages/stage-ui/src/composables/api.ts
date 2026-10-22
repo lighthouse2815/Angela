@@ -1,4 +1,4 @@
-import type { AppType } from '@proj-airi/api-server/app-type'
+import type { AppType } from '@angela/api-server/app-type'
 
 import { hc } from 'hono/client'
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ModelSettingsRuntimeSnapshot } from '@proj-airi/stage-ui/components/scenarios/settings/model-settings/runtime'
+import type { ModelSettingsRuntimeSnapshot } from '@angela/stage-ui/components/scenarios/settings/model-settings/runtime'
 
 import {
   useHostMouseAroundWindowBorder,
@@ -8,20 +8,20 @@ import {
   useHostOnboarding,
   useHostPointerPassthrough,
   useHostRelativeMouse,
-} from '@proj-airi/stage-host-context'
-import { useExpressionStore } from '@proj-airi/stage-ui-live2d/stores/expression-store'
-import { useModelStore, useThreeSceneIsTransparentAtPoint } from '@proj-airi/stage-ui-three'
-import { HoloCoupon, VoiceDrafts } from '@proj-airi/stage-ui/components'
+} from '@angela/stage-host-context'
+import { useExpressionStore } from '@angela/stage-ui-live2d/stores/expression-store'
+import { useModelStore, useThreeSceneIsTransparentAtPoint } from '@angela/stage-ui-three'
+import { HoloCoupon, VoiceDrafts } from '@angela/stage-ui/components'
 import {
   createEmptyModelSettingsRuntimeSnapshot,
   resolveComponentStateToRuntimePhase,
-} from '@proj-airi/stage-ui/components/scenarios/settings/model-settings/runtime'
-import { WidgetStage } from '@proj-airi/stage-ui/components/scenes'
-import { useCanvasPixelIsTransparentAtPoint } from '@proj-airi/stage-ui/composables/canvas-alpha'
-import { useVoiceListening } from '@proj-airi/stage-ui/composables/voice-input-mode'
-import { useOnboardingStore } from '@proj-airi/stage-ui/stores/onboarding'
-import { useSettings } from '@proj-airi/stage-ui/stores/settings'
-import { useVoiceStore } from '@proj-airi/stage-ui/stores/voice'
+} from '@angela/stage-ui/components/scenarios/settings/model-settings/runtime'
+import { WidgetStage } from '@angela/stage-ui/components/scenes'
+import { useCanvasPixelIsTransparentAtPoint } from '@angela/stage-ui/composables/canvas-alpha'
+import { useVoiceListening } from '@angela/stage-ui/composables/voice-input-mode'
+import { useOnboardingStore } from '@angela/stage-ui/stores/onboarding'
+import { useSettings } from '@angela/stage-ui/stores/settings'
+import { useVoiceStore } from '@angela/stage-ui/stores/voice'
 import { refDebounced } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, ref, shallowRef, toRef, watch } from 'vue'

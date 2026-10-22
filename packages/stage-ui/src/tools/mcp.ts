@@ -1,6 +1,6 @@
 import type { Tool } from '@xsai/shared-chat'
 
-import { errorMessageFromValue } from '@proj-airi/stage-shared'
+import { errorMessageFromValue } from '@angela/stage-shared'
 import { tool } from '@xsai/tool'
 import { z } from 'zod'
 

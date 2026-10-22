@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { AmbientLightMap } from '@proj-airi/stage-shared/screen-ambient-light'
+import type { AmbientLightMap } from '@angela/stage-shared/screen-ambient-light'
 import type { ComponentPublicInstance } from 'vue'
 
 import type { ScreenAmbientLightDiagnosticsSnapshot } from '../../../../shared/screen-ambient-light-diagnostics'
 
-import { ambientLightNeutralMapMargin, linearToSrgbByte } from '@proj-airi/stage-shared/screen-ambient-light'
+import { ambientLightNeutralMapMargin, linearToSrgbByte } from '@angela/stage-shared/screen-ambient-light'
 import { computed, nextTick, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 

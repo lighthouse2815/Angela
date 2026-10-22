@@ -5,9 +5,9 @@
  * without a DOM environment or Vue test-utils.
  */
 
-import type { McpCallToolResult } from '@proj-airi/stage-ui/stores/mcp-tool-bridge'
+import type { McpCallToolResult } from '@angela/stage-ui/stores/mcp-tool-bridge'
 
-import { errorMessageFromValue } from '@proj-airi/stage-shared'
+import { errorMessageFromValue } from '@angela/stage-shared'
 
 import { desktopOverlayPollHeartbeatMarker, desktopOverlayPollHeartbeatQueryParam } from '../../shared/desktop-overlay-heartbeat'
 

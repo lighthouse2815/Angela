@@ -3,7 +3,7 @@ import type { MorphSlot } from '../constants/morphs'
 
 import localforage from 'localforage'
 
-import { useLocalStorageManualReset } from '@proj-airi/stage-shared/composables'
+import { useLocalStorageManualReset } from '@angela/stage-shared/composables'
 import { useBroadcastChannel } from '@vueuse/core'
 import { nanoid } from 'nanoid/non-secure'
 import { defineStore } from 'pinia'

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TachieEmotion } from '../../constants/emotions'
 
-import { Screen } from '@proj-airi/ui'
+import { Screen } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed, useTemplateRef, watch } from 'vue'
 

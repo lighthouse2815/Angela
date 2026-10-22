@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ElectronMcpTestResult } from '../../../../../shared/eventa'
 
-import { Button, Callout, FieldSelect, SettingsCard } from '@proj-airi/ui'
+import { Button, Callout, FieldSelect, SettingsCard } from '@angela/ui'
 import { useI18n } from 'vue-i18n'
 
 interface TestOption {

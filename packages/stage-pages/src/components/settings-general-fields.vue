@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { all } from '@proj-airi/i18n'
-import { useAnalytics } from '@proj-airi/stage-ui/composables/use-analytics'
-import { isAnalyticsAvailableInBuild } from '@proj-airi/stage-ui/libs/product-signals'
-import { useSettings } from '@proj-airi/stage-ui/stores/settings'
-import { FieldCheckbox, FieldCombobox, useTheme } from '@proj-airi/ui'
+import { all } from '@angela/i18n'
+import { useAnalytics } from '@angela/stage-ui/composables/use-analytics'
+import { isAnalyticsAvailableInBuild } from '@angela/stage-ui/libs/product-signals'
+import { useSettings } from '@angela/stage-ui/stores/settings'
+import { FieldCheckbox, FieldCombobox, useTheme } from '@angela/ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

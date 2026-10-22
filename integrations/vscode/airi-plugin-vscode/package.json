@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/airi-plugin-vscode",
+  "name": "@angela/plugin-vscode",
   "type": "module",
   "version": "0.12.0-beta.5",
   "private": true,
@@ -28,6 +28,6 @@
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "@proj-airi/plugin-sdk": "workspace:*"
+    "@angela/plugin-sdk": "workspace:*"
   }
 }

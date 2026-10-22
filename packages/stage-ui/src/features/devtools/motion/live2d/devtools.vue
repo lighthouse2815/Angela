@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { StandardGamepadSnapshot } from '@proj-airi/input-gamepad'
-import type { Live2DBreathControlOptions, Live2DMotionControlDynamics, Live2DMotionControlPose } from '@proj-airi/stage-ui-live2d/stores'
+import type { StandardGamepadSnapshot } from '@angela/input-gamepad'
+import type { Live2DBreathControlOptions, Live2DMotionControlDynamics, Live2DMotionControlPose } from '@angela/stage-ui-live2d/stores'
 
 import type { Live2DMotionEditorFrame } from './composables/keyframes'
 
-import { defaultLive2DBreathControlOptions, defaultLive2DMotionControlDynamics, neutralLive2DMotionControlPose, useLive2DMotionControl } from '@proj-airi/stage-ui-live2d/stores'
-import { BasicButton, FieldRange } from '@proj-airi/ui'
+import { defaultLive2DBreathControlOptions, defaultLive2DMotionControlDynamics, neutralLive2DMotionControlPose, useLive2DMotionControl } from '@angela/stage-ui-live2d/stores'
+import { BasicButton, FieldRange } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { onMounted, onUnmounted, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

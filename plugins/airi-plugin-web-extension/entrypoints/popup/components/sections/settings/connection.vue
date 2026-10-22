@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Button, FieldInput } from '@proj-airi/ui'
+import { Button, FieldInput } from '@angela/ui'
 
 defineProps<{
   enabled: boolean

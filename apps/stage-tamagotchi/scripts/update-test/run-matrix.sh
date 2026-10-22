@@ -21,7 +21,7 @@ printf "mode\tlane\tstatus\treason\tsummary\n" > "${SUMMARY_TSV}"
 
 if [[ ! -x "${APP_BIN}" ]]; then
   echo "Packaged app not found: ${APP_BIN}"
-  echo "Build first: rm -rf apps/stage-tamagotchi/dist && pnpm -F @proj-airi/stage-tamagotchi build:mac"
+  echo "Build first: rm -rf apps/stage-tamagotchi/dist && pnpm -F @angela/desktop build:mac"
   exit 1
 fi
 
@@ -37,7 +37,7 @@ bash "${SCRIPT_DIR}/setup.sh"
 
 echo "==> Generating local update fixtures for lanes: ${LANES[*]}"
 for lane in "${LANES[@]}"; do
-  pnpm -F @proj-airi/stage-tamagotchi update-test:generate \
+  pnpm -F @angela/desktop update-test:generate \
     --root scripts/update-test/fixtures/server \
     --channel "${lane}" \
     --target aarch64-apple-darwin \
@@ -46,7 +46,7 @@ for lane in "${LANES[@]}"; do
 done
 
 echo "==> Starting local update-test server on port ${PORT}"
-pnpm -F @proj-airi/stage-tamagotchi update-test:server \
+pnpm -F @angela/desktop update-test:server \
   --port "${PORT}" \
   --root scripts/update-test/fixtures/server \
   > "${LOG_DIR}/server.log" 2>&1 &

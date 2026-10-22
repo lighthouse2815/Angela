@@ -1,4 +1,4 @@
-import type { WebSocketEvent } from '@proj-airi/server-shared/types'
+import type { WebSocketEvent } from '@angela/server-shared/types'
 
 import type { Peer } from './types'
 
@@ -36,7 +36,7 @@ vi.mock('h3', () => ({
   },
 }))
 
-vi.mock('@proj-airi/better-ws/server/h3', () => ({
+vi.mock('@angela/better-ws/server/h3', () => ({
   toH3Handler: vi.fn((server: TestWsServer, options: { state: (peer: Peer) => { rawPeer: Peer } }) => ({
     open(peer: Peer) {
       server.accept({

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useHostEventaInvoke } from '@proj-airi/stage-host-context'
-import { useModsServerChannelStore } from '@proj-airi/stage-ui/stores/mods/api/channel-server'
-import { lampFlickerAnimationClass } from '@proj-airi/ui'
+import { useHostEventaInvoke } from '@angela/stage-host-context'
+import { useModsServerChannelStore } from '@angela/stage-ui/stores/mods/api/channel-server'
+import { lampFlickerAnimationClass } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

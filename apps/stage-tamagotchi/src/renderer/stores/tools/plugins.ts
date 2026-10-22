@@ -1,9 +1,9 @@
-import type { ExecutableTool } from '@proj-airi/stage-ui/stores/ai/chat-llm/tools'
+import type { ExecutableTool } from '@angela/stage-ui/stores/ai/chat-llm/tools'
 
+import { useElectronEventaInvoke } from '@angela/electron-vueuse'
+import { useLlmToolsStore } from '@angela/stage-ui/stores/ai/chat-llm/tools'
+import { useLlmToolsetPromptsStore } from '@angela/stage-ui/stores/ai/chat-llm/toolset-prompts'
 import { errorMessageFrom } from '@moeru/std'
-import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { useLlmToolsStore } from '@proj-airi/stage-ui/stores/ai/chat-llm/tools'
-import { useLlmToolsetPromptsStore } from '@proj-airi/stage-ui/stores/ai/chat-llm/toolset-prompts'
 import { rawTool } from '@xsai/tool'
 import { defineStore } from 'pinia'
 

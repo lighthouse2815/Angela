@@ -1,7 +1,7 @@
 import type { FSWatcher } from 'node:fs'
 
-import type { cliMessages } from '@proj-airi/i18n/cli'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { cliMessages } from '@angela/i18n/cli'
+import type { GenerationProvider } from '@angela/provider-inference'
 import type { Tool } from '@xsai/shared-chat'
 
 import type { RecallHit } from './recall-index'

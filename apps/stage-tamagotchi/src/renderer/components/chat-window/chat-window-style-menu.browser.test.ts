@@ -19,7 +19,7 @@ const mocks = vi.hoisted(() => ({
 // The preferences live in the Electron main process. The doubles answer for
 // it, so the test controls when each saved choice settles.
 // Removal condition: browser tests running inside an Electron renderer.
-vi.mock('@proj-airi/electron-vueuse', async () => {
+vi.mock('@angela/electron-vueuse', async () => {
   const { electronChatWindowGetPreferences } = await import('../../../shared/eventa')
   return {
     useElectronEventaInvoke: (event: unknown) => event === electronChatWindowGetPreferences ? mocks.getPreferences : mocks.setPreferences,

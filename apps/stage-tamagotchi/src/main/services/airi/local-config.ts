@@ -1,7 +1,7 @@
 import type { createContext } from '@moeru/eventa/adapters/electron/main'
 
+import { LocalConfigFile } from '@angela/local-config/node'
 import { defineInvokeHandler } from '@moeru/eventa'
-import { LocalConfigFile } from '@proj-airi/local-config/node'
 import { BrowserWindow } from 'electron'
 
 import { localConfigRead, localConfigUpdate } from '../../../shared/eventa/local-config'

@@ -1,4 +1,4 @@
-import type { InferenceServiceProvider } from '@proj-airi/provider-inference'
+import type { InferenceServiceProvider } from '@angela/provider-inference'
 
 import * as v from 'valibot'
 

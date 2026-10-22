@@ -1,7 +1,7 @@
-import messages from '@proj-airi/i18n/locales'
+import messages from '@angela/i18n/locales'
 
-import { resolveSupportedLocale } from '@proj-airi/i18n'
-import { useLocalStorageManualReset } from '@proj-airi/stage-shared/composables'
+import { resolveSupportedLocale } from '@angela/i18n'
+import { useLocalStorageManualReset } from '@angela/stage-shared/composables'
 import { defineStore } from 'pinia'
 import { onMounted } from 'vue'
 

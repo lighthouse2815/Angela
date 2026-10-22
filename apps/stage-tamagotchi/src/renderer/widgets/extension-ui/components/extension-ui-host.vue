@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { PluginHostModuleSummary } from '@proj-airi/stage-shared/plugin-host'
+import type { PluginHostModuleSummary } from '@angela/stage-shared/plugin-host'
 import type { ComponentPublicInstance } from 'vue'
 
 import type {
@@ -8,8 +8,8 @@ import type {
 } from '../../../../shared/eventa'
 import type { PluginModuleWidgetPayload } from '../../../../shared/eventa/plugin/host'
 
-import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { useContextBridgeStore } from '@proj-airi/stage-ui/stores/mods/api/context-bridge'
+import { useElectronEventaInvoke } from '@angela/electron-vueuse'
+import { useContextBridgeStore } from '@angela/stage-ui/stores/mods/api/context-bridge'
 import { isPlainObject } from 'es-toolkit'
 import { computed, shallowRef, watch } from 'vue'
 

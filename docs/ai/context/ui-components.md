@@ -1,4 +1,4 @@
-# `@proj-airi/ui` Component Reference
+# `@angela/ui` Component Reference
 
 > **Auto-maintained**: When adding or updating components in `packages/ui`, update this document accordingly.
 

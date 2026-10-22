@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { ShortcutAccelerator, ShortcutFailureReason } from '@proj-airi/stage-shared/global-shortcut'
+import type { ShortcutAccelerator, ShortcutFailureReason } from '@angela/stage-shared/global-shortcut'
 
-import { useHostSpotlightShortcut } from '@proj-airi/stage-host-context'
-import { formatAccelerator, ShortcutFailureReasons } from '@proj-airi/stage-shared/global-shortcut'
-import { useAnalytics } from '@proj-airi/stage-ui/composables'
-import { Button } from '@proj-airi/ui'
+import { useHostSpotlightShortcut } from '@angela/stage-host-context'
+import { formatAccelerator, ShortcutFailureReasons } from '@angela/stage-shared/global-shortcut'
+import { useAnalytics } from '@angela/stage-ui/composables'
+import { Button } from '@angela/ui'
 import { isMacOS } from 'std-env'
 import { computed, onMounted, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'

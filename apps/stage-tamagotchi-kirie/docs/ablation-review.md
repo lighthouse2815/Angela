@@ -105,8 +105,8 @@ These commands describe the earlier experiment batches, before the current frame
 | `mise x -- dotnet build StageTamagotchiKirie.csproj --no-restore` | Passed after probe removal, with no warnings or errors. |
 | `mise x -- dotnet run --project tests/StageTamagotchiKirie.Tests --no-restore` | Passed after probe removal. Experiment 5's new case failed on the old selector first. |
 | `mise x -- dotnet format StageTamagotchiKirie.csproj --verify-no-changes --no-restore` | Passed. Both project format checks also passed in the relevant earlier batches. |
-| `mise x -- pnpm -F @proj-airi/stage-tamagotchi-kirie test:unit` | Passed after probe removal: 13 files and 42 existing tests. |
-| `mise x -- pnpm -F @proj-airi/stage-tamagotchi-kirie typecheck` | Passed after probe removal. |
+| `mise x -- pnpm -F @angela/desktop-kirie test:unit` | Passed after probe removal: 13 files and 42 existing tests. |
+| `mise x -- pnpm -F @angela/desktop-kirie typecheck` | Passed after probe removal. |
 | `mise x -- pnpm typecheck` | Review batch passed all 54 tasks. |
 | `mise x -- pnpm exec moeru-lint <changed documentation and host adapters>` | Passed for the recorded changed files. The immutable full review retains the exact file arguments. |
 | `mise x -- pnpm lint` | Failed with 1,715 errors and 701 warnings. All errors were in 23 ignored artifact files. |

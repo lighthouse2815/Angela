@@ -1,8 +1,8 @@
-import type { EventContext } from '@moeru/eventa'
 import type {
   ExtensionIdentity,
   ExtensionModuleIdentity,
-} from '@proj-airi/plugin-protocol/types'
+} from '@angela/plugin-protocol/types'
+import type { EventContext } from '@moeru/eventa'
 
 import { createContext } from '@moeru/eventa'
 

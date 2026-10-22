@@ -10,7 +10,7 @@ Issue #1491 asks AIRI to read and control Home Assistant. A user wants to say
 `plugins/airi-plugin-homeassistant` was a scaffold. Commit `4401b96c9`
 (2025-12-29) added a `package.json`, a `tsconfig.json`, a tsdown config, and a
 single `src/index.ts` that held `console.warn('WIP')`. The scaffold depended on
-`@proj-airi/server-sdk`, which suggests a channel plugin was the starting idea.
+`@angela/server-sdk`, which suggests a channel plugin was the starting idea.
 `plugins/airi-plugin-bilibili-laplace` arrived the same day in the same shape.
 Nothing imported the package, and this work removes it, because the integration
 lives in the application instead of in a process of its own.
@@ -51,7 +51,7 @@ the settings page can only push a live update.
 
 ### Why not an extension
 
-`@proj-airi/plugin-sdk` gives a typed tool with a real return value, so it meets
+`@angela/plugin-sdk` gives a typed tool with a real return value, so it meets
 the same requirement. Three facts decide against it here.
 
 - No extension can receive configuration. `ExtensionSetupContext` carries only

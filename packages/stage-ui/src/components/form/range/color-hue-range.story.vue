@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ColorHueRange } from '@proj-airi/ui'
+import { ColorHueRange } from '@angela/ui'
 import { ref } from 'vue'
 
 const minValue = ref(0)

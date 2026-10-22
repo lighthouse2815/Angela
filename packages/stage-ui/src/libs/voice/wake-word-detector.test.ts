@@ -1,10 +1,10 @@
-import type { LiveAudioSource, PcmBlock } from '@proj-airi/pipelines-audio'
+import type { LiveAudioSource, PcmBlock } from '@angela/pipelines-audio'
 import type { Detection, KeywordEntry, KeywordSpotter } from '@sherpaw/kws'
 
 import type { WakeWordDetectorOptions } from './wake-word-detector'
 import type { WakePronunciation } from './wake-words'
 
-import { AudioInput, createPushStream } from '@proj-airi/pipelines-audio'
+import { AudioInput, createPushStream } from '@angela/pipelines-audio'
 import { describe, expect, it, vi } from 'vitest'
 
 import { WakeWordDetector } from './wake-word-detector'

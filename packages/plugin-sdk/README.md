@@ -1,4 +1,4 @@
-# @proj-airi/plugin-sdk
+# @angela/plugin-sdk
 
 Runtime-agnostic SDK for AIRI extensions.
 

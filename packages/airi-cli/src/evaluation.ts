@@ -1,5 +1,5 @@
-import type { cliMessages } from '@proj-airi/i18n/cli'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { cliMessages } from '@angela/i18n/cli'
+import type { GenerationProvider } from '@angela/provider-inference'
 import type { Tool } from '@xsai/shared-chat'
 
 import process from 'node:process'
@@ -10,7 +10,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { parseArgs } from 'node:util'
 
-import { getGenerationProvider, listProviders } from '@proj-airi/provider-inference'
+import { getGenerationProvider, listProviders } from '@angela/provider-inference'
 
 import * as v from 'valibot'
 

@@ -1,9 +1,9 @@
 import type { ChatInterruptionOptions } from './use-chat-interruption'
 
+import { getSpeechBusContext, voiceGetTurns, voiceInterrupt, voiceTurnsChanged } from '@angela/stage-ui/services/speech/bus'
+import { useChatSessionStore } from '@angela/stage-ui/stores/chat/session-store'
+import { useSpeechOutputControlStore } from '@angela/stage-ui/stores/speech-output-control'
 import { defineInvokeHandler } from '@moeru/eventa'
-import { getSpeechBusContext, voiceGetTurns, voiceInterrupt, voiceTurnsChanged } from '@proj-airi/stage-ui/services/speech/bus'
-import { useChatSessionStore } from '@proj-airi/stage-ui/stores/chat/session-store'
-import { useSpeechOutputControlStore } from '@proj-airi/stage-ui/stores/speech-output-control'
 import { createPinia, disposePinia, setActivePinia } from 'pinia'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createApp, defineComponent, h, ref } from 'vue'

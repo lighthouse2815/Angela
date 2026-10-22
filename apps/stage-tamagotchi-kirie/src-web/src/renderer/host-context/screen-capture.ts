@@ -1,4 +1,4 @@
-import type { ScreenCaptureSetSourceRequest, SerializableDesktopCapturerSource } from '@proj-airi/electron-screen-capture'
+import type { ScreenCaptureSetSourceRequest, SerializableDesktopCapturerSource } from '@angela/electron-screen-capture'
 import type { SourcesOptions, systemPreferences } from 'electron'
 import type { MaybeRefOrGetter } from 'vue'
 

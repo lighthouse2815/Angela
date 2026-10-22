@@ -1,8 +1,8 @@
-import type { PcmBlock } from '@proj-airi/pipelines-audio'
+import type { PcmBlock } from '@angela/pipelines-audio'
 
 import type { AudioPluginTask, TranscriptionEnd, TranscriptionEvent, VoicePluginControls, WriteResult } from '../index'
 
-import { AudioInput, capture, createPushStream, observe } from '@proj-airi/pipelines-audio'
+import { AudioInput, capture, createPushStream, observe } from '@angela/pipelines-audio'
 import { describe, expect, it, vi } from 'vitest'
 
 import { VoiceController } from '../index'
@@ -227,7 +227,7 @@ describe('voiceController input', () => {
       throw new Error('Diagnostic sink failed')
     })
     const controller = new VoiceController({ audio, onError: diagnostics, transcriber: vi.fn(), submit: vi.fn() })
-    let observation: import('@proj-airi/pipelines-audio').Observer | undefined
+    let observation: import('@angela/pipelines-audio').Observer | undefined
     const observing = Promise.withResolvers<void>()
     controller.use({ name: 'speaker', setup(plugin) {
       observation = plugin.observeAudio({ windowMs: 4, hopMs: 4 }, async () => {

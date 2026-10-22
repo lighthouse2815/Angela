@@ -1,13 +1,13 @@
+import type { GenerationProvider } from '@angela/provider-inference'
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
 
 import { PassThrough } from 'node:stream'
 
+import { cliMessages } from '@angela/i18n/cli'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js'
-import { cliMessages } from '@proj-airi/i18n/cli'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { Chat } from './chat'

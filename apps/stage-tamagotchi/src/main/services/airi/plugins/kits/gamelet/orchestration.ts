@@ -1,5 +1,5 @@
-import type { GameletKitRuntime } from '@proj-airi/plugin-sdk-tamagotchi/gamelet'
-import type { HostDataRecord } from '@proj-airi/plugin-sdk/plugin-host'
+import type { GameletKitRuntime } from '@angela/plugin-sdk-tamagotchi/gamelet'
+import type { HostDataRecord } from '@angela/plugin-sdk/plugin-host'
 
 import type { ExtensionHostGameletWidgetsManager } from '../../types'
 

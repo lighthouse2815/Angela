@@ -2,7 +2,7 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   test: {
-    name: '@proj-airi/core-agent',
+    name: '@angela/core-agent',
     include: ['src/**/*.test.ts'],
   },
 })

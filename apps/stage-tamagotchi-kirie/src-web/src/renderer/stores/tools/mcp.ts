@@ -1,8 +1,8 @@
-import type { ExecutableTool } from '@proj-airi/stage-ui/stores/ai/chat-llm/tools'
+import type { ExecutableTool } from '@angela/stage-ui/stores/ai/chat-llm/tools'
 
-import { useHostEventaInvoke } from '@proj-airi/stage-host-context'
-import { useLlmToolsStore } from '@proj-airi/stage-ui/stores/ai/chat-llm/tools'
-import { createMcpTools } from '@proj-airi/stage-ui/tools/mcp'
+import { useHostEventaInvoke } from '@angela/stage-host-context'
+import { useLlmToolsStore } from '@angela/stage-ui/stores/ai/chat-llm/tools'
+import { createMcpTools } from '@angela/stage-ui/tools/mcp'
 import { defineStore } from 'pinia'
 
 import { electronMcpCallTool, electronMcpListTools } from '../../../shared/eventa'

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { WidgetsIframeRequestPayload, WidgetsIframeRequestResultPayload, WidgetSnapshot, WidgetWindowSize } from '../../shared/eventa'
 
-import { useHostEventaContext, useHostEventaInvoke } from '@proj-airi/stage-host-context'
-import { useAnalytics } from '@proj-airi/stage-ui/composables'
+import { useHostEventaContext, useHostEventaInvoke } from '@angela/stage-host-context'
+import { useAnalytics } from '@angela/stage-ui/composables'
 import { computed, defineAsyncComponent, defineComponent, h, onBeforeUnmount, onMounted, ref, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'

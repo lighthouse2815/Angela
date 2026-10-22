@@ -1,4 +1,4 @@
-import type { ContextUpdate, ModuleAnnouncedEvent } from '@proj-airi/server-sdk'
+import type { ContextUpdate, ModuleAnnouncedEvent } from '@angela/server-sdk'
 
 import { describe, expect, it, vi } from 'vitest'
 

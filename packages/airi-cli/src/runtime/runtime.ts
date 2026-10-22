@@ -1,6 +1,6 @@
-import type { Conversation, StreamOptions } from '@proj-airi/core-agent'
-import type { cliMessages } from '@proj-airi/i18n/cli'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { Conversation, StreamOptions } from '@angela/core-agent'
+import type { cliMessages } from '@angela/i18n/cli'
+import type { GenerationProvider } from '@angela/provider-inference'
 
 import type { Chat } from '../chat'
 import type { McpTools } from '../mcp'

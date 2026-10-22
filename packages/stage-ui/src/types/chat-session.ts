@@ -1,4 +1,4 @@
-import type { VoiceInterruptionEvent } from '@proj-airi/core-agent'
+import type { VoiceInterruptionEvent } from '@angela/core-agent'
 
 import type { ChatHistoryItem } from './chat'
 

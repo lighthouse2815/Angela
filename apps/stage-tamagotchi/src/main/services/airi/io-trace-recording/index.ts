@@ -1,4 +1,4 @@
-import type { IOTraceRecordingState, SerializedIOSpan } from '@proj-airi/stage-shared/types/io-trace'
+import type { IOTraceRecordingState, SerializedIOSpan } from '@angela/stage-shared/types/io-trace'
 
 import { appendFile, mkdir, readdir, rm, stat } from 'node:fs/promises'
 import { join } from 'node:path'

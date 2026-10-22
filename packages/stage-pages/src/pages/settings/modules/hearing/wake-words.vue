@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { WakeWord } from '@proj-airi/stage-ui/libs/voice/wake-words'
+import type { WakeWord } from '@angela/stage-ui/libs/voice/wake-words'
 
-import { WakeWordStatus } from '@proj-airi/stage-ui/components'
-import { wakeWordKey } from '@proj-airi/stage-ui/libs/voice/wake-words'
-import { useAiriCardStore } from '@proj-airi/stage-ui/stores/modules/airi-card'
-import { useWakeWordDetectionStore } from '@proj-airi/stage-ui/stores/wake-word-detection'
-import { useWakeWordsStore } from '@proj-airi/stage-ui/stores/wake-words'
-import { SettingsCard } from '@proj-airi/ui'
+import { WakeWordStatus } from '@angela/stage-ui/components'
+import { wakeWordKey } from '@angela/stage-ui/libs/voice/wake-words'
+import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useWakeWordDetectionStore } from '@angela/stage-ui/stores/wake-word-detection'
+import { useWakeWordsStore } from '@angela/stage-ui/stores/wake-words'
+import { SettingsCard } from '@angela/ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

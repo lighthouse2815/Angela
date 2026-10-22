@@ -1,4 +1,4 @@
-import type { Position } from '@proj-airi/pipelines-audio'
+import type { Position } from '@angela/pipelines-audio'
 
 import type { TurnRef } from '../turn'
 

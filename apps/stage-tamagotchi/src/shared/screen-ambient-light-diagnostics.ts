@@ -4,7 +4,7 @@ import type {
   PixelFrame,
   ScreenAmbientLightSamplingDiagnostics,
   ScreenAmbientLightSource,
-} from '@proj-airi/stage-shared/screen-ambient-light'
+} from '@angela/stage-shared/screen-ambient-light'
 
 export const screenAmbientLightDiagnosticsChannelName = 'airi::screen-ambient-light-diagnostics'
 

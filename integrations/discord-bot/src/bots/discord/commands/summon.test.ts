@@ -1,5 +1,5 @@
+import type { WebSocketEventOf } from '@angela/server-shared/types'
 import type { AudioPlayer, VoiceConnection } from '@discordjs/voice'
-import type { WebSocketEventOf } from '@proj-airi/server-shared/types'
 import type { ChatInputCommandInteraction, Client, VoiceChannel } from 'discord.js'
 
 import { Buffer } from 'node:buffer'
@@ -8,8 +8,8 @@ import { PassThrough } from 'node:stream'
 
 import OpusScript from 'opusscript'
 
+import { cliMessages } from '@angela/i18n/cli'
 import { AudioPlayerStatus, AudioResource, createAudioPlayer, createAudioResource, entersState, joinVoiceChannel, VoiceConnectionStatus } from '@discordjs/voice'
-import { cliMessages } from '@proj-airi/i18n/cli'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 
 import { Speech } from '../../../pipelines/speech'

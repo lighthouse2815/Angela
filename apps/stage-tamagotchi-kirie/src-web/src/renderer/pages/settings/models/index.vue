@@ -3,20 +3,20 @@ import type {
   StageViewErrorPayload,
   StageViewPatch,
   StageViewSnapshotPayload,
-} from '@proj-airi/stage-shared/godot-stage'
-import type { DisplayModel } from '@proj-airi/stage-ui/stores/display-models'
+} from '@angela/stage-shared/godot-stage'
+import type { DisplayModel } from '@angela/stage-ui/stores/display-models'
 
 import type {
   ElectronGodotStageSceneInputPayload,
   ElectronGodotStageStatus,
 } from '../../../../shared/eventa'
 
+import { useHostEventaContext, useHostEventaInvoke } from '@angela/stage-host-context'
+import { ModelSettingsPanel } from '@angela/stage-ui/components/scenarios/settings/model-settings'
+import { useAnalytics } from '@angela/stage-ui/composables'
+import { useSettings } from '@angela/stage-ui/stores/settings'
+import { Callout, GhostButton } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { useHostEventaContext, useHostEventaInvoke } from '@proj-airi/stage-host-context'
-import { ModelSettingsPanel } from '@proj-airi/stage-ui/components/scenarios/settings/model-settings'
-import { useAnalytics } from '@proj-airi/stage-ui/composables'
-import { useSettings } from '@proj-airi/stage-ui/stores/settings'
-import { Callout, GhostButton } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 

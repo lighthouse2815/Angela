@@ -1,4 +1,4 @@
-# @proj-airi/cap-vite
+# @angela/cap-vite
 
 CLI for [Capacitor](https://capacitorjs.com/) live-reload development using Vite.
 

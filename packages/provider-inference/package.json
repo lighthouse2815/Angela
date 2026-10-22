@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/provider-inference",
+  "name": "@angela/provider-inference",
   "type": "module",
   "version": "0.12.0-beta.5",
   "private": true,
@@ -40,8 +40,8 @@
     "test:browser": "vitest run --project browser"
   },
   "dependencies": {
+    "@angela/audio": "workspace:^",
     "@moeru/std": "catalog:",
-    "@proj-airi/audio": "workspace:^",
     "@sherpaw/asr": "0.2.1",
     "@sherpaw/xsai-transcription": "catalog:",
     "@xsai-ext/providers": "catalog:",

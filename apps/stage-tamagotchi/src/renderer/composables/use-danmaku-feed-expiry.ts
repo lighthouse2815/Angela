@@ -1,6 +1,6 @@
 import type { MaybeRefOrGetter } from 'vue'
 
-import { useChatSessionStore } from '@proj-airi/stage-ui/stores/chat/session-store'
+import { useChatSessionStore } from '@angela/stage-ui/stores/chat/session-store'
 import { storeToRefs } from 'pinia'
 import { computed, effectScope, shallowRef, toValue, watch } from 'vue'
 

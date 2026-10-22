@@ -24,6 +24,8 @@ import type {
   WorkerInboundMessage,
 } from '../inference/protocol'
 
+import { toFloat32FromPCM16 } from '@angela/audio/encoding'
+import { errorMessageFromValue } from '@angela/stage-shared'
 import {
   AutoProcessor,
   AutoTokenizer,
@@ -31,8 +33,6 @@ import {
   TextStreamer,
   WhisperForConditionalGeneration,
 } from '@huggingface/transformers'
-import { toFloat32FromPCM16 } from '@proj-airi/audio/encoding'
-import { errorMessageFromValue } from '@proj-airi/stage-shared'
 
 import { MODEL_IDS, MODEL_NAMES } from '../inference/constants'
 import { classifyError, isRecoverable } from '../inference/protocol'

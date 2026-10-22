@@ -1,4 +1,4 @@
-import type { AudioInput, PcmBlock } from '@proj-airi/pipelines-audio'
+import type { AudioInput, PcmBlock } from '@angela/pipelines-audio'
 
 import { AudioSample, AudioSampleSource } from 'mediabunny'
 import { expect, expectTypeOf, it, vi } from 'vitest'

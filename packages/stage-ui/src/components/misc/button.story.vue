@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button, GhostButton, IconButton, OverlayButton } from '@proj-airi/ui'
+import { Button, GhostButton, IconButton, OverlayButton } from '@angela/ui'
 import { computed, shallowRef } from 'vue'
 
 const buttonColors = ['neutral', 'primary', 'cyan', 'blue', 'green', 'lime', 'amber', 'red', 'orange', 'purple', 'pink'] as const

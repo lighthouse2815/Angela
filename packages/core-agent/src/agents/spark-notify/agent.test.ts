@@ -1,4 +1,4 @@
-import type { WebSocketEventOf } from '@proj-airi/server-sdk'
+import type { WebSocketEventOf } from '@angela/server-sdk'
 
 import type { SparkNotifyRunRequest } from './types'
 

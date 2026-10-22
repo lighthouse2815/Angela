@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BasicButton } from '@proj-airi/ui'
+import { BasicButton } from '@angela/ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

@@ -1,5 +1,5 @@
-import type { ClientConnection, ClientConnector, ClientEvents } from '@proj-airi/better-ws'
-import type { WebSocketBaseEvent, WebSocketEvent, WebSocketEventOptionalSource, WebSocketEvents } from '@proj-airi/server-shared/types'
+import type { ClientConnection, ClientConnector, ClientEvents } from '@angela/better-ws'
+import type { WebSocketBaseEvent, WebSocketEvent, WebSocketEventOptionalSource, WebSocketEvents } from '@angela/server-shared/types'
 
 import type { ExtensionPeerClient } from '../src/extension-peer'
 

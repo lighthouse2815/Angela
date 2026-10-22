@@ -1,7 +1,7 @@
+import { gameletIframeRequest } from '@angela/plugin-sdk-tamagotchi/gamelet'
+import { widgetsIframeInitEvent, widgetsIframePublishEvent } from '@angela/plugin-sdk-tamagotchi/widgets'
 import { defineInvoke, defineInvokeHandler } from '@moeru/eventa'
 import { createContext } from '@moeru/eventa/adapters/window-message'
-import { gameletIframeRequest } from '@proj-airi/plugin-sdk-tamagotchi/gamelet'
-import { widgetsIframeInitEvent, widgetsIframePublishEvent } from '@proj-airi/plugin-sdk-tamagotchi/widgets'
 import { describe, expect, it } from 'vitest'
 
 class MockWindow {

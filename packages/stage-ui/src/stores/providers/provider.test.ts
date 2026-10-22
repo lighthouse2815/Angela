@@ -1,6 +1,6 @@
 import type { Session, User } from 'better-auth'
 
-import { isGenerationProvider } from '@proj-airi/provider-inference'
+import { isGenerationProvider } from '@angela/provider-inference'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'

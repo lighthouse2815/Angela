@@ -1,2 +1,2 @@
-export type { CategorizedResponse, CategorizedSegment, ResponseCategory } from '@proj-airi/core-agent'
-export { categorizeResponse, createStreamingCategorizer } from '@proj-airi/core-agent'
+export type { CategorizedResponse, CategorizedSegment, ResponseCategory } from '@angela/core-agent'
+export { categorizeResponse, createStreamingCategorizer } from '@angela/core-agent'

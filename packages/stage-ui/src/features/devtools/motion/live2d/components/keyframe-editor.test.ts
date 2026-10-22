@@ -1,11 +1,11 @@
 // @vitest-environment jsdom
 
-import type { StandardGamepadButtonName, StandardGamepadButtonState, StandardGamepadSnapshot } from '@proj-airi/input-gamepad'
+import type { StandardGamepadButtonName, StandardGamepadButtonState, StandardGamepadSnapshot } from '@angela/input-gamepad'
 
 import type { Live2DMotionEditorFrame } from '../composables/keyframes'
 import type { Live2DMotionRecording, ReadonlyLive2DMotionRecording } from '../composables/recording'
 
-import { neutralLive2DMotionControlPose } from '@proj-airi/stage-ui-live2d/stores'
+import { neutralLive2DMotionControlPose } from '@angela/stage-ui-live2d/stores'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createApp, h, nextTick, shallowRef } from 'vue'
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useHostEventaInvoke } from '@proj-airi/stage-host-context'
-import { useAnalytics } from '@proj-airi/stage-ui/composables/use-analytics'
+import { useHostEventaInvoke } from '@angela/stage-host-context'
+import { useAnalytics } from '@angela/stage-ui/composables/use-analytics'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

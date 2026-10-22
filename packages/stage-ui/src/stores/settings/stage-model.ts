@@ -2,7 +2,7 @@ import type {} from 'pinia-plugin-synced'
 
 import type { DisplayModel } from '../display-models'
 
-import { useLocalStorageManualReset } from '@proj-airi/stage-shared/composables'
+import { useLocalStorageManualReset } from '@angela/stage-shared/composables'
 import { refManualReset, useEventListener } from '@vueuse/core'
 import { defineStore, storeToRefs } from 'pinia'
 import { computed, watch } from 'vue'
@@ -95,7 +95,7 @@ export const useSettingsStageModel = defineStore('settings-stage-model', () => {
 
     // The Three.js store is browser-only. Load it only during browser startup so
     // Node consumers of the shared settings store do not evaluate rendering APIs.
-    legacyModelIdentityResetPromise ??= import('@proj-airi/stage-ui-three').then(({ useModelStore }) => {
+    legacyModelIdentityResetPromise ??= import('@angela/stage-ui-three').then(({ useModelStore }) => {
       useModelStore().resetLegacyModelIdentity()
     })
 

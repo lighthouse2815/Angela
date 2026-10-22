@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BasicButton, SwipeActionButton, SwipeActionsContent, SwipeActionsItem, SwipeActionsList, SwipeActionsRoot } from '@proj-airi/ui'
+import { BasicButton, SwipeActionButton, SwipeActionsContent, SwipeActionsItem, SwipeActionsList, SwipeActionsRoot } from '@angela/ui'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 

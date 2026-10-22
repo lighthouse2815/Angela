@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useHostAuth, useHostEventaContext, useHostEventaInvoke } from '@proj-airi/stage-host-context'
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
-import { Avatar } from '@proj-airi/ui'
+import { useHostAuth, useHostEventaContext, useHostEventaInvoke } from '@angela/stage-host-context'
+import { useAuthStore } from '@angela/stage-ui/stores/auth'
+import { Avatar } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

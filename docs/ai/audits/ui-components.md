@@ -177,13 +177,13 @@ Regenerate the snapshot after concurrent component changes. The audit script rep
 Checks in this section refer to the isolated PR branch. Results from the original dirty checkout are not PR acceptance evidence.
 
 - `pnpm run build:packages`: passed, 34 tasks.
-- `pnpm -F @proj-airi/stage-ui typecheck`: passed.
+- `pnpm -F @angela/stage-ui typecheck`: passed.
 - `pnpm typecheck`: passed, 55 tasks.
 - `pnpm exec eslint <15 new stories> scripts/audit-ui-components.mjs`: passed.
 - `pnpm lint`: passed with existing warnings.
-- `pnpm -F @proj-airi/stage-ui exec vitest run`: 188 files passed. Three files failed because Node native localStorage was unavailable.
-- `NODE_OPTIONS=--no-experimental-webstorage pnpm -F @proj-airi/stage-ui exec vitest run src/stores/onboarding.test.ts src/stores/modules/consciousness-settings.test.ts src/stores/modules/consciousness.test.ts`: all 22 failed tests passed.
-- `pnpm -F @proj-airi/stage-ui exec vitest run src/components/scenarios/status/status-capsule.browser.test.ts src/components/scenarios/chat/components/scrollable-area.browser.test.ts`: 6 tests passed.
+- `pnpm -F @angela/stage-ui exec vitest run`: 188 files passed. Three files failed because Node native localStorage was unavailable.
+- `NODE_OPTIONS=--no-experimental-webstorage pnpm -F @angela/stage-ui exec vitest run src/stores/onboarding.test.ts src/stores/modules/consciousness-settings.test.ts src/stores/modules/consciousness.test.ts`: all 22 failed tests passed.
+- `pnpm -F @angela/stage-ui exec vitest run src/components/scenarios/status/status-capsule.browser.test.ts src/components/scenarios/chat/components/scrollable-area.browser.test.ts`: 6 tests passed.
 - Vishot rendered all 15 real story components in a disposable browser gallery. Initial variants were captured and inspected.
 
 The browser gallery uses Story and Variant wrappers. Screenshots prove the captured initial states, not every interaction or Histoire navigation.

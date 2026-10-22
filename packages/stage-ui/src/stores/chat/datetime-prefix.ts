@@ -1,1 +1,1 @@
-export { formatTimePrefix } from '@proj-airi/core-agent'
+export { formatTimePrefix } from '@angela/core-agent'

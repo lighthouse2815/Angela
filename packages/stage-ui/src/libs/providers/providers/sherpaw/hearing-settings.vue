@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { formatSherpawLanguageName, formatSherpawModelName, selectSherpawModel, sherpawModelsForLanguage } from '@angela/provider-inference'
+import { FieldCombobox } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { formatSherpawLanguageName, formatSherpawModelName, selectSherpawModel, sherpawModelsForLanguage } from '@proj-airi/provider-inference'
-import { FieldCombobox } from '@proj-airi/ui'
 import { computed, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 

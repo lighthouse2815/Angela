@@ -6,17 +6,17 @@ import type {
   ScreenAmbientLightDiagnosticsSnapshot,
 } from '../../shared/screen-ambient-light-diagnostics'
 
-import { errorMessageFrom } from '@moeru/std'
-import { useElectronScreenCapture } from '@proj-airi/electron-screen-capture/vue'
-import { useElectronAllDisplays, useElectronWindowBounds } from '@proj-airi/electron-vueuse'
+import { useElectronScreenCapture } from '@angela/electron-screen-capture/vue'
+import { useElectronAllDisplays, useElectronWindowBounds } from '@angela/electron-vueuse'
 import {
   ambientLightSampleFromHex,
   sampleScreenAmbientLight,
   smoothAmbientLightEnvironment,
   uniformAmbientLightEnvironment,
   wholeWindowRectangle,
-} from '@proj-airi/stage-shared/screen-ambient-light'
-import { useScreenAmbientLightEnvironment, useSettingsScreenAmbientLight } from '@proj-airi/stage-shared/stores/screen-ambient-light'
+} from '@angela/stage-shared/screen-ambient-light'
+import { useScreenAmbientLightEnvironment, useSettingsScreenAmbientLight } from '@angela/stage-shared/stores/screen-ambient-light'
+import { errorMessageFrom } from '@moeru/std'
 import { until, useBroadcastChannel, watchDebounced } from '@vueuse/core'
 import { clamp } from 'es-toolkit'
 import { storeToRefs } from 'pinia'

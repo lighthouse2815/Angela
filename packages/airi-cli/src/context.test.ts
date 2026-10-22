@@ -1,8 +1,8 @@
-import type { Conversation } from '@proj-airi/core-agent'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { Conversation } from '@angela/core-agent'
+import type { GenerationProvider } from '@angela/provider-inference'
 
-import { chatMessagesToTurns } from '@proj-airi/core-agent'
-import { cliMessages } from '@proj-airi/i18n/cli'
+import { chatMessagesToTurns } from '@angela/core-agent'
+import { cliMessages } from '@angela/i18n/cli'
 import { expect, it, vi } from 'vitest'
 
 import { Context } from './context'

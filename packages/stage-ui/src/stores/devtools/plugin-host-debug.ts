@@ -5,7 +5,7 @@ import type {
   PluginHostKitSummary,
   PluginHostSessionSummary,
   PluginRegistrySnapshot,
-} from '@proj-airi/stage-shared/plugin-host'
+} from '@angela/stage-shared/plugin-host'
 
 import { errorMessageFrom } from '@moeru/std'
 import { defineStore } from 'pinia'

@@ -119,7 +119,7 @@ All fixtures are 16 kHz mono 16-bit PCM WAV files. The leading silence gives the
 The script reads the `TESTING_AUDIO_TTS_*` variables in the same way as the cases. Set them in `packages/testing-audio/.env.local` or `.env.test.local`. Then run:
 
 ```bash
-pnpm -F @proj-airi/testing-audio exec tsx scripts/generate-wake-word-fixtures.ts
+pnpm -F @angela/testing-audio exec tsx scripts/generate-wake-word-fixtures.ts
 ```
 
 The speech changes a little on each request. After you generate the fixtures, run the cases on both hosts. If a phrase does not wake the character, change the phrase or its pronunciation. Do not change the assertions.
@@ -127,7 +127,7 @@ The speech changes a little on each request. After you generate the fixtures, ru
 Run the cases on both hosts:
 
 ```bash
-pnpm -F @proj-airi/testing-audio test:run cases/wake-word
+pnpm -F @angela/testing-audio test:run cases/wake-word
 ```
 
 For one host, build its app and select `--project audio-web` or `--project audio-electron`.
@@ -172,20 +172,20 @@ These tests send audio and text to external Providers. Each run can incur Provid
 Build both targets and run all runtime projects:
 
 ```bash
-pnpm -F @proj-airi/testing-audio test:run
+pnpm -F @angela/testing-audio test:run
 ```
 
 Use existing builds:
 
 ```bash
-pnpm -F @proj-airi/testing-audio test:existing-builds
+pnpm -F @angela/testing-audio test:existing-builds
 ```
 
 Run one runtime project:
 
 ```bash
-pnpm -F @proj-airi/testing-audio exec vitest run --project audio-web
-pnpm -F @proj-airi/testing-audio exec vitest run --project audio-electron
+pnpm -F @angela/testing-audio exec vitest run --project audio-web
+pnpm -F @angela/testing-audio exec vitest run --project audio-electron
 ```
 
 Use `*.audio.web.test.ts` for Web-only cases. Use `*.audio.electron.test.ts` for Electron-only cases. The `*.audio.test.ts` pattern runs in both projects.

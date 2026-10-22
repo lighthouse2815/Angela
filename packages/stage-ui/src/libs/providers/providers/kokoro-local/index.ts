@@ -2,7 +2,7 @@ import type { ProgressInfo } from '@xsai-transformers/shared/types'
 
 import type { VoiceKey } from '../../../../workers/kokoro/types'
 
-import { getCachedWebGPUCapabilities } from '@proj-airi/stage-shared/webgpu'
+import { getCachedWebGPUCapabilities } from '@angela/stage-shared/webgpu'
 import { z } from 'zod'
 
 import { getDefaultKokoroModel, KOKORO_MODELS, kokoroModelsToModelInfo } from '../../../../workers/kokoro/constants'

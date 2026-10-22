@@ -1,6 +1,6 @@
-import type { DisplayModel } from '@proj-airi/stage-ui/stores/display-models'
+import type { DisplayModel } from '@angela/stage-ui/stores/display-models'
 
-import { DisplayModelFormat } from '@proj-airi/stage-ui/stores/display-models'
+import { DisplayModelFormat } from '@angela/stage-ui/stores/display-models'
 
 /**
  * Checks whether a display model can be sent to the Godot stage scene input path.

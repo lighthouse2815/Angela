@@ -1,6 +1,6 @@
 import type { Ref } from 'vue'
 
-import { useSpeechOutputControlStore } from '@proj-airi/stage-ui/stores/speech-output-control'
+import { useSpeechOutputControlStore } from '@angela/stage-ui/stores/speech-output-control'
 import { computed, ref } from 'vue'
 
 import { useStopSpeakingButton } from './useStopSpeakingButton'

@@ -1,4 +1,4 @@
-# @proj-airi/stage-ui-mmd
+# @angela/stage-ui-mmd
 
 MMD (MikuMikuDance) scene components, composables, and stores for Project AIRI.
 
@@ -35,11 +35,11 @@ is initialized only after a live MMD model is mounted.
 ## How to use
 
 The package exposes the same scene contract as the other renderers, so it is
-wired through `@proj-airi/stage-ui`'s `Stage.vue` automatically when the
+wired through `@angela/stage-ui`'s `Stage.vue` automatically when the
 selected model resolves to the `mmd` renderer:
 
 ```ts
-import { MMDScene, useMMD } from '@proj-airi/stage-ui-mmd'
+import { MMDScene, useMMD } from '@angela/stage-ui-mmd'
 ```
 
 ```vue
@@ -68,6 +68,6 @@ is edited through the model settings panel.
 
 ## When not to use it
 
-- For VRM avatars use `@proj-airi/stage-ui-three`; for Live2D use
-  `@proj-airi/stage-ui-live2d`; for Spine use `@proj-airi/stage-ui-spine`.
+- For VRM avatars use `@angela/stage-ui-three`; for Live2D use
+  `@angela/stage-ui-live2d`; for Spine use `@angela/stage-ui-spine`.
 - In environments without WebGL/WASM support (MMD physics requires Ammo WASM).

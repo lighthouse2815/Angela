@@ -1,4 +1,4 @@
-import type { ChatSessionsIndex } from '@proj-airi/stage-ui/types/chat-session'
+import type { ChatSessionsIndex } from '@angela/stage-ui/types/chat-session'
 
 import type { AudioInputSession } from '../../../src/types'
 

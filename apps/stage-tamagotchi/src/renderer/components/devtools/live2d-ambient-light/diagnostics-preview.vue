@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { NormalizedRectangle, PixelFrame } from '@proj-airi/stage-shared/screen-ambient-light'
+import type { NormalizedRectangle, PixelFrame } from '@angela/stage-shared/screen-ambient-light'
 
-import { ambientLightMapMarginFor } from '@proj-airi/stage-shared/screen-ambient-light'
+import { ambientLightMapMarginFor } from '@angela/stage-shared/screen-ambient-light'
 import { computed, nextTick, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 

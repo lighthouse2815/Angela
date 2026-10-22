@@ -1,6 +1,6 @@
-import type { PcmBlock } from '@proj-airi/pipelines-audio'
+import type { PcmBlock } from '@angela/pipelines-audio'
 
-import { AudioInput, capture, createPushStream, Playback } from '@proj-airi/pipelines-audio'
+import { AudioInput, capture, createPushStream, Playback } from '@angela/pipelines-audio'
 import { expect, it } from 'vitest'
 
 import { BrowserPlayback, mediaStreamSource, microphoneSource, toMediaStream } from './browser'

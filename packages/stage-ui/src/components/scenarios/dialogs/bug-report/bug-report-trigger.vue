@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { BugReportDialogSubmitPayload } from './types'
 
-import { Button } from '@proj-airi/ui'
+import { Button } from '@angela/ui'
 import { computed, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 

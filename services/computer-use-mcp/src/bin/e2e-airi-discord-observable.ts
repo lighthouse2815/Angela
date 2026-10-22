@@ -212,7 +212,7 @@ async function findAvailablePort(preferredPort: number, attempts = 20) {
 async function terminateExistingStageTamagotchiInstances() {
   const patterns = [
     resolve(repoDir, 'apps', 'stage-tamagotchi'),
-    '@proj-airi/stage-tamagotchi',
+    '@angela/desktop',
     resolve(repoDir, 'node_modules', '.pnpm', 'electron@'),
   ]
 
@@ -226,7 +226,7 @@ async function terminateExistingStageTamagotchiInstances() {
 async function terminateExistingDiscordBotInstances() {
   const patterns = [
     resolve(repoDir, 'services', 'discord-bot'),
-    '@proj-airi/discord-bot',
+    '@angela/discord-bot',
   ]
 
   for (const pattern of patterns) {
@@ -548,7 +548,7 @@ async function main() {
     const discordBotLogStream = createWriteStream(discordBotLogPath, { flags: 'a' })
 
     addTimeline('start-stage-tamagotchi')
-    stageProcess = spawn('pnpm', ['-F', '@proj-airi/stage-tamagotchi', 'dev'], {
+    stageProcess = spawn('pnpm', ['-F', '@angela/desktop', 'dev'], {
       cwd: repoDir,
       env: {
         ...env,
@@ -603,7 +603,7 @@ async function main() {
     await bringTargetToFront(mainTargetClient, 'main')
 
     addTimeline('start-discord-bot')
-    discordBotProcess = spawn('pnpm', ['-F', '@proj-airi/discord-bot', 'start'], {
+    discordBotProcess = spawn('pnpm', ['-F', '@angela/discord-bot', 'start'], {
       cwd: repoDir,
       env: {
         ...env,

@@ -1,4 +1,4 @@
-import { BasicTextarea } from '@proj-airi/ui'
+import { BasicTextarea } from '@angela/ui'
 import { expect, it } from 'vitest'
 import { render } from 'vitest-browser-vue'
 import { page } from 'vitest/browser'

@@ -1,7 +1,7 @@
-import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { usePiniaSynced } from '@proj-airi/stage-ui/libs/pinia'
-import { useAiriCardStore } from '@proj-airi/stage-ui/stores/modules/airi-card'
-import { useLearningMemoryStore } from '@proj-airi/stage-ui/stores/modules/learning-memory'
+import { useElectronEventaInvoke } from '@angela/electron-vueuse'
+import { usePiniaSynced } from '@angela/stage-ui/libs/pinia'
+import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useLearningMemoryStore } from '@angela/stage-ui/stores/modules/learning-memory'
 import { useIntervalFn } from '@vueuse/core'
 import { onScopeDispose, watch } from 'vue'
 

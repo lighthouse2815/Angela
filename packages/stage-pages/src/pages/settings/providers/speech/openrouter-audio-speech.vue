@@ -4,11 +4,11 @@ import type { SpeechProvider } from '@xsai-ext/providers/utils'
 import {
   SpeechPlayground,
   SpeechProviderSettings,
-} from '@proj-airi/stage-ui/components'
-import { useSpeechStore } from '@proj-airi/stage-ui/stores/modules/speech'
-import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
-import { useProviderStore } from '@proj-airi/stage-ui/stores/providers/provider'
-import { FieldCombobox } from '@proj-airi/ui'
+} from '@angela/stage-ui/components'
+import { useSpeechStore } from '@angela/stage-ui/stores/modules/speech'
+import { useProviderConfigStore } from '@angela/stage-ui/stores/providers/config'
+import { useProviderStore } from '@angela/stage-ui/stores/providers/provider'
+import { FieldCombobox } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted } from 'vue'
 

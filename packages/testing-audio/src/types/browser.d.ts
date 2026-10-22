@@ -1,6 +1,6 @@
-import type { SerializedIOSpan } from '@proj-airi/stage-shared/types/io-trace'
-import type { PiniaActionEvent } from '@proj-airi/stage-shared/types/pinia-action-event'
-import type { WakeWordPreparation } from '@proj-airi/stage-ui/libs/voice/wake-word-detector'
+import type { SerializedIOSpan } from '@angela/stage-shared/types/io-trace'
+import type { PiniaActionEvent } from '@angela/stage-shared/types/pinia-action-event'
+import type { WakeWordPreparation } from '@angela/stage-ui/libs/voice/wake-word-detector'
 
 import type { AudioInputVoiceInput } from '../types'
 

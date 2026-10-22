@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { Live2DValidationReport } from '@proj-airi/stage-ui-live2d'
+import type { Live2DValidationReport } from '@angela/stage-ui-live2d'
 
-import { Button } from '@proj-airi/ui'
+import { Button } from '@angela/ui'
 import { reactive } from 'vue'
 
 import ReportModal from './modal.vue'

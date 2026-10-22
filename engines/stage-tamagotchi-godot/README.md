@@ -1,4 +1,4 @@
-# `@proj-airi/stage-tamagotchi-godot`
+# `@angela/stage-tamagotchi-godot`
 
 Godot-native desktop stage runtime project for `stage-tamagotchi`.
 
@@ -52,9 +52,9 @@ Godot-native desktop stage runtime project for `stage-tamagotchi`.
 
 ## Build
 
-- `pnpm -F @proj-airi/stage-tamagotchi-godot build`
-- `pnpm -F @proj-airi/stage-tamagotchi-godot typecheck`
-- `pnpm -F @proj-airi/stage-tamagotchi-godot test`
+- `pnpm -F @angela/stage-tamagotchi-godot build`
+- `pnpm -F @angela/stage-tamagotchi-godot typecheck`
+- `pnpm -F @angela/stage-tamagotchi-godot test`
 
 The engine uses the .NET 10 SDK, a shared `Directory.Build.props` contract, and the
 `stage-tamagotchi-godot.slnx` solution. The build and typecheck commands compile both the
@@ -215,13 +215,13 @@ Renderer-facing changes should produce comparable render artifacts before they
 are accepted:
 
 ```powershell
-pnpm -F @proj-airi/stage-tamagotchi-godot dump:render-stages
+pnpm -F @angela/stage-tamagotchi-godot dump:render-stages
 ```
 
 For rim or edge-light shape checks, prefer the upper-body camera preset:
 
 ```powershell
-pnpm -F @proj-airi/stage-tamagotchi-godot dump:render-stages:upper-body
+pnpm -F @angela/stage-tamagotchi-godot dump:render-stages:upper-body
 ```
 
 The command launches the real `StageRoot` scene through the local WebSocket
@@ -298,7 +298,7 @@ into `resources/godot-stage` via `extraResources`. To inspect an unpacked
 Electron build locally, run:
 
 ```bash
-pnpm -F @proj-airi/stage-tamagotchi run build:unpack
+pnpm -F @angela/desktop run build:unpack
 ```
 
 ## Notes

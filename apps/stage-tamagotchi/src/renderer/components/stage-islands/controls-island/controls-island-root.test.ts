@@ -21,7 +21,7 @@ const windowBounds = {
   width: shallowRef(450),
   height: shallowRef(600),
 }
-vi.mock('@proj-airi/electron-vueuse', () => ({
+vi.mock('@angela/electron-vueuse', () => ({
   useElectronAllDisplays: () => displays,
   useElectronWindowBounds: () => windowBounds,
 }))

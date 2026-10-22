@@ -1,7 +1,7 @@
 import type { ElectronServerChannelConfig } from '../../../shared/eventa'
 
+import { useHostEventaInvoke } from '@angela/stage-host-context'
 import { errorMessageFrom } from '@moeru/std'
-import { useHostEventaInvoke } from '@proj-airi/stage-host-context'
 import { useLocalStorage } from '@vueuse/core'
 import { defineStore } from 'pinia'
 import { shallowRef, watch } from 'vue'

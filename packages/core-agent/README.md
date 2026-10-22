@@ -1,6 +1,6 @@
 # Core Agent
 
-`@proj-airi/core-agent` owns scheduling, context composition, tool rounds, and generation events. Stage applications provide persistence and UI through its ports. Provider registration and configuration belong to `provider-inference`. Authentication and Flux billing belong to the gateway.
+`@angela/core-agent` owns scheduling, context composition, tool rounds, and generation events. Stage applications provide persistence and UI through its ports. Provider registration and configuration belong to `provider-inference`. Authentication and Flux billing belong to the gateway.
 
 ## Conversation and protocol projection
 
@@ -62,8 +62,8 @@ Realtime transport is not implemented. A future session adapter can project the 
 ## Verify
 
 ```sh
-pnpm -F @proj-airi/core-agent typecheck
-pnpm -F @proj-airi/core-agent exec vitest run src/runtime src/messages src/agents/spark-notify
+pnpm -F @angela/core-agent typecheck
+pnpm -F @angela/core-agent exec vitest run src/runtime src/messages src/agents/spark-notify
 ```
 
 ## Type boundaries

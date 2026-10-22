@@ -1,4 +1,4 @@
-# `@proj-airi/api-server`
+# `@angela/api-server`
 
 Project AIRI's resource API. Authentication is a separate workspace app at
 `../dev-in-future/server/apps/auth`; this package does not instantiate Better Auth or expose
@@ -129,7 +129,7 @@ S3-compatible server. Set `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`
 to its test credentials. The test creates and deletes a unique bucket.
 
 ```sh
-pnpm -F @proj-airi/api-server exec vitest run src/services/adapters/object-store.integration.test.ts
+pnpm -F @angela/api-server exec vitest run src/services/adapters/object-store.integration.test.ts
 ```
 
 ## Payment
@@ -184,10 +184,10 @@ cancels the subscription first.
 ## Run locally
 
 ```sh
-pnpm -F @proj-airi/api-server dev
-pnpm -F @proj-airi/api-server typecheck
-pnpm -F @proj-airi/api-server exec vitest run
-pnpm -F @proj-airi/api-server build
+pnpm -F @angela/api-server dev
+pnpm -F @angela/api-server typecheck
+pnpm -F @angela/api-server exec vitest run
+pnpm -F @angela/api-server build
 ```
 
 Run the complete local backend from the repository root:
@@ -196,7 +196,7 @@ Run the complete local backend from the repository root:
 pnpm dev:backend
 ```
 
-For source-level debugging, start `@proj-airi/api-server` and
+For source-level debugging, start `@angela/api-server` and
 `@proj-airi/auth-server` separately instead.
 
 `../dev-in-future/server/docker-compose.yaml` exposes the local Caddy gateway at `http://localhost:6112` and keeps
@@ -211,7 +211,7 @@ the API and Auth container ports private.
   not have its own public ingress.
 - `AUTH_SERVER_INTERNAL_URL` optionally sends JWKS fetches directly to Auth on
   the private network while issuer and audience remain `AUTH_SERVER_URL`.
-- Auth tables and principal types come from `@proj-airi/auth-shared`; no module
+- Auth tables and principal types come from `@angela/auth-shared`; no module
   under `../dev-in-future/server/apps/auth` is imported.
 
 ## Railway

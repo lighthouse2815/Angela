@@ -1,6 +1,6 @@
 /**
  * Opacity “lamp flicker” for offline / warning icons.
- * Loaded via @proj-airi/ui/main.css (import from app `styles/main.css`).
+ * Loaded via @angela/ui/main.css (import from app `styles/main.css`).
  */
 @keyframes lamp-flicker-keyframes {
   0%,

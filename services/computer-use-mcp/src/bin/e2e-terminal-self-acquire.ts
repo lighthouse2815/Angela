@@ -20,7 +20,7 @@
  * NOTE: No pre-created PTY. The workflow self-acquires.
  *
  * Usage:
- *   pnpm -F @proj-airi/computer-use-mcp e2e:terminal-self-acquire
+ *   pnpm -F @angela/computer-use-mcp e2e:terminal-self-acquire
  */
 
 import { mkdtempSync, writeFileSync } from 'node:fs'

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { SpeechProvider } from '@xsai-ext/providers/utils'
 
-import { isStageTamagotchi } from '@proj-airi/stage-shared'
-import { Callout, FieldRange } from '@proj-airi/ui'
+import { isStageTamagotchi } from '@angela/stage-shared'
+import { Callout, FieldRange } from '@angela/ui'
 import { computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 

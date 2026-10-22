@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useWakeWordsStore } from '@proj-airi/stage-ui/stores/wake-words'
-import { Callout } from '@proj-airi/ui'
+import { useWakeWordsStore } from '@angela/stage-ui/stores/wake-words'
+import { Callout } from '@angela/ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink } from 'vue-router'

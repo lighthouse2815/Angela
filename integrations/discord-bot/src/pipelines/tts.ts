@@ -6,9 +6,9 @@ import { env } from 'node:process'
 
 import wavefile from 'wavefile'
 
+import { toWav } from '@angela/audio'
 import { useLogg } from '@guiiai/logg'
 import { pipeline } from '@huggingface/transformers'
-import { toWav } from '@proj-airi/audio'
 import { createOpenAI } from '@xsai-ext/providers/create'
 import { generateTranscription } from '@xsai/generate-transcription'
 

@@ -1,8 +1,8 @@
-import en from '@proj-airi/i18n/locales/en'
+import en from '@angela/i18n/locales/en'
 
+import { ProviderGenerationSettings } from '@angela/stage-ui/components'
+import { useProviderConfigStore } from '@angela/stage-ui/stores/providers/config'
 import { PiniaColada } from '@pinia/colada'
-import { ProviderGenerationSettings } from '@proj-airi/stage-ui/components'
-import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { render } from 'vitest-browser-vue'

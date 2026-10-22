@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ChatSessionsDrawer } from '@proj-airi/stage-ui/components'
-import { useAiriCardStore } from '@proj-airi/stage-ui/stores/modules/airi-card'
+import { ChatSessionsDrawer } from '@angela/stage-ui/components'
+import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
 import { storeToRefs } from 'pinia'
 import { shallowRef, useTemplateRef } from 'vue'
 

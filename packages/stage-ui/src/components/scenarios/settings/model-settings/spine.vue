@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { ModelSettingsRuntimeSnapshot } from './runtime'
 
-import { useSpine } from '@proj-airi/stage-ui-spine'
-import { Button, FieldCombobox, FieldRange, SelectTab } from '@proj-airi/ui'
+import { useSpine } from '@angela/stage-ui-spine'
+import { Button, FieldCombobox, FieldRange, SelectTab } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

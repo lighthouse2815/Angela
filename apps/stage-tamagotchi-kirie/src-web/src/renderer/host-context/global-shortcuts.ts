@@ -1,13 +1,13 @@
-import type { GlobalShortcut, GlobalShortcutKeyEvent } from '@gd-kirie/platform'
 import type {
   ShortcutAccelerator,
   ShortcutBinding,
   ShortcutRegistrationResult,
-} from '@proj-airi/stage-shared/global-shortcut'
+} from '@angela/stage-shared/global-shortcut'
+import type { GlobalShortcut, GlobalShortcutKeyEvent } from '@gd-kirie/platform'
 
 import type { ElectronShortcutTriggerPayload } from '../../shared/eventa'
 
-import { ShortcutFailureReasons } from '@proj-airi/stage-shared/global-shortcut'
+import { ShortcutFailureReasons } from '@angela/stage-shared/global-shortcut'
 
 import { initializeHostContext } from './owner'
 

@@ -243,7 +243,7 @@ Example local macOS entry:
       "command": "pnpm",
       "args": [
         "-F",
-        "@proj-airi/computer-use-mcp",
+        "@angela/computer-use-mcp",
         "start"
       ],
       "cwd": "/path/to/your/airi/repo",
@@ -284,17 +284,17 @@ Use the two surfaces differently:
 
 ## Validation Commands
 
-- `pnpm -F @proj-airi/computer-use-mcp typecheck`
-- `pnpm -F @proj-airi/computer-use-mcp test`
-- `pnpm -F @proj-airi/computer-use-mcp smoke:stdio`
-- `pnpm -F @proj-airi/computer-use-mcp smoke:macos`
-- `pnpm -F @proj-airi/computer-use-mcp e2e:airi-chat`
-- `pnpm -F @proj-airi/computer-use-mcp e2e:airi-discord`
+- `pnpm -F @angela/computer-use-mcp typecheck`
+- `pnpm -F @angela/computer-use-mcp test`
+- `pnpm -F @angela/computer-use-mcp smoke:stdio`
+- `pnpm -F @angela/computer-use-mcp smoke:macos`
+- `pnpm -F @angela/computer-use-mcp e2e:airi-chat`
+- `pnpm -F @angela/computer-use-mcp e2e:airi-discord`
 
 Legacy remote validation remains available:
 
-- `pnpm -F @proj-airi/computer-use-mcp bootstrap:remote`
-- `pnpm -F @proj-airi/computer-use-mcp smoke:remote`
+- `pnpm -F @angela/computer-use-mcp bootstrap:remote`
+- `pnpm -F @angela/computer-use-mcp smoke:remote`
 
 ## Demo Story To Record
 

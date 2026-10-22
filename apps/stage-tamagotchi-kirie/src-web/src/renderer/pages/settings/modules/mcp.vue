@@ -6,10 +6,10 @@ import type {
 } from '../../../../shared/eventa'
 import type { ServerForm } from './mcp-config'
 
+import { useHostEventaInvoke } from '@angela/stage-host-context'
+import { useAnalytics } from '@angela/stage-ui/composables'
+import { Button, Callout, Checkbox, GhostButton, TransitionVertical } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { useHostEventaInvoke } from '@proj-airi/stage-host-context'
-import { useAnalytics } from '@proj-airi/stage-ui/composables'
-import { Button, Callout, Checkbox, GhostButton, TransitionVertical } from '@proj-airi/ui'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 

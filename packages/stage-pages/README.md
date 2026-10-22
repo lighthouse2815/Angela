@@ -1,6 +1,6 @@
 # Stage Pages
 
-`@proj-airi/stage-pages` contains route-level Vue pages that multiple AIRI stage applications share.
+`@angela/stage-pages` contains route-level Vue pages that multiple AIRI stage applications share.
 
 ## Use
 
@@ -9,7 +9,7 @@ Add a page under `src/pages`. Each stage application scans this directory throug
 Import a shared page through the package boundary when code needs the component directly:
 
 ```ts
-import PolaroidPage from '@proj-airi/stage-pages/pages/devtools/polaroid.vue'
+import PolaroidPage from '@angela/stage-pages/pages/devtools/polaroid.vue'
 ```
 
 ## When to use this package
@@ -18,9 +18,9 @@ Use this package when two or more stage applications need the same page behavior
 
 ## When not to use this package
 
-Keep application-specific pages in the owning application. Put reusable business components in `@proj-airi/stage-ui`.
+Keep application-specific pages in the owning application. Put reusable business components in `@angela/stage-ui`.
 
-Put primitive UI components in `@proj-airi/ui`. Put shared layouts in `@proj-airi/stage-layouts`.
+Put primitive UI components in `@angela/ui`. Put shared layouts in `@angela/stage-layouts`.
 
 ## Provider settings
 

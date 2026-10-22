@@ -1,6 +1,6 @@
+import type { cliMessages } from '@angela/i18n/cli'
+import type { WebSocketEventOf } from '@angela/server-shared/types'
 import type { AudioPlayer, AudioResource, VoiceConnection } from '@discordjs/voice'
-import type { cliMessages } from '@proj-airi/i18n/cli'
-import type { WebSocketEventOf } from '@proj-airi/server-shared/types'
 import type { ChatInputCommandInteraction, Client as DiscordClient, VoiceChannel } from 'discord.js'
 
 import type { Speech } from '../../../pipelines/speech'

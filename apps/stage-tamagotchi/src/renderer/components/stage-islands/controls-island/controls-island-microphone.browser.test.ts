@@ -1,6 +1,6 @@
-import en from '@proj-airi/i18n/locales/en'
+import en from '@angela/i18n/locales/en'
 
-import { useSettingsAudioDevice } from '@proj-airi/stage-ui/stores/settings'
+import { useSettingsAudioDevice } from '@angela/stage-ui/stores/settings'
 import { createPinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render } from 'vitest-browser-vue'
@@ -15,7 +15,7 @@ import { controlsIslandPlacementKey } from './use-controls-island-placement'
 import '@unocss/reset/tailwind.css'
 import 'virtual:uno.css'
 
-vi.mock('@proj-airi/electron-vueuse', () => ({
+vi.mock('@angela/electron-vueuse', () => ({
   useElectronEventaContext: () => ref({ on: vi.fn(() => vi.fn()), emit: vi.fn() }),
   useElectronEventaInvoke: () => vi.fn().mockResolvedValue(false),
   useElectronMouseInElement: () => ({ isOutside: ref(false) }),
@@ -27,7 +27,7 @@ vi.mock('@moeru/eventa', async importOriginal => ({
 }))
 
 // The card store reads the account refs to synchronize cards. Without an account the user is `local`.
-vi.mock('@proj-airi/stage-ui/stores/auth', async () => {
+vi.mock('@angela/stage-ui/stores/auth', async () => {
   const { ref } = await import('vue')
   const auth = {
     credits: ref(0),

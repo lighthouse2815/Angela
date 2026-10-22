@@ -4,8 +4,8 @@ import {
   formatter as threeFormatter,
   useModelStore,
   useThreeViewControl,
-} from '@proj-airi/stage-ui-three'
-import { RoundRange } from '@proj-airi/ui'
+} from '@angela/stage-ui-three'
+import { RoundRange } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed, onUnmounted } from 'vue'
 

@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/model-driver-lipsync",
+  "name": "@angela/model-driver-lipsync",
   "type": "module",
   "version": "0.12.0-beta.5",
   "private": true,

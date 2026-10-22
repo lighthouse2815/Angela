@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import type { BugReportDialogSubmitPayload } from '@proj-airi/stage-ui/components'
+import type { BugReportDialogSubmitPayload } from '@angela/stage-ui/components'
 
 import type { ElectronUpdaterChannel } from '../../shared/eventa'
 
 import semver from 'semver'
 
-import { useHostAutoUpdater, useHostEventaInvoke } from '@proj-airi/stage-host-context'
-import { AboutContent, BugReportDialog, createBugReportPageContext, MarkdownRenderer } from '@proj-airi/stage-ui/components'
-import { useAnalytics, useBreakpoints, useBuildInfo } from '@proj-airi/stage-ui/composables'
-import { Button, ContainerError, DoubleCheckButton, FieldSelect, Progress, ScrollableArea } from '@proj-airi/ui'
+import { useHostAutoUpdater, useHostEventaInvoke } from '@angela/stage-host-context'
+import { AboutContent, BugReportDialog, createBugReportPageContext, MarkdownRenderer } from '@angela/stage-ui/components'
+import { useAnalytics, useBreakpoints, useBuildInfo } from '@angela/stage-ui/composables'
+import { Button, ContainerError, DoubleCheckButton, FieldSelect, Progress, ScrollableArea } from '@angela/ui'
 import { useClipboard } from '@vueuse/core'
 import { DialogContent, DialogDescription, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'reka-ui'
 import { DrawerContent, DrawerDescription, DrawerHandle, DrawerOverlay, DrawerPortal, DrawerRoot, DrawerTitle } from 'vaul-vue'

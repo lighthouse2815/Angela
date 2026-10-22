@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import type { AiriCard } from '@proj-airi/stage-ui/stores/modules/airi-card'
+import type { AiriCard } from '@angela/stage-ui/stores/modules/airi-card'
 
 import DOMPurify from 'dompurify'
 
-import { useAnalytics } from '@proj-airi/stage-ui/composables'
-import { useDownload } from '@proj-airi/stage-ui/composables/download'
-import { exportAiriCardPackage } from '@proj-airi/stage-ui/services/airi-card-import-export'
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
-import { useBackgroundStore } from '@proj-airi/stage-ui/stores/background'
-import { useDisplayModelsStore } from '@proj-airi/stage-ui/stores/display-models'
-import { useAiriCardStore } from '@proj-airi/stage-ui/stores/modules/airi-card'
-import { Button, GhostButton, Select } from '@proj-airi/ui'
+import { useAnalytics } from '@angela/stage-ui/composables'
+import { useDownload } from '@angela/stage-ui/composables/download'
+import { exportAiriCardPackage } from '@angela/stage-ui/services/airi-card-import-export'
+import { useAuthStore } from '@angela/stage-ui/stores/auth'
+import { useBackgroundStore } from '@angela/stage-ui/stores/background'
+import { useDisplayModelsStore } from '@angela/stage-ui/stores/display-models'
+import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { Button, GhostButton, Select } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import {
   DialogContent,

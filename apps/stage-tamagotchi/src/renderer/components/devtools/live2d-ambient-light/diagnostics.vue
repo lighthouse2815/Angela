@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Section } from '@proj-airi/stage-ui/components'
+import { Section } from '@angela/stage-ui/components'
 import { useI18n } from 'vue-i18n'
 
 import DiagnosticsColors from './diagnostics-colors.vue'

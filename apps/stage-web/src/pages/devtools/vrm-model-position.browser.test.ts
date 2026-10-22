@@ -1,5 +1,5 @@
-import { ThreeScene, useModelStore } from '@proj-airi/stage-ui-three'
-import { useDisplayModelsStore } from '@proj-airi/stage-ui/stores/display-models'
+import { ThreeScene, useModelStore } from '@angela/stage-ui-three'
+import { useDisplayModelsStore } from '@angela/stage-ui/stores/display-models'
 import { createPinia } from 'pinia'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { createApp, defineComponent, h, nextTick, shallowRef } from 'vue'

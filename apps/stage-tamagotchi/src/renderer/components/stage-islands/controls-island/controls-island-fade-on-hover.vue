@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { useAnalytics } from '@proj-airi/stage-ui/composables/use-analytics'
+import { useElectronEventaInvoke } from '@angela/electron-vueuse'
+import { useAnalytics } from '@angela/stage-ui/composables/use-analytics'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

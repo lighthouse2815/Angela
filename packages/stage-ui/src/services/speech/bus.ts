@@ -1,4 +1,4 @@
-import type { TurnRef } from '@proj-airi/core-agent'
+import type { TurnRef } from '@angela/core-agent'
 
 import type { VoiceMessageSnapshot } from '../../libs/voice/voice-message'
 import type { WakeWordPreparation } from '../../libs/voice/wake-word-detector'

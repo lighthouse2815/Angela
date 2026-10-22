@@ -1,10 +1,10 @@
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { GenerationProvider } from '@angela/provider-inference'
 import type { ItemParam } from '@xsai-ext/responses'
 import type { Tool } from '@xsai/shared-chat'
 
 import type { AssistantTurn, Conversation } from '../messages/types'
 
-import { getDefinedProvider } from '@proj-airi/provider-inference'
+import { getDefinedProvider } from '@angela/provider-inference'
 import { describe, expect, it, vi } from 'vitest'
 
 import { readTurns } from '../messages/turns'

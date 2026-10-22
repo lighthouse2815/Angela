@@ -1,10 +1,10 @@
-import type { StreamOptions } from '@proj-airi/core-agent'
-import type { WebSocketEvents } from '@proj-airi/server-sdk'
+import type { StreamOptions } from '@angela/core-agent'
+import type { WebSocketEvents } from '@angela/server-sdk'
 import type { Tool } from '@xsai/shared-chat'
 
 import type { DescribeToolImage } from './tool-images'
 
-import { createSparkCommandTool } from '@proj-airi/core-agent/agents/spark-command'
+import { createSparkCommandTool } from '@angela/core-agent/agents/spark-command'
 import { uniqBy } from 'es-toolkit'
 
 import { createWebSearchTools, debug, mcp } from '../../../tools'

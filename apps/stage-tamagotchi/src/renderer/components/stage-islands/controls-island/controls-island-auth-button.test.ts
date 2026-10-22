@@ -24,11 +24,11 @@ const authState = {
   }),
 }
 
-vi.mock('@proj-airi/stage-ui/stores/auth', () => ({
+vi.mock('@angela/stage-ui/stores/auth', () => ({
   useAuthStore: () => authState,
 }))
 
-vi.mock('@proj-airi/electron-vueuse', () => ({
+vi.mock('@angela/electron-vueuse', () => ({
   useElectronEventaContext: () => ref({
     on: subscriptions.on,
   }),

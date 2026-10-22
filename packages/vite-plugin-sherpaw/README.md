@@ -3,8 +3,8 @@
 This plugin exposes pinned Sherpaw preload packs to Vite applications. Hosts select local packs separately for development and builds.
 
 ```ts
-import { paraformerBilingualZhEn } from '@proj-airi/provider-inference/sherpaw-transcription/models'
-import { Sherpaw } from '@proj-airi/vite-plugin-sherpaw'
+import { paraformerBilingualZhEn } from '@angela/provider-inference/sherpaw-transcription/models'
+import { Sherpaw } from '@angela/vite-plugin-sherpaw'
 import { defineConfig } from 'vite'
 
 export default defineConfig({
@@ -18,13 +18,13 @@ export default defineConfig({
 
 ## Presets
 
-| Export from `@proj-airi/provider-inference/sherpaw-transcription/models` | Languages | Source format | Size before compression |
+| Export from `@angela/provider-inference/sherpaw-transcription/models` | Languages | Source format | Size before compression |
 | --- | --- | --- | --- |
 | `paraformerBilingualZhEn` | Chinese, English | Sherpaw data and metadata | About 237 MB |
 | `zipformerMultilingual` | Arabic, English, Indonesian, Japanese, Russian, Thai, Vietnamese, Chinese | Sherpaw data and metadata | About 339 MB |
 | `xAsrBilingualZhEnInt8` | Chinese, English | Sherpaw data and metadata | About 169 MB |
 
-The plugin also accepts a keyword spotting pack. AIRI pins it as `kwsModel` in `@proj-airi/stage-ui/libs/voice/kws-model-info`.
+The plugin also accepts a keyword spotting pack. AIRI pins it as `kwsModel` in `@angela/stage-ui/libs/voice/kws-model-info`.
 Its preload pair contains the encoder, the decoder, the joiner, and the token vocabulary. It is about 13 MB.
 
 The required `models` option controls which presets the runtime can use. Remote presets load on demand.
@@ -32,7 +32,7 @@ The required `models` option controls which presets the runtime can use. Remote 
 Set `cacheDir` to share downloads between applications:
 
 ```ts
-import { paraformerBilingualZhEn, xAsrBilingualZhEnInt8, zipformerMultilingual } from '@proj-airi/provider-inference/sherpaw-transcription/models'
+import { paraformerBilingualZhEn, xAsrBilingualZhEnInt8, zipformerMultilingual } from '@angela/provider-inference/sherpaw-transcription/models'
 
 Sherpaw({
   models: [paraformerBilingualZhEn, zipformerMultilingual, xAsrBilingualZhEnInt8],
@@ -73,7 +73,7 @@ The plugin downloads local files to a revision-scoped cache. It removes its prev
 Production builds add only `bundledModels` to the Vite asset graph. An empty list for the current mode performs no model download.
 The download cache survives selection changes. Its default path is `.cache` relative to the Vite root.
 
-`@proj-airi/provider-inference/sherpaw-transcription/models` owns the transcription presets, including recognizer architecture and supported languages.
+`@angela/provider-inference/sherpaw-transcription/models` owns the transcription presets, including recognizer architecture and supported languages.
 Stage UI owns the keyword spotting pack identity. The plugin reads only the ID, repository, revision, and artifact directory of each pack (`SherpawModelArtifacts`).
 
 Local download failures stop startup or the build. Development serves `developmentModels` through Vite.
@@ -83,10 +83,10 @@ AIRI's VAD model has a separate download path, so this plugin alone does not mak
 
 ## Runtime URLs and remote storage
 
-The plugin replaces `@proj-airi/vite-plugin-sherpaw/assets` with URL imports for the selected models:
+The plugin replaces `@angela/vite-plugin-sherpaw/assets` with URL imports for the selected models:
 
 ```ts
-import { assets } from '@proj-airi/vite-plugin-sherpaw/assets'
+import { assets } from '@angela/vite-plugin-sherpaw/assets'
 
 const model = assets['paraformer-zh-en']
 ```

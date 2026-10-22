@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/server-sdk",
+  "name": "@angela/server-sdk",
   "type": "module",
   "version": "0.12.0-beta.5",
   "description": "Client-side SDK for connecting to Angela server components and runtimes",
@@ -36,9 +36,9 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@angela/better-ws": "workspace:^",
+    "@angela/server-shared": "workspace:^",
     "@moeru/std": "catalog:",
-    "@proj-airi/better-ws": "workspace:^",
-    "@proj-airi/server-shared": "workspace:^",
     "superjson": "catalog:",
     "valibot": "catalog:"
   }

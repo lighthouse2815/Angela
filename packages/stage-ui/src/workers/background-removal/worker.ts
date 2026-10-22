@@ -17,8 +17,8 @@ import type {
   WorkerInboundMessage,
 } from '../../libs/inference/protocol'
 
+import { errorMessageFromValue } from '@angela/stage-shared'
 import { AutoModel, AutoProcessor, env, RawImage } from '@huggingface/transformers'
-import { errorMessageFromValue } from '@proj-airi/stage-shared'
 
 import { MODEL_IDS, MODEL_NAMES } from '../../libs/inference/constants'
 import { classifyError, isRecoverable } from '../../libs/inference/protocol'

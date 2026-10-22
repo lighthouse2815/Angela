@@ -1,8 +1,8 @@
-import type { AudioInput, PcmBlock } from '@proj-airi/pipelines-audio'
+import type { AudioInput, PcmBlock } from '@angela/pipelines-audio'
 
+import { encodeWav } from '@angela/audio/encoding'
+import { capture } from '@angela/pipelines-audio'
 import { errorMessageFrom } from '@moeru/std'
-import { encodeWav } from '@proj-airi/audio/encoding'
-import { capture } from '@proj-airi/pipelines-audio'
 
 /**
  * The application owns a preview until explicit submission receives its durable message receipt.

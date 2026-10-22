@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { QueuedSendSnapshot } from '@proj-airi/stage-ui/stores/chat'
+import type { QueuedSendSnapshot } from '@angela/stage-ui/stores/chat'
 
-import { Section } from '@proj-airi/stage-ui/components'
+import { Section } from '@angela/stage-ui/components'
 
 defineProps<{
   connected: boolean

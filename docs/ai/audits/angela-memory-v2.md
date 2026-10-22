@@ -153,7 +153,7 @@ Run commands from the repository root, one at a time:
 ```sh
 pnpm exec tsx packages/airi-cli/scripts/benchmark-memory-v2.ts WAL memory-v2-result.json
 pnpm exec tsx packages/airi-cli/scripts/benchmark-runtime-startup.ts startup-result.json
-pnpm -F @proj-airi/airi-cli exec vitest run --config vitest.config.ts src/memory-v2 --maxWorkers=1
+pnpm -F @angela/cli exec vitest run --config vitest.config.ts src/memory-v2 --maxWorkers=1
 ```
 
 `ANGELA_BENCH_SOURCE` selects an extracted source directory that uses the same installed workspace dependencies.
@@ -262,10 +262,10 @@ No garbage collection or FinalizationRegistry callback is a correctness conditio
 
 - Full local CLI suite: **384/384 tests, 47 files**, before the final deadline timer adjustment.
 - Telegram/lifecycle follow-up after that adjustment: **34/34 tests**. These include success, cancellation, reset, eviction, and shared-host shutdown.
-- `pnpm -F @proj-airi/airi-cli typecheck`: passed after the deadline adjustment.
+- `pnpm -F @angela/cli typecheck`: passed after the deadline adjustment.
 - `pnpm typecheck --concurrency=1`: **53/53 tasks**, 52 cached, with the changed CLI checked again.
 - Root typecheck required the installed native pnpm binary on PATH because the local wrapper lacks a shebang.
-- `pnpm -F @proj-airi/airi-cli build` and the built executable `--help`: passed after the deadline adjustment.
+- `pnpm -F @angela/cli build` and the built executable `--help`: passed after the deadline adjustment.
 - `pnpm exec eslint packages/airi-cli/src packages/airi-cli/scripts`: passed with no package errors.
 - `pnpm lint`: passed. ESLint reported 0 errors and 603 warnings. The Oxlint phase reported 12 warnings.
 - `.github/workflows/cli-core.yml` runs the full CLI gate on PR #1 with one job and one Vitest worker.

@@ -1,5 +1,5 @@
-import type { ProtocolEvents } from '@proj-airi/plugin-protocol/types'
-import type { WebSocketEventOf } from '@proj-airi/server-sdk'
+import type { ProtocolEvents } from '@angela/plugin-protocol/types'
+import type { WebSocketEventOf } from '@angela/server-sdk'
 import type { ToolChoice } from '@xsai/shared-chat'
 
 import type { Turn } from '../../messages/types'

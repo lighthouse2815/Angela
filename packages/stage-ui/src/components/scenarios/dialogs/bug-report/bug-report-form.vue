@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button, ContainerError, FieldCheckbox, FieldInputFile, Textarea } from '@proj-airi/ui'
+import { Button, ContainerError, FieldCheckbox, FieldInputFile, Textarea } from '@angela/ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

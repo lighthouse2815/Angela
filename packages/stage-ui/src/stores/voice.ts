@@ -1,11 +1,11 @@
-import type { BeginSpeechInput, SpeechInputAttempt, SpeechOutput, SpeechStream, TurnRef, VoicePluginHandle, VoiceResponse } from '@proj-airi/core-agent'
+import type { BeginSpeechInput, SpeechInputAttempt, SpeechOutput, SpeechStream, TurnRef, VoicePluginHandle, VoiceResponse } from '@angela/core-agent'
 
 import type { VoiceActivityOptions } from '../libs/voice/voice-activity-plugin'
 import type { VoiceHostSnapshot } from '../services/speech/bus'
 
+import { turnKey } from '@angela/core-agent'
 import { defineInvokeHandler } from '@moeru/eventa'
 import { errorMessageFrom } from '@moeru/std'
-import { turnKey } from '@proj-airi/core-agent'
 import { defineStore, storeToRefs } from 'pinia'
 import { onScopeDispose, shallowRef, watch } from 'vue'
 

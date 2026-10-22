@@ -1,8 +1,8 @@
 import type { AnalyticsAdapter, AnalyticsAdapterOptions } from './client'
 
+import { isStageCapacitor, isStageTamagotchi } from '@angela/stage-shared'
+import { OPENPANEL_CONFIG } from '@angela/stage-shared/analytics/openpanel'
 import { OpenPanel } from '@openpanel/web'
-import { isStageCapacitor, isStageTamagotchi } from '@proj-airi/stage-shared'
-import { OPENPANEL_CONFIG } from '@proj-airi/stage-shared/analytics/openpanel'
 
 const deviceStorageKey = 'airi:openpanel-device-id'
 

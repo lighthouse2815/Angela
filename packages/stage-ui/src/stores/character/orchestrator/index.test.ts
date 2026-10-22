@@ -1,5 +1,5 @@
-import type { Conversation } from '@proj-airi/core-agent'
-import type { WebSocketEventOf } from '@proj-airi/server-sdk'
+import type { Conversation } from '@angela/core-agent'
+import type { WebSocketEventOf } from '@angela/server-sdk'
 /* eslint-disable style/indent-binary-ops */
 /* eslint-disable style/operator-linebreak */
 import type { Pinia, Store, StoreDefinition } from 'pinia'
@@ -10,7 +10,7 @@ import type z from 'zod'
 import type { StreamEvent } from '../../ai/chat-llm/llm'
 import type { AiriCard } from '../../modules'
 
-import { renderConversationPreview } from '@proj-airi/core-agent'
+import { renderConversationPreview } from '@angela/core-agent'
 import { tool } from '@xsai/tool'
 import { nanoid } from 'nanoid'
 import { createPinia, setActivePinia } from 'pinia'

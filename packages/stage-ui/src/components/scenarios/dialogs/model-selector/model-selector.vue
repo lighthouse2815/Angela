@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { Live2DValidationReport } from '@proj-airi/stage-ui-live2d'
-import type { TachieValidationReport } from '@proj-airi/stage-ui-tachie'
+import type { Live2DValidationReport } from '@angela/stage-ui-live2d'
+import type { TachieValidationReport } from '@angela/stage-ui-tachie'
 
 import type { DisplayModel } from '../../../../stores/display-models'
 
-import { validateLive2DZip } from '@proj-airi/stage-ui-live2d'
-import { TACHIE_ARCHIVE_SUFFIX, validateTachieZip } from '@proj-airi/stage-ui-tachie'
-import { Button } from '@proj-airi/ui'
+import { validateLive2DZip } from '@angela/stage-ui-live2d'
+import { TACHIE_ARCHIVE_SUFFIX, validateTachieZip } from '@angela/stage-ui-tachie'
+import { Button } from '@angela/ui'
 import { useFileDialog } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuRoot, DropdownMenuTrigger, EditableArea, EditableEditTrigger, EditableInput, EditablePreview, EditableRoot, EditableSubmitTrigger } from 'reka-ui'

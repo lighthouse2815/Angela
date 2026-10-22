@@ -13,8 +13,8 @@ import type { ServerChannel } from '../../services/airi/channel-server'
 
 import { join, resolve } from 'node:path'
 
+import { safeClose } from '@angela/electron-vueuse/main'
 import { createContext } from '@moeru/eventa/adapters/electron/main'
-import { safeClose } from '@proj-airi/electron-vueuse/main'
 import { BrowserWindow as ElectronBrowserWindow, ipcMain, screen } from 'electron'
 import { clamp } from 'es-toolkit/math'
 import { isMacOS } from 'std-env'

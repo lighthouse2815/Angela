@@ -2,8 +2,8 @@ import type { InferOutput } from 'valibot'
 
 import type { FeatureFlag } from '../libs/feature-flags'
 
+import { useLocalStorageManualReset } from '@angela/stage-shared/composables'
 import { errorMessageFrom } from '@moeru/std'
-import { useLocalStorageManualReset } from '@proj-airi/stage-shared/composables'
 import { defineStore } from 'pinia'
 import { parse } from 'valibot'
 import { computed, onScopeDispose, shallowRef, watch } from 'vue'

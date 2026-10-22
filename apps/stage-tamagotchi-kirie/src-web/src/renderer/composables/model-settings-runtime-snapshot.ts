@@ -1,14 +1,14 @@
-import type { Live2DExpressionSettingsCommand } from '@proj-airi/stage-ui-live2d/stores/expression-store'
+import type { Live2DExpressionSettingsCommand } from '@angela/stage-ui-live2d/stores/expression-store'
 import type {
   ModelSettingsRuntimeSnapshot,
-} from '@proj-airi/stage-ui/components/scenarios/settings/model-settings/runtime'
+} from '@angela/stage-ui/components/scenarios/settings/model-settings/runtime'
 
 import type { ModelSettingsRuntimeContext } from '../../shared/model-settings-runtime'
 
-import { defineInvoke } from '@moeru/eventa'
 import {
   createEmptyModelSettingsRuntimeSnapshot,
-} from '@proj-airi/stage-ui/components/scenarios/settings/model-settings/runtime'
+} from '@angela/stage-ui/components/scenarios/settings/model-settings/runtime'
+import { defineInvoke } from '@moeru/eventa'
 import { onMounted, onUnmounted, ref } from 'vue'
 
 import {

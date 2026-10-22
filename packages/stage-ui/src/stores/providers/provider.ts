@@ -1,12 +1,12 @@
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { GenerationProvider } from '@angela/provider-inference'
 import type {} from 'pinia-plugin-synced'
 
 import type { ProviderMetadata, ProviderValidationPlan } from '../../libs/providers'
 import type { ChatRequestOptions, ModelInfo, ProviderDefinition, ProviderInstance, VoiceInfo } from '../../libs/providers/types'
 
+import { getGenerationProvider } from '@angela/provider-inference'
+import { isCustomProvidersDisabled } from '@angela/stage-shared'
 import { errorMessageFrom } from '@moeru/std'
-import { getGenerationProvider } from '@proj-airi/provider-inference'
-import { isCustomProvidersDisabled } from '@proj-airi/stage-shared'
 import { computedAsync, useAsyncState, useIntervalFn } from '@vueuse/core'
 import { listModels } from '@xsai/model'
 import { uniqBy } from 'es-toolkit'

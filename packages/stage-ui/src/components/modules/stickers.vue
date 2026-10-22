@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { StickerEmotion, StickerEntry } from '../../types/sticker'
 
-import { Button, FieldCheckbox, FieldInput, FieldInputFile, FieldSelect, GhostButton, SettingsCard } from '@proj-airi/ui'
+import { Button, FieldCheckbox, FieldInput, FieldInputFile, FieldSelect, GhostButton, SettingsCard } from '@angela/ui'
 import { useObjectUrl } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, nextTick, ref, useTemplateRef, watch } from 'vue'

@@ -31,7 +31,7 @@ describe('live2D model settings', () => {
     // We fixed this by sending a serializable expression snapshot from the stage owner.
     Object.assign(window, { Live2DCubismCore: {} })
     const [{ useExpressionStore, useSettingsLive2d }, { default: Live2DSettings }] = await Promise.all([
-      import('@proj-airi/stage-ui-live2d'),
+      import('@angela/stage-ui-live2d'),
       import('./live2d.vue'),
     ])
 

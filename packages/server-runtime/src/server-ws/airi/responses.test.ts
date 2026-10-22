@@ -1,4 +1,4 @@
-import { WebSocketEventSource } from '@proj-airi/server-shared/types'
+import { WebSocketEventSource } from '@angela/server-shared/types'
 import { describe, expect, it } from 'vitest'
 
 import packageJSON from '../../../package.json'

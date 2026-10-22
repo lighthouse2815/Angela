@@ -88,10 +88,10 @@ Explicit non-goals of this pass:
 
 ## Commands Verified In This Checkout
 
-- `pnpm -F @proj-airi/computer-use-mcp typecheck`
-- `pnpm -F @proj-airi/computer-use-mcp test`
-- `pnpm -F @proj-airi/stage-ui typecheck`
-- `pnpm -F @proj-airi/stage-tamagotchi typecheck`
+- `pnpm -F @angela/computer-use-mcp typecheck`
+- `pnpm -F @angela/computer-use-mcp test`
+- `pnpm -F @angela/stage-ui typecheck`
+- `pnpm -F @angela/desktop typecheck`
 
 ## Practical Interpretation
 

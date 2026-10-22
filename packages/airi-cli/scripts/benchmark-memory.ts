@@ -1,4 +1,4 @@
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { GenerationProvider } from '@angela/provider-inference'
 
 import process from 'node:process'
 
@@ -8,7 +8,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { setImmediate, setTimeout } from 'node:timers/promises'
 
-import { cliMessages } from '@proj-airi/i18n/cli'
+import { cliMessages } from '@angela/i18n/cli'
 import { Bot } from 'grammy'
 
 import { Chat } from '../src/chat'

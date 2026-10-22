@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Character, CreateCharacterPayload } from '@proj-airi/stage-ui/types/character'
+import type { Character, CreateCharacterPayload } from '@angela/stage-ui/types/character'
 
-import { useAnalytics } from '@proj-airi/stage-ui/composables/use-analytics'
-import { useCharacterStore } from '@proj-airi/stage-ui/stores/characters'
-import { CreateCharacterSchema } from '@proj-airi/stage-ui/types/character'
-import { Button, FieldInput, GhostButton, ScrollableArea } from '@proj-airi/ui'
+import { useAnalytics } from '@angela/stage-ui/composables/use-analytics'
+import { useCharacterStore } from '@angela/stage-ui/stores/characters'
+import { CreateCharacterSchema } from '@angela/stage-ui/types/character'
+import { Button, FieldInput, GhostButton, ScrollableArea } from '@angela/ui'
 import {
   DialogContent,
   DialogOverlay,

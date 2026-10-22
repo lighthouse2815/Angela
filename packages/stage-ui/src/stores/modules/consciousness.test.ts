@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { streamFrom } from '@proj-airi/core-agent'
+import { streamFrom } from '@angela/core-agent'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'

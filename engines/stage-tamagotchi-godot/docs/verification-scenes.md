@@ -99,13 +99,13 @@ For shipped stage visuals, export render-stage artifacts instead of relying on a
 temporary manual screenshot:
 
 ```powershell
-pnpm -F @proj-airi/stage-tamagotchi-godot dump:render-stages
+pnpm -F @angela/stage-tamagotchi-godot dump:render-stages
 ```
 
 For rim or edge-light shape checks, prefer the upper-body camera preset:
 
 ```powershell
-pnpm -F @proj-airi/stage-tamagotchi-godot dump:render-stages:upper-body
+pnpm -F @angela/stage-tamagotchi-godot dump:render-stages:upper-body
 ```
 
 The dump command runs this flow:

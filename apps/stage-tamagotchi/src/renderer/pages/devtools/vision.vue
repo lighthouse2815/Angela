@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { VisionWorkloadId } from '@proj-airi/stage-ui/composables'
+import type { VisionWorkloadId } from '@angela/stage-ui/composables'
 import type { SourcesOptions } from 'electron'
 
+import { ProcessingMeter } from '@angela/stage-ui/components'
+import { VISION_WORKLOADS } from '@angela/stage-ui/composables'
+import { useVisionActivityStore, useVisionOrchestratorStore, useVisionProcessingStore, useVisionStore } from '@angela/stage-ui/stores/modules/vision'
+import { Button, FieldCheckbox, FieldCombobox, FieldRange, SelectTab } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { ProcessingMeter } from '@proj-airi/stage-ui/components'
-import { VISION_WORKLOADS } from '@proj-airi/stage-ui/composables'
-import { useVisionActivityStore, useVisionOrchestratorStore, useVisionProcessingStore, useVisionStore } from '@proj-airi/stage-ui/stores/modules/vision'
-import { Button, FieldCheckbox, FieldCombobox, FieldRange, SelectTab } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
 import { computed, onBeforeUnmount, ref } from 'vue'
 

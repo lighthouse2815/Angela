@@ -1,6 +1,6 @@
 import type { Pinia } from 'pinia'
 
-import { useHomeAssistantStore } from '@proj-airi/stage-ui/stores/modules/home-assistant'
+import { useHomeAssistantStore } from '@angela/stage-ui/stores/modules/home-assistant'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
 import { render } from 'vitest-browser-vue'
@@ -18,8 +18,8 @@ const invokeMocks = vi.hoisted(() => ({
   setConfig: vi.fn(),
 }))
 
-vi.mock('@proj-airi/electron-vueuse', async importOriginal => ({
-  ...await importOriginal<typeof import('@proj-airi/electron-vueuse')>(),
+vi.mock('@angela/electron-vueuse', async importOriginal => ({
+  ...await importOriginal<typeof import('@angela/electron-vueuse')>(),
   useElectronEventaInvoke: (event: { receiveEvent?: { id?: string } }) => {
     if (event?.receiveEvent?.id === 'eventa:invoke:home-assistant:get-config-receive')
       return invokeMocks.getConfig

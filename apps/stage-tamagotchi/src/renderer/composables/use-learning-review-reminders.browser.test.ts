@@ -1,7 +1,7 @@
-import en from '@proj-airi/i18n/locales/en'
+import en from '@angela/i18n/locales/en'
 
-import { setupSynced, usePiniaSynced } from '@proj-airi/stage-ui/libs/pinia'
-import { useLearningMemoryStore } from '@proj-airi/stage-ui/stores/modules/learning-memory'
+import { setupSynced, usePiniaSynced } from '@angela/stage-ui/libs/pinia'
+import { useLearningMemoryStore } from '@angela/stage-ui/stores/modules/learning-memory'
 import { createPinia, disposePinia } from 'pinia'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { createApp, h, nextTick } from 'vue'
@@ -10,7 +10,7 @@ import { createI18n } from 'vue-i18n'
 import { useLearningReviewReminders } from './use-learning-review-reminders'
 
 const ipc = vi.hoisted(() => ({ notify: vi.fn() }))
-vi.mock('@proj-airi/electron-vueuse', () => ({ useElectronEventaInvoke: () => ipc.notify }))
+vi.mock('@angela/electron-vueuse', () => ({ useElectronEventaInvoke: () => ipc.notify }))
 
 const contexts: { dispose: () => void }[] = []
 

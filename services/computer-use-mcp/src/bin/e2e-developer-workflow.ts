@@ -8,7 +8,7 @@
  * and the chain must propagate the same projectPath end-to-end.
  *
  * Usage:
- *   pnpm -F @proj-airi/computer-use-mcp exec tsx ./src/bin/e2e-developer-workflow.ts
+ *   pnpm -F @angela/computer-use-mcp exec tsx ./src/bin/e2e-developer-workflow.ts
  */
 
 import { mkdtempSync, writeFileSync } from 'node:fs'

@@ -1,7 +1,7 @@
 import type { ControlsIslandAction } from '../libs/product-signals/events/controls-island'
 import type { SpeechOutputStopReason } from '../stores/speech-output-control'
 
-import { isStageCapacitor, isStageTamagotchi } from '@proj-airi/stage-shared'
+import { isStageCapacitor, isStageTamagotchi } from '@angela/stage-shared'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

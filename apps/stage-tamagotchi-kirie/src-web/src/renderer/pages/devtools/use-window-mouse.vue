@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useHostRelativeMouse } from '@proj-airi/stage-host-context'
+import { useHostRelativeMouse } from '@angela/stage-host-context'
 
 const { x, y } = useHostRelativeMouse()
 </script>

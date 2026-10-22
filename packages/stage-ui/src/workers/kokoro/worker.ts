@@ -16,7 +16,7 @@ import type {
 } from '../../libs/inference/protocol'
 import type { VoiceKey, Voices } from './types'
 
-import { errorMessageFromValue } from '@proj-airi/stage-shared'
+import { errorMessageFromValue } from '@angela/stage-shared'
 import { KokoroTTS } from 'kokoro-js'
 
 import { MODEL_IDS, MODEL_NAMES } from '../../libs/inference/constants'

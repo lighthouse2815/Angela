@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import type { ProviderValidationStep } from '@proj-airi/stage-ui/libs'
+import type { ProviderValidationStep } from '@angela/stage-ui/libs'
 import type { ZodType } from 'zod'
 import type { $ZodType } from 'zod/v4/core'
 
 // TODO: https://developer.mozilla.org/en-US/docs/Web/API/HTML_Sanitizer_API
 import DOMPurify from 'dompurify'
 
-import { errorMessageFrom, merge } from '@moeru/std'
 import {
   Alert,
   ProviderAccountIdInput,
@@ -17,10 +16,11 @@ import {
   ProviderSettingsContainer,
   ProviderSettingsLayout,
   ProviderValidationDetailsDialog,
-} from '@proj-airi/stage-ui/components'
-import { getDefinedProvider, getSchemaDefault, getValidatorsOfProvider, validateProvider } from '@proj-airi/stage-ui/libs'
-import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
-import { Button, Callout, FieldCheckbox, FieldCombobox, FieldInput, FieldKeyValues, GhostButton } from '@proj-airi/ui'
+} from '@angela/stage-ui/components'
+import { getDefinedProvider, getSchemaDefault, getValidatorsOfProvider, validateProvider } from '@angela/stage-ui/libs'
+import { useProviderConfigStore } from '@angela/stage-ui/stores/providers/config'
+import { Button, Callout, FieldCheckbox, FieldCombobox, FieldInput, FieldKeyValues, GhostButton } from '@angela/ui'
+import { errorMessageFrom, merge } from '@moeru/std'
 import { computedAsync, useCloned, useDebounceFn } from '@vueuse/core'
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuRoot, DropdownMenuTrigger } from 'reka-ui'
 import { computed, ref, watch } from 'vue'

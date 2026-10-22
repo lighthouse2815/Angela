@@ -22,12 +22,12 @@ From the repo root:
 
 ```bash
 bash apps/stage-tamagotchi/scripts/update-test/setup.sh
-pnpm -F @proj-airi/stage-tamagotchi update-test:generate \
+pnpm -F @angela/desktop update-test:generate \
   --root scripts/update-test/fixtures/server \
   --channel stable \
   --target aarch64-apple-darwin \
   --version 9.9.9-update-test.1
-pnpm -F @proj-airi/stage-tamagotchi update-test:server \
+pnpm -F @angela/desktop update-test:server \
   --port 8787 \
   --root scripts/update-test/fixtures/server
 ```
@@ -67,7 +67,7 @@ bash apps/stage-tamagotchi/scripts/update-test/run-test.sh
 For automated matrix checks (lane x runtime feed mode + bundle-version test matrix), run:
 
 ```bash
-pnpm -F @proj-airi/stage-tamagotchi update-test:matrix
+pnpm -F @angela/desktop update-test:matrix
 ```
 
 This script:
@@ -102,4 +102,4 @@ Common targets:
 - The generated artifact is a placeholder file meant for update discovery and early download flow verification.
 - Real signed installer execution remains a separate manual verification step.
 - The first pass is manual-first by design. A Playwright `_electron` smoke layer can be added on top later.
-- When invoking the package scripts through `pnpm -F @proj-airi/stage-tamagotchi`, treat `--root` as relative to `apps/stage-tamagotchi`, not the workspace root.
+- When invoking the package scripts through `pnpm -F @angela/desktop`, treat `--root` as relative to `apps/stage-tamagotchi`, not the workspace root.

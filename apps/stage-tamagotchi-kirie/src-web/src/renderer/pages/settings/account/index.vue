@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import AccountSettingsPage from '@proj-airi/stage-pages/pages/settings/account/account-settings-page.vue'
+import AccountSettingsPage from '@angela/stage-pages/pages/settings/account/account-settings-page.vue'
 
-import { useHostAuth } from '@proj-airi/stage-host-context'
-import { signOut } from '@proj-airi/stage-ui/libs/auth'
+import { useHostAuth } from '@angela/stage-host-context'
+import { signOut } from '@angela/stage-ui/libs/auth'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()

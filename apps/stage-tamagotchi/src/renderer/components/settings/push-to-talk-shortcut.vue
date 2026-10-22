@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { ShortcutAccelerator, ShortcutFailureReason } from '@proj-airi/stage-shared/global-shortcut'
+import type { ShortcutAccelerator, ShortcutFailureReason } from '@angela/stage-shared/global-shortcut'
 
+import { useElectronEventaInvoke } from '@angela/electron-vueuse'
+import { formatAccelerator, isSameKeyCombination, ShortcutFailureReasons } from '@angela/stage-shared/global-shortcut'
+import { useHearingStore } from '@angela/stage-ui/stores/modules/hearing'
+import { useSettingsAudioDevice } from '@angela/stage-ui/stores/settings'
+import { Button } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { formatAccelerator, isSameKeyCombination, ShortcutFailureReasons } from '@proj-airi/stage-shared/global-shortcut'
-import { useHearingStore } from '@proj-airi/stage-ui/stores/modules/hearing'
-import { useSettingsAudioDevice } from '@proj-airi/stage-ui/stores/settings'
-import { Button } from '@proj-airi/ui'
 import { isMacOS } from 'std-env'
 import { computed, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'

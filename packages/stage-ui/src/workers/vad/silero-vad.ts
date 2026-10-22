@@ -1,5 +1,5 @@
+import type { AudioWindow } from '@angela/pipelines-audio'
 import type { PreTrainedModel } from '@huggingface/transformers'
-import type { AudioWindow } from '@proj-airi/pipelines-audio'
 
 import { AutoModel, PretrainedConfig, Tensor } from '@huggingface/transformers'
 

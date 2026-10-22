@@ -1,10 +1,10 @@
-# @proj-airi/ui-loading-screens
+# @angela/ui-loading-screens
 
 This package provides loading screens for AIRI apps. [View the playground](https://proj-airi-packages-ui-loading-screens.netlify.app/).
 
 ## Use
 
-Import `StartupScreen` from `@proj-airi/ui-loading-screens/startup-screen`. Give it the phase, progress, logo URL, and translated labels.
+Import `StartupScreen` from `@angela/ui-loading-screens/startup-screen`. Give it the phase, progress, logo URL, and translated labels.
 
 ```vue
 <StartupScreen phase="loading" :progress="50" logo-src="/favicon.svg" :label="t('stage.operations.load-models-status.loading')" :error-title="t('stage.startup.failed')" :error-hint="t('stage.startup.recover')" :error-details-label="t('stage.startup.details')" :error-details-close-label="t('stage.startup.close-details')" :retry-label="t('stage.startup.retry')" />
@@ -17,7 +17,7 @@ Mobile hides the logo and places progress just above the bottom actions. Error p
 The small details button opens a desktop tooltip or a mobile bottom drawer. The `done` phase removes the screen.
 
 The screen uses Comfortaa for the brand and content.
-The progress bar uses `Progress` from `@proj-airi/ui`.
+The progress bar uses `Progress` from `@angela/ui`.
 `StartupOverlay` reads the resource state and supplies the error text.
 The optional `alternative-label` adds a second action for a recoverable failure.
 

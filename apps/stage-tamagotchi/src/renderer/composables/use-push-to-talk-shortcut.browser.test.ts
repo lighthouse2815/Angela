@@ -1,10 +1,10 @@
+import type { ShortcutBinding, ShortcutRegistrationResult } from '@angela/stage-shared/global-shortcut'
 import type { createContext } from '@moeru/eventa'
-import type { ShortcutBinding, ShortcutRegistrationResult } from '@proj-airi/stage-shared/global-shortcut'
 
-import { useChatSessionStore } from '@proj-airi/stage-ui/stores/chat/session-store'
-import { useHearingStore } from '@proj-airi/stage-ui/stores/modules/hearing'
-import { useSettingsAudioDevice } from '@proj-airi/stage-ui/stores/settings'
-import { useVoiceStore } from '@proj-airi/stage-ui/stores/voice'
+import { useChatSessionStore } from '@angela/stage-ui/stores/chat/session-store'
+import { useHearingStore } from '@angela/stage-ui/stores/modules/hearing'
+import { useSettingsAudioDevice } from '@angela/stage-ui/stores/settings'
+import { useVoiceStore } from '@angela/stage-ui/stores/voice'
 import { createPinia, disposePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
 import { render } from 'vitest-browser-vue'
@@ -24,7 +24,7 @@ const mocks = vi.hoisted(() => ({
 // The shortcut service runs in the Electron main process. The doubles answer for it: an in-memory Eventa context
 // carries trigger events, and the register and unregister invokes are recorded.
 // Removal condition: browser tests running inside an Electron renderer.
-vi.mock('@proj-airi/electron-vueuse', async () => {
+vi.mock('@angela/electron-vueuse', async () => {
   const { createContext } = await import('@moeru/eventa')
   mocks.context = createContext()
   return {

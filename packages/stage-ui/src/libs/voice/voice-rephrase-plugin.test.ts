@@ -1,8 +1,8 @@
-import type { SpeechInputAttempt, TranscriptionEvent } from '@proj-airi/core-agent'
-import type { PcmBlock } from '@proj-airi/pipelines-audio'
+import type { SpeechInputAttempt, TranscriptionEvent } from '@angela/core-agent'
+import type { PcmBlock } from '@angela/pipelines-audio'
 
-import { VoiceController } from '@proj-airi/core-agent'
-import { AudioInput, createPushStream } from '@proj-airi/pipelines-audio'
+import { VoiceController } from '@angela/core-agent'
+import { AudioInput, createPushStream } from '@angela/pipelines-audio'
 import { describe, expect, it, vi } from 'vitest'
 
 import { createVoiceRephrasePlugin, parseRephrasedSegments } from './voice-rephrase-plugin'

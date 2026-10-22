@@ -14,9 +14,9 @@ import type { SkinnedMesh, Texture } from 'three'
 import type { GazeOffset, MMDAnimationManager, MorphController } from '../../composables/mmd'
 import type { ResolvedMMDModel } from '../../utils/mmd-loader'
 
+import { coverRect } from '@angela/stage-shared'
+import { Screen } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { coverRect } from '@proj-airi/stage-shared'
-import { Screen } from '@proj-airi/ui'
 import { storeToRefs } from 'pinia'
 import {
   AmbientLight,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useHostAutoUpdater } from '@proj-airi/stage-host-context'
-import { Button, Callout, Progress } from '@proj-airi/ui'
+import { useHostAutoUpdater } from '@angela/stage-host-context'
+import { Button, Callout, Progress } from '@angela/ui'
 import { computed } from 'vue'
 
 const {

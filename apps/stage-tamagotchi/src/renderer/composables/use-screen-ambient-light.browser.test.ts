@@ -1,4 +1,4 @@
-import { useSettingsScreenAmbientLight } from '@proj-airi/stage-shared/stores/screen-ambient-light'
+import { useSettingsScreenAmbientLight } from '@angela/stage-shared/stores/screen-ambient-light'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { effectScope, ref } from 'vue'
@@ -25,12 +25,12 @@ const offeredSources = vi.hoisted(() => ({ list: [] as { id: string, display_id:
 
 // The returned functions run at composable setup, after the consts above
 // exist; the factory itself runs before them and must not touch them.
-vi.mock('@proj-airi/electron-vueuse', () => ({
+vi.mock('@angela/electron-vueuse', () => ({
   useElectronAllDisplays: () => displayList,
   useElectronWindowBounds: () => bounds,
 }))
 
-vi.mock('@proj-airi/electron-screen-capture/vue', () => ({
+vi.mock('@angela/electron-screen-capture/vue', () => ({
   useElectronScreenCapture: () => ({
     checkMacOSPermission: vi.fn(async () => 'granted'),
     requestMacOSPermission: vi.fn(async () => {}),

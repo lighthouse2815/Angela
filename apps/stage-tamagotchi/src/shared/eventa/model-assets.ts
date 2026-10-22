@@ -1,4 +1,4 @@
-import type { ModelAssetStatus } from '@proj-airi/stage-shared/model-assets'
+import type { ModelAssetStatus } from '@angela/stage-shared/model-assets'
 
 import { defineEventa, defineInvokeEventa } from '@moeru/eventa'
 

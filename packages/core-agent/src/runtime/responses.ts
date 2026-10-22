@@ -1,4 +1,4 @@
-import type { ResponsesConfig } from '@proj-airi/provider-inference'
+import type { ResponsesConfig } from '@angela/provider-inference'
 import type { ItemParam, ResponsesOptions } from '@xsai-ext/responses'
 import type { CompletionStep, Tool } from '@xsai/shared-chat'
 

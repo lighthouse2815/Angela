@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { IOSubsystem } from '@proj-airi/stage-shared'
+import type { IOSubsystem } from '@angela/stage-shared'
 
-import { Button } from '@proj-airi/ui'
+import { Button } from '@angela/ui'
 
 import { SUBSYSTEM_CONFIG_MAP, SUBSYSTEM_CONFIGS } from '../io-tracer-types'
 

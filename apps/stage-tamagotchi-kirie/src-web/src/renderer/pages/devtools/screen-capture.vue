@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { SerializableDesktopCapturerSource } from '@proj-airi/electron-screen-capture'
+import type { SerializableDesktopCapturerSource } from '@angela/electron-screen-capture'
 import type { SourcesOptions } from 'electron'
 
-import { useHostScreenCapture } from '@proj-airi/stage-host-context'
-import { Button, SelectTab } from '@proj-airi/ui'
+import { useHostScreenCapture } from '@angela/stage-host-context'
+import { Button, SelectTab } from '@angela/ui'
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 

@@ -1,4 +1,4 @@
-# `@proj-airi/stage-ui-tachie`
+# `@angela/stage-ui-tachie`
 
 Tachie scene rendering for characters represented by a small set of complete,
 static emotion images.
@@ -41,7 +41,7 @@ recognized image must use the same pixel dimensions.
 
 ```vue
 <script setup lang="ts">
-import { TachieScene } from '@proj-airi/stage-ui-tachie'
+import { TachieScene } from '@angela/stage-ui-tachie'
 </script>
 
 <template>

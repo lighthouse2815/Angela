@@ -1,6 +1,6 @@
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { GenerationProvider } from '@angela/provider-inference'
 
-import { cliMessages } from '@proj-airi/i18n/cli'
+import { cliMessages } from '@angela/i18n/cli'
 import { expect, it, vi } from 'vitest'
 
 import { Evaluation } from './evaluation'

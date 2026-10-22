@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SessionRow } from './sessions-list.vue'
 
-import { BasicButton, BottomDrawer } from '@proj-airi/ui'
+import { BasicButton, BottomDrawer } from '@angela/ui'
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle, PopoverContent, PopoverPortal, PopoverRoot, PopoverTrigger } from 'reka-ui'
 import { useI18n } from 'vue-i18n'
 

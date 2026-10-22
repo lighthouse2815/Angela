@@ -8,7 +8,7 @@ import { dirname, resolve } from 'node:path'
 import { env, exit, kill as killProcess } from 'node:process'
 import { fileURLToPath } from 'node:url'
 
-import { errorMessageFromValue } from '@proj-airi/stage-shared'
+import { errorMessageFromValue } from '@angela/stage-shared'
 
 import { desktopOverlayPollHeartbeatMarker } from '../src/shared/desktop-overlay-heartbeat'
 import { selectDesktopOverlaySmokeCandidateId } from '../src/shared/desktop-overlay-live-window-smoke'
@@ -104,7 +104,7 @@ async function prepareMcpConfig() {
     mcpServers: {
       computer_use: {
         command: 'pnpm',
-        args: ['-F', '@proj-airi/computer-use-mcp', 'start'],
+        args: ['-F', '@angela/computer-use-mcp', 'start'],
         cwd: repoDir,
         enabled: true,
         env: mcpEnv,
@@ -137,7 +137,7 @@ async function ensureSmokePrerequisites() {
     'APP_START_FAILED: required workspace build outputs are missing.',
     `Missing: ${missingOutputs.join(', ')}`,
     'Build stage-tamagotchi dependencies manually before this smoke. The smoke command does not auto-build them to avoid saturating the local machine.',
-    'Suggested command: pnpm -F \'@proj-airi/stage-tamagotchi^...\' --if-present build',
+    'Suggested command: pnpm -F \'@angela/desktop^...\' --if-present build',
   ].join(' '))
 }
 
@@ -218,7 +218,7 @@ function requireRunState(result: McpResult, label: string): Record<string, unkno
 }
 
 function startStage(debugPort: number, heartbeatLines: string[]): ChildProcessWithoutNullStreams {
-  const stageProcess = spawn('pnpm', ['-F', '@proj-airi/stage-tamagotchi', 'dev'], {
+  const stageProcess = spawn('pnpm', ['-F', '@angela/desktop', 'dev'], {
     cwd: repoDir,
     detached: true,
     env: {

@@ -1,4 +1,4 @@
-import type { ExtensionHost, KitDescriptor } from '@proj-airi/plugin-sdk/plugin-host'
+import type { ExtensionHost, KitDescriptor } from '@angela/plugin-sdk/plugin-host'
 
 export { resolveWidgetAssetRoute, rewriteWidgetModuleAssetUrl } from './asset-url'
 

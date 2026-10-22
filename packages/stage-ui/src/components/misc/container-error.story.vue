@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ContainerError } from '@proj-airi/ui'
+import { ContainerError } from '@angela/ui'
 import { ref } from 'vue'
 
 const actionLog = ref('No action yet')

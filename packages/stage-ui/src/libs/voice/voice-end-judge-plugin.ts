@@ -1,4 +1,4 @@
-import type { TurnEvidence, VoicePlugin } from '@proj-airi/core-agent'
+import type { TurnEvidence, VoicePlugin } from '@angela/core-agent'
 
 /** Whether the speaker finished the message, as a chat model reads the transcript. */
 export type EndJudgement = 'complete' | 'incomplete'

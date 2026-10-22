@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button } from '@proj-airi/ui'
+import { Button } from '@angela/ui'
 import { onClickOutside, useMediaQuery } from '@vueuse/core'
 import { DrawerContent, DrawerDescription, DrawerHandle, DrawerOverlay, DrawerPortal, DrawerRoot, DrawerTitle } from 'vaul-vue'
 import { shallowRef, useTemplateRef, watch } from 'vue'

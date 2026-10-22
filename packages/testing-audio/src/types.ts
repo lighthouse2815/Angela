@@ -1,6 +1,6 @@
-import type { SerializedIOSpan } from '@proj-airi/stage-shared/types/io-trace'
-import type { PiniaActionEvent, PiniaActionEventStatus } from '@proj-airi/stage-shared/types/pinia-action-event'
-import type { AudioCapture, AudioCaptureFormat, AudioTestCase, AudioTestPreflightCallback, AudioTestSession } from '@proj-airi/vitest-plugin-fakemic'
+import type { SerializedIOSpan } from '@angela/stage-shared/types/io-trace'
+import type { PiniaActionEvent, PiniaActionEventStatus } from '@angela/stage-shared/types/pinia-action-event'
+import type { AudioCapture, AudioCaptureFormat, AudioTestCase, AudioTestPreflightCallback, AudioTestSession } from '@angela/vitest-plugin-fakemic'
 import type { ElectronApplication, Page } from 'playwright'
 
 export const audioInputTargets = ['web', 'electron'] as const

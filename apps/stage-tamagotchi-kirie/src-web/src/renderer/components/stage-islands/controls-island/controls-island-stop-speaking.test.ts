@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import type { ControlsIslandPlacement } from './use-controls-island-placement'
 
-import { useSpeakingStore } from '@proj-airi/stage-ui/stores/audio'
+import { useSpeakingStore } from '@angela/stage-ui/stores/audio'
 import { createPinia } from 'pinia'
 import { describe, expect, it, vi } from 'vitest'
 import { createApp, h, nextTick, shallowRef } from 'vue'
@@ -19,7 +19,7 @@ const placement: ControlsIslandPlacement = {
   motionPhase: shallowRef('idle'),
 }
 
-vi.mock('@proj-airi/stage-layouts/composables/useStopSpeakingButton', () => ({
+vi.mock('@angela/stage-layouts/composables/useStopSpeakingButton', () => ({
   useStopSpeakingButton: () => ({
     stopAllSpeaking: stopAllSpeakingMock,
     showStopSpeakingButton: nowSpeakingRef,

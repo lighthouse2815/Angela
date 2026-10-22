@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Citation } from '@proj-airi/core-agent'
+import type { Citation } from '@angela/core-agent'
 
 import { computed } from 'vue'
 

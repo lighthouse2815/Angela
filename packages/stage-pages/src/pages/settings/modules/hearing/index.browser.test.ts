@@ -1,6 +1,6 @@
-import en from '@proj-airi/i18n/locales/en'
+import en from '@angela/i18n/locales/en'
 
-import { pushToTalkTriggerKey } from '@proj-airi/stage-ui/composables/push-to-talk-trigger'
+import { pushToTalkTriggerKey } from '@angela/stage-ui/composables/push-to-talk-trigger'
 import { createPinia, disposePinia } from 'pinia'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render } from 'vitest-browser-vue'

@@ -1,4 +1,4 @@
-import type { PlaybackClip, PlaybackDriver, PlayingAudio } from '@proj-airi/pipelines-audio'
+import type { PlaybackClip, PlaybackDriver, PlayingAudio } from '@angela/pipelines-audio'
 
 import { AudioOutput } from './audio-output'
 

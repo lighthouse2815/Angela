@@ -1,5 +1,5 @@
+import type { ShortcutAccelerator, ShortcutBinding } from '@angela/stage-shared/global-shortcut'
 import type { GlobalShortcut, GlobalShortcutKeyEvent } from '@gd-kirie/platform'
-import type { ShortcutAccelerator, ShortcutBinding } from '@proj-airi/stage-shared/global-shortcut'
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 

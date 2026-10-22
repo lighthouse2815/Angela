@@ -1,4 +1,4 @@
-import en from '@proj-airi/i18n/locales/en'
+import en from '@angela/i18n/locales/en'
 
 import { createPinia, disposePinia } from 'pinia'
 import { afterEach, expect, it } from 'vitest'

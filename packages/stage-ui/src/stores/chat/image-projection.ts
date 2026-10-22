@@ -1,4 +1,4 @@
-import type { Conversation } from '@proj-airi/core-agent'
+import type { Conversation } from '@angela/core-agent'
 
 function isTextSegment(part: { type: string }): part is { type: 'text', text: string } {
   return part.type === 'text'

@@ -1,1 +1,1 @@
-export { type ChatHookRegistry, createChatHooks } from '@proj-airi/core-agent'
+export { type ChatHookRegistry, createChatHooks } from '@angela/core-agent'

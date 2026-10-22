@@ -1,7 +1,7 @@
-import en from '@proj-airi/i18n/locales/en'
+import en from '@angela/i18n/locales/en'
 
+import { registerAuthorizationHandler } from '@angela/stage-ui/libs/auth'
 import { PiniaColada } from '@pinia/colada'
-import { registerAuthorizationHandler } from '@proj-airi/stage-ui/libs/auth'
 import { createPinia, disposePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { render } from 'vitest-browser-vue'

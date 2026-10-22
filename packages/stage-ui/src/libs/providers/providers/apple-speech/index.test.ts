@@ -15,7 +15,7 @@ vi.mock('@moeru/eventa/adapters/electron/renderer', () => ({
   createContext: () => ({ context: {}, dispose: mocks.dispose }),
 }))
 
-vi.mock('@proj-airi/stage-shared', () => ({
+vi.mock('@angela/stage-shared', () => ({
   isElectronWindow: () => true,
   isStageTamagotchi: () => true,
 }))

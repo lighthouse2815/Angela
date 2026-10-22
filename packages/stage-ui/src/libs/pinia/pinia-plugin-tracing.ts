@@ -1,8 +1,8 @@
-import type { PiniaActionEvent, PiniaActionEventStatus } from '@proj-airi/stage-shared/types/pinia-action-event'
+import type { PiniaActionEvent, PiniaActionEventStatus } from '@angela/stage-shared/types/pinia-action-event'
 import type { PiniaPlugin } from 'pinia'
 
+import { piniaActionTracingChannelName } from '@angela/stage-shared/types/pinia-action-event'
 import { errorMessageFrom } from '@moeru/std'
-import { piniaActionTracingChannelName } from '@proj-airi/stage-shared/types/pinia-action-event'
 import { nanoid } from 'nanoid/non-secure'
 
 const rateTraceStorageKey = 'airi:debug:pinia-tracing'

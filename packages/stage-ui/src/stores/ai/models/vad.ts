@@ -3,8 +3,8 @@ import type { MaybeRefOrGetter } from 'vue'
 
 import type { BaseVADConfig } from '../../../libs/audio/vad'
 
+import { errorMessageFromValue, IOAttributes, IOSpanNames, IOSubsystems } from '@angela/stage-shared'
 import { merge } from '@moeru/std'
-import { errorMessageFromValue, IOAttributes, IOSpanNames, IOSubsystems } from '@proj-airi/stage-shared'
 import { ref, toRef, watch } from 'vue'
 
 import { startSpan } from '../../../composables/use-io-tracer'

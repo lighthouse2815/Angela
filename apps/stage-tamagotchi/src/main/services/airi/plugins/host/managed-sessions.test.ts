@@ -1,4 +1,4 @@
-import type { ExtensionManifestV2 } from '@proj-airi/plugin-sdk/plugin-host'
+import type { ExtensionManifestV2 } from '@angela/plugin-sdk/plugin-host'
 
 import { describe, expect, it, vi } from 'vitest'
 

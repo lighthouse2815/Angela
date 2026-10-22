@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { ShortcutAccelerator, ShortcutFailureReason } from '@proj-airi/stage-shared/global-shortcut'
+import type { ShortcutAccelerator, ShortcutFailureReason } from '@angela/stage-shared/global-shortcut'
 
-import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { formatAccelerator, ShortcutFailureReasons } from '@proj-airi/stage-shared/global-shortcut'
-import { useAnalytics } from '@proj-airi/stage-ui/composables'
-import { Button } from '@proj-airi/ui'
+import { useElectronEventaInvoke } from '@angela/electron-vueuse'
+import { formatAccelerator, ShortcutFailureReasons } from '@angela/stage-shared/global-shortcut'
+import { useAnalytics } from '@angela/stage-ui/composables'
+import { Button } from '@angela/ui'
 import { computed, onMounted, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { toast } from 'vue-sonner'

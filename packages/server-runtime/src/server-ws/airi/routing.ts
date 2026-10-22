@@ -1,8 +1,8 @@
-import type { DeliveryConfig, WebSocketEvent } from '@proj-airi/server-shared/types'
+import type { DeliveryConfig, WebSocketEvent } from '@angela/server-shared/types'
 
 import type { RouteContext, RouteDecision, RouteMiddleware } from '../../middlewares'
 
-import { getProtocolEventMetadata } from '@proj-airi/server-shared/types'
+import { getProtocolEventMetadata } from '@angela/server-shared/types'
 
 /**
  * Resolves the effective event delivery policy.

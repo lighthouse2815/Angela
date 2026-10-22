@@ -1,4 +1,4 @@
-import type { ShortcutAccelerator, ShortcutBinding } from '@proj-airi/stage-shared/global-shortcut'
+import type { ShortcutAccelerator, ShortcutBinding } from '@angela/stage-shared/global-shortcut'
 
 import { createPinia, disposePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
@@ -16,7 +16,7 @@ const listShortcuts = vi.hoisted(() => vi.fn<() => Promise<ShortcutBinding[]>>()
 // NOTICE:
 // The shortcut list comes from the Electron main process. The double answers with the bindings that each test registers.
 // Removal condition: browser tests running inside an Electron renderer.
-vi.mock('@proj-airi/electron-vueuse', () => ({
+vi.mock('@angela/electron-vueuse', () => ({
   getElectronEventaContext: vi.fn(),
   useElectronEventaInvoke: () => listShortcuts,
 }))

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useFeatureFlagsStore } from '@proj-airi/stage-ui/stores/feature-flags'
-import { Button, FieldCheckbox } from '@proj-airi/ui'
+import { useFeatureFlagsStore } from '@angela/stage-ui/stores/feature-flags'
+import { Button, FieldCheckbox } from '@angela/ui'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()

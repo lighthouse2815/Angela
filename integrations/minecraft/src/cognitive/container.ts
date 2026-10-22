@@ -1,5 +1,5 @@
+import type { Client } from '@angela/server-sdk'
 import type { Logg } from '@guiiai/logg'
-import type { Client } from '@proj-airi/server-sdk'
 
 import type { AiriBridge } from '../airi/airi-bridge'
 import type { MinecraftContextService } from '../airi/minecraft-context-service'

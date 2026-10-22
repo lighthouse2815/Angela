@@ -1,12 +1,12 @@
-import type { Conversation, StreamOptions } from '@proj-airi/core-agent'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { Conversation, StreamOptions } from '@angela/core-agent'
+import type { GenerationProvider } from '@angela/provider-inference'
 import type { Tool } from '@xsai/shared-chat'
 
 import { Buffer } from 'node:buffer'
 import { randomUUID } from 'node:crypto'
 
-import { conversationToChatMessages, streamFrom } from '@proj-airi/core-agent'
-import { cliMessages } from '@proj-airi/i18n/cli'
+import { conversationToChatMessages, streamFrom } from '@angela/core-agent'
+import { cliMessages } from '@angela/i18n/cli'
 
 /** Owns a request-only rolling summary. Full turns remain in Chat and session storage. Estimates include tools and reserve output space. */
 export class Context {

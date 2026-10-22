@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import type { Application } from '@pixi/app'
-import type { Filter } from '@pixi/core'
 import type {
   AmbientLightEnvironment,
   AmbientLightFilterOptions,
   NormalizedRectangle,
   ScreenAmbientLightMode,
-} from '@proj-airi/stage-shared/screen-ambient-light'
+} from '@angela/stage-shared/screen-ambient-light'
+import type { Application } from '@pixi/app'
+import type { Filter } from '@pixi/core'
 
 import type { PixiLive2DInternalModel } from '../../../composables/live2d'
 
-import { listenBeatSyncBeatSignal } from '@proj-airi/stage-shared/beat-sync'
-import { ambientLightDefaults, ambientLightNeutralEnvironment, ambientLightPerceptualLevel, wholeWindowRectangle } from '@proj-airi/stage-shared/screen-ambient-light'
-import { useTheme } from '@proj-airi/ui'
+import { listenBeatSyncBeatSignal } from '@angela/stage-shared/beat-sync'
+import { ambientLightDefaults, ambientLightNeutralEnvironment, ambientLightPerceptualLevel, wholeWindowRectangle } from '@angela/stage-shared/screen-ambient-light'
+import { useTheme } from '@angela/ui'
 import { until } from '@vueuse/core'
 import { animate } from 'animejs'
 import { formatHex } from 'culori'

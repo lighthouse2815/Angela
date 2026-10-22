@@ -1,6 +1,6 @@
-import type { LiveAudioSource, PcmBlock } from '@proj-airi/pipelines-audio'
+import type { LiveAudioSource, PcmBlock } from '@angela/pipelines-audio'
 
-import { AudioInput, createPushStream } from '@proj-airi/pipelines-audio'
+import { AudioInput, createPushStream } from '@angela/pipelines-audio'
 import { describe, expect, it } from 'vitest'
 
 import { observeInputLevel } from './input-level'

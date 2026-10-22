@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useHostEventaInvoke } from '@proj-airi/stage-host-context'
-import { ProfileSwitcherPopover } from '@proj-airi/stage-ui/components'
+import { useHostEventaInvoke } from '@angela/stage-host-context'
+import { ProfileSwitcherPopover } from '@angela/stage-ui/components'
 import { computed } from 'vue'
 
 import { electronOpenSettings } from '../../../../shared/eventa'

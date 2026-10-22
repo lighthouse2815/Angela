@@ -1,10 +1,10 @@
-import type { Conversation } from '@proj-airi/core-agent'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { Conversation } from '@angela/core-agent'
+import type { GenerationProvider } from '@angela/provider-inference'
 
 import type { VisionWorkloadId } from './use-vision-workloads'
 
+import { DEFAULT_CONCURRENT_VISION_READS } from '@angela/provider-inference'
 import { errorMessageFrom } from '@moeru/std'
-import { DEFAULT_CONCURRENT_VISION_READS } from '@proj-airi/provider-inference'
 import { storeToRefs } from 'pinia'
 import { ref } from 'vue'
 

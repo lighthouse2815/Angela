@@ -105,14 +105,14 @@ async function ensureSmokePrerequisites() {
     'APP_START_FAILED: required workspace build outputs are missing.',
     `Missing: ${missingOutputs.join(', ')}`,
     'Build stage-tamagotchi dependencies before this smoke.',
-    'Suggested command: pnpm -F \'@proj-airi/stage-tamagotchi^...\' --if-present build',
+    'Suggested command: pnpm -F \'@angela/desktop^...\' --if-present build',
   ].join(' '))
 }
 
 function startStage(debugPort: number): ChildProcessWithoutNullStreams {
   // Keeps the run hermetic: a fresh user-data dir per run means no persisted
   // onboarding state, window bounds, or provider config leak between runs.
-  return spawn('pnpm', ['-F', '@proj-airi/stage-tamagotchi', 'start'], {
+  return spawn('pnpm', ['-F', '@angela/desktop', 'start'], {
     cwd: repoDir,
     detached: true,
     env: {

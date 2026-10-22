@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useHostEventaInvoke } from '@proj-airi/stage-host-context'
-import { Button, FieldCheckbox, FieldCombobox, FieldInput, FieldTextArea } from '@proj-airi/ui'
+import { useHostEventaInvoke } from '@angela/stage-host-context'
+import { Button, FieldCheckbox, FieldCombobox, FieldInput, FieldTextArea } from '@angela/ui'
 import { computed, reactive, ref } from 'vue'
 
 import { widgetsAdd, widgetsClear, widgetsOpenWindow, widgetsPrepareWindow, widgetsRemove, widgetsUpdate } from '../../../shared/eventa'

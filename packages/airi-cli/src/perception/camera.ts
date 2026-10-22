@@ -1,6 +1,6 @@
 import type { FacePerceptionProvider } from './observation'
 
-import { cliMessages } from '@proj-airi/i18n/cli'
+import { cliMessages } from '@angela/i18n/cli'
 
 import { AffectEngine } from './affect-engine'
 import { CameraContextProvider } from './camera-context'

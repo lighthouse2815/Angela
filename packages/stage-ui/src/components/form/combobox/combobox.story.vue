@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Combobox } from '@proj-airi/ui'
+import { Combobox } from '@angela/ui'
 import { shallowRef } from 'vue'
 
 const selected = shallowRef('local')

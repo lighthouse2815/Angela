@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { DataSettingsStatusEmits } from '@proj-airi/stage-pages/pages/settings/data/status'
+import type { DataSettingsStatusEmits } from '@angela/stage-pages/pages/settings/data/status'
 
-import { useHostWindowCenter } from '@proj-airi/stage-host-context'
-import { createDataSettingsStatusHelpers } from '@proj-airi/stage-pages/pages/settings/data/status'
-import { useAnalytics } from '@proj-airi/stage-ui/composables'
-import { useDataMaintenance } from '@proj-airi/stage-ui/composables/use-data-maintenance'
-import { Button, DoubleCheckButton } from '@proj-airi/ui'
+import { useHostWindowCenter } from '@angela/stage-host-context'
+import { createDataSettingsStatusHelpers } from '@angela/stage-pages/pages/settings/data/status'
+import { useAnalytics } from '@angela/stage-ui/composables'
+import { useDataMaintenance } from '@angela/stage-ui/composables/use-data-maintenance'
+import { Button, DoubleCheckButton } from '@angela/ui'
 import { useI18n } from 'vue-i18n'
 
 const emit = defineEmits<DataSettingsStatusEmits>()

@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/server-runtime",
+  "name": "@angela/server-runtime",
   "type": "module",
   "version": "0.12.0-beta.5",
   "description": "Server runtime implementation for AIRI running in different environments",
@@ -39,10 +39,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@angela/better-ws": "workspace:^",
+    "@angela/server-shared": "workspace:^",
     "@guiiai/logg": "catalog:",
     "@moeru/std": "catalog:",
-    "@proj-airi/better-ws": "workspace:^",
-    "@proj-airi/server-shared": "workspace:^",
     "crossws": "catalog:",
     "h3": "catalog:",
     "nanoid": "catalog:",

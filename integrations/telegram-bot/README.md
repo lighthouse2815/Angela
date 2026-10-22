@@ -72,5 +72,5 @@ Start both DB and the bot:
 
 ```shell
 docker compose up -d
-pnpm run -F @proj-airi/telegram-bot start
+pnpm run -F @angela/telegram-bot start
 ```

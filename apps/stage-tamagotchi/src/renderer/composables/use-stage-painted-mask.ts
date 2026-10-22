@@ -1,6 +1,6 @@
-import type { NormalizedRectangle } from '@proj-airi/stage-shared/screen-ambient-light'
+import type { NormalizedRectangle } from '@angela/stage-shared/screen-ambient-light'
 
-import { wholeWindowRectangle } from '@proj-airi/stage-shared/screen-ambient-light'
+import { wholeWindowRectangle } from '@angela/stage-shared/screen-ambient-light'
 import { clamp } from 'es-toolkit'
 
 /**

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { IOSpan, IOSubsystem, IOTurn } from '@proj-airi/stage-shared'
+import type { IOSpan, IOSubsystem, IOTurn } from '@angela/stage-shared'
 
-import { IOSubsystems } from '@proj-airi/stage-shared'
+import { IOSubsystems } from '@angela/stage-shared'
 import { useElementBounding, useElementSize, useEventListener } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 

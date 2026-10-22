@@ -1,26 +1,26 @@
-import type { ClientConnector } from '@proj-airi/server-sdk'
-import type { KokoroAdapter } from '@proj-airi/stage-ui/libs/inference/adapters/kokoro'
+import type { ClientConnector } from '@angela/server-sdk'
+import type { KokoroAdapter } from '@angela/stage-ui/libs/inference/adapters/kokoro'
 import type { BrowserWindow, IpcMain, IpcMainEvent, IpcRendererEvent, WebContents } from 'electron'
 
 import type { PluginCapabilityPayload } from '../shared/eventa/plugin/capabilities'
 
 import localforage from 'localforage'
 
+import { electron } from '@angela/electron-eventa'
+import { getElectronEventaContext, resetElectronEventaContextForTesting } from '@angela/electron-vueuse'
+import { parseEvent, stringifyEvent } from '@angela/server-sdk'
+import { artistrySyncConfig } from '@angela/stage-shared'
+import { setupSynced, usePiniaSynced } from '@angela/stage-ui/libs/pinia'
+import { useCharacterOrchestratorStore } from '@angela/stage-ui/stores/character'
+import { useChatStore } from '@angela/stage-ui/stores/chat'
+import { useChatSessionStore } from '@angela/stage-ui/stores/chat/session-store'
+import { useModsServerChannelStore } from '@angela/stage-ui/stores/mods/api/channel-server'
+import { useSpeechStore } from '@angela/stage-ui/stores/modules/speech'
+import { useVisionStore } from '@angela/stage-ui/stores/modules/vision'
+import { useProviderConfigStore } from '@angela/stage-ui/stores/providers/config'
 import { defineInvoke, defineInvokeHandler } from '@moeru/eventa'
 import { createContext as createMainContext } from '@moeru/eventa/adapters/electron/main'
 import { PiniaColada } from '@pinia/colada'
-import { electron } from '@proj-airi/electron-eventa'
-import { getElectronEventaContext, resetElectronEventaContextForTesting } from '@proj-airi/electron-vueuse'
-import { parseEvent, stringifyEvent } from '@proj-airi/server-sdk'
-import { artistrySyncConfig } from '@proj-airi/stage-shared'
-import { setupSynced, usePiniaSynced } from '@proj-airi/stage-ui/libs/pinia'
-import { useCharacterOrchestratorStore } from '@proj-airi/stage-ui/stores/character'
-import { useChatStore } from '@proj-airi/stage-ui/stores/chat'
-import { useChatSessionStore } from '@proj-airi/stage-ui/stores/chat/session-store'
-import { useModsServerChannelStore } from '@proj-airi/stage-ui/stores/mods/api/channel-server'
-import { useSpeechStore } from '@proj-airi/stage-ui/stores/modules/speech'
-import { useVisionStore } from '@proj-airi/stage-ui/stores/modules/vision'
-import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
 import { createPinia, disposePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from 'vitest'
 import { render } from 'vitest-browser-vue'
@@ -54,7 +54,7 @@ const inference = vi.hoisted(() => ({
 } satisfies KokoroAdapter))
 
 // The adapter owns model downloads. Startup still uses the real preload scheduler.
-vi.mock('@proj-airi/stage-ui/libs/inference/adapters/kokoro', () => ({
+vi.mock('@angela/stage-ui/libs/inference/adapters/kokoro', () => ({
   getKokoroAdapter: async () => inference,
 }))
 

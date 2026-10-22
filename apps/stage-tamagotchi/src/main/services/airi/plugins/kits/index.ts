@@ -1,12 +1,12 @@
-import type { KitRef } from '@proj-airi/plugin-sdk'
-import type { ToolKitRuntime } from '@proj-airi/plugin-sdk-tamagotchi/tools'
-import type { ExtensionHost, HostProvidedKitDeclaration, KitDescriptor } from '@proj-airi/plugin-sdk/plugin-host'
+import type { KitRef } from '@angela/plugin-sdk'
+import type { ToolKitRuntime } from '@angela/plugin-sdk-tamagotchi/tools'
+import type { ExtensionHost, HostProvidedKitDeclaration, KitDescriptor } from '@angela/plugin-sdk/plugin-host'
 
 import type { SetupExtensionHostOptions } from '../types'
 import type { GameletOrchestrationRuntime } from './gamelet/orchestration'
 
-import { gameletKit, toolKit } from '@proj-airi/plugin-sdk-tamagotchi'
-import { TamagotchiToolRegistry } from '@proj-airi/plugin-sdk-tamagotchi/tools'
+import { gameletKit, toolKit } from '@angela/plugin-sdk-tamagotchi'
+import { TamagotchiToolRegistry } from '@angela/plugin-sdk-tamagotchi/tools'
 
 import { gameletPluginKitDescriptor, registerGameletPluginKit } from './gamelet'
 import { createGameletOrchestrationRuntime } from './gamelet/orchestration'

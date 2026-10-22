@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { PerceptionState, VrmPoseTargets } from '@proj-airi/model-driver-mediapipe'
+import type { PerceptionState, VrmPoseTargets } from '@angela/model-driver-mediapipe'
 import type { Vector3Like } from 'three'
 
-import { createMediaPipeBackend, createMocapEngine, createVrmPoseApplier, drawOverlay, poseToVrmTargets } from '@proj-airi/model-driver-mediapipe'
-import { errorMessageFromValue } from '@proj-airi/stage-shared'
-import { ThreeScene } from '@proj-airi/stage-ui-three'
-import { animations } from '@proj-airi/stage-ui-three/assets/vrm'
-import { useSettings } from '@proj-airi/stage-ui/stores/settings'
-import { Checkbox } from '@proj-airi/ui'
+import { createMediaPipeBackend, createMocapEngine, createVrmPoseApplier, drawOverlay, poseToVrmTargets } from '@angela/model-driver-mediapipe'
+import { errorMessageFromValue } from '@angela/stage-shared'
+import { ThreeScene } from '@angela/stage-ui-three'
+import { animations } from '@angela/stage-ui-three/assets/vrm'
+import { useSettings } from '@angela/stage-ui/stores/settings'
+import { Checkbox } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, onUnmounted, ref, toRaw, watch } from 'vue'
 

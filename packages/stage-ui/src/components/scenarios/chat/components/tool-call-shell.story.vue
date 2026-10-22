@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IconButton } from '@proj-airi/ui'
+import { IconButton } from '@angela/ui'
 import { shallowRef } from 'vue'
 
 import ToolCallShell from './tool-call-shell.vue'

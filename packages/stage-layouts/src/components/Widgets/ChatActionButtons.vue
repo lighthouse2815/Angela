@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTheme } from '@proj-airi/ui'
+import { useTheme } from '@angela/ui'
 import { useLocalStorage } from '@vueuse/core'
 import { DropdownMenuContent, DropdownMenuItem, DropdownMenuPortal, DropdownMenuRoot, DropdownMenuTrigger } from 'reka-ui'
 import { computed, ref } from 'vue'

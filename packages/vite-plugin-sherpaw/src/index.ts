@@ -1,11 +1,11 @@
-import type { SherpawModelArtifacts } from '@proj-airi/provider-inference/sherpaw-transcription/models'
+import type { SherpawModelArtifacts } from '@angela/provider-inference/sherpaw-transcription/models'
 import type { Plugin } from 'vite'
 
 import { rm } from 'node:fs/promises'
 import { join, resolve } from 'node:path'
 import { env } from 'node:process'
 
-import { defaultSherpawModelEndpoint, sherpawModelArtifactUrl, sherpawModelPath } from '@proj-airi/provider-inference/sherpaw-transcription/models'
+import { defaultSherpawModelEndpoint, sherpawModelArtifactUrl, sherpawModelPath } from '@angela/provider-inference/sherpaw-transcription/models'
 import { Download } from '@proj-airi/unplugin-fetch/vite'
 import { normalizePath } from 'vite'
 
@@ -49,7 +49,7 @@ export function resolveModelEndpoint(endpoint?: string) {
  * Development downloads only `developmentModels` before Vite starts.
  */
 export function Sherpaw(options: SherpawOptions): Plugin {
-  const moduleId = '@proj-airi/vite-plugin-sherpaw/assets'
+  const moduleId = '@angela/vite-plugin-sherpaw/assets'
   const resolvedModuleId = `\0${moduleId}`
   // configResolved prepares the imports before Vite loads the runtime asset catalogue.
   let assetModule: string

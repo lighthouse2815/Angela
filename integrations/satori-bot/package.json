@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/satori-bot",
+  "name": "@angela/satori-bot",
   "type": "module",
   "private": true,
   "description": "Satori protocol adapter for AIRI - Connect to multiple chat platforms via Satori",

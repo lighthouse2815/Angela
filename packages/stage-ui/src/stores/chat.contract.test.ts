@@ -1,12 +1,12 @@
-import type { ChatOrchestratorSessionPort, Conversation, StreamOptions, Turn } from '@proj-airi/core-agent'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { ChatOrchestratorSessionPort, Conversation, StreamOptions, Turn } from '@angela/core-agent'
+import type { GenerationProvider } from '@angela/provider-inference'
 import type { Tool } from '@xsai/shared-chat'
 import type { SyncedPiniaRuntime } from 'pinia-plugin-synced'
 
 import type { LlmStreamOptions } from './ai/chat-llm/llm'
 
+import { IOAttributes, IOSpanNames } from '@angela/stage-shared'
 import { errorMessageFrom } from '@moeru/std'
-import { IOAttributes, IOSpanNames } from '@proj-airi/stage-shared'
 import { createPinia, disposePinia, setActivePinia } from 'pinia'
 import { createSyncedPiniaPlugin } from 'pinia-plugin-synced'
 import { beforeEach, describe, expect, it, vi } from 'vitest'

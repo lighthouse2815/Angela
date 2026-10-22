@@ -1,4 +1,4 @@
-import type { ChatOrchestratorRuntimeState } from '@proj-airi/core-agent'
+import type { ChatOrchestratorRuntimeState } from '@angela/core-agent'
 
 import type { StreamingAssistantMessage } from '../../types/chat'
 

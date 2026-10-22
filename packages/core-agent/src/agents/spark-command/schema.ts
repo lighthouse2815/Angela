@@ -1,4 +1,4 @@
-import { ContextUpdateStrategy } from '@proj-airi/server-sdk'
+import { ContextUpdateStrategy } from '@angela/server-sdk'
 import { z } from 'zod/v4'
 
 /** Allowed intent values for a `spark:command` event. */

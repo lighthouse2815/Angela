@@ -1,6 +1,6 @@
 import buildTime from '~build/time'
 
-import { isStageWeb } from '@proj-airi/stage-shared'
+import { isStageWeb } from '@angela/stage-shared'
 import { abbreviatedSha, branch } from '~build/git'
 
 import packageJSON from '../../package.json'

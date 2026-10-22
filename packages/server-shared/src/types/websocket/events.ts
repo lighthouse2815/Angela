@@ -1,6 +1,6 @@
-import type { MetadataEventSource, ProtocolEvents, RouteConfig, WebSocketEventSource } from '@proj-airi/plugin-protocol/types'
+import type { MetadataEventSource, ProtocolEvents, RouteConfig, WebSocketEventSource } from '@angela/plugin-protocol/types'
 
-export * from '@proj-airi/plugin-protocol/types'
+export * from '@angela/plugin-protocol/types'
 
 export interface WebSocketEventBaseMetadata {
   source?: MetadataEventSource

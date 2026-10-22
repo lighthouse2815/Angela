@@ -1,5 +1,5 @@
+import type { GenerationProvider } from '@angela/provider-inference'
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
 import type { Update } from 'grammy/types'
 
 import { once } from 'node:events'
@@ -8,11 +8,11 @@ import { createServer } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import { cliMessages } from '@angela/i18n/cli'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
 import { Server } from '@modelcontextprotocol/sdk/server/index.js'
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js'
-import { cliMessages } from '@proj-airi/i18n/cli'
 import { Bot } from 'grammy'
 import { afterEach, expect, it, vi } from 'vitest'
 

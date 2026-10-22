@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FieldCombobox } from '@proj-airi/ui'
+import { FieldCombobox } from '@angela/ui'
 import { ref } from 'vue'
 
 const basicValue = ref<'option-1' | 'option-2' | 'option-3' | undefined>('option-2')

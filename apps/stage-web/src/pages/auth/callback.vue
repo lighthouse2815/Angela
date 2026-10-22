@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { useAnalytics } from '@angela/stage-ui/composables'
+import { applyOIDCTokens, triggerSignIn } from '@angela/stage-ui/libs/auth'
+import { consumeFlowState, exchangeCodeForTokens } from '@angela/stage-ui/libs/auth-oidc'
+import { Button } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { useAnalytics } from '@proj-airi/stage-ui/composables'
-import { applyOIDCTokens, triggerSignIn } from '@proj-airi/stage-ui/libs/auth'
-import { consumeFlowState, exchangeCodeForTokens } from '@proj-airi/stage-ui/libs/auth-oidc'
-import { Button } from '@proj-airi/ui'
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'

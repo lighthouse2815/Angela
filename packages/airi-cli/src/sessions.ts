@@ -1,5 +1,5 @@
-import type { Conversation } from '@proj-airi/core-agent'
-import type { cliMessages } from '@proj-airi/i18n/cli'
+import type { Conversation } from '@angela/core-agent'
+import type { cliMessages } from '@angela/i18n/cli'
 import type { Message } from '@xsai/shared-chat'
 
 import type { Chat } from './chat'
@@ -11,7 +11,7 @@ import { mkdir, open, readdir, readFile, rename, stat, unlink, writeFile } from 
 import { hostname } from 'node:os'
 import { join } from 'node:path'
 
-import { chatMessagesToTurns, conversationToChatMessages } from '@proj-airi/core-agent'
+import { chatMessagesToTurns, conversationToChatMessages } from '@angela/core-agent'
 
 import * as v from 'valibot'
 

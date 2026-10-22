@@ -1,6 +1,6 @@
 import type { ChatSessionMeta } from '../../../../types/chat-session'
 
-import { SwipeActionButton, SwipeActionsContent, SwipeActionsItem, SwipeActionsList, SwipeActionsRoot } from '@proj-airi/ui'
+import { SwipeActionButton, SwipeActionsContent, SwipeActionsItem, SwipeActionsList, SwipeActionsRoot } from '@angela/ui'
 import { describe, expect, it } from 'vitest'
 import { render } from 'vitest-browser-vue'
 import { page, userEvent } from 'vitest/browser'

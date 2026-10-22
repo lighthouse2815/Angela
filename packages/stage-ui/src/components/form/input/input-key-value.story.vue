@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { InputKeyValue } from '@proj-airi/ui'
+import { InputKeyValue } from '@angela/ui'
 import { ref } from 'vue'
 
 const key = ref('')

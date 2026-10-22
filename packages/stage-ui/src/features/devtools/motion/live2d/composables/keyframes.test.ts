@@ -1,4 +1,4 @@
-import { neutralLive2DMotionControlPose } from '@proj-airi/stage-ui-live2d/stores'
+import { neutralLive2DMotionControlPose } from '@angela/stage-ui-live2d/stores'
 import { describe, expect, it } from 'vitest'
 
 import {

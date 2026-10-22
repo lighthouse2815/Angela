@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { isFluxPurchaseDisabled } from '@proj-airi/stage-shared'
+import { isFluxPurchaseDisabled } from '@angela/stage-shared'
 import {
   ProviderSettingsContainer,
   ProviderSettingsLayout,
   SpeechPlayground,
-} from '@proj-airi/stage-ui/components'
-import { selectProviderMetadata, streamingSynthesize } from '@proj-airi/stage-ui/libs'
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
-import { useSpeechStore } from '@proj-airi/stage-ui/stores/modules/speech'
-import { useProviderConfigStore } from '@proj-airi/stage-ui/stores/providers/config'
-import { useProviderStore } from '@proj-airi/stage-ui/stores/providers/provider'
-import { Callout, ComboboxSelect } from '@proj-airi/ui'
+} from '@angela/stage-ui/components'
+import { selectProviderMetadata, streamingSynthesize } from '@angela/stage-ui/libs'
+import { useAuthStore } from '@angela/stage-ui/stores/auth'
+import { useSpeechStore } from '@angela/stage-ui/stores/modules/speech'
+import { useProviderConfigStore } from '@angela/stage-ui/stores/providers/config'
+import { useProviderStore } from '@angela/stage-ui/stores/providers/provider'
+import { Callout, ComboboxSelect } from '@angela/ui'
 import { computedAsync } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, shallowRef, watch } from 'vue'

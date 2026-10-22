@@ -1,8 +1,8 @@
-import type { LlmStreamingControlDispatchContext, LlmStreamingControlDispatchEvent } from '@proj-airi/pipelines-audio'
+import type { LlmStreamingControlDispatchContext, LlmStreamingControlDispatchEvent } from '@angela/pipelines-audio'
 
+import { createStreamingControlParser } from '@angela/pipelines-audio'
+import { IOAttributes, IOEvents, IOSpanNames, IOSubsystems } from '@angela/stage-shared'
 import { errorMessageFrom } from '@moeru/std'
-import { createStreamingControlParser } from '@proj-airi/pipelines-audio'
-import { IOAttributes, IOEvents, IOSpanNames, IOSubsystems } from '@proj-airi/stage-shared'
 import { useBroadcastChannel } from '@vueuse/core'
 import { nanoid } from 'nanoid'
 import { defineStore } from 'pinia'

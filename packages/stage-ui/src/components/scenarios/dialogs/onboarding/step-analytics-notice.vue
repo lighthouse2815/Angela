@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { OnboardingStepNextHandler, OnboardingStepPrevHandler } from './types'
 
-import { Button, Callout } from '@proj-airi/ui'
+import { Button, Callout } from '@angela/ui'
 import { useI18n } from 'vue-i18n'
 
 import { useAnalytics } from '../../../../composables/use-analytics'

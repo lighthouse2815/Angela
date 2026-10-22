@@ -1,6 +1,6 @@
 import type { ChatStreamEvent, ChatStreamEventContext, ContextMessage } from '../../../types/chat'
 
-import { ContextUpdateStrategy } from '@proj-airi/server-sdk'
+import { ContextUpdateStrategy } from '@angela/server-sdk'
 import { createPinia, disposePinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ref } from 'vue'
@@ -189,8 +189,8 @@ const chatOrchestratorMock = {
   emitAssistantResponseEndHooks: (...args: unknown[]) => emitHooks(assistantEndHooks, ...args),
 }
 
-vi.mock('@proj-airi/stage-shared', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@proj-airi/stage-shared')>()
+vi.mock('@angela/stage-shared', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@angela/stage-shared')>()
   return {
     ...actual,
     isStageWeb: () => true,

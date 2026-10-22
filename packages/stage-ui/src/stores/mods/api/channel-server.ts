@@ -6,12 +6,12 @@ import type {
   WebSocketEvent,
   WebSocketEventOptionalSource,
   WebSocketEvents,
-} from '@proj-airi/server-sdk'
+} from '@angela/server-sdk'
 import type { CommonContentPart } from '@xsai/shared-chat'
 
+import { Client, createTextProtocolConnector, WebSocketEventSource } from '@angela/server-sdk'
+import { isStageTamagotchi, isStageWeb } from '@angela/stage-shared'
 import { errorMessageFrom } from '@moeru/std'
-import { Client, createTextProtocolConnector, WebSocketEventSource } from '@proj-airi/server-sdk'
-import { isStageTamagotchi, isStageWeb } from '@proj-airi/stage-shared'
 import { useLocalStorage } from '@vueuse/core'
 import { nanoid } from 'nanoid'
 import { defineStore } from 'pinia'

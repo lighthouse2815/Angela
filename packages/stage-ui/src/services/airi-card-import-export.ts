@@ -1,4 +1,4 @@
-import type { Card, ccv3 } from '@proj-airi/ccc'
+import type { Card, ccv3 } from '@angela/ccc'
 import type { GenericSchema, InferOutput } from 'valibot'
 
 import type { DisplayModel, useDisplayModelsStore } from '../stores/display-models'
@@ -6,7 +6,7 @@ import type { AiriCard, AiriExtension } from '../types/airiCard'
 
 import JSZip from 'jszip'
 
-import { exportToJSON } from '@proj-airi/ccc'
+import { exportToJSON } from '@angela/ccc'
 import { array, literal, object, optional, parse, picklist, record, string, unknown as unknownSchema } from 'valibot'
 
 import { wakeWordSchema } from '../libs/voice/wake-words'

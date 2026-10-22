@@ -1,7 +1,7 @@
 import type { AnalyticsCaptureOptions } from './client'
 import type { AnalyticsEvent, InferAnalyticsEventPayload } from './utils/dsl'
 
-import { isStageCapacitor, isStageTamagotchi } from '@proj-airi/stage-shared'
+import { isStageCapacitor, isStageTamagotchi } from '@angela/stage-shared'
 import { watch } from 'vue'
 
 import { useBuildInfo } from '../../composables/use-build-info'

@@ -1,8 +1,8 @@
-import type { UseQueueReturn } from '@proj-airi/stream-kit'
+import type { UseQueueReturn } from '@angela/stream-kit'
 
 import type { Emotion, EmotionPayload } from '../constants/emotions'
 
-import { createQueue } from '@proj-airi/stream-kit'
+import { createQueue } from '@angela/stream-kit'
 
 import { EMOTION_VALUES } from '../constants/emotions'
 

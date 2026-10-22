@@ -3,12 +3,12 @@ import type {
   ExtensionDirectoryImportPlan,
   PluginHostSessionSummary,
   PluginManifestSummary,
-} from '@proj-airi/stage-shared/plugin-host'
+} from '@angela/stage-shared/plugin-host'
 
+import { Section } from '@angela/stage-ui/components'
+import { usePluginHostInspectorStore } from '@angela/stage-ui/stores/devtools/plugin-host-debug'
+import { Button, Callout, GhostButton, Input } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { Section } from '@proj-airi/stage-ui/components'
-import { usePluginHostInspectorStore } from '@proj-airi/stage-ui/stores/devtools/plugin-host-debug'
-import { Button, Callout, GhostButton, Input } from '@proj-airi/ui'
 import { computed, onMounted, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { toast } from 'vue-sonner'

@@ -1,4 +1,4 @@
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { GenerationProvider } from '@angela/provider-inference'
 
 import type { RuntimeOptions } from './runtime'
 
@@ -7,8 +7,8 @@ import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import { cliMessages } from '@angela/i18n/cli'
 import { Client } from '@modelcontextprotocol/sdk/client/index.js'
-import { cliMessages } from '@proj-airi/i18n/cli'
 import { afterEach, expect, it, vi } from 'vitest'
 
 import { McpTools } from '../mcp'

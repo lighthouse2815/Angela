@@ -9,9 +9,9 @@ import process from 'node:process'
 import { realpath, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 
+import { chatMessagesToTurns } from '@angela/core-agent'
+import { getGenerationProvider, listProviders } from '@angela/provider-inference'
 import { errorMessageFrom } from '@moeru/std'
-import { chatMessagesToTurns } from '@proj-airi/core-agent'
-import { getGenerationProvider, listProviders } from '@proj-airi/provider-inference'
 
 import { readConfig } from '../config'
 import { formatRequestError } from '../errors'

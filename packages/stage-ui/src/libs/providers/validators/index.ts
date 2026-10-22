@@ -5,11 +5,11 @@ export {
   getProviderValidationIntervalMs,
   getValidatorsOfProvider,
   validateProvider,
-} from '@proj-airi/provider-inference'
+} from '@angela/provider-inference'
 export type {
   ProviderValidationCallbacks,
   ProviderValidationPlan,
   ProviderValidationStep,
   ProviderValidationStepKind,
   ProviderValidationStepStatus,
-} from '@proj-airi/provider-inference'
+} from '@angela/provider-inference'

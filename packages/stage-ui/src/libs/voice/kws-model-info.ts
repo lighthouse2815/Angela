@@ -1,4 +1,4 @@
-import type { SherpawModelArtifacts } from '@proj-airi/provider-inference/sherpaw-transcription/models'
+import type { SherpawModelArtifacts } from '@angela/provider-inference/sherpaw-transcription/models'
 
 /**
  * The pinned bilingual Chinese and English Zipformer 3M keyword spotting pack.

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { CaptionChannelEvent } from '@proj-airi/stage-shared'
+import type { CaptionChannelEvent } from '@angela/stage-shared'
 
+import { useHostEventaContext, useHostMouseAroundWindowBorder, useHostMouseInWindow } from '@angela/stage-host-context'
+import { createFadeAnimator, PoppinText } from '@angela/stage-ui/components'
 import { defineInvoke } from '@moeru/eventa'
-import { useHostEventaContext, useHostMouseAroundWindowBorder, useHostMouseInWindow } from '@proj-airi/stage-host-context'
-import { createFadeAnimator, PoppinText } from '@proj-airi/stage-ui/components'
 import { refDebounced, useBroadcastChannel } from '@vueuse/core'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 

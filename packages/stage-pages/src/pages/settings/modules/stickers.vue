@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Stickers } from '@proj-airi/stage-ui/components'
+import { Stickers } from '@angela/stage-ui/components'
 </script>
 
 <template>

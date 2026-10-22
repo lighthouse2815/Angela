@@ -1,4 +1,4 @@
-import type { TranscriptEdit, VoicePlugin } from '@proj-airi/core-agent'
+import type { TranscriptEdit, VoicePlugin } from '@angela/core-agent'
 
 import { array, parse, string } from 'valibot'
 

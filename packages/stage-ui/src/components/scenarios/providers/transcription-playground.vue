@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { Capture } from '@proj-airi/pipelines-audio'
+import type { Capture } from '@angela/pipelines-audio'
 
 import type { HearingTranscriptionResult } from '../../../libs/providers/transcription-types'
 
+import { encodeWav } from '@angela/audio/encoding'
+import { capture as captureAudio, observe } from '@angela/pipelines-audio'
+import { Button, FieldCombobox, FieldRange } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { encodeWav } from '@proj-airi/audio/encoding'
-import { capture as captureAudio, observe } from '@proj-airi/pipelines-audio'
-import { Button, FieldCombobox, FieldRange } from '@proj-airi/ui'
 import { computed, onScopeDispose, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 

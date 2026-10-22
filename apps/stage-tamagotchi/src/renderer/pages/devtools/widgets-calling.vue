@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { Button, FieldCheckbox, FieldCombobox, FieldInput, FieldTextArea } from '@proj-airi/ui'
+import { useElectronEventaInvoke } from '@angela/electron-vueuse'
+import { Button, FieldCheckbox, FieldCombobox, FieldInput, FieldTextArea } from '@angela/ui'
 import { computed, reactive, ref } from 'vue'
 
 import { widgetsAdd, widgetsClear, widgetsOpenWindow, widgetsPrepareWindow, widgetsRemove, widgetsUpdate } from '../../../shared/eventa'

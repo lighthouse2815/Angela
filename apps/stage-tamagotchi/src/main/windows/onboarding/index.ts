@@ -3,9 +3,9 @@ import type { ServerChannel } from '../../services/airi/channel-server'
 
 import { join, resolve } from 'node:path'
 
+import { safeClose } from '@angela/electron-vueuse/main'
 import { defineInvokeHandler } from '@moeru/eventa'
 import { createContext } from '@moeru/eventa/adapters/electron/main'
-import { safeClose } from '@proj-airi/electron-vueuse/main'
 import { BrowserWindow, ipcMain } from 'electron'
 import { isMacOS } from 'std-env'
 

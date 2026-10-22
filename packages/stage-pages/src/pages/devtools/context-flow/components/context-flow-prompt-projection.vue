@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { PromptProjectionSnapshot } from '@proj-airi/stage-ui/stores/devtools/context-observability'
+import type { PromptProjectionSnapshot } from '@angela/stage-ui/stores/devtools/context-observability'
 
-import { Section } from '@proj-airi/stage-ui/components'
+import { Section } from '@angela/stage-ui/components'
 
 defineProps<{
   currentPromptText: string

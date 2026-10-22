@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { coverRect } from '@angela/stage-shared'
 import { Application } from '@pixi/app'
 import { BatchRenderer, Texture } from '@pixi/core'
 import { extensions } from '@pixi/extensions'
 import { Sprite } from '@pixi/sprite'
-import { coverRect } from '@proj-airi/stage-shared'
 import { onMounted, onUnmounted, shallowRef, useTemplateRef, watch } from 'vue'
 
 const props = withDefaults(defineProps<{

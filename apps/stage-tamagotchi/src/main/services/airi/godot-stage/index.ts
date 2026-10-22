@@ -1,13 +1,13 @@
 import type { ChildProcessByStdio } from 'node:child_process'
 import type { Readable } from 'node:stream'
 
-import type { createContext } from '@moeru/eventa/adapters/electron/main'
 import type {
   StageViewErrorPayload,
   StageViewPatch,
   StageViewRequestAckPayload,
   StageViewSnapshotPayload,
-} from '@proj-airi/stage-shared/godot-stage'
+} from '@angela/stage-shared/godot-stage'
+import type { createContext } from '@moeru/eventa/adapters/electron/main'
 import type { BrowserWindow } from 'electron'
 import type { WebSocketMessage, WebSocketPeer } from 'h3'
 import type { InferOutput } from 'valibot'
@@ -24,14 +24,14 @@ import { randomUUID } from 'node:crypto'
 import { access, mkdir, stat, writeFile } from 'node:fs/promises'
 import { basename, dirname, join, resolve } from 'node:path'
 
-import { useLogg } from '@guiiai/logg'
-import { defineInvokeHandler } from '@moeru/eventa'
-import { errorMessageFrom } from '@moeru/std'
 import {
   parseStageViewErrorPayload,
   parseStageViewPatchPayload,
   parseStageViewSnapshotPayload,
-} from '@proj-airi/stage-shared/godot-stage'
+} from '@angela/stage-shared/godot-stage'
+import { useLogg } from '@guiiai/logg'
+import { defineInvokeHandler } from '@moeru/eventa'
+import { errorMessageFrom } from '@moeru/std'
 import { Mutex } from 'async-mutex'
 import { plugin as ws } from 'crossws/server'
 import { safeDestr } from 'destr'

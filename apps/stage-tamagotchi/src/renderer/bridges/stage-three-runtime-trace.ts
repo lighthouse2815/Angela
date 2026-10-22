@@ -2,7 +2,6 @@ import type { Eventa } from '@moeru/eventa'
 
 import type { StageThreeRuntimeTraceEnvelope } from '../../shared/eventa'
 
-import { createContext as createBroadcastChannelContext } from '@moeru/eventa/adapters/broadcast-channel'
 import {
   acquireStageThreeRuntimeTrace,
   getStageThreeRuntimeTraceContext,
@@ -14,7 +13,8 @@ import {
   stageThreeTraceVrmLoadErrorEvent,
   stageThreeTraceVrmLoadStartEvent,
   stageThreeTraceVrmUpdateFrameEvent,
-} from '@proj-airi/stage-ui-three/trace'
+} from '@angela/stage-ui-three/trace'
+import { createContext as createBroadcastChannelContext } from '@moeru/eventa/adapters/broadcast-channel'
 
 import {
   stageThreeRuntimeTraceForwardedEvent,

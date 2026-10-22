@@ -1,7 +1,7 @@
-import type { SpeechInputAttemptState, SpeechSnapshot, VoiceControllerOptions } from '@proj-airi/core-agent'
+import type { SpeechInputAttemptState, SpeechSnapshot, VoiceControllerOptions } from '@angela/core-agent'
 
+import { VoiceController } from '@angela/core-agent'
 import { errorMessageFrom } from '@moeru/std'
-import { VoiceController } from '@proj-airi/core-agent'
 import { markRaw, onScopeDispose, shallowRef, watch } from 'vue'
 
 import { useSettingsAudioDevice } from '../../stores/settings/audio-device'

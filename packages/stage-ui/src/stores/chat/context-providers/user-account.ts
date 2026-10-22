@@ -1,7 +1,7 @@
 import type { ContextMessage } from '../../../types/chat'
 import type { useAuthStore } from '../../auth'
 
-import { ContextUpdateStrategy } from '@proj-airi/server-sdk'
+import { ContextUpdateStrategy } from '@angela/server-sdk'
 import { nanoid } from 'nanoid'
 
 /**

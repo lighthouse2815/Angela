@@ -1,4 +1,4 @@
-import type { StreamEvent } from '@proj-airi/core-agent'
+import type { StreamEvent } from '@angela/core-agent'
 import type { Tool } from '@xsai/shared-chat'
 
 import type { McpTools } from '../mcp'

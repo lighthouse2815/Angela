@@ -1,8 +1,8 @@
-import type { PcmBlock } from '@proj-airi/pipelines-audio'
+import type { PcmBlock } from '@angela/pipelines-audio'
 
 import type { TranscriptionEvent } from '../../index'
 
-import { AudioInput, createPushStream } from '@proj-airi/pipelines-audio'
+import { AudioInput, createPushStream } from '@angela/pipelines-audio'
 import { describe, expect, it, vi } from 'vitest'
 
 import { VoiceController } from '../../index'

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ambientLightDefaults } from '@proj-airi/stage-shared/screen-ambient-light'
-import { useSettingsScreenAmbientLight } from '@proj-airi/stage-shared/stores/screen-ambient-light'
-import { Section } from '@proj-airi/stage-ui/components'
-import { FieldCheckbox, FieldRange } from '@proj-airi/ui'
+import { ambientLightDefaults } from '@angela/stage-shared/screen-ambient-light'
+import { useSettingsScreenAmbientLight } from '@angela/stage-shared/stores/screen-ambient-light'
+import { Section } from '@angela/stage-ui/components'
+import { FieldCheckbox, FieldRange } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 

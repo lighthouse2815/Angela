@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { IOTurn } from '@proj-airi/stage-shared'
+import type { IOTurn } from '@angela/stage-shared'
 
 import { SUBSYSTEM_CONFIGS } from '../io-tracer-types'
 

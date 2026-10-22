@@ -1,18 +1,18 @@
 import type { Dirent } from 'node:fs'
 
-import type { useLogg } from '@guiiai/logg'
-import type { ExtensionManifestV2 } from '@proj-airi/plugin-sdk/plugin-host'
+import type { ExtensionManifestV2 } from '@angela/plugin-sdk/plugin-host'
 import type {
   PluginManifestSummary,
   PluginRegistrySnapshot,
-} from '@proj-airi/stage-shared/plugin-host'
+} from '@angela/stage-shared/plugin-host'
+import type { useLogg } from '@guiiai/logg'
 
 import type { ExtensionConfig, ManifestEntry } from '../types'
 
 import { mkdir, readdir, readFile, realpath, stat } from 'node:fs/promises'
 import { dirname, isAbsolute, join, resolve } from 'node:path'
 
-import { parseExtensionManifest } from '@proj-airi/plugin-sdk/plugin-host'
+import { parseExtensionManifest } from '@angela/plugin-sdk/plugin-host'
 
 export const extensionManifestFileName = 'extension.airi.json'
 

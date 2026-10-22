@@ -1,8 +1,8 @@
 import type { WhisperEvent } from '../libs/inference/adapters/whisper'
 import type { ProgressPayload } from '../libs/inference/protocol'
 
+import { errorMessageFromValue } from '@angela/stage-shared'
 import { merge } from '@moeru/std'
-import { errorMessageFromValue } from '@proj-airi/stage-shared'
 import { onUnmounted, ref } from 'vue'
 
 import { createWhisperAdapter } from '../libs/inference/adapters/whisper'

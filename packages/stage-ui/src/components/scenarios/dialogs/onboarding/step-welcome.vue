@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { OnboardingStepNextHandler } from './types'
 
-import { all } from '@proj-airi/i18n'
-import { Button, DropdownMenu } from '@proj-airi/ui'
+import { all } from '@angela/i18n'
+import { Button, DropdownMenu } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { DropdownMenuItem } from 'reka-ui'
 import { computed } from 'vue'

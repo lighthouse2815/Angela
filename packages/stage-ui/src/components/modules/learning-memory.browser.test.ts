@@ -1,5 +1,5 @@
-import en from '@proj-airi/i18n/locales/en'
-import viLocale from '@proj-airi/i18n/locales/vi'
+import en from '@angela/i18n/locales/en'
+import viLocale from '@angela/i18n/locales/vi'
 
 import { createPinia, disposePinia } from 'pinia'
 import { afterEach, expect, it, vi } from 'vitest'

@@ -12,7 +12,7 @@ const authMocks = vi.hoisted(() => ({
 
 const eventHandlers = vi.hoisted(() => new Map<object, (event: { body?: unknown }) => Promise<void> | void>())
 
-vi.mock('@proj-airi/stage-host-context', () => ({
+vi.mock('@angela/stage-host-context', () => ({
   getHostEventaContext: () => ({
     on: (event: object, handler: (event: { body?: unknown }) => Promise<void> | void) => {
       eventHandlers.set(event, handler)
@@ -20,7 +20,7 @@ vi.mock('@proj-airi/stage-host-context', () => ({
   }),
 }))
 
-vi.mock('@proj-airi/stage-ui/stores/auth', () => ({
+vi.mock('@angela/stage-ui/stores/auth', () => ({
   useAuthStore: () => ({
     completeSignIn: authMocks.completeSignIn,
   }),

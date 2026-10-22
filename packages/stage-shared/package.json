@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/stage-shared",
+  "name": "@angela/stage-shared",
   "type": "module",
   "private": true,
   "description": "Shared",
@@ -45,10 +45,10 @@
     "vue": "catalog:"
   },
   "devDependencies": {
+    "@angela/electron-screen-capture": "workspace:^",
     "@electron-toolkit/preload": "catalog:",
     "@moeru/eventa": "catalog:",
     "@nekopaw/tempora": "catalog:",
-    "@proj-airi/electron-screen-capture": "workspace:^",
     "@types/audioworklet": "catalog:"
   }
 }

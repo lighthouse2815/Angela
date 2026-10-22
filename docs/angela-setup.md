@@ -15,7 +15,7 @@ SHERPAW_BUNDLE_KWS=false mise exec -- pnpm dev:tamagotchi
 Build cùng cấu hình bằng:
 
 ```bash
-NODE_OPTIONS=--max-old-space-size=4096 SHERPAW_BUNDLE_KWS=false mise exec -- pnpm -F @proj-airi/stage-tamagotchi build
+NODE_OPTIONS=--max-old-space-size=4096 SHERPAW_BUNDLE_KWS=false mise exec -- pnpm -F @angela/desktop build
 ```
 
 Mô hình từ gọi vẫn có trong ứng dụng và tải vào thư mục dữ liệu khi dùng lần đầu.
@@ -26,7 +26,7 @@ Tài nguyên avatar và binary Electron vẫn cần tải trước hoặc có s�
 Sau khi build xong, mở bản desktop bằng:
 
 ```bash
-mise exec -- pnpm -F @proj-airi/stage-tamagotchi start
+mise exec -- pnpm -F @angela/desktop start
 ```
 
 Lệnh `start` tự cài binary Electron nếu chưa có. Lần tải đầu cần kết nối tới GitHub.
@@ -34,7 +34,7 @@ Lệnh này cũng build lại ứng dụng trước khi mở.
 Nếu đã build, mở trực tiếp bằng:
 
 ```bash
-mise exec -- pnpm -F @proj-airi/stage-tamagotchi run start --skipBuild
+mise exec -- pnpm -F @angela/desktop run start --skipBuild
 ```
 
 Nếu Wayland gặp lỗi hiển thị, thử script `start:xwayland` của cùng package.
@@ -229,7 +229,7 @@ Bản desktop đã tích hợp AUV qua công cụ `computer_use` và `computer_u
 Kiểm tra binary đi kèm trước khi giao tác vụ trên laptop:
 
 ```bash
-mise exec -- pnpm -F @proj-airi/stage-tamagotchi exec auv --help
+mise exec -- pnpm -F @angela/desktop exec auv --help
 ```
 
 Binary AUV đi kèm có thể thiếu thư viện native trên một số bản Linux.
@@ -237,7 +237,7 @@ Trên Arch Linux, bản `0.0.28` yêu cầu `liblept.so.5`, còn hệ thống d�
 Nếu gặp lỗi này, build AUV với thư viện của máy:
 
 ```bash
-mise exec -- pnpm -F @proj-airi/stage-tamagotchi setup:computer-use
+mise exec -- pnpm -F @angela/desktop setup:computer-use
 mise exec -- pnpm dev:tamagotchi
 ```
 
@@ -254,7 +254,7 @@ Dùng libclang tương thích trong môi trường Python riêng:
 python3 -m venv .cache/auv-build-tools
 .cache/auv-build-tools/bin/python -m pip install libclang==18.1.1
 AUV_LIBCLANG_PATH="$(.cache/auv-build-tools/bin/python -c 'from clang import cindex; print(cindex.Config.library_path)')"
-LIBCLANG_PATH="$AUV_LIBCLANG_PATH" BINDGEN_EXTRA_CLANG_ARGS="-resource-dir=$(clang -print-resource-dir)" mise exec -- pnpm -F @proj-airi/stage-tamagotchi setup:computer-use
+LIBCLANG_PATH="$AUV_LIBCLANG_PATH" BINDGEN_EXTRA_CLANG_ARGS="-resource-dir=$(clang -print-resource-dir)" mise exec -- pnpm -F @angela/desktop setup:computer-use
 ```
 
 Các công cụ này nằm trong cache, không thay Clang của hệ thống hoặc dependency ứng dụng.
@@ -317,7 +317,7 @@ Sau khi đồng ý cấp quyền tạm thời, chạy:
 
 ```bash
 pkexec setfacl -m "u:$(id -u):rw" /dev/uinput
-mise exec -- pnpm -F @proj-airi/stage-tamagotchi dev:uinput
+mise exec -- pnpm -F @angela/desktop dev:uinput
 ```
 
 Nếu đã build desktop, dùng `start:uinput` thay cho `dev:uinput`.
@@ -351,7 +351,7 @@ Kết quả gửi phím thành công chưa chứng minh ô nhập nhận đúng 
 Sau khi cấp quyền uinput tạm thời như trên, chạy từ thư mục gốc repository:
 
 ```bash
-AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AUV_LINUX_INPUT_BACKEND=uinput mise exec -- pnpm -F @proj-airi/stage-tamagotchi smoke:computer-use-input
+AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AUV_LINUX_INPUT_BACKEND=uinput mise exec -- pnpm -F @angela/desktop smoke:computer-use-input
 ```
 
 Bài thử cần phiên Wayland đang mở khóa và đúng một màn hình.
@@ -408,7 +408,7 @@ Kiểm thử dùng thư mục và hồ sơ riêng, không chỉnh workspace đan
 ## Dữ liệu và cập nhật
 
 Tên hiển thị Angela không đổi thư mục dữ liệu hiện có của Electron.
-Bản đóng gói dùng hồ sơ `AIRI`, bản phát triển dùng `@proj-airi/stage-tamagotchi`.
+Bản đóng gói dùng hồ sơ `AIRI`, bản phát triển dùng `@angela/desktop`.
 `APP_USER_DATA_PATH` vẫn chọn được hồ sơ riêng, gồm dữ liệu ứng dụng và phiên Chromium.
 
 Nguồn cập nhật đã trỏ đến repository Angela. Repository hiện private và updater chưa có cơ chế xác thực cho release private.

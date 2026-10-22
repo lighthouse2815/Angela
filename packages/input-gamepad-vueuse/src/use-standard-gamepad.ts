@@ -4,14 +4,14 @@ import type {
   StandardGamepadMonitorOptions,
   StandardGamepadSnapshot,
   StandardGamepadStickState,
-} from '@proj-airi/input-gamepad'
+} from '@angela/input-gamepad'
 import type { ComputedRef, DeepReadonly, ShallowRef } from 'vue'
 
 import {
   isGamepadApiSupported,
   standardGamepadButtonNames,
   StandardGamepadMonitor,
-} from '@proj-airi/input-gamepad'
+} from '@angela/input-gamepad'
 import { tryOnMounted, tryOnScopeDispose } from '@vueuse/core'
 import { computed, readonly, shallowRef } from 'vue'
 

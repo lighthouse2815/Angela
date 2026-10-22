@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { clearModelCache, formatBytes, getModelCacheSize, isModelCached } from '@proj-airi/stage-ui/libs/inference'
-import { Button, GhostButton } from '@proj-airi/ui'
+import { clearModelCache, formatBytes, getModelCacheSize, isModelCached } from '@angela/stage-ui/libs/inference'
+import { Button, GhostButton } from '@angela/ui'
 import { onMounted, ref } from 'vue'
 
 const cacheSize = ref(0)

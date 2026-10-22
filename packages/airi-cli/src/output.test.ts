@@ -1,7 +1,7 @@
 import { PassThrough } from 'node:stream'
 import { stripVTControlCharacters } from 'node:util'
 
-import { cliMessages } from '@proj-airi/i18n/cli'
+import { cliMessages } from '@angela/i18n/cli'
 import { afterEach, expect, it, vi } from 'vitest'
 
 import { Output } from './output'

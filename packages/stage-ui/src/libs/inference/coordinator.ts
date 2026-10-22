@@ -9,7 +9,7 @@
 import type { GPUResourceCoordinator } from './gpu-resource-coordinator'
 import type { LoadQueue } from './load-queue'
 
-import { getCachedWebGPUCapabilities } from '@proj-airi/stage-shared/webgpu'
+import { getCachedWebGPUCapabilities } from '@angela/stage-shared/webgpu'
 
 import { MODEL_NAMES } from './constants'
 import { createGPUResourceCoordinator } from './gpu-resource-coordinator'

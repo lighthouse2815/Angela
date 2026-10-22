@@ -1,10 +1,10 @@
-import type { WakeWord } from '@proj-airi/stage-ui/libs/voice/wake-words'
-import type { AiriCard } from '@proj-airi/stage-ui/types'
+import type { WakeWord } from '@angela/stage-ui/libs/voice/wake-words'
+import type { AiriCard } from '@angela/stage-ui/types'
 
 import type { AudioInputPreflightCallback, AudioInputPreflightContext } from '../../../src/types'
 
-import { sherpawModelArtifactUrl } from '@proj-airi/provider-inference/sherpaw-transcription/models'
-import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
+import { sherpawModelArtifactUrl } from '@angela/provider-inference/sherpaw-transcription/models'
+import { kwsModel } from '@angela/stage-ui/libs/voice/kws-model-info'
 
 import { prepareWakeWordModel } from '../../../src/setup/wake-word-model'
 import { configureStorage } from './storage'

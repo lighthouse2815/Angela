@@ -1,6 +1,6 @@
 import type { HomeAssistantExposure, HomeAssistantExposureMode } from '../../libs/home-assistant/exposure'
 
-import { useLocalStorageManualReset } from '@proj-airi/stage-shared/composables'
+import { useLocalStorageManualReset } from '@angela/stage-shared/composables'
 import { defineStore } from 'pinia'
 import { computed, watch } from 'vue'
 

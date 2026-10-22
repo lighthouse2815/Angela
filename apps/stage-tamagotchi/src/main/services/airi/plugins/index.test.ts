@@ -1,11 +1,11 @@
-import type { createContext } from '@moeru/eventa'
 import type {
   BindingRecord,
   ExtensionManifestV2,
   HostDataRecord,
   ModulePermissionDeclaration,
-} from '@proj-airi/plugin-sdk/plugin-host'
-import type { ExtensionDirectoryImportPrepareResult, PluginRegistrySnapshot } from '@proj-airi/stage-shared/plugin-host'
+} from '@angela/plugin-sdk/plugin-host'
+import type { ExtensionDirectoryImportPrepareResult, PluginRegistrySnapshot } from '@angela/stage-shared/plugin-host'
+import type { createContext } from '@moeru/eventa'
 
 import type { WidgetsAddPayload, WidgetSnapshot, WidgetsUpdatePayload } from '../../../../shared/eventa'
 import type { ExtensionHostService } from './types'
@@ -15,9 +15,9 @@ import { tmpdir } from 'node:os'
 import { basename, join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
+import { ExtensionHost } from '@angela/plugin-sdk/plugin-host'
 import { useLogg } from '@guiiai/logg'
 import { defineInvoke } from '@moeru/eventa'
-import { ExtensionHost } from '@proj-airi/plugin-sdk/plugin-host'
 import { afterEach, beforeEach, describe, expect, expectTypeOf, it, vi } from 'vitest'
 
 import { electronPluginGetAssetBaseUrl } from '../../../../shared/eventa/plugin/assets'
@@ -248,19 +248,19 @@ async function installExampleExtension(pluginsRoot: string, extensionId: string,
     join(destinationDir, entrypointFileName),
     (await readFile(join(sourceDir, entrypointFileName), 'utf-8'))
       .replace(
-        '\'@proj-airi/plugin-sdk\'',
+        '\'@angela/plugin-sdk\'',
         JSON.stringify(pathToFileURL(resolve(repoRoot, 'packages/plugin-sdk/src/index.ts')).href),
       ),
   )
 }
 
-async function linkWorkspacePackageForPlugin(pluginDir: string, packageName: '@proj-airi/plugin-sdk' | '@proj-airi/plugin-sdk-tamagotchi') {
-  const packageDirName = packageName.replace('@proj-airi/', '')
-  const packageDir = join(pluginDir, 'node_modules', '@proj-airi', packageDirName)
+async function linkWorkspacePackageForPlugin(pluginDir: string, packageName: '@angela/plugin-sdk' | '@angela/plugin-sdk-tamagotchi') {
+  const packageDirName = packageName.replace('@angela/', '')
+  const packageDir = join(pluginDir, 'node_modules', '@angela', packageDirName)
   await mkdir(packageDir, { recursive: true })
   await symlink(resolve(repoRoot, 'packages', packageDirName, 'src'), join(packageDir, 'src'), 'dir')
 
-  const exports = packageName === '@proj-airi/plugin-sdk'
+  const exports = packageName === '@angela/plugin-sdk'
     ? {
         '.': './src/index.ts',
         './plugin-host': './src/plugin-host/index.ts',
@@ -2777,14 +2777,14 @@ describe('setupExtensionHost', () => {
     const { service, widgetsManager } = await setupExtensionHostForTest()
     const pluginDir = join(pluginsDir, 'test-extension-gamelet-orchestration')
     await mkdir(pluginDir, { recursive: true })
-    await linkWorkspacePackageForPlugin(pluginDir, '@proj-airi/plugin-sdk')
-    await linkWorkspacePackageForPlugin(pluginDir, '@proj-airi/plugin-sdk-tamagotchi')
+    await linkWorkspacePackageForPlugin(pluginDir, '@angela/plugin-sdk')
+    await linkWorkspacePackageForPlugin(pluginDir, '@angela/plugin-sdk-tamagotchi')
     const entrypointPath = await writeEntrypoint({
       dir: pluginDir,
       name: 'test-extension-gamelet-orchestration.ts',
       contents: [
-        'import { defineExtension } from \'@proj-airi/plugin-sdk\'',
-        'import { gameletKit } from \'@proj-airi/plugin-sdk-tamagotchi\'',
+        'import { defineExtension } from \'@angela/plugin-sdk\'',
+        'import { gameletKit } from \'@angela/plugin-sdk-tamagotchi\'',
         '',
         'export default defineExtension({',
         '  id: \'test-extension-gamelet-orchestration\',',
@@ -2862,14 +2862,14 @@ describe('setupExtensionHost', () => {
     const { service, widgetsManager } = await setupExtensionHostForTest()
     const pluginDir = join(pluginsDir, 'test-extension-gamelet-session-cleanup')
     await mkdir(pluginDir, { recursive: true })
-    await linkWorkspacePackageForPlugin(pluginDir, '@proj-airi/plugin-sdk')
-    await linkWorkspacePackageForPlugin(pluginDir, '@proj-airi/plugin-sdk-tamagotchi')
+    await linkWorkspacePackageForPlugin(pluginDir, '@angela/plugin-sdk')
+    await linkWorkspacePackageForPlugin(pluginDir, '@angela/plugin-sdk-tamagotchi')
     const entrypointPath = await writeEntrypoint({
       dir: pluginDir,
       name: 'test-extension-gamelet-session-cleanup.ts',
       contents: [
-        'import { createModule, defineExtension } from \'@proj-airi/plugin-sdk\'',
-        'import { createGamelet } from \'@proj-airi/plugin-sdk-tamagotchi/kits/gamelet\'',
+        'import { createModule, defineExtension } from \'@angela/plugin-sdk\'',
+        'import { createGamelet } from \'@angela/plugin-sdk-tamagotchi/kits/gamelet\'',
         '',
         'export default defineExtension({',
         '  id: \'test-extension-gamelet-session-cleanup\',',

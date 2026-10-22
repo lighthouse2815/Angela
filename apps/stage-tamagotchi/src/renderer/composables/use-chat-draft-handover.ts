@@ -2,8 +2,8 @@ import type { MaybeRefOrGetter } from 'vue'
 
 import type { ChatDraftHandover } from '../../shared/eventa'
 
+import { getElectronEventaContext, useElectronEventaInvoke } from '@angela/electron-vueuse'
 import { defineInvokeHandler } from '@moeru/eventa'
-import { getElectronEventaContext, useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
 import { onMounted, onScopeDispose, toValue } from 'vue'
 
 import { electronChatWindowCollectDraft, electronChatWindowDraftSettled, electronChatWindowTakeDraft } from '../../shared/eventa'

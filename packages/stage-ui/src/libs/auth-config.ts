@@ -1,4 +1,4 @@
-import { isStageCapacitor } from '@proj-airi/stage-shared'
+import { isStageCapacitor } from '@angela/stage-shared'
 
 const FALLBACK = 'http://localhost'
 const POCKET_CALLBACK_ORIGIN = 'ai.moeru.airi-pocket://links'

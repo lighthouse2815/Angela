@@ -1,4 +1,4 @@
-import { Screen } from '@proj-airi/ui'
+import { Screen } from '@angela/ui'
 import { expect, it } from 'vitest'
 import { render } from 'vitest-browser-vue'
 import { page } from 'vitest/browser'

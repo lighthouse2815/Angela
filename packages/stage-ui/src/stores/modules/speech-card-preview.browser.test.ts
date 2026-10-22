@@ -1,4 +1,4 @@
-import en from '@proj-airi/i18n/locales/en'
+import en from '@angela/i18n/locales/en'
 
 import { PiniaColada } from '@pinia/colada'
 import { MotionPlugin } from '@vueuse/motion'

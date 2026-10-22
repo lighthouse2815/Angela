@@ -1,5 +1,5 @@
-import type { Live2DExpressionSettingsCommand } from '@proj-airi/stage-ui-live2d/stores/expression-store'
-import type { ModelSettingsRuntimeSnapshot } from '@proj-airi/stage-ui/components'
+import type { Live2DExpressionSettingsCommand } from '@angela/stage-ui-live2d/stores/expression-store'
+import type { ModelSettingsRuntimeSnapshot } from '@angela/stage-ui/components'
 
 import { defineEventa, defineInvokeEventa } from '@moeru/eventa'
 import { createContext as createBroadcastChannelContext } from '@moeru/eventa/adapters/broadcast-channel'

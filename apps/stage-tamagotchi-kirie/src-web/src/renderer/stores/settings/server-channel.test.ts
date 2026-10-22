@@ -16,7 +16,7 @@ const invokeMocks = vi.hoisted(() => {
   }
 })
 
-vi.mock('@proj-airi/stage-host-context', () => ({
+vi.mock('@angela/stage-host-context', () => ({
   useHostEventaInvoke: (event: { receiveEvent?: { id?: string } }) => {
     if (event?.receiveEvent?.id === 'eventa:invoke:electron:server-channel:get-config-receive')
       return invokeMocks.getConfig

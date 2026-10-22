@@ -1,17 +1,17 @@
-import type { Conversation, StreamOptions } from '@proj-airi/core-agent'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { Conversation, StreamOptions } from '@angela/core-agent'
+import type { GenerationProvider } from '@angela/provider-inference'
 
 import type { DescribeToolImage } from './tool-images'
 
-import { streamFrom as coreStreamFrom, isContentArrayRelatedError, isToolRelatedError, modelKey } from '@proj-airi/core-agent'
+import { streamFrom as coreStreamFrom, isContentArrayRelatedError, isToolRelatedError, modelKey } from '@angela/core-agent'
 import { listModels } from '@xsai/model'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 import { resolveLlmTools } from './tool-resolver'
 
-export type { StreamEvent, StreamOptions } from '@proj-airi/core-agent'
-export { isContentArrayRelatedError, isToolRelatedError } from '@proj-airi/core-agent'
+export type { StreamEvent, StreamOptions } from '@angela/core-agent'
+export { isContentArrayRelatedError, isToolRelatedError } from '@angela/core-agent'
 
 /** Core stream options plus the stage-ui reader of images in tool results. */
 export interface LlmStreamOptions extends StreamOptions {

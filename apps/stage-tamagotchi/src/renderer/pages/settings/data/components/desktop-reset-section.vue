@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { DataSettingsStatusEmits } from '@proj-airi/stage-pages/pages/settings/data/status'
+import type { DataSettingsStatusEmits } from '@angela/stage-pages/pages/settings/data/status'
 
-import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { createDataSettingsStatusHelpers } from '@proj-airi/stage-pages/pages/settings/data/status'
-import { useAnalytics } from '@proj-airi/stage-ui/composables'
-import { useDataMaintenance } from '@proj-airi/stage-ui/composables/use-data-maintenance'
-import { Button, DoubleCheckButton } from '@proj-airi/ui'
+import { useElectronEventaInvoke } from '@angela/electron-vueuse'
+import { createDataSettingsStatusHelpers } from '@angela/stage-pages/pages/settings/data/status'
+import { useAnalytics } from '@angela/stage-ui/composables'
+import { useDataMaintenance } from '@angela/stage-ui/composables/use-data-maintenance'
+import { Button, DoubleCheckButton } from '@angela/ui'
 import { useI18n } from 'vue-i18n'
 
 import { electronCenterMainWindow } from '../../../../../shared/eventa'

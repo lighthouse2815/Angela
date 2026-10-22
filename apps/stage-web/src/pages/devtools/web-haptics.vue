@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button } from '@proj-airi/ui'
+import { Button } from '@angela/ui'
 import { useWebHaptics } from 'web-haptics/vue'
 
 const presetButtons = [

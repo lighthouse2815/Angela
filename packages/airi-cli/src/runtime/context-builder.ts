@@ -1,4 +1,4 @@
-import type { cliMessages } from '@proj-airi/i18n/cli'
+import type { cliMessages } from '@angela/i18n/cli'
 
 import type { Memory } from '../memory'
 import type { ProjectMemory } from '../project-memory'

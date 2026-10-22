@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { GamingMinecraft } from '@proj-airi/stage-ui/components'
+import { GamingMinecraft } from '@angela/stage-ui/components'
 </script>
 
 <template>

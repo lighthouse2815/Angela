@@ -1,7 +1,7 @@
 import type { Tool } from '@xsai/shared-chat'
 
-import { useLlmToolsStore } from '@proj-airi/stage-ui/stores/ai/chat-llm/tools'
-import { useLlmToolsetPromptsStore } from '@proj-airi/stage-ui/stores/ai/chat-llm/toolset-prompts'
+import { useLlmToolsStore } from '@angela/stage-ui/stores/ai/chat-llm/tools'
+import { useLlmToolsetPromptsStore } from '@angela/stage-ui/stores/ai/chat-llm/toolset-prompts'
 import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -33,7 +33,7 @@ const invokeMocks = vi.hoisted(() => ({
   })),
 }))
 
-vi.mock('@proj-airi/stage-host-context', () => ({
+vi.mock('@angela/stage-host-context', () => ({
   useHostEventaInvoke: (event: { receiveEvent?: { id?: string } }) => {
     if (event?.receiveEvent?.id === 'eventa:invoke:electron:plugins:tools:list-xsai-receive')
       return invokeMocks.listPluginXsaiTools

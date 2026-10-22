@@ -1,5 +1,5 @@
+import type { ResizeDirection } from '@angela/electron-eventa'
 import type { createContext } from '@moeru/eventa/adapters/electron/main'
-import type { ResizeDirection } from '@proj-airi/electron-eventa'
 import type { Point, Rectangle } from 'electron'
 
 import type { ChatFloatingPlacement, ChatFloatingState } from '../../../shared/eventa'
@@ -7,9 +7,9 @@ import type { AttachedChatLayout } from './floating-placement'
 
 import { join, resolve } from 'node:path'
 
+import { isRendererUnavailable } from '@angela/electron-vueuse/main'
 import { defineInvokeHandler } from '@moeru/eventa'
 import { createContext as createElectronContext } from '@moeru/eventa/adapters/electron/main'
-import { isRendererUnavailable } from '@proj-airi/electron-vueuse/main'
 import { animate } from 'animejs'
 import { BrowserWindow, ipcMain, screen } from 'electron'
 import { debounce } from 'es-toolkit'

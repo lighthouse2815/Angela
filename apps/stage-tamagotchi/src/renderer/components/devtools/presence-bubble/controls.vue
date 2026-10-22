@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { Section } from '@proj-airi/stage-ui/components'
-import { useSettingsPresenceBubble } from '@proj-airi/stage-ui/stores/presence-bubble'
-import { FieldCheckbox, FieldRange } from '@proj-airi/ui'
+import { Section } from '@angela/stage-ui/components'
+import { useSettingsPresenceBubble } from '@angela/stage-ui/stores/presence-bubble'
+import { FieldCheckbox, FieldRange } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 

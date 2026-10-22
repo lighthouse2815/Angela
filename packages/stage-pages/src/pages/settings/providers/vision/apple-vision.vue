@@ -3,8 +3,8 @@ import {
   ProviderSettingsContainer,
   ProviderSettingsLayout,
   ProviderValidationAlerts,
-} from '@proj-airi/stage-ui/components'
-import { useProviderValidation } from '@proj-airi/stage-ui/composables/use-provider-validation'
+} from '@angela/stage-ui/components'
+import { useProviderValidation } from '@angela/stage-ui/composables/use-provider-validation'
 
 const providerId = 'apple-vision'
 

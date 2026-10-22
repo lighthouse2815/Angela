@@ -2,8 +2,8 @@ import type { AppleSpeechLocale } from '@xsai-apple-speech/transcription'
 
 import type { ProviderConfigContext } from '../../types'
 
+import { isElectronWindow } from '@angela/stage-shared'
 import { createContext } from '@moeru/eventa/adapters/electron/renderer'
-import { isElectronWindow } from '@proj-airi/stage-shared'
 import { createAppleSpeechProvider } from '@xsai-apple-speech/transcription-electron-plugin'
 import { z } from 'zod'
 

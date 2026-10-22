@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/discord-bot",
+  "name": "@angela/discord-bot",
   "type": "module",
   "private": true,
   "description": "Discord bot for AIRI",
@@ -28,13 +28,13 @@
     "test": "vitest run --config vitest.config.ts"
   },
   "dependencies": {
+    "@angela/audio": "workspace:^",
+    "@angela/i18n": "workspace:^",
+    "@angela/server-sdk": "workspace:^",
+    "@angela/server-shared": "workspace:^",
     "@discordjs/voice": "catalog:",
     "@guiiai/logg": "catalog:",
     "@huggingface/transformers": "catalog:",
-    "@proj-airi/audio": "workspace:^",
-    "@proj-airi/i18n": "workspace:^",
-    "@proj-airi/server-sdk": "workspace:^",
-    "@proj-airi/server-shared": "workspace:^",
     "@snazzah/davey": "catalog:",
     "@xsai-ext/providers": "catalog:",
     "@xsai/generate-speech": "catalog:",

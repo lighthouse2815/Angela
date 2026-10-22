@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { DataSettingsStatusEmits } from '@proj-airi/stage-pages/pages/settings/data/status'
+import type { DataSettingsStatusEmits } from '@angela/stage-pages/pages/settings/data/status'
 
-import { openApplicationDataDirectory } from '@proj-airi/stage-host-context'
-import { createDataSettingsStatusHelpers } from '@proj-airi/stage-pages/pages/settings/data/status'
-import { Button } from '@proj-airi/ui'
+import { openApplicationDataDirectory } from '@angela/stage-host-context'
+import { createDataSettingsStatusHelpers } from '@angela/stage-pages/pages/settings/data/status'
+import { Button } from '@angela/ui'
 import { useI18n } from 'vue-i18n'
 
 const emit = defineEmits<DataSettingsStatusEmits>()

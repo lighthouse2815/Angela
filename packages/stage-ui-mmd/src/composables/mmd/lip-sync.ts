@@ -1,15 +1,15 @@
-import type { Profile, WLipSyncAudioNode, WLipSyncVowel } from '@proj-airi/model-driver-lipsync/shared/wlipsync'
+import type { Profile, WLipSyncAudioNode, WLipSyncVowel } from '@angela/model-driver-lipsync/shared/wlipsync'
 import type { Ref } from 'vue'
 
 import type { VowelSlot } from '../../constants/morphs'
 import type { MorphController } from './morph'
 
-import { createWLipSyncNode } from '@proj-airi/model-driver-lipsync/runtime/wlipsync'
+import { createWLipSyncNode } from '@angela/model-driver-lipsync/runtime/wlipsync'
 import {
   createWLipSyncVowelDriver,
   WLIP_SYNC_VOWELS,
   wlipsyncProfile,
-} from '@proj-airi/model-driver-lipsync/shared/wlipsync'
+} from '@angela/model-driver-lipsync/shared/wlipsync'
 import { shallowRef, watch } from 'vue'
 
 const MMD_SLOT_BY_VOWEL: Record<WLipSyncVowel, VowelSlot> = {

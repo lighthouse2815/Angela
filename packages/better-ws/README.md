@@ -1,4 +1,4 @@
-# @proj-airi/better-ws
+# @angela/better-ws
 
 Runtime-agnostic WebSocket primitives for reliable realtime connections.
 
@@ -12,8 +12,8 @@ Runtime-agnostic WebSocket primitives for reliable realtime connections.
 ## How to use
 
 ```ts
-import { createClient } from '@proj-airi/better-ws'
-import { createServer } from '@proj-airi/better-ws/server'
+import { createClient } from '@angela/better-ws'
+import { createServer } from '@angela/better-ws/server'
 
 const client = createClient({
   url: 'ws://localhost:3000/ws',

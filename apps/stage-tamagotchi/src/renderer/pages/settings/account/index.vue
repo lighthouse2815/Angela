@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import AccountSettingsPage from '@proj-airi/stage-pages/pages/settings/account/account-settings-page.vue'
+import AccountSettingsPage from '@angela/stage-pages/pages/settings/account/account-settings-page.vue'
 
-import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { signOut } from '@proj-airi/stage-ui/libs/auth'
+import { useElectronEventaInvoke } from '@angela/electron-vueuse'
+import { signOut } from '@angela/stage-ui/libs/auth'
 import { useRouter } from 'vue-router'
 
 import { electronAuthLogout, electronAuthStartLogin } from '../../../../shared/eventa'

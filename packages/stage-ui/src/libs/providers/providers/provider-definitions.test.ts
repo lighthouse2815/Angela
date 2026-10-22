@@ -1,4 +1,4 @@
-import type { ProviderTranslator } from '@proj-airi/provider-inference'
+import type { ProviderTranslator } from '@angela/provider-inference'
 
 import type { StageProviderId } from './registry'
 

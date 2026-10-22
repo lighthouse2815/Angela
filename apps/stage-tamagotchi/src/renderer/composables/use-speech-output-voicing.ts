@@ -1,5 +1,5 @@
+import { getSpeechBusContext, speechOutputGetPlaybackState, speechOutputPlaybackStateChangedEvent } from '@angela/stage-ui/services/speech/bus'
 import { defineInvoke } from '@moeru/eventa'
-import { getSpeechBusContext, speechOutputGetPlaybackState, speechOutputPlaybackStateChangedEvent } from '@proj-airi/stage-ui/services/speech/bus'
 import { onScopeDispose, shallowRef } from 'vue'
 
 /**

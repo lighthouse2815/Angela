@@ -1,6 +1,6 @@
 import type { Buffer } from 'node:buffer'
 
-import type { cliMessages } from '@proj-airi/i18n/cli'
+import type { cliMessages } from '@angela/i18n/cli'
 
 import process from 'node:process'
 

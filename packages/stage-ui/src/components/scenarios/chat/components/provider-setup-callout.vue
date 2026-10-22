@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BasicButton, Callout } from '@proj-airi/ui'
+import { BasicButton, Callout } from '@angela/ui'
 import { useI18n } from 'vue-i18n'
 
 const emit = defineEmits<{

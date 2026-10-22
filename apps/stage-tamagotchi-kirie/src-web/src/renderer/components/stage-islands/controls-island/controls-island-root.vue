@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ControlsIslandDock, ControlsIslandMotionPhase, ControlsIslandPlacement } from './use-controls-island-placement'
 
-import { useHostDisplays, useHostWindowBounds } from '@proj-airi/stage-host-context'
+import { useHostDisplays, useHostWindowBounds } from '@angela/stage-host-context'
 import { refDebounced, usePreferredReducedMotion, useTimeoutFn } from '@vueuse/core'
 import { computed, provide, shallowRef, watch } from 'vue'
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { DataSettingsStatusEmits } from '../status'
 
-import { useAnalytics } from '@proj-airi/stage-ui/composables'
-import { useDataMaintenance } from '@proj-airi/stage-ui/composables/use-data-maintenance'
-import { DoubleCheckButton } from '@proj-airi/ui'
+import { useAnalytics } from '@angela/stage-ui/composables'
+import { useDataMaintenance } from '@angela/stage-ui/composables/use-data-maintenance'
+import { DoubleCheckButton } from '@angela/ui'
 import { useI18n } from 'vue-i18n'
 
 import { createDataSettingsStatusHelpers } from '../status'

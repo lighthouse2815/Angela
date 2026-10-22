@@ -9,7 +9,7 @@
  * onMounted, after stores are initialized).
  */
 
-import { detectWebGPU, getCachedWebGPUCapabilities } from '@proj-airi/stage-shared/webgpu'
+import { detectWebGPU, getCachedWebGPUCapabilities } from '@angela/stage-shared/webgpu'
 
 import { getKokoroAdapter } from '../libs/inference/adapters/kokoro'
 import { useProviderConfigStore } from '../stores/providers/config'

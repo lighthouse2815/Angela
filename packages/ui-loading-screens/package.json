@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/ui-loading-screens",
+  "name": "@angela/ui-loading-screens",
   "type": "module",
   "private": true,
   "description": "A collection of loading screens that used by Project AIRI",
@@ -28,10 +28,10 @@
     "typecheck": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@angela/font-departure-mono": "workspace:^",
+    "@angela/ui": "workspace:^",
     "@fontsource-variable/comfortaa": "catalog:",
     "@moeru/std": "catalog:",
-    "@proj-airi/font-departure-mono": "workspace:^",
-    "@proj-airi/ui": "workspace:^",
     "@rive-app/canvas-lite": "catalog:",
     "@vueuse/core": "catalog:",
     "@vueuse/motion": "catalog:",

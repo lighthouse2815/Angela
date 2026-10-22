@@ -1,4 +1,4 @@
-import type { MessageRole, SendMessagesRequest, WireMessage } from '@proj-airi/server-sdk-shared'
+import type { MessageRole, SendMessagesRequest, WireMessage } from '@angela/server-sdk-shared'
 
 import type { Database } from '../../libs/db'
 import type { EngagementMetrics } from '../../otel'

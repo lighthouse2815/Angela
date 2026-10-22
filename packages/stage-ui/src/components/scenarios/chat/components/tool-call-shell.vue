@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Collapsible } from '@proj-airi/ui'
+import { Collapsible } from '@angela/ui'
 
 /** Properties for the shared collapsible frame around a chat tool call. */
 interface Props {

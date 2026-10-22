@@ -1,4 +1,4 @@
-import type { ProviderDefinition as CoreProviderDefinition } from '@proj-airi/provider-inference'
+import type { ProviderDefinition as CoreProviderDefinition } from '@angela/provider-inference'
 
 import type { ProviderViews } from './views'
 
@@ -16,7 +16,7 @@ export {
   CHAT_COMPLETIONS_VALIDATOR_ID,
   isModelProvider,
   ProviderValidationCheck,
-} from '@proj-airi/provider-inference'
+} from '@angela/provider-inference'
 
 export type {
   ChatReasoningCapability,
@@ -37,4 +37,4 @@ export type {
   ProviderValidationStatus,
   ProviderValidatorSchedule,
   VoiceInfo,
-} from '@proj-airi/provider-inference'
+} from '@angela/provider-inference'

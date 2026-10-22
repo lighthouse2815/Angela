@@ -1,8 +1,8 @@
-import type { TtsRequest } from '@proj-airi/pipelines-audio'
+import type { TtsRequest } from '@angela/pipelines-audio'
 
 import type { SpeechAudio, StreamingTranscriber, TranscriptionEvent } from '../../index'
 
-import { AudioInput, createPushStream, Playback } from '@proj-airi/pipelines-audio'
+import { AudioInput, createPushStream, Playback } from '@angela/pipelines-audio'
 import { describe, expect, it, vi } from 'vitest'
 
 import { VoiceController } from '../../index'
@@ -161,7 +161,7 @@ describe('voiceController output', () => {
   })
 
   it('retains speech-onset samples while waiting for playback silence', async () => {
-    const source = createPushStream<import('@proj-airi/pipelines-audio').PcmBlock>()
+    const source = createPushStream<import('@angela/pipelines-audio').PcmBlock>()
     const audio = new AudioInput(pcmSource(source.stream), { historyMs: 4 })
     const release = keepOpen(audio)
     const playing = Promise.withResolvers<void>()
@@ -225,7 +225,7 @@ describe('voiceController output', () => {
       playing.resolve()
       return { done: new Promise<{ throughMs: number }>(() => {}), stop: () => faded.promise }
     } })
-    const audio = new AudioInput(pcmSource(createPushStream<import('@proj-airi/pipelines-audio').PcmBlock>().stream, async () => {}))
+    const audio = new AudioInput(pcmSource(createPushStream<import('@angela/pipelines-audio').PcmBlock>().stream, async () => {}))
     const transcriber = vi.fn()
     const controller = new VoiceController({ audio, transcriber, submit: vi.fn(), speech: () => ({ playback, synthesize: async () => new Blob(['speech']) }), recordInterruption: async () => ({ status: 'queued' }) })
     const turn = { sessionId: 'alice', turnId: 'talking' }

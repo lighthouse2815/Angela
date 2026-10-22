@@ -1,4 +1,4 @@
-# `@proj-airi/stage-shared`
+# `@angela/stage-shared`
 
 Shared contracts and runtime-neutral helpers for AIRI stage applications and UI packages.
 
@@ -9,7 +9,7 @@ Use this package when a type or behavior must cross stage application boundaries
 The `plugin-host` entrypoint owns the serializable Plugin Host snapshots exchanged between the Electron main process and shared renderer code:
 
 ```ts
-import type { PluginHostDebugSnapshot } from '@proj-airi/stage-shared/plugin-host'
+import type { PluginHostDebugSnapshot } from '@angela/stage-shared/plugin-host'
 ```
 
 The `model-assets` entrypoint owns model file manifests, download status, and
@@ -18,6 +18,6 @@ It does not own a recognizer or Worker.
 
 ## Do not use this package
 
-Keep Electron IPC definitions in the Electron application. Keep UI state and actions in `@proj-airi/stage-ui`. Keep Extension runtime and manifest behavior in `@proj-airi/plugin-sdk`.
+Keep Electron IPC definitions in the Electron application. Keep UI state and actions in `@angela/stage-ui`. Keep Extension runtime and manifest behavior in `@angela/plugin-sdk`.
 
 Do not add application startup, persistence, or platform-specific side effects here.

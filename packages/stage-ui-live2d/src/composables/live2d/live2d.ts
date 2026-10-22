@@ -1,4 +1,4 @@
-import { useLocalStorageManualReset, useVersionedLocalStorageManualReset } from '@proj-airi/stage-shared/composables'
+import { useLocalStorageManualReset, useVersionedLocalStorageManualReset } from '@angela/stage-shared/composables'
 import { defineStore } from 'pinia'
 
 export type Live2DMotionDriver = 'magic' | 'universal'

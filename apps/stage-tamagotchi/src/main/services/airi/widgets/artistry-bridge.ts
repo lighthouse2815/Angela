@@ -9,10 +9,10 @@ import type { ArtistryProvider, ArtistryRequest } from './providers/base'
 import { Buffer } from 'node:buffer'
 import { createHash } from 'node:crypto'
 
+import { artistryGenerateHeadless, artistrySyncConfig, artistryTestComfyUIConnection, errorMessageFromValue } from '@angela/stage-shared'
 import { useLogg } from '@guiiai/logg'
 import { defineInvokeHandler } from '@moeru/eventa'
 import { errorMessageFrom } from '@moeru/std'
-import { artistryGenerateHeadless, artistrySyncConfig, artistryTestComfyUIConnection, errorMessageFromValue } from '@proj-airi/stage-shared'
 import { injeca } from 'injeca'
 
 import { ComfyUIProvider } from './providers/comfyui'

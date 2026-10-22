@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ModelSettings } from '@proj-airi/stage-ui/components/scenarios/settings/model-settings'
+import { ModelSettings } from '@angela/stage-ui/components/scenarios/settings/model-settings'
 import { Vibrant } from 'node-vibrant/browser'
 import { ref } from 'vue'
 

@@ -1,6 +1,6 @@
 import type { ElectronWindowLifecycleState } from '../../shared/eventa'
 
-import { useHostWindowLifecycle } from '@proj-airi/stage-host-context'
+import { useHostWindowLifecycle } from '@angela/stage-host-context'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 

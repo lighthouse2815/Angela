@@ -1,5 +1,5 @@
-import type { Live2DExpressionSettingsCommand } from '@proj-airi/stage-ui-live2d/stores/expression-store'
-import type { ModelSettingsRuntimeSnapshot } from '@proj-airi/stage-ui/components/scenarios/settings/model-settings/runtime'
+import type { Live2DExpressionSettingsCommand } from '@angela/stage-ui-live2d/stores/expression-store'
+import type { ModelSettingsRuntimeSnapshot } from '@angela/stage-ui/components/scenarios/settings/model-settings/runtime'
 import type { MaybeRefOrGetter } from 'vue'
 
 import type { ModelSettingsRuntimeContext } from '../../shared/model-settings-runtime'

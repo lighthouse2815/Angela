@@ -18,11 +18,11 @@ const authState = {
   credits: ref(9620),
 }
 
-vi.mock('@proj-airi/stage-ui/stores/auth', () => ({
+vi.mock('@angela/stage-ui/stores/auth', () => ({
   useAuthStore: () => authState,
 }))
 
-vi.mock('@proj-airi/stage-host-context', () => ({
+vi.mock('@angela/stage-host-context', () => ({
   useHostEventaContext: () => ref({
     on: subscriptions.on,
   }),

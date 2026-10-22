@@ -6,10 +6,10 @@ import type {
 } from '../../../../shared/eventa'
 import type { ServerForm } from './mcp-config'
 
+import { useElectronEventaInvoke } from '@angela/electron-vueuse'
+import { useAnalytics } from '@angela/stage-ui/composables'
+import { Button, Callout, Checkbox, GhostButton, SettingsCard, TransitionVertical } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { useAnalytics } from '@proj-airi/stage-ui/composables'
-import { Button, Callout, Checkbox, GhostButton, SettingsCard, TransitionVertical } from '@proj-airi/ui'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 

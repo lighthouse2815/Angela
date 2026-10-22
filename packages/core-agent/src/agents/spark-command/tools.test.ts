@@ -1,6 +1,6 @@
 import type { JsonSchema } from 'xsschema'
 
-import { ContextUpdateStrategy } from '@proj-airi/server-sdk'
+import { ContextUpdateStrategy } from '@angela/server-sdk'
 import { describe, expect, it, vi } from 'vitest'
 
 import { createSparkCommandTool } from './tools'

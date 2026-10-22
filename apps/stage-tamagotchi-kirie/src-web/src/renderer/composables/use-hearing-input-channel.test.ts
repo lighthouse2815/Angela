@@ -1,6 +1,6 @@
-import type { HearingInputChannelEvent } from '@proj-airi/stage-shared'
+import type { HearingInputChannelEvent } from '@angela/stage-shared'
 
-import { hearingInputChannelName } from '@proj-airi/stage-shared'
+import { hearingInputChannelName } from '@angela/stage-shared'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { nextTick, ref, shallowRef } from 'vue'
 

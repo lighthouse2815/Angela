@@ -1,8 +1,8 @@
 import type { EventContext } from '@moeru/eventa'
 
+import { serializeSpan, subscribeIOSpan } from '@angela/stage-ui/composables/use-io-tracer'
 import { useLogg } from '@guiiai/logg'
 import { defineInvoke } from '@moeru/eventa'
-import { serializeSpan, subscribeIOSpan } from '@proj-airi/stage-ui/composables/use-io-tracer'
 
 import {
   ioTraceRecordingChanged,

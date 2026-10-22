@@ -1,10 +1,10 @@
-import type { Conversation, StreamEvent, StreamOptions } from '@proj-airi/core-agent'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { Conversation, StreamEvent, StreamOptions } from '@angela/core-agent'
+import type { GenerationProvider } from '@angela/provider-inference'
 
 import { randomUUID } from 'node:crypto'
 
-import { streamFrom } from '@proj-airi/core-agent'
-import { cliMessages } from '@proj-airi/i18n/cli'
+import { streamFrom } from '@angela/core-agent'
+import { cliMessages } from '@angela/i18n/cli'
 
 import { Context } from './context'
 

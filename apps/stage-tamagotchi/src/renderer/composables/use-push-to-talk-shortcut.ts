@@ -1,9 +1,9 @@
-import type { ShortcutAccelerator, ShortcutFailureReason } from '@proj-airi/stage-shared/global-shortcut'
+import type { ShortcutAccelerator, ShortcutFailureReason } from '@angela/stage-shared/global-shortcut'
 
+import { getElectronEventaContext, useElectronEventaInvoke } from '@angela/electron-vueuse'
+import { ShortcutFailureReasons } from '@angela/stage-shared/global-shortcut'
+import { useVoicePushToTalk } from '@angela/stage-ui/composables/voice-input-mode'
 import { errorMessageFrom } from '@moeru/std'
-import { getElectronEventaContext, useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { ShortcutFailureReasons } from '@proj-airi/stage-shared/global-shortcut'
-import { useVoicePushToTalk } from '@proj-airi/stage-ui/composables/voice-input-mode'
 import { useLocalStorage } from '@vueuse/core'
 import { onScopeDispose, watch } from 'vue'
 import { useI18n } from 'vue-i18n'

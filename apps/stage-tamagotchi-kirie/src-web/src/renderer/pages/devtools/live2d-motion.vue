@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useStandardGamepad } from '@proj-airi/input-gamepad-vueuse'
-import { Live2DMotionDevtools } from '@proj-airi/stage-ui/features/devtools/motion/live2d'
-import { BasicButton } from '@proj-airi/ui'
+import { useStandardGamepad } from '@angela/input-gamepad-vueuse'
+import { Live2DMotionDevtools } from '@angela/stage-ui/features/devtools/motion/live2d'
+import { BasicButton } from '@angela/ui'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 

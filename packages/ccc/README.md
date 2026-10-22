@@ -1,4 +1,4 @@
-# @proj-airi/ccc
+# @angela/ccc
 
 Character Card protocol primitives for AIRI.
 
@@ -15,7 +15,7 @@ settings, local persistence, chat message assembly, or editor behavior.
 ## Parse a CCv3 document
 
 ```ts
-import { parseCharacterCardV3 } from '@proj-airi/ccc'
+import { parseCharacterCardV3 } from '@angela/ccc'
 
 const { card, compatibility } = parseCharacterCardV3(jsonText)
 

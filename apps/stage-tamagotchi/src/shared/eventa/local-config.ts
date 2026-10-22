@@ -1,4 +1,4 @@
-import type { LocalConfigPatch, LocalConfigSnapshot } from '@proj-airi/local-config'
+import type { LocalConfigPatch, LocalConfigSnapshot } from '@angela/local-config'
 
 import { defineInvokeEventa } from '@moeru/eventa'
 

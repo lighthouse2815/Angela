@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { IOTraceRecordingState } from '@proj-airi/stage-shared/types/io-trace'
+import type { IOTraceRecordingState } from '@angela/stage-shared/types/io-trace'
 
-import { useElectronEventaContext, useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
-import { ButtonBar, CheckBar, IconItem } from '@proj-airi/stage-ui/components'
-import { useSettings } from '@proj-airi/stage-ui/stores/settings'
+import { useElectronEventaContext, useElectronEventaInvoke } from '@angela/electron-vueuse'
+import { ButtonBar, CheckBar, IconItem } from '@angela/stage-ui/components'
+import { useSettings } from '@angela/stage-ui/stores/settings'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'

@@ -117,13 +117,13 @@ Commands executed:
 | Command | Result |
 | --- | --- |
 | `python3 -m unittest discover -s packages/airi-cli/python/camera-worker -p test.py` | 11 passed |
-| `pnpm -F @proj-airi/airi-cli exec vitest run src/perception` | 33 passed |
-| `pnpm -F @proj-airi/airi-cli test` | 163 passed, one baseline failure |
-| `pnpm -F @proj-airi/i18n test` | 20 passed |
-| `pnpm -F @proj-airi/airi-cli typecheck` | Passed |
-| `pnpm -F @proj-airi/i18n typecheck` | Passed |
-| `pnpm -F @proj-airi/airi-cli build` | Passed |
-| `pnpm -F @proj-airi/i18n build` | Passed |
+| `pnpm -F @angela/cli exec vitest run src/perception` | 33 passed |
+| `pnpm -F @angela/cli test` | 163 passed, one baseline failure |
+| `pnpm -F @angela/i18n test` | 20 passed |
+| `pnpm -F @angela/cli typecheck` | Passed |
+| `pnpm -F @angela/i18n typecheck` | Passed |
+| `pnpm -F @angela/cli build` | Passed |
+| `pnpm -F @angela/i18n build` | Passed |
 | `pnpm lint` | Baseline plan error described above |
 | `pnpm typecheck` | Default heap exhausted in stage-ui |
 | `NODE_OPTIONS=--max-old-space-size=8192 pnpm typecheck --concurrency=2` | Manually interrupted because of memory pressure |

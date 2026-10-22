@@ -1,4 +1,4 @@
-import type { AudioCaptureFormat } from '@proj-airi/vitest-plugin-fakemic'
+import type { AudioCaptureFormat } from '@angela/vitest-plugin-fakemic'
 
 import type { AudioInputPreflightCallback, AudioInputPreflightContext } from '../../../src/types'
 import type { ProviderConfiguration } from './provider'

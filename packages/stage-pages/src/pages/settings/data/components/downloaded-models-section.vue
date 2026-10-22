@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { DataSettingsStatusEmits } from '../status'
 
-import { sherpawModels } from '@proj-airi/provider-inference/sherpaw-transcription/models'
-import { useModelAssetStatus } from '@proj-airi/stage-ui/composables/use-model-asset-status'
-import { cancelSherpawModelAssets, isSherpawModelBundled, listSherpawModelAssets, removeSherpawModelAssets } from '@proj-airi/stage-ui/libs/providers/providers/sherpaw/model-assets'
-import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
-import { DoubleCheckButton, GhostButton } from '@proj-airi/ui'
+import { sherpawModels } from '@angela/provider-inference/sherpaw-transcription/models'
+import { useModelAssetStatus } from '@angela/stage-ui/composables/use-model-asset-status'
+import { cancelSherpawModelAssets, isSherpawModelBundled, listSherpawModelAssets, removeSherpawModelAssets } from '@angela/stage-ui/libs/providers/providers/sherpaw/model-assets'
+import { kwsModel } from '@angela/stage-ui/libs/voice/kws-model-info'
+import { DoubleCheckButton, GhostButton } from '@angela/ui'
 import { computed, onMounted, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 

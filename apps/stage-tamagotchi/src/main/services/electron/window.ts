@@ -3,9 +3,9 @@ import type { BrowserWindow } from 'electron'
 
 import type { ElectronWindowLifecycleState } from '../../../shared/eventa'
 
+import { bounds, startLoopGetBounds } from '@angela/electron-eventa'
+import { createRendererLoop, safeClose } from '@angela/electron-vueuse/main'
 import { defineInvokeHandler } from '@moeru/eventa'
-import { bounds, startLoopGetBounds } from '@proj-airi/electron-eventa'
-import { createRendererLoop, safeClose } from '@proj-airi/electron-vueuse/main'
 import { isWindows } from 'std-env'
 
 import {

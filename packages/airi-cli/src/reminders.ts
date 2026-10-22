@@ -1,4 +1,4 @@
-import type { cliMessages } from '@proj-airi/i18n/cli'
+import type { cliMessages } from '@angela/i18n/cli'
 
 import type { ReminderNotifier } from './reminder-scheduler'
 import type { Task } from './task-schema'

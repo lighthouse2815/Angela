@@ -1,13 +1,13 @@
+import type { SerializableDesktopCapturerSource } from '@angela/electron-screen-capture'
 import type { Analyser, AnalyserBeatEvent, AnalyserWorkletParameters } from '@nekopaw/tempora'
-import type { SerializableDesktopCapturerSource } from '@proj-airi/electron-screen-capture'
 
 import type { BeatSyncDetectorEventMap, BeatSyncDetectorState } from './types'
 
 import analyserWorklet from '@nekopaw/tempora/worklet?url'
 
+import { setupElectronScreenCapture } from '@angela/electron-screen-capture/renderer'
 import { defineInvoke, defineInvokeHandler } from '@moeru/eventa'
 import { startAnalyser as startTemporaAnalyser } from '@nekopaw/tempora'
-import { setupElectronScreenCapture } from '@proj-airi/electron-screen-capture/renderer'
 
 import { isStageCapacitor, isStageTamagotchi, isStageWeb, StageEnvironment } from '../environment'
 import { isElectronWindow } from '../window'

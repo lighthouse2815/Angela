@@ -42,7 +42,7 @@ vi.mock('h3', () => ({
   })),
 }))
 
-vi.mock('@proj-airi/better-ws/server/h3', () => ({
+vi.mock('@angela/better-ws/server/h3', () => ({
   createH3CrossWsPlugin: serveMocks.createH3CrossWsPluginCall,
 }))
 

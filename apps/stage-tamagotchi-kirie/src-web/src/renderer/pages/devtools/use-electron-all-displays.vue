@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useHostDisplays, useHostRelativeMouse, useHostWindowBounds } from '@proj-airi/stage-host-context'
+import { useHostDisplays, useHostRelativeMouse, useHostWindowBounds } from '@angela/stage-host-context'
 import { useWindowSize } from '@vueuse/core'
 import { computed } from 'vue'
 

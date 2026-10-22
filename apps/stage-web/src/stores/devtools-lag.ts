@@ -1,6 +1,6 @@
-import type { TraceEvent } from '@proj-airi/stage-shared'
+import type { TraceEvent } from '@angela/stage-shared'
 
-import { defaultPerfTracer, exportCsv as exportCsvFile } from '@proj-airi/stage-shared'
+import { defaultPerfTracer, exportCsv as exportCsvFile } from '@angela/stage-shared'
 import { defineStore } from 'pinia'
 import { onScopeDispose, reactive, ref, shallowRef, watch } from 'vue'
 

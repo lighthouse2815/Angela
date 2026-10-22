@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { ScreenAmbientLightMode, ScreenAmbientLightSource } from '@proj-airi/stage-shared/screen-ambient-light'
-import type { SelectTabOption } from '@proj-airi/ui'
+import type { ScreenAmbientLightMode, ScreenAmbientLightSource } from '@angela/stage-shared/screen-ambient-light'
+import type { SelectTabOption } from '@angela/ui'
 
-import { ambientLightDefaults } from '@proj-airi/stage-shared/screen-ambient-light'
-import { useSettingsScreenAmbientLight } from '@proj-airi/stage-shared/stores/screen-ambient-light'
-import { ColorPicker, Section } from '@proj-airi/stage-ui/components'
-import { FieldCheckbox, FieldRange, SelectTab } from '@proj-airi/ui'
+import { ambientLightDefaults } from '@angela/stage-shared/screen-ambient-light'
+import { useSettingsScreenAmbientLight } from '@angela/stage-shared/stores/screen-ambient-light'
+import { ColorPicker, Section } from '@angela/stage-ui/components'
+import { FieldCheckbox, FieldRange, SelectTab } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

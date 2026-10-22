@@ -1,17 +1,17 @@
-import type { SerializableDesktopCapturerSource } from '@proj-airi/electron-screen-capture'
-import type { Live2DLipSync } from '@proj-airi/model-driver-lipsync'
-import type { Profile } from '@proj-airi/model-driver-lipsync/shared/wlipsync'
+import type { SerializableDesktopCapturerSource } from '@angela/electron-screen-capture'
+import type { Live2DLipSync } from '@angela/model-driver-lipsync'
+import type { Profile } from '@angela/model-driver-lipsync/shared/wlipsync'
 import type {
   SystemAudioLipSyncCallbacks,
   SystemAudioLipSyncDriver,
   SystemAudioLipSyncOptions,
   SystemAudioLipSyncOutput,
-} from '@proj-airi/stage-ui/stores/system-audio-lipsync'
+} from '@angela/stage-ui/stores/system-audio-lipsync'
 
-import { setupElectronScreenCapture } from '@proj-airi/electron-screen-capture/renderer'
-import { getElectronEventaContext } from '@proj-airi/electron-vueuse'
-import { createLive2DLipSync } from '@proj-airi/model-driver-lipsync'
-import { wlipsyncProfile } from '@proj-airi/model-driver-lipsync/shared/wlipsync'
+import { setupElectronScreenCapture } from '@angela/electron-screen-capture/renderer'
+import { getElectronEventaContext } from '@angela/electron-vueuse'
+import { createLive2DLipSync } from '@angela/model-driver-lipsync'
+import { wlipsyncProfile } from '@angela/model-driver-lipsync/shared/wlipsync'
 import { clamp } from 'es-toolkit'
 
 const inputAnalyserFFTSize = 1024

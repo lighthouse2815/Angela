@@ -1,4 +1,4 @@
-import type { PortableProviderId } from '@proj-airi/provider-inference'
+import type { PortableProviderId } from '@angela/provider-inference'
 import type { MaybePromise } from 'clustr'
 import type { $ZodType } from 'zod/v4/core'
 

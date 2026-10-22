@@ -1,10 +1,10 @@
-import type { TranscriptionEvent } from '@proj-airi/core-agent'
-import type { PcmBlock } from '@proj-airi/pipelines-audio'
+import type { TranscriptionEvent } from '@angela/core-agent'
+import type { PcmBlock } from '@angela/pipelines-audio'
 
 import type { EndJudgement } from './voice-end-judge-plugin'
 
-import { VoiceController } from '@proj-airi/core-agent'
-import { AudioInput, createPushStream } from '@proj-airi/pipelines-audio'
+import { VoiceController } from '@angela/core-agent'
+import { AudioInput, createPushStream } from '@angela/pipelines-audio'
 import { describe, expect, it, vi } from 'vitest'
 
 import { createVoiceEndJudgePlugin } from './voice-end-judge-plugin'

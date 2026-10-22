@@ -1,16 +1,16 @@
-import type { useLogg } from '@guiiai/logg'
 import type {
   ShortcutAccelerator,
   ShortcutBinding,
   ShortcutKey,
   ShortcutModifier,
   ShortcutRegistrationResult,
-} from '@proj-airi/stage-shared/global-shortcut'
+} from '@angela/stage-shared/global-shortcut'
+import type { useLogg } from '@guiiai/logg'
 import type { UiohookKeyboardEvent } from 'uiohook-napi'
 
 import process from 'node:process'
 
-import { ShortcutFailureReasons } from '@proj-airi/stage-shared/global-shortcut'
+import { ShortcutFailureReasons } from '@angela/stage-shared/global-shortcut'
 import { systemPreferences } from 'electron'
 import { uIOhook, UiohookKey } from 'uiohook-napi'
 

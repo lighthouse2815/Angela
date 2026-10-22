@@ -73,7 +73,7 @@ STT and TTS keys remain separate. Local endpoints can use empty keys.
 Start Angela's desktop or local web client, then start the adapter:
 
 ```sh
-pnpm -F @proj-airi/discord-bot start
+pnpm -F @angela/discord-bot start
 ```
 
 Use `ANGELA_LOCALE=en` for English command descriptions and notices. Vietnamese is the default.
@@ -124,12 +124,12 @@ Angela's existing chat history and the providers' own retention settings remain 
 ## Checks
 
 ```sh
-pnpm -F @proj-airi/discord-bot typecheck
-pnpm -F @proj-airi/discord-bot test
-ANGELA_DISCORD_AUDIO_TEST=1 pnpm -F @proj-airi/discord-bot test
-pnpm -F @proj-airi/i18n typecheck
-pnpm -F @proj-airi/i18n test
-pnpm -F @proj-airi/i18n build
+pnpm -F @angela/discord-bot typecheck
+pnpm -F @angela/discord-bot test
+ANGELA_DISCORD_AUDIO_TEST=1 pnpm -F @angela/discord-bot test
+pnpm -F @angela/i18n typecheck
+pnpm -F @angela/i18n test
+pnpm -F @angela/i18n build
 pnpm lint
 ```
 

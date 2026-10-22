@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button, Collapsible } from '@proj-airi/ui'
+import { Button, Collapsible } from '@angela/ui'
 import { shallowRef } from 'vue'
 
 const open = shallowRef(false)

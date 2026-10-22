@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { WebSearch } from '@proj-airi/stage-ui/components'
+import { WebSearch } from '@angela/stage-ui/components'
 </script>
 
 <template>

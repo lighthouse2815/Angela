@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { PresenceBubbleState } from '@proj-airi/stage-shared'
+import type { PresenceBubbleState } from '@angela/stage-shared'
 
 import type { Live2DEyeFocusSource } from '../../composables/live2d'
 
-import { presenceBubbleIdle } from '@proj-airi/stage-shared'
-import { useScreenAmbientLightEnvironment, useSettingsScreenAmbientLight } from '@proj-airi/stage-shared/stores/screen-ambient-light'
-import { Screen } from '@proj-airi/ui'
+import { presenceBubbleIdle } from '@angela/stage-shared'
+import { useScreenAmbientLightEnvironment, useSettingsScreenAmbientLight } from '@angela/stage-shared/stores/screen-ambient-light'
+import { Screen } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { computed, onUnmounted, ref, watch } from 'vue'
 

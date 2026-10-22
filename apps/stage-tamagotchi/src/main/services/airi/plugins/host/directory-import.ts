@@ -1,11 +1,11 @@
 import type { Stats } from 'node:fs'
 
-import type { ExtensionManifestV2 } from '@proj-airi/plugin-sdk/plugin-host'
+import type { ExtensionManifestV2 } from '@angela/plugin-sdk/plugin-host'
 import type {
   ExtensionDirectoryImportKitSummary,
   ExtensionDirectoryImportPermissionSummary,
   ExtensionDirectoryImportPlan,
-} from '@proj-airi/stage-shared/plugin-host'
+} from '@angela/stage-shared/plugin-host'
 
 import type { ManifestEntry } from '../types'
 
@@ -16,7 +16,7 @@ import { chmod, lstat, mkdir, open, opendir, realpath, rename, rm } from 'node:f
 import { isAbsolute, join, relative, resolve, sep } from 'node:path'
 import { pipeline } from 'node:stream/promises'
 
-import { parseExtensionManifest } from '@proj-airi/plugin-sdk/plugin-host'
+import { parseExtensionManifest } from '@angela/plugin-sdk/plugin-host'
 
 import { extensionManifestFileName } from './registry'
 

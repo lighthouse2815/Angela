@@ -1,5 +1,5 @@
+import type { BaseVAD, BaseVADConfig, VADEventCallback, VADEvents } from '@angela/stage-ui/libs/audio/vad'
 import type { PreTrainedModel } from '@huggingface/transformers'
-import type { BaseVAD, BaseVADConfig, VADEventCallback, VADEvents } from '@proj-airi/stage-ui/libs/audio/vad'
 
 import { AutoModel, Tensor } from '@huggingface/transformers'
 

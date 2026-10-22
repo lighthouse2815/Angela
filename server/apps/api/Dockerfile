@@ -15,11 +15,11 @@ COPY server/packages/server-sdk-shared server/packages/server-sdk-shared
 RUN --mount=type=cache,id=pnpm-store,target=/root/.pnpm-store \
     pnpm install --frozen-lockfile --ignore-scripts
 
-RUN pnpm -F @proj-airi/server-sdk-shared run build
-RUN pnpm -F @proj-airi/api-server run build
+RUN pnpm -F @angela/server-sdk-shared run build
+RUN pnpm -F @angela/api-server run build
 
 EXPOSE 3000
 
 USER airi
 
-CMD ["pnpm", "-F", "@proj-airi/api-server", "start"]
+CMD ["pnpm", "-F", "@angela/api-server", "start"]

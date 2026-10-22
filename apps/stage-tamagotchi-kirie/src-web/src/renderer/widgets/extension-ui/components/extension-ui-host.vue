@@ -7,8 +7,8 @@ import type {
 } from '../../../../shared/eventa'
 import type { PluginHostModuleSummary, PluginModuleWidgetPayload } from '../../../../shared/eventa/plugin/host'
 
-import { useHostEventaInvoke } from '@proj-airi/stage-host-context'
-import { useContextBridgeStore } from '@proj-airi/stage-ui/stores/mods/api/context-bridge'
+import { useHostEventaInvoke } from '@angela/stage-host-context'
+import { useContextBridgeStore } from '@angela/stage-ui/stores/mods/api/context-bridge'
 import { isPlainObject } from 'es-toolkit'
 import { computed, shallowRef, watch } from 'vue'
 

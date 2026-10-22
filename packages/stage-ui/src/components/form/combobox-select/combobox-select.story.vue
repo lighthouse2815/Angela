@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ComboboxSelect } from '@proj-airi/ui'
+import { ComboboxSelect } from '@angela/ui'
 import { ref } from 'vue'
 
 const singleValue = ref('option1')

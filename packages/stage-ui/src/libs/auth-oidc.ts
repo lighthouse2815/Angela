@@ -1,4 +1,4 @@
-import { generateCodeChallenge, generateCodeVerifier, generateState } from '@proj-airi/stage-shared/auth'
+import { generateCodeChallenge, generateCodeVerifier, generateState } from '@angela/stage-shared/auth'
 
 import { SERVER_URL } from './server'
 

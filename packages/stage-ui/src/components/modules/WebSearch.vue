@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Callout, FieldCheckbox, FieldInput, SettingsCard } from '@proj-airi/ui'
+import { Callout, FieldCheckbox, FieldInput, SettingsCard } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 

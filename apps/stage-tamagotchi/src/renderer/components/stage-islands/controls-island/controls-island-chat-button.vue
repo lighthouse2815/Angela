@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ChatButtonState } from '../../../../shared/eventa'
 
-import { useElectronEventaContext, useElectronEventaInvoke } from '@proj-airi/electron-vueuse'
+import { useElectronEventaContext, useElectronEventaInvoke } from '@angela/electron-vueuse'
 import { computed, onMounted, onScopeDispose, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 

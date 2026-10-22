@@ -1,5 +1,5 @@
-import type { cliMessages } from '@proj-airi/i18n/cli'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { cliMessages } from '@angela/i18n/cli'
+import type { GenerationProvider } from '@angela/provider-inference'
 import type { Context } from 'grammy'
 
 import type { McpTools } from './mcp'
@@ -15,7 +15,7 @@ import { join } from 'node:path'
 import { Writable } from 'node:stream'
 import { parseEnv } from 'node:util'
 
-import { getGenerationProvider, listProviders } from '@proj-airi/provider-inference'
+import { getGenerationProvider, listProviders } from '@angela/provider-inference'
 import { APICallError } from '@xsai/shared'
 import { AbortController as TelegramAbortController } from 'abort-controller'
 import { Bot, InlineKeyboard } from 'grammy'

@@ -1,9 +1,9 @@
+import type { SpeechAudio, SpeechOutput, TurnRef } from '@angela/core-agent'
 import type { Span } from '@opentelemetry/api'
-import type { SpeechAudio, SpeechOutput, TurnRef } from '@proj-airi/core-agent'
 
+import { IOAttributes, IOSpanNames, IOSubsystems } from '@angela/stage-shared'
 import { errorMessageFrom } from '@moeru/std'
 import { SpanStatusCode } from '@opentelemetry/api'
-import { IOAttributes, IOSpanNames, IOSubsystems } from '@proj-airi/stage-shared'
 
 import { activeTurnSpan, startSpan } from './use-io-tracer'
 

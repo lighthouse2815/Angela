@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { ServerEvent, ServerEvents } from '@proj-airi/stage-ui/libs/providers/providers/aliyun-nls'
+import type { ServerEvent, ServerEvents } from '@angela/stage-ui/libs/providers/providers/aliyun-nls'
 
-import vadWorkletUrl from '@proj-airi/stage-ui/workers/vad/process.worklet?worker&url'
+import vadWorkletUrl from '@angela/stage-ui/workers/vad/process.worklet?worker&url'
 
-import { toPCM16FromFloat32 } from '@proj-airi/audio/encoding'
-import { errorMessageFromValue } from '@proj-airi/stage-shared'
-import { createAliyunNLSProvider } from '@proj-airi/stage-ui/libs/providers/providers/aliyun-nls'
-import { streamTranscription } from '@proj-airi/stage-ui/libs/providers/stream-transcription'
-import { Button, FieldCombobox, FieldInput } from '@proj-airi/ui'
+import { toPCM16FromFloat32 } from '@angela/audio/encoding'
+import { errorMessageFromValue } from '@angela/stage-shared'
+import { createAliyunNLSProvider } from '@angela/stage-ui/libs/providers/providers/aliyun-nls'
+import { streamTranscription } from '@angela/stage-ui/libs/providers/stream-transcription'
+import { Button, FieldCombobox, FieldInput } from '@angela/ui'
 import { computed, nextTick, onBeforeUnmount, reactive, ref, shallowRef, watch } from 'vue'
 
 type AliyunRegion

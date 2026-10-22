@@ -1,6 +1,6 @@
 import type { CustomerInfo, Package } from '@revenuecat/purchases-js'
 
-import { getRevenuecatWebKey, isCapacitorAvailable } from '@proj-airi/stage-shared'
+import { getRevenuecatWebKey, isCapacitorAvailable } from '@angela/stage-shared'
 import { ErrorCode, Purchases, PurchasesError } from '@revenuecat/purchases-js'
 import { object, optional, pipe, record, safeParse, string, trim } from 'valibot'
 import { onScopeDispose, ref, watch } from 'vue'

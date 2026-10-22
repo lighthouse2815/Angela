@@ -1,4 +1,4 @@
-import type { FakemicWebPrepareContext } from '@proj-airi/vitest-plugin-fakemic'
+import type { FakemicWebPrepareContext } from '@angela/vitest-plugin-fakemic'
 
 import type { AudioInputSession } from '../types'
 

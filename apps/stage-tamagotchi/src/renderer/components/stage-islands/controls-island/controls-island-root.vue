@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ControlsIslandDock, ControlsIslandMotionPhase, ControlsIslandPlacement } from './use-controls-island-placement'
 
-import { useElectronAllDisplays, useElectronWindowBounds } from '@proj-airi/electron-vueuse'
+import { useElectronAllDisplays, useElectronWindowBounds } from '@angela/electron-vueuse'
 import { refDebounced, usePreferredReducedMotion, useTimeoutFn } from '@vueuse/core'
 import { computed, provide, shallowRef, watch } from 'vue'
 

@@ -1,8 +1,8 @@
-import type { HearingInputChannelEvent } from '@proj-airi/stage-shared'
+import type { HearingInputChannelEvent } from '@angela/stage-shared'
 import type { Ref } from 'vue'
 
-import { hearingInputChannelName } from '@proj-airi/stage-shared'
-import { useStreamingTranscriptionInput } from '@proj-airi/stage-ui/composables/use-streaming-transcription-input'
+import { hearingInputChannelName } from '@angela/stage-shared'
+import { useStreamingTranscriptionInput } from '@angela/stage-ui/composables/use-streaming-transcription-input'
 import { useBroadcastChannel } from '@vueuse/core'
 import { watch } from 'vue'
 

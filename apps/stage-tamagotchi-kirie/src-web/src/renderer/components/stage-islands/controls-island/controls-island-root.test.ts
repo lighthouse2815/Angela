@@ -21,7 +21,7 @@ const windowBounds = {
   width: shallowRef(450),
   height: shallowRef(600),
 }
-vi.mock('@proj-airi/stage-host-context', () => ({
+vi.mock('@angela/stage-host-context', () => ({
   useHostDisplays: () => displays,
   useHostWindowBounds: () => windowBounds,
 }))

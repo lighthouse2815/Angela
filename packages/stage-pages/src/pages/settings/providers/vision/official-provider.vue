@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { isFluxPurchaseDisabled } from '@proj-airi/stage-shared'
+import { isFluxPurchaseDisabled } from '@angela/stage-shared'
 import {
   ProviderSettingsContainer,
   ProviderSettingsLayout,
-} from '@proj-airi/stage-ui/components'
-import { selectProviderMetadata } from '@proj-airi/stage-ui/libs'
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
-import { useProviderStore } from '@proj-airi/stage-ui/stores/providers/provider'
-import { Callout } from '@proj-airi/ui'
+} from '@angela/stage-ui/components'
+import { selectProviderMetadata } from '@angela/stage-ui/libs'
+import { useAuthStore } from '@angela/stage-ui/stores/auth'
+import { useProviderStore } from '@angela/stage-ui/stores/providers/provider'
+import { Callout } from '@angela/ui'
 import { computedAsync } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'

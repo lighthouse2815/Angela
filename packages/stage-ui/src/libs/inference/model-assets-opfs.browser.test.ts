@@ -1,4 +1,4 @@
-import type { ModelAsset } from '@proj-airi/stage-shared/model-assets'
+import type { ModelAsset } from '@angela/stage-shared/model-assets'
 
 import { afterEach, describe, expect, it } from 'vitest'
 

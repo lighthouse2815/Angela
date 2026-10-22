@@ -1,7 +1,7 @@
-import en from '@proj-airi/i18n/locales/en'
+import en from '@angela/i18n/locales/en'
 
-import { updateModelAssetStatus } from '@proj-airi/stage-ui/composables/use-model-asset-status'
-import { kwsModel } from '@proj-airi/stage-ui/libs/voice/kws-model-info'
+import { updateModelAssetStatus } from '@angela/stage-ui/composables/use-model-asset-status'
+import { kwsModel } from '@angela/stage-ui/libs/voice/kws-model-info'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-vue'
 import { createI18n } from 'vue-i18n'
@@ -16,7 +16,7 @@ const { list, remove, cancel } = vi.hoisted(() => ({
   cancel: vi.fn(async (_id: string) => {}),
 }))
 
-vi.mock('@proj-airi/stage-ui/libs/providers/providers/sherpaw/model-assets', () => ({
+vi.mock('@angela/stage-ui/libs/providers/providers/sherpaw/model-assets', () => ({
   listSherpawModelAssets: list,
   removeSherpawModelAssets: remove,
   cancelSherpawModelAssets: cancel,

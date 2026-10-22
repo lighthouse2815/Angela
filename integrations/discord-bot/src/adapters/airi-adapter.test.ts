@@ -1,4 +1,4 @@
-import type { WebSocketEventOf } from '@proj-airi/server-shared/types'
+import type { WebSocketEventOf } from '@angela/server-shared/types'
 
 import { EventEmitter } from 'node:events'
 
@@ -9,7 +9,7 @@ import { VoiceManager } from '../bots/discord/commands'
 import { DiscordAdapter } from './airi-adapter'
 
 const bridge = vi.hoisted(() => ({ handlers: new Map<string, (event: unknown) => Promise<void>>(), close: vi.fn() }))
-vi.mock('@proj-airi/server-sdk', () => ({
+vi.mock('@angela/server-sdk', () => ({
   Client: class {
     onEvent(name: string, handler: (event: unknown) => Promise<void>) {
       bridge.handlers.set(name, handler)

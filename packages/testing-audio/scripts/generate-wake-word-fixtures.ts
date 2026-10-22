@@ -1,10 +1,10 @@
-import type { PcmBlock } from '@proj-airi/pipelines-audio'
+import type { PcmBlock } from '@angela/pipelines-audio'
 
 import { writeFile } from 'node:fs/promises'
 import { env } from 'node:process'
 import { fileURLToPath } from 'node:url'
 
-import { encodeWav, toFloat32FromPCM16 } from '@proj-airi/audio/encoding'
+import { encodeWav, toFloat32FromPCM16 } from '@angela/audio/encoding'
 
 import { loadCaseEnvironment } from '../cases/shared/configurations'
 
@@ -104,7 +104,7 @@ async function generate(fixture: WakeWordFixture, environment: Record<string, st
   // TODO:
   // Mediabunny resamples with linear interpolation and no anti-aliasing filter (`resample.js`).
   // Voice messages use this `encodeWav` before transcription too.
-  // Add a low-pass filter in `@proj-airi/audio`. These fixtures pass with it and with a sinc resampler.
+  // Add a low-pass filter in `@angela/audio`. These fixtures pass with it and with a sinc resampler.
   const wav = await encodeWav(stream, { sampleRate: fixtureSampleRate, channels: 1 })
   const output = fileURLToPath(new URL(fixture.output, import.meta.url))
   await writeFile(output, new Uint8Array(await wav.arrayBuffer()))

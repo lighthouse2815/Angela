@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { FieldCombobox, GhostButton } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { FieldCombobox, GhostButton } from '@proj-airi/ui'
 import { computedAsync } from '@vueuse/core'
 import { computed, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'

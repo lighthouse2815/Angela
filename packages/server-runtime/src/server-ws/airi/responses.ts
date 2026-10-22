@@ -1,7 +1,7 @@
-import type { ExtensionIdentity, MessageHeartbeat, MessageHeartbeatKind, MetadataEventSource, WebSocketEvent } from '@proj-airi/server-shared/types'
+import type { ExtensionIdentity, MessageHeartbeat, MessageHeartbeatKind, MetadataEventSource, WebSocketEvent } from '@angela/server-shared/types'
 
-import { ServerErrorMessages } from '@proj-airi/server-shared'
-import { WebSocketEventSource } from '@proj-airi/server-shared/types'
+import { ServerErrorMessages } from '@angela/server-shared'
+import { WebSocketEventSource } from '@angela/server-shared/types'
 import { nanoid } from 'nanoid'
 
 import packageJSON from '../../../package.json'

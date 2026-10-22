@@ -3,7 +3,7 @@ import type { MaybeRefOrGetter } from 'vue'
 import { useEventListener } from '@vueuse/core'
 import { computed, onScopeDispose, readonly, shallowRef, toValue, watch } from 'vue'
 
-/** A speech input that one hold started. `SpeechInputAttempt` from `@proj-airi/core-agent` satisfies it. */
+/** A speech input that one hold started. `SpeechInputAttempt` from `@angela/core-agent` satisfies it. */
 export interface VoiceHoldInput {
   /** Stops capture and lets the host transcribe and deliver the speech. */
   end: () => unknown

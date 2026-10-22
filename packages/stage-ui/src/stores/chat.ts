@@ -1,6 +1,6 @@
-import type { ChatAttachment, ChatOrchestratorRuntimeState, ChatOrchestratorSendOptions, Conversation, StreamEvent, StreamOptions } from '@proj-airi/core-agent'
-import type { GenerationProvider, GenerationRequest } from '@proj-airi/provider-inference'
-import type { WebSocketEventInputs } from '@proj-airi/server-sdk'
+import type { ChatAttachment, ChatOrchestratorRuntimeState, ChatOrchestratorSendOptions, Conversation, StreamEvent, StreamOptions } from '@angela/core-agent'
+import type { GenerationProvider, GenerationRequest } from '@angela/provider-inference'
+import type { WebSocketEventInputs } from '@angela/server-sdk'
 import type { Message } from '@xsai/shared-chat'
 import type { SyncedPiniaRuntime } from 'pinia-plugin-synced'
 
@@ -8,11 +8,11 @@ import type { ChatHistoryItem, ChatToolReference } from '../types/chat'
 import type { StoredVoiceInterruption } from '../types/chat-session'
 import type { ToolCallRerunPayload } from './tool-call-rerun'
 
+import { fileSource } from '@angela/audio/encoding'
+import { createChatOrchestratorRuntime, renderConversationPreview } from '@angela/core-agent'
+import { IOAttributes, IOEvents, IOSpanNames, IOSubsystems } from '@angela/stage-shared'
 import { errorMessageFrom } from '@moeru/std'
 import { decodeBase64 } from '@moeru/std/base64'
-import { fileSource } from '@proj-airi/audio/encoding'
-import { createChatOrchestratorRuntime, renderConversationPreview } from '@proj-airi/core-agent'
-import { IOAttributes, IOEvents, IOSpanNames, IOSubsystems } from '@proj-airi/stage-shared'
 import { nanoid } from 'nanoid'
 import { defineStore, storeToRefs } from 'pinia'
 import { computed, shallowRef, toRaw } from 'vue'
@@ -210,7 +210,7 @@ function retrySourceIndexFrom(messages: ChatHistoryItem[], index: number): numbe
   return -1
 }
 
-export type { QueuedSendSnapshot } from '@proj-airi/core-agent'
+export type { QueuedSendSnapshot } from '@angela/core-agent'
 
 /** Stands in for an image in a stored tool result while the vision model reads tool images. */
 const STORED_TOOL_IMAGE = 'A tool image was left out of the history.'

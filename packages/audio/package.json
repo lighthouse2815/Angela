@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/audio",
+  "name": "@angela/audio",
   "type": "module",
   "private": true,
   "description": "Audio processing utilities for Angela",
@@ -50,8 +50,8 @@
   },
   "dependencies": {
     "@alexanderolsen/libsamplerate-js": "catalog:",
+    "@angela/pipelines-audio": "workspace:*",
     "@moeru/std": "catalog:",
-    "@proj-airi/pipelines-audio": "workspace:*",
     "mediabunny": "catalog:",
     "nanoid": "catalog:"
   },

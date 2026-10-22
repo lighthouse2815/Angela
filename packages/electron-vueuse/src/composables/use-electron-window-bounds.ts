@@ -1,5 +1,5 @@
+import { bounds, startLoopGetBounds } from '@angela/electron-eventa'
 import { defineInvoke } from '@moeru/eventa'
-import { bounds, startLoopGetBounds } from '@proj-airi/electron-eventa'
 import { ref } from 'vue'
 
 import { getElectronEventaContext } from './use-electron-eventa-context'

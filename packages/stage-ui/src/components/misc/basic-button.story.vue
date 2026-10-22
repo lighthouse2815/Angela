@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BasicButton } from '@proj-airi/ui'
+import { BasicButton } from '@angela/ui'
 import { shallowRef } from 'vue'
 
 const clicks = shallowRef(0)

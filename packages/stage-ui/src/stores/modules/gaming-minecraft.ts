@@ -1,4 +1,4 @@
-import type { MetadataEventSource, WebSocketBaseEvent, WebSocketEvents } from '@proj-airi/server-sdk'
+import type { MetadataEventSource, WebSocketBaseEvent, WebSocketEvents } from '@angela/server-sdk'
 
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'

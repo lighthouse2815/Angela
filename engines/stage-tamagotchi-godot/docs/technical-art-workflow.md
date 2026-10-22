@@ -23,13 +23,13 @@ accepted:
 The current render-stage dump command is:
 
 ```powershell
-pnpm -F @proj-airi/stage-tamagotchi-godot dump:render-stages
+pnpm -F @angela/stage-tamagotchi-godot dump:render-stages
 ```
 
 For rim or edge-light shape checks, prefer the upper-body camera preset:
 
 ```powershell
-pnpm -F @proj-airi/stage-tamagotchi-godot dump:render-stages:upper-body
+pnpm -F @angela/stage-tamagotchi-godot dump:render-stages:upper-body
 ```
 
 The dump is end-to-end: it launches the real main stage, loads the tracked

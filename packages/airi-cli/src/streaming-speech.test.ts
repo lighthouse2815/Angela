@@ -1,4 +1,4 @@
-import { cliMessages } from '@proj-airi/i18n/cli'
+import { cliMessages } from '@angela/i18n/cli'
 import { expect, it, vi } from 'vitest'
 
 import { StreamingSpeech } from './streaming-speech'

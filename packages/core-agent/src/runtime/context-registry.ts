@@ -1,4 +1,4 @@
-import type { MetadataEventSource } from '@proj-airi/server-shared/types'
+import type { MetadataEventSource } from '@angela/server-shared/types'
 
 import type { ContextMessage } from '../types/chat'
 

@@ -1,6 +1,6 @@
 import type { SpeechProviderWithExtraOptions } from '@xsai-ext/providers/utils'
 
-import { isGenerationProvider } from '@proj-airi/provider-inference'
+import { isGenerationProvider } from '@angela/provider-inference'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 

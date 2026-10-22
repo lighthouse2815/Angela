@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { ChatComposerController, ChatImageAttachment } from '@proj-airi/stage-ui/components/scenarios/chat'
+import type { ChatComposerController, ChatImageAttachment } from '@angela/stage-ui/components/scenarios/chat'
 
-import { ChatImageAttachmentPreview, ChatProviderSetupCallout, ChatReplyPreview, ChatSendButton, useChatImages, VoiceDrafts, VoiceInputButton } from '@proj-airi/stage-ui/components/scenarios/chat'
-import { useChatSessionStore } from '@proj-airi/stage-ui/stores/chat/session-store'
-import { useConsciousnessStore } from '@proj-airi/stage-ui/stores/modules/consciousness'
-import { useSettings } from '@proj-airi/stage-ui/stores/settings'
-import { BasicTextarea } from '@proj-airi/ui'
+import { ChatImageAttachmentPreview, ChatProviderSetupCallout, ChatReplyPreview, ChatSendButton, useChatImages, VoiceDrafts, VoiceInputButton } from '@angela/stage-ui/components/scenarios/chat'
+import { useChatSessionStore } from '@angela/stage-ui/stores/chat/session-store'
+import { useConsciousnessStore } from '@angela/stage-ui/stores/modules/consciousness'
+import { useSettings } from '@angela/stage-ui/stores/settings'
+import { BasicTextarea } from '@angela/ui'
 import { useLocalStorage } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, nextTick, ref, shallowRef, useTemplateRef, watch } from 'vue'

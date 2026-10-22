@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import { Button, GhostButton, Progress } from '@angela/ui'
 import { errorMessageFrom } from '@moeru/std'
-import { Button, GhostButton, Progress } from '@proj-airi/ui'
 import { computed, onMounted, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 

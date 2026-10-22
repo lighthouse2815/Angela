@@ -1,8 +1,8 @@
-import type { AudioPlayback, IntentHandle, PcmBlock, PlaybackGroup, PlaybackItem, PlaybackReceipt, SpeechPipelineEvents, SpeechPipelineOptions } from '@proj-airi/pipelines-audio'
+import type { AudioPlayback, IntentHandle, PcmBlock, PlaybackGroup, PlaybackItem, PlaybackReceipt, SpeechPipelineEvents, SpeechPipelineOptions } from '@angela/pipelines-audio'
 
 import type { TurnRef } from '../turn'
 
-import { createPushStream, createSpeechPipeline, createTtsSegmentStream } from '@proj-airi/pipelines-audio'
+import { createPushStream, createSpeechPipeline, createTtsSegmentStream } from '@angela/pipelines-audio'
 import { nanoid } from 'nanoid/non-secure'
 
 import { errorFromCause, errorMessageFromValue } from '../../utils/error'

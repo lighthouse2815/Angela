@@ -31,7 +31,7 @@ The endpoint requires a custom request header, same-origin access, and loopback 
 It does not enable CORS or serve configuration to remote clients. Hosted configuration is outside this scope.
 
 ```sh
-pnpm -F @proj-airi/local-config typecheck
-pnpm -F @proj-airi/local-config test
-pnpm -F @proj-airi/local-config build
+pnpm -F @angela/local-config typecheck
+pnpm -F @angela/local-config test
+pnpm -F @angela/local-config build
 ```

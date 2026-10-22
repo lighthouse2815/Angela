@@ -5,10 +5,10 @@ import type { BackgroundItem } from '../stores/background'
 
 import Color from 'colorjs.io'
 
+import { colorFromElement, patchThemeSamplingHtml2CanvasClone } from '@angela/stage-ui/libs'
+import { useSettings } from '@angela/stage-ui/stores/settings'
+import { useTheme } from '@angela/ui'
 import { withRetry } from '@moeru/std'
-import { colorFromElement, patchThemeSamplingHtml2CanvasClone } from '@proj-airi/stage-ui/libs'
-import { useSettings } from '@proj-airi/stage-ui/stores/settings'
-import { useTheme } from '@proj-airi/ui'
 import { useDocumentVisibility, useIntervalFn } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { nextTick, watch } from 'vue'

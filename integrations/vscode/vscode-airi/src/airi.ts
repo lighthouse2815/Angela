@@ -1,9 +1,9 @@
-import type { WebSocketEventOptionalSource } from '@proj-airi/server-sdk'
+import type { WebSocketEventOptionalSource } from '@angela/server-sdk'
 
 import type { Events } from './types'
 
+import { ContextUpdateStrategy, Client as ServerClient } from '@angela/server-sdk'
 import { useLogger } from '@guiiai/logg'
-import { ContextUpdateStrategy, Client as ServerClient } from '@proj-airi/server-sdk'
 import { nanoid } from 'nanoid'
 
 export class Client {

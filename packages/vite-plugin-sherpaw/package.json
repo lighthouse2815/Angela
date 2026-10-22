@@ -1,5 +1,5 @@
 {
-  "name": "@proj-airi/vite-plugin-sherpaw",
+  "name": "@angela/vite-plugin-sherpaw",
   "type": "module",
   "private": true,
   "description": "Expose remote and bundled Sherpaw speech models to Vite applications",
@@ -26,7 +26,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@proj-airi/provider-inference": "workspace:^",
+    "@angela/provider-inference": "workspace:^",
     "@proj-airi/unplugin-fetch": "catalog:"
   },
   "devDependencies": {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Button, DropdownMenu } from '@proj-airi/ui'
+import { Button, DropdownMenu } from '@angela/ui'
 import { DropdownMenuItem } from 'reka-ui'
 import { shallowRef } from 'vue'
 

@@ -1,9 +1,9 @@
-import type { SerializedIOSpan } from '@proj-airi/stage-shared/types/io-trace'
-import type { PiniaActionEvent } from '@proj-airi/stage-shared/types/pinia-action-event'
-import type { VoiceHostSnapshot } from '@proj-airi/stage-ui/services/speech/bus'
+import type { SerializedIOSpan } from '@angela/stage-shared/types/io-trace'
+import type { PiniaActionEvent } from '@angela/stage-shared/types/pinia-action-event'
+import type { VoiceHostSnapshot } from '@angela/stage-ui/services/speech/bus'
 
-import { piniaActionTracingChannelName } from '@proj-airi/stage-shared/types/pinia-action-event'
-import { voiceSnapshotChanged } from '@proj-airi/stage-ui/services/speech/bus'
+import { piniaActionTracingChannelName } from '@angela/stage-shared/types/pinia-action-event'
+import { voiceSnapshotChanged } from '@angela/stage-ui/services/speech/bus'
 
 /** Application event names that the probe reads. Playwright serializes this value into the page. */
 export interface BrowserProbeOptions {

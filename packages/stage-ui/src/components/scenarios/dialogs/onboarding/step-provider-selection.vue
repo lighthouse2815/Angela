@@ -2,7 +2,7 @@
 import type { ProviderMetadata } from '../../../../libs/providers/metadata'
 import type { OnboardingStepNextHandler, OnboardingStepPrevHandler } from './types'
 
-import { Button, ScrollableArea } from '@proj-airi/ui'
+import { Button, ScrollableArea } from '@angela/ui'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 

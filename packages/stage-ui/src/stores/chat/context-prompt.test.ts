@@ -1,6 +1,6 @@
 import type { ContextSnapshot } from './context-prompt'
 
-import { ContextUpdateStrategy } from '@proj-airi/server-sdk'
+import { ContextUpdateStrategy } from '@angela/server-sdk'
 import { describe, expect, it } from 'vitest'
 
 import { buildContextPromptMessage, formatContextPromptText } from './context-prompt'

@@ -3,7 +3,7 @@ import type { HearingInputMode } from '../../../../stores/modules/hearing'
 import type { ChatToolReference } from '../../../../types/chat'
 import type { VoiceComposerMode } from '../composables/use-voice-composer'
 
-import { BasicButton, DropdownMenu } from '@proj-airi/ui'
+import { BasicButton, DropdownMenu } from '@angela/ui'
 import { useEventListener, useIntervalFn, useLocalStorage, useNow } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import {

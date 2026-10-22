@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import AccountSettingsPage from '@proj-airi/stage-pages/pages/settings/account/account-settings-page.vue'
+import AccountSettingsPage from '@angela/stage-pages/pages/settings/account/account-settings-page.vue'
 
-import { signOut } from '@proj-airi/stage-ui/libs/auth'
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
+import { signOut } from '@angela/stage-ui/libs/auth'
+import { useAuthStore } from '@angela/stage-ui/stores/auth'
 import { useRouter } from 'vue-router'
 
 const authStore = useAuthStore()

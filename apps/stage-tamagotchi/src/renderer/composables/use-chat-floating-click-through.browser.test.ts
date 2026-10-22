@@ -18,7 +18,7 @@ const mocks = vi.hoisted(() => ({
 // process. The doubles hold the cursor still over the top-left corner and
 // record what the composable asks the window to do.
 // Removal condition: browser tests running inside an Electron renderer.
-vi.mock('@proj-airi/electron-vueuse', async () => {
+vi.mock('@angela/electron-vueuse', async () => {
   const { shallowRef } = await import('vue')
   mocks.cursor = { x: shallowRef(40), y: shallowRef(40) }
   return {

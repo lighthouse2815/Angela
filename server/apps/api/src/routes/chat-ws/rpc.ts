@@ -5,9 +5,9 @@ import type { ChatService } from '../../services/domain/chats'
 import type { ChatBroadcastCoordinator } from './broadcast'
 import type { ChatConnectionRegistry } from './connection-registry'
 
+import { parsePullMessagesRequest, parseSendMessagesRequest, pullMessages, sendMessages } from '@angela/server-sdk-shared'
 import { useLogger } from '@guiiai/logg'
 import { defineInvokeHandler } from '@moeru/eventa'
-import { parsePullMessagesRequest, parseSendMessagesRequest, pullMessages, sendMessages } from '@proj-airi/server-sdk-shared'
 
 const log = useLogger('chat-ws').useGlobalConfig()
 

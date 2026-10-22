@@ -1,10 +1,10 @@
-import type { StreamTranscriptionSnapshot } from '@proj-airi/provider-inference'
+import type { StreamTranscriptionSnapshot } from '@angela/provider-inference'
 import type { CommonRequestOptions } from '@xsai/shared'
 import type { StreamTranscriptionDelta, StreamTranscriptionResult } from '@xsai/stream-transcription'
 
 type AudioChunk = ArrayBuffer | ArrayBufferView
 
-export type { StreamTranscriptionSnapshot } from '@proj-airi/provider-inference'
+export type { StreamTranscriptionSnapshot } from '@angela/provider-inference'
 
 export type AIRIStreamTranscriptionDelta = StreamTranscriptionDelta | StreamTranscriptionSnapshot
 

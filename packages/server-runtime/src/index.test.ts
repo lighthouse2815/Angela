@@ -1,4 +1,4 @@
-import type { WebSocketBaseEvent, WebSocketEvents } from '@proj-airi/server-shared/types'
+import type { WebSocketBaseEvent, WebSocketEvents } from '@angela/server-shared/types'
 
 import type { ConsumerStickyAssignment } from './server-ws/airi/consumers'
 

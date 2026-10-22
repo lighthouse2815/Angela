@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Live2DMotionControlPose } from '@proj-airi/stage-ui-live2d/stores'
+import type { Live2DMotionControlPose } from '@angela/stage-ui-live2d/stores'
 
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'

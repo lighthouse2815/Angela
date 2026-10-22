@@ -1,7 +1,7 @@
-import type { VoiceHostSnapshot, VoiceInputCommand } from '@proj-airi/stage-ui/services/speech/bus'
+import type { VoiceHostSnapshot, VoiceInputCommand } from '@angela/stage-ui/services/speech/bus'
 
+import { getSpeechBusContext, voiceInputCommand, voiceSnapshotChanged } from '@angela/stage-ui/services/speech/bus'
 import { defineInvokeHandler } from '@moeru/eventa'
-import { getSpeechBusContext, voiceInputCommand, voiceSnapshotChanged } from '@proj-airi/stage-ui/services/speech/bus'
 import { createPinia, disposePinia } from 'pinia'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render } from 'vitest-browser-vue'
@@ -24,7 +24,7 @@ const { returnHome, setIgnoreMouseEvents, registerShortcut, unregisterShortcut, 
 }))
 
 // The inlay talks to its Electron window through these IPC composables. The cursor starts outside the page.
-vi.mock('@proj-airi/electron-vueuse', async () => {
+vi.mock('@angela/electron-vueuse', async () => {
   const { shallowRef } = await import('vue')
   const { electronInlayReturnHome, electronShortcutRegister, electronShortcutUnregister } = await import('../../../shared/eventa')
   const invokes = new Map<unknown, unknown>([

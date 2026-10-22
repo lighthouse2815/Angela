@@ -1,6 +1,6 @@
-import type { PcmBlock } from '@proj-airi/pipelines-audio'
+import type { PcmBlock } from '@angela/pipelines-audio'
 
-import { createPushStream } from '@proj-airi/pipelines-audio'
+import { createPushStream } from '@angela/pipelines-audio'
 import { expect, it } from 'vitest'
 
 import { Pcm16Encoder } from './pcm-stream'

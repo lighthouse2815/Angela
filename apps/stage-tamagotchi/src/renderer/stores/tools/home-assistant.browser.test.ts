@@ -1,8 +1,8 @@
-import type { LeadershipMode } from '@proj-airi/stage-ui/libs/pinia/setup-synced'
+import type { LeadershipMode } from '@angela/stage-ui/libs/pinia/setup-synced'
 
-import { setupSynced, usePiniaSynced } from '@proj-airi/stage-ui/libs/pinia/setup-synced'
-import { useLlmToolsStore } from '@proj-airi/stage-ui/stores/ai/chat-llm/tools'
-import { useHomeAssistantStore } from '@proj-airi/stage-ui/stores/modules/home-assistant'
+import { setupSynced, usePiniaSynced } from '@angela/stage-ui/libs/pinia/setup-synced'
+import { useLlmToolsStore } from '@angela/stage-ui/stores/ai/chat-llm/tools'
+import { useHomeAssistantStore } from '@angela/stage-ui/stores/modules/home-assistant'
 import { createPinia, disposePinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp } from 'vue'
@@ -17,7 +17,7 @@ const invokeMocks = vi.hoisted(() => ({
 }))
 
 // The renderer reaches the main process through these, and no call here needs it.
-vi.mock('@proj-airi/electron-vueuse', () => ({
+vi.mock('@angela/electron-vueuse', () => ({
   useElectronEventaInvoke: () => invokeMocks.getConfig,
 }))
 

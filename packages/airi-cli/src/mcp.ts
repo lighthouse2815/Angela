@@ -1,5 +1,5 @@
+import type { cliMessages } from '@angela/i18n/cli'
 import type { CallToolResult, Tool as McpTool } from '@modelcontextprotocol/sdk/types.js'
-import type { cliMessages } from '@proj-airi/i18n/cli'
 import type { Tool } from '@xsai/shared-chat'
 
 import process from 'node:process'
@@ -55,7 +55,7 @@ export class McpTools {
       await client.connect(new StdioClientTransport({
         command: config.computerUse ? process.execPath : config.mcpCommand!,
         args: config.computerUse
-          ? [fileURLToPath(new URL('./bin/run.mjs', import.meta.resolve('@proj-airi/computer-use-mcp')))]
+          ? [fileURLToPath(new URL('./bin/run.mjs', import.meta.resolve('@angela/computer-use-mcp')))]
           : config.mcpArgs,
         cwd: workspace,
         env: childEnv,

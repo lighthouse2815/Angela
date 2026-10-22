@@ -1,7 +1,7 @@
-import { useAnalytics } from '@proj-airi/stage-ui/composables/use-analytics'
-import { useSpeakingStore } from '@proj-airi/stage-ui/stores/audio'
-import { useChatSessionStore } from '@proj-airi/stage-ui/stores/chat/session-store'
-import { useSpeechOutputControlStore } from '@proj-airi/stage-ui/stores/speech-output-control'
+import { useAnalytics } from '@angela/stage-ui/composables/use-analytics'
+import { useSpeakingStore } from '@angela/stage-ui/stores/audio'
+import { useChatSessionStore } from '@angela/stage-ui/stores/chat/session-store'
+import { useSpeechOutputControlStore } from '@angela/stage-ui/stores/speech-output-control'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
 

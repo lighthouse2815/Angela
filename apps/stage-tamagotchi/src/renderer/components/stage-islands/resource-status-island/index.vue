@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useModelAssetStatus } from '@proj-airi/stage-ui/composables'
-import { TransitionVertical } from '@proj-airi/ui'
+import { useModelAssetStatus } from '@angela/stage-ui/composables'
+import { TransitionVertical } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import { TooltipContent, TooltipPortal, TooltipProvider, TooltipRoot, TooltipTrigger } from 'reka-ui'
 import { computed, shallowRef, watch } from 'vue'

@@ -1,6 +1,6 @@
 import type { ChatRequestOptions } from '../../types'
 
-import { isStageTamagotchi } from '@proj-airi/stage-shared'
+import { isStageTamagotchi } from '@angela/stage-shared'
 import { createOpenAI } from '@xsai-ext/providers/create'
 import { z } from 'zod'
 

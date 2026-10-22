@@ -21,7 +21,7 @@ const mocks = vi.hoisted(() => ({
 // for it: an in-memory Eventa context stands in for the IPC channel, and the
 // take and settle invokes are recorded.
 // Removal condition: browser tests running inside an Electron renderer.
-vi.mock('@proj-airi/electron-vueuse', async () => {
+vi.mock('@angela/electron-vueuse', async () => {
   const { createContext } = await import('@moeru/eventa')
   mocks.context = createContext()
   return {

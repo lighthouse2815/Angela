@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useHostEventaInvoke } from '@proj-airi/stage-host-context'
-import { ButtonBar, CheckBar, IconItem } from '@proj-airi/stage-ui/components'
-import { useSettings } from '@proj-airi/stage-ui/stores/settings'
+import { useHostEventaInvoke } from '@angela/stage-host-context'
+import { ButtonBar, CheckBar, IconItem } from '@angela/stage-ui/components'
+import { useSettings } from '@angela/stage-ui/stores/settings'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'

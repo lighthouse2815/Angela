@@ -12,7 +12,7 @@
  * policy / action-executor pipeline.
  *
  * Usage:
- *   pnpm -F @proj-airi/computer-use-mcp exec tsx ./src/bin/smoke-workflow.ts
+ *   pnpm -F @angela/computer-use-mcp exec tsx ./src/bin/smoke-workflow.ts
  */
 
 import { mkdtempSync, writeFileSync } from 'node:fs'

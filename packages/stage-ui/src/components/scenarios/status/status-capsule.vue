@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { BasicButton } from '@proj-airi/ui'
+import { BasicButton } from '@angela/ui'
 import { computed, ref } from 'vue'
 
 const props = withDefaults(defineProps<{

@@ -1,11 +1,11 @@
-import type { ChatToolCallRerunEvent } from '@proj-airi/stage-ui/stores/tool-call-rerun'
+import type { ChatToolCallRerunEvent } from '@angela/stage-ui/stores/tool-call-rerun'
 
+import { useChatVision } from '@angela/stage-ui/composables/vision/use-chat-vision'
+import { resolveLlmTools } from '@angela/stage-ui/stores/ai/chat-llm/tool-resolver'
+import { useChatSessionStore } from '@angela/stage-ui/stores/chat/session-store'
+import { useConsciousnessStore } from '@angela/stage-ui/stores/modules/consciousness'
+import { executeToolCallRerun } from '@angela/stage-ui/stores/tool-call-rerun'
 import { errorMessageFrom } from '@moeru/std'
-import { useChatVision } from '@proj-airi/stage-ui/composables/vision/use-chat-vision'
-import { resolveLlmTools } from '@proj-airi/stage-ui/stores/ai/chat-llm/tool-resolver'
-import { useChatSessionStore } from '@proj-airi/stage-ui/stores/chat/session-store'
-import { useConsciousnessStore } from '@proj-airi/stage-ui/stores/modules/consciousness'
-import { executeToolCallRerun } from '@proj-airi/stage-ui/stores/tool-call-rerun'
 
 export function useChatToolCallRerun() {
   const chatSession = useChatSessionStore()

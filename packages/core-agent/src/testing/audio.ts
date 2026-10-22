@@ -1,4 +1,4 @@
-import type { AudioInput, LiveAudioSource, PcmBlock } from '@proj-airi/pipelines-audio'
+import type { AudioInput, LiveAudioSource, PcmBlock } from '@angela/pipelines-audio'
 import type { Mock } from 'vitest'
 
 import { vi } from 'vitest'

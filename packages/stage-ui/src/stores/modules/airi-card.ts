@@ -1,13 +1,13 @@
-import type { Card, ccv3 } from '@proj-airi/ccc'
+import type { Card, ccv3 } from '@angela/ccc'
 
 import type { DocumentFields, DocumentSnapshot, DocumentSyncClient, LocalDocumentChanges } from '../../libs/document-sync'
 import type { CardModuleDefaults } from '../../services/airi-card-modules'
 import type { AiriCard, AiriExtension } from '../../types/airiCard'
 
-import localeMessages from '@proj-airi/i18n/locales'
+import localeMessages from '@angela/i18n/locales'
 
+import { useLocalStorageManualReset } from '@angela/stage-shared/composables'
 import { errorMessageFrom } from '@moeru/std'
-import { useLocalStorageManualReset } from '@proj-airi/stage-shared/composables'
 import { StorageSerializers, useDocumentVisibility, watchDebounced } from '@vueuse/core'
 import { isEqual } from 'es-toolkit'
 import { nanoid } from 'nanoid'

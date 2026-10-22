@@ -1,4 +1,4 @@
-import type { PresenceBubblePalette } from '@proj-airi/stage-shared'
+import type { PresenceBubblePalette } from '@angela/stage-shared'
 import type { InjectionKey } from 'vue'
 
 /**

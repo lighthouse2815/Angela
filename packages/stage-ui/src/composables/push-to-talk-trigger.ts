@@ -16,7 +16,7 @@ import { useHearingStore } from '../stores/modules/hearing'
  *
  * This module does not import the voice host, so windows that only show settings or chat can read it.
  */
-export const pushToTalkTriggerKey: InjectionKey<MaybeRefOrGetter<boolean>> = Symbol('@proj-airi/stage-ui/push-to-talk-trigger')
+export const pushToTalkTriggerKey: InjectionKey<MaybeRefOrGetter<boolean>> = Symbol('@angela/stage-ui/push-to-talk-trigger')
 
 /**
  * Reads whether this host has a Push to Talk trigger.

@@ -9,8 +9,8 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-import { cliMessages } from '@proj-airi/i18n/cli'
-import { LocalConfigFile } from '@proj-airi/local-config/node'
+import { cliMessages } from '@angela/i18n/cli'
+import { LocalConfigFile } from '@angela/local-config/node'
 import { afterEach, expect, it } from 'vitest'
 
 import { Memory } from './memory'

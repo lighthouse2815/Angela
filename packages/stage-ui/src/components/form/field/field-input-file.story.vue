@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FieldInputFile } from '@proj-airi/ui'
+import { FieldInputFile } from '@angela/ui'
 import { ref } from 'vue'
 
 const files = ref<File[] | undefined>(undefined)

@@ -1,6 +1,6 @@
-import en from '@proj-airi/i18n/locales/en'
+import en from '@angela/i18n/locales/en'
 
-import { useAuthStore } from '@proj-airi/stage-ui/stores/auth'
+import { useAuthStore } from '@angela/stage-ui/stores/auth'
 import { createPinia, disposePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render } from 'vitest-browser-vue'

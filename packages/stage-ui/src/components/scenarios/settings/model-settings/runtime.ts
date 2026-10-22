@@ -1,5 +1,5 @@
-import type { StageAvatarBoundsPayload, StageViewState } from '@proj-airi/stage-shared/godot-stage'
-import type { Live2DExpressionSettingsSnapshot } from '@proj-airi/stage-ui-live2d/stores/expression-store'
+import type { StageAvatarBoundsPayload, StageViewState } from '@angela/stage-shared/godot-stage'
+import type { Live2DExpressionSettingsSnapshot } from '@angela/stage-ui-live2d/stores/expression-store'
 
 import type { StageModelRenderer } from '../../../../stores/settings/stage-model'
 

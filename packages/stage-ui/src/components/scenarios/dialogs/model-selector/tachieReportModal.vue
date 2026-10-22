@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import type { TachieValidationReport } from '@proj-airi/stage-ui-tachie'
+import type { TachieValidationReport } from '@angela/stage-ui-tachie'
 
-import { Button } from '@proj-airi/ui'
+import { Button } from '@angela/ui'
 import { useMediaQuery, useResizeObserver, useScreenSafeArea } from '@vueuse/core'
 import { DialogContent, DialogOverlay, DialogPortal, DialogRoot, DialogTitle } from 'reka-ui'
 import { DrawerContent, DrawerHandle, DrawerOverlay, DrawerPortal, DrawerRoot } from 'vaul-vue'

@@ -1,4 +1,4 @@
-import type { ExtensionHost, ExtensionManifestV2 } from '@proj-airi/plugin-sdk/plugin-host'
+import type { ExtensionHost, ExtensionManifestV2 } from '@angela/plugin-sdk/plugin-host'
 
 import type {
   WidgetsAddPayload,

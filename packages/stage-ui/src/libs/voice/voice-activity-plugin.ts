@@ -1,5 +1,5 @@
-import type { TurnRef, VoicePlugin } from '@proj-airi/core-agent'
-import type { AudioWindow } from '@proj-airi/pipelines-audio'
+import type { TurnRef, VoicePlugin } from '@angela/core-agent'
+import type { AudioWindow } from '@angela/pipelines-audio'
 
 /** Application policy chooses the destination. The model only supplies scores for ordered windows. */
 export interface VoiceActivityOptions {

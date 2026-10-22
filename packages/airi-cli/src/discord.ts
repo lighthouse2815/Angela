@@ -1,6 +1,6 @@
-import type { DiscordAdapterConfig } from '@proj-airi/discord-bot'
-import type { cliMessages } from '@proj-airi/i18n/cli'
-import type { GenerationProvider } from '@proj-airi/provider-inference'
+import type { DiscordAdapterConfig } from '@angela/discord-bot'
+import type { cliMessages } from '@angela/i18n/cli'
+import type { GenerationProvider } from '@angela/provider-inference'
 
 import type { RuntimeSession } from './runtime/runtime'
 
@@ -12,9 +12,9 @@ import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { parseEnv } from 'node:util'
 
-import { conversationToChatMessages } from '@proj-airi/core-agent'
-import { DiscordAdapter } from '@proj-airi/discord-bot'
-import { getGenerationProvider, listProviders } from '@proj-airi/provider-inference'
+import { conversationToChatMessages } from '@angela/core-agent'
+import { DiscordAdapter } from '@angela/discord-bot'
+import { getGenerationProvider, listProviders } from '@angela/provider-inference'
 
 import { readConfig } from './config'
 import { AngelaRuntime } from './runtime/runtime'
