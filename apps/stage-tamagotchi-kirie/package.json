@@ -1,15 +1,14 @@
 {
-  "name": "@proj-airi/stage-tamagotchi-kirie",
+  "name": "@angela/desktop-kirie",
   "type": "module",
   "version": "0.0.0",
   "private": true,
-  "description": "LLM powered virtual character",
+  "description": "Angela desktop companion powered by Kirie",
   "author": {
-    "name": "Moeru AI",
-    "email": "airi@moeru.ai",
-    "url": "https://github.com/moeru-ai"
+    "name": "lighthouse2815",
+    "url": "https://github.com/lighthouse2815"
   },
-  "homepage": "https://airi.moeru.ai/docs/",
+  "homepage": "https://github.com/lighthouse2815/Angela",
   "scripts": {
     "build": "kirie build",
     "dev": "kirie dev",
