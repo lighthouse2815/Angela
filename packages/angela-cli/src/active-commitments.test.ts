@@ -3,8 +3,8 @@ import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { cliMessages } from '@angela/i18n/cli'
 import { chatMessagesToTurns } from '@angela/core-agent'
+import { cliMessages } from '@angela/i18n/cli'
 import { expect, it } from 'vitest'
 
 import { ActiveCommitments } from './active-commitments'
@@ -47,6 +47,25 @@ it('does not renew an expired conversation reference from another channel delive
     const batch = Array.from({ length: 9 }, (_, index) => ({ ...task, id: randomUUID(), title: `Task ${index}` }))
     await active.mention(batch, 'notification', later)
     expect(await active.resolve({ turns: [] }, batch, later)).toEqual([])
+  }
+  finally { await rm(dataDir, { recursive: true, force: true }) }
+})
+
+it('resolves only the latest focus group and never falls back after its task becomes inactive', async () => {
+  const now = Date.parse('2026-10-23T09:00:00Z')
+  const active = new ActiveCommitments()
+  const dataDir = await mkdtemp(join(tmpdir(), 'angela-focus-'))
+  try {
+    const tasks = new Tasks(dataDir, cliMessages.en.tasks, () => now, 'UTC')
+    const older = await tasks.create({ title: 'Older', type: 'todo' })
+    const latest = await tasks.create({ title: 'Latest', type: 'todo' })
+    await active.mention([older], 'conversation', now)
+    await active.mention([latest], 'notification', now)
+    expect(await active.resolve({ turns: [] }, await tasks.list({ status: 'all' }), now)).toEqual([latest])
+    await tasks.complete(latest.id)
+    expect(await active.resolve({ turns: [] }, await tasks.list({ status: 'all' }), now)).toEqual([])
+    await active.mention([older, latest], 'notification', now)
+    expect(await active.resolve({ turns: [] }, await tasks.list({ status: 'all' }), now)).toEqual([])
   }
   finally { await rm(dataDir, { recursive: true, force: true }) }
 })

@@ -110,3 +110,13 @@ Explicit snooze re-arms the same task with a new occurrence.
 Natural-language grammar remains conservative. Uncertain requests cannot create tasks through model tools.
 The scheduler and all notification wording remain independent of model availability.
 No dependency, database, broker, backend, event bus, or agent subsystem was added.
+
+## Focus and intent corrections (2026-10-23)
+
+Task creation requires a semantic task phrase. Generic `create`, `add`, and `save` do not grant task-tool authority.
+Meta framing before or after an action blocks persistence. Local extraction and task tools share the classifier.
+
+One presentation creates one focus group. A batch remains ambiguous even when only one member stays pending.
+The resolver uses only the latest group. Completed, missing, expired, or ambiguous focus never selects older pending work.
+Focus stores at most eight IDs for eight requests or six hours under an exact workspace, session, and channel.
+Version two uses a separate focus file. Existing task records and delivery leases keep their format.

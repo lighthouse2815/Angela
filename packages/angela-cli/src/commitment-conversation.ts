@@ -59,17 +59,17 @@ export class CommitmentConversation {
       ? 'completed'
       : /^(?:không cần nhắc (?:cái đó(?: nữa)?|nữa)|(?:hủy|huỷ|bỏ nhắc)(?:\s+\S.*)?)$/iu.test(controlText)
         ? 'cancelled'
-        : /^(?:(?:\d+|một|hai|ba|bốn|năm|sáu|bảy|tám|chín|mười)\s*(?:phút|tiếng|giờ)\s+nữa\s+)?nhắc lại$/iu.test(controlText) ? 'snoozed' : undefined
+        : /^(?:(?:\d+|một|hai|ba|bốn|năm|sáu|bảy|tám|chín|mười)\s*(?:phút|tiếng|giờ)\s+nữa\s+)?nhắc lại(?:\s+(?:\d+|một|hai|ba)\s*(?:phút|tiếng|giờ)\s+nữa)?$/iu.test(controlText) ? 'snoozed' : undefined
     if (!control)
       return undefined
     const rejection = durableWriteRejection(privacy, 'task', text)
     if (rejection)
       return { text: this.messages.protected }
     const all = await this.tasks.list({ status: 'all' })
-    const selection = /^(?:hoàn thành\s+việc|hủy|huỷ|bỏ nhắc)\s+(.+)$/iu.exec(controlText)?.[1]?.replace(/^việc\s+/iu, '').trim().toLocaleLowerCase()
+    const selection = /^(?:hoàn thành\s+việc|hủy|huỷ|bỏ nhắc)\s+(\S.*)$/iu.exec(controlText)?.[1]?.replace(/^việc\s+/iu, '').trim().toLocaleLowerCase()
     const named = selection ? all.filter(task => task.title.toLocaleLowerCase() === selection) : []
     let candidates = named
-    if (!candidates.length)
+    if (!selection)
       candidates = await this.active.resolve(history, all, this.tasks.now())
     if (candidates.length !== 1)
       return { text: this.messages.clarifyTask }

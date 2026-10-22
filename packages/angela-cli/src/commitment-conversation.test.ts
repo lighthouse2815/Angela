@@ -41,7 +41,7 @@ it('creates a persisted alarm, snoozes the same task, completes it and rejects f
   expect(snoozed?.task?.snoozedUntil).toBe('2026-10-22T02:00:00.000Z')
   expect(snoozed?.task?.snoozeCount).toBe(1)
   expect((await send('Tao làm xong rồi.'))?.task?.status).toBe('completed')
-  expect((await send('2 tiếng nữa nhắc lại.'))?.text).toBe(cliMessages.vi.tasks.inactive)
+  expect((await send('2 tiếng nữa nhắc lại.'))?.text).toBe(cliMessages.vi.tasks.clarifyTask)
   expect(await tasks.list()).toHaveLength(0)
 })
 
@@ -93,7 +93,7 @@ it('keeps a recent reference across an unrelated assistant reply', async () => {
   expect((await tasks.find(created!.task!.id)).status).toBe('completed')
 })
 
-it('expires references after sustained unrelated conversation and refuses multiple recent tasks', async () => {
+it('expires focus after sustained unrelated conversation and selects the latest separate event', async () => {
   const { send, tasks } = await setup()
   const created = await send('Mai 9h nhắc tôi học LINQ')
   for (let index = 0; index < 9; index++)
@@ -101,9 +101,9 @@ it('expires references after sustained unrelated conversation and refuses multip
   expect((await send('Xong rồi.'))?.text).toBe(cliMessages.vi.tasks.clarifyTask)
   expect((await tasks.find(created!.task!.id)).status).toBe('pending')
   await send('Mai 10h nhắc tôi làm auth')
-  await send('Mai 11h nhắc tôi gửi báo cáo')
-  expect((await send('Xong rồi.'))?.text).toBe(cliMessages.vi.tasks.clarifyTask)
-  expect(await tasks.list()).toHaveLength(3)
+  const latest = await send('Mai 11h nhắc tôi gửi báo cáo')
+  expect((await send('Xong rồi.'))?.task?.id).toBe(latest!.task!.id)
+  expect(await tasks.list()).toHaveLength(2)
 })
 
 it('does not mistake words in the control phrase for an explicitly named task', async () => {

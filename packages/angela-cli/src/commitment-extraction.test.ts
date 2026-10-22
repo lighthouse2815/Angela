@@ -88,3 +88,11 @@ it('uses local dates across midnight and asks about past times or DST ambiguity'
   expect(parseReminderTime('8/3/2026 2:30', Date.parse('2026-03-07T00:00:00Z'), 'America/New_York').status).toBe('clarify')
   expect(parseReminderTime('1/11/2026 1:30', Date.parse('2026-10-31T00:00:00Z'), 'America/New_York').status).toBe('clarify')
 })
+
+it.each(['Create a task to study LINQ.', 'Add a reminder for tomorrow at 9.', 'Save this as a task.', 'Schedule a reminder.', 'Add a todo.'])('authorizes semantic task phrases: %s', (text) => {
+  expect(classifyCommitmentIntent(text)).toBe('create')
+})
+it.each(['Create a parser for reminder syntax.', 'Add validation for reminder timestamps.', 'Nhắc tôi học lúc 9h là một ví dụ hợp lệ.'])('rejects technical objects and suffix meta framing: %s', (text) => {
+  expect(extractCommitment(text, now, zone).isCommitment).toBe(false)
+  expect(classifyCommitmentIntent(text)).not.toBe('create')
+})
