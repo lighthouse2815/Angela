@@ -299,7 +299,7 @@ export class RuntimeSession {
       return JSON.stringify(await (await this.recall())?.enrich(this.runtime.model, this.runtime.provider, signal))
     if (/^\/(?:tasks|today|done|cancel|snooze)(?:\s|$)/u.test(text)) {
       const { taskCommand } = await import('../task-commands')
-      return await taskCommand(text, await this.tasks(), this.runtime.messages.tasks, this.options.locale ?? 'en')
+      return await taskCommand(text, await this.tasks(), this.runtime.messages.tasks, this.options.locale ?? 'en', task => this.recordDomain({ type: text.startsWith('/done ') ? 'task.completed' : 'task.updated', taskId: task.id }, `${task.title} [${task.status}] ${task.id}`))
     }
     if (/^\/project(?:\s|$)/u.test(text) && this.options.channel === 'cli')
       return await (await this.project()).command(text)
@@ -319,6 +319,25 @@ export class RuntimeSession {
       return response
     }
     return undefined
+  }
+
+  private async recordDomain(payload: EventPayload, evidence: string) {
+    let workspace = this.options.workspace
+    try {
+      if (this.options.channel === 'cli' || this.options.channel === 'desktop')
+        workspace = (await this.project()).workspace
+    }
+    catch { this.options.warn?.(this.runtime.messages.projectMemoryUnavailable) }
+    const event: AngelaEvent = { ...payload, id: randomUUID(), timestamp: new Date().toISOString(), correlationId: randomUUID(), sessionId: this.options.sessionId, channel: this.options.channel, workspace }
+    this.runtime.events.emit(event)
+    try {
+      if (this.options.channel !== 'discord') {
+        const capture = await (await this.recall())?.capture()
+        capture?.record(event, evidence, true)
+        capture?.finish('')
+      }
+    }
+    catch { this.options.warn?.(this.runtime.messages.memoryUnavailable) }
   }
 
   /**

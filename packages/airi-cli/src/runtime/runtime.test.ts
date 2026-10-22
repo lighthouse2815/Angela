@@ -14,6 +14,7 @@ import { afterEach, expect, it, vi } from 'vitest'
 import { Chat } from '../chat'
 import { McpTools } from '../mcp'
 import { Recall } from '../recall'
+import { RecallIndex } from '../recall-index'
 import { AngelaRuntime } from './runtime'
 
 const directories: string[] = []
@@ -27,6 +28,33 @@ afterEach(async () => {
 function completion(text: string) {
   return new Response(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', content: text }, finish_reason: 'stop' }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } })
 }
+
+it('captures successful task commands without model calls or cross-user observations', async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>(async () => completion('Unused'))
+  const { runtime, options, directory } = await setup(fetch)
+  const scope = runtime.open(options)
+  const events: AngelaEvent[] = []
+  runtime.events.on('task.completed', event => events.push(event))
+  runtime.events.on('task.updated', event => events.push(event))
+  const task = await (await scope.tasks()).create({ title: 'Ship the copper release', type: 'todo' })
+  await scope.command('/done invalid-id')
+  expect(events).toEqual([])
+  await scope.command(`/done ${task.id}`)
+  expect(events).toHaveLength(1)
+  expect(events[0]).toMatchObject({ type: 'task.completed', taskId: task.id, channel: 'telegram', sessionId: options.sessionId })
+  expect(events[0]?.correlationId).toBeTruthy()
+  expect(JSON.stringify(events)).not.toContain(task.title)
+  const index = await RecallIndex.open(directory)
+  try {
+    const episode = index.memory.current(directory, 'episodic', `session:${options.sessionId}`)
+    expect(episode?.body).toContain('Completed:')
+    expect(episode?.body).toContain(task.title)
+    expect(index.memory.observations(directory, 'another-session')).toEqual([])
+  }
+  finally { index.close() }
+  expect(fetch).not.toHaveBeenCalled()
+  await scope.close()
+})
 
 async function setup(fetch: typeof globalThis.fetch = async () => completion('Hello')) {
   const directory = await mkdtemp(join(tmpdir(), 'angela-runtime-'))

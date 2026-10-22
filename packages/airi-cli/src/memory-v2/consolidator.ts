@@ -32,7 +32,7 @@ export class MemoryConsolidator {
     }
     if (previous) {
       for (const line of previous.body.split('\n')) {
-        const match = /^(User|Decision|Completed|Failed|Fact|Workflow|Next step|Tool|Commitment|Artifact): (.+)$/u.exec(line)
+        const match = /^(User|Decision|Completed|Task|Failed|Fact|Workflow|Next step|Tool|Commitment|Artifact): (.+)$/u.exec(line)
         if (match)
           append(match[1]!, match[2]!)
       }
@@ -49,6 +49,8 @@ export class MemoryConsolidator {
         append('Tool', text)
       else if (item.type === 'task.completed')
         append('Completed', text)
+      else if (item.type === 'task.created' || item.type === 'task.updated')
+        append('Task', text)
       else if (item.type === 'project.changed')
         append('Decision', text)
       else if (item.type === 'memory.changed')
@@ -56,7 +58,7 @@ export class MemoryConsolidator {
       else if (item.type === 'assistant.message')
         append('Commitment', `Assistant report, unverified: ${text}`)
     }
-    const labels = ['Decision', 'Completed', 'Failed', 'Fact', 'Workflow', 'Next step', 'Artifact', 'User', 'Tool', 'Commitment']
+    const labels = ['Decision', 'Completed', 'Failed', 'Fact', 'Workflow', 'Task', 'Next step', 'Artifact', 'User', 'Tool', 'Commitment']
     const body = [`Goal: ${goal}`, ...labels.flatMap(label => groups.get(label)?.map(text => `${label}: ${text}`) ?? [])].join('\n').slice(0, 24_000)
     return this.store.write({ tier: 'episodic', kind: 'session', scope, key: `session:${sessionId}`, title: goal.slice(0, 160), body, abstract: goal, authority: 'episode', salience: groups.has('Decision') || groups.has('Completed') ? 1.5 : 0.75, sourceSessionId: sessionId, expectedVersion: previous?.version ?? null })
   }

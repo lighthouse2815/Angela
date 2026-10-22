@@ -40,7 +40,7 @@ export function keepTokens(body: string) {
 export function compact(page: Pick<MemoryPage, 'body' | 'abstract'>) {
   const facts = keepTokens(page.body)
   const lines = page.body.split(/\r?\n/u)
-  const decisions = lines.filter(line => /^(?:Decision|Fact|Next step|Goal|Failed|Completed|User|Project|Workflow|Name|Date):/iu.test(line)).slice(0, 20).map(line => line.slice(0, 400))
+  const decisions = lines.filter(line => /^(?:Decision|Fact|Next step|Goal|Failed|Completed|Task|User|Project|Workflow|Name|Date):/iu.test(line)).slice(0, 20).map(line => line.slice(0, 400))
   const summary = page.abstract || lines.find(line => line.trim() && !line.startsWith('#')) || ''
   return [summary.slice(0, 500), ...decisions, ...facts.map(fact => `- ${fact}`)].join('\n').slice(0, 12_000)
 }

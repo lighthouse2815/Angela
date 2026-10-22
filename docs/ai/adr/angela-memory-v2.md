@@ -86,6 +86,7 @@ Session boundaries follow runtime acquisition and release. Request boundaries ha
 Observer failures cannot interrupt model execution or prevent other observers from receiving an event.
 Successful reminder presentation emits a correlated delivery event. The existing lease and acknowledgment policy remains in the scheduler.
 Project observations include the checkpoint that the host actually saved, rather than only a tool name.
+Successful task commands also emit domain events and capture their saved result without a provider call. Invalid commands emit no success event.
 The compiler preserves literal diagnostics beyond its prose excerpt, then prioritizes decisions and failures within the summary budget.
 Cold aging runs in bounded idle indexing passes. `/memory age` also runs one explicit pass.
 Foreground context preparation pauses new background embedding batches and compaction passes.
