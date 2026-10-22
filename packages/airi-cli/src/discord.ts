@@ -2,6 +2,8 @@ import type { DiscordAdapterConfig } from '@proj-airi/discord-bot'
 import type { cliMessages } from '@proj-airi/i18n/cli'
 import type { GenerationProvider } from '@proj-airi/provider-inference'
 
+import type { RuntimeSession } from './runtime/runtime'
+
 import process from 'node:process'
 
 import { createHash } from 'node:crypto'
@@ -16,6 +18,7 @@ import { getGenerationProvider, listProviders } from '@proj-airi/provider-infere
 
 import { Chat } from './chat'
 import { readConfig } from './config'
+import { AngelaRuntime } from './runtime/runtime'
 import { Sessions } from './sessions'
 
 type Input = Parameters<NonNullable<DiscordAdapterConfig['respond']>>[0]
@@ -33,6 +36,8 @@ function isGatewayDiagnostic(text: string) {
 export class DiscordChat {
   private readonly pending = new Map<string, Set<Promise<string>>>()
   private readonly shutdown = new AbortController()
+  private readonly runtime: AngelaRuntime
+  private readonly ownsRuntime: boolean
 
   constructor(
     private readonly provider: GenerationProvider,
@@ -40,7 +45,11 @@ export class DiscordChat {
     private readonly sessions: Sessions,
     private readonly workspace: string,
     private readonly messages: typeof cliMessages.en,
-  ) {}
+    runtime?: AngelaRuntime,
+  ) {
+    this.ownsRuntime = !runtime
+    this.runtime = runtime ?? new AngelaRuntime(model, provider, messages)
+  }
 
   /** Keeps voice and text histories separate. Shutdown and call interruption cancel active and queued requests. */
   respond(input: Input, signal: AbortSignal): Promise<string> {
@@ -52,7 +61,7 @@ export class DiscordChat {
     const kind = 'voiceRequestId' in context ? 'voice' : 'text'
     const key = JSON.stringify([kind, context.guildId, context.channelId])
     const queue = this.pending.get(key) ?? new Set<Promise<string>>()
-    if (queue.size >= 4)
+    if (queue.size >= 4 || (!this.pending.has(key) && this.pending.size >= 8))
       return Promise.reject(new Error(this.messages.discordBusy))
     this.pending.set(key, queue)
     const previous = [...queue].at(-1)
@@ -63,12 +72,14 @@ export class DiscordChat {
       const hex = createHash('sha256').update(`angela:discord:${key}`).digest('hex')
       const id = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-8${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`
       const session = await this.sessions.open(this.workspace, id, { recoverAbandoned: true })
+      let scope: RuntimeSession | undefined
       try {
+        scope = this.runtime.open({ dataDir: this.sessions.directory, workspace: this.workspace, sessionId: id, channel: 'discord' })
         const chat = new Chat(this.model, this.provider, this.workspace, session.restore(), false, 32_000, this.messages)
         let answer = ''
-        await session.save(chat.conversation, true)
+        await session.saveChat(chat, true)
         try {
-          await chat.send(`${input.overrides?.messagePrefix ?? ''}${input.text}`, {
+          await scope.send(chat, `${input.overrides?.messagePrefix ?? ''}${input.text}`, {
             abortSignal: requestSignal,
             // Keep historical service failures on disk, but exclude them from model context before compaction.
             prepareConversation: async conversation => ({
@@ -89,16 +100,21 @@ export class DiscordChat {
             chat.conversation.turns.pop()
             throw new Error(this.messages.discordFailed)
           }
-          await session.save(chat.conversation, false)
+          await session.saveChat(chat, false)
           return answer
         }
         catch (error) {
-          await session.save(chat.conversation, true)
+          await session.saveChat(chat, true)
           throw error
         }
       }
       finally {
-        await session.close()
+        try {
+          await scope?.close()
+        }
+        finally {
+          await session.close()
+        }
       }
     })()
     queue.add(result)
@@ -114,6 +130,8 @@ export class DiscordChat {
   async close() {
     this.shutdown.abort()
     await Promise.allSettled([...this.pending.values()].flatMap(queue => [...queue]))
+    if (this.ownsRuntime)
+      await this.runtime.close()
   }
 }
 
@@ -121,7 +139,7 @@ export class DiscordChat {
  * Runs Discord with the CLI's saved provider, without a desktop client or server-channel process.
  *
  * Call stack:
- * runDiscord -> DiscordAdapter -> DiscordChat.respond -> Chat.send -> core-agent.streamFrom
+ * runDiscord -> DiscordAdapter -> DiscordChat.respond -> RuntimeSession.send -> Chat.send -> core-agent.streamFrom
  *                                                     -> Sessions -> local session files
  */
 export async function runDiscord(args: string[], env: NodeJS.ProcessEnv) {
