@@ -313,7 +313,8 @@ Added or extended tests cover:
 
 ### Final validation
 
-- `pnpm --config.verify-deps-before-run=false -F @angela/cli test --maxWorkers=2`: **PASS**, 72 files, 812 tests.
+- `pnpm --config.verify-deps-before-run=false -F @angela/cli test --maxWorkers=2`: **PASS**, 72 files, 812 tests before the final two-line authorization refinement.
+- `../../node_modules/.bin/vitest run --config vitest.config.ts --maxWorkers=2` from `packages/angela-cli`: **PASS**, 72 files, 814 tests after the final refinement.
 - `pnpm --config.verify-deps-before-run=false -F @angela/cli typecheck`: **PASS** when run after i18n build completes.
 - `pnpm --config.verify-deps-before-run=false -F @angela/cli build`: **PASS**.
 - `pnpm --config.verify-deps-before-run=false -F @angela/i18n typecheck`: **PASS**.
