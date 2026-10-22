@@ -52,7 +52,7 @@ If `/json/list` does not contain a window that the user says exists, do not assu
 
 The CDP port is project- and run-command-specific. Do not assume `9222`, `9250`, or any other value is universal. If an Electron process is running but no CDP port responds, tell the user to relaunch the app with the project's remote-debug environment variables or launch flags.
 
-For Angela stage-tamagotchi on POSIX shells:
+For Angela desktop on POSIX shells:
 
 ```bash
 APP_REMOTE_DEBUG=true APP_REMOTE_DEBUG_PORT=9250 pnpm dev:tamagotchi
@@ -163,7 +163,7 @@ The `9250` examples below assume the app was started by the person running it wi
 APP_REMOTE_DEBUG=true APP_REMOTE_DEBUG_PORT=9250 pnpm dev:tamagotchi
 ```
 
-That port is not intrinsic to Angela or Electron. It depends on the current command and environment. Most stage-tamagotchi code lives under `apps/desktop`; inspect that app's Electron startup and window code when the port, routes, or remote-debug behavior differ.
+That port is not intrinsic to Angela or Electron. It depends on the current command and environment. Most desktop code lives under `apps/desktop`; inspect that app's Electron startup and window code when the port, routes, or remote-debug behavior differ.
 
 Relevant files:
 - `apps/desktop/src/main/windows/chat/index.ts`

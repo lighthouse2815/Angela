@@ -10,7 +10,7 @@ Keep product routes, selectors, window identities, and interaction scenarios in 
 ## Workflow
 
 1. Identify the Electron package, built main entrypoint, requested window and state, and output directory supplied by the caller.
-2. Search for an existing `defineScenario` module. In Angela, start with `packages/scenarios-stage-tamagotchi-electron`.
+2. Search for an existing `defineScenario` module. In Angela, start with `packages/scenarios-desktop-electron`.
 3. Build the application when its main entrypoint is absent or stale. For a production/file renderer, wait for the repository build command to exit successfully. Pass `--settle-ms 2500` so Vishot waits through Vite bundling or renderer reloads; Vishot intentionally has no default delay.
 4. Run the product scenario with `vishot capture --target electron`.
 5. When no scenario is needed, use Vishot's direct window capture:

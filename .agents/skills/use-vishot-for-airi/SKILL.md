@@ -1,23 +1,23 @@
 ---
 name: use-vishot-for-airi
-description: Run Angela-owned Vishot scenarios for stage-web or stage-tamagotchi, including skipping first-run onboarding and importing a local Live2D, VRM, or MMD display model before capture. Use when Angela visual evidence must exercise a contributor-supplied avatar file instead of a preset model.
+description: Run Angela-owned Vishot scenarios for stage-web or desktop, including skipping first-run onboarding and importing a local Live2D, VRM, or MMD display model before capture. Use when Angela visual evidence must exercise a contributor-supplied avatar file instead of a preset model.
 ---
 
 # Use Vishot for Angela
 
-Invoke `$use-vishot`, `$use-vishot-with-electron`, and `$use-vishot-with-input-file`. Reuse the product helper at `packages/scenarios-stage-tamagotchi-electron/src/scenarios/display-model-from-file.ts`.
+Invoke `$use-vishot`, `$use-vishot-with-electron`, and `$use-vishot-with-input-file`. Reuse the product helper at `packages/scenarios-desktop-electron/src/scenarios/display-model-from-file.ts`.
 
 ## Local model capture
 
 Build Electron, then pass the model path and explicit format through the environment:
 
 ```bash
-pnpm build:tamagotchi
+pnpm build:desktop
 
 AIRI_DISPLAY_MODEL_FORMAT=live2d \
 AIRI_DISPLAY_MODEL_PATH='/Users/neko/Pictures/Angela 静态资产/形象 - Iru/Live2D/Iru v2.0 @ Angela 运行文件.zip' \
 pnpm exec vishot capture \
-  ./packages/scenarios-stage-tamagotchi-electron/src/scenarios/display-model-from-file.ts \
+  ./packages/scenarios-desktop-electron/src/scenarios/display-model-from-file.ts \
   --target electron \
   --app-entrypoint ./apps/desktop/out/main/index.js \
   --cwd . \

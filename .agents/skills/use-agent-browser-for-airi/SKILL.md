@@ -1,6 +1,6 @@
 ---
 name: use-agent-browser-for-airi
-description: Test Angela display-model imports with agent-browser across stage-tamagotchi Electron, stage-web, and stage-pocket mobile web layouts. Use when uploading and verifying contributor-supplied Live2D ZIP, VRM, or MMD ZIP/PMX/PMD files through Angela's model selector, including onboarding bypass, format-specific import behavior, renderer verification, and mobile-platform coverage decisions.
+description: Test Angela display-model imports with agent-browser across desktop Electron, stage-web, and stage-pocket mobile web layouts. Use when uploading and verifying contributor-supplied Live2D ZIP, VRM, or MMD ZIP/PMX/PMD files through Angela's model selector, including onboarding bypass, format-specific import behavior, renderer verification, and mobile-platform coverage decisions.
 ---
 
 # Use Agent Browser for Angela
@@ -9,7 +9,7 @@ Invoke `$agent-browser` and `$use-agent-browser-with-input-file`. The input-file
 
 Select the runtime guide:
 
-- Electron stage-tamagotchi: read [references/electron.md](references/electron.md).
+- Electron desktop: read [references/electron.md](references/electron.md).
 - stage-web: read [references/web.md](references/web.md).
 - stage-pocket and mobile coverage: read [references/mobile.md](references/mobile.md).
 

@@ -1,12 +1,16 @@
 # stage-pocket and mobile coverage
 
+The mobile source is deferred at `../dev-in-future/apps/stage-pocket`, outside this Git repository.
+Before using these commands, restore its workspace, catalog entries, and paths through `../dev-in-future/README.md`.
+The current workspace cannot run the mobile commands. The deferred package retains its actual private package name.
+
 ## Browser-driven mobile layout
 
 Run stage-pocket's web surface on a dedicated HTTPS port:
 
 ```bash
 pnpm -F @proj-airi/stage-pocket dev:web --host 127.0.0.1 --port 5174
-agent-browser --session airi-pocket-web --ignore-https-errors open https://127.0.0.1:5174/settings/models
+agent-browser --session angela-pocket-web --ignore-https-errors open https://127.0.0.1:5174/settings/models
 ```
 
 Set a desktop-width viewport while operating the settings page if controls are present in the DOM but visually outside the compact layout:

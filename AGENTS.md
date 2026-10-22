@@ -11,7 +11,7 @@ All apps use Vue 3, Vite, TypeScript, Pinia, VueUse, UnoCSS, Vitest, and ESLint.
 | `apps/stage-web` | The web app. It uses Vue Router. |
 | `apps/desktop` | The Electron desktop app. |
 | `../dev-in-future/apps/stage-pocket` | The mobile app. It uses Vue Router, Capacitor, Kotlin, and Swift. |
-| `packages/stage-ui` | Business components, composables, and stores that stage-web and stage-tamagotchi share. |
+| `packages/stage-ui` | Business components, composables, and stores that stage-web and desktop share. |
 | `packages/stage-ui-three` | Three.js bindings and Vue components. |
 | `packages/stage-shared` | Logic that the stage packages and the stage apps share. |
 | `packages/stage-pages` | Shared page bases. |
@@ -51,12 +51,12 @@ The API and shared server packages remain active because desktop imports their c
 
 Use pnpm workspace filters to limit a command to one workspace. Replace `<package name>` with the current `name` field in `package.json`. Some packages still use transitional workspace names and must be referenced exactly until the namespace migration is complete.
 
-- Typecheck one workspace: `pnpm -F <package name> typecheck`. For stage-tamagotchi, this command runs `tsc` and `vue-tsc`.
+- Typecheck one workspace: `pnpm -F <package name> typecheck`. For desktop, this command runs `vue-tsc`.
 - Test one file: `pnpm exec vitest run <path>`.
 - Test one workspace: `pnpm -F <package name> exec vitest run`.
 - Test all projects: `pnpm test:run`. If Vitest finds no tests, examine the `include` patterns in `vitest.config.ts`.
 - Lint: `pnpm lint`. ESLint also does the formatting. To fix lint and format errors, run `pnpm lint:fix`.
-- Build one workspace: `pnpm -F <package name> build`. For stage-tamagotchi, this command runs the typecheck and `electron-vite build`.
+- Build one workspace: `pnpm -F <package name> build`. For desktop, run the separate typecheck before `electron-vite build`.
 
 ## Scope and Checks
 
@@ -161,7 +161,7 @@ Skills are in `.agents/skills/<name>/SKILL.md`. Read the listed file before you 
 | Analyze why a chat, speech, or audio turn was slow or failed, using saved IO traces | [`analyze-io-traces`](.agents/skills/analyze-io-traces/SKILL.md) |
 | Create or prepare a pull request | [`create-pr`](.agents/skills/create-pr/SKILL.md) |
 | Upload a local file through a file input or a file chooser in a web or Electron app | [`use-agent-browser-with-input-file`](.agents/skills/use-agent-browser-with-input-file/SKILL.md) and [`agent-browser`](.agents/skills/agent-browser/SKILL.md). For Electron, also read [`agent-browser-electron`](.agents/skills/agent-browser-electron/SKILL.md). |
-| Test Live2D, VRM, or MMD import and rendering in stage-web, stage-tamagotchi, or stage-pocket | [`use-agent-browser-for-airi`](.agents/skills/use-agent-browser-for-airi/SKILL.md) |
+| Test Live2D, VRM, or MMD import and rendering in stage-web, desktop, or stage-pocket | [`use-agent-browser-for-airi`](.agents/skills/use-agent-browser-for-airi/SKILL.md) |
 
 These directories also have their own `AGENTS.md`. Read it before you work in the directory:
 
