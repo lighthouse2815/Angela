@@ -62,7 +62,7 @@ Personal preferences continue through `personal_memory`. Inferred technical page
 `/memory purge memory:<id>` removes a page claim, all its versions, and downstream derived pages.
 Personal corrections and forget operations also remove captured copies and matching history projections.
 Identity-only session tombstones prevent late events or reindexing from restoring forgotten facts.
-The affected session's automatic captures stop. This favors privacy over retention of its other captured details.
+Forget blocks earlier request correlations while fresh requests can create new memory. Deleted session identities stay blocked.
 User-visible conversation archives retain their existing explicit `angela sessions delete <id>` lifecycle.
 Deleting an archive also purges its Memory V2 derivatives.
 
@@ -90,3 +90,25 @@ The compiler preserves literal diagnostics beyond its prose excerpt, then priori
 Cold aging runs in bounded idle indexing passes. `/memory age` also runs one explicit pass.
 Foreground context preparation pauses new background embedding batches and compaction passes.
 If an optional memory file is invalid, the runtime omits its tools and continues the conversation with a warning.
+
+## SQLite performance and cleanup
+
+The connection uses WAL, `synchronous=FULL`, a three-second busy timeout, and a 512-page automatic checkpoint.
+Prepared statement caches contain at most 48 entries per owner. They cache compiled SQL, never personal text or search results.
+File reconciliation prunes at most 32 origins per transaction and yields between batches.
+Page projections remain outside file pruning. Unchanged source text retains vectors, and version guards reject stale embedding writes.
+
+Reinforcement checks its SQL cooldown before acquiring the writer lock.
+Automatic context excludes this session's own episode because Chat already owns its working history.
+Explicit recall can still retrieve that episode. Only memory actually selected for context receives reinforcement.
+Session checkpoint versions preserve their existing access history.
+
+A scoped aging cursor advances past old reinforced episodes and survives adapter release.
+Idle passes inspect four candidates. Explicit aging inspects at most 128 candidates.
+The scoped aging index covers its time and ID cursor. No separate last-access index or speculative duplicate index is required.
+
+Forget traverses derivation and supersession together. It deletes projections, vectors, source observations, and edges in one transaction.
+Source-session deletion preserves later independent explicit knowledge.
+Identity-only blocked correlations stop late results. Fresh requests after forgetting remain eligible for capture.
+Destructive operations checkpoint obsolete WAL frames before returning success.
+If an external reader prevents that checkpoint, cleanup reports an error and requires a retry after the reader releases its snapshot.

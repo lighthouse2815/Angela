@@ -50,3 +50,23 @@ it('preserves page projections during file reconciliation and enforces exact-rea
     await rm(directory, { recursive: true, force: true })
   }
 })
+
+it('keeps the current episode available to explicit recall without duplicating working memory in automatic context', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'angela-working-memory-'))
+  const index = await RecallIndex.open(directory)
+  const episode = index.memory.write({ tier: 'episodic', kind: 'session', scope: directory, key: 'session:session', title: 'Working episode', body: 'UniqueCurrentEpisodeMarker', authority: 'episode', sourceSessionId: 'session' })
+  const recall = new Recall(directory, directory, 'session', cliMessages.en, {}, { apiKey: '' })
+  try {
+    await recall.start()
+    const prepared = await recall.prepare('UniqueCurrentEpisodeMarker')
+    expect(prepared.context).not.toContain('UniqueCurrentEpisodeMarker')
+    expect(index.memory.read(episode.id, directory)?.accessCount).toBe(0)
+    expect(await recall.search('UniqueCurrentEpisodeMarker')).toHaveLength(1)
+    expect(index.memory.read(episode.id, directory)?.accessCount).toBe(1)
+  }
+  finally {
+    await recall.close()
+    index.close()
+    await rm(directory, { recursive: true, force: true })
+  }
+})

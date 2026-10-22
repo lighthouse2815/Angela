@@ -18,12 +18,13 @@ export function keepTokens(body: string) {
   const facts = new Set<string>()
   const patterns = [
     /https?:\/\/[^\s<>()[\]"'`]+/gu,
-    /(?:\b|\/)(?:[\w.-]+\/)+[\w.-]+\.\w+\b/gu,
-    /\b[\w.-]+\.(?:ts|tsx|js|json|md|sql|yaml|yml|py|rs|toml)\b/gu,
+    /(?:\b|\/)(?:[\w.-]{1,128}\/){1,16}[\w.-]{1,128}\.\w{1,16}\b/gu,
+    /\b[\w.-]{1,128}\.(?:ts|tsx|js|json|md|sql|yaml|yml|py|rs|toml)\b/gu,
     /\b(?:E\d{2,4}|HTTP\s?\d{3}|ERR_[A-Z_]+|\d{4}-\d{2}-\d{2})\b/gu,
     /\b[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}\b/giu,
     /`([^`\n]{2,128})`/gu,
-    /\b[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+\b/gu,
+    /\b[A-Z][A-Z0-9]{0,64}(?:_[A-Z0-9]{1,64}){1,8}\b/gu,
+    /\b(?:[a-z][a-z0-9]{0,64}_[a-z0-9_]{1,128}|[a-z][a-z0-9]{0,64}[A-Z][A-Za-z0-9]{1,128})\b/gu,
   ]
   for (const pattern of patterns) {
     for (const match of body.matchAll(pattern)) {
