@@ -414,15 +414,15 @@ describe('javaScriptPlanner', () => {
     expect(planned.actions).toHaveLength(0)
   })
 
-  it('bridges Angela notification callbacks through the isolate', async () => {
+  it.each(['Angela', 'Airi'])('bridges %s notification callbacks through the isolate', async (name) => {
     const planner = new JavaScriptPlanner()
     const executeAction = vi.fn(async action => `ok:${action.tool}`)
     const notifyAngela = vi.fn()
     const updateAngelaContext = vi.fn()
 
     const planned = await planner.evaluate(`
-      notifyAngela('Need help', 'Low health', 'immediate')
-      updateAngelaContext('Shelter built', ['shelter', 'spawn'], 'memory')
+      notify${name}('Need help', 'Low health', 'immediate')
+      update${name}Context('Shelter built', ['shelter', 'spawn'], 'memory')
       return 'ok'
     `, actions, {
       ...globals,

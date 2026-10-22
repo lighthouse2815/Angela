@@ -1342,6 +1342,10 @@ globalThis.updateAngelaContext = __plannerAvailability.updateAngelaContext
   ? (text, hints, lane) => __plannerCallBridge('updateAngelaContext', [text, hints, lane])
   : null
 
+// Saved planner scripts use these supported aliases of the same host callbacks.
+globalThis.notifyAiri = globalThis.notifyAngela
+globalThis.updateAiriContext = globalThis.updateAngelaContext
+
 delete globalThis.querySeed
 delete globalThis.llmLogSeed
 delete globalThis.historySeed
