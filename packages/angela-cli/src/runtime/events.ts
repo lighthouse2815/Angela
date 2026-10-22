@@ -5,12 +5,13 @@ export interface BaseAngelaEvent {
   correlationId: string
   sessionId?: string
   workspace?: string
-  channel?: 'cli' | 'telegram' | 'discord' | 'desktop' | 'system'
+  channel?: 'cli' | 'telegram' | 'discord' | 'desktop' | 'zalo' | 'system'
 }
 
 /** Lifecycle messages contain metadata only. Prompts, generated text, arguments, and results remain request-local. */
 export type AngelaEvent = BaseAngelaEvent & (
   | { type: 'user.message' }
+  | { type: 'external.message' }
   | { type: 'assistant.message' }
   | { type: 'tool.call', toolCallId: string, toolName: string }
   | { type: 'tool.result', toolCallId: string, toolName: string, outcome: 'verified' | 'unverified' | 'failed' }

@@ -166,3 +166,12 @@ packages/i18n/glossary/glossary.tbx
 # Sherpaw models downloaded by the Vite plugin
 apps/*/public/sherpaw/
 apps/*/src/renderer/public/sherpaw/
+
+# Zalo personal session material and account-scoped external message logs
+**/zalo-credentials.json
+**/zalo-login-qr.png
+**/zalo-host.lock
+**/zalo/*.tmp
+**/zalo/*/*.tmp
+**/zalo/*/messages/
+**/zalo/*/away.json
