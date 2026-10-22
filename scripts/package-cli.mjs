@@ -42,7 +42,7 @@ try {
   if (!values['skip-build'])
     await run('pnpm', ['run', 'build:cli'])
   // This flag applies only to deployment. The dedicated lockfile preserves pinned versions without changing workspace installation settings.
-  await run('pnpm', ['--filter', '@proj-airi/airi-cli', '--config.inject-workspace-packages=true', 'deploy', '--prod', '--ignore-scripts', output])
+  await run('pnpm', ['--filter', '@angela/cli', '--config.inject-workspace-packages=true', 'deploy', '--prod', '--ignore-scripts', output])
   await mkdir(join(output, 'resources', 'openseeface'), { recursive: true })
   await mkdir(join(output, 'services', 'voice-local'), { recursive: true })
   for (const file of ['tracker.py', 'retinaface.py', 'remedian.py', 'similaritytransform.py', 'models', 'LICENSE', 'Licenses', 'README.md'])
