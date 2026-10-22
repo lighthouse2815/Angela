@@ -76,9 +76,10 @@ it('suppresses an equivalent task before delivery and keeps workspace dedupe iso
   await notice('Auth vẫn lỗi.', 'other-workspace')
   expect(await loops.list()).toHaveLength(2)
   const tasks = new Tasks(directory, cliMessages.en.tasks, clock, 'UTC')
-  const task = await tasks.create({ title: 'fix auth', type: 'reminder', dueAt: '2026-10-24T09:00:00Z' })
+  const task = await tasks.create({ title: 'fix auth', type: 'reminder', dueAt: '2026-10-24T09:00:00Z' }, { scope: directory, sourceSessionId: 'session' })
   await loops.reconcile([task])
   expect((await loops.list()).find(loop => loop.id === first?.id)).toMatchObject({ state: 'dismissed', supersededByTaskId: task.id })
+  expect((await loops.list()).find(loop => loop.workspace === 'other-workspace')?.state).toBe('open')
   advance(5)
   expect(await loops.claim(first!.id)).toBeUndefined()
   expect((await tasks.find(task.id)).status).toBe('pending')
@@ -125,4 +126,23 @@ it('retains prompt caps on repeated active mentions and bounds frequent conversa
   expect((await loops.activity()).lastActivityAt).toBe(Date.parse(saved.activity.at(-1)) + 3_600_000)
   advance(8)
   expect(await loops.claim(loop.id)).toBeUndefined()
+})
+
+it('requires compatible workspace provenance before suppression in a shared task store', async () => {
+  const { loops, notice, directory, clock } = await setup()
+  const first = (await notice('Auth vẫn lỗi.', 'workspace-a'))!
+  const second = (await notice('Auth vẫn lỗi.', 'workspace-b'))!
+  const tasks = new Tasks(directory, cliMessages.en.tasks, clock, 'UTC')
+  const task = await tasks.create({ title: 'fix auth', type: 'todo' }, { scope: 'workspace-b', sourceSessionId: 'session-b' })
+  await loops.reconcile([task])
+  expect((await loops.list()).find(loop => loop.id === first.id)?.state).toBe('open')
+  expect((await loops.list()).find(loop => loop.id === second.id)).toMatchObject({ state: 'dismissed', supersededByTaskId: task.id })
+})
+
+it('does not infer ownership of global tasks with absent provenance or free-form context', async () => {
+  const { loops, notice, directory, clock } = await setup()
+  const loop = (await notice('Auth vẫn lỗi.', 'workspace-a'))!
+  const task = await new Tasks(directory, cliMessages.en.tasks, clock).create({ title: 'fix auth', type: 'todo', context: 'workspace-a' })
+  await loops.reconcile([task])
+  expect((await loops.list()).find(item => item.id === loop.id)?.state).toBe('open')
 })

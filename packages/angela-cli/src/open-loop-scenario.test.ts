@@ -216,3 +216,40 @@ it('clarifies inactive latest task focus instead of snoozing older pending work'
   expect((await tasks.find(older.id)).snoozedUntil).toBeUndefined()
   expect(generation).not.toHaveBeenCalled()
 })
+
+it.each([
+  ['cli', false],
+  ['telegram', false],
+  ['cli', true],
+  ['telegram', true],
+] as const)('uses workspace provenance for a %s task in shared user storage (same workspace: %s)', async (channel, sameWorkspace) => {
+  const { directory, options, createRuntime } = await setup()
+  const workspaceA = join(directory, 'workspace-a')
+  const workspaceB = join(directory, 'workspace-b')
+  await mkdir(workspaceA)
+  await mkdir(workspaceB)
+  const runtime = createRuntime()
+  const first = runtime.open({ ...options, workspace: workspaceA })
+  const second = runtime.open({ ...options, workspace: sameWorkspace ? workspaceA : workspaceB, sessionId: randomUUID(), channel })
+  await first.send(await runtime.createChat(workspaceA), 'Auth vẫn lỗi.', {})
+  await second.send(await runtime.createChat(sameWorkspace ? workspaceA : workspaceB), 'Mai 9h nhắc tao fix auth.', {})
+  const loop = (await runtime.openLoops(directory).list())[0]!
+  const task = (await (await second.tasks()).list())[0]!
+  expect(task.memoryProjection?.scope).toBe(sameWorkspace ? workspaceA : workspaceB)
+  expect(loop.state).toBe(sameWorkspace ? 'dismissed' : 'open')
+  expect(loop.supersededByTaskId).toBe(sameWorkspace ? task.id : undefined)
+})
+
+it('does not let another workspace task prevent later loop extraction', async () => {
+  const { directory, options, createRuntime } = await setup()
+  const workspaceA = join(directory, 'workspace-a')
+  const workspaceB = join(directory, 'workspace-b')
+  await mkdir(workspaceA)
+  await mkdir(workspaceB)
+  const runtime = createRuntime()
+  const second = runtime.open({ ...options, workspace: workspaceB })
+  await second.send(await runtime.createChat(workspaceB), 'Mai 9h nhắc tao fix auth.', {})
+  const first = runtime.open({ ...options, workspace: workspaceA })
+  await first.send(await runtime.createChat(workspaceA), 'Auth vẫn lỗi.', {})
+  expect(await runtime.openLoops(directory).list()).toMatchObject([{ workspace: workspaceA, key: 'auth', state: 'open' }])
+})

@@ -655,6 +655,7 @@ export class RuntimeSession {
           sources.recall = await this.recall()
           recall = sources.recall
           envelope.workspace = sources.project?.workspace ?? this.options.workspace
+          sources.workspace = envelope.workspace
           try {
             if (sources.privacy.durableMemoryAllowed)
               capture = await sources.recall?.capture(sources.privacy)
@@ -673,7 +674,7 @@ export class RuntimeSession {
           try {
             if (sources.privacy.durableMemoryAllowed && await this.runtime.openLoopsEnabled(this.options.dataDir)) {
               sources.openLoops = this.runtime.openLoops(this.options.dataDir)
-              openLoopReply = await new OpenLoopConversation(sources.openLoops, this.activeCommitments, sources.tasks, this.options.workspace, this.options.sessionId, this.runtime.messages.tasks).handle(text, sources.privacy)
+              openLoopReply = await new OpenLoopConversation(sources.openLoops, this.activeCommitments, sources.tasks, sources.workspace ?? this.options.workspace, this.options.sessionId, this.runtime.messages.tasks).handle(text, sources.privacy)
             }
           }
           catch { sources.warn(this.runtime.messages.tasks.openLoopUnavailable) }

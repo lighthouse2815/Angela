@@ -63,7 +63,7 @@ it('retries a failure before presentation and stops after an uncertain external 
   expect((await loops.list())[0]?.id).toBe(loop.id)
 })
 it.each(['privacy', 'task'])('revalidates %s immediately before presentation', async (change) => {
-  const { clock, loops, tasks } = await setup()
+  const { directory, clock, loops, tasks } = await setup()
   let allowed = true
   const present = vi.fn()
   const notifier: ReminderNotifier = {
@@ -72,7 +72,7 @@ it.each(['privacy', 'task'])('revalidates %s immediately before presentation', a
       if (change === 'privacy')
         allowed = false
       else
-        await tasks.create({ title: 'fix auth', type: 'todo' })
+        await tasks.create({ title: 'fix auth', type: 'todo' }, { scope: directory, sourceSessionId: 'session' })
       await verify()
       signal.throwIfAborted()
       present(current)

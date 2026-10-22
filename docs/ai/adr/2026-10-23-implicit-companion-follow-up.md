@@ -113,12 +113,15 @@ The scheduler reconciles implicit work within one minute. It reads no semantic-m
 
 ## Task suppression
 
-A pending Task with an equivalent normalized subject dismisses the implicit loop and records `supersededByTaskId`.
+A pending Task with an equivalent normalized subject and matching host-owned `memoryProjection.scope` dismisses the implicit loop and records `supersededByTaskId`.
 The runtime observes task creation and updates. The source also repairs suppression on each reconciliation and before presentation.
 Task observers cannot roll back a successful Task write.
 If a pending equivalent Task exists, later implicit statements do not create another loop.
 Cancelling the Task does not silently resurrect a dismissed loop. A fresh user statement can open another loop.
-Suppression applies across workspaces within the same intended user task store.
+Tasks remain global per user store. Suppression requires an exact compatible workspace scope.
+Existing projection provenance supplies that evidence without changing the Task schema or using historical memory.
+Unknown provenance and free-form Task context do not authorize suppression.
+New runtime OpenLoops use the existing canonical project scope, including nested Git directories.
 
 ## Persistence and delivery
 

@@ -47,6 +47,11 @@ type State = v.InferOutput<typeof stateSchema>
 type ChangeType = 'open_loop.created' | 'open_loop.updated' | 'open_loop.resolved' | 'open_loop.dismissed' | 'open_loop.expired' | 'proactive.prompted'
 export type OpenLoopChange = { [Type in ChangeType]: { type: Type, loopId: string } }[ChangeType]
 
+/** Only host-owned matching scope and subject prove equivalence. Global tasks without provenance cannot dismiss project-local work. */
+export function taskSuppressesOpenLoop(task: Task, workspace: string, key: string) {
+  return task.status === 'pending' && task.memoryProjection?.scope === workspace && openLoopKey(task.title) === key
+}
+
 /** Owns bounded private state independently of tasks and semantic memory. All claims, caps, and transitions use the same atomic file lock. */
 export class OpenLoops {
   private readonly file: MemoryFile<State>
@@ -127,7 +132,7 @@ export class OpenLoops {
       for (const loop of state.loops) {
         if (loop.state !== 'open')
           continue
-        const task = tasks.find(task => task.status === 'pending' && openLoopKey(task.title) === loop.key)
+        const task = tasks.find(task => taskSuppressesOpenLoop(task, loop.workspace, loop.key))
         if (task) {
           loop.supersededByTaskId = task.id
           loop.state = 'dismissed'

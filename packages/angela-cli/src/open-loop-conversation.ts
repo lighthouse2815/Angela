@@ -5,7 +5,8 @@ import type { OpenLoops } from './open-loops'
 import type { RequestPrivacy } from './privacy-policy'
 import type { Tasks } from './tasks'
 
-import { extractOpenLoop, openLoopKey, openLoopOutcome } from './open-loop-extraction'
+import { extractOpenLoop, openLoopOutcome } from './open-loop-extraction'
+import { taskSuppressesOpenLoop } from './open-loops'
 import { durableWriteRejection } from './privacy-policy'
 
 /** Host-owned extraction and focus resolution run before model tools. Notice creates state without replacing the ordinary chat reply. */
@@ -31,7 +32,7 @@ export class OpenLoopConversation {
     if (!extraction)
       return undefined
     const tasks = await this.tasks.list({ status: 'all' })
-    if (tasks.some(task => task.status === 'pending' && openLoopKey(task.title) === extraction.key)) {
+    if (tasks.some(task => taskSuppressesOpenLoop(task, this.workspace, extraction.key))) {
       await this.loops.reconcile(tasks)
       return undefined
     }

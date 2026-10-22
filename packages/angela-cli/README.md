@@ -1106,7 +1106,8 @@ Frequent conversation adds a one-hour activity deferral. Runtime quiet-hour conf
 Each loop permits one attempt. The user store permits one implicit attempt per eight hours, including restarts.
 `Xong rồi` resolves the exact focused loop. `Đừng hỏi vụ này nữa` dismisses it.
 Named outcomes such as `Fix được auth rồi` also resolve a matching thread.
-A pending equivalent explicit Task suppresses the implicit path. It never produces both notifications for the same tracked subject.
+A pending equivalent explicit Task suppresses the implicit path only when its host-owned workspace provenance matches.
+Tasks without provenance or from another workspace cannot silently dismiss the thread.
 
 OpenLoop state lives in private `open-loops/state.json`, independently of historical memory and Tasks.
 Personal memory, automatic memory, recall, and request privacy controls gate extraction and delivery.
