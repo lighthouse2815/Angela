@@ -237,6 +237,7 @@ Evaluate extraction and dedupe against a consented Vietnamese conversation corpu
 
 Inspected baseline: `62d250fc45fba1965f6c1696d53e46a5385a8000`.
 Implementation head before this audit addendum: `774a626a378770c62689e76b5bd3ce5be7040380`.
+Final head after the follow-up authorization hardening: `d0e0e59`.
 
 ### Reproduced bugs
 
@@ -330,6 +331,7 @@ Added or extended tests cover:
 - `ef5a119`: forget and do-not-ask dismissal semantics plus reservation naming.
 - `97a0180`: open-loop context ordering.
 - `774a626`: final documentation and bounded context test.
+- `d0e0e59`: accept explicit personal activities after `for` without reopening coding false positives.
 
 These commits are pushed to `origin/main`. The only uncommitted paths are pre-existing deletions of `LICENSE` and `third_party/openseeface/LICENSE`, which were not touched by this work.
 
