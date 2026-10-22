@@ -1,8 +1,8 @@
-# AIRI Design Guide
+# Angela Design Guide
 
 ## Overview
 
-AIRI is a character companion interface. The stage gives the character room to remain present while conversation and controls stay within reach.
+Angela is a character companion interface. The stage gives the character room to remain present while conversation and controls stay within reach.
 
 Rounded controls, soft neutral surfaces, and a configurable accent give the interface a friendly, personal character. Clear labels and visible states keep configuration tasks understandable.
 
@@ -16,7 +16,7 @@ For unspecified details, reuse the nearest shared component and layout. Preserve
 
 This document follows the section structure of the [Google DESIGN.md specification](https://github.com/google-labs-code/design.md/blob/main/docs/spec.md).
 
-The optional YAML token block is omitted. AIRI's dynamic palette and existing component values remain authoritative in their source files.
+The optional YAML token block is omitted. Angela's dynamic palette and existing component values remain authoritative in their source files.
 
 API details belong in the [component reference](./docs/ai/context/ui-components.md). Source limitations and delivery procedures belong in the [implementation notes](./docs/ai/context/design-implementation.md).
 
