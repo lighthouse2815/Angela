@@ -71,17 +71,36 @@ export class McpTools {
   }
 
   async close() {
-    await this.client.close()
+    try {
+      await this.client.close()
+    }
+    finally {
+      this.discovered.length = 0
+      this.names.clear()
+      this.approvalQueue = Promise.resolve()
+    }
   }
 
   /** Reads every discovery page. Built-in mode exposes terminal operations only. */
   async discover(signal?: AbortSignal) {
+    this.discovered.length = 0
+    this.names.clear()
+    let schemaChars = 0
     let cursor: string | undefined
     const cursors = new Set<string>()
     do {
       const page = await this.client.listTools({ cursor }, { signal })
-      this.discovered.push(...page.tools.filter(tool => !reserved.has(tool.name) && (!this.workspace || terminalTools.has(tool.name))))
+      for (const tool of page.tools) {
+        if (reserved.has(tool.name) || (this.workspace && !terminalTools.has(tool.name)))
+          continue
+        schemaChars += JSON.stringify(tool).length
+        if (this.discovered.length >= 512 || schemaChars > 2_000_000)
+          throw new Error('MCP discovery limit exceeded')
+        this.discovered.push(tool)
+      }
       cursor = page.nextCursor
+      if (cursors.size >= 64)
+        throw new Error('MCP discovery page limit exceeded')
       if (cursor && cursors.has(cursor))
         throw new Error('MCP discovery returned a repeated cursor')
       if (cursor)

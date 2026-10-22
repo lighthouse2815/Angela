@@ -13,7 +13,6 @@ import { errorMessageFrom } from '@moeru/std'
 import { chatMessagesToTurns } from '@proj-airi/core-agent'
 import { getGenerationProvider, listProviders } from '@proj-airi/provider-inference'
 
-import { Chat } from '../chat'
 import { readConfig } from '../config'
 import { formatRequestError } from '../errors'
 import { Output } from '../output'
@@ -84,7 +83,7 @@ async function main() {
       ['--cwd', messages.cwd],
       ['--locale', messages.locale],
       ['--help, -h', messages.help],
-      ['--computer-use', messages.computerUse],
+      ['--computer-use / --no-computer-use', messages.computerUse],
       ['--mcp-command', messages.mcpCommand],
       ['--mcp-arg', messages.mcpArg],
       ['--resume', messages.resume],
@@ -113,8 +112,8 @@ async function main() {
     const provider = getGenerationProvider(await definition.createProvider(config.providerConfig))
     if (!provider)
       throw new Error(`${messages.unsupportedProvider}: ${config.definitionId}`)
-    const chat = new Chat(config.model, provider, workspace, session.restore(), true, Number(process.env.ANGELA_CONTEXT_TOKENS ?? 32_000), messages)
     const runtime = new AngelaRuntime(config.model, provider, messages, process.env, config)
+    const chat = await runtime.createChat(workspace, session.restore(), true, Number(process.env.ANGELA_CONTEXT_TOKENS ?? 32_000))
     const modelTarget = { model: config.model, chatProvider: provider, providerId: definition.id }
     const persona = chat.conversation.turns.filter(turn => turn.type === 'system').flatMap(turn => turn.content).flatMap(part => part.type === 'text' ? [part.text] : []).join('\n')
     await session.saveChat(chat, session.record.interrupted)

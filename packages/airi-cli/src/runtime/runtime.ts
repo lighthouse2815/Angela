@@ -1,4 +1,4 @@
-import type { StreamOptions } from '@proj-airi/core-agent'
+import type { Conversation, StreamOptions } from '@proj-airi/core-agent'
 import type { cliMessages } from '@proj-airi/i18n/cli'
 import type { GenerationProvider } from '@proj-airi/provider-inference'
 
@@ -32,6 +32,14 @@ export class AngelaRuntime {
 
   constructor(readonly model: string, readonly provider: GenerationProvider, readonly messages: typeof cliMessages.en, readonly env: NodeJS.ProcessEnv = {}, readonly defaults: { baseUrl?: string, apiKey: string } = { apiKey: '' }) {}
 
+  /** Creates working conversation state with the host's single model/provider configuration. No device or tool client is loaded. */
+  async createChat(workspace: string, history?: Conversation, toolsAvailable = true, contextLimit = 32_000) {
+    if (this.closing)
+      throw new Error('Runtime is closed')
+    const { Chat } = await import('../chat')
+    return new Chat(this.model, this.provider, workspace, history, toolsAvailable, contextLimit, this.messages)
+  }
+
   /** At most eight contexts can run concurrently. Callers release each acquisition in a finally block. */
   open(options: SessionOptions) {
     if (this.closing)
@@ -41,7 +49,7 @@ export class AngelaRuntime {
     if (!state) {
       if (this.states.size >= 8)
         throw new Error('Runtime active context limit reached')
-      state = new RuntimeSession(this, options, () => this.states.delete(key))
+      state = new RuntimeSession(this, { ...options }, () => this.states.delete(key))
       this.states.set(key, state)
     }
     state.retain()
@@ -107,6 +115,8 @@ export class AngelaRuntime {
 
   /** Returns the shared task store when a reminder route already owns it. Other contexts own their store until release. */
   async tasks(dataDir: string) {
+    if (this.closing)
+      throw new Error('Runtime is closed')
     const route = this.remindersByStore.get(dataDir)
     if (route)
       return await route.tasks
@@ -386,6 +396,8 @@ export class RuntimeSession {
         this.checkpoint = undefined
         this.retrieval = undefined
         this.client = undefined
+        this.options.connectMcp = undefined
+        this.options.warn = undefined
         this.removed()
       }
     })()

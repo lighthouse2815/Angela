@@ -2,7 +2,7 @@ import type { cliMessages } from '@proj-airi/i18n/cli'
 import type { Tool } from '@xsai/shared-chat'
 
 import { createHash, randomUUID } from 'node:crypto'
-import { lstat, mkdir, open, readdir, readFile, realpath, rename, stat, unlink, writeFile } from 'node:fs/promises'
+import { lstat, mkdir, open, readdir, readFile, realpath, rename, unlink, writeFile } from 'node:fs/promises'
 import { join, relative, resolve, sep } from 'node:path'
 
 import { errorMessageFrom } from '@moeru/std'
@@ -26,7 +26,6 @@ const saveSchema = v.object({
 
 /** Owns trusted user-managed skill files. Project files never become executable guidance merely because a directory was opened. */
 export class Skills {
-  private readonly cache = new Map<string, { stamp: string, skill: v.InferOutput<typeof headerSchema> & { instructions: string, version: string } }>()
   readonly directory: string
   private readonly settings: MemoryFile<v.InferOutput<typeof stateSchema>>
 
@@ -57,7 +56,6 @@ export class Skills {
         }
         catch (error) {
           if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
-            this.cache.delete(name)
             continue
           }
           throw error
@@ -67,13 +65,6 @@ export class Skills {
         const location = relative(root, file)
         if (location.startsWith(`..${sep}`) || location === '..' || resolve(root, location) !== file || !(await lstat(file)).isFile())
           throw new Error(this.messages.skillsInvalid)
-        const information = await stat(file)
-        const stamp = `${information.ino}:${information.mtimeMs}:${information.size}`
-        const cached = this.cache.get(name)
-        if (cached?.stamp === stamp) {
-          skills.push({ ...cached.skill, enabled: settings.enabled && !settings.disabled.includes(name) })
-          continue
-        }
         const source = await readFile(file, 'utf8')
         if (source.length > 16_000)
           throw new Error(this.messages.skillsInvalid)
@@ -87,7 +78,6 @@ export class Skills {
         if (header.name !== name || !match[2]!.trim() || match[2]!.length > 12_000)
           throw new Error(this.messages.skillsInvalid)
         const skill = { ...header, instructions: match[2]!.trim(), version: createHash('sha256').update(source).digest('hex') }
-        this.cache.set(name, { stamp, skill })
         skills.push({ ...skill, enabled: settings.enabled && !settings.disabled.includes(name) })
       }
       catch {
@@ -209,7 +199,6 @@ export class Skills {
     const lock = await open(lockPath, 'wx', 0o600)
     try {
       await unlink(join(directory, 'SKILL.md'))
-      this.cache.delete(name)
       await RecallIndex.invalidate(this.dataDir, `skill:${name}`)
     }
     finally {

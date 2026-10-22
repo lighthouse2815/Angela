@@ -9,7 +9,7 @@ import { useLogg } from '@guiiai/logg'
 import { cliMessages } from '@proj-airi/i18n/cli'
 import { Client as ServerChannel } from '@proj-airi/server-sdk'
 import { ContextUpdateStrategy } from '@proj-airi/server-shared/types'
-import { Client, Events, GatewayIntentBits, MessageFlags, Partials } from 'discord.js'
+import { Client, Events, GatewayIntentBits, MessageFlags, Options, Partials } from 'discord.js'
 
 import * as v from 'valibot'
 
@@ -75,6 +75,15 @@ export class DiscordAdapter {
         GatewayIntentBits.DirectMessages,
       ],
       partials: [Partials.Channel],
+      // Session files own conversation history. Gateway caches retain only small identity and membership working sets.
+      makeCache: Options.cacheWithLimits({
+        ...Options.DefaultMakeCacheSettings,
+        MessageManager: 0,
+        UserManager: 64,
+        GuildMemberManager: { maxSize: 32, keepOverLimit: member => member.id === member.client.user?.id },
+        PresenceManager: 0,
+        ReactionManager: 0,
+      }),
     })
 
     // Initialize AIRI client

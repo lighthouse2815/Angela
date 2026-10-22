@@ -105,3 +105,23 @@ it('compacts the outgoing request while retaining full history for session persi
   expect(JSON.stringify({ turns: chat.conversation.turns.slice(0, -2) })).toBe(original)
   expect(JSON.stringify(chat.conversation)).not.toContain('Old requirement: preserve the API design')
 })
+
+it('waits for asynchronous stream consumers before storing the assistant turn or releasing the request', async () => {
+  const delivered = Promise.withResolvers<void>()
+  const release = Promise.withResolvers<void>()
+  const provider: GenerationProvider = { generation: model => ({ protocol: 'chat-completions', config: { model, baseURL: 'https://provider.example/v1/', fetch: async () => completion('Answer') } }) }
+  const chat = new Chat('model', provider, '/workspace')
+  const sending = chat.send('Hi', { onStreamEvent: async (event) => {
+    if (event.type === 'text-delta') {
+      delivered.resolve()
+      await release.promise
+    }
+  } })
+  await delivered.promise
+  expect(chat.isSending).toBe(true)
+  expect(chat.conversation.turns.some(turn => turn.type === 'assistant')).toBe(false)
+  release.resolve()
+  await sending
+  expect(chat.isSending).toBe(false)
+  expect(chat.conversation.turns.at(-1)?.type).toBe('assistant')
+})

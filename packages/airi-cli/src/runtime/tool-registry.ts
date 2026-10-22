@@ -4,8 +4,6 @@ import type { Tool } from '@xsai/shared-chat'
 import type { McpTools } from '../mcp'
 import type { ContextSources } from './context-builder'
 
-import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js'
-
 import { taskTools } from '../task-tools'
 
 /** Builds one request's executable definitions and evidence. No connection or discovery occurs while listing tools. */
@@ -13,6 +11,7 @@ export async function buildTools(sources: ContextSources, text: string, sessionI
   const observations: string[] = []
   const verified: string[] = []
   const calls = new Set<string>()
+  const resultSchema = mcp ? (await import('@modelcontextprotocol/sdk/types.js')).CallToolResultSchema : undefined
   const tools: Tool[] = []
   if (mcp)
     tools.push(...mcp.definitions())
@@ -48,9 +47,9 @@ export async function buildTools(sources: ContextSources, text: string, sessionI
       observations.push(excerpt)
       if (observations.length > 8)
         observations.shift()
-      if (event.type === 'tool-result') {
+      if (event.type === 'tool-result' && resultSchema) {
         try {
-          const result = CallToolResultSchema.safeParse(typeof event.result === 'string' ? JSON.parse(event.result) : event.result)
+          const result = resultSchema.safeParse(typeof event.result === 'string' ? JSON.parse(event.result) : event.result)
           const backend = result.success ? result.data.structuredContent?.backendResult : undefined
           const failed = backend && typeof backend === 'object' && (('timedOut' in backend && backend.timedOut) || ('exitCode' in backend && backend.exitCode !== undefined && backend.exitCode !== null && backend.exitCode !== 0))
           if (result.success && !result.data.isError && !failed) {

@@ -3,6 +3,49 @@
 Chat with Angela from a Node.js terminal. The CLI uses AIRI's existing provider and generation runtime.
 Angela can manage everyday tasks and deliver reminders while the terminal process remains open.
 
+## Runtime and memory
+
+CLI, Telegram, and Discord use `AngelaRuntime` for context, tools, generation, and lifecycle events.
+A host creates one runtime. Embedded adapters can receive that same runtime through their optional final constructor argument.
+The host that creates a runtime must call `await runtime.close()`.
+
+`runtime.open(...)` acquires an active logical context. Its `memory()`, `tasks()`, `skills()`, `project()`, `recall()`, and `mcp()` initialize on demand.
+Call `await scope.close()` after each acquisition. The last release closes Recall and MCP and removes the context immediately.
+CLI retains one active context. Telegram and Discord release their context after each job, including failed and cancelled jobs.
+Model and provider configuration belong to the shared runtime. Conversation objects belong to the active adapter request.
+
+The event bus delivers typed metadata synchronously. Events contain correlation IDs and lifecycle names, without prompts, arguments, outputs, or history.
+Tool definitions and verification evidence exist only during a request. Evidence permits eight excerpts of 20,000 characters.
+Skills have no persistent instruction cache. Recall reuses the context's memory and skills stores.
+Text chat does not import camera or voice processing. Embeddings still require an explicit embedding model configuration.
+
+| Working state | Bound or release policy |
+| --- | --- |
+| Runtime contexts | Eight concurrent contexts, immediate release after the last owner closes |
+| Telegram jobs and permissions | Eight jobs, 32 permission entries, ten-minute idle eviction on subsequent access |
+| Discord queues | Eight channels, four queued requests per channel |
+| Reminder routes | 128 stores, three channel destinations per store, one shared reconciliation timer |
+| Recall bookkeeping | 32 workspace roots, 256 dirty filenames, 64 diagnostics, 50 selected excerpts |
+| MCP discovery | 512 tools, 64 pages, two million schema characters, released on close |
+| Event listeners | 32 per lifecycle type, removed through unsubscribe or runtime shutdown |
+| Pending voice announcements | Eight excerpts of 4,000 characters, independent of delivered text |
+
+Reminder routes retain small task-store handles for configured users. They read tasks from disk, without retaining conversations or Recall instances.
+A shared store has one scheduler. The most recently registered live channel destination receives its reminders.
+Closing an embedded adapter releases its destination without closing another channel's route.
+Per-delivery lease timers exist only during notification delivery. All owned timers are unreferenced and cancelled during shutdown.
+
+Session snapshots retain full portable history on disk. An optional `working` checkpoint stores the compacted prefix offset and bounded summary.
+After an atomic save, Chat releases covered turns and Session releases its portable message snapshot.
+A restart restores the working tail and summary. Direct full-history snapshots still replace the session and clear its working checkpoint.
+Tool checkpoints finish before a request closes. They never retire turns while generation still owns its prepared conversation.
+
+Built-in computer use remains enabled by default. Use `angela --no-computer-use` or `angela telegram --no-computer-use` for text without MCP.
+The default MCP connection starts with the first generation. It does not start during idle input or local commands.
+Telegram's `/memory used` diagnostics apply to its active Recall lifecycle, which ends after the job.
+
+See [memory measurements and the initial resource audit](benchmarks/README.md) for commands, raw metrics, and remaining hotspots.
+
 ## Run
 
 From the repository root, install workspace dependencies and build the required packages:

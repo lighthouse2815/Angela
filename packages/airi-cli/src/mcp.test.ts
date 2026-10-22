@@ -166,3 +166,13 @@ it('runs a model-requested tool through the real generation and MCP protocols', 
   expect(progress).not.toContain('Final verification marker')
   expect(chat.conversation.turns.at(-1)).toMatchObject({ type: 'assistant', status: 'completed' })
 })
+
+it('replaces discovery snapshots and releases schemas and executable names on close', async () => {
+  const { tools } = await connect()
+  const before = await tools.definitions()[0].execute({}, { messages: [], toolCallId: 'list' })
+  await tools.discover()
+  expect(await tools.definitions()[0].execute({}, { messages: [], toolCallId: 'list-again' })).toEqual(before)
+  await tools.close()
+  expect(await tools.definitions()[0].execute({}, { messages: [], toolCallId: 'closed' })).toEqual([])
+  expect(await tools.call('terminal_exec', {})).toMatchObject({ isError: true })
+})

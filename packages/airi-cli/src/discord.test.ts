@@ -175,3 +175,18 @@ it('bounds each channel queue and cancels active and queued requests during shut
   expect(fetch).toHaveBeenCalledOnce()
   expect((await readdir(directory)).some(file => file.endsWith('.lock'))).toBe(false)
 })
+
+it('bounds independent channels and releases all active runtime contexts when the host closes', async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>(async (_url, init) => {
+    init?.signal?.throwIfAborted()
+    return await new Promise<Response>((_resolve, reject) => init?.signal?.addEventListener('abort', () => reject(init.signal?.reason), { once: true }))
+  })
+  const { host, directory } = await setup(fetch)
+  const requests = Array.from({ length: 8 }, (_, index) => host.respond(input('Wait', `room-${index}`), new AbortController().signal))
+  const settled = Promise.allSettled(requests)
+  await expect(host.respond(input('Overflow', 'room-9'), new AbortController().signal)).rejects.toThrow(cliMessages.vi.discordBusy)
+  await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(8))
+  await host.close()
+  expect((await settled).every(result => result.status === 'rejected')).toBe(true)
+  expect((await readdir(directory)).some(file => file.endsWith('.lock'))).toBe(false)
+})

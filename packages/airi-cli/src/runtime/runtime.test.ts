@@ -7,10 +7,12 @@ import { mkdtemp, readdir, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import { Client } from '@modelcontextprotocol/sdk/client/index.js'
 import { cliMessages } from '@proj-airi/i18n/cli'
 import { afterEach, expect, it, vi } from 'vitest'
 
 import { Chat } from '../chat'
+import { McpTools } from '../mcp'
 import { Recall } from '../recall'
 import { AngelaRuntime } from './runtime'
 
@@ -160,4 +162,24 @@ it('emits correlated tool lifecycle metadata without copying arguments or tool r
   expect(JSON.stringify(events)).not.toContain('My name is Lan')
   expect((await (await scope.memory()).read()).entries[0]?.text).toBe('My name is Lan')
   await scope.close()
+})
+
+it('reports a tool error using metadata and closes the enabled MCP client on release', async () => {
+  const tool = { id: 'failed-call', type: 'function', function: { name: 'builtIn_mcpCallTool', arguments: JSON.stringify({ name: 'terminal_exec', arguments: 'invalid JSON payload' }) } }
+  const fetch = vi.fn<typeof globalThis.fetch>()
+    .mockResolvedValueOnce(new Response(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', tool_calls: [{ index: 0, ...tool }] }, finish_reason: 'tool_calls' }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } }))
+    .mockResolvedValueOnce(completion('The tool failed'))
+  const { runtime, options, directory, provider } = await setup(fetch)
+  const client = new Client({ name: 'test', version: '1' })
+  const close = vi.spyOn(client, 'close')
+  const scope = runtime.open({ ...options, connectMcp: async () => new McpTools(client, async () => false, cliMessages.en) })
+  const errors: AngelaEvent[] = []
+  runtime.events.on('tool.error', event => errors.push(event))
+  await scope.send(new Chat('model', provider, directory), 'Try the tool', {})
+  expect(errors).toHaveLength(1)
+  expect(errors[0]).toMatchObject({ type: 'tool.error', toolCallId: 'failed-call', sessionId: options.sessionId })
+  expect(JSON.stringify(errors)).not.toContain('invalid JSON payload')
+  await scope.close()
+  expect(close).toHaveBeenCalledOnce()
+  expect(scope.options.connectMcp).toBeUndefined()
 })

@@ -11,6 +11,7 @@ import * as v from 'valibot'
 export async function readConfig(args: string[], env: NodeJS.ProcessEnv) {
   const { values } = parseArgs({
     args,
+    allowNegative: true,
     options: {
       'model': { type: 'string' },
       'provider': { type: 'string' },

@@ -53,10 +53,14 @@ export class Chat {
     }
     const lifetime = new AbortController()
     const signal = options.abortSignal ? AbortSignal.any([options.abortSignal, lifetime.signal]) : lifetime.signal
+    // SDK tool observers can outlive its completed steps. Drain only active callbacks before persistence and cleanup.
     const pending = new Set<Promise<void>>()
+    let accepting = true
     let callbackError: unknown
     let callbackFailed = false
     const deliver = (event: StreamEvent): void | Promise<void> => {
+      if (!accepting)
+        return
       if (event.type === 'finish') {
         return (async () => {
           await Promise.all(pending)
@@ -102,9 +106,10 @@ export class Chat {
       })
     }
     finally {
+      accepting = false
+      lifetime.abort()
       await Promise.all(pending)
       pending.clear()
-      lifetime.abort()
       this.active = false
     }
   }
