@@ -69,3 +69,13 @@ Deleting an archive also purges its Memory V2 derivatives.
 FTS and optional vectors still feed reciprocal-rank fusion. Bounded authority and tier signals resolve close ranking contests.
 History remains eligible when the query specifically matches it. Semantic knowledge has no automatic recency penalty.
 The deterministic evaluation measures facts, episodes, decisions, procedures, supersession, contradictions, noise, and compaction recall.
+
+## Optional provider enrichment
+
+`/memory consolidate` enriches the current episode with the already configured chat provider.
+The zero-provider episode always exists first. Provider failures leave it searchable.
+The structured tool contract permits at most six technical semantic or procedural candidates, each with a real source quote.
+Enrichment has a 15-second deadline and an output ceiling. It has no filesystem or transport tools.
+After generation, the host rechecks privacy switches, episode version, suppression, authority, and pinning before applying candidates.
+Derived-from edges preserve provenance. Purging the source also purges downstream knowledge.
+Dream clustering stays optional and is not enabled by this change.

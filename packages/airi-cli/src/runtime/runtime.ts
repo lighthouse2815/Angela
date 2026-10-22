@@ -280,6 +280,8 @@ export class RuntimeSession {
     signal?.throwIfAborted()
     if (!text.startsWith('/'))
       return undefined
+    if (text === '/memory consolidate')
+      return JSON.stringify(await (await this.recall())?.enrich(this.runtime.model, this.runtime.provider, signal))
     if (/^\/(?:tasks|today|done|cancel|snooze)(?:\s|$)/u.test(text)) {
       const { taskCommand } = await import('../task-commands')
       return await taskCommand(text, await this.tasks(), this.runtime.messages.tasks, this.options.locale ?? 'en')

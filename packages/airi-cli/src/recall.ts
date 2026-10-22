@@ -1,6 +1,7 @@
 import type { FSWatcher } from 'node:fs'
 
 import type { cliMessages } from '@proj-airi/i18n/cli'
+import type { GenerationProvider } from '@proj-airi/provider-inference'
 import type { Tool } from '@xsai/shared-chat'
 
 import type { RecallHit } from './recall-index'
@@ -567,6 +568,41 @@ export class Recall {
     const settings = await this.settings.read()
     const personal = await this.memory.read()
     return settings.enabled && personal.enabled ? pageTools(this.database().memory, this.workspace, this.sessionId, text, verified) : []
+  }
+
+  /** Provider failure leaves the rule-based episode intact. Current source and privacy switches are rechecked after generation. */
+  async enrich(model: string, provider: GenerationProvider, signal?: AbortSignal) {
+    const personal = await this.memory.read()
+    if (!(await this.settings.read()).enabled || !personal.enabled || !personal.autoEnabled)
+      return { status: 'disabled', count: 0 }
+    const store = this.database().memory
+    const episode = store.current(this.workspace, 'episodic', `session:${this.sessionId}`)
+    if (!episode)
+      return { status: 'empty', count: 0 }
+    try {
+      const { MemoryEnricher } = await import('./memory-v2/enrichment')
+      const candidates = await new MemoryEnricher(model, provider).extract(episode, signal)
+      const currentPersonal = await this.memory.read()
+      const settings = await this.settings.read()
+      signal?.throwIfAborted()
+      if (this.closed || !currentPersonal.enabled || !currentPersonal.autoEnabled || !settings.enabled || store.suppressed(this.workspace, this.sessionId) || store.read(episode.id, this.workspace)?.version !== episode.version)
+        return { status: 'stale', count: 0 }
+      let count = 0
+      for (const candidate of candidates) {
+        const current = store.current(this.workspace, candidate.tier, candidate.key)
+        try {
+          const page = store.write({ ...candidate, scope: this.workspace, authority: 'consolidated', sourceSessionId: this.sessionId, expectedVersion: current?.version ?? null })
+          store.link(page.id, episode.id, 'derived_from', this.workspace)
+          count++
+        }
+        catch { /* Explicit or pinned knowledge takes precedence over automatic candidates. */ }
+      }
+      return { status: 'enriched', count }
+    }
+    catch {
+      signal?.throwIfAborted()
+      return { status: 'unavailable', count: 0 }
+    }
   }
 
   async changed(clearUsed = true) {
