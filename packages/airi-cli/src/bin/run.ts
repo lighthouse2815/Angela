@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+import type { Camera } from '../perception/camera'
+import type { Voice } from '../voice'
+import type { VoiceInterruption } from '../voice-interruption'
+
 import process from 'node:process'
 
 import { realpath, stat } from 'node:fs/promises'
@@ -11,66 +15,54 @@ import { getGenerationProvider, listProviders } from '@proj-airi/provider-infere
 
 import { Chat } from '../chat'
 import { readConfig } from '../config'
-import { runDoctor } from '../doctor'
 import { formatRequestError } from '../errors'
-import { runEvaluation } from '../evaluation'
-import { McpTools } from '../mcp'
-import { Memory } from '../memory'
 import { Output } from '../output'
-import { Camera } from '../perception/camera'
 import { Permissions } from '../permissions'
-import { ProjectMemory } from '../project-memory'
-import { Recall } from '../recall'
 import { ReminderNotifications } from '../reminder-notifications'
-import { ReminderScheduler } from '../reminder-scheduler'
-import { runReminders } from '../reminders'
-import { buildContext } from '../runtime/context-builder'
-import { buildTools } from '../runtime/tool-registry'
-import { runSessionCommand } from '../session-command'
+import { AngelaRuntime } from '../runtime/runtime'
 import { Sessions } from '../sessions'
-import { runSetup } from '../setup'
-import { StreamingSpeech } from '../streaming-speech'
-import { taskCommand } from '../task-commands'
-import { Tasks } from '../tasks'
-import { runTelegram } from '../telegram'
 import { Terminal } from '../terminal'
-import { Voice } from '../voice'
-import { VoiceInterruption } from '../voice-interruption'
-import { runVoiceService } from '../voice-service'
 
 /**
  * Runs terminal chat and owns input, signals, and provider configuration.
  *
  * Call stack:
- * main -> readConfig -> Chat.send -> core-agent.streamFrom
+ * main -> readConfig -> RuntimeSession.send -> Chat.send -> core-agent.streamFrom
  *                    -> McpTools -> MCP client -> tool server
  */
 async function main() {
   if (process.argv[2] === 'eval') {
+    const { runEvaluation } = await import('../evaluation')
     await runEvaluation(process.argv.slice(3), process.env)
     return
   }
   if (process.argv[2] === 'setup') {
+    const { runSetup } = await import('../setup')
     await runSetup(process.argv.slice(3), process.env)
     return
   }
   if (process.argv[2] === 'reminders') {
+    const { runReminders } = await import('../reminders')
     await runReminders(process.argv.slice(3), process.env)
     return
   }
   if (process.argv[2] === 'doctor') {
+    const { runDoctor } = await import('../doctor')
     await runDoctor(process.argv.slice(3), process.env)
     return
   }
   if (process.argv[2] === 'voice') {
+    const { runVoiceService } = await import('../voice-service')
     await runVoiceService(process.argv.slice(3), process.env)
     return
   }
   if (process.argv[2] === 'sessions') {
+    const { runSessionCommand } = await import('../session-command')
     await runSessionCommand(process.argv.slice(3), process.env)
     return
   }
   if (process.argv[2] === 'telegram') {
+    const { runTelegram } = await import('../telegram')
     await runTelegram(process.argv.slice(3), process.env)
     return
   }
@@ -102,8 +94,6 @@ async function main() {
     return
   }
 
-  // Temporary audio cleanup is best effort. It never deletes chat history or active playback.
-  await Voice.cleanupTemporaryAudio().catch(() => {})
   const sessions = new Sessions(config.dataDir, messages)
   if (config.list) {
     const list = await sessions.list()
@@ -124,19 +114,45 @@ async function main() {
     if (!provider)
       throw new Error(`${messages.unsupportedProvider}: ${config.definitionId}`)
     const chat = new Chat(config.model, provider, workspace, session.restore(), true, Number(process.env.ANGELA_CONTEXT_TOKENS ?? 32_000), messages)
+    const runtime = new AngelaRuntime(config.model, provider, messages, process.env, config)
     const modelTarget = { model: config.model, chatProvider: provider, providerId: definition.id }
     const persona = chat.conversation.turns.filter(turn => turn.type === 'system').flatMap(turn => turn.content).flatMap(part => part.type === 'text' ? [part.text] : []).join('\n')
     await session.save(chat.conversation, session.record.interrupted)
     const interactive = process.stdin.isTTY && config.prompt === undefined
     const output = new Output(messages)
     const permissions = new Permissions(messages)
-    const camera = new Camera(process.env, messages)
+    let camera: Camera | undefined
     let input: Terminal | undefined
-    const tasks = new Tasks(config.dataDir, messages.tasks)
-    const memory = new Memory(config.dataDir, messages)
-    const project = await ProjectMemory.open(config.dataDir, workspace, messages)
-    const recall = new Recall(config.dataDir, project.workspace, session.record.id, messages, process.env, config)
-    let recallReady = false
+    const scope = runtime.open({
+      dataDir: config.dataDir,
+      workspace,
+      sessionId: session.record.id,
+      channel: 'cli',
+      locale: config.locale,
+      warn: message => process.stderr.write(`\n${message}\n`),
+      connectMcp: config.computerUse || config.mcpCommand
+        ? async (signal) => {
+          const { McpTools } = await import('../mcp')
+          const tools = await McpTools.connect(config, workspace, join(config.dataDir, 'computer-use', session.record.id), async (request, approvalSignal) => {
+            output.approval(request)
+            if (permissions.fullAccess) {
+              approvalSignal?.throwIfAborted()
+              output.decided(true)
+              return true
+            }
+            if (!input) {
+              output.decided(false)
+              return false
+            }
+            const approved = (await input.ask(`\n${messages.approve} `, approvalSignal))?.trim().toLowerCase() === 'yes'
+            output.decided(approved)
+            return approved
+          }, messages, process.env, signal)
+          process.stderr.write(`${messages.mcpConnected}\n`)
+          return tools
+        }
+        : undefined,
+    })
     if (interactive)
       output.intro()
     process.stderr.write(`${messages.session}: ${session.record.id}\n`)
@@ -172,7 +188,6 @@ async function main() {
       process.exitCode = 143
     }
     process.on('SIGTERM', stop)
-    let mcp: McpTools | undefined
 
     let pendingUtterance: string | undefined
     let voiceReady = false
@@ -191,7 +206,7 @@ async function main() {
       if (voiceReady && !input?.hasInput)
         reminderWake?.abort()
     })
-    const scheduler = new ReminderScheduler(tasks, notifications, (error) => {
+    const scheduler = await runtime.reminders(config.dataDir, notifications, (error) => {
       const text = `${messages.tasks.unavailable} ${errorMessageFrom(error) ?? messages.tasks.failed}`
       if (input)
         void input.notify(text).catch(() => {})
@@ -212,9 +227,9 @@ async function main() {
     async function send(text: string) {
       notifications.pause()
       active = new AbortController()
-      const speech = voice ? new StreamingSpeech(voice, active.signal, () => process.stderr.write(`\n${messages.voiceSpeaking}\n`)) : undefined
+      const speech = voice ? new (await import('../streaming-speech')).StreamingSpeech(voice, active.signal, () => process.stderr.write(`\n${messages.voiceSpeaking}\n`)) : undefined
       interruption = voice?.canInterrupt
-        ? new VoiceInterruption(voice, active, (state) => {
+        ? new (await import('../voice-interruption')).VoiceInterruption(voice, active, (state) => {
             const label = state === 'ready' ? messages.voicePrompt : state === 'speech' ? messages.voiceRecord : messages.voiceTranscribing
             process.stderr.write(`${label}\n`)
           })
@@ -223,35 +238,23 @@ async function main() {
       try {
         output.start()
         await session.save(chat.conversation, true)
-        const sources = { memory, project, tasks, recall: recallReady ? recall : undefined, channel: 'cli' as const, messages, warn: (message: string) => process.stderr.write(`\n${message}\n`) }
-        const context = await buildContext(sources, text, active.signal)
-        const requestTools = await buildTools(sources, text, session.record.id, mcp)
-        const tools = requestTools.tools
-        try {
-          await chat.send(text, {
-            abortSignal: active.signal,
-            tools,
-            resolveStep: async () => ({
-              ...modelTarget,
-              systemPrompt: [persona, camera.getContext()].filter(Boolean).join('\n\n'),
-              tools,
-            }),
-            diagnostics: {
+        await scope.send(chat, text, {
+          abortSignal: active.signal,
+          resolveStep: async () => ({
+            ...modelTarget,
+            systemPrompt: [persona, camera?.getContext()].filter(Boolean).join('\n\n'),
+          }),
+          diagnostics: {
             // The send catch owns the final message. SDK promise diagnostics must not print the same failure again.
-              error() {},
-              warn() { output.retry() },
-            },
-            onStreamEvent: async (event) => {
-              output.event(event)
-              requestTools.observe(event)
-              if (event.type === 'text-delta')
-                await speech?.push(event.text)
-            },
-          }, context)
-        }
-        finally {
-          requestTools.close()
-        }
+            error() {},
+            warn() { output.retry() },
+          },
+          onStreamEvent: async (event) => {
+            output.event(event)
+            if (event.type === 'text-delta')
+              await speech?.push(event.text)
+          },
+        })
         if (!output.hasText)
           throw new Error(messages.emptyResponse)
         completed = true
@@ -285,37 +288,11 @@ async function main() {
     }
 
     try {
-      try {
-        await recall.start()
-        recallReady = true
-      }
-      catch {
-        await recall.close()
-        process.stderr.write(`${messages.recallInvalid}\n`)
-      }
-      if (config.computerUse || config.mcpCommand) {
-        mcp = await McpTools.connect(config, workspace, join(config.dataDir, 'computer-use', session.record.id), async (request, signal) => {
-          output.approval(request)
-          if (permissions.fullAccess) {
-            signal?.throwIfAborted()
-            output.decided(true)
-            return true
-          }
-          if (!input) {
-            output.decided(false)
-            return false
-          }
-          const approved = (await input.ask(`\n${messages.approve} `, signal))?.trim().toLowerCase() === 'yes'
-          output.decided(approved)
-          return approved
-        }, messages, process.env, shutdown.signal)
-        process.stderr.write(`${messages.mcpConnected}\n`)
-      }
       await scheduler.start()
       if (input && interactive) {
         process.stderr.write(`${messages.workspace}: ${workspace}\n${messages.welcome}\n${messages.permissionAsk}\n`)
         while (!shutdown.signal.aborted) {
-          const cameraNotice = camera.takeNotice()
+          const cameraNotice = camera?.takeNotice()
           if (cameraNotice)
             process.stderr.write(`${cameraNotice}\n`)
           notifications.setVoiceEnabled(Boolean(voice))
@@ -348,7 +325,7 @@ async function main() {
                 if (voiceReady && notifications.hasSpeech && !input?.hasInput)
                   wake.abort()
                 const label = state === 'ready' ? messages.voicePrompt : state === 'speech' ? messages.voiceRecord : messages.voiceTranscribing
-                process.stderr.write(`${camera.enabled ? `${messages.cameraIndicator} | ` : ''}${label}\n`)
+                process.stderr.write(`${camera?.enabled ? `${messages.cameraIndicator} | ` : ''}${label}\n`)
               })
               if (result.kind === 'transcript') {
                 if (result.text) {
@@ -380,10 +357,12 @@ async function main() {
             }
           }
           else {
-            text = (await input.ask(`${camera.enabled ? `${messages.cameraIndicator}\n` : ''}${output.prompt()}`, undefined, messages.cliCommands))?.trim()
+            text = (await input.ask(`${camera?.enabled ? `${messages.cameraIndicator}\n` : ''}${output.prompt()}`, undefined, messages.cliCommands))?.trim()
           }
           if (text === '/voice') {
             try {
+              const { Voice } = await import('../voice')
+              await Voice.cleanupTemporaryAudio().catch(() => {})
               voice ??= loadedVoice ?? await Voice.load(process.env, messages)
               loadedVoice = voice
               notifications.setVoiceEnabled(true)
@@ -427,10 +406,10 @@ async function main() {
           }
           active = new AbortController()
           try {
-            const response = await camera.command(text, active.signal) ?? await taskCommand(text, tasks, messages.tasks, config.locale) ?? await project.command(text) ?? await recall.command(text, active.signal) ?? await recall.skills.command(text) ?? await memory.command(text)
+            if (/^\/camera(?:\s|$)/u.test(text))
+              camera ??= new (await import('../perception/camera')).Camera(process.env, messages)
+            const response = await camera?.command(text, active.signal) ?? await scope.command(text, active.signal)
             if (response !== undefined) {
-              if (recallReady && /^\/(?:remember |forget |memory (?:edit |pin |unpin |auto |on$|off$)|skills (?:import |edit |forget |on|off))/u.test(text))
-                await recall.changed()
               process.stderr.write(`${response}\n`)
               continue
             }
@@ -476,21 +455,16 @@ async function main() {
       finally {
         input?.close()
         try {
-          await camera.close()
+          await camera?.close()
           await releaseVoice()
         }
         finally {
           try {
-            await mcp?.close()
+            await runtime.close()
           }
           finally {
-            try {
-              await recall.close()
-            }
-            finally {
-              process.off('SIGINT', interrupt)
-              process.off('SIGTERM', stop)
-            }
+            process.off('SIGINT', interrupt)
+            process.off('SIGTERM', stop)
           }
         }
       }

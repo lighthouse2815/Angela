@@ -20,7 +20,7 @@ export class ReminderScheduler {
   private startup = true
   private reportedError = false
 
-  constructor(private readonly tasks: Tasks, private readonly notifier: ReminderNotifier, private readonly onError: (error: unknown) => void) {}
+  constructor(private readonly tasks: Tasks, private readonly notifier: ReminderNotifier, private readonly onError: (error: unknown) => void, private readonly scheduleShared?: (delay: number) => void) {}
 
   async start() {
     if (this.started || this.lifetime.signal.aborted)
@@ -114,16 +114,19 @@ export class ReminderScheduler {
       signal.throwIfAborted()
       clearTimeout(expiry)
       expiry = setTimeout(() => lease.abort(new Error('Reminder lease expired')), deliveryLeaseMs)
+      expiry.unref()
     }
     const renew = () => {
       renewing = renewing.then(verify).then(() => {
         if (!signal.aborted)
           heartbeat = setTimeout(renew, deliveryLeaseMs / 3)
+        heartbeat?.unref()
       }).catch((error: unknown) => lease.abort(error))
     }
     try {
       await verify()
       heartbeat = setTimeout(renew, deliveryLeaseMs / 3)
+      heartbeat.unref()
       await this.notifier.notify(claimed, overdue, signal, async () => {
         await renewing
         await verify()
@@ -147,6 +150,10 @@ export class ReminderScheduler {
   private schedule(delay: number) {
     if (this.lifetime.signal.aborted)
       return
+    if (this.scheduleShared) {
+      this.scheduleShared(delay)
+      return
+    }
     this.timer = setTimeout(() => this.refresh(), delay)
     this.timer.unref()
   }

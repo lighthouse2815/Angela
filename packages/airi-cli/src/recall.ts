@@ -68,9 +68,11 @@ export class Recall {
     private readonly messages: typeof cliMessages.en,
     env: NodeJS.ProcessEnv,
     defaults: { baseUrl?: string, apiKey: string },
+    memory?: Memory,
+    skills?: Skills,
   ) {
-    this.memory = new Memory(dataDir, messages)
-    this.skills = new Skills(dataDir, messages)
+    this.memory = memory ?? new Memory(dataDir, messages)
+    this.skills = skills ?? new Skills(dataDir, messages)
     this.sessions = new Sessions(dataDir, messages)
     this.settings = new MemoryFile(join(dataDir, 'memory'), 'recall-settings', settingsSchema, () => ({ enabled: true, history: true, semantic: true, budget: 12_000 }), { invalid: messages.recallInvalid, locked: messages.memoryLocked })
     if (env.ANGELA_EMBEDDING_MODEL) {
@@ -83,13 +85,21 @@ export class Recall {
 
   /** Starts one coalesced IO task. SQLite batches yield between sources and embedding batches do not block normal text-only requests. */
   async start() {
+    if (this.index || this.closed)
+      return
     this.index = await RecallIndex.open(this.dataDir)
     try {
       this.watcher = watch(this.dataDir, (_event, file) => {
-        if (!file)
+        if (!file) {
           this.historyScan = 0
-        else if (/^[\da-f-]{36}\.json$/iu.test(file) && file !== `${this.sessionId}.json`)
+        }
+        else if (/^[\da-f-]{36}\.json$/iu.test(file) && file !== `${this.sessionId}.json`) {
+          if (this.changedHistory.size >= 256) {
+            this.changedHistory.clear()
+            this.historyScan = 0
+          }
           this.changedHistory.add(file)
+        }
       })
       this.watcher.on('error', () => {
         this.watcher?.close()
@@ -110,7 +120,7 @@ export class Recall {
   private background() {
     if (this.closed)
       return
-    void this.refresh().then(() => this.embed()).catch(() => this.problems.add('index'))
+    void this.refresh().then(() => this.embed()).catch(() => this.problem('index'))
   }
 
   async close() {
@@ -121,6 +131,30 @@ export class Recall {
     await Promise.allSettled([this.syncing, this.embedding])
     this.index?.close()
     this.index = undefined
+    this.timer = undefined
+    this.watcher = undefined
+    this.client = undefined
+    this.workspaceRoots.clear()
+    this.changedHistory.clear()
+    this.readableAcrossWorkspaces.clear()
+    this.problems.clear()
+    this.lastUsed = []
+  }
+
+  get resourceCounts() {
+    return { indexes: Number(Boolean(this.index)), watchers: Number(Boolean(this.watcher)), timers: Number(Boolean(this.timer)), embeddings: Number(Boolean(this.client)) }
+  }
+
+  private problem(name: string) {
+    if (this.problems.size >= 64)
+      this.problems.delete(this.problems.values().next().value!)
+    this.problems.add(name)
+  }
+
+  private allowOrigin(origin: string) {
+    if (this.readableAcrossWorkspaces.size >= 50)
+      this.readableAcrossWorkspaces.delete(this.readableAcrossWorkspaces.values().next().value!)
+    this.readableAcrossWorkspaces.add(origin)
   }
 
   private database() {
@@ -155,7 +189,7 @@ export class Recall {
     this.problems.delete('skills')
     this.problems.delete('index')
     if (this.embeddingConfigError)
-      this.problems.add('embedding-config')
+      this.problem('embedding-config')
     const seen = new Set<string>()
     if (settings.enabled) {
       try {
@@ -167,7 +201,7 @@ export class Recall {
             index.replace('personal', version, state.entries.map(entry => ({ id: `personal:${entry.id}`, kind: 'personal', scope: '', text: entry.text, updatedAt: entry.updatedAt })))
         }
       }
-      catch { this.problems.add('personal') }
+      catch { this.problem('personal') }
       try {
         for (const skill of (await this.skills.list()).filter(skill => skill.enabled)) {
           const origin = `skill:${skill.name}`
@@ -176,7 +210,7 @@ export class Recall {
             index.replace(origin, skill.version, [{ id: origin, kind: 'skill', scope: '', text: `${skill.name}\n${skill.description}\n${skill.instructions}`, updatedAt: '' }])
         }
       }
-      catch { this.problems.add('skills') }
+      catch { this.problem('skills') }
       if (settings.history) {
         const reconcile = !this.watcher || Date.now() - this.historyScan > 60_000
         let files = [...this.changedHistory]
@@ -188,7 +222,7 @@ export class Recall {
           }
           catch (error) {
             if (!(error instanceof Error) || !('code' in error) || error.code !== 'ENOENT')
-              this.problems.add('history')
+              this.problem('history')
           }
         }
         if (!reconcile) {
@@ -222,6 +256,8 @@ export class Recall {
                 catch {
                   // Archived workspaces can no longer exist. Their recorded path remains their retrieval scope.
                 }
+                if (this.workspaceRoots.size >= 32)
+                  this.workspaceRoots.delete(this.workspaceRoots.keys().next().value!)
                 this.workspaceRoots.set(session.workspace, root)
               }
               const excerpts: Omit<RecallHit, 'origin' | 'version'>[] = []
@@ -243,7 +279,7 @@ export class Recall {
             }
             seen.add(origin)
           }
-          catch { this.problems.add(origin) }
+          catch { this.problem(origin) }
           await setImmediate()
         }
       }
@@ -276,7 +312,7 @@ export class Recall {
         }
         catch {
           if (!this.closed)
-            this.problems.add('embedding')
+            this.problem('embedding')
           break
         }
         await setImmediate()
@@ -319,7 +355,7 @@ export class Recall {
       }
       catch {
         signal?.throwIfAborted()
-        this.problems.add('embedding')
+        this.problem('embedding')
       }
     }
     signal?.throwIfAborted()
@@ -364,7 +400,7 @@ export class Recall {
       core = await this.memory.read()
     }
     catch {
-      this.problems.add('personal')
+      this.problem('personal')
     }
     if (!settings.enabled) {
       if (core?.enabled)
@@ -408,7 +444,7 @@ export class Recall {
       }
     }
     catch {
-      this.problems.add('skills')
+      this.problem('skills')
     }
     const guidance = [
       `Current local date: ${localDate(new Date())}.`,
@@ -438,7 +474,7 @@ export class Recall {
           this.track(hits)
           if (parsed.output.all_workspaces) {
             for (const hit of hits)
-              this.readableAcrossWorkspaces.add(hit.origin)
+              this.allowOrigin(hit.origin)
           }
           return { status: 'ok', hits, partial: this.problems.size > 0, embedding: this.client?.status ?? (this.embeddingConfigError ? 'invalid' : 'not-configured') }
         }
@@ -493,6 +529,11 @@ export class Recall {
     return hit
   }
 
+  finishRequest() {
+    this.readableAcrossWorkspaces.clear()
+    this.lastUsed = this.lastUsed.slice(-50).map(hit => ({ ...hit, text: hit.text.slice(0, 1200) }))
+  }
+
   async changed(clearUsed = true) {
     if (clearUsed)
       this.lastUsed = []
@@ -523,7 +564,7 @@ export class Recall {
     if (text.startsWith('/memory search-all ')) {
       const hits = await this.search(text.slice(19), true, signal)
       for (const hit of hits)
-        this.readableAcrossWorkspaces.add(hit.origin)
+        this.allowOrigin(hit.origin)
       return JSON.stringify(hits, null, 2)
     }
     if (text.startsWith('/memory read '))
