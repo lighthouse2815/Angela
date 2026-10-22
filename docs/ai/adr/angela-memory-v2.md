@@ -89,3 +89,4 @@ Project observations include the checkpoint that the host actually saved, rather
 The compiler preserves literal diagnostics beyond its prose excerpt, then prioritizes decisions and failures within the summary budget.
 Cold aging runs in bounded idle indexing passes. `/memory age` also runs one explicit pass.
 Foreground context preparation pauses new background embedding batches and compaction passes.
+If an optional memory file is invalid, the runtime omits its tools and continues the conversation with a warning.

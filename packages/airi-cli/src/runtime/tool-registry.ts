@@ -40,8 +40,14 @@ export async function buildTools(sources: ContextSources, text: string, sessionI
   if (sources.tasks)
     tools.push(...taskTools(sources.tasks, sources.messages.tasks))
   const recall = sources.recall
-  if (recall)
-    tools.push(...recall.tools(), ...await recall.pageTools(text, verified), ...recall.skills.tools(text, verified, sessionId, () => recall.changed(false)))
+  if (recall) {
+    tools.push(...recall.tools())
+    try {
+      tools.push(...await recall.pageTools(text, verified))
+    }
+    catch { sources.warn(sources.messages.memoryUnavailable) }
+    tools.push(...recall.skills.tools(text, verified, sessionId, () => recall.changed(false)))
+  }
   return {
     tools,
     observe(event: StreamEvent): ToolObservation | undefined {
