@@ -1,6 +1,6 @@
 # @angela/electron-eventa
 
-Shared Eventa contract definitions for Electron IPC across AIRI apps.
+Shared Eventa contract definitions for Electron IPC across Angela apps.
 
 ## Exports
 

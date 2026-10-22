@@ -32,7 +32,7 @@ pages:
         failed: ショートカットの更新に失敗しました
         requiresModifier: Cmd、Ctrl、Alt、Super のいずれかを少なくとも 1 つ使用してください。
         requiresHoldModifier: Cmd、Ctrl、Alt、Superのいずれか、またはF13などのファンクションキーを使用してください。Shiftだけでは使えません。
-        denied: AIRIがグローバルキーを読み取れません。アクセシビリティ設定でAIRIを許可してから再試行してください。
+        denied: Angelaがグローバルキーを読み取れません。アクセシビリティ設定でAngelaを許可してから再試行してください。
         unsupported: このシステムはグローバルショートカットのキーを離したことを検出できません。
       toggle-move:
         label: 移動の切り替え
@@ -43,7 +43,7 @@ pages:
       press-keys: 何かキーを押してください…
       push-to-talk:
         title: プッシュトゥトークのショートカット
-        description: どのアプリでも、このショートカットを押しながらAIRIに話しかけられます。ショートカットをクリックして新しいキーの組み合わせを押してください。Escでキャンセルできます。
+        description: どのアプリでも、このショートカットを押しながらAngelaに話しかけられます。ショートカットをクリックして新しいキーの組み合わせを押してください。Escでキャンセルできます。
         inactive: このショートカットは、聴覚の入力モードがプッシュトゥトークで、マイクがオンの場合のみ使えます。
     developer:
       sections:
@@ -54,7 +54,7 @@ pages:
     general:
       hide-app-icon:
         title: タスクバー／Dockのアイコンを非表示
-        description: AIRIをトレイにのみ表示します。ウィンドウの表示や終了にはトレイメニューを使ってください。変更はすぐに適用されます。
+        description: Angelaをトレイにのみ表示します。ウィンドウの表示や終了にはトレイメニューを使ってください。変更はすぐに適用されます。
         load-error: アプリアイコンの設定を読み込めませんでした。
         save-error: アプリアイコンの設定を更新できませんでした。
 devtools:
@@ -63,8 +63,8 @@ devtools:
     context-flow:
       title: コンテキストのフロー
     editor:
-      title: AIRIエディタ
-      description: AIRIエディタウィンドウを開く
+      title: Angelaエディタ
+      description: Angelaエディタウィンドウを開く
       button: エディタを開く
     lag-visualizer:
       title: ラグビジュアライザー
@@ -138,21 +138,21 @@ devtools:
           starting: 開始中
           capturing: キャプチャ中
         title: キャプチャ診断
-        waiting: AIRIのメインウィンドウからの診断を待機中です。
+        waiting: Angelaのメインウィンドウからの診断を待機中です。
         capture:
           title: キャプチャ状態
           description: 選択したディスプレイ、キャプチャサイズ、除外座標を確認します。
           display: ディスプレイと範囲
           video-size: 入力映像
           sample-size: サンプルフレーム
-          window-bounds: AIRIウィンドウの範囲
+          window-bounds: Angelaウィンドウの範囲
           excluded-region: 除外領域
           exposure: 画面の露光
           behind-luminance: キャラクターの背後の光
           updated: 最終更新
         preview:
           title: 縮小キャプチャ
-          description: 赤い長方形はAIRIのウィンドウを示します。破線の長方形はライトマップが覆う領域を示します。
+          description: 赤い長方形はAngelaのウィンドウを示します。破線の長方形はライトマップが覆う領域を示します。
           unavailable: キャプチャフレームがありません。
         pixels:
           title: ピクセルの判定
@@ -163,7 +163,7 @@ devtools:
           see-through: 透過
         maps:
           title: ライトマップ
-          window: 各マップはAIRIウィンドウと、その各辺から半ウィンドウ分までを覆います。輪郭線はウィンドウを示します。
+          window: 各マップはAngelaウィンドウと、その各辺から半ウィンドウ分までを覆います。輪郭線はウィンドウを示します。
           unavailable: 環境データがありません。
           target: 計測値
           applied: 平滑化後の適用値
@@ -187,7 +187,7 @@ devtools:
         neutral-color-weight:
           title: 無彩色の重み
           description: 彩度の低い色の最小の重みを設定します。有彩色の内容は灰色より重く扱われます。
-      main-window-note: 変更はAIRIのメインウィンドウに反映されます。
+      main-window-note: 変更はAngelaのメインウィンドウに反映されます。
       title: Live2Dの環境光
       description: 画面のサンプリングとLive2Dのカラーライティングシェーダーを調整します
       controls:
@@ -253,7 +253,7 @@ devtools:
         filtered: シェーダー出力
         unavailable: プレビューにはWebGLが必要ですが、このウィンドウではコンテキストを作成できませんでした。
         environment:
-          live: 光はAIRIのメインウィンドウが公開した最新のスナップショットに基づきます。
+          live: 光はAngelaのメインウィンドウが公開した最新のスナップショットに基づきます。
           neutral: スナップショットがまだ届いていないため、プレビューはニュートラルな環境を使います。
         regions:
           title: テストカードの領域
@@ -373,7 +373,7 @@ devtools:
         reset-view: 表示をリセット
         export-project: プロジェクトをエクスポート
         import-project: プロジェクトをインポート
-        import-error: このファイルは有効なAIRI Live2Dモーションプロジェクトではありません。
+        import-error: このファイルは有効なAngela Live2Dモーションプロジェクトではありません。
         playback:
           label: タイムラインの再生操作
           start: 先頭へ移動
@@ -397,7 +397,7 @@ devtools:
           recording: モーションを収録中
           playing: モーションを再生中
           ready: '{count}サンプル · {duration}'
-        import-error: このファイルは有効なAIRI Live2Dモーション記録ではありません。
+        import-error: このファイルは有効なAngela Live2Dモーション記録ではありません。
       title: Live2Dモーション制御
       description: Live2Dの目、頭、体の動きを制御します。
       system-audio:
@@ -523,7 +523,7 @@ devtools:
       unread:
         title: 未読メッセージ
         description: 頭上のパネルにマークと件数を表示します。
-      main-window-note: 変更はAIRIのメインウィンドウに反映されます。
+      main-window-note: 変更はAngelaのメインウィンドウに反映されます。
     io-tracer:
       title: 入出力トレーサー
       recording:
@@ -537,8 +537,8 @@ screen-capture:
     dismiss: 閉じる
     instructions:
       step-1: '「システム設定」を開き、サイドバーから「プライバシーとセキュリティ」を選択します。'
-      step-2: '「画面収録とシステムオーディオ録音」および「システムオーディオ録音のみ」のセクションで、AIRI用のスイッチをオンにしてください。'
-      step-2-note: AIRIが表示されていない場合は、「+」ボタンをクリックして「アプリケーション」フォルダから「AIRI」を選択して手動で追加してください。
+      step-2: '「画面収録とシステムオーディオ録音」および「システムオーディオ録音のみ」のセクションで、Angela用のスイッチをオンにしてください。'
+      step-2-note: Angelaが表示されていない場合は、「+」ボタンをクリックして「アプリケーション」フォルダから「Angela」を選択して手動で追加してください。
 microphone-permission:
   states:
     not-determined: 未設定
@@ -546,11 +546,11 @@ microphone-permission:
     denied: 拒否済み
   settings:
     title: マイク
-    description: AIRIによるマイクの使用を管理します。この選択をリセットすると、現在のマイク入力が停止し、次回再び許可を求めます。
+    description: Angelaによるマイクの使用を管理します。この選択をリセットすると、現在のマイク入力が停止し、次回再び許可を求めます。
     revoke: アクセスを取り消す
     reset: 選択をリセット
   prompt:
     title: マイクへのアクセスを許可しますか？
-    description: AIRIは音声入力と文字起こしにマイクを使います。この選択は設定でリセットするまで有効です。
+    description: Angelaは音声入力と文字起こしにマイクを使います。この選択は設定でリセットするまで有効です。
     allow: 許可
     deny: 拒否

@@ -15,7 +15,7 @@ export async function setupInlayWindowInvokes(params: {
   inlayWindow: BrowserWindow
   serverChannel: ServerChannel
   i18n: I18n
-  /** The inlay registers a global Escape while it shows speech, so Escape interrupts AIRI from any app. */
+  /** The inlay registers a global Escape while it shows speech, so Escape interrupts Angela from any app. */
   globalShortcut: GlobalShortcutService
   /** Places the window at its home position. */
   returnHome: () => void

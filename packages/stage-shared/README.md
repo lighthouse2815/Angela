@@ -1,6 +1,6 @@
 # `@angela/stage-shared`
 
-Shared contracts and runtime-neutral helpers for AIRI stage applications and UI packages.
+Shared contracts and runtime-neutral helpers for Angela stage applications and UI packages.
 
 ## Use this package
 

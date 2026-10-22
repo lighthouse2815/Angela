@@ -2,7 +2,7 @@
   "name": "@angela/ui",
   "type": "module",
   "version": "0.12.0-beta.5",
-  "description": "A collection of UI components that used by Project AIRI",
+  "description": "A collection of UI components that used by Angela",
   "author": {
     "name": "Moeru AI Project AIRI Team",
     "email": "airi@moeru.ai",
@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/moeru-ai/airi.git",
+    "url": "https://github.com/lighthouse2815/Angela.git",
     "directory": "packages/ui"
   },
   "exports": {

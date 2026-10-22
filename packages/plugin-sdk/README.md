@@ -1,6 +1,6 @@
 # @angela/plugin-sdk
 
-Runtime-agnostic SDK for AIRI extensions.
+Runtime-agnostic SDK for Angela extensions.
 
 ## Extension Manifest
 

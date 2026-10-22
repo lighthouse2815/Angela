@@ -251,13 +251,13 @@ export interface ExtensionKitManifest {
 export interface ExtensionManifestV2 {
   /** Manifest schema version expected by the current Host. */
   manifestVersion: 2
-  /** Manifest kind discriminator used to identify AIRI Extension manifests. */
+  /** Manifest kind discriminator used to identify Angela Extension manifests. */
   kind: 'manifest.extension.airi.moeru.ai'
   /** Stable Extension identifier used for installation and session identity. */
   id: string
   /** Extension package version. */
   version: string
-  /** AIRI compatibility range and supported runtimes. */
+  /** Angela compatibility range and supported runtimes. */
   engines: {
     airi: string
     runtimes: PluginRuntime[]
@@ -497,7 +497,7 @@ export interface ExtensionHostInstallContext {
  * - The host bootstrap options consumed by {@link import('../core').ExtensionHost}
  */
 export interface ExtensionHostOptions {
-  /** Running AIRI version used to enforce `engines.airi` before setup. */
+  /** Running Angela version used to enforce `engines.airi` before setup. */
   airiVersion?: string
   /** Installable host features that can register kits, resources, and capabilities. @default [] */
   contributions?: ExtensionHostContribution[]

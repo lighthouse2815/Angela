@@ -150,7 +150,7 @@ async function streamOnce({
       // NOTICE:
       // `steps` settles after all tool rounds, while provider finish events can arrive earlier.
       // Await it and consume other SDK promises to prevent stalled evals and unhandled rejections.
-      // Source: @xsai/stream-text 0.5 steps and AIRI eval runners.
+      // Source: @xsai/stream-text 0.5 steps and Angela eval runners.
       // Remove this path when xsAI emits one terminal event after all tool rounds.
       void streamResult.steps.then(async () => {
         if (settled)

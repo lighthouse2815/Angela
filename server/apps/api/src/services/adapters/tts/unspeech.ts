@@ -24,7 +24,7 @@ interface SendSpeechOptions {
  * Sends one OpenAI-shaped speech request through the unspeech SDK.
  *
  * Use when:
- * - A TTS adapter has resolved AIRI's provider policy and needs to delegate the
+ * - A TTS adapter has resolved Angela's provider policy and needs to delegate the
  *   actual HTTP request to unspeech.
  *
  * Expects:
@@ -90,7 +90,7 @@ interface ListVoicesOptions {
 }
 
 /**
- * Lists unspeech voices and maps SDK failures into AIRI gateway errors.
+ * Lists unspeech voices and maps SDK failures into Angela gateway errors.
  *
  * Use when:
  * - A TTS adapter needs unspeech's normalized `Voice[]` catalog.

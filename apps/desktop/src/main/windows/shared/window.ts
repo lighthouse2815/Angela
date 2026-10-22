@@ -45,7 +45,7 @@ export function transparentWindowConfig(): BrowserWindowConstructorOptions {
  * - Creating an Electron window that receives the shared privileged preload
  *
  * Expects:
- * - The window loads only AIRI-controlled renderer content
+ * - The window loads only Angela-controlled renderer content
  *
  * Returns:
  * - Nothing; installs navigation and popup guards on the window's web contents

@@ -2,17 +2,17 @@
   "name": "@angela/unocss-preset-fonts",
   "type": "module",
   "version": "0.12.0-beta.5",
-  "description": "Fonts that are not included by Google Fonts, FontSource but open-source used by Project AIRI",
+  "description": "Fonts that are not included by Google Fonts, FontSource but open-source used by Angela",
   "author": {
     "name": "Moeru AI Project AIRI Team",
     "email": "airi@moeru.ai",
     "url": "https://github.com/moeru-ai"
   },
   "license": "MIT",
-  "homepage": "https://github.com/moeru-ai/airi",
+  "homepage": "https://github.com/lighthouse2815/Angela",
   "repository": {
     "type": "git",
-    "url": "https://github.com/moeru-ai/airi.git",
+    "url": "https://github.com/lighthouse2815/Angela.git",
     "directory": "packages/unocss-preset-fonts"
   },
   "exports": {

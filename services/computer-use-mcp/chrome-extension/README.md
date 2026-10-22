@@ -1,6 +1,6 @@
-# AIRI Desktop Grounding — Chrome Extension
+# Angela Desktop Grounding — Chrome Extension
 
-Read-only Chrome DOM observation bridge for the AIRI Desktop Grounding layer.
+Read-only Chrome DOM observation bridge for the Angela Desktop Grounding layer.
 
 ## What it does
 

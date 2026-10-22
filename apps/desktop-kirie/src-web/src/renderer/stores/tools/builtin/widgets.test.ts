@@ -186,10 +186,10 @@ async function resolveAihubmixModel(): Promise<string> {
 }
 
 /**
- * Builds the exact `stage_widgets` tool schema AIRI sends to the provider.
+ * Builds the exact `stage_widgets` tool schema Angela sends to the provider.
  *
  * Use when:
- * - The integration test needs to prove the live provider sees the same tool schema as AIRI
+ * - The integration test needs to prove the live provider sees the same tool schema as Angela
  *
  * Expects:
  * - `widgetsTools()` resolves in the Vitest Node runtime

@@ -6,7 +6,7 @@
 
 `Conversation` contains ordered `Turn` values. `UserTurn` owns user content. `SystemTurn` owns instructions or application context. Its authority distinguishes system instructions, developer instructions, and context data. Application context does not gain instruction authority merely because the application supplied it.
 
-`AssistantTurn` owns an ordered `rounds` array. One round represents one model invocation and all tool executions it requested, including parallel calls. Its content references tool invocations; each invocation owns its call and result once. The provider call id correlates results within that round. Tool reruns use the AIRI invocation id to distinguish repeated provider call ids. A run id refers to a real scheduler execution, not the number of rounds. Imported history has no model-call metadata when that information is unavailable.
+`AssistantTurn` owns an ordered `rounds` array. One round represents one model invocation and all tool executions it requested, including parallel calls. Its content references tool invocations; each invocation owns its call and result once. The provider call id correlates results within that round. Tool reruns use the Angela invocation id to distinguish repeated provider call ids. A run id refers to a real scheduler execution, not the number of rounds. Imported history has no model-call metadata when that information is unavailable.
 
 `ProviderContinuation` stores each protocol's own SDK message type: Chat `Message[]` or Responses `ItemParam[]`.
 

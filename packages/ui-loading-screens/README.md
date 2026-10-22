@@ -1,6 +1,6 @@
 # @angela/ui-loading-screens
 
-This package provides loading screens for AIRI apps. [View the playground](https://proj-airi-packages-ui-loading-screens.netlify.app/).
+This package provides loading screens for Angela apps. [View the playground](https://proj-airi-packages-ui-loading-screens.netlify.app/).
 
 ## Use
 

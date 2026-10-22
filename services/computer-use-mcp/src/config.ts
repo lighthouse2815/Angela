@@ -9,6 +9,7 @@ const defaultDeniedApps = [
   'system settings',
   'activity monitor',
   'airi',
+  'angela',
 ]
 
 const defaultOpenableApps = [

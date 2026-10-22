@@ -266,7 +266,7 @@ describe('stripeRoutes', () => {
       expect(payment.settle).not.toHaveBeenCalled()
     })
 
-    it('acknowledges a checkout session that is not an AIRI order', async () => {
+    it('acknowledges a checkout session that is not an Angela order', async () => {
       const payment = createMockPayment()
       const webhook = createWebhookOperation(
         {

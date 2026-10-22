@@ -31,15 +31,15 @@ describe('voiceController input', () => {
     const segment = { id: 'words', revision: 1, text: 'air', tokens: [{ text: 'air', start: 0, end: 3 }], final: false }
     output.write({ type: 'update', revision: 1, segments: [segment] })
     await expect.poll(() => attempt.input?.transcript.raw.text).toBe('air')
-    expect(controller.correctInput(attempt.id, [{ segmentId: 'words', range: { kind: 'tokens', start: 0, end: 1 }, expectedText: 'air', replacement: 'AIRI' }])).toEqual({ status: 'applied' })
+    expect(controller.correctInput(attempt.id, [{ segmentId: 'words', range: { kind: 'tokens', start: 0, end: 1 }, expectedText: 'air', replacement: 'Angela' }])).toEqual({ status: 'applied' })
     output.write({ type: 'update', revision: 2, segments: [{ ...segment, revision: 2, text: 'air listens', final: true }] })
     await expect.poll(() => attempt.input?.transcript.raw.text).toBe('air listens')
-    expect(attempt.input?.transcript.corrected.text).toBe('AIRI listens')
+    expect(attempt.input?.transcript.corrected.text).toBe('Angela listens')
     void attempt.end()
     output.write({ type: 'complete', revision: 2 })
     output.close()
     expect((await attempt.done).status).toBe('drafted')
-    expect(submit).toHaveBeenCalledWith(expect.objectContaining({ text: 'AIRI listens' }), expect.any(AbortSignal))
+    expect(submit).toHaveBeenCalledWith(expect.objectContaining({ text: 'Angela listens' }), expect.any(AbortSignal))
     await controller.close()
   })
 
@@ -340,7 +340,7 @@ describe('voiceController input', () => {
               return
             started.resolve()
             await rewrite.promise
-            writes.push(ctx.patch({ edits: [{ segmentId: 'first', range: { kind: 'tokens', start: 0, end: 1 }, expectedText: 'air', replacement: 'AIRI' }], evidenceIds: ['fuzzy-match'] }))
+            writes.push(ctx.patch({ edits: [{ segmentId: 'first', range: { kind: 'tokens', start: 0, end: 1 }, expectedText: 'air', replacement: 'Angela' }], evidenceIds: ['fuzzy-match'] }))
           })
         })
       },
@@ -355,13 +355,13 @@ describe('voiceController input', () => {
     await expect.poll(() => attempt.input?.transcript.raw.text).toBe('air listens')
     rewrite.resolve()
     await expect.poll(() => writes).toEqual([{ status: 'applied' }])
-    expect(attempt.input?.transcript.corrected.text).toBe('AIRI listens')
+    expect(attempt.input?.transcript.corrected.text).toBe('Angela listens')
     expect(attempt.input?.transcript.raw.text).toBe('air listens')
     void attempt.end()
     output.write({ type: 'complete', revision: 2 })
     output.close()
     expect((await attempt.done).status).toBe('drafted')
-    expect(submit).toHaveBeenCalledWith(expect.objectContaining({ text: 'AIRI listens' }), expect.any(AbortSignal))
+    expect(submit).toHaveBeenCalledWith(expect.objectContaining({ text: 'Angela listens' }), expect.any(AbortSignal))
     await controller.close()
   })
 

@@ -2,9 +2,9 @@
 > Auth, Compose, Caddy, and Railway files moved to [dev-infuture](../../dev-in-future/README.md).
 > The local desktop does not require this hosted stack.
 
-# AIRI Backend
+# Angela Backend
 
-Project AIRI's hosted backend source lives under this folder. Workspace package
+Angela's hosted backend source lives under this folder. Workspace package
 names stay stable; the directory groups service source and database ownership
 while production deployment configuration remains in `proj-airi/airi-railway`.
 

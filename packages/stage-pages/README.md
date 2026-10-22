@@ -1,6 +1,6 @@
 # Stage Pages
 
-`@angela/stage-pages` contains route-level Vue pages that multiple AIRI stage applications share.
+`@angela/stage-pages` contains route-level Vue pages that multiple Angela stage applications share.
 
 ## Use
 

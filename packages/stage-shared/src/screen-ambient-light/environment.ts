@@ -302,7 +302,7 @@ export interface AmbientLightEnvironment {
    */
   exposure: number
   /**
-   * Mean linear luminance of the display outside the AIRI window, from 0 to 1.
+   * Mean linear luminance of the display outside the Angela window, from 0 to 1.
    *
    * It sets the exposure of the whole model, so a window dragged from a bright
    * area to a dark one does not change how bright the character is. The light

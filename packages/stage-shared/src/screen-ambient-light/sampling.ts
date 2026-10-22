@@ -28,12 +28,12 @@ export interface PixelFrame {
 }
 
 export interface SampleRegion {
-  /** The AIRI window, in display-normalized coordinates. */
+  /** The Angela window, in display-normalized coordinates. */
   exclude: NormalizedRectangle
   /**
-   * Opacity of what AIRI paints, on the same grid as the frame, from 0 to 255.
+   * Opacity of what Angela paints, on the same grid as the frame, from 0 to 255.
    *
-   * The capture contains the AIRI window composited over the desktop, so the
+   * The capture contains the Angela window composited over the desktop, so the
    * window rectangle holds a mix of the character and the desktop showing
    * through wherever the window is transparent. This mask separates the two.
    * Where it reads zero, the captured pixel is the desktop behind the window,
@@ -108,14 +108,14 @@ export interface ScreenAmbientLightSamplingDiagnostics {
    * blur. The rest of the frame cannot affect the maps and is not read.
    */
   totalPixelCount: number
-  /** Pixels inside the window that AIRI paints. These carry no measurement. */
+  /** Pixels inside the window that Angela paints. These carry no measurement. */
   excludedPixelCount: number
   /** Frame pixels the capture left fully transparent. These carry no light. */
   transparentPixelCount: number
   /** Pixels that contributed light to the maps. */
   acceptedPixelCount: number
   /**
-   * Pixels inside the window that AIRI does not paint, which is the desktop
+   * Pixels inside the window that Angela does not paint, which is the desktop
    * behind the character. Zero means the backlight had no data this frame.
    */
   seeThroughPixelCount: number
@@ -147,13 +147,13 @@ interface ResampledField {
 }
 
 /**
- * Measures the screen around and behind the AIRI window from one coarse frame.
+ * Measures the screen around and behind the Angela window from one coarse frame.
  *
  * The result is two light maps that cover the window plus a margin, so that the
  * shader can look light up by screen position instead of by direction from the
  * model center. The steps are:
  *
- * 1. Give every frame pixel a weight. Pixels that AIRI paints weigh nothing, so
+ * 1. Give every frame pixel a weight. Pixels that Angela paints weigh nothing, so
  *    the model cannot feed its own colors back into the next sample. The
  *    saturation weight then lets colored content count for more than gray.
  * 2. Blur the weighted linear color and the weight itself, once for each of the
@@ -453,7 +453,7 @@ function classifyPixel(frame: PixelFrame, region: SampleRegion, x: number, y: nu
 }
 
 /**
- * Mean linear luminance of the display outside the AIRI window.
+ * Mean linear luminance of the display outside the Angela window.
  *
  * This is the exposure meter for the whole model, so it reads every visible
  * pixel of the frame rather than the grid that feeds the maps: a bright window

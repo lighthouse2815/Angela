@@ -38,14 +38,14 @@ declare module 'vitest' {
   }
 }
 
-/** Vitest expect with AIRI audio-input matcher types. */
+/** Vitest expect with Angela audio-input matcher types. */
 export const expect = vitestExpect
 
 /**
  * Normalizes speech text for transcript comparison.
  *
  * @example
- * normalizeSpeechText(' Hello, AIRI! ')
+ * normalizeSpeechText(' Hello, Angela! ')
  * // => 'helloairi'
  */
 function normalizeSpeechText(value: string): string {
@@ -55,7 +55,7 @@ function normalizeSpeechText(value: string): string {
     .replace(/[^\p{L}\p{N}]+/gu, '')
 }
 
-/** Installs asynchronous matchers for AIRI audio-input observations. */
+/** Installs asynchronous matchers for Angela audio-input observations. */
 export function installAudioInputMatchers(): void {
   vitestExpect.extend({
     async toHaveCapturedTranscriptionAudio(

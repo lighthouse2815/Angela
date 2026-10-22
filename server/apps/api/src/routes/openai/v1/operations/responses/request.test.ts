@@ -150,7 +150,7 @@ describe('stateless Responses request boundary', () => {
 })
 
 it('preserves search options, tool choice, sources and client-owned search history', () => {
-  const input = [{ type: 'web_search_call', id: 'ws-1', status: 'completed', action: { type: 'search', queries: ['AIRI'], sources: [{ type: 'url', url: 'https://airi.moeru.ai' }] } }]
+  const input = [{ type: 'web_search_call', id: 'ws-1', status: 'completed', action: { type: 'search', queries: ['Angela'], sources: [{ type: 'url', url: 'https://airi.moeru.ai' }] } }]
   const tools = [{ type: 'web_search', external_web_access: false, filters: { allowed_domains: ['airi.moeru.ai'] }, user_location: { type: 'approximate', country: 'JP' } }]
   const request = parseResponsesRequest({ input, tools, tool_choice: 'none', include: ['web_search_call.action.sources'] })
   expect(request.policy.input).toEqual(input)
@@ -161,7 +161,7 @@ it('preserves search options, tool choice, sources and client-owned search histo
 })
 
 it('preserves a live find-in-page search item without a URL', () => {
-  const input = [{ type: 'web_search_call', id: 'ws-1', status: 'completed', action: { type: 'find_in_page', pattern: 'AIRI' } }]
+  const input = [{ type: 'web_search_call', id: 'ws-1', status: 'completed', action: { type: 'find_in_page', pattern: 'Angela' } }]
 
   const request = parseResponsesRequest({ input })
 

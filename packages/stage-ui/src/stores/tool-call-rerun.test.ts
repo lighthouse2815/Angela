@@ -69,7 +69,7 @@ describe('replaceToolCallResult', () => {
   it('updates only the selected invocation when rounds reuse a call id (PR #2477)', () => {
     // ROOT CAUSE:
     // Provider call ids can repeat across rounds. Matching every call id replaced
-    // unrelated executions. AIRI invocation ids identify the selected execution.
+    // unrelated executions. Angela invocation ids identify the selected execution.
     const message = assistantMessage({ generationTranscript: {
       type: 'assistant',
       id: 'turn',

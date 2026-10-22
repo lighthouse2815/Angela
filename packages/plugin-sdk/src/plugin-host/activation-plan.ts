@@ -74,7 +74,7 @@ export interface ActivationPlannerInput {
   hostProvidedKits: readonly HostProvidedKitDeclaration[]
   /** Runtime that will load the target Extensions. */
   runtime: PluginRuntime
-  /** Running AIRI version. When omitted, the Planner skips AIRI compatibility validation. @default undefined */
+  /** Running Angela version. When omitted, the Planner skips Angela compatibility validation. @default undefined */
   airiVersion?: string
   /** Whether the Host can run enabled Extensions. */
   systemEnabled: boolean
@@ -197,7 +197,7 @@ export function planExtensionActivation(input: ActivationPlannerInput): Activati
         extensionIds: [extensionId],
         requestedVersion: manifest.engines.airi,
         providerVersion: input.airiVersion,
-        message: `Extension "${extensionId}" requires AIRI ${manifest.engines.airi}, but the Host runs ${input.airiVersion}.`,
+        message: `Extension "${extensionId}" requires Angela ${manifest.engines.airi}, but the Host runs ${input.airiVersion}.`,
       })
     }
   }

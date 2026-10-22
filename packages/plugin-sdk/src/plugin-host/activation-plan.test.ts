@@ -435,7 +435,7 @@ describe('planExtensionActivation', () => {
     })
   })
 
-  it('rejects an Extension that does not support the AIRI version', () => {
+  it('rejects an Extension that does not support the Angela version', () => {
     const extension = createManifest('future-extension')
     extension.engines.airi = '^2.0.0'
 
@@ -456,7 +456,7 @@ describe('planExtensionActivation', () => {
         extensionIds: ['future-extension'],
         requestedVersion: '^2.0.0',
         providerVersion: '1.5.0',
-        message: 'Extension "future-extension" requires AIRI ^2.0.0, but the Host runs 1.5.0.',
+        message: 'Extension "future-extension" requires Angela ^2.0.0, but the Host runs 1.5.0.',
       }],
     })
   })

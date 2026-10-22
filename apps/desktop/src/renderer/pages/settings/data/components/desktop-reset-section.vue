@@ -32,7 +32,7 @@ async function resetDesktopState() {
 }
 
 /**
- * Moves the main AIRI desktop window back to the current display center.
+ * Moves the main Angela desktop window back to the current display center.
  */
 async function handleCenterMainWindow() {
   try {

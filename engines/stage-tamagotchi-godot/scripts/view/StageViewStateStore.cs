@@ -3,7 +3,7 @@ using System.IO;
 using System.Text.Json;
 
 /// <summary>
-/// Load and save Godot-owned stage view state under the AIRI-provided storage root.
+/// Load and save Godot-owned stage view state under the Angela-provided storage root.
 ///
 /// This preserves the persistence mechanism for the future Godot-hosted architecture.
 /// The current Electron-sidecar runtime does not wire this store into the active view-state
@@ -22,7 +22,7 @@ public sealed class StageViewStateStore
     {
         if (string.IsNullOrWhiteSpace(storageRoot) || !Path.IsPathFullyQualified(storageRoot))
         {
-            throw new InvalidOperationException("AIRI storage root must be a non-empty absolute path.");
+            throw new InvalidOperationException("Angela storage root must be a non-empty absolute path.");
         }
 
         _jsonOptions = jsonOptions;

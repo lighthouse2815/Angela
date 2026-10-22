@@ -216,7 +216,7 @@ describe('screen ambient light sampling', () => {
   it('places the maps around what was drawn rather than around the window', () => {
     // ROOT CAUSE:
     //
-    // The maps sat around the AIRI window, and a wide window holding an
+    // The maps sat around the Angela window, and a wide window holding an
     // upright character is mostly empty: on a 1200 x 400 window the character
     // covered 5 of 24 texels across. The maps now sit around the bounds of
     // what the renderer drew.
@@ -265,7 +265,7 @@ describe('screen ambient light sampling', () => {
   it('never lets the character reach the light maps', () => {
     // ROOT CAUSE:
     //
-    // The capture holds the AIRI window composited over the desktop, so the
+    // The capture holds the Angela window composited over the desktop, so the
     // window rectangle holds the character too. Averaging the character back
     // into the light that lights it compounds every frame until the color runs
     // away. Only pixels the mask reports as unpainted may contribute.
@@ -295,7 +295,7 @@ describe('screen ambient light sampling', () => {
     // The maps only see beside the character where the character is painted.
     // A window hidden behind it lights the character from behind, and the
     // pixels that carry that light are the ones inside the window rectangle
-    // that AIRI does not paint.
+    // that Angela does not paint.
     const frame = createFrame(32, 32, [10, 10, 12, 255])
     fillPixels(frame, 8, 8, 16, 16, [40, 200, 90, 255])
     const painted = new Uint8ClampedArray(32 * 32)
@@ -454,7 +454,7 @@ function blackFrame() {
 
 /**
  * Reads a map the way the shader does, at a position given in window
- * coordinates: 0 is the left or top edge of the AIRI window and 1 is the right
+ * coordinates: 0 is the left or top edge of the Angela window and 1 is the right
  * or bottom edge, so -0.2 lies beside the window and 0.5 is its center.
  */
 function lightAt(

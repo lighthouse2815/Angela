@@ -75,7 +75,7 @@ describe('controlsIslandSpeechMute', () => {
     host.remove()
   })
 
-  // Muting is reachable before AIRI speaks, which is what keeps a user from
+  // Muting is reachable before Angela speaks, which is what keeps a user from
   // paying for synthesis they do not want to hear. The chat panel's interrupt
   // button owns stopping speech that already plays.
   it('toggles speech output on click', async () => {

@@ -4,7 +4,7 @@ Own the Electron capture scenarios used to generate tamagotchi docs screenshots.
 
 ## Purpose
 
-This package owns product-specific Electron scenario definitions and AIRI window, navigation, and interaction helpers only. It depends on `@vishot/source-electron` for:
+This package owns product-specific Electron scenario definitions and Angela window, navigation, and interaction helpers only. It depends on `@vishot/source-electron` for:
 
 - the generic `defineScenario()` helper
 - the generic Electron capture context surface

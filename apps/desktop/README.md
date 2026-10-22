@@ -1,6 +1,6 @@
 # Stage Tamagotchi
 
-The Electron desktop app runs AIRI characters, chat, voice, and desktop tools.
+The Electron desktop app runs Angela characters, chat, voice, and desktop tools.
 Shared character behavior belongs in `packages/stage-ui`. Use `stage-web` for browser-only features.
 
 ## Shared local configuration

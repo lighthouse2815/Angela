@@ -75,11 +75,11 @@ const audioTestAPI = createAudioTestAPI<
   },
 })
 
-/** Groups AIRI audio-input tests in the Vitest task tree. */
+/** Groups Angela audio-input tests in the Vitest task tree. */
 export const describe = audioTestAPI.describe
 
-/** Defines an AIRI audio-input test for each selected target. */
+/** Defines an Angela audio-input test for each selected target. */
 export const it = audioTestAPI.it
 
-/** Vitest expect with AIRI audio-input matchers installed. */
+/** Vitest expect with Angela audio-input matchers installed. */
 export { expect }

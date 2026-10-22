@@ -21,7 +21,7 @@ export type WakeWordModelFile = (typeof files)[number]['name']
 async function modelDirectory(): Promise<string> {
   const root = await findWorkspaceDir(import.meta.dirname)
   if (!root)
-    throw new Error('Could not find the AIRI workspace.')
+    throw new Error('Could not find the Angela workspace.')
   return join(root, '.cache', sherpawModelPath(kwsModel))
 }
 

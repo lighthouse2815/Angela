@@ -3,7 +3,7 @@ import type { Card } from '@angela/ccc'
 import type { WakeWord } from '../libs/voice/wake-words'
 
 /**
- * AIRI-specific runtime configuration embedded in a character card.
+ * Angela-specific runtime configuration embedded in a character card.
  *
  * The extension is persisted with the card. Editor surfaces must preserve
  * fields they do not own so independent runtime modules can evolve without
@@ -70,7 +70,7 @@ export interface AiriExtension {
   }>
 }
 
-/** Character card normalized with the AIRI extension required by the runtime. */
+/** Character card normalized with the Angela extension required by the runtime. */
 export interface AiriCard extends Card {
   extensions: {
     airi: AiriExtension

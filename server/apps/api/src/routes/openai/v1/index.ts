@@ -90,7 +90,7 @@ export function createV1Routes(input: CreateV1RoutesDeps) {
   const audio = gateway.route('audio')
   const speechCatalog = createSpeechCatalogOperation(deps)
 
-  // AIRI audio surface (mounted at /api/v1/audio). Lives outside /openai/ so
+  // Angela audio surface (mounted at /api/v1/audio). Lives outside /openai/ so
   // the `/voices`, `/voices/streaming`, and `/models` extensions aren't
   // misread as OpenAI-compatible. `/audio/speech/ws` is registered
   // separately in app.ts because it needs the WebSocket upgrade middleware.

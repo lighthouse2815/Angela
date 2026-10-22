@@ -1,14 +1,14 @@
 {
   "publisher": "proj-airi",
   "name": "airi-vscode",
-  "displayName": "AIRI VSCode adapter",
+  "displayName": "Angela VSCode adapter",
   "type": "module",
   "version": "0.12.0-beta.5",
   "private": true,
-  "description": "Adapter that connects VSCode into Project AIRI",
+  "description": "Adapter that connects VSCode into Angela",
   "repository": {
     "type": "git",
-    "url": "https://github.com/moeru-ai/airi.git",
+    "url": "https://github.com/lighthouse2815/Angela.git",
     "directory": "integrations/vscode/vscode-airi"
   },
   "categories": [
@@ -27,24 +27,24 @@
     "commands": [
       {
         "command": "airi-vscode.enable",
-        "title": "AIRI: Enable"
+        "title": "Angela: Enable"
       },
       {
         "command": "airi-vscode.disable",
-        "title": "AIRI: Disable"
+        "title": "Angela: Disable"
       },
       {
         "command": "airi-vscode.status",
-        "title": "AIRI: Show Status"
+        "title": "Angela: Show Status"
       }
     ],
     "configuration": {
-      "title": "AIRI",
+      "title": "Angela",
       "properties": {
         "airi-vscode.enabled": {
           "type": "boolean",
           "default": true,
-          "description": "Enable or disable the AIRI extension"
+          "description": "Enable or disable the Angela extension"
         },
         "airi-vscode.contextLines": {
           "type": "number",

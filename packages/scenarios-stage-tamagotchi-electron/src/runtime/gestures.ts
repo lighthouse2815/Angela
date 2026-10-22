@@ -22,7 +22,7 @@ const gestureFrameIntervalMs = 16
 const gestureSettleTimeMs = 350
 
 /**
- * Performs one swipe through the input path used by the AIRI gesture modules.
+ * Performs one swipe through the input path used by the Angela gesture modules.
  *
  * Touch input uses Chromium CDP so the browser produces trusted Pointer Events.
  * Wheel input uses Playwright's native mouse wheel path.

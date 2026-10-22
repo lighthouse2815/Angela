@@ -290,7 +290,7 @@ async function installCACertificate(caCert: string) {
     }
   }
   catch (error) {
-    log.withError(error).warn(`Failed to install AIRI WebSocket CA certificate from ${caCertPath}`)
+    log.withError(error).warn(`Failed to install Angela WebSocket CA certificate from ${caCertPath}`)
   }
 }
 

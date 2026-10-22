@@ -30,7 +30,7 @@ describe('regenerateWindowsLatest', () => {
 
     await mkdir(bundleDir, { recursive: true })
     await writeFile(join(workspaceRoot, 'pnpm-workspace.yaml'), 'packages:\n  - apps/*\n', 'utf8')
-    await writeFile(join(bundleDir, 'AIRI-1.2.3-windows-x64-setup.exe'), 'signed-binary-content', 'utf8')
+    await writeFile(join(bundleDir, 'Angela-1.2.3-windows-x64-setup.exe'), 'signed-binary-content', 'utf8')
     await writeFile(join(bundleDir, 'latest.yml'), yaml.stringify({
       version: 'stale-version',
       path: 'stale.exe',
@@ -43,22 +43,22 @@ describe('regenerateWindowsLatest', () => {
     process.chdir(packageDir)
 
     const nextUpdateInfo = await regenerateWindowsLatest({
-      input: 'apps/desktop/bundle/AIRI-1.2.3-windows-x64-setup.exe',
+      input: 'apps/desktop/bundle/Angela-1.2.3-windows-x64-setup.exe',
       output: 'apps/desktop/bundle/latest.yml',
       version: '1.2.3',
     })
 
-    const expectedHashes = await hashFile(join(bundleDir, 'AIRI-1.2.3-windows-x64-setup.exe'))
+    const expectedHashes = await hashFile(join(bundleDir, 'Angela-1.2.3-windows-x64-setup.exe'))
     expect(nextUpdateInfo).toMatchObject({
       version: '1.2.3',
-      path: 'AIRI-1.2.3-windows-x64-setup.exe',
+      path: 'Angela-1.2.3-windows-x64-setup.exe',
       sha512: expectedHashes.sha512,
       sha2: expectedHashes.sha256,
       releaseDate: '2026-01-02T03:04:05.000Z',
       stagingPercentage: 25,
       files: [
         {
-          url: 'AIRI-1.2.3-windows-x64-setup.exe',
+          url: 'Angela-1.2.3-windows-x64-setup.exe',
           sha512: expectedHashes.sha512,
         },
       ],
@@ -75,27 +75,27 @@ describe('regenerateWindowsLatest', () => {
     const bundleDir = join(packageDir, 'bundle')
 
     await mkdir(bundleDir, { recursive: true })
-    await writeFile(join(bundleDir, 'AIRI-9.9.9-windows-x64-setup.exe'), 'another-signed-binary', 'utf8')
+    await writeFile(join(bundleDir, 'Angela-9.9.9-windows-x64-setup.exe'), 'another-signed-binary', 'utf8')
     process.chdir(packageDir)
 
     await regenerateWindowsLatest({
-      input: 'bundle/AIRI-9.9.9-windows-x64-setup.exe',
+      input: 'bundle/Angela-9.9.9-windows-x64-setup.exe',
       output: 'bundle/latest.yml',
       version: '9.9.9',
       releaseDate: '2026-03-23T00:00:00.000Z',
     })
 
     const persisted = yaml.parse(await readFile(resolve(bundleDir, 'latest.yml'), 'utf8'))
-    const expectedHashes = await hashFile(join(bundleDir, 'AIRI-9.9.9-windows-x64-setup.exe'))
+    const expectedHashes = await hashFile(join(bundleDir, 'Angela-9.9.9-windows-x64-setup.exe'))
     expect(persisted).toMatchObject({
       version: '9.9.9',
-      path: 'AIRI-9.9.9-windows-x64-setup.exe',
+      path: 'Angela-9.9.9-windows-x64-setup.exe',
       sha512: expectedHashes.sha512,
       sha2: expectedHashes.sha256,
       releaseDate: '2026-03-23T00:00:00.000Z',
       files: [
         {
-          url: 'AIRI-9.9.9-windows-x64-setup.exe',
+          url: 'Angela-9.9.9-windows-x64-setup.exe',
           sha512: expectedHashes.sha512,
         },
       ],

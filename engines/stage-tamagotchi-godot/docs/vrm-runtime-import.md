@@ -51,7 +51,7 @@ There are two independent boundaries:
 - Runtime support: the V-Sekai add-on has editor import support, but it does not
   expose a stable high-level runtime API such as `load_vrm(path) -> Node`.
 
-The current AIRI runtime bridge covers the VRM 0.x path:
+The current Angela runtime bridge covers the VRM 0.x path:
 
 ```text
 extensions.VRM
@@ -75,13 +75,13 @@ by the sidecar runtime importer. VRM 1.0 runtime import needs a real fixture and
 separate registration of the vendored `VRMC_*` extensions before it should be
 claimed as supported.
 
-## AIRI Runtime Extension
+## Angela Runtime Extension
 
 `AiriVrmRuntimeExtension.gd` extends the vendored V-Sekai VRM 0.x extension.
 It exists because Godot 4.6 reports an internal missing-key error when
 `GLTFState.get_additional_data(&"vrm/already_processed")` reads an unset key.
 
-The AIRI runtime importer seeds that key before import, and the AIRI extension
+The Angela runtime importer seeds that key before import, and the Angela extension
 treats only `true` as already processed. This preserves the vendor preflight
 behavior while avoiding the debugger error during sidecar runtime import.
 

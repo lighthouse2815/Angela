@@ -1,6 +1,6 @@
-# AIRI Minecraft Service
+# Angela Minecraft Service
 
-This workspace runs AIRI's dedicated Minecraft bot. It connects a Mineflayer runtime to a Minecraft server, loads the cognitive stack in `src/cognitive`, and bridges status, context, and command traffic back to AIRI so the Stage settings shell can observe the service.
+This workspace runs Angela's dedicated Minecraft bot. It connects a Mineflayer runtime to a Minecraft server, loads the cognitive stack in `src/cognitive`, and bridges status, context, and command traffic back to Angela so the Stage settings shell can observe the service.
 
 ## Deprecation Notice
 
@@ -32,7 +32,7 @@ Treat this service as a local-development and trusted-server tool only.
 
 3. Edit `integrations/minecraft/.env.local`.
 
-   In AIRI, open **Settings -> Connection** and copy the WebSocket authentication token.
+   In Angela, open **Settings -> Connection** and copy the WebSocket authentication token.
    Set `AIRI_WS_TOKEN` to that token in `.env.local`:
 
    ```dotenv
@@ -53,11 +53,11 @@ Treat this service as a local-development and trusted-server tool only.
    pnpm dev
    ```
 
-5. The bot should automatically connect to both AIRI and the Minecraft server.
+5. The bot should automatically connect to both Angela and the Minecraft server.
 
 ## Cognitive Architecture
 
-AIRI's Minecraft agent is built on a **four-layered cognitive architecture** inspired by cognitive science, enabling reactive, conscious, and physically grounded behaviors.
+Angela's Minecraft agent is built on a **four-layered cognitive architecture** inspired by cognitive science, enabling reactive, conscious, and physically grounded behaviors.
 
 ### Architecture Overview
 
@@ -174,7 +174,7 @@ Player: "build a house"
 
 ```txt
 src/
-├── airi/                      # AIRI bridge, module shell, status publishing
+├── airi/                      # Angela bridge, module shell, status publishing
 ├── cognitive/                  # 🧠 Perception → Reflex → Conscious → Action
 │   ├── perception/            # Event definitions + rule evaluation
 │   │   ├── events/

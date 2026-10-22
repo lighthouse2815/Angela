@@ -1,6 +1,6 @@
 # @angela/pipelines-audio
 
-Shared audio-pipeline orchestration for AIRI. The package owns input sharing, capture intervals, detector windows, playback groups, and text chunking. It does not depend on a UI.
+Shared audio-pipeline orchestration for Angela. The package owns input sharing, capture intervals, detector windows, playback groups, and text chunking. It does not depend on a UI.
 
 ## Use it for
 

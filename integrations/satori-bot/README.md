@@ -1,16 +1,16 @@
-# AIRI Satori Bot
+# Angela Satori Bot
 
-> **⚠️ Disclaimer**: This is a submodule of **AIRI**. The `core` part of this satori bot is merely a **temporary solution**. We will eventually delete it and integrate with **AIRI's Core** once the main framework is stable.
+> **⚠️ Disclaimer**: This is a submodule of **Angela**. The `core` part of this satori bot is merely a **temporary solution**. We will eventually delete it and integrate with **Angela's Core** once the main framework is stable.
 
 A **STANDALONE**, event-driven AI agent built on the [Satori Protocol](https://satori.chat/). It connects to multiple chat platforms (QQ, Telegram, Discord, Lark) via a Koishi bridge, featuring an autonomous thought loop.
 
 ## 🏗 Architecture & Internals (Provisional)
 
-**Important**: This module currently implements a self-contained "Mini-Core" (`src/core/`) to operate independently. This is **NOT** the final architecture of AIRI.
+**Important**: This module currently implements a self-contained "Mini-Core" (`src/core/`) to operate independently. This is **NOT** the final architecture of Angela.
 
-* **Temporary Logic**: The Event Loop, Scheduler, and Planner logic located in `src/core/` are placeholders. They simulate the behavior of the future AIRI Core.
-* **Retained Components**: The **Dispatcher** and **Database** will be retained. They will be exposed as **tool-like modules** to the AIRI Core for action execution and state persistence.
-* **Future Migration**: Once the main AIRI Core is ready, the `src/core/` directory (specifically the loop/planning logic) will be removed. This module will then be refactored to strictly function as an **Adapter** (Satori Protocol handling) and **Capability Provider** (Actions), delegating the cognitive loop to the main AIRI process.
+* **Temporary Logic**: The Event Loop, Scheduler, and Planner logic located in `src/core/` are placeholders. They simulate the behavior of the future Angela Core.
+* **Retained Components**: The **Dispatcher** and **Database** will be retained. They will be exposed as **tool-like modules** to the Angela Core for action execution and state persistence.
+* **Future Migration**: Once the main Angela Core is ready, the `src/core/` directory (specifically the loop/planning logic) will be removed. This module will then be refactored to strictly function as an **Adapter** (Satori Protocol handling) and **Capability Provider** (Actions), delegating the cognitive loop to the main Angela process.
 
 For the current standalone version, please refer to these documents:
 

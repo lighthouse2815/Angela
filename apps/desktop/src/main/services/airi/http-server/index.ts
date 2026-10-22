@@ -8,7 +8,7 @@ export interface BuiltInServer {
 }
 
 /**
- * Composes AIRI local HTTP servers behind one lifecycle service.
+ * Composes Angela local HTTP servers behind one lifecycle service.
  *
  * Use when:
  * - Main process needs one start/stop entrypoint for local HTTP services

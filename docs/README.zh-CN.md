@@ -1,3 +1,5 @@
+> Angela is derived from [Project AIRI](https://github.com/moeru-ai/airi). Historical posts, community links, and upstream documentation retain their original attribution.
+
 <picture>
   <source
     width="100%"
@@ -12,17 +14,17 @@
   <img width="250" src="./assets/banner-light-1280x640.avif" />
 </picture>
 
-<h1 align="center">Project AIRI</h1>
+<h1 align="center">Angela</h1>
 
 <p align="center">复刻 Neuro-sama，让 AI waifu / 虚拟角色也能来到我们的世界。</p>
 
 <p align="center">
-  [<a href="https://discord.gg/TgQ3Cu2F7A">加入 Discord</a>] [<a href="https://airi.moeru.ai">试试看</a>] [<a href="https://github.com/moeru-ai/airi/blob/main/README.md">English</a>] [<a href="https://github.com/moeru-ai/airi/blob/main/docs/README.ja-JP.md">日本語</a>] [<a href="https://github.com/moeru-ai/airi/blob/main/docs/README.ru-RU.md">Русский</a>] [<a href="https://github.com/moeru-ai/airi/blob/main/docs/README.vi.md">Tiếng Việt</a>] [<a href="https://github.com/moeru-ai/airi/blob/main/docs/README.fr.md">Français</a>] [<a href="https://github.com/moeru-ai/airi/blob/main/docs/README.ko-KR.md">한국어</a>]
+  [<a href="https://discord.gg/TgQ3Cu2F7A">加入 Discord</a>] [<a href="https://airi.moeru.ai">试试看</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/README.md">English</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.ja-JP.md">日本語</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.ru-RU.md">Русский</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.vi.md">Tiếng Việt</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.fr.md">Français</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.ko-KR.md">한국어</a>]
 </p>
 
 <p align="center">
   <a href="https://deepwiki.com/moeru-ai/airi"><img src="https://deepwiki.com/badge.svg"></a>
-  <a href="https://github.com/moeru-ai/airi/blob/main/LICENSE"><img src="https://img.shields.io/github/license/moeru-ai/airi.svg?style=flat&colorA=080f12&colorB=1fa669"></a>
+  <a href="https://github.com/lighthouse2815/Angela/blob/main/LICENSE"><img src="https://img.shields.io/github/license/moeru-ai/airi.svg?style=flat&colorA=080f12&colorB=1fa669"></a>
   <a href="https://discord.gg/TgQ3Cu2F7A"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FTgQ3Cu2F7A%3Fwith_counts%3Dtrue&query=%24.approximate_member_count&suffix=%20members&logo=discord&logoColor=white&label=%20&color=7389D8&labelColor=6A7EC2"></a>
   <a href="https://x.com/proj_airi"><img src="https://img.shields.io/badge/%40proj__airi-black?style=flat&logo=x&labelColor=%23101419&color=%232d2e30"></a>
   <a href="https://t.me/+7M_ZKO3zUHFlOThh"><img src="https://img.shields.io/badge/Telegram-%235AA9E6?logo=telegram&labelColor=FFFFFF"></a>
@@ -32,7 +34,7 @@
 
 <p float="left" align="center">
   <!-- readme-section:release-binary-windows -->
-  <a href="https://github.com/moeru-ai/airi/releases/download/v0.12.0-beta.5/AIRI-0.12.0-beta.5-windows-x64-setup.exe">
+  <a href="https://github.com/lighthouse2815/Angela/releases">
     <picture>
       <source
         width="33%"
@@ -48,7 +50,7 @@
     </picture>
   </a>
   <!-- readme-section:release-binary-macos -->
-  <a href="https://github.com/moeru-ai/airi/releases/download/v0.12.0-beta.5/AIRI-0.12.0-beta.5-darwin-arm64.dmg">
+  <a href="https://github.com/lighthouse2815/Angela/releases">
     <picture>
       <source
         width="33%"
@@ -63,7 +65,7 @@
       <img width="33%" src="./assets/download-buttons/download-buttons.macos.light.zh-Hans.avif" />
     </picture>
   </a>
-  <a href="https://github.com/moeru-ai/airi/releases/latest">
+  <a href="https://github.com/lighthouse2815/Angela/releases/latest">
     <picture>
       <source
         width="33%"
@@ -128,27 +130,27 @@
 </p>
 
 <p align="center">
-  <a href="https://www.producthunt.com/products/airi?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-airi" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=993524&theme=neutral&t=1752696535380" alt="AIRI - A&#0032;container&#0032;of&#0032;cyber&#0032;living&#0032;souls&#0044;&#0032;re&#0045;creation&#0032;of&#0032;Neuro&#0045;sama | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+  <a href="https://www.producthunt.com/products/airi?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-airi" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=993524&theme=neutral&t=1752696535380" alt="Angela - A&#0032;container&#0032;of&#0032;cyber&#0032;living&#0032;souls&#0044;&#0032;re&#0045;creation&#0032;of&#0032;Neuro&#0045;sama | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
   <a href="https://trendshift.io/repositories/14636" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14636" alt="moeru-ai%2Fairi | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 </p>
 
 > 深受 [Neuro-sama](https://www.youtube.com/@Neurosama) 启发
 
 > [!TIP]
-> 在 Windows 上，你也可以使用 [winget](https://learn.microsoft.com/windows/package-manager/winget/) 安装 AIRI：
+> 在 Windows 上，你也可以使用 [winget](https://learn.microsoft.com/windows/package-manager/winget/) 安装 Angela：
 >
 > ```powershell
-> winget install MoeruAI.AIRI
+> winget install MoeruAI.Angela
 > ```
 >
-> 或者使用 [Scoop](https://scoop.sh/) 安装 AIRI：
+> 或者使用 [Scoop](https://scoop.sh/) 安装 Angela：
 >
 > ```powershell
-> scoop bucket add airi https://github.com/moeru-ai/airi
+> scoop bucket add airi https://github.com/lighthouse2815/Angela
 > scoop install airi/airi
 > ```
 >
-> 在 macOS 上，你无需添加自定义 tap，即可通过 [Homebrew Cask](https://brew.sh/) 安装 AIRI：
+> 在 macOS 上，你无需添加自定义 tap，即可通过 [Homebrew Cask](https://brew.sh/) 安装 Angela：
 >
 > ```sh
 > brew install --cask airi
@@ -159,12 +161,12 @@
 
 > [!NOTE]
 >
-> 我们有一个专门的组织 [@proj-airi](https://github.com/proj-airi) 用于所有从 Project AIRI 诞生的子项目，快来看看吧！
+> 我们有一个专门的组织 [@proj-airi](https://github.com/proj-airi) 用于所有从 Angela 诞生的子项目，快来看看吧！
 >
 > RAG（检索增强生成）、记忆系统、嵌入式数据库、图标、Live2D 实用工具等等！
 
 > [!TIP]
-> 你可以在 [Crowdin](https://crowdin.com/project/proj-airi) 上翻译 AIRI，也可以直接提交修改 `packages/i18n/src/locales/` 的 Pull Request。两种方式更新的是同一份翻译。
+> 你可以在 [Crowdin](https://crowdin.com/project/proj-airi) 上翻译 Angela，也可以直接提交修改 `packages/i18n/src/locales/` 的 Pull Request。两种方式更新的是同一份翻译。
 >
 > 请不要提交与英文原文完全相同的译文。这类译文会在审核时被拒绝。没有译文的字符串会直接显示英文。
 >
@@ -178,7 +180,7 @@
 
 你可能已经知道 [Neuro-sama](https://www.youtube.com/@Neurosama)，她目前是最好的能够玩游戏、聊天并与你和参与者（在VTuber社区中）互动的 AI VTuber / 伴侣，有些人也称这种存在为"数字人"。**可惜的是，她并不开源，当她从直播中下线后，你就无法与她互动了**。
 
-因此，这个项目 AIRI，在这里提供了另一种可能性：**让你轻松拥有自己的数字生命、赛博生命，随时随地**。
+因此，这个项目 Angela，在这里提供了另一种可能性：**让你轻松拥有自己的数字生命、赛博生命，随时随地**。
 
 ## 近期 DevLog 与故事
 
@@ -200,7 +202,7 @@
 > [!TIP]
 > 担心使用 Web 技术会导致性能下降吗？
 >
-> 不用担心，浏览器版本旨在展示我们在浏览器和 webview 里能做到什么，但不会完全依赖它。AIRI 桌面版默认原生支持 [NVIDIA CUDA](https://developer.nvidia.com/cuda-toolkit) 和 [Apple Metal](https://developer.apple.com/metal/)（多亏了 HuggingFace 与可爱的 [candle](https://github.com/huggingface/candle) 项目），且无需复杂的依赖管理。考虑到取舍，我们在图形、布局、动画和 WIP 插件系统上部分使用了 Web 技术，方便大家集成。
+> 不用担心，浏览器版本旨在展示我们在浏览器和 webview 里能做到什么，但不会完全依赖它。Angela 桌面版默认原生支持 [NVIDIA CUDA](https://developer.nvidia.com/cuda-toolkit) 和 [Apple Metal](https://developer.apple.com/metal/)（多亏了 HuggingFace 与可爱的 [candle](https://github.com/huggingface/candle) 项目），且无需复杂的依赖管理。考虑到取舍，我们在图形、布局、动画和 WIP 插件系统上部分使用了 Web 技术，方便大家集成。
 
 这意味着 **アイリ VTuber 能够在现代浏览器和设备上运行**，甚至能够在移动设备上运行（已经完成了 PWA 支持），这为我们（贡献者们）带来了更多的可能性，让我们得以更进一步构建和扩展 アイリ VTuber 的外部功能，而与此同时也不失配置的灵活性——可以有选择地在不同设备上启用需要 TCP 连接或其他非 Web 技术的功能，例如连接到 Discord 的语音频道一起开黑，或是和朋友们一起玩 Minecraft（我的世界）、Factorio（异星工厂）。
 
@@ -293,7 +295,7 @@ pnpm dev:tamagotchi
 我们提供了拓麻歌子的 Nix 包。先启用 flakes，然后可以直接运行：
 
 ```shell
-nix run github:moeru-ai/airi
+nix run github:lighthouse2815/Angela
 ```
 
 #### NixOS
@@ -395,9 +397,9 @@ npx bumpp --no-commit --no-tag
 - [`hfup`](https://github.com/moeru-ai/hfup)：帮助部署与打包到 HuggingFace Spaces 的工具
 - [`xsai-transformers`](https://github.com/moeru-ai/xsai-transformers)：面向 [xsAI](https://github.com/moeru-ai/xsai) 的实验性 [🤗 Transformers.js](https://github.com/huggingface/transformers.js) provider
 - [WebAI: Realtime Voice Chat](https://github.com/proj-airi/webai-realtime-voice-chat)：从零实现 ChatGPT 实时语音（VAD + STT + LLM + TTS）的完整示例
-- [`@proj-airi/drizzle-duckdb-wasm`](https://github.com/moeru-ai/airi/tree/main/packages/drizzle-duckdb-wasm/README.md)：DuckDB WASM 的 Drizzle ORM 驱动
-- [`@proj-airi/duckdb-wasm`](https://github.com/moeru-ai/airi/tree/main/packages/duckdb-wasm/README.md)：好用的 `@duckdb/duckdb-wasm` 封装
-- [AIRI Factorio](https://github.com/moeru-ai/airi-factorio): 让 AIRI 玩 Factorio
+- [`@proj-airi/drizzle-duckdb-wasm`](https://github.com/lighthouse2815/Angela/tree/main/packages/drizzle-duckdb-wasm/README.md)：DuckDB WASM 的 Drizzle ORM 驱动
+- [`@proj-airi/duckdb-wasm`](https://www.npmjs.com/package/@proj-airi/duckdb-wasm)：好用的 `@duckdb/duckdb-wasm` 封装
+- [AIRI Factorio](https://github.com/moeru-ai/airi-factorio): 让 Angela 玩 Factorio
 - [Factorio RCON API](https://github.com/nekomeowww/factorio-rcon-api): Factorio 无头服务器控制台的 RESTful API 封装
 - [`autorio`](https://github.com/moeru-ai/airi-factorio/tree/main/packages/autorio): Factorio 自动化库
 - [`tstl-plugin-reload-factorio-mod`](https://github.com/moeru-ai/airi-factorio/tree/main/packages/tstl-plugin-reload-factorio-mod): 开发时支持热重载 Factorio 模组
@@ -486,7 +488,7 @@ flowchart LR
 ![Repobeats analytics image](https://repobeats.axiom.co/api/embed/a1d6fe2c13ea2bb53a5154435a71e2431f70c2ee.svg 'Repobeats analytics image')
 
 ## 鸣谢
-- [AtomGit](https://gitcode.com/moeru-ai/airi): 在国内托管 AIRI，帮助中国大陆用户更快访问项目与下载 Release。
+- [AtomGit](https://gitcode.com/moeru-ai/airi): 在国内托管 Angela，帮助中国大陆用户更快访问项目与下载 Release。
 - [Reka UI](https://github.com/unovue/reka-ui): 文档站的设计，新的 landing page 也基于此，并感谢他们实现了大量 UI 组件。（shadcn-vue 使用 Reka UI 作为 headless 组件，去看看！）
 - [pixiv/ChatVRM](https://github.com/pixiv/ChatVRM)
 - [josephrocca/ChatVRM-js: A JS conversion/adaptation of parts of the ChatVRM (TypeScript) code for standalone use in OpenCharacters and elsewhere](https://github.com/josephrocca/ChatVRM-js)
@@ -497,16 +499,16 @@ flowchart LR
 ## 支持者
 
 <p align="center">
-  <strong>感谢你通过 OpenCollective、Patreon 和 Ko-fi 支持 Project AIRI。</strong>
+  <strong>感谢你通过 OpenCollective、Patreon 和 Ko-fi 支持 Angela。</strong>
 </p>
 
 <p align="center">
-  <img src="./assets/sponsors/sponsors.svg" alt="Project AIRI supporters" />
+  <img src="./assets/sponsors/sponsors.svg" alt="Angela supporters" />
 </p>
 
 ## 特别感谢
 
-特别感谢所有 Contributors 对 Project AIRI 的贡献 ❤️
+特别感谢所有 Contributors 对 Angela 的贡献 ❤️
 
 <a href="https://github.com/moeru-ai/airi/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=moeru-ai/airi" />

@@ -59,7 +59,7 @@ function isDesktopCaptureMediaPermission(permission: ElectronPermission, details
 }
 
 /**
- * Checks whether every requester identity supplied by Electron is local to AIRI.
+ * Checks whether every requester identity supplied by Electron is local to Angela.
  */
 function shouldGrantLocalAppPermission(
   webContents: LocalAppWebContents | null,
@@ -87,7 +87,7 @@ function isGameController(device: HIDDevice): boolean {
 }
 
 /**
- * Grants device access only to game controllers requested by an AIRI-owned page.
+ * Grants device access only to game controllers requested by an Angela-owned page.
  *
  * Triggering workflow:
  *
@@ -110,7 +110,7 @@ function shouldGrantDevicePermission(details: DevicePermissionHandlerHandlerDeta
 }
 
 /**
- * Decides whether an Electron media operation is an AIRI-owned audio-only request.
+ * Decides whether an Electron media operation is an Angela-owned audio-only request.
  *
  * Use when:
  * - Chromium asks the default session to check or request microphone access
@@ -134,7 +134,7 @@ export function shouldGrantAudioCapturePermission(
 }
 
 /**
- * Applies AIRI's allowlist to an Electron session permission operation.
+ * Applies Angela's allowlist to an Electron session permission operation.
  *
  * Use when:
  * - Wiring both Electron permission check and request handlers
@@ -142,9 +142,9 @@ export function shouldGrantAudioCapturePermission(
  *
  * Expects:
  * - Unknown or unreviewed permission categories must remain denied
- * - All explicit frame, security, and embedding origins must identify local AIRI pages
+ * - All explicit frame, security, and embedding origins must identify local Angela pages
  * - Electron reports desktop capture through the `media` permission instead of `display-capture`
- * - Desktop capture is only ever requested by AIRI's own selected-source flow
+ * - Desktop capture is only ever requested by Angela's own selected-source flow
  *
  * Returns:
  * - Whether the requested permission is allowlisted, locally owned, and authorized for desktop capture
@@ -166,7 +166,7 @@ export function shouldGrantElectronPermission(
 
   // Electron cannot distinguish `getDisplayMedia()` from the legacy `chromeMediaSource: 'desktop'`
   // constraint here, and only the former is routed through `setDisplayMediaRequestHandler`. Requiring an
-  // authorized source keeps the legacy path from capturing the full desktop behind AIRI's picker, and
+  // authorized source keeps the legacy path from capturing the full desktop behind Angela's picker, and
   // costs the supported path nothing: without that handler Electron answers `NOT_SUPPORTED` regardless.
   if (isDesktopCapture && !isDesktopCaptureAuthorized())
     return false
@@ -184,7 +184,7 @@ export function shouldGrantElectronPermission(
  * - Initializing Electron's default session after app readiness
  *
  * Expects:
- * - The session is the one used by AIRI renderer windows
+ * - The session is the one used by Angela renderer windows
  * - macOS systemPreferences remains responsible for OS-level consent prompts and status
  * - `isDesktopCaptureAuthorized` reports whether a renderer already selected a capture source
  *

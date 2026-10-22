@@ -23,7 +23,7 @@ export interface AudioInputPreflightContext {
 /** One optional case callback that resolves configuration from its environment. */
 export type AudioInputPreflightCallback = AudioTestPreflightCallback<AudioInputPreflightContext>
 
-/** One AIRI audio-input test definition. */
+/** One Angela audio-input test definition. */
 export interface AudioInputTestCase extends AudioTestCase<AudioInputPreflightContext> {
   /**
    * Selects pipelines that the runner prepares before the file microphone starts.
@@ -33,7 +33,7 @@ export interface AudioInputTestCase extends AudioTestCase<AudioInputPreflightCon
   pipelines?: readonly AudioInputPipeline[]
 }
 
-/** Snapshot of the observable AIRI audio pipeline state. */
+/** Snapshot of the observable Angela audio pipeline state. */
 export interface AudioInputSnapshot {
   piniaActionEvents: PiniaActionEvent[]
   spans: SerializedIOSpan[]
@@ -87,7 +87,7 @@ export interface AudioInputTurn {
   }
 }
 
-/** Observable audio values used by AIRI matchers. */
+/** Observable audio values used by Angela matchers. */
 export interface AudioInputObservations {
   /** Capture format used by the active transcription Provider. */
   transcriptionCaptureFormat?: AudioCaptureFormat
@@ -138,7 +138,7 @@ export interface AudioInputObservations {
   }) => Promise<PiniaActionEvent>
 }
 
-/** Runtime handle for one AIRI audio-input test. */
+/** Runtime handle for one Angela audio-input test. */
 export interface AudioInputSession extends AudioInputObservations, AudioTestSession {
   /** Electron application for Electron tasks. */
   electronApp?: ElectronApplication

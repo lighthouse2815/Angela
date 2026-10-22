@@ -6,7 +6,7 @@ import { nanoid } from 'nanoid'
 
 import packageJSON from '../../../package.json'
 
-/** Creates AIRI server event metadata and preserves optional parent correlation. */
+/** Creates Angela server event metadata and preserves optional parent correlation. */
 export function createEventMetadata(
   serverInstanceId: string,
   parentId?: string,
@@ -27,7 +27,7 @@ export function createEventMetadata(
   }
 }
 
-/** Creates AIRI server response event factories. */
+/** Creates Angela server response event factories. */
 export function createResponses(serverInstanceId: string) {
   return {
     authenticated(parentId?: string) {

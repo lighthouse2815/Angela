@@ -47,7 +47,7 @@ internal sealed class LoopbackAuthServer : IDisposable
             }
         }
 
-        throw new InvalidOperationException("AIRI could not bind a loopback port for sign-in.");
+        throw new InvalidOperationException("Angela could not bind a loopback port for sign-in.");
     }
 
     public void Dispose()
@@ -169,7 +169,7 @@ internal sealed class LoopbackAuthServer : IDisposable
         await WriteHtmlAsync(
                 response,
                 HttpStatusCode.OK,
-                "Authentication successful. You can close this window and return to AIRI.")
+                "Authentication successful. You can close this window and return to Angela.")
             .ConfigureAwait(false);
         _result.TrySetResult(code);
     }

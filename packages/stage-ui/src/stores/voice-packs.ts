@@ -22,7 +22,7 @@ export interface VoicePackListItem {
 }
 
 /**
- * Loads the enabled Voice Pack library from the AIRI server.
+ * Loads the enabled Voice Pack library from the Angela server.
  *
  * Use when:
  * - Settings pages need the curated Voice Pack list before binding one to the

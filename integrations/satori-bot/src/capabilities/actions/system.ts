@@ -10,7 +10,7 @@ export const continueAction: ActionHandler = {
     return {
       success: true,
       shouldContinue: false,
-      result: 'AIRI System: Acknowledged, will now wait for user input.',
+      result: 'Angela System: Acknowledged, will now wait for user input.',
     }
   },
 }
@@ -23,7 +23,7 @@ export const breakAction: ActionHandler = {
     return {
       success: true,
       shouldContinue: false,
-      result: 'AIRI System: Memory cleared. Loop broken.',
+      result: 'Angela System: Memory cleared. Loop broken.',
     }
   },
 }
@@ -44,7 +44,7 @@ export const sleepAction: ActionHandler = {
     return {
       success: true,
       shouldContinue: true,
-      result: `AIRI System: Slept for ${duration / 1000} seconds.`,
+      result: `Angela System: Slept for ${duration / 1000} seconds.`,
     }
   },
 }
@@ -58,7 +58,7 @@ export const listChannelsAction: ActionHandler = {
     return {
       success: true,
       shouldContinue: true,
-      result: `AIRI System: Channel List:\n${list}`,
+      result: `Angela System: Channel List:\n${list}`,
     }
   },
 }

@@ -12,7 +12,7 @@ export interface HearingModuleConfiguration {
   /** @default false */
   microphoneEnabled?: boolean
   /**
-   * Sends each accepted transcript to chat. Without it, AIRI keeps the transcript as a voice draft.
+   * Sends each accepted transcript to chat. Without it, Angela keeps the transcript as a voice draft.
    * @default false
    */
   autoSend?: boolean

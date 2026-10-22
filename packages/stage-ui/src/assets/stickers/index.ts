@@ -11,7 +11,7 @@ import surprised from './airi-surprised.png'
 import thanks from './airi-thanks.png'
 import tired from './airi-tired.png'
 
-/** Static AIRI artwork shared by the catalog and saved chat slices. */
+/** Static Angela artwork shared by the catalog and saved chat slices. */
 export const chatStickers = [
   { id: 'airi-happy', description: 'Happy', src: happy, emotions: ['happy'] as const },
   { id: 'airi-sad', description: 'Sad', src: sad, emotions: ['sad'] as const },

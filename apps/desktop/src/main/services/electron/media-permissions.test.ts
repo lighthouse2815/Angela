@@ -137,7 +137,7 @@ describe('media permissions', () => {
     )).toBe(false)
   })
 
-  /** @example A local child frame embedded by a remote page is not AIRI-owned. */
+  /** @example A local child frame embedded by a remote page is not Angela-owned. */
   it('rejects local frames embedded by a remote origin', () => {
     expect(shouldGrantAudioCapturePermission(
       null,
@@ -165,11 +165,11 @@ describe('media permissions', () => {
     )).toBe(true)
   })
 
-  /** @example Extension assets served from AIRI's loopback server remain untrusted. */
+  /** @example Extension assets served from Angela's loopback server remain untrusted. */
   it('rejects plugin asset frames served from a loopback origin', () => {
     // ROOT CAUSE:
     //
-    // Treating every loopback HTTP origin as AIRI-owned also trusts extension UI frames.
+    // Treating every loopback HTTP origin as Angela-owned also trusts extension UI frames.
     // Those frames use the same loopback transport but do not share the renderer origin.
     // We fixed this by matching HTTP origins against ELECTRON_RENDERER_URL exactly.
     expect(shouldGrantAudioCapturePermission(
@@ -184,7 +184,7 @@ describe('media permissions', () => {
     )).toBe(false)
   })
 
-  /** @example A plugin development server cannot inherit AIRI renderer permissions. */
+  /** @example A plugin development server cannot inherit Angela renderer permissions. */
   it('rejects plugin frames served from another localhost port', () => {
     expect(shouldGrantAudioCapturePermission(
       null,
@@ -208,7 +208,7 @@ describe('media permissions', () => {
     )).toBe(true)
   })
 
-  /** @example Local AIRI pages retain screen-capture access. */
+  /** @example Local Angela pages retain screen-capture access. */
   it('grants display capture requests from local app pages', () => {
     expect(shouldGrantElectronPermission(
       localWebContents,
@@ -274,11 +274,11 @@ describe('media permissions', () => {
     // Electron reports the legacy `chromeMediaSource: 'desktop'` constraint with the same empty
     // `mediaTypes` list as `getDisplayMedia()`, but serves it from `HandleUserMediaRequest` instead of
     // `setDisplayMediaRequestHandler`. Granting on empty `mediaTypes` alone therefore also handed a local
-    // page the full desktop through `getUserMedia()`, skipping AIRI's own source selection:
+    // page the full desktop through `getUserMedia()`, skipping Angela's own source selection:
     //
     // const allowlistPermission = isDisplayCaptureMediaPermission(permission, details) ? 'display-capture' : permission
     //
-    // We fixed this by additionally requiring an authorized capture source, which only AIRI's selected
+    // We fixed this by additionally requiring an authorized capture source, which only Angela's selected
     // source flow installs.
     expect(shouldGrantElectronPermission(
       localWebContents,
@@ -308,7 +308,7 @@ describe('media permissions', () => {
     )).toBe(false)
   })
 
-  /** @example Local AIRI pages retain sanitized clipboard writes used by chat copy actions. */
+  /** @example Local Angela pages retain sanitized clipboard writes used by chat copy actions. */
   it('grants sanitized clipboard writes from local app pages', () => {
     expect(shouldGrantElectronPermission(
       localWebContents,
@@ -328,7 +328,7 @@ describe('media permissions', () => {
     )).toBe(false)
   })
 
-  it('grants local AIRI pages access to HID devices through the device permission handler', () => {
+  it('grants local Angela pages access to HID devices through the device permission handler', () => {
     const targetSession = {
       setDevicePermissionHandler: vi.fn<Session['setDevicePermissionHandler']>(),
       setPermissionCheckHandler: vi.fn<Session['setPermissionCheckHandler']>(),
@@ -346,7 +346,7 @@ describe('media permissions', () => {
     expect(handler?.(createHIDPermissionDetails({ deviceType: 'usb' }))).toBe(false)
   })
 
-  it('allows HID permission checks only for local AIRI pages', () => {
+  it('allows HID permission checks only for local Angela pages', () => {
     expect(shouldGrantElectronPermission(
       localWebContents,
       'hid',

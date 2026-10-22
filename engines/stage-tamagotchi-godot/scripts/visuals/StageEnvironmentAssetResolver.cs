@@ -8,7 +8,7 @@ using System.IO;
 /// - A fixed visual preset needs a local filesystem path instead of a Godot imported resource.
 ///
 /// Expects:
-/// - <c>startDirectory</c> is inside or below the AIRI repository when workspace assets exist.
+/// - <c>startDirectory</c> is inside or below the Angela repository when workspace assets exist.
 ///
 /// Returns:
 /// - Absolute filesystem paths for found assets, or an empty string when unavailable.

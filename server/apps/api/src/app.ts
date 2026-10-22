@@ -395,7 +395,7 @@ export async function buildApp(deps: AppDeps) {
 
       return context.json({
         service: 'airi-api',
-        message: `This is the Project AIRI API server. Visit ${webAppUrl} to use the product, or see the docs at ${docsUrl}.`,
+        message: `This is the Angela API server. Visit ${webAppUrl} to use the product, or see the docs at ${docsUrl}.`,
         docs: docsUrl,
         ui: webAppUrl,
       })

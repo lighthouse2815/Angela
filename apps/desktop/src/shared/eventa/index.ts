@@ -361,10 +361,10 @@ export interface ElectronMcpStdioServerConfig {
 }
 
 /**
- * One remote MCP server that AIRI reaches over streamable HTTP.
+ * One remote MCP server that Angela reaches over streamable HTTP.
  *
  * Use when:
- * - A server runs outside this machine and AIRI talks to it by URL
+ * - A server runs outside this machine and Angela talks to it by URL
  *
  * Expects:
  * - `url` is an absolute `http` or `https` endpoint

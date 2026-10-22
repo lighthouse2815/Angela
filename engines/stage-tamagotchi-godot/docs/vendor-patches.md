@@ -47,31 +47,31 @@ Files:
   antialiasing path by writing `ALPHA`, setting `ALPHA_SCISSOR_THRESHOLD`,
   `ALPHA_ANTIALIASING_EDGE`, and `ALPHA_TEXTURE_COORDINATE`, and enabling
   `render_mode alpha_to_coverage`.
-- Reason: AIRI's stage preset owns sky, ground, and environment presentation, but
+- Reason: Angela's stage preset owns sky, ground, and environment presentation, but
   avatar toon materials need stable character color. Godot's default ambient
   light and radiance contribution can wash out MToon avatars as the stage
-  environment changes, so AIRI isolates avatar MToon materials from implicit
+  environment changes, so Angela isolates avatar MToon materials from implicit
   WorldEnvironment ambient while keeping direct light handling in the shader.
 - Reason: VRM hair, lashes, accessories, and outline cutout passes use hard alpha
   edges. At distance, those edges collapse into visible stair-step or dashed
   pixels. Godot's alpha-to-coverage path works with 3D MSAA, and Godot's shader
   alpha scissor path requires `ALPHA` to receive the sampled texture alpha.
   Writing `ALPHA` may route these shaders through Godot's transparent pipeline,
-  which can introduce sorting or shadow-casting regressions. AIRI accepts that
+  which can introduce sorting or shadow-casting regressions. Angela accepts that
   tradeoff for the current visual baseline and should revisit it if those
   regressions appear or upstream exposes a cutout antialiasing path that
   preserves opaque shadow semantics.
 - Validation: `tests/material-rendering-check/materialRenderingCheck.tscn`
   imports AvatarSample A/B and still detects MToon, cutout, transparent,
   outline, and shadow-caster materials after the patch.
-- Removal condition: remove this patch if AIRI moves to an owned MToon shader
+- Removal condition: remove this patch if Angela moves to an owned MToon shader
   variant, or if upstream exposes a supported way to opt MToon materials out of
   Godot environment ambient/radiance while preserving VRM import compatibility.
 
 ## Generated Metadata Differences
 
 These files differ from the upstream commit after opening/importing the add-on
-with Godot `4.6.2`. They are not AIRI behavior patches, but they are recorded so
+with Godot `4.6.2`. They are not Angela behavior patches, but they are recorded so
 future add-on upgrades can distinguish generated metadata churn from intentional
 source changes.
 

@@ -19,13 +19,13 @@ import { clamp } from 'es-toolkit'
  */
 const paintedAlphaIntervalMs = 250
 
-/** Marks a DOM element as something AIRI paints over the stage window. */
+/** Marks a DOM element as something Angela paints over the stage window. */
 export const stageOpaqueAttribute = 'data-ambient-light-opaque'
 
 /**
  * Everything the mask covers besides the character.
  *
- * The marker covers the overlays AIRI places itself. Floating content is
+ * The marker covers the overlays Angela places itself. Floating content is
  * different: reka-ui mounts tooltip, popover and menu content and dialogs on
  * the body through a portal, outside every marked root, so a marker on the
  * island that opened them never reaches them. The mask recognizes them by what
@@ -66,11 +66,11 @@ export interface PaintedRead {
 }
 
 /**
- * Reports which pixels of the stage window AIRI paints, one alpha byte per
+ * Reports which pixels of the stage window Angela paints, one alpha byte per
  * pixel of the screen sample frame.
  *
  * The screen sampler subtracts this mask, so that it measures the desktop
- * behind the window instead of AIRI's own output. Two things need covering:
+ * behind the window instead of Angela's own output. Two things need covering:
  * the character, whose exact silhouette including soft edges comes from the
  * stage canvas, and the overlays, which are plain DOM and count as rectangles.
  */
@@ -128,7 +128,7 @@ export function useStagePaintedMask(sources: {
 
   /**
    * Missing either part biases the measurement: the character feeds the filter
-   * its own output, and an overlay feeds it AIRI's interface colors.
+   * its own output, and an overlay feeds it Angela's interface colors.
    */
   function readPaintedAlpha(windowRectangle: NormalizedRectangle): PaintedRead | undefined {
     const stageCanvas = sources.stageCanvas?.()

@@ -1,6 +1,6 @@
 # `@angela/stage-ui-three`
 
-Three.js runtime components, stores, composables, and diagnostics used by AIRI stage surfaces.
+Three.js runtime components, stores, composables, and diagnostics used by Angela stage surfaces.
 
 ## What It Does
 

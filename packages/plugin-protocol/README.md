@@ -1,6 +1,6 @@
 # @angela/plugin-protocol
 
-Shared protocol contracts for plugin-module communication in Project AIRI.
+Shared protocol contracts for plugin-module communication in Angela.
 
 ## What it does
 

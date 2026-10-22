@@ -12,8 +12,8 @@ accepted:
    Use screenshots, Blender captures, shader references, or shipped-game
    examples. Record the camera, model, active feature state, and what visual
    property the reference is meant to prove.
-2. Before/after AIRI evidence.
-   Capture the current AIRI output before and after changing the renderer when
+2. Before/after Angela evidence.
+   Capture the current Angela output before and after changing the renderer when
    the question depends on a visual difference.
 3. Pipeline evidence.
    Capture the relevant intermediate render stages when debugging compositor or

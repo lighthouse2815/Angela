@@ -24,7 +24,7 @@ export default defineConfig({
 | `zipformerMultilingual` | Arabic, English, Indonesian, Japanese, Russian, Thai, Vietnamese, Chinese | Sherpaw data and metadata | About 339 MB |
 | `xAsrBilingualZhEnInt8` | Chinese, English | Sherpaw data and metadata | About 169 MB |
 
-The plugin also accepts a keyword spotting pack. AIRI pins it as `kwsModel` in `@angela/stage-ui/libs/voice/kws-model-info`.
+The plugin also accepts a keyword spotting pack. Angela pins it as `kwsModel` in `@angela/stage-ui/libs/voice/kws-model-info`.
 Its preload pair contains the encoder, the decoder, the joiner, and the token vocabulary. It is about 13 MB.
 
 The required `models` option controls which presets the runtime can use. Remote presets load on demand.
@@ -79,7 +79,7 @@ Stage UI owns the keyword spotting pack identity. The plugin reads only the ID, 
 Local download failures stop startup or the build. Development serves `developmentModels` through Vite.
 Remote files keep their pinned Hugging Face URLs and load when recognition starts.
 
-AIRI's VAD model has a separate download path, so this plugin alone does not make the complete application work offline.
+Angela's VAD model has a separate download path, so this plugin alone does not make the complete application work offline.
 
 ## Runtime URLs and remote storage
 
@@ -97,16 +97,16 @@ Vite resolves bundled URLs for the application base. Hosts without the plugin re
 `?url&no-inline` keeps both files in the asset graph. With Basemove, include `.data` and `.metadata` files and keep its local deletion enabled.
 Basemove rewrites the URLs, uploads the files, and removes them from the deployment directory. Remote storage must allow browser requests through CORS.
 
-Electron release builds keep local copies. AIRI rewrites their model URLs to `airi-sherpaw://assets/` in `electron.vite.config.ts`.
+Electron release builds keep local copies. Angela rewrites their model URLs to `airi-sherpaw://assets/` in `electron.vite.config.ts`.
 The main process serves these URLs from the renderer package. Renderer `fetch()` cannot read the same files through `file://`.
 
 ## Development loading
 
 The plugin downloads only configured `developmentModels` before the Vite development server starts. Existing cache files are reused.
-AIRI Electron and Stage Pocket use the repository's `.cache/sherpaw/<model-id>/<revision>/` directory for the keyword spotting pack.
+Angela Electron and Stage Pocket use the repository's `.cache/sherpaw/<model-id>/<revision>/` directory for the keyword spotting pack.
 
 Vite converts the generated URL imports into local development URLs. Files outside the application root use Vite's `/@fs/` route. Sherpaw reads the selected model through that server when recognition starts. Basemove runs only during production builds.
 
-All AIRI hosts keep the transcription presets remote in development. The host model asset service installs them when recognition needs them.
+All Angela hosts keep the transcription presets remote in development. The host model asset service installs them when recognition needs them.
 Desktop release workflows bundle X-ASR. Ordinary CI builds keep all transcription presets remote.
 Electron and Pocket always bundle the keyword spotting pack. Web keeps it remote. The renderer model asset repository installs it in OPFS when wake word detection first prepares.

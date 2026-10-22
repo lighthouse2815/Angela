@@ -3,10 +3,10 @@ import type { Event } from '@xsai/shared-chat'
 import type { StreamEvent } from '../types/llm'
 
 /**
- * Maps xsAI stream events onto the AIRI {@link StreamEvent} contract.
+ * Maps xsAI stream events onto the Angela {@link StreamEvent} contract.
  *
  * xsAI 0.5.0-beta.8 marks failed tool executions with `isError: true` on
- * `tool-result.done` instead of aborting the stream, so AIRI can distinguish
+ * `tool-result.done` instead of aborting the stream, so Angela can distinguish
  * `tool-error` from `tool-result` directly from the event payload.
  */
 export function toAiriStreamEvent(event: Event): StreamEvent | null {

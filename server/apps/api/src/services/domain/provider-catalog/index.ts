@@ -90,7 +90,7 @@ function catalogError(message: string, errorCode: string, details?: unknown) {
 }
 
 /**
- * Owns AIRI's provider catalog curation state.
+ * Owns Angela's provider catalog curation state.
  *
  * The router config still owns real provider URLs, keys, and fallback
  * mechanics. Capability aliases and provider model or voice rows decide what

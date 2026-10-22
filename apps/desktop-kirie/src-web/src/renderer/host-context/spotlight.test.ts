@@ -97,7 +97,7 @@ describe('spotlight host context', () => {
     expect(notifications.show).toHaveBeenCalledWith({
       body: 'Hello from Spotlight',
       id: expect.stringMatching(/^spotlight-result-/),
-      title: 'AIRI',
+      title: 'Angela',
     })
 
     const notificationId = notifications.show.mock.calls[0]![0].id as string

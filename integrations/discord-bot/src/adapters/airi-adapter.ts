@@ -86,7 +86,7 @@ export class DiscordAdapter {
       }),
     })
 
-    // Initialize AIRI client
+    // Initialize Angela client
     this.airiClient = config.respond
       ? undefined
       : new ServerChannel({
@@ -165,14 +165,14 @@ export class DiscordAdapter {
       }
     })
 
-    // Handle input from AIRI system
+    // Handle input from Angela system
     this.airiClient?.onEvent('input:text', async (event) => {
-      log.log('Received input from AIRI system:', event.data.text)
+      log.log('Received input from Angela system:', event.data.text)
       // Process Discord-related commands
       // For now, we'll just log the input
     })
 
-    // Handle output from AIRI system (IA response)
+    // Handle output from Angela system (IA response)
     this.airiClient?.onEvent('output:gen-ai:chat:message', async (event) => {
       try {
         const message = event.data.message

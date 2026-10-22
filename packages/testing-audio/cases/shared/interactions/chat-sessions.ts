@@ -3,7 +3,7 @@ import type { ChatSessionsIndex } from '@angela/stage-ui/types/chat-session'
 import type { AudioInputSession } from '../../../src/types'
 
 /**
- * Returns the ID of the AIRI Card that owns one chat session, or undefined when no stored index lists the session.
+ * Returns the ID of the Angela Card that owns one chat session, or undefined when no stored index lists the session.
  *
  * The chat session store saves `ChatSessionsIndex` through unstorage. Its `local` mount uses the idb-keyval driver
  * with the `airi-local` base, so each index is one value in the default `keyval-store` database. The value is read

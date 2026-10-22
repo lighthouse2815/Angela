@@ -483,7 +483,7 @@ describe('createChatOrchestratorRuntime', () => {
   // ROOT CAUSE:
   //
   // xsAI kept the assistant tool call and tool result in its private message copy.
-  // AIRI stored only UI slices, then removed those slices from the next provider request.
+  // Angela stored only UI slices, then removed those slices from the next provider request.
   //
   // We fixed this by storing the provider generated turn on the finalized UI message.
   // The next request expands that generated turn back into chronological provider messages.

@@ -6,7 +6,7 @@ import type { AudioInputSession } from '../types'
 import { browserProbeOptions, stubForBrowser } from '../setup/browser-probe'
 import { createSession } from '../setup/session'
 
-/** Adapts a Fakemic Electron process into an AIRI desktop audio session. */
+/** Adapts a Fakemic Electron process into an Angela desktop audio session. */
 export default async function prepareElectronRuntime(context: FakemicElectronPrepareContext): Promise<AudioInputSession> {
   await context.app.context().addInitScript(stubForBrowser, browserProbeOptions)
   const page = await waitForPage(context, (page) => {

@@ -261,7 +261,7 @@ export interface AutoUpdater {
 
 export interface AutoUpdaterOptions {
   /**
-   * Whether AIRI owns application updates for this distribution.
+   * Whether Angela owns application updates for this distribution.
    *
    * @default true
    */

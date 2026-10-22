@@ -46,7 +46,7 @@ export function computeCenteredWindowBounds(options: {
  * Centers and reveals an Electron window on the display matching its current bounds.
  *
  * Use when:
- * - A renderer requests recovery of an off-screen AIRI window
+ * - A renderer requests recovery of an off-screen Angela window
  * - A hidden window must become visible after its position is restored
  *
  * Expects:
@@ -57,7 +57,7 @@ export function computeCenteredWindowBounds(options: {
  */
 export function centerWindowOnDisplay(window: Pick<BrowserWindow, 'getBounds' | 'isDestroyed' | 'setBounds' | 'show'> | undefined): Rectangle {
   if (!window || window.isDestroyed())
-    throw new Error('Main AIRI window is not available.')
+    throw new Error('Main Angela window is not available.')
 
   const windowBounds = window.getBounds()
   const displayWorkArea = screen.getDisplayMatching(windowBounds).workArea

@@ -3,7 +3,7 @@ import type { ServerManager } from './types'
 import { Mutex } from 'async-mutex'
 
 /**
- * Creates an ordered lifecycle manager for AIRI local HTTP servers.
+ * Creates an ordered lifecycle manager for Angela local HTTP servers.
  *
  * Use when:
  * - Multiple standalone HTTP servers must boot together

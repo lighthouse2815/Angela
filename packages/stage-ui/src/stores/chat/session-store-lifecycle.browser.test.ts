@@ -596,7 +596,7 @@ describe('chat-session-store · cloud deletion', () => {
 
 describe('chat-session-store · active card prompt edits', () => {
   // https://github.com/moeru-ai/airi/discussions/2239
-  it('adds the AIRI chat math syntax to the system message for Issue #2239', async () => {
+  it('adds the Angela chat math syntax to the system message for Issue #2239', async () => {
     const store = useChatSessionStore()
     await store.initialize()
 

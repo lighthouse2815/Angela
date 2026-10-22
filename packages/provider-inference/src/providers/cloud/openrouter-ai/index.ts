@@ -11,8 +11,8 @@ import { createOpenAICompatibleValidators } from '../../../validators'
 import { defineProvider } from '../../registry'
 
 export const OPENROUTER_ATTRIBUTION_HEADERS: Record<string, string> = {
-  'HTTP-Referer': 'https://airi.moeru.ai/',
-  'X-OpenRouter-Title': 'Project AIRI',
+  'HTTP-Referer': 'https://github.com/lighthouse2815/Angela',
+  'X-OpenRouter-Title': 'Angela',
 }
 
 const openRouterConfigSchema = z.object({

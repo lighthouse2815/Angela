@@ -1,6 +1,6 @@
 # @angela/electron-vueuse
 
-VueUse-like composables and helpers shared across AIRI Electron apps.
+VueUse-like composables and helpers shared across Angela Electron apps.
 
 ## What it provides
 

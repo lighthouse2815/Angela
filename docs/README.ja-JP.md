@@ -1,3 +1,5 @@
+> Angela is derived from [Project AIRI](https://github.com/moeru-ai/airi). Historical posts, community links, and upstream documentation retain their original attribution.
+
 <picture>
   <source
     width="100%"
@@ -12,17 +14,17 @@
   <img width="250" src="./assets/banner-light-1280x640.avif" />
 </picture>
 
-<h1 align="center">Project AIRI</h1>
+<h1 align="center">Angela</h1>
 
 <p align="center">Neuro-sama を再創造し、AI waifu / バーチャルキャラクターの魂の器をこの世界へ。/ Neuro-sama のようなバーチャルパートナーも、私たちの暮らしの一部に。</p>
 
 <p align="center">
-  [<a href="https://discord.gg/TgQ3Cu2F7A">Discordサーバーに参加する</a>] [<a href="https://airi.moeru.ai">試してみる</a>] [<a href="https://github.com/moeru-ai/airi/blob/main/README.md">English</a>] [<a href="https://github.com/moeru-ai/airi/blob/main/docs/README.zh-CN.md">简体中文</a>] [<a href="https://github.com/moeru-ai/airi/blob/main/docs/README.ru-RU.md">Русский</a>] [<a href="https://github.com/moeru-ai/airi/blob/main/docs/README.vi.md">Tiếng Việt</a>] [<a href="https://github.com/moeru-ai/airi/blob/main/docs/README.fr.md">Français</a>] [<a href="https://github.com/moeru-ai/airi/blob/main/docs/README.ko-KR.md">한국어</a>]
+  [<a href="https://discord.gg/TgQ3Cu2F7A">Discordサーバーに参加する</a>] [<a href="https://airi.moeru.ai">試してみる</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/README.md">English</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.zh-CN.md">简体中文</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.ru-RU.md">Русский</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.vi.md">Tiếng Việt</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.fr.md">Français</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.ko-KR.md">한국어</a>]
 </p>
 
 <p align="center">
   <a href="https://deepwiki.com/moeru-ai/airi"><img src="https://deepwiki.com/badge.svg"></a>
-  <a href="https://github.com/moeru-ai/airi/blob/main/LICENSE"><img src="https://img.shields.io/github/license/moeru-ai/airi.svg?style=flat&colorA=080f12&colorB=1fa669"></a>
+  <a href="https://github.com/lighthouse2815/Angela/blob/main/LICENSE"><img src="https://img.shields.io/github/license/moeru-ai/airi.svg?style=flat&colorA=080f12&colorB=1fa669"></a>
   <a href="https://discord.gg/TgQ3Cu2F7A"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FTgQ3Cu2F7A%3Fwith_counts%3Dtrue&query=%24.approximate_member_count&suffix=%20members&logo=discord&logoColor=white&label=%20&color=7389D8&labelColor=6A7EC2"></a>
   <a href="https://x.com/proj_airi"><img src="https://img.shields.io/badge/%40proj__airi-black?style=flat&logo=x&labelColor=%23101419&color=%232d2e30"></a>
   <a href="https://t.me/+7M_ZKO3zUHFlOThh"><img src="https://img.shields.io/badge/Telegram-%235AA9E6?logo=telegram&labelColor=FFFFFF"></a>
@@ -32,7 +34,7 @@
 
 <p float="left" align="center">
   <!-- readme-section:release-binary-windows -->
-  <a href="https://github.com/moeru-ai/airi/releases/download/v0.12.0-beta.5/AIRI-0.12.0-beta.5-windows-x64-setup.exe">
+  <a href="https://github.com/lighthouse2815/Angela/releases">
     <picture>
       <source
         width="33%"
@@ -48,7 +50,7 @@
     </picture>
   </a>
   <!-- readme-section:release-binary-macos -->
-  <a href="https://github.com/moeru-ai/airi/releases/download/v0.12.0-beta.5/AIRI-0.12.0-beta.5-darwin-arm64.dmg">
+  <a href="https://github.com/lighthouse2815/Angela/releases">
     <picture>
       <source
         width="33%"
@@ -63,7 +65,7 @@
       <img width="33%" src="./assets/download-buttons/download-buttons.macos.light.en-US.avif" />
     </picture>
   </a>
-  <a href="https://github.com/moeru-ai/airi/releases/latest">
+  <a href="https://github.com/lighthouse2815/Angela/releases/latest">
     <picture>
       <source
         width="33%"
@@ -128,27 +130,27 @@
 </p>
 
 <p align="center">
-  <a href="https://www.producthunt.com/products/airi?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-airi" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=993524&theme=neutral&t=1752696535380" alt="AIRI - A&#0032;container&#0032;of&#0032;cyber&#0032;living&#0032;souls&#0044;&#0032;re&#0045;creation&#0032;of&#0032;Neuro&#0045;sama | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+  <a href="https://www.producthunt.com/products/airi?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-airi" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=993524&theme=neutral&t=1752696535380" alt="Angela - A&#0032;container&#0032;of&#0032;cyber&#0032;living&#0032;souls&#0044;&#0032;re&#0045;creation&#0032;of&#0032;Neuro&#0045;sama | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
   <a href="https://trendshift.io/repositories/14636" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14636" alt="moeru-ai%2Fairi | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 </p>
 
 > [Neuro-sama](https://www.youtube.com/@Neurosama) に大きな影響を受けました
 
 > [!TIP]
-> Windows では、[winget](https://learn.microsoft.com/windows/package-manager/winget/) で AIRI をインストールできます：
+> Windows では、[winget](https://learn.microsoft.com/windows/package-manager/winget/) で Angela をインストールできます：
 >
 > ```powershell
-> winget install MoeruAI.AIRI
+> winget install MoeruAI.Angela
 > ```
 >
-> または、[Scoop](https://scoop.sh/) で AIRI をインストールできます：
+> または、[Scoop](https://scoop.sh/) で Angela をインストールできます：
 >
 > ```powershell
-> scoop bucket add airi https://github.com/moeru-ai/airi
+> scoop bucket add airi https://github.com/lighthouse2815/Angela
 > scoop install airi/airi
 > ```
 >
-> macOS では、カスタム tap を追加せずに [Homebrew Cask](https://brew.sh/) で AIRI をインストールできます：
+> macOS では、カスタム tap を追加せずに [Homebrew Cask](https://brew.sh/) で Angela をインストールできます：
 >
 > ```sh
 > brew install --cask airi
@@ -159,12 +161,12 @@
 
 > [!NOTE]
 >
-> Project AIRIから生まれたすべてのサブプロジェクト用に、専用の組織[@proj-airi](https://github.com/proj-airi)があります。ぜひチェックしてみてください！
+> Angelaから生まれたすべてのサブプロジェクト用に、専用の組織[@proj-airi](https://github.com/proj-airi)があります。ぜひチェックしてみてください！
 >
 > RAG、メモリシステム、組み込みデータベース、アイコン、Live2Dユーティリティなど多数あります！
 
 > [!TIP]
-> [Crowdin](https://crowdin.com/project/proj-airi) で AIRI を翻訳するか、`packages/i18n/src/locales/` を変更する Pull Request を作成できます。どちらも同じ翻訳を更新します。
+> [Crowdin](https://crowdin.com/project/proj-airi) で Angela を翻訳するか、`packages/i18n/src/locales/` を変更する Pull Request を作成できます。どちらも同じ翻訳を更新します。
 >
 > 英語の本文と完全に同一の翻訳を送らないでください。レビューで拒否されます。翻訳がない文字列は英語で表示されます。
 >
@@ -178,7 +180,7 @@
 
 おそらく[Neuro-sama](https://www.youtube.com/@Neurosama)をすでに知っているでしょう。彼女は現在、ゲームをプレイし、チャットし、あなたや参加者（VTuberコミュニティ内）と対話できる最高のコンパニオンです。この種の存在を「デジタルヒューマン」と呼ぶ人もいます。**残念ながら、オープンソースではないため、ライブストリームがオフラインになった後は彼女と対話することはできません**。
 
-そのため、このプロジェクトAIRIは、ここで別の可能性を提供します：**簡単に、どこでも、いつでも、あなた自身のデジタルライフ、サイバー生活を所有できるようにします**。
+そのため、このプロジェクトAngelaは、ここで別の可能性を提供します：**簡単に、どこでも、いつでも、あなた自身のデジタルライフ、サイバー生活を所有できるようにします**。
 
 ## 最近の DevLog とストーリー
 
@@ -201,7 +203,7 @@
 > [!TIP]
 > 「Web技術だとパフォーマンスが落ちない？」と心配ですか？
 >
-> ご安心を。ブラウザ版はブラウザやWebViewでどこまでできるかを示すためのものですが、そこに完全依存しません。デスクトップ版 AIRI は標準で [NVIDIA CUDA](https://developer.nvidia.com/cuda-toolkit) と [Apple Metal](https://developer.apple.com/metal/) を扱えます（HuggingFace と愛すべき [candle](https://github.com/huggingface/candle) に感謝）。依存管理も複雑ではなく、グラフィックス・レイアウト・アニメーション・プラグインシステム（WIP）は Web 技術を組み合わせつつ、いいとこ取りしています。
+> ご安心を。ブラウザ版はブラウザやWebViewでどこまでできるかを示すためのものですが、そこに完全依存しません。デスクトップ版 Angela は標準で [NVIDIA CUDA](https://developer.nvidia.com/cuda-toolkit) と [Apple Metal](https://developer.apple.com/metal/) を扱えます（HuggingFace と愛すべき [candle](https://github.com/huggingface/candle) に感謝）。依存管理も複雑ではなく、グラフィックス・レイアウト・アニメーション・プラグインシステム（WIP）は Web 技術を組み合わせつつ、いいとこ取りしています。
 
 これは、**アイリVTuberが現代のブラウザやデバイスで動作可能である**ことを意味し、モバイルデバイスでも動作します（PWAサポート済み）。これにより、私たち（開発者）はアイリVTuberの力を次のレベルに引き上げるための多くの可能性を持ちつつ、ユーザーがTCP接続や他の非Web技術を必要とする機能を有効にする柔軟性を残しています。例えば、Discordのボイスチャネルに接続したり、MinecraftやFactorioを友達と一緒にプレイすることができます。
 
@@ -294,7 +296,7 @@ pnpm dev:tamagotchi
 たまごっち用の Nix パッケージも用意しています。flakes を有効化した上で、次のように実行できます：
 
 ```shell
-nix run github:moeru-ai/airi
+nix run github:lighthouse2815/Angela
 ```
 
 ### Stage Pocket（モバイル版）
@@ -387,9 +389,9 @@ npx bumpp --no-commit --no-tag
 - [`hfup`](https://github.com/moeru-ai/hfup): HuggingFace Spaces へのデプロイとバンドルを支援するツール
 - [`xsai-transformers`](https://github.com/moeru-ai/xsai-transformers): [xsAI](https://github.com/moeru-ai/xsai)向けの実験的な [🤗 Transformers.js](https://github.com/huggingface/transformers.js) プロバイダー
 - [WebAI: Realtime Voice Chat](https://github.com/proj-airi/webai-realtime-voice-chat): VAD + STT + LLM + TTS で ChatGPT のリアルタイム音声をゼロから実装する完全例
-- [`@proj-airi/drizzle-duckdb-wasm`](https://github.com/moeru-ai/airi/tree/main/packages/drizzle-duckdb-wasm/README.md): DuckDB WASM の Drizzle ORM ドライバー
-- [`@proj-airi/duckdb-wasm`](https://github.com/moeru-ai/airi/tree/main/packages/duckdb-wasm/README.md): 使いやすい `@duckdb/duckdb-wasm` ラッパー
-- [AIRI Factorio](https://github.com/moeru-ai/airi-factorio): AIRI が Factorio をプレイできるようにする
+- [`@proj-airi/drizzle-duckdb-wasm`](https://github.com/lighthouse2815/Angela/tree/main/packages/drizzle-duckdb-wasm/README.md): DuckDB WASM の Drizzle ORM ドライバー
+- [`@proj-airi/duckdb-wasm`](https://www.npmjs.com/package/@proj-airi/duckdb-wasm): 使いやすい `@duckdb/duckdb-wasm` ラッパー
+- [AIRI Factorio](https://github.com/moeru-ai/airi-factorio): Angela が Factorio をプレイできるようにする
 - [Factorio RCON API](https://github.com/nekomeowww/factorio-rcon-api): Factorio ヘッドレスサーバーコンソールの RESTful API ラッパー
 - [`autorio`](https://github.com/moeru-ai/airi-factorio/tree/main/packages/autorio): Factorio 自動化ライブラリ
 - [`tstl-plugin-reload-factorio-mod`](https://github.com/moeru-ai/airi-factorio/tree/main/packages/tstl-plugin-reload-factorio-mod): Factorio モッド開発時のリロードを支援
@@ -493,12 +495,12 @@ flowchart LR
 </p>
 
 <p align="center">
-  <img src="./assets/sponsors/sponsors.svg" alt="Project AIRI supporters" />
+  <img src="./assets/sponsors/sponsors.svg" alt="Angela supporters" />
 </p>
 
 ## 特別の感謝
 
-Project AIRIへの貢献に対して、すべての貢献者に特別の感謝を捧げます ❤️
+Angelaへの貢献に対して、すべての貢献者に特別の感謝を捧げます ❤️
 
 <a href="https://github.com/moeru-ai/airi/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=moeru-ai/airi" />

@@ -88,7 +88,7 @@ function createHostMicrophonePermission(context: KirieEventaContext): HostMicrop
 let microphonePermission: HostMicrophonePermission | undefined
 let microphonePermissionContext: KirieEventaContext | undefined
 
-/** Returns the renderer bridge for AIRI-owned Kirie microphone permission state. */
+/** Returns the renderer bridge for Angela-owned Kirie microphone permission state. */
 export function useHostMicrophonePermission(): HostMicrophonePermission {
   const host = initializeHostContext()
   if (!microphonePermission || microphonePermissionContext !== host.context) {

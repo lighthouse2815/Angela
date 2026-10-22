@@ -99,7 +99,7 @@ export function setupGlobalShortcutService(): GlobalShortcutService {
     if (!uiohookDriver) {
       // NOTICE:
       // uiohook-napi@1.5.5 ships an x86-64 binary in its Linux ARM64 prebuild.
-      // Loading the existing driver only when needed keeps AIRI startup working.
+      // Loading the existing driver only when needed keeps Angela startup working.
       // Source: https://app.unpkg.com/uiohook-napi@1.5.5/files/prebuilds/linux-arm64
       // Remove this workaround when that prebuild contains an ARM64 binary.
       try {

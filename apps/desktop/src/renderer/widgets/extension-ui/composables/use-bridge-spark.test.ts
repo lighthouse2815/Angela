@@ -6,7 +6,7 @@ import { publishWidgetSparkNotifyReaction } from './use-bridge-spark'
 /**
  * @example
  * await publishWidgetSparkNotifyReaction(event, options)
- * expect(options.dispatchSparkNotifyReaction).toHaveBeenCalledWith(expect.objectContaining({ headline: 'AIRI move' }))
+ * expect(options.dispatchSparkNotifyReaction).toHaveBeenCalledWith(expect.objectContaining({ headline: 'Angela move' }))
  */
 describe('publishWidgetSparkNotifyReaction', () => {
   /**
@@ -30,7 +30,7 @@ describe('publishWidgetSparkNotifyReaction', () => {
           kind: 'ping',
           urgency: 'immediate',
           forceTextResponse: true,
-          headline: 'AIRI move',
+          headline: 'Angela move',
           note: 'Explain the chess move.',
           destinations: ['character'],
           source: 'plugin:airi-plugin-game-chess',
@@ -50,7 +50,7 @@ describe('publishWidgetSparkNotifyReaction', () => {
       urgency: 'immediate',
       forceTextResponse: true,
       fallbackResponseText: 'Fallback text.',
-      headline: 'AIRI move',
+      headline: 'Angela move',
       note: 'Explain the chess move.',
       destinations: ['character'],
       source: 'plugin:airi-plugin-game-chess',

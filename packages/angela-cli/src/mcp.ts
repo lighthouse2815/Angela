@@ -110,7 +110,7 @@ export class McpTools {
       this.names.add(tool.name)
   }
 
-  /** Uses the existing AIRI discovery/call pattern to keep tool schemas out of every model request. */
+  /** Uses the existing Angela discovery/call pattern to keep tool schemas out of every model request. */
   definitions(): Tool[] {
     return [
       {

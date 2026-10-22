@@ -37,7 +37,7 @@ export interface AiriDesktopDisplayBounds {
   height: number
 }
 
-/** Physical display geometry and scale reported by the AIRI Godot host. */
+/** Physical display geometry and scale reported by the Angela Godot host. */
 export interface AiriDesktopDisplaySnapshot {
   bounds: AiriDesktopDisplayBounds
   workArea: AiriDesktopDisplayBounds

@@ -73,7 +73,7 @@ async function clickOverlayCorner(page: Page): Promise<void> {
   const x = 16
   const y = Math.max(16, Math.min((viewport?.height ?? 48) - 16, 48))
 
-  // NOTICE: AIRI dialogs and drawers render full-screen overlays, so a corner
+  // NOTICE: Angela dialogs and drawers render full-screen overlays, so a corner
   // click is a practical generic dismiss fallback when a dedicated close affordance
   // is not known ahead of time.
   await page.mouse.click(x, y)

@@ -13,9 +13,9 @@ The important truth is:
 - `exec` is already a real mainline surface.
 - `PTY` is no longer just a loose tool set; the workflow engine now has self-acquire support.
 - Service-layer terminal E2Es for the current lane are present and treated as the terminal proof line.
-- The AIRI chat terminal demo is now aligned with terminal lane v2 and no longer pre-creates PTY.
+- The Angela chat terminal demo is now aligned with terminal lane v2 and no longer pre-creates PTY.
 - The desktop shell now distinguishes `pty_session` from `terminal_and_apps`.
-- AIRI chat self-acquire is now part of the strict release gate set, so PTY mainline support is no longer intentionally held back.
+- Angela chat self-acquire is now part of the strict release gate set, so PTY mainline support is no longer intentionally held back.
 
 Do not rely on compressed chat summaries to resume this work. Use this file as the handoff source of truth and update it when terminal-lane behavior changes materially.
 
@@ -101,14 +101,14 @@ It currently uses:
 
 This is the current service-level proof for terminal lane v2.
 
-### 5. AIRI chat self-acquire demo is now on the v2 path
+### 5. Angela chat self-acquire demo is now on the v2 path
 
 `src/bin/e2e-airi-chat-terminal-self-acquire.ts` follows the same product story:
 
 - no harness-side `pty_create`
-- AIRI calls the real workflow
+- Angela calls the real workflow
 - the workflow self-acquires PTY for the interactive validation step
-- AIRI finishes with a natural-language summary for demo use
+- Angela finishes with a natural-language summary for demo use
 
 The latest successful reports live under:
 
@@ -206,7 +206,7 @@ If you change terminal lane behavior, update this file before stopping.
 At minimum, always rewrite these four facts:
 
 1. Is PTY self-acquire the mainline, or does any path still depend on pre-created PTY?
-2. Is AIRI chat E2E aligned with the service-level terminal lane, or still on an older path?
+2. Is Angela chat E2E aligned with the service-level terminal lane, or still on an older path?
 3. Is desktop approval using real `pty_session` semantics, or still old `terminal_and_apps` semantics?
 4. Which terminal capabilities are `product-supported` vs only `covered` in `src/support-matrix.ts`?
 

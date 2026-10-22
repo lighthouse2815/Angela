@@ -6,7 +6,7 @@ using GodotEnvironment = Godot.Environment;
 /// Installs the fixed G1.3 default stage visual baseline.
 ///
 /// Use when:
-/// - The sidecar starts the default AIRI presentation stage.
+/// - The sidecar starts the default Angela presentation stage.
 /// - Camera, lighting, sky, and ground references should be available without host settings.
 ///
 /// Expects:

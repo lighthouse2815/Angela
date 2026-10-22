@@ -8,7 +8,7 @@ interface SingleInstanceGuardOptions {
 }
 
 /**
- * Focuses the main AIRI window after a duplicate launch.
+ * Focuses the main Angela window after a duplicate launch.
  *
  * Use when:
  * - Electron forwards a second process launch to the primary instance
@@ -33,7 +33,7 @@ function focusMainWindow(getWindow: SingleInstanceGuardOptions['getWindow']) {
  * Installs Electron's single-instance guard for the desktop runtime.
  *
  * Use when:
- * - Only one AIRI desktop process should own local runtime resources
+ * - Only one Angela desktop process should own local runtime resources
  * - Fixed localhost services such as the server channel must not bind twice
  *
  * Expects:

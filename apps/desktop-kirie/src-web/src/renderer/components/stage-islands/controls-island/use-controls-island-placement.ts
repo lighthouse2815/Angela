@@ -7,7 +7,7 @@ import { inject } from 'vue'
 
 import { findDominantDisplayArea } from '../../../../shared/utils/electron/display'
 
-/** A corner of the AIRI window where the Controls Island can dock. */
+/** A corner of the Angela window where the Controls Island can dock. */
 export type ControlsIslandDock = 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 
 /** Inputs for the Controls Island quadrant policy. */
@@ -16,7 +16,7 @@ export interface ResolveControlsIslandDockOptions {
   displays: readonly DisplayArea[]
   /** Dock that remains active while display data is missing or the window is near the display center. */
   previousDock: ControlsIslandDock
-  /** AIRI window bounds in host-independent logical coordinates. Zero width or height means that the bounds are not available. */
+  /** Angela window bounds in host-independent logical coordinates. Zero width or height means that the bounds are not available. */
   windowBounds: Rectangle
 }
 
@@ -75,11 +75,11 @@ export type ControlsIslandMotionPhase = 'idle' | 'leaving' | 'entering' | 'arriv
 
 /** Placement state shared by the Controls Island and its anchored surfaces. */
 export interface ControlsIslandPlacement {
-  /** Current corner inside the AIRI window. */
+  /** Current corner inside the Angela window. */
   dock: Readonly<Ref<ControlsIslandDock>>
-  /** True when the Island uses the left edge of the AIRI window. */
+  /** True when the Island uses the left edge of the Angela window. */
   isLeft: Readonly<Ref<boolean>>
-  /** True when the Island uses the top edge of the AIRI window. */
+  /** True when the Island uses the top edge of the Angela window. */
   isTop: Readonly<Ref<boolean>>
   /** Current phase of the fade and move animation. */
   motionPhase: Readonly<Ref<ControlsIslandMotionPhase>>

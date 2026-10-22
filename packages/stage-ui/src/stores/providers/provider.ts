@@ -950,7 +950,7 @@ export const useProviderStore = defineStore('provider', () => {
   }
 
   /**
-   * Passes AIRI chat options to the provider that owns their wire representation.
+   * Passes Angela chat options to the provider that owns their wire representation.
    * The cached base instance remains unchanged for consumers that do not opt in.
    */
   async function getChatProviderInstance(

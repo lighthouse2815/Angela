@@ -82,3 +82,5 @@ Các tài liệu kiến trúc và audit nằm trong [`docs/ai`](./docs/ai/).
 ## Repository
 
 https://github.com/lighthouse2815/Angela
+
+Angela kế thừa [Project AIRI](https://github.com/moeru-ai/airi) của Moeru AI. Các giấy phép và ghi nhận tác giả gốc được giữ nguyên.

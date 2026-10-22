@@ -45,7 +45,7 @@ minimumReleaseAgeExclude:
   - '@moeru/*'
   - '@proj-airi/*'
   # NOTICE:
-  # Sherpaw 0.2.1 contains the browser worker fix required by AIRI.
+  # Sherpaw 0.2.1 contains the browser worker fix required by Angela.
   # pnpm blocks packages published within the last 72 hours.
   # Source: https://github.com/moeru-ai/sherpaw/pull/18
   # Remove these exceptions after 2026-09-30 19:54 UTC.

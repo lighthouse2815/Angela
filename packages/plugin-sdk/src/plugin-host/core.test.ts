@@ -386,7 +386,7 @@ describe('extension manifest schema', () => {
 })
 
 describe('for ExtensionHost', () => {
-  it('rejects an incompatible AIRI version before importing the entrypoint', async () => {
+  it('rejects an incompatible Angela version before importing the entrypoint', async () => {
     const host = new ExtensionHost({ runtime: 'node', airiVersion: '1.0.0' })
 
     await expect(host.start({
@@ -397,7 +397,7 @@ describe('for ExtensionHost', () => {
       engines: { airi: '>=99.0.0', runtimes: ['node'] },
       permissions: {},
       entrypoints: { node: './missing-entrypoint.mjs' },
-    })).rejects.toThrow('requires AIRI `>=99.0.0`')
+    })).rejects.toThrow('requires Angela `>=99.0.0`')
   })
 
   it('runs extension setup and registers multiple module sessions', async () => {

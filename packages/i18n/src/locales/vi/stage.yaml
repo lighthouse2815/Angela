@@ -50,7 +50,7 @@ chat:
     auto-send: Gửi khi dừng ghi âm
     system-default: Mặc định hệ thống
     listen: Lắng nghe liên tục
-    push-to-talk-unavailable: Thiết bị này không có phím nhấn để nói nên AIRI không lắng nghe. Hãy đổi chế độ nhập trong cài đặt Nghe.
+    push-to-talk-unavailable: Thiết bị này không có phím nhấn để nói nên Angela không lắng nghe. Hãy đổi chế độ nhập trong cài đặt Nghe.
     wake-word: Lắng nghe từ đánh thức
     hearing-settings: Cài đặt Nghe khác…
     options-hint: Di chuột hoặc nhấp chuột phải để xem tùy chọn
@@ -215,7 +215,7 @@ mobile-tools:
   settings: Cài đặt
   hearing: Nghe
   appearance: Diện mạo
-  sign-in: Đăng nhập AIRI
+  sign-in: Đăng nhập Angela
   account-description: Tài khoản và tùy chọn
   sound: Âm thanh
   character-voice: Giọng nhân vật
@@ -258,7 +258,7 @@ status:
   dismiss: Bỏ qua
   listening: Đang lắng nghe
   preparing: Đang chuẩn bị micrô
-  paused: Tạm dừng lắng nghe khi AIRI nói
+  paused: Tạm dừng lắng nghe khi Angela nói
   transcribing: Đang phiên âm
   hearing-error: Không thể phiên âm âm thanh
   no-transcript: Lời nói được nhận dạng sẽ xuất hiện ở đây.

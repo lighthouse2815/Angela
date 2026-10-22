@@ -43,7 +43,7 @@ chat:
     auto-send: Envoyer à l’arrêt de l’enregistrement
     system-default: Par défaut du système
     listen: Écouter en continu
-    push-to-talk-unavailable: Cet appareil n’a pas de touche pour parler, donc AIRI n’écoute pas. Changez le mode de saisie dans les paramètres d’Audition.
+    push-to-talk-unavailable: Cet appareil n’a pas de touche pour parler, donc Angela n’écoute pas. Changez le mode de saisie dans les paramètres d’Audition.
     wake-word: Écouter les mots d’activation
     hearing-settings: Autres paramètres d’Audition…
     options-hint: Survolez ou faites un clic droit pour voir les options
@@ -205,7 +205,7 @@ mobile-tools:
   settings: Paramètres
   view: Vue
   hearing: Audition
-  sign-in: Se connecter à AIRI
+  sign-in: Se connecter à Angela
   account-description: Compte et préférences
   sound: Son
   character-voice: Voix du personnage
@@ -246,7 +246,7 @@ status:
   dismiss: Ignorer
   listening: Écoute en cours
   preparing: Préparation du microphone
-  paused: Écoute en pause pendant qu’AIRI parle
+  paused: Écoute en pause pendant qu’Angela parle
   transcribing: Transcription en cours
   hearing-error: Impossible de transcrire l’audio
   no-transcript: Le texte reconnu apparaîtra ici.

@@ -99,7 +99,7 @@ Nguồn: [GPT-5.4 Mini](https://developers.openai.com/api/docs/models/gpt-5.4-mi
 
 Nhân vật mặc định của bản cài mới là Angela.
 Các thẻ nhân vật bạn đã tạo hoặc chỉnh sửa vẫn được giữ.
-Nếu đã có dữ liệu AIRI, bạn có thể tạo một thẻ Angela trong cài đặt nhân vật.
+Nếu đã có dữ liệu Angela, bạn có thể tạo một thẻ Angela trong cài đặt nhân vật.
 
 ## Trí nhớ học tập
 
@@ -408,7 +408,7 @@ Kiểm thử dùng thư mục và hồ sơ riêng, không chỉnh workspace đan
 ## Dữ liệu và cập nhật
 
 Tên hiển thị Angela không đổi thư mục dữ liệu hiện có của Electron.
-Bản đóng gói dùng hồ sơ `AIRI`, bản phát triển dùng `@angela/desktop`.
+Bản đóng gói dùng hồ sơ `Angela`, bản phát triển dùng `@angela/desktop`.
 `APP_USER_DATA_PATH` vẫn chọn được hồ sơ riêng, gồm dữ liệu ứng dụng và phiên Chromium.
 
 Nguồn cập nhật đã trỏ đến repository Angela. Repository hiện private và updater chưa có cơ chế xác thực cho release private.

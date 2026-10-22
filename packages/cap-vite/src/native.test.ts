@@ -45,9 +45,9 @@ describe('pickServerUrl', () => {
 describe('resolveCapRunArgs', () => {
   it('keeps an explicit --target argument untouched', async () => {
     await expect(resolveCapRunArgs(
-      ['ios', '--target', 'iPhone 16 Pro', '--scheme', 'AIRI'],
+      ['ios', '--target', 'iPhone 16 Pro', '--scheme', 'Angela'],
       { CAPACITOR_DEVICE_ID_IOS: 'ignored-device' },
-    )).resolves.toEqual(['ios', '--target', 'iPhone 16 Pro', '--scheme', 'AIRI'])
+    )).resolves.toEqual(['ios', '--target', 'iPhone 16 Pro', '--scheme', 'Angela'])
   })
 
   it('injects --target from CAPACITOR_DEVICE_ID_ANDROID when it is missing', async () => {
@@ -59,9 +59,9 @@ describe('resolveCapRunArgs', () => {
 
   it('injects --target from CAPACITOR_DEVICE_ID_IOS when it is missing', async () => {
     await expect(resolveCapRunArgs(
-      ['ios', '--scheme', 'AIRI'],
+      ['ios', '--scheme', 'Angela'],
       { CAPACITOR_DEVICE_ID_IOS: 'iPhone 16 Pro' },
-    )).resolves.toEqual(['ios', '--target', 'iPhone 16 Pro', '--scheme', 'AIRI'])
+    )).resolves.toEqual(['ios', '--target', 'iPhone 16 Pro', '--scheme', 'Angela'])
   })
 
   it('does not use the other platform device id', async () => {

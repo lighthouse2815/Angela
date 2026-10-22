@@ -14,7 +14,7 @@ export interface H3HttpErrorOptions {
 }
 
 /**
- * Unified HTTP error shape for AIRI local HTTP server modules.
+ * Unified HTTP error shape for Angela local HTTP server modules.
  *
  * Use when:
  * - Returning typed errors from internal server modules

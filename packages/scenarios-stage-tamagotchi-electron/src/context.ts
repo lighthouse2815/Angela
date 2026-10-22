@@ -43,7 +43,7 @@ export interface GesturesApi {
 }
 
 /**
- * Generic Vishot Electron context plus AIRI stage-tamagotchi navigation helpers.
+ * Generic Vishot Electron context plus Angela stage-tamagotchi navigation helpers.
  */
 export interface StageTamagotchiScenarioContext extends ScenarioContext {
   stageWindows: StageWindowsApi
@@ -60,7 +60,7 @@ export interface StageTamagotchiScenario {
 }
 
 /**
- * Adds AIRI-specific window and overlay helpers to Vishot's generic Electron context.
+ * Adds Angela-specific window and overlay helpers to Vishot's generic Electron context.
  */
 export function createStageTamagotchiScenarioContext(context: ScenarioContext): StageTamagotchiScenarioContext {
   return {
@@ -120,7 +120,7 @@ export function createStageTamagotchiScenarioContext(context: ScenarioContext): 
 }
 
 /**
- * Defines an AIRI stage-tamagotchi Electron scenario for Vishot's generic source runner.
+ * Defines an Angela stage-tamagotchi Electron scenario for Vishot's generic source runner.
  */
 export function defineStageTamagotchiScenario(scenario: StageTamagotchiScenario): ElectronScenario {
   return defineScenario({

@@ -10,7 +10,7 @@ The [immutable full review](https://github.com/BeanDz/airi/blob/ef7eb50e5a76265f
 ## Whole-framework decisions
 
 The migration supplies a desktop host around an existing Vue application.
-Its essential layers are the renderer, one transport owner, desktop capabilities, and AIRI application services.
+Its essential layers are the renderer, one transport owner, desktop capabilities, and Angela application services.
 A runtime choice inside every adapter adds no requirement to a Kirie-only application.
 
 | Layer | Decision | Reason and boundary |

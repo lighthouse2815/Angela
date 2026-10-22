@@ -124,14 +124,14 @@ describe('capVitePlugin', () => {
     const server = createMockServer()
 
     await configurePluginServer(capVitePlugin({
-      capArgs: ['ios', '--target', 'iPhone 16 Pro', '--scheme', 'AIRI'],
+      capArgs: ['ios', '--target', 'iPhone 16 Pro', '--scheme', 'Angela'],
     }), server)
 
     server.httpServer.emit('listening')
 
     expect(emitKeypressEvents).toHaveBeenCalledWith(stdin)
     expect(stdin.setRawMode).toHaveBeenCalledWith(true)
-    expect(x).toHaveBeenNthCalledWith(1, 'cap', ['run', 'ios', '--target', 'iPhone 16 Pro', '--scheme', 'AIRI'], {
+    expect(x).toHaveBeenNthCalledWith(1, 'cap', ['run', 'ios', '--target', 'iPhone 16 Pro', '--scheme', 'Angela'], {
       nodeOptions: {
         cwd: '/repo/app',
         env: {
@@ -146,8 +146,8 @@ describe('capVitePlugin', () => {
 
     await vi.waitFor(() => {
       expect(firstRun.kill).toHaveBeenCalledWith('SIGINT')
-      expect(server.config.logger.info).toHaveBeenCalledWith('[cap-vite] manual restart requested. Re-running "cap run ios --target iPhone 16 Pro --scheme AIRI".')
-      expect(x).toHaveBeenNthCalledWith(2, 'cap', ['run', 'ios', '--target', 'iPhone 16 Pro', '--scheme', 'AIRI'], {
+      expect(server.config.logger.info).toHaveBeenCalledWith('[cap-vite] manual restart requested. Re-running "cap run ios --target iPhone 16 Pro --scheme Angela".')
+      expect(x).toHaveBeenNthCalledWith(2, 'cap', ['run', 'ios', '--target', 'iPhone 16 Pro', '--scheme', 'Angela'], {
         nodeOptions: {
           cwd: '/repo/app',
           env: {

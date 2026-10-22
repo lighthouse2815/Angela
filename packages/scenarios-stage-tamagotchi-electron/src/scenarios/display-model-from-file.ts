@@ -8,7 +8,7 @@ import { waitForStageWindow } from '../runtime/windows'
 export type DisplayModelInputFormat = 'live2d' | 'vrm' | 'mmd'
 
 export interface DisplayModelInput {
-  /** Select the AIRI importer whose accepted extensions match the file. */
+  /** Select the Angela importer whose accepted extensions match the file. */
   format: DisplayModelInputFormat
   /** Provide an absolute path visible to the machine running Vishot. */
   filePath: string
@@ -18,7 +18,7 @@ export interface ImportedDisplayModel {
   id: string
   mainPage: Page
   settingsPage: Page
-  /** Restore persisted AIRI state and remove the imported IndexedDB fixture. */
+  /** Restore persisted Angela state and remove the imported IndexedDB fixture. */
   cleanup: () => Promise<void>
 }
 
@@ -35,7 +35,7 @@ const importedModelKeyPrefix = 'display-model-'
 const modelRoutePath = '/settings/models'
 
 /**
- * Imports and selects a display model through AIRI's user-facing model chooser.
+ * Imports and selects a display model through Angela's user-facing model chooser.
  *
  * The returned cleanup owns every persisted value changed by this flow. Call it
  * after capture so repeated scenarios do not inherit a prior imported fixture.
@@ -110,14 +110,14 @@ export function resolveDisplayModelInputFromEnvironment(
 }
 
 /**
- * Captures AIRI after importing the model provided through environment variables.
+ * Captures Angela after importing the model provided through environment variables.
  *
  * Call stack:
  *
  * displayModelFromFileScenario
  *   -> {@link resolveDisplayModelInputFromEnvironment}
  *     -> {@link importDisplayModelFromFile}
- *       -> AIRI model chooser
+ *       -> Angela model chooser
  *         -> Vishot capture
  */
 const displayModelFromFileScenario = defineStageTamagotchiScenario({
@@ -154,7 +154,7 @@ async function findMainRenderer(electronApp: ElectronApplication, timeout = 30_0
     await new Promise(resolve => setTimeout(resolve, 250))
   }
 
-  throw new Error('Timed out waiting for the AIRI main renderer')
+  throw new Error('Timed out waiting for the Angela main renderer')
 }
 
 async function markOnboardingCompleted(page: Page): Promise<void> {

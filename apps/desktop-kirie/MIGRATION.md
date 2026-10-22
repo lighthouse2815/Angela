@@ -42,7 +42,7 @@ The review does not imply unreported coverage of multiple displays or every onbo
 | GAP-007 | Spotlight | Accepted | Pass | After the window flag fix, direct open and native scan-code Ctrl+Shift+A displayed Spotlight. Repeated open and hide/reopen passed. Desktop capture showed the input and transparency. Earlier notification display and click-to-Chat passed. Physical keyboard and macOS regression checks remain pending. |
 | GAP-008 | Global shortcuts | Accepted | Pass | Register, list, duplicate rejection, and unregister passed. Physical Ctrl+Shift+K produced one down/up pair in the foreground and another in the background. |
 | GAP-009 | Window lifecycle | Accepted | Pass | Native actions produced minimize, restore, blur, and focus events. |
-| GAP-010 | Server channel | Deferred | Deferred | AIRI server configuration and lifecycle require the deferred sidecar work. |
+| GAP-010 | Server channel | Deferred | Deferred | Angela server configuration and lifecycle require the deferred sidecar work. |
 | GAP-011 | Locale | Accepted | Pass | Locale changes reached another window and survived process restart. The Chinese locale normalized to `zh-Hans`. English also survived the next restart. |
 | GAP-012 | Onboarding | Accepted | Pass (user review) | Window creation and reuse passed. The user reported that onboarding looked normal on Windows. |
 | GAP-013 | Settings window | Accepted | Pass | Settings opened, routed, closed through its native title bar, and reopened. |
@@ -84,7 +84,7 @@ A later exit returned code 0 with two ObjectDB leaks. This intermittent success 
 
 ### Additional observations
 
-- Child close logged `AIRI host context disposed.` at 18:34:04 through `disposeHostContext` and `disposeRendererHost`.
+- Child close logged `Angela host context disposed.` at 18:34:04 through `disposeHostContext` and `disposeRendererHost`.
   Close and reopen succeeded. Promise cleanup remains unresolved.
 - One microphone request after restart returned `AbortError: Failed due to shutdown`. An immediate repeat returned a live track.
 - Root lint failures differed by checkout artifacts: Windows recorded 41 errors. The later macOS review recorded 1,715 errors and 701 warnings.
@@ -113,7 +113,7 @@ Linux notifications remain outside the review.
 
 1. Reproduce an in-scope failure before adding a capability.
 2. Use the Godot API or lifecycle that owns the behavior.
-3. Keep general desktop capabilities in Platform and AIRI services in AIRI.
+3. Keep general desktop capabilities in Platform and Angela services in Angela.
 4. Keep one Eventa context per renderer and Godot window operations on the main thread.
 5. Record a proven Godot limit before native integration or sidecar work.
 6. Get explicit approval for native dependencies, sidecars, and dependency workarounds.
@@ -126,11 +126,11 @@ Linux notifications remain outside the review.
 
 | Gap | Missing behavior | Reopen condition |
 | --- | --- | --- |
-| GAP-010 | Server configuration, QR payload, listener, and WebSocket lifecycle | The user reopens sidecar work. AIRI defines an artifact and lifecycle, or accepts an external server. |
-| GAP-023 | Plugin discovery, workers, directory import, and extension lifecycle | The user reopens sidecar work. AIRI owns files, runtime modules, shutdown, and packaging. |
-| GAP-024 | Artistry configuration and generation | The user reopens sidecar work. AIRI owns credentials, persistence, providers, jobs, downloads, and Widget updates. |
-| GAP-025 | MCP configuration and stdio processes | The user reopens sidecar work. AIRI owns configuration, process shutdown, and packaging. |
-| GAP-026 | Production installation and updates | The user reopens releases. AIRI defines versions, exports, signatures, manifests, installation, and relaunch. |
+| GAP-010 | Server configuration, QR payload, listener, and WebSocket lifecycle | The user reopens sidecar work. Angela defines an artifact and lifecycle, or accepts an external server. |
+| GAP-023 | Plugin discovery, workers, directory import, and extension lifecycle | The user reopens sidecar work. Angela owns files, runtime modules, shutdown, and packaging. |
+| GAP-024 | Artistry configuration and generation | The user reopens sidecar work. Angela owns credentials, persistence, providers, jobs, downloads, and Widget updates. |
+| GAP-025 | MCP configuration and stdio processes | The user reopens sidecar work. Angela owns configuration, process shutdown, and packaging. |
+| GAP-026 | Production installation and updates | The user reopens releases. Angela defines versions, exports, signatures, manifests, installation, and relaunch. |
 
 The workspace Node.js command is not a production sidecar.
 Do not port the server protocol to C# as a workaround.

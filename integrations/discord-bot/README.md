@@ -2,7 +2,7 @@
 
 Angela can chat through mentions and direct messages, and join a server voice channel for spoken conversation.
 Run `angela discord` to use the CLI's saved chat provider without a desktop or web client.
-The standalone adapter also supports the existing AIRI server channel with a connected desktop or web client.
+The standalone adapter also supports the existing Angela server channel with a connected desktop or web client.
 Use this package for voice conversation. The CLI Telegram task, permission, status, and recovery commands are separate features.
 
 ## CLI setup

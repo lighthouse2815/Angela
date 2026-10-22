@@ -1,5 +1,5 @@
 // ---------------------------------------------------------------------------
-// Span attribute constants (OTel semantic conventions + AIRI custom)
+// Span attribute constants (OTel semantic conventions + Angela custom)
 // ---------------------------------------------------------------------------
 
 // GenAI semconv attributes — https://opentelemetry.io/docs/specs/semconv/gen-ai/
@@ -10,7 +10,7 @@ export const GEN_AI_ATTR_SYSTEM = 'gen_ai.system'
 export const GEN_AI_ATTR_USAGE_INPUT_TOKENS = 'gen_ai.usage.input_tokens'
 export const GEN_AI_ATTR_USAGE_OUTPUT_TOKENS = 'gen_ai.usage.output_tokens'
 
-// AIRI custom span attributes
+// Angela custom span attributes
 export const AIRI_ATTR_BILLING_FLUX_CONSUMED = 'airi.billing.flux_consumed'
 export const AIRI_ATTR_GEN_AI_INPUT_MESSAGES = 'airi.gen_ai.input.messages'
 export const AIRI_ATTR_GEN_AI_INPUT_TEXT = 'airi.gen_ai.input.text'
@@ -21,7 +21,7 @@ export const AIRI_ATTR_GEN_AI_OUTPUT_TEXT = 'airi.gen_ai.output.text'
 export const AIRI_ATTR_GEN_AI_STREAM = 'airi.gen_ai.stream'
 export const AIRI_ATTR_GEN_AI_STREAM_INTERRUPTED = 'airi.gen_ai.stream_interrupted'
 
-// AIRI router gateway span attributes (in-process LLM/TTS routing — KTD-3).
+// Angela router gateway span attributes (in-process LLM/TTS routing — KTD-3).
 // All prefixed `airi.gen_ai.gateway.*` to stay under the existing `airi.gen_ai.*`
 // namespace already used by `airi.gen_ai.stream_interrupted`.
 export const AIRI_ATTR_GEN_AI_GATEWAY_UPSTREAM_URL = 'airi.gen_ai.gateway.upstream.url'
@@ -42,13 +42,13 @@ export const SERVER_ATTR_PORT = 'server.port'
 export const METRIC_HTTP_SERVER_REQUEST_DURATION = 'http.server.request.duration'
 export const METRIC_HTTP_SERVER_ACTIVE_REQUESTS = 'http.server.active_requests'
 
-// Auth & user (AIRI custom)
+// Auth & user (Angela custom)
 export const METRIC_AUTH_ATTEMPTS = 'auth.attempts'
 export const METRIC_AUTH_FAILURES = 'auth.failures'
 export const METRIC_USER_REGISTERED = 'user.registered'
 export const METRIC_USER_LOGIN = 'user.login'
 
-// Engagement (AIRI custom)
+// Engagement (Angela custom)
 export const METRIC_CHAT_MESSAGES = 'chat.messages'
 export const METRIC_CHARACTER_CREATED = 'character.created'
 export const METRIC_CHARACTER_DELETED = 'character.deleted'
@@ -58,7 +58,7 @@ export const METRIC_WS_USERS_ONLINE = 'ws.users.online'
 export const METRIC_WS_MESSAGES_SENT = 'ws.messages.sent'
 export const METRIC_WS_MESSAGES_RECEIVED = 'ws.messages.received'
 
-// Revenue (AIRI custom)
+// Revenue (Angela custom)
 export const METRIC_STRIPE_CHECKOUT_CREATED = 'stripe.checkout.created'
 export const METRIC_STRIPE_CHECKOUT_COMPLETED = 'stripe.checkout.completed'
 export const METRIC_STRIPE_EVENTS = 'stripe.events'
@@ -71,7 +71,7 @@ export const METRIC_GEN_AI_CLIENT_TOKEN_USAGE_INPUT = 'gen_ai.client.token.usage
 export const METRIC_GEN_AI_CLIENT_TOKEN_USAGE_OUTPUT = 'gen_ai.client.token.usage.output'
 export const METRIC_FLUX_CONSUMED = 'airi.billing.flux.consumed'
 
-// AIRI billing — credit/debit visibility beyond raw consumption
+// Angela billing — credit/debit visibility beyond raw consumption
 export const METRIC_AIRI_FLUX_CREDITED = 'airi.billing.flux.credited'
 // Streaming-only: token already streamed to user but post-stream debit failed.
 // Real revenue leak — every >0 sample should page. NOT covered by DB latency /
@@ -80,28 +80,28 @@ export const METRIC_AIRI_FLUX_UNBILLED = 'airi.billing.flux.unbilled'
 export const METRIC_AIRI_TTS_CHARS = 'airi.billing.tts.chars'
 export const METRIC_AIRI_TTS_PREFLIGHT_REJECTIONS = 'airi.billing.tts.preflight_rejections'
 
-// AIRI observability — self-monitoring for the metric pipeline
+// Angela observability — self-monitoring for the metric pipeline
 export const METRIC_AIRI_OBSERVABILITY_READ_ERRORS = 'airi.observability.read_errors'
 
-// AIRI database — local pg pool capacity and queue state
+// Angela database — local pg pool capacity and queue state
 export const METRIC_AIRI_DB_POOL_CONNECTIONS = 'airi.db.pool.connections'
 
-// AIRI revenue — actual money in (smallest currency unit, e.g. cents)
+// Angela revenue — actual money in (smallest currency unit, e.g. cents)
 export const METRIC_AIRI_STRIPE_REVENUE = 'airi.stripe.revenue'
 
-// AIRI email — transactional delivery health
+// Angela email — transactional delivery health
 export const METRIC_AIRI_EMAIL_SEND = 'airi.email.send'
 export const METRIC_AIRI_EMAIL_FAILURES = 'airi.email.failures'
 export const METRIC_AIRI_EMAIL_DURATION = 'airi.email.duration'
 
-// AIRI rate limiting — abuse / attack visibility
+// Angela rate limiting — abuse / attack visibility
 export const METRIC_AIRI_RATE_LIMIT_BLOCKED = 'airi.rate_limit.blocked'
 
-// AIRI GenAI — stream quality
+// Angela GenAI — stream quality
 export const METRIC_AIRI_GEN_AI_STREAM_INTERRUPTED = 'airi.gen_ai.stream.interrupted'
 export const METRIC_GEN_AI_CLIENT_FIRST_TOKEN_DURATION = 'gen_ai.client.first_token.duration'
 
-// AIRI router gateway — in-process LLM/TTS routing fallback / health signals.
+// Angela router gateway — in-process LLM/TTS routing fallback / health signals.
 //
 // fallback_count    — each retry attempt (per failing key). Labels: provider,
 //                     from_key, reason. Dashboard sum gives 24h fallback volume.

@@ -1,6 +1,6 @@
 # `@angela/model-driver-lipsync`
 
-Shared lip-sync profiles and model-neutral mouth-driving policies for AIRI.
+Shared lip-sync profiles and model-neutral mouth-driving policies for Angela.
 
 ## What It Does
 

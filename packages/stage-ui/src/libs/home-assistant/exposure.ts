@@ -2,7 +2,7 @@
  * Which Home Assistant entities the model can reach.
  *
  * The user owns this choice, and the settings page writes it. It works on
- * entities rather than domains. A user who wants AIRI to run the lights does not
+ * entities rather than domains. A user who wants Angela to run the lights does not
  * want it to open the front door, and one domain can hold both a harmless device
  * and a door.
  *

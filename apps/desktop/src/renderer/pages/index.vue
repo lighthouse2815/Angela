@@ -50,7 +50,7 @@ const { isOutside: outsideAuthStatus } = useElectronMouseInElement(authStatusEle
 const controlsIslandRef = ref<InstanceType<typeof ControlsIsland>>()
 const controlsIslandInteractionActive = shallowRef(false)
 const widgetStageRef = ref<InstanceType<typeof WidgetStage>>()
-// The stage canvas alpha tells the sampler which pixels of the window AIRI
+// The stage canvas alpha tells the sampler which pixels of the window Angela
 // paints, so it can read the desktop showing through behind the character.
 useScreenAmbientLight({ stageCanvas: () => widgetStageRef.value?.canvasElement() })
 const stageCanvas = toRef(() => widgetStageRef.value?.canvasElement())
@@ -426,7 +426,7 @@ const cursorPosition = computed(() => ({
       >
         <!--
           Every element that paints over the stage carries the opaque marker,
-          so that the screen sampler does not read AIRI's own colors as desktop
+          so that the screen sampler does not read Angela's own colors as desktop
           light. ResourceStatusIsland marks its pill itself, because its root
           spans the whole stage width. Tooltips and dialogs need none: reka-ui
           portals them to the body and the mask finds them there. HoloCoupon

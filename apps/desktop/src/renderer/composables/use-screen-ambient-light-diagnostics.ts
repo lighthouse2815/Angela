@@ -11,7 +11,7 @@ import {
   screenAmbientLightDiagnosticsRequestMs,
 } from '../../shared/screen-ambient-light-diagnostics'
 
-/** Receives transient capture diagnostics from the main AIRI renderer. */
+/** Receives transient capture diagnostics from the main Angela renderer. */
 export function useScreenAmbientLightDiagnostics() {
   const diagnostics = shallowRef<ScreenAmbientLightDiagnosticsSnapshot>()
   const { data, post } = useBroadcastChannel<ScreenAmbientLightDiagnosticsChannelEvent, ScreenAmbientLightDiagnosticsChannelEvent>({

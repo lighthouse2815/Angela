@@ -110,7 +110,7 @@ function handleKeydown(event: KeyboardEvent) {
         :disabled="sending"
         autofocus
         type="text"
-        placeholder="Ask AIRI…"
+        placeholder="Ask Angela…"
         :class="[
           'relative z-1',
           'w-full bg-transparent',

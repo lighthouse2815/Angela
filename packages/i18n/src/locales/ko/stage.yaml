@@ -46,7 +46,7 @@ chat:
     auto-send: 녹음이 끝나면 보내기
     system-default: 시스템 기본값
     listen: 계속 듣기
-    push-to-talk-unavailable: 이 기기에는 눌러서 말하기 키가 없어 AIRI가 듣지 않습니다. 청력 설정에서 입력 모드를 변경하세요.
+    push-to-talk-unavailable: 이 기기에는 눌러서 말하기 키가 없어 Angela가 듣지 않습니다. 청력 설정에서 입력 모드를 변경하세요.
     wake-word: 호출어 듣기
     hearing-settings: 청력 설정 더 보기…
     options-hint: 마우스를 올리거나 오른쪽 클릭하여 옵션 보기
@@ -206,7 +206,7 @@ mobile-tools:
   view: 보기
   hearing: 청력
   appearance: 외형
-  sign-in: AIRI에 로그인
+  sign-in: Angela에 로그인
   account-description: 계정 및 환경설정
   sound: 소리
   character-voice: 캐릭터 음성
@@ -249,7 +249,7 @@ status:
   dismiss: 무시
   listening: 듣는 중
   preparing: 마이크 준비 중
-  paused: AIRI가 말하는 동안 듣기 일시 중지
+  paused: Angela가 말하는 동안 듣기 일시 중지
   transcribing: 전사 중
   hearing-error: 오디오를 전사할 수 없습니다
   no-transcript: 인식된 음성이 여기에 표시됩니다.

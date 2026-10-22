@@ -12,7 +12,7 @@ export const authClient = createAuthClient({
   plugins: [steamClient()],
   fetchOptions: {
     // NOTICE: better-auth sets `credentials: "include"` by default.
-    // AIRI uses Bearer authentication and must not attach a browser session cookie.
+    // Angela uses Bearer authentication and must not attach a browser session cookie.
     credentials: 'omit',
     auth: {
       type: 'Bearer',

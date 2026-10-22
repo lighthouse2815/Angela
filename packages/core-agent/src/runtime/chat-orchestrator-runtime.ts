@@ -467,7 +467,7 @@ async function waitForProvider(work: Promise<unknown>, signal: AbortSignal) {
  * Creates the core chat orchestrator runtime used behind UI facades.
  *
  * Use when:
- * - A platform wants AIRI chat send orchestration without Vue/Pinia coupling.
+ * - A platform wants Angela chat send orchestration without Vue/Pinia coupling.
  * - Session, context, foreground stream, and LLM integrations are provided as adapters.
  *
  * Expects:

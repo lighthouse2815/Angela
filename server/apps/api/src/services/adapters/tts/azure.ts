@@ -87,8 +87,8 @@ export const azureAdapter: TtsAdapter = {
  *
  * NOTICE:
  * `unspeech` owns the canonical Microsoft helpers, but the currently consumed
- * helper surface only lets AIRI pass speed. Voice Pack pitch and volume must be
- * encoded before the request reaches unspeech because AIRI sends pre-built SSML
+ * helper surface only lets Angela pass speed. Voice Pack pitch and volume must be
+ * encoded before the request reaches unspeech because Angela sends pre-built SSML
  * with `disable_ssml: true`.
  * Source/context: this adapter's `extraOptions.pitch` and `extraOptions.volume`
  * contract, covered by `azureAdapter.send` tests.

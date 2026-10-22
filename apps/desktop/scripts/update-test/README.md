@@ -1,8 +1,8 @@
-# AIRI Electron Updater Local Test Harness
+# Angela Electron Updater Local Test Harness
 
 This directory provides a local mocked update-server workflow for Stage Tamagotchi.
 
-It is intended to verify AIRI's updater path:
+It is intended to verify Angela's updater path:
 
 - explicit `UPDATE_SERVER_URL` override mode
 - lane switching (`stable`, `beta`, `alpha`, `nightly`) via `AIRI_UPDATE_CHANNEL`

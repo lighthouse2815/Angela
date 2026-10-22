@@ -57,15 +57,15 @@ const requiredWorkspaceBuildOutputs = [
 const smokeHtml = `<!doctype html>
 <html>
   <head>
-    <title>AIRI Desktop Overlay Live Window Smoke</title>
+    <title>Angela Desktop Overlay Live Window Smoke</title>
     <style>
       body { font-family: sans-serif; padding: 48px; }
       button { font-size: 18px; padding: 12px 18px; }
     </style>
   </head>
   <body>
-    <h1>AIRI Desktop Overlay Live Window Smoke</h1>
-    <button id="airi-desktop-overlay-smoke-button">AIRI Desktop Overlay Smoke Button</button>
+    <h1>Angela Desktop Overlay Live Window Smoke</h1>
+    <button id="airi-desktop-overlay-smoke-button">Angela Desktop Overlay Smoke Button</button>
   </body>
 </html>`
 

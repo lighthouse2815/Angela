@@ -58,7 +58,7 @@ function findInvocation(message: ChatAssistantMessage, callId: string, invocatio
 /**
  * Replaces one execution and its display results, preserving their order.
  * Native continuation for this round and later rounds becomes stale after the edit.
- * Repeated provider call ids require an AIRI invocation id.
+ * Repeated provider call ids require an Angela invocation id.
  */
 export function replaceToolCallResult(message: ChatAssistantMessage, result: ToolCallResultInput, invocationId?: string): ChatAssistantMessage {
   const target = findInvocation(message, result.id, invocationId)
@@ -82,7 +82,7 @@ export function replaceToolCallResult(message: ChatAssistantMessage, result: Too
     }
   }
   // Display and imported provider results follow occurrence order for each call id.
-  // Their protocol envelopes do not carry AIRI invocation ids.
+  // Their protocol envelopes do not carry Angela invocation ids.
   let providerOccurrence = 0
   let sliceOccurrence = 0
   let storedOccurrence = 0
@@ -163,9 +163,9 @@ export async function executeToolCallRerun<TToolset extends string = string>(
 
   try {
     // NOTICE:
-    // Re-run tools receive AIRI's original chat history so runtime tools can
+    // Re-run tools receive Angela's original chat history so runtime tools can
     // inspect the same context the UI is updating. xsai types narrow
-    // `messages` to provider `Message[]`, while AIRI history can also contain
+    // `messages` to provider `Message[]`, while Angela history can also contain
     // local-only `error` entries. Keep the cast at this boundary instead of
     // filtering messages and silently changing the tool's context.
     // Removal condition: xsai exposes a tool execution context type that can

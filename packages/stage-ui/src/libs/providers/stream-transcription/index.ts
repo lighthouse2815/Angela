@@ -8,7 +8,7 @@ export type { StreamTranscriptionSnapshot } from '@angela/provider-inference'
 
 export type AIRIStreamTranscriptionDelta = StreamTranscriptionDelta | StreamTranscriptionSnapshot
 
-/** xsAI stream result with AIRI's replaceable snapshot event. */
+/** xsAI stream result with Angela's replaceable snapshot event. */
 export interface AIRIStreamTranscriptionResult extends Omit<StreamTranscriptionResult, 'fullStream'> {
   fullStream: ReadableStream<AIRIStreamTranscriptionDelta>
 }

@@ -1,6 +1,6 @@
 # `@angela/api-server`
 
-Project AIRI's resource API. Authentication is a separate workspace app at
+Angela's resource API. Authentication is a separate workspace app at
 `../dev-in-future/server/apps/auth`; this package does not instantiate Better Auth or expose
 auth/OIDC routes.
 
@@ -355,7 +355,7 @@ Messages API remains unsupported until these pieces exist.
 
 Responses validation reuses `src/services/adapters/llm/schemas/responses.ts`.
 This server-owned protocol layer derives schemas from OpenResponses and adds OpenAI search extensions.
-It permits provider-side references; the AIRI request policy rejects them for shared upstream accounts.
+It permits provider-side references; the Angela request policy rejects them for shared upstream accounts.
 The schema directory retains its generation input and instructions. Compiled JavaScript is not stored in source.
 xsai's existing client patch remains unchanged. No schema export or new peer dependency is added to xsai.
 
@@ -390,7 +390,7 @@ Before the first device test:
 2. Add a dedicated account's internal user ID to `APPLE_IAP_SANDBOX_USER_IDS`.
 3. Configure `APPLE_FLUX_PACKS` in ConfigKV, not in environment variables. Use exact App Store product IDs and positive `fluxAmount` values.
 4. Set the App Store Connect Sandbox Notifications V2 URL to the public `/api/v1/apple-iap/notifications` endpoint.
-5. Install a build with the iOS settlement fixes. Sign in to the dedicated AIRI account and complete a sandbox purchase.
+5. Install a build with the iOS settlement fixes. Sign in to the dedicated Angela account and complete a sandbox purchase.
 
 Check purchase credit, device retries, and duplicate Apple notifications.
 Each purchase must credit once. Check that a normal account cannot receive

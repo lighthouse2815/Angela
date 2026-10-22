@@ -213,7 +213,7 @@ export const providerOfficialSpeech = defineProvider({
           // provider resolves voices through the server's /audio/voices?model=
           // endpoint, which already returns only voices valid for the active
           // model. Re-applying the client-side filter on top can zero out the
-          // list when upstream compatibility ids differ from AIRI's router ids.
+          // list when upstream compatibility ids differ from Angela's router ids.
           // See packages/stage-pages/.../speech.vue filter predicate.
           languages: Array.isArray(v.languages) ? v.languages : [],
         }
@@ -366,7 +366,7 @@ export const providerOfficialTranscription = defineProvider({
         id: 'auto',
         name: 'Auto',
         provider: OFFICIAL_TRANSCRIPTION_PROVIDER_ID,
-        description: 'Realtime transcription routed by AIRI',
+        description: 'Realtime transcription routed by Angela',
       },
     ],
   },

@@ -1,6 +1,6 @@
 # @angela/server-shared
 
-The shared type definitions for all server-side packages of Project AIRI.
+The shared type definitions for all server-side packages of Angela.
 
 ## Usage
 

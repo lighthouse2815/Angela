@@ -1,6 +1,6 @@
 # Testing audio
 
-This package runs recorded microphone tests through the real AIRI audio pipeline.
+This package runs recorded microphone tests through the real Angela audio pipeline.
 
 ```text
 input.wav -> virtual microphone -> VAD -> ASR -> LLM -> TTS -> playback -> UI
@@ -68,7 +68,7 @@ A case can independently choose its VAD behavior, ASR, LLM, and TTS configuratio
 
 ## Test wake word detection
 
-Use `configureWakeWord` to add AIRI Cards with wake words. Each configuration adds one card with one wake word and its pronunciations. The callback also turns on the microphone and selects the `wake-word` Hearing input mode. The case does not need an ASR Provider.
+Use `configureWakeWord` to add Angela Cards with wake words. Each configuration adds one card with one wake word and its pronunciations. The callback also turns on the microphone and selects the `wake-word` Hearing input mode. The case does not need an ASR Provider.
 
 Set `pipelines: ['kws']`. Then the Web runner downloads and verifies the pinned KWS model before the file microphone starts. The Web page gets the model from the workspace cache, not from the network. Electron uses its bundled model.
 

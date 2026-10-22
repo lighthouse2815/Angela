@@ -8,7 +8,7 @@ describe('audio input pipeline', () => {
   // It repeats the greeting after a 2-second pause to catch regressions that drop the second utterance.
   it('keeps two utterances in transcription', {
     input: new URL('./input.test.wav', import.meta.url),
-    // This regression isolates AIRI's default VAD and one explicit ASR Provider.
+    // This regression isolates Angela's default VAD and one explicit ASR Provider.
     preflight: [
       configureOnboarding(() => ({ completed: true })),
       configureModuleHearing(async (context) => {

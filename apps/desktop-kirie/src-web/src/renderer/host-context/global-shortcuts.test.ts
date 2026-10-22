@@ -38,7 +38,7 @@ describe('kirie global shortcuts', () => {
     platform.unregister.mockReset().mockResolvedValue(undefined)
   })
 
-  it('maps AIRI accelerators to Godot key values', () => {
+  it('maps Angela accelerators to Godot key values', () => {
     expect(toKirieGlobalShortcut(binding.accelerator)).toEqual({
       altPressed: false,
       commandOrControlAutoremap: true,

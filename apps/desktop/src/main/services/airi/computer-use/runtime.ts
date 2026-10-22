@@ -96,7 +96,7 @@ export function createComputerUseRuntime(options: { binaryPath: string, storeRoo
     // The host owns routing and artifact storage. CLI global flags must not replace them.
     const managedFlags = ['--store-root', '--endpoint', '--device', '--device-id', '--run', '--config', '--profile', '--discovery-file', '--pairing-store']
     if (argv.some(arg => managedFlags.some(flag => arg === flag || arg.startsWith(`${flag}=`))))
-      throw new Error('Computer use routing and storage are managed by AIRI.')
+      throw new Error('Computer use routing and storage are managed by Angela.')
 
     if (windowId != null && argv[1].startsWith('input.') && argv.some(arg => arg === '--target' || arg.startsWith('--target=')))
       throw new Error('Do not combine a Niri windowId with an AUV target. Use foreground input after selecting the native window.')
@@ -235,7 +235,7 @@ export function createComputerUseRuntime(options: { binaryPath: string, storeRoo
       const target = await realpath(path)
       const within = relative(root, target)
       if (!within || isAbsolute(within) || within === '..' || within.startsWith(`..${sep}`))
-        throw new Error('Only screenshots from this AIRI computer-use store can be read.')
+        throw new Error('Only screenshots from this Angela computer-use store can be read.')
       const info = await stat(target)
       if (!info.isFile() || info.size > 8 * 1024 * 1024)
         throw new Error('Screenshot must be a file smaller than 8 MiB.')

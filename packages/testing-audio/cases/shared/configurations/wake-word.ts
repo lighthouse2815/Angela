@@ -10,7 +10,7 @@ import { prepareWakeWordModel } from '../../../src/setup/wake-word-model'
 import { configureStorage } from './storage'
 
 export interface WakeWordConfiguration {
-  /** ID of a new AIRI Card that owns the wake word. The active card stays active. */
+  /** ID of a new Angela Card that owns the wake word. The active card stays active. */
   targetCardId: string
   /** Written wake word, for example the character name. */
   text: string
@@ -21,7 +21,7 @@ export interface WakeWordConfiguration {
 type WakeWordResolver = (context: AudioInputPreflightContext) => WakeWordConfiguration[] | undefined | Promise<WakeWordConfiguration[] | undefined>
 
 /**
- * Adds one AIRI Card with a wake word for each configuration, and selects the `wake-word` Hearing input mode with the microphone on.
+ * Adds one Angela Card with a wake word for each configuration, and selects the `wake-word` Hearing input mode with the microphone on.
  *
  * The case needs no ASR Provider. On Web, the callback serves the verified model from the workspace cache, so the
  * model asset repository installs it without a network download. Electron loads the pack from its bundle.
@@ -55,17 +55,17 @@ export function configureWakeWord(resolve: WakeWordResolver): AudioInputPrefligh
     await context.runtime.runtimePage.evaluate((configuredTargets) => {
       const serializedCards = localStorage.getItem('airi-cards')
       if (!serializedCards)
-        throw new Error('The AIRI Card store is not initialized.')
+        throw new Error('The Angela Card store is not initialized.')
 
       const activeCardId = localStorage.getItem('airi-card-active-id') ?? 'default'
       const cards = JSON.parse(serializedCards) as Array<[string, AiriCard]>
       const activeCard = cards.find(([cardId]) => cardId === activeCardId)?.[1]
       if (!activeCard)
-        throw new Error(`The active AIRI Card "${activeCardId}" does not exist.`)
+        throw new Error(`The active Angela Card "${activeCardId}" does not exist.`)
 
       for (const target of configuredTargets) {
         if (cards.some(([cardId]) => cardId === target.cardId))
-          throw new Error(`The AIRI Card "${target.cardId}" already exists.`)
+          throw new Error(`The Angela Card "${target.cardId}" already exists.`)
 
         // The copy keeps valid Provider modules. Only the wake word separates the target from the active card.
         const targetCard = structuredClone(activeCard)

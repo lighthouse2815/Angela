@@ -8,7 +8,7 @@ import { createTestConfig } from './test-fixtures'
 const baseConfig: ComputerUseConfig = createTestConfig({
   executor: 'dry-run',
   permissionChainHint: 'Terminal -> local dry-run',
-  denyApps: ['airi'],
+  denyApps: ['airi', 'angela'],
   requireAllowedBoundsForMutatingActions: false,
   requireCoordinateAlignmentForMutatingActions: false,
   requireSessionTagForMutatingActions: false,
@@ -114,7 +114,7 @@ describe('evaluateActionPolicy', () => {
     expect(decision.riskLevel).toBe('high')
   })
 
-  it('denies sensitive foreground apps for ui actions', () => {
+  it.each(['AIRI', 'Angela'])('denies %s foreground windows for ui actions', (appName) => {
     const decision = evaluateActionPolicy({
       action: {
         kind: 'press_keys',
@@ -125,7 +125,7 @@ describe('evaluateActionPolicy', () => {
       config: baseConfig,
       context: {
         available: true,
-        appName: 'AIRI',
+        appName,
         platform: 'darwin',
       },
       operationsExecuted: 0,

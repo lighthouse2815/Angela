@@ -11,7 +11,7 @@ Godot-native desktop stage runtime project for `stage-tamagotchi`.
 ## What It Is Not
 
 - It is not the Electron host app.
-- It does not own AIRI agent logic or adaptation-layer IPC contracts.
+- It does not own Angela agent logic or adaptation-layer IPC contracts.
 - It is not a web or mobile renderer package.
 
 ## Current Scope
@@ -47,7 +47,7 @@ Godot-native desktop stage runtime project for `stage-tamagotchi`.
 ## When Not To Use It
 
 - Do not put Electron main/renderer host logic here.
-- Do not put AIRI agent orchestration or cross-process protocol definitions here.
+- Do not put Angela agent orchestration or cross-process protocol definitions here.
 - Do not use it as a generic cross-platform stage abstraction package.
 
 ## Build

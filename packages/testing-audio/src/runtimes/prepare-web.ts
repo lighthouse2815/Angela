@@ -5,7 +5,7 @@ import type { AudioInputSession } from '../types'
 import { browserProbeOptions, stubForBrowser } from '../setup/browser-probe'
 import { createSession } from '../setup/session'
 
-/** Adapts a Fakemic Chromium process into an AIRI Web audio session. */
+/** Adapts a Fakemic Chromium process into an Angela Web audio session. */
 export default async function prepareWebRuntime(context: FakemicWebPrepareContext): Promise<AudioInputSession> {
   await context.context.addInitScript(stubForBrowser, browserProbeOptions)
 

@@ -70,7 +70,7 @@ describe('stage painted mask overlays', () => {
     //
     // The mask covered only marked elements. Reka-ui portals tooltip, popover
     // and menu content to the body, outside every marked root, so an open
-    // tooltip fed AIRI's own colors into the light maps. The mask now covers
+    // tooltip fed Angela's own colors into the light maps. The mask now covers
     // reka-ui's popper wrapper, which this case pins to the installed version.
     mount(defineComponent(() => () => h(TooltipProvider, { delayDuration: 0 }, () => h(TooltipRoot, { defaultOpen: true }, () => [
       h(TooltipTrigger, { style: 'position: fixed; left: 100px; top: 100px; width: 20px; height: 20px' }, () => 'trigger'),

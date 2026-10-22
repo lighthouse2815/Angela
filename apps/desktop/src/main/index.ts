@@ -152,7 +152,7 @@ if (is.dev)
   app.dock?.setIcon(devIcon)
 electronApp.setAppUserModelId('ai.moeru.airi')
 
-// Track the real user-facing AIRI window because the process also owns hidden utility windows.
+// Track the real user-facing Angela window because the process also owns hidden utility windows.
 // The second-instance handler should restore the main UI instead of accidentally surfacing internals.
 let userFacingMainWindow: BrowserWindow | undefined
 let settingsWindowManager: SettingsWindowManager | undefined

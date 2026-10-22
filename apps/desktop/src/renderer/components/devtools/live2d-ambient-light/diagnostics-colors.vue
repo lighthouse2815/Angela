@@ -13,7 +13,7 @@ const props = defineProps<{
 }>()
 
 /**
- * Part of a map that the AIRI window covers, as a fraction of the map.
+ * Part of a map that the Angela window covers, as a fraction of the map.
  *
  * The maps reach the same distance past every edge, so a window that is not
  * square sits in a taller or wider part of the map than it does across. The

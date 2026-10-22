@@ -2,7 +2,7 @@
   "name": "@angela/discord-bot",
   "type": "module",
   "private": true,
-  "description": "Discord bot for AIRI",
+  "description": "Discord bot for Angela",
   "author": {
     "name": "Moeru AI Project AIRI Team",
     "email": "airi@moeru.ai",
@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/moeru-ai/airi.git",
+    "url": "https://github.com/lighthouse2815/Angela.git",
     "directory": "integrations/discord-bot"
   },
   "exports": {
@@ -20,7 +20,11 @@
       "default": "./dist/airi-adapter.mjs"
     }
   },
-  "files": ["README.md", "dist", "package.json"],
+  "files": [
+    "README.md",
+    "dist",
+    "package.json"
+  ],
   "scripts": {
     "build": "tsdown",
     "start": "tsx --env-file-if-exists=.env --env-file-if-exists=.env.local src/index.ts",

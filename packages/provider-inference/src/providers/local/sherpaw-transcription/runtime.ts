@@ -55,7 +55,7 @@ export function createProvider(config: { model: SherpawModelId }, host: SherpawT
       throw new Error('Sherpaw did not provide transcription events.')
 
     active.add(transport)
-    // Sherpaw's text streams append deltas. AIRI needs indexed partials to replace corrections.
+    // Sherpaw's text streams append deltas. Angela needs indexed partials to replace corrections.
     const [executionEvents, snapshotEvents] = transport.events.tee()
     const live = streamTranscription({ ...transport, events: executionEvents })
     void live.fullStream.cancel()

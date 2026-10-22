@@ -3,7 +3,7 @@
  *
  * All image generation providers (ComfyUI, Replicate, etc.) must implement
  * this interface. The bridge dispatches to the active provider based on
- * the current AIRI card's artistry settings.
+ * the current Angela card's artistry settings.
  */
 
 export interface ArtistryRequest {

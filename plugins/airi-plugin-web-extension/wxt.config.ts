@@ -10,14 +10,14 @@ type VitePlugin = NonNullable<WxtViteConfig['plugins']>[number]
 export default defineConfig({
   modules: ['@wxt-dev/module-vue'],
   manifest: {
-    name: 'AIRI Web Extension',
-    description: 'Capture web context (videos, pages, subtitles) for Project AIRI.',
+    name: 'Angela Web Extension',
+    description: 'Capture web context (videos, pages, subtitles) for Angela.',
     permissions: ['storage', 'tabs'],
     optional_host_permissions: [
       '*://*/*',
     ],
     action: {
-      default_title: 'AIRI Web Extension',
+      default_title: 'Angela Web Extension',
     },
   },
   vite: () => {

@@ -3,14 +3,17 @@ import process from 'node:process'
 import { readdir, readFile, writeFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 
+import packageJSON from '../../../package.json' with { type: 'json' }
+
 import { getFilenames } from './utils'
 
 const ROOT_DIR = resolve(import.meta.dirname, '..', '..', '..')
 const DOCS_DIR = resolve(ROOT_DIR, 'docs')
+const RELEASES_DOWNLOAD_URL = `${packageJSON.repository.url.replace(/\.git$/, '')}/releases/download`
 
 // GitHub releases download URLs
-const GITHUB_WINDOWS_RE = /https:\/\/github\.com\/moeru-ai\/airi\/releases\/download\/v[^/]+\/AIRI-[^")\s]+-windows-x64-setup\.exe/g
-const GITHUB_MACOS_RE = /https:\/\/github\.com\/moeru-ai\/airi\/releases\/download\/v[^/]+\/AIRI-[^")\s]+-darwin-arm64\.dmg/g
+const GITHUB_WINDOWS_RE = /https:\/\/github\.com\/(?:moeru-ai\/airi|lighthouse2815\/Angela)\/releases\/download\/v[^/]+\/(?:AIRI|Angela)-[^")\s]+-windows-x64-setup\.exe/g
+const GITHUB_MACOS_RE = /https:\/\/github\.com\/(?:moeru-ai\/airi|lighthouse2815\/Angela)\/releases\/download\/v[^/]+\/(?:AIRI|Angela)-[^")\s]+-darwin-arm64\.dmg/g
 
 // Aliyun OSS mirror download URLs (used by zh-CN README)
 const OSS_WINDOWS_RE = /https:\/\/static-cn-proj-airi\.oss-cn-shanghai\.aliyuncs\.com\/artifacts\/apps\/desktop\/versions\/v[^/]+\/AIRI-[^")\s]+-windows-x64-setup\.exe/g
@@ -43,10 +46,10 @@ async function main() {
 
   function updateContent(content: string): string {
     return content
-      .replace(GITHUB_WINDOWS_RE, `https://github.com/moeru-ai/airi/releases/download/v${cleanVersion}/${windowsExe}`)
-      .replace(GITHUB_MACOS_RE, `https://github.com/moeru-ai/airi/releases/download/v${cleanVersion}/${macosDmg}`)
-      .replace(OSS_WINDOWS_RE, `https://github.com/moeru-ai/airi/releases/download/v${cleanVersion}/${windowsExe}`)
-      .replace(OSS_MACOS_RE, `https://github.com/moeru-ai/airi/releases/download/v${cleanVersion}/${macosDmg}`)
+      .replace(GITHUB_WINDOWS_RE, `${RELEASES_DOWNLOAD_URL}/v${cleanVersion}/${windowsExe}`)
+      .replace(GITHUB_MACOS_RE, `${RELEASES_DOWNLOAD_URL}/v${cleanVersion}/${macosDmg}`)
+      .replace(OSS_WINDOWS_RE, `${RELEASES_DOWNLOAD_URL}/v${cleanVersion}/${windowsExe}`)
+      .replace(OSS_MACOS_RE, `${RELEASES_DOWNLOAD_URL}/v${cleanVersion}/${macosDmg}`)
   }
 
   const readmeFiles: string[] = [

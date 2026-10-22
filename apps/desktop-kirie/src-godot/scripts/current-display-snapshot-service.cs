@@ -5,7 +5,7 @@ using Godot;
 internal static class CurrentDisplaySnapshotService
 {
     /// <summary>
-    /// Attaches the AIRI display snapshot handler to the main renderer's Eventa context.
+    /// Attaches the Angela display snapshot handler to the main renderer's Eventa context.
     /// The returned registration owns the handler lifetime and must be disposed by the caller.
     /// </summary>
     public static IDisposable Attach(IEventContext context, Window hostWindow)

@@ -36,7 +36,7 @@ internal static class Program
     {
         // ROOT CAUSE:
         //
-        // CEF can issue concurrent requests while one AIRI permission prompt is open.
+        // CEF can issue concurrent requests while one Angela permission prompt is open.
         // Showing one modal per raw request creates conflicting decisions and exposes
         // native request identifiers to the renderer.
         //

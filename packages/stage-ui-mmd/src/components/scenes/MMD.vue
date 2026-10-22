@@ -362,7 +362,7 @@ function renderLoop() {
   if (animation) {
     // three-mmd preserves the required mixer → IK → grant → physics order.
     animation.update(delta)
-    // Apply AIRI-owned morphs after the runtime so lip-sync/expression win
+    // Apply Angela-owned morphs after the runtime so lip-sync/expression win
     // over any VMD mouth/expression keyframes.
     emote?.update(delta)
     blink.update(morphs, delta)

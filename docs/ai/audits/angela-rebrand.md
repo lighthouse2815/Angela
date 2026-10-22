@@ -86,12 +86,14 @@ The Kirie-only `stage-host-context` alias changes with its Vite and TypeScript m
 ## External npm packages
 
 These packages have registry versions and integrity records in the lockfile. They are outside this workspace.
+Seven appear in the catalog. `duckdb-wasm` is a transitive npm dependency of `drizzle-duckdb-wasm`.
 Their `@proj-airi` namespace, import subpaths, catalogs, and release-age policy remain unchanged.
 
 | Package | Referencing files at baseline |
 | --- | --- |
 | `@proj-airi/chromatic` | 4 |
 | `@proj-airi/drizzle-duckdb-wasm` | 17 |
+| `@proj-airi/duckdb-wasm` | 6 translated documents and the lockfile |
 | `@proj-airi/iconify-meteocons` | 6 |
 | `@proj-airi/lobe-icons` | 8 |
 | `@proj-airi/unocss-preset-chromatic` | 6 |
@@ -104,7 +106,7 @@ Their `@proj-airi` namespace, import subpaths, catalogs, and release-age policy 
   This includes `airi-cli`, `computer-use-mcp-*`, and `e2e-*` client names.
 - Electron profiles keep `AIRI` for packaged builds and `@proj-airi/stage-tamagotchi` for development.
 - `Symbol('@proj-airi/chromatic-hue')` labels a Vue injection key. It is not a package import.
-- `@proj-airi/duckdb-wasm` in translated upstream documentation describes an external historical package.
+- `@proj-airi/duckdb-wasm` is an external transitive npm package, also referenced in translated upstream documentation.
 - Deferred `stage-pocket` and `auth-server` belong to `../dev-in-future`, outside this repository's workspace.
 - External npm packages retain their upstream repository links and package names.
 - AIRI env variables, IPC/Eventa names, debug globals, URL schemes, storage keys, and card schema fields remain supported contracts.
@@ -157,3 +159,81 @@ The lockfile importer paths change in the same commit. No external resolution ch
 - CLI path/configuration/MCP/perception checks: 8 files and 58 tests passed.
 - Desktop plugin/profile checks: 2 files and 68 tests passed.
 - ESLint on modified configuration and source files passed with zero errors.
+
+## Product branding and supported old identifiers
+
+UI labels, localized product text, prompts, package descriptions, repository metadata, OpenRouter attribution, and updater fixtures use Angela.
+The original authors, copyright notices, historical posts, third-party assets, and upstream npm projects retain their attribution.
+Translated READMEs identify the upstream project and send product downloads to Angela's release page.
+
+These identifiers remain supported without conversion:
+
+- Electron `AIRI` and `@proj-airi/stage-tamagotchi` profile directories preserve user data.
+- The stored main-window record still uses the title `AIRI` as its lookup key. Its visible window title is Angela.
+- Godot's `config/name="AIRI"` keeps existing `user://` microphone permissions and spotlight settings.
+- Local certificate issuer `AIRI`, its organization, and CA filenames remain trusted.
+- `AIRI_*` and `VITE_AIRI_*` env names, Eventa/IPC names, WebSocket identities, telemetry attributes, and debug globals remain stable.
+- `airi-*` URL schemes, card/module IDs, `engines.airi`, `extension.airi.json`, sticker IDs, and exported adapter names remain stable.
+- VS Code publisher/package IDs, command IDs, and configuration keys preserve existing extension settings.
+- External hosted-provider endpoints, Player2 game keys, model asset locations, and documentation URLs remain upstream addresses.
+- `bucket/airi.json` remains an installer for published upstream AIRI binaries. It does not pretend to install Angela.
+- `scripts/build-airi-docs.sh` builds the external `moeru-ai/airi-docs` repository and retains its env contract.
+
+Computer-use denies both `airi` and `angela`. Debug target selection accepts both visible titles.
+No external dependency versions, snapshots, integrity data, catalogs, overrides, or patches changed from baseline `5227709`.
+
+Nix hash update helpers now use the `angela` flake output. This machine has no Nix executable.
+Nix dependency and asset hashes cannot be regenerated or verified here.
+
+## Final build and regression checks
+
+All builds used one workspace task at a time and `RAYON_NUM_THREADS=1`.
+CLI tests used one worker and a 1536 MiB heap. Frontend builds used a 2048 MiB heap.
+The final full typecheck used a 2560 MiB heap with one task at a time.
+
+| Check | Result |
+| --- | --- |
+| Packages and CLI dependency graph build | Passed |
+| CLI final build, typecheck, and built `--help` | Passed |
+| `pnpm --filter @angela/web... --workspace-concurrency=1 run build` | Passed |
+| `pnpm -F @angela/desktop build` | Passed, main/preload/renderer |
+| `pnpm -F @angela/desktop-kirie build` | Passed, renderer and .NET assembly |
+| Desktop Node suite | 89 files passed, 671 tests passed, 2 skipped |
+| Kirie Node suite | 10 files and 32 tests passed |
+| Provider inference Node suite | 18 files and 186 tests passed |
+| Plugin SDK suite after branding | 13 files and 113 tests passed |
+| Computer-use configuration, debug targets, policy, and executor | 4 files and 32 tests passed |
+| Core-agent, Discord, and locale scripts after branding | 29 files passed, 259 tests passed, 1 skipped |
+| i18n glossary build and tests | Passed, 20 tests |
+| Static updater fixture filenames, sizes, and SHA-512 | Passed |
+| Final frozen installation with scripts disabled | Passed |
+| Final root `pnpm lint` | Passed, zero errors and 603 existing warnings |
+| Root `pnpm typecheck --concurrency=1 --continue` at 2560 MiB | Passed, 53 of 53 tasks |
+
+Kirie required its documented `kirie doctor --fix plugin:core` setup before the native build.
+The CEF archive exceeds the free tmpfs space in `/tmp`. Setup completed with `TMPDIR` on the checkout's disk cache.
+No addon or backend dependency was added to Git or changed in version.
+
+## Checks outside the root filter
+
+`turbo run typecheck` with `./integrations/**`, `./plugins/**`, and `./engines/**` completed with 38 successful tasks and six failures.
+The root typecheck above remains fully successful.
+
+| Workspace | Remaining result |
+| --- | --- |
+| `@angela/satori-bot` | Existing optional event/channel and response-field type errors |
+| `@angela/telegram-bot` | Existing optional fields, control-flow returns, and unassigned-variable errors |
+| `@angela/twitter-services` | Existing unused function/parameter diagnostics |
+| `@angela/minecraft-bot` | Existing array inference and incompatible `vec3` versions in the locked graph |
+| `@angela/plugin-game-chess` | Existing script refers to absent `tsconfig.json` |
+| `@angela/plugin-claude-code` | Exceeds the 2560 MiB typecheck heap limit |
+
+Source comparison against `5227709` found 101 TypeScript diagnostics across 22 files.
+Twenty-one files are byte-identical to baseline. The remaining Telegram file differs only by `AIRI` to `Angela` product text.
+The game-chess `tsconfig.json` is also absent in baseline. The external dependency graph is unchanged.
+These checks expose existing integration debt and a memory limit. This migration does not change that business logic or dependency graph.
+
+The targeted API schema and WebSocket contract checks passed: two files, six tests.
+The README release-link CLI uses the root repository metadata for download destinations.
+An isolated real-CLI check passed for old AIRI links, new Angela links, and OSS mirror inputs on Windows and macOS.
+Historical issue URLs remained unchanged. ESLint passed for this final release-helper change.

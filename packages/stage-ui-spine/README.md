@@ -1,6 +1,6 @@
 # @angela/stage-ui-spine
 
-Spine 2D scene components and stores for Project AIRI. Provides Vue components, composables, and utilities for rendering and managing Spine animations within the stage UI.
+Spine 2D scene components and stores for Angela. Provides Vue components, composables, and utilities for rendering and managing Spine animations within the stage UI.
 
 ## Prerequisites
 

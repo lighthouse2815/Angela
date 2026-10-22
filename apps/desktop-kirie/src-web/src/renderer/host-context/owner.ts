@@ -51,7 +51,7 @@ export function disposeHostContext() {
   if (!owner)
     return
 
-  owner.context.abort(new Error('AIRI host context disposed.'))
+  owner.context.abort(new Error('Angela host context disposed.'))
   owner.dispose()
   owner = undefined
 }

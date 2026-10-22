@@ -51,7 +51,7 @@ export function useHostSpotlightWindow() {
         await host.platform.notifications.show({
           body,
           id,
-          title: 'AIRI',
+          title: 'Angela',
         })
       }
       catch (error) {

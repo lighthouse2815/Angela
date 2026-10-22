@@ -10,8 +10,8 @@ animations:
 dialogs:
   onboarding:
     official:
-      title: Proveedor Oficial de AIRI
-    title: '¡Bienvenido a AIRI!'
+      title: Proveedor Oficial de Angela
+    title: '¡Bienvenido a Angela!'
     description: Configuremos tu primer proveedor de IA para comenzar.
     selectProvider: Elige un Proveedor de IA
     configureProvider: Configurar {provider}
@@ -34,13 +34,13 @@ dialogs:
     retry: Volver a intentar
     credentialsSafeLabel: '¡Mantén tus claves y credenciales API a salvo!'
     credentialsSafeLocal: >-
-      AIRI se está ejecutando localmente en su PC, y nunca robaremos sus credenciales para proveedores de IA / LLM. Pero tenga en cuenta que sus claves API son información confidencial. Asegúrese de mantenerlas seguras y no compartirlas con nadie.
+      Angela se está ejecutando localmente en su PC, y nunca robaremos sus credenciales para proveedores de IA / LLM. Pero tenga en cuenta que sus claves API son información confidencial. Asegúrese de mantenerlas seguras y no compartirlas con nadie.
     credentialsSafeOpenSource: >-
-      AIRI es de código abierto en {github}, si desea comprobar cómo manejamos sus credenciales, no dude en inspeccionar nuestro código.
+      Angela es de código abierto en {github}, si desea comprobar cómo manejamos sus credenciales, no dude en inspeccionar nuestro código.
     enableChatCheck: >-
       Permitir a airi enviar un mensaje "ping" al primer modelo de chat disponible para comprobar la disponibilidad
     start: '¡Hagámoslo!'
-    loginPrompt: Inicia sesión para utilizar el proveedor oficial de AIRI para obtener la mejor experiencia.
+    loginPrompt: Inicia sesión para utilizar el proveedor oficial de Angela para obtener la mejor experiencia.
     loginAction: Iniciar sesión
     setupWithoutSigningIn: Configurar con su proveedor
     flux: Flujo
@@ -55,7 +55,7 @@ dialogs:
       notificationsTitle: Notificaciones
       notificationsDescription: Permitir recordatorios y actualizaciones importantes de estado.
       microphoneTitle: Micrófono
-      microphoneDescription: Permite que AIRI use el micrófono para la entrada de voz y la transcripción.
+      microphoneDescription: Permite que Angela use el micrófono para la entrada de voz y la transcripción.
       requestAction: Solicitar acceso
       optionalHint: Puedes continuar aunque no se concedan estos permisos.
       stateGranted: Concedido
@@ -95,7 +95,7 @@ analytics:
   notice:
     title: Análisis de uso
     description: >-
-      AIRI recopila análisis de uso anónimo para ayudarnos a entender cómo se utiliza la aplicación y mejorar la estabilidad. No se recogen datos personales.
+      Angela recopila análisis de uso anónimo para ayudarnos a entender cómo se utiliza la aplicación y mejorar la estabilidad. No se recogen datos personales.
     privacyPrefix: Leer el
     privacyLink: Política de privacidad
     onboardingHint: Puedes desactivar las analíticas más tarde en Configuración > Sistema > General.
@@ -172,7 +172,7 @@ live2d:
   theme-color-from-model:
     title: Extraer colores del modelo
     description: >
-      Extrae los colores más destacados del lienzo de renderizado actual. Haz clic en el color para aplicarlo a AIRI. Si los colores no te convencen, prueba a realizar la extracción varias veces, con el modelo en diferentes poses.
+      Extrae los colores más destacados del lienzo de renderizado actual. Haz clic en el color para aplicarlo a Angela. Si los colores no te convencen, prueba a realizar la extracción varias veces, con el modelo en diferentes poses.
     button-extract:
       title: Extraer
   animation:
@@ -195,7 +195,7 @@ live2d:
       description: Forzar la animación de parpadeo con un temporizador externo
     blink-mode:
       title: Modo parpadeo
-      description: Elige entre el parpadeo integrado en el modelo o el temporizador de parpadeo forzado de AIRI.
+      description: Elige entre el parpadeo integrado en el modelo o el temporizador de parpadeo forzado de Angela.
     idle-motion:
       title: Animación inactiva
       no-motion: No hay animación disponible
@@ -204,7 +204,7 @@ live2d:
       disable-motion-description: Desactivar animación inactiva
     motion-driver:
       title: Controlador de movimiento
-      description: Elige cómo AIRI genera los movimientos del cuerpo y los ojos en reposo.
+      description: Elige cómo Angela genera los movimientos del cuerpo y los ojos en reposo.
       options:
         universal:
           description: Usa los movimientos del modelo, los movimientos oculares en reposo y el seguimiento del ratón.
@@ -281,7 +281,7 @@ pages:
     connections:
       tab: Cuentas conectadas
       title: Cuentas conectadas
-      description: Inicia sesión en AIRI a través de estos proveedores. Desvincula tu cuenta para revocar el acceso y, a continuación, vuelve a vincularla para cambiar a otra cuenta.
+      description: Inicia sesión en Angela a través de estos proveedores. Desvincula tu cuenta para revocar el acceso y, a continuación, vuelve a vincularla para cambiar a otra cuenta.
       status:
         linked: Vinculado
         notLinked: No vinculado
@@ -298,7 +298,7 @@ pages:
         listFailed: No se pudo cargar las cuentas conectadas.
         unlinkFailed: No se pudo desvincular esta cuenta.
         linkFailed: No se pudo iniciar el flujo de vinculación.
-        accountAlreadyLinkedToDifferentUser: Esta cuenta OAuth ya está vinculada a otra cuenta de AIRI. Elige otra cuenta del proveedor o desvincúlala primero de la otra cuenta de AIRI.
+        accountAlreadyLinkedToDifferentUser: Esta cuenta OAuth ya está vinculada a otra cuenta de Angela. Elige otra cuenta del proveedor o desvincúlala primero de la otra cuenta de Angela.
         oauthCallbackFailed: No pudimos conectar esta cuenta OAuth. Inténtalo de nuevo o elige otra cuenta del proveedor.
         lastAccount: Este es tu único método de inicio de sesión. Establece primero una contraseña antes de desvincularlo.
     security:
@@ -371,7 +371,7 @@ pages:
     delete: Eliminar
     delete_card: Eliminar Tarjeta
     delete_confirmation: '¿Estás seguro de que quieres eliminar esta tarjeta?'
-    description: Usar presets de tarjeta de personaje AIRI
+    description: Usar presets de tarjeta de personaje Angela
     description_label: Descripción
     drop_here: Suelta para subir
     create_card: Crear una nueva Tarjeta
@@ -449,7 +449,7 @@ pages:
       model: Habla / Modelo
       voice: Habla / Voz
     systemprompt: Prompt del Sistema
-    title: Tarjeta AIRI
+    title: Tarjeta Angela
     try_different_search: Prueba un término de búsqueda diferente
     export: Exportar
     exported: Paquete de tarjeta exportado
@@ -458,7 +458,7 @@ pages:
     import_missing_file: Al paquete de tarjeta le faltan archivos necesarios
     import_invalid_file: El archivo del paquete de la tarjeta no es válido
     upload: Subir
-    upload_desc: Haz clic o arrastra un paquete de tarjeta de AIRI para importarlo
+    upload_desc: Haz clic o arrastra un paquete de tarjeta de Angela para importarlo
     sync:
       notice: Las tarjetas de personaje se sincronizan con tu cuenta. Puedes restaurar una tarjeta eliminada durante 30 días.
       off_notice: Has iniciado sesión, pero la sincronización de tarjetas de personaje está desactivada.
@@ -468,7 +468,7 @@ pages:
         pending: Pendiente de subir
         refused: No se ha subido. Tu cuenta no tiene espacio para más tarjetas, por lo que esta tarjeta permanece en este dispositivo.
       conflict_copy_name: '{name} (copia por conflicto)'
-      conflict_notice: Otro dispositivo modificó el mismo personaje. AIRI conservó la versión de este dispositivo como una copia.
+      conflict_notice: Otro dispositivo modificó el mismo personaje. Angela conservó la versión de este dispositivo como una copia.
       history:
         tab: Historial
         empty: Esta tarjeta aún no tiene historial.
@@ -538,7 +538,7 @@ pages:
     title: Memoria
   data:
     title: Datos
-    description: Administrar, exportar y restablecer los datos de AIRI
+    description: Administrar, exportar y restablecer los datos de Angela
     sections:
       chats:
         title: Conversaciones
@@ -567,11 +567,11 @@ pages:
         delete: Eliminar todos los datos
       desktop-folder:
         title: Abrir carpeta de datos de la aplicación
-        description: Abrir carpeta de datos de AIRI en tu explorador de archivos.
+        description: Abrir carpeta de datos de Angela en tu explorador de archivos.
         open: Abrir carpeta
       desktop:
         title: Restablecer ajustes de escritorio y estados
-        description: Limpiar ajustes de escritorio y estado de ejecución de AIRI.
+        description: Limpiar ajustes de escritorio y estado de ejecución de Angela.
         center: Mover la ventana del escritorio al centro
         reset: Restablecer datos de escritorio
       model-downloads:
@@ -673,7 +673,7 @@ pages:
           name: Nano Banana (Vista previa)
           description: Utilice Google AI Studio para previsualizar imágenes y reacciones.
       card:
-        description: Configura cómo AIRI genera imágenes y contenido visual.
+        description: Configura cómo Angela genera imágenes y contenido visual.
         comfyui_empty: No hay flujos de trabajo de ComfyUI configurados. Ve a Ajustes → Proveedores → ComfyUI para cargar una plantilla de flujo de trabajo.
         exposed_fields: 'Campos expuestos {count}'
         open_on_replicate: Abrir al replicar
@@ -757,13 +757,13 @@ pages:
             thinking:
               label: Razonamiento
               required-description: Este modelo requiere razonamiento.
-              provider-default-description: AIRI no tiene ajustes de razonamiento para este modelo. OpenRouter aplica sus valores predeterminados.
+              provider-default-description: Angela no tiene ajustes de razonamiento para este modelo. OpenRouter aplica sus valores predeterminados.
       title: Consciencia
     description: Pensamiento, visión, síntesis de voz, juegos, etc.
     gaming-factorio:
       description: '¡Jugando Factorio!'
       enable: Habilitar integración con Factorio
-      enable-description: Permitir que AIRI interactúe con el juego Factorio
+      enable-description: Permitir que Angela interactúe con el juego Factorio
       server-address: Dirección del servidor
       server-address-description: La dirección IP o nombre de host del servidor de Factorio
       server-address-placeholder: Ingrese la dirección del servidor (por ejemplo, localhost o 192.168.1.100)
@@ -822,16 +822,16 @@ pages:
           input-mode:
             wake-word: Palabras de activación
             title: Modo de entrada
-            description: Elige cómo empieza a escuchar AIRI cuando el micrófono está encendido.
+            description: Elige cómo empieza a escuchar Angela cuando el micrófono está encendido.
             label: Empezar a escuchar
             always-on: Siempre activo
-            always-on-description: AIRI escucha siempre y responde cuando hablas.
+            always-on-description: Angela escucha siempre y responde cuando hablas.
             push-to-talk: Pulsar para hablar
-            push-to-talk-description: AIRI solo escucha mientras mantienes pulsada la tecla de Pulsar para hablar. El micrófono solo se abre durante la pulsación.
+            push-to-talk-description: Angela solo escucha mientras mantienes pulsada la tecla de Pulsar para hablar. El micrófono solo se abre durante la pulsación.
             push-to-talk-unavailable: No disponible aquí. Esta aplicación no tiene una tecla de Pulsar para hablar en este dispositivo.
             stranded-title: Pulsar para hablar no está disponible aquí
-            stranded-description: Esta aplicación no tiene una tecla de Pulsar para hablar en este dispositivo, así que AIRI no escucha. Elige Siempre activo o Palabras de activación para hablar con AIRI aquí.
-            wake-word-description: El micrófono permanece encendido, pero AIRI solo escucha después de que digas la palabra de activación de un personaje.
+            stranded-description: Esta aplicación no tiene una tecla de Pulsar para hablar en este dispositivo, así que Angela no escucha. Elige Siempre activo o Palabras de activación para hablar con Angela aquí.
+            wake-word-description: El micrófono permanece encendido, pero Angela solo escucha después de que digas la palabra de activación de un personaje.
             wake-word-status:
               no-words: Ningún personaje tiene palabras de activación. Pídele a un personaje que las configure en el chat.
               unconfigured: La detección de palabras de activación empieza cuando se enciende el micrófono.
@@ -839,22 +839,22 @@ pages:
               ready: Las palabras de activación están listas.
               error: 'El modelo de palabras de activación no está disponible: {error}'
           microphone:
-            description: Enciende el micrófono para Audición. El modo de entrada controla cuándo escucha AIRI.
+            description: Enciende el micrófono para Audición. El modo de entrada controla cuándo escucha Angela.
             error: El micrófono no está disponible
             title: Micrófono
             label: Micrófono
           input-device:
             label: Dispositivo de entrada
-            description: Elige el micrófono que usa AIRI.
+            description: Elige el micrófono que usa Angela.
             playground-description: Audición y el área de pruebas usan este micrófono.
             placeholder: Elige un micrófono
           auto-send:
             title: Transcripciones
-            description: Elige qué hace AIRI con el texto de tu voz.
+            description: Elige qué hace Angela con el texto de tu voz.
             label: Enviar automáticamente
-            label-description: AIRI envía la transcripción al chat tras un retraso. Desactívalo para revisar y editar el texto antes. Cada mensaje enviado consume tokens.
+            label-description: Angela envía la transcripción al chat tras un retraso. Desactívalo para revisar y editar el texto antes. Cada mensaje enviado consume tokens.
             delay: Retraso de envío
-            delay-description: Tiempo que espera AIRI antes de enviar la transcripción.
+            delay-description: Tiempo que espera Angela antes de enviar la transcripción.
             immediate: Inmediatamente
           rephrase:
             title: Reescritura de transcripciones
@@ -907,7 +907,7 @@ pages:
     messaging-discord:
       description: Chat y chat de voz por Discord
       enable: Habilitar integración con Discord
-      enable-description: Permitir que AIRI interactúe a través de Discord
+      enable-description: Permitir que Angela interactúe a través de Discord
       token: Token del bot
       token-description: Su token de bot de Discord
       token-placeholder: Ingrese su token de bot de Discord
@@ -989,7 +989,7 @@ pages:
     x:
       description: Navegación y uso de X / Twitter
       enable: Habilitar integración con X / Twitter
-      enable-description: Permitir que AIRI interactúe con X / Twitter
+      enable-description: Permitir que Angela interactúe con X / Twitter
       api-key: Clave API
       api-key-description: Su clave API de X / Twitter
       api-key-placeholder: Ingrese su clave API de X / Twitter
@@ -1005,16 +1005,16 @@ pages:
       configured: '¡X / Twitter está configurado correctamente!'
     web-search:
       title: Búsqueda web
-      description: Permitir que AIRI busque información actual en la web
+      description: Permitir que Angela busque información actual en la web
       enable: Activar la búsqueda web
-      enable-description: Permitir que AIRI busque en la web durante el chat
+      enable-description: Permitir que Angela busque en la web durante el chat
       api-key: Clave API de Tavily
       api-key-description: La búsqueda web funciona con Tavily. Obtén una clave API gratuita en tavily.com.
       api-key-placeholder: Introduce tu clave API de Tavily
       configured: '¡La búsqueda web está lista para usar!'
     mcp-server:
       title: Servidores MCP
-      description: Configure los servidores MCP y traiga sus herramientas a AIRI.
+      description: Configure los servidores MCP y traiga sus herramientas a Angela.
       config-path: Archivo de configuración
       runtime-title: Estado de ejecución
       empty: Aún no hay servidores MCP; haz clic en "Añadir servidor" a continuación para crear uno, o pega una configuración mediante "Editar JSON".
@@ -1072,7 +1072,7 @@ pages:
         enabled:
           label: Habilitado
         transport:
-          description: Cómo se conecta AIRI a este servidor.
+          description: Cómo se conecta Angela a este servidor.
           stdio: Proceso local
           http: URL remota
           label: Tipo
@@ -1177,9 +1177,9 @@ pages:
       cancel: Cancelar
       confirm-delete: Confirmar eliminación
     home-assistant:
-      description: Permite que AIRI lea y controle tus dispositivos de Home Assistant.
+      description: Permite que Angela lea y controle tus dispositivos de Home Assistant.
       enable: Activar Home Assistant
-      enable-description: Permitir que AIRI lea y controle tus dispositivos
+      enable-description: Permitir que Angela lea y controle tus dispositivos
       base-url:
         label: Dirección
         description: Dirección de tu instancia de Home Assistant.
@@ -1203,15 +1203,15 @@ pages:
         failed-policy-rollback: Se rechazó el guardado. La lista de dispositivos no llegó a la ventana que ejecuta las herramientas, así que el modelo no tiene acceso a ningún dispositivo. Inténtalo de nuevo.
       access:
         label: Acceso a dispositivos
-        description: Elige qué dispositivos puede leer y controlar AIRI.
+        description: Elige qué dispositivos puede leer y controlar Angela.
         mode-all: Todos los dispositivos
         mode-allow: Lista de permitidos
         mode-deny: Lista de bloqueados
-        all-hint: AIRI tiene acceso a todos los dispositivos. Elige una lista para limitarlo.
+        all-hint: Angela tiene acceso a todos los dispositivos. Elige una lista para limitarlo.
         rule-allow: Solo se puede acceder a los dispositivos seleccionados.
         rule-deny: Se puede acceder a todos los dispositivos excepto los seleccionados.
         selected-count: '{count} seleccionados'
-        empty-warning: Elige al menos un dispositivo. AIRI no tiene acceso a ninguno hasta que lo hagas.
+        empty-warning: Elige al menos un dispositivo. Angela no tiene acceso a ninguno hasta que lo hagas.
         search: Buscar dispositivos
         reload: Recargar dispositivos
         loading: Cargando dispositivos…
@@ -1530,7 +1530,7 @@ pages:
     helpinfo:
       title: '¿Primera vez aquí?'
       description: >
-        AIRI requiere que al menos un proveedor de {chat} esté configurado para pensar y comportarse correctamente. Podrías pensarlo como el cerebro de los personajes que viven en el sistema AIRI.
+        Angela requiere que al menos un proveedor de {chat} esté configurado para pensar y comportarse correctamente. Podrías pensarlo como el cerebro de los personajes que viven en el sistema Angela.
     explained:
       chat: Proveedores de modelos de generación de texto. ej. OpenRouter, OpenAI, Ollama.
       Speech: Proveedores de modelos de habla (texto a voz). ej. ElevenLabs, Azure Speech.
@@ -1617,7 +1617,7 @@ pages:
               description: La dirección donde se ejecuta ComfyUI
           cors:
             title: Bloque de CORS detectado
-            description: ComfyUI bloquea por defecto las solicitudes de otras aplicaciones. Para permitir que AIRI se conecte, inicia ComfyUI con `--enable-cors-header "*"`.
+            description: ComfyUI bloquea por defecto las solicitudes de otras aplicaciones. Para permitir que Angela se conecte, inicia ComfyUI con `--enable-cors-header "*"`.
           workflows:
             title: Plantillas de flujo de trabajo
             upload: Subir flujo de trabajo
@@ -1628,7 +1628,7 @@ pages:
             config_snippet: Snippet de configuración de Artistry
             copy_json: Copiar JSON
             empty: No hay flujos de trabajo subidos. Haz clic en «Subir flujo de trabajo» para importar un workflow_api.json de ComfyUI.
-            paste_hint: Pega esto en la configuración de generación de imágenes de tu tarjeta AIRI para sobrescribir estos nodos.
+            paste_hint: Pega esto en la configuración de generación de imágenes de tu tarjeta Angela para sobrescribir estos nodos.
           upload:
             prompt: Soltar o seleccionar un archivo workflow_api.json
             invalid_json: JSON inválido
@@ -1782,13 +1782,13 @@ pages:
         title: La API de Prompt
       official:
         title: Proveedor Oficial
-        description: Proveedor oficial de IA por AIRI.
+        description: Proveedor oficial de IA por Angela.
         speech-title: Proveedor oficial de voz
-        speech-description: Proveedor oficial de texto a voz de AIRI.
+        speech-description: Proveedor oficial de texto a voz de Angela.
         speech-streaming-title: Proveedor oficial de voz en streaming
         transcription-title: Proveedor Oficial de Transcripción
-        transcription-description: Proveedor oficial de voz a texto por AIRI.
-        speech-streaming-description: Proveedor oficial de texto a voz de baja latencia de AIRI, mediante WebSocket bidireccional.
+        transcription-description: Proveedor oficial de voz a texto por Angela.
+        speech-streaming-description: Proveedor oficial de texto a voz de baja latencia de Angela, mediante WebSocket bidireccional.
       transcriptions:
         playground:
           title: Playground de Transcripción
@@ -1799,7 +1799,7 @@ pages:
           cancel: Cancelar
           title: Archivos del modelo
           unknown: Comprobando archivos…
-          bundled: Incluido con AIRI
+          bundled: Incluido con Angela
           installed: Guardado en este dispositivo
           missing: Descargar al usar
           downloading: Descargando…
@@ -1863,18 +1863,18 @@ pages:
       label: Dirección del servidor WebSocket
     server-hostname:
       label: Exponer en red
-      description: Choose whether the AIRI gateway only listens on this device or can be reached from your local network.
+      description: Choose whether the Angela gateway only listens on this device or can be reached from your local network.
     server-auth-token:
       label: Token de autenticación
       description: >-
-        Security token required by remote clients that connect to this gateway. When left empty, AIRI generates a new token automatically.
+        Security token required by remote clients that connect to this gateway. When left empty, Angela generates a new token automatically.
       placeholder: Autogenerar
     qr:
       title: Connect from Stage Pocket
       description: >-
         Scan this QR code from Stage Pocket to try all reachable local network addresses and save the first working one.
       refresh: Actualizar
-      image-alt: Código QR de conexión de canal del servidor AIRI
+      image-alt: Código QR de conexión de canal del servidor Angela
       token-hint: >-
         The QR code includes the auth token so Stage Pocket can authenticate after connecting. Do not share it publicly.
       errors:
@@ -1884,7 +1884,7 @@ pages:
     qr-scan:
       title: Conexión rápida
       description: Escanear el código QR desde Tamagotchi para conectarse rápidamente
-      instructions: Señalar la cámara en el código QR de la conexión AIRI.
+      instructions: Señalar la cámara en el código QR de la conexión Angela.
       action: Escanear
       success:
         title: Dirección conectada guardada
@@ -1993,8 +1993,8 @@ pages:
           presets:
             default:
               colors:
-                color-1: Verde AIRI
-              description: '¡El color de tema verdoso predeterminado, traído por AIRI para ti!'
+                color-1: Verde Angela
+              description: '¡El color de tema verdoso predeterminado, traído por Angela para ti!'
               title: Color Predeterminado
             morandi:
               colors:
@@ -2131,7 +2131,7 @@ pages:
 theme:
   title: Tema
   description: |
-    Cambiar el tema base de AIRI, modo Claro o modo Oscuro.
+    Cambiar el tema base de Angela, modo Claro o modo Oscuro.
   light: Claro
   auto: Sistema
   dark: Oscuro

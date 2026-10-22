@@ -148,7 +148,7 @@ function resetScreenCaptureSource() {
  * Reports whether a renderer-selected capture source is currently being served.
  *
  * Use when:
- * - A permission handler has to tell AIRI's own display capture flow apart from an unsolicited request
+ * - A permission handler has to tell Angela's own display capture flow apart from an unsolicited request
  *
  * Expects:
  * - `initScreenCaptureForWindow` installed the invoke handlers that own the selection mutex

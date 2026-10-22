@@ -10,8 +10,8 @@ import { electronShortcutRegister, electronShortcutTriggered, electronShortcutUn
  * Calls `onEscape` when the user presses Escape in any app, while `active` is true.
  *
  * The binding uses the uiohook driver, which observes keys without consuming them. The focused app still receives
- * its Escape, and AIRI reacts to the same press. An Electron accelerator would take Escape away from every other app.
- * The binding exists only while `active` is true, so Escape costs nothing when AIRI shows nothing.
+ * its Escape, and Angela reacts to the same press. An Electron accelerator would take Escape away from every other app.
+ * The binding exists only while `active` is true, so Escape costs nothing when Angela shows nothing.
  *
  * Without the macOS Accessibility permission, or on native Wayland, registration fails and nothing happens.
  * The caller keeps its own window `keydown` handler for that case.

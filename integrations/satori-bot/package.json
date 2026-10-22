@@ -2,7 +2,7 @@
   "name": "@angela/satori-bot",
   "type": "module",
   "private": true,
-  "description": "Satori protocol adapter for AIRI - Connect to multiple chat platforms via Satori",
+  "description": "Satori protocol adapter for Angela - Connect to multiple chat platforms via Satori",
   "author": {
     "name": "Moeru AI Project AIRI Team",
     "email": "airi@moeru.ai",
@@ -11,7 +11,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/moeru-ai/airi.git",
+    "url": "https://github.com/lighthouse2815/Angela.git",
     "directory": "integrations/satori-bot"
   },
   "scripts": {

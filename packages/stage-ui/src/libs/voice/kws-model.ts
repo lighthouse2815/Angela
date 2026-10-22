@@ -32,7 +32,7 @@ export const kwsToneVariants = createToneVariants(kwsVocabulary)
  * - `score` boosts keyword paths over other paths. `threshold` is the lowest keyword probability that triggers.
  *
  * The values come from the KWS presets of the Sherpaw sandbox, which detect "Hey Iru" in live microphone speech.
- * The sherpa-onnx defaults (4 paths, boost 1, threshold 0.25) missed most live calls of the same keyword in AIRI.
+ * The sherpa-onnx defaults (4 paths, boost 1, threshold 0.25) missed most live calls of the same keyword in Angela.
  * Source: https://github.com/moeru-ai/sherpaw/blob/main/packages/sandbox/src/features/kws/presets.ts
  */
 export const kwsSearch = {

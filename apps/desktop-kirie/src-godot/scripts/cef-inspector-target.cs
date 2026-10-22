@@ -5,7 +5,7 @@ internal static class CefInspectorTarget
     private const string LeaderQuery = "synced-leader=true";
 
     /// <summary>
-    /// Selects the DevTools frontend for the main AIRI page from the CEF target list.
+    /// Selects the DevTools frontend for the main Angela page from the CEF target list.
     /// </summary>
     public static Uri SelectMainInspectorUri(string targetsJson)
     {

@@ -117,7 +117,7 @@ watch(shown, (value) => {
 
 /**
  * Escape interrupts what the inlay shows. The window stays shown, so the next speech appears without delay.
- * Live speech is cancelled on the host, because hidden listening would leave the user unsure whether AIRI still hears.
+ * Live speech is cancelled on the host, because hidden listening would leave the user unsure whether Angela still hears.
  */
 function dismiss() {
   if (shown.value === 'hidden' || shown.value === 'sent')

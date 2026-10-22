@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { createProductEventService } from './product-events'
 
 describe('productEventService', () => {
-  it('routes confirmed product facts to OpenPanel with stable AIRI user ids', async () => {
+  it('routes confirmed product facts to OpenPanel with stable Angela user ids', async () => {
     const capture = vi.fn<(input: ProductCaptureInput) => Promise<void>>().mockResolvedValue(undefined)
     const service = createProductEventService({ capture })
     await service.track({ userId: 'user-1', feature: 'auth', action: 'user_signed_up', status: 'succeeded' })

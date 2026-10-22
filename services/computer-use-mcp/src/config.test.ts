@@ -60,6 +60,7 @@ describe('resolveComputerUseConfig', () => {
     expect(config.executor).toBe('macos-local')
     expect(config.openableApps).toEqual(['Finder', 'Terminal', 'Cursor', 'Visual Studio Code', 'Google Chrome'])
     expect(config.denyApps).toContain('airi')
+    expect(config.denyApps).toContain('angela')
     expect(config.terminalShell).toBeTruthy()
     expect(config.permissionChainHint).toContain('swift/quartz + open')
     expect(config.requireAllowedBoundsForMutatingActions).toBe(false)

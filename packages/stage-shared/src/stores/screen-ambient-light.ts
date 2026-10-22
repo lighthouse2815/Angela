@@ -11,7 +11,7 @@ import { shallowRef } from 'vue'
 import { useLocalStorageManualReset } from '../composables'
 import { ambientLightDefaults, ambientLightNeutralEnvironment, wholeWindowRectangle } from '../screen-ambient-light'
 
-// These describe the screen behind the AIRI window, not one renderer, so they
+// These describe the screen behind the Angela window, not one renderer, so they
 // stay out of the Live2D package that owns the only shader reading them today.
 const screenAmbientLightEnabled = useLocalStorageManualReset<boolean>('settings/screen-ambient-light/enabled', ambientLightDefaults.enabled)
 const screenAmbientLightSource = useLocalStorageManualReset<ScreenAmbientLightSource>('settings/screen-ambient-light/source', ambientLightDefaults.source)

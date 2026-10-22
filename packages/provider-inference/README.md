@@ -1,6 +1,6 @@
 # Provider Inference
 
-`@angela/provider-inference` owns runtime-neutral AIRI provider definitions.
+`@angela/provider-inference` owns runtime-neutral Angela provider definitions.
 
 Use this package to list built-in providers, create provider configuration schemas, and create provider instances. The package runs in Node.js and Browser runtimes.
 
@@ -57,13 +57,13 @@ const provider = await definition.createProvider({
 })
 ```
 
-User-configured providers send Responses requests directly to their configured endpoint with their own API key. They do not require AIRI backend changes or Flux billing.
+User-configured providers send Responses requests directly to their configured endpoint with their own API key. They do not require Angela backend changes or Flux billing.
 The official provider defaults to Responses and lets the user select Chat Completions.
 
 OpenAI has a `webSearch` switch, disabled by default. The selected protocol must be Responses.
 Explicitly enabling search sends the hosted tool on the official OpenAI endpoint. The provider validates model support.
 Custom endpoints do not inherit this tool declaration. Model names never determine search support.
-Search uses the configured OpenAI key and does not require an AIRI login or Tavily key.
+Search uses the configured OpenAI key and does not require an Angela login or Tavily key.
 
 ## Model metadata
 

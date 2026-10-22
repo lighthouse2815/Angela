@@ -1,6 +1,6 @@
 # Angela CLI
 
-Chat with Angela from a Node.js terminal. The CLI uses AIRI's existing provider and generation runtime.
+Chat with Angela from a Node.js terminal. The CLI uses Angela's existing provider and generation runtime.
 Angela can manage everyday tasks and deliver reminders while the terminal process remains open.
 
 ## Runtime and memory
@@ -149,7 +149,7 @@ The package also builds an executable at `packages/angela-cli/dist/bin/run.mjs`.
 With workspace dependencies installed and built, this executable works from another directory:
 
 ```sh
-/absolute/path/to/airi/packages/angela-cli/dist/bin/run.mjs --cwd /path/to/workspace
+/absolute/path/to/Angela/packages/angela-cli/dist/bin/run.mjs --cwd /path/to/workspace
 ```
 
 The checkout executable uses workspace packages. Use the portable release below to run without the checkout.

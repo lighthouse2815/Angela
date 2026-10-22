@@ -1,5 +1,5 @@
 /**
- * Shared lifecycle contract for AIRI local HTTP sub-servers.
+ * Shared lifecycle contract for Angela local HTTP sub-servers.
  *
  * Use when:
  * - Registering standalone local HTTP services under `services/airi/http-server`

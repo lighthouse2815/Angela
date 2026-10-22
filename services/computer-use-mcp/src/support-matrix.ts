@@ -236,7 +236,7 @@ export const supportMatrix: SupportMatrixEntry[] = [
       'src/terminal-release-gates.test.ts',
     ],
     smokeCommand: 'pnpm -F @angela/computer-use-mcp e2e:airi-chat-terminal-self-acquire',
-    happyPath: 'AIRI chat validates the repo → workflow self-acquires PTY for vim --version → PTY remains readable and run-state / audit / bindings stay consistent',
+    happyPath: 'Angela chat validates the repo → workflow self-acquires PTY for vim --version → PTY remains readable and run-state / audit / bindings stay consistent',
   },
   {
     lane: 'terminal',

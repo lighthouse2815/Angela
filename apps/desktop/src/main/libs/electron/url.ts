@@ -1,10 +1,10 @@
 import { env } from 'node:process'
 
 /**
- * Checks whether a URL belongs to an AIRI-owned local renderer page.
+ * Checks whether a URL belongs to an Angela-owned local renderer page.
  *
  * Use when:
- * - Electron main-process policies need to distinguish AIRI pages from remote content
+ * - Electron main-process policies need to distinguish Angela pages from remote content
  * - Packaged and development renderer URLs must share the same trust decision
  *
  * Expects:

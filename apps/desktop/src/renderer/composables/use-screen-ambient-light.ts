@@ -81,7 +81,7 @@ const displaySettleMs = 500
 export function useScreenAmbientLight(sources: {
   /**
    * The canvas the character renders into. Its alpha says which pixels of the
-   * window AIRI paints, which is what separates the character from the desktop
+   * window Angela paints, which is what separates the character from the desktop
    * showing through behind it. Without it the backlight stays off.
    */
   stageCanvas?: () => HTMLCanvasElement | undefined
@@ -266,7 +266,7 @@ export function useScreenAmbientLight(sources: {
         // platform gets the extra hint.
         if (screens.length === 0) {
           throw new Error(window.platform === 'darwin'
-            ? 'No screen-capture source is available. Check the screen-recording permission for AIRI.'
+            ? 'No screen-capture source is available. Check the screen-recording permission for Angela.'
             : 'No screen-capture source is available.')
         }
 
