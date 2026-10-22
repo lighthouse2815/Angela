@@ -2,16 +2,15 @@
   "name": "@proj-airi/plugin-protocol",
   "type": "module",
   "version": "0.12.0-beta.5",
-  "description": "Plugin protocol event definitions and shared websocket types for Project AIRI",
+  "description": "Plugin protocol event definitions and shared websocket types for Angela",
   "author": {
-    "name": "Moeru AI Project AIRI Team",
-    "email": "airi@moeru.ai",
-    "url": "https://github.com/moeru-ai"
+    "name": "lighthouse2815",
+    "url": "https://github.com/lighthouse2815"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/moeru-ai/airi.git",
+    "url": "https://github.com/lighthouse2815/Angela.git",
     "directory": "packages/plugin-protocol"
   },
   "exports": {
