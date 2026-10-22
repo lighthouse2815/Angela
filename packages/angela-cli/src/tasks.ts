@@ -16,10 +16,16 @@ import { localDate, nextOccurrence, taskDue } from './task-time'
 /** Delivery owners renew every ten seconds. Thirty seconds bounds recovery after a crashed process. */
 export const deliveryLeaseMs = 30_000
 
+/** Emitted after atomic persistence. Delivery claims remain scheduler-internal state. */
+export interface TaskChange {
+  type: 'task.created' | 'task.updated' | 'task.completed' | 'task.cancelled' | 'task.snoozed' | 'task.delivered'
+  task: Task
+}
+
 /** Owns task invariants and atomic mutations across sessions. Subscribers observe successful local commits only. */
 export class Tasks {
   private readonly file: MemoryFile<v.InferOutput<typeof taskState>>
-  private readonly listeners = new Set<() => void>()
+  private readonly listeners = new Set<(change: TaskChange) => void | Promise<void>>()
 
   constructor(dataDir: string, private readonly messages: typeof cliMessages.en.tasks, private readonly clock: Clock | (() => number) = new SystemClock(), readonly timezone = Intl.DateTimeFormat().resolvedOptions().timeZone) {
     v.parse(taskZone, timezone)
@@ -41,10 +47,10 @@ export class Tasks {
     return task
   }
 
-  async create(input: TaskInput): Promise<Task> {
+  async create(input: TaskInput, memoryProjection?: Task['memoryProjection']): Promise<Task> {
     const parsed = v.parse(taskCreate, input)
     const now = new Date(this.now()).toISOString()
-    const task = v.parse(taskSchema, { ...parsed, id: randomUUID(), status: 'pending', timezone: parsed.timezone ?? this.timezone, snoozeCount: 0, createdAt: now, updatedAt: now, recurrenceAnchor: parsed.recurrence ? parsed.dueAt : undefined })
+    const task = v.parse(taskSchema, { ...parsed, memoryProjection, id: randomUUID(), status: 'pending', timezone: parsed.timezone ?? this.timezone, snoozeCount: 0, createdAt: now, updatedAt: now, recurrenceAnchor: parsed.recurrence ? parsed.dueAt : undefined })
     let saved = task
     await this.file.edit((state) => {
       // Repeated model calls and retried requests reuse an identical pending commitment under the same storage lock.
@@ -58,7 +64,7 @@ export class Tasks {
         state.tasks.push(task)
       this.retain(state)
     })
-    this.changed()
+    await this.changed(saved, 'task.created')
     return saved
   }
 
@@ -96,7 +102,7 @@ export class Tasks {
       else {
         task.status = 'completed'
       }
-    })
+    }, 'task.completed')
   }
 
   async cancel(id: string) {
@@ -105,7 +111,7 @@ export class Tasks {
       task.status = 'cancelled'
       task.snoozedUntil = undefined
       task.delivery = undefined
-    })
+    }, 'task.cancelled')
   }
 
   async snooze(id: string, until: string) {
@@ -118,7 +124,7 @@ export class Tasks {
       task.snoozeCount = (task.snoozeCount ?? 0) + 1
       task.notifiedFor = undefined
       task.delivery = undefined
-    })
+    }, 'task.snoozed')
   }
 
   /** Claims expire without changing notification history or recurrence. The token fences acknowledgments from stale owners. */
@@ -159,6 +165,7 @@ export class Tasks {
   /** Only successful text delivery updates history and advances a routine. A lost acknowledgment can cause a retry, never silent loss. */
   async delivered(id: string, token: string) {
     let delivered = false
+    let updated: Task | undefined
     await this.file.edit((state) => {
       const task = state.tasks.find(task => task.id === id)
       if (!task || !this.owns(task, token) || task.delivery?.status !== 'claimed')
@@ -176,7 +183,10 @@ export class Tasks {
       }
       this.retain(state)
       delivered = true
+      updated = structuredClone(task)
     })
+    if (updated)
+      await this.changed(updated, 'task.delivered')
     return delivered
   }
 
@@ -197,7 +207,7 @@ export class Tasks {
   }
 
   /** The scheduler owns its subscription lifetime. Cross-process changes are discovered by its bounded timer. */
-  subscribe(listener: () => void) {
+  subscribe(listener: (change: TaskChange) => void | Promise<void>) {
     this.listeners.add(listener)
     return () => this.listeners.delete(listener)
   }
@@ -211,7 +221,7 @@ export class Tasks {
       throw new Error(this.messages.inactive)
   }
 
-  private async edit(id: string, change: (task: Task) => void) {
+  private async edit(id: string, change: (task: Task) => void, type: TaskChange['type'] = 'task.updated') {
     v.parse(taskId, id)
     let updated: Task | undefined
     await this.file.edit((state) => {
@@ -225,7 +235,7 @@ export class Tasks {
       state.tasks[index] = updated
       this.retain(state)
     })
-    this.changed()
+    await this.changed(updated!, type)
     return updated!
   }
 
@@ -244,8 +254,8 @@ export class Tasks {
     }
   }
 
-  private changed() {
-    for (const listener of this.listeners)
-      listener()
+  private async changed(task: Task, type: TaskChange['type']) {
+    // Observers cannot roll back an authoritative write or turn a successful mutation into an apparent failure.
+    await Promise.allSettled([...this.listeners].map(async listener => listener({ type, task: structuredClone(task) })))
   }
 }

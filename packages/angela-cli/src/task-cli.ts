@@ -64,6 +64,7 @@ export async function runTaskCli(args: string[], env: NodeJS.ProcessEnv, listOnl
       const sessionId = randomUUID()
       recall = new Recall(config.dataDir, workspace, sessionId, messages, env, { apiKey: '' }, new Memory(config.dataDir, messages), new Skills(config.dataDir, messages))
       await recall.start()
+      await recall.bindTasks(tasks)
       const capture = await recall.capture()
       capture?.record({ id: randomUUID(), correlationId: randomUUID(), timestamp: new Date(tasks.now()).toISOString(), workspace, sessionId, channel: 'cli', type: action === 'done' ? 'task.completed' : 'task.updated', taskId: task.id }, taskEvidence(task), true)
       capture?.finish('')

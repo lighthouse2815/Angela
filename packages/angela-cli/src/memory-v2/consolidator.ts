@@ -61,7 +61,7 @@ export class MemoryConsolidator {
     }
     const labels = ['Decision', 'Completed', 'Failed', 'Fact', 'Workflow', 'Task', 'Next step', 'Artifact', 'User', 'Tool', 'Commitment']
     const body = [`Goal: ${goal}`, ...labels.flatMap(label => groups.get(label)?.map(text => `${label}: ${text}`) ?? [])].join('\n').slice(0, 24_000)
-    return this.store.write({ tier: 'episodic', kind: 'session', scope, key: `session:${sessionId}`, title: goal.slice(0, 160), body, abstract: goal, authority: 'episode', salience: groups.has('Decision') || groups.has('Completed') ? 1.5 : 0.75, sourceSessionId: sessionId, expectedVersion: previous?.version ?? null })
+    return this.store.write({ tier: 'episodic', kind: 'session', scope, key: `session:${sessionId}`, title: goal.slice(0, 160), body, abstract: goal, authority: 'episode', salience: groups.has('Decision') || groups.has('Completed') ? 1.5 : 0.75, sourceSessionId: sessionId, expectedVersion: previous?.version ?? null }, observations.at(-1)!.timestamp)
   }
 
   /** Explicit workflow statements can become procedures without inferring a lasting preference from casual behavior. */
@@ -71,8 +71,8 @@ export class MemoryConsolidator {
       return undefined
     const text = sanitize(workflow, 1000)
     const key = createHash('sha256').update(text.normalize('NFKC').toLowerCase().replace(/\s+/gu, ' ')).digest('hex')
-    const page = this.store.write({ tier: 'procedural', kind: 'workflow', scope, key: `workflow:${key}`, title: text.slice(0, 160), body: text, authority: 'user', salience: 1.5, sourceSessionId: sessionId })
-    this.store.link(page.id, episode.id, 'derived_from', scope)
+    const page = this.store.write({ tier: 'procedural', kind: 'workflow', scope, key: `workflow:${key}`, title: text.slice(0, 160), body: text, authority: 'user', salience: 1.5, sourceSessionId: sessionId }, episode.updatedAt)
+    this.store.link(page.id, episode.id, 'derived_from', scope, episode.updatedAt)
     return page
   }
 }
@@ -94,10 +94,6 @@ export class MemoryCapture {
       return
     const observation: Observation = { id: event.id, type: event.type === 'tool.result' && event.outcome === 'failed' ? 'tool.error' : event.type, correlationId: event.correlationId, sessionId: this.sessionId, scope: this.scope, channel: event.channel ?? 'system', timestamp: event.timestamp, text: sanitize(text), verified }
     this.store.observe(observation)
-    if (verified && text && (event.type === 'task.created' || event.type === 'task.updated' || event.type === 'task.completed')) {
-      // Each verified transition supersedes its current record. Session episodes retain historical evidence with explicit dates.
-      this.store.write({ tier: 'episodic', kind: 'commitment', scope: this.scope, key: `commitment:${event.taskId}`, title: `Commitment ${event.taskId}`, body: observation.text, authority: 'verified', sourceSessionId: this.sessionId }, event.timestamp)
-    }
   }
 
   finish(userText: string) {

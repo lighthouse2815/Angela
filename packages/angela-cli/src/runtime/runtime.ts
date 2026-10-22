@@ -56,9 +56,10 @@ export class AngelaRuntime {
   private readonly maxIdle: number
   private readonly idleTtlMs: number
   private readonly remindersByStore = new Map<string, { tasks: Promise<Tasks>, ready: Promise<ReminderScheduler>, targets: Map<object, ReminderTarget>, dueAt: number }>()
+  private readonly taskStores = new Map<string, Promise<Tasks>>()
   private reminderTimer?: ReturnType<typeof setTimeout>
   private delivering?: Promise<void>
-  private readonly clock: Clock
+  readonly clock: Clock
   private readonly proactive: ProactivePolicy
 
   constructor(readonly model: string, readonly provider: GenerationProvider, readonly messages: typeof cliMessages.en, readonly env: NodeJS.ProcessEnv = {}, readonly defaults: { baseUrl?: string, apiKey: string } = { apiKey: '' }, options: RuntimeOptions = {}) {
@@ -211,7 +212,7 @@ export class AngelaRuntime {
     if (this.remindersByStore.size >= 128)
       return Promise.reject(new Error('Runtime reminder route limit reached'))
     const targets = new Map<object, ReminderTarget>([[owner, { notifier, onError }]])
-    const tasks = import('../tasks').then(({ Tasks }) => new Tasks(dataDir, this.messages.tasks, this.clock, this.env.ANGELA_TIMEZONE))
+    const tasks = this.tasks(dataDir)
     const ready = (async () => {
       const { ReminderScheduler } = await import('../reminder-scheduler')
       const target = () => {
@@ -230,7 +231,7 @@ export class AngelaRuntime {
             this.events.emit({ id: randomUUID(), type: 'reminder.due', timestamp: new Date(this.clock.now()).toISOString(), correlationId, channel: 'system', taskId: task.id })
           await destination.notifier.notify(...args)
           for (const task of args[0])
-            this.events.emit({ id: randomUUID(), type: 'reminder.delivered', timestamp: new Date().toISOString(), correlationId, channel: 'system', taskId: task.id })
+            this.events.emit({ id: randomUUID(), type: 'reminder.delivered', timestamp: new Date(this.clock.now()).toISOString(), correlationId, channel: 'system', taskId: task.id })
         },
       }, error => target()?.onError(error), (delay) => {
         const route = this.remindersByStore.get(dataDir)
@@ -252,15 +253,19 @@ export class AngelaRuntime {
     return ready
   }
 
-  /** Returns the shared task store when a reminder route already owns it. Other contexts own their store until release. */
+  /** One store per data directory keeps scheduler and projection observers on the same local mutation stream. */
   async tasks(dataDir: string) {
     if (this.closing)
       throw new Error('Runtime is closed')
-    const route = this.remindersByStore.get(dataDir)
-    if (route)
-      return await route.tasks
-    const { Tasks } = await import('../tasks')
-    return new Tasks(dataDir, this.messages.tasks, this.clock, this.env.ANGELA_TIMEZONE)
+    let tasks = this.taskStores.get(dataDir)
+    if (!tasks) {
+      if (this.taskStores.size >= 256)
+        throw new Error('Runtime task store limit reached')
+      tasks = import('../tasks').then(({ Tasks }) => new Tasks(dataDir, this.messages.tasks, this.clock, this.env.ANGELA_TIMEZONE))
+      this.taskStores.set(dataDir, tasks)
+      void tasks.catch(() => this.taskStores.delete(dataDir))
+    }
+    return await tasks
   }
 
   pauseReminders(dataDir: string, owner: object = this) {
@@ -342,6 +347,7 @@ export class AngelaRuntime {
         this.retiring.clear()
         this.idleTimer = undefined
         this.remindersByStore.clear()
+        this.taskStores.clear()
         this.reminderTimer = undefined
         this.states.clear()
         this.events.close()
@@ -431,9 +437,10 @@ export class RuntimeSession {
       const memory = await this.memory()
       const skills = await this.skills()
       const workspace = this.options.channel === 'cli' || this.options.channel === 'desktop' ? (await this.project()).workspace : this.options.workspace
-      const recall = new Recall(this.options.dataDir, workspace, this.options.sessionId, this.runtime.messages, this.runtime.env, this.runtime.defaults, memory, skills)
+      const recall = new Recall(this.options.dataDir, workspace, this.options.sessionId, this.runtime.messages, this.runtime.env, this.runtime.defaults, memory, skills, this.runtime.clock)
       try {
         await recall.start()
+        await recall.bindTasks(await this.tasks())
         this.resolvedRecall = recall
         return recall
       }
@@ -503,7 +510,7 @@ export class RuntimeSession {
         workspace = (await this.project()).workspace
     }
     catch { this.options.warn?.(this.runtime.messages.projectMemoryUnavailable) }
-    const event: AngelaEvent = { ...payload, id: randomUUID(), timestamp: new Date().toISOString(), correlationId: randomUUID(), sessionId: this.options.sessionId, channel: this.options.channel, workspace }
+    const event: AngelaEvent = { ...payload, id: randomUUID(), timestamp: new Date(this.runtime.clock.now()).toISOString(), correlationId: randomUUID(), sessionId: this.options.sessionId, channel: this.options.channel, workspace }
     this.runtime.events.emit(event)
     try {
       if (this.options.channel !== 'discord' && this.options.channel !== 'zalo') {
@@ -531,7 +538,7 @@ export class RuntimeSession {
     let capture: MemoryCapture | undefined
     let recall: Recall | undefined
     const emit = async (payload: EventPayload, evidence = '', verified = false) => {
-      const event: AngelaEvent = { ...envelope, ...payload, id: randomUUID(), timestamp: new Date().toISOString() }
+      const event: AngelaEvent = { ...envelope, ...payload, id: randomUUID(), timestamp: new Date(this.runtime.clock.now()).toISOString() }
       this.runtime.events.emit(event)
       try {
         if (capture && !await recall?.automaticMemoryEnabled())
@@ -585,7 +592,8 @@ export class RuntimeSession {
         await emit({ type: this.options.channel === 'zalo' ? 'external.message' : 'user.message' }, text)
         if (sources.tasks && sources.privacy) {
           const { CommitmentConversation } = await import('../commitment-conversation')
-          const response = await new CommitmentConversation(sources.tasks, this.runtime.messages.tasks, this.options.locale ?? 'en').handle(text, chat.conversation, sources.privacy)
+          const projection = capture ? await sources.recall?.commitmentSource() : undefined
+          const response = await new CommitmentConversation(sources.tasks, this.runtime.messages.tasks, this.options.locale ?? 'en', projection).handle(text, chat.conversation, sources.privacy)
           if (response) {
             if (response.task) {
               const { taskEvidence } = await import('../task-commands')
@@ -679,7 +687,7 @@ export class RuntimeSession {
       try {
         await this.request?.catch(() => {})
         if (this.sessionStarted && this.lastRequest) {
-          const event: AngelaEvent = { ...this.lastRequest, id: randomUUID(), timestamp: new Date().toISOString(), type: 'session.ended', reason: this.lastReason }
+          const event: AngelaEvent = { ...this.lastRequest, id: randomUUID(), timestamp: new Date(this.runtime.clock.now()).toISOString(), type: 'session.ended', reason: this.lastReason }
           this.runtime.events.emit(event)
           try {
             const capture = this.lastPrivacyAllowed ? await (await this.retrieval)?.capture() : undefined

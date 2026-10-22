@@ -47,7 +47,7 @@ export async function buildTools(sources: ContextSources, text: string, sessionI
     catch { sources.warn(sources.messages.projectMemoryUnavailable) }
   }
   if (sources.tasks)
-    tools.push(...taskTools(sources.tasks, sources.messages.tasks, privacy, text))
+    tools.push(...taskTools(sources.tasks, sources.messages.tasks, privacy, text, async () => privacy.durableMemoryAllowed ? await sources.recall?.commitmentSource() : undefined))
   const recall = sources.recall
   if (recall) {
     tools.push(...recall.tools())

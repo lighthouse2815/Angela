@@ -1196,3 +1196,13 @@ Local extraction and `task_create` share a deterministic intent classifier.
 Only direct requests authorize creation. Meta discussion, examples, quotes, code, predictions, negation, and hypothetical requests cannot create tasks.
 Ambiguous requests with multiple actions require clarification. Missing request provenance also rejects model-created tasks.
 Alarm requests retain their exact-time clarification rules.
+
+Normal prompts contain at most 8 overdue, 8 due today, 6 upcoming, 5 unscheduled, and 3 recently completed tasks.
+Recent completion means seven days. Cancelled tasks and older completions require `task_list`.
+The bounded snapshot does not imply that omitted tasks are absent.
+
+Task mutations emit typed events after atomic persistence. Recall updates only the affected `commitment:<taskId>` page.
+Startup and five-minute recovery repair external mutations and failed projections. Requests do not run commitment reconciliation.
+Host-owned task provenance permits initial projection recovery. Disabled memory never grants this provenance.
+Memory suppression prevents recovery from recreating forgotten pages. Task storage remains authoritative when recall fails.
+Runtime task, delivery, event, and commitment projection timestamps use the injected clock.

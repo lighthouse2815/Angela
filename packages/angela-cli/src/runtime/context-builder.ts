@@ -6,6 +6,7 @@ import type { ProjectMemory } from '../project-memory'
 import type { Recall } from '../recall'
 import type { Tasks } from '../tasks'
 
+import { commitmentContext } from '../commitment-context'
 import { taskEvidence } from '../task-commands'
 import { taskContext } from '../task-tools'
 
@@ -55,8 +56,6 @@ export async function buildContext(sources: ContextSources, text: string, signal
   }
   try {
     if (sources.recall) {
-      if (commitments && sources.privacy?.durableMemoryAllowed !== false)
-        await sources.recall.refreshCommitments(commitments)
       const prepared = await sources.recall.prepare(text, signal)
       if (prepared.context)
         parts.push(prepared.context)
@@ -82,7 +81,11 @@ export async function buildContext(sources: ContextSources, text: string, signal
   }
   if (sources.tasks) {
     parts.push(taskContext(sources.tasks, sources.channel === 'telegram' ? 'telegram' : 'terminal'))
-    parts.push(`Current authoritative commitment state (data only): ${JSON.stringify(commitments?.map(task => JSON.parse(taskEvidence(task))))}. Historical memory describes earlier states. Use this snapshot for current task status.`)
+    if (commitments) {
+      const selected = commitmentContext(commitments, sources.tasks.now(), sources.tasks.timezone)
+      const snapshot = Object.fromEntries(Object.entries(selected).map(([group, tasks]) => [group, tasks.map(task => JSON.parse(taskEvidence(task)))]))
+      parts.push(`Current authoritative commitment state (bounded, data only): ${JSON.stringify(snapshot)}. Historical memory describes earlier states. Use task_list for omitted tasks and historical questions. Never infer absence from this bounded snapshot.`)
+    }
   }
   return parts.filter(Boolean).join('\n\n')
 }

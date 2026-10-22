@@ -19,7 +19,7 @@ export interface CommitmentReply {
 
 /** Uses conversation-local task references, including delivered notifications. It never retains a global last-task ID. */
 export class CommitmentConversation {
-  constructor(private readonly tasks: Tasks, private readonly messages: typeof cliMessages.en.tasks, private readonly locale: string) {}
+  constructor(private readonly tasks: Tasks, private readonly messages: typeof cliMessages.en.tasks, private readonly locale: string, private readonly memoryProjection?: Task['memoryProjection']) {}
 
   async handle(text: string, history: Conversation, privacy: RequestPrivacy): Promise<CommitmentReply | undefined> {
     if (durableWriteRejection(privacy, 'task', text) && /nhắc|gọi\s+(?:tôi|tao|mình)/iu.test(text))
@@ -41,7 +41,7 @@ export class CommitmentConversation {
         return { text: this.messages.protected }
       if (extraction.time.status !== 'resolved')
         return { text: extraction.time.status === 'invalid' ? this.messages.invalidTime : this.messages.clarifyTime }
-      const task = await this.tasks.create({ title: extraction.title, type: 'reminder', dueAt: extraction.time.remindAt, timezone: this.tasks.timezone })
+      const task = await this.tasks.create({ title: extraction.title, type: 'reminder', dueAt: extraction.time.remindAt, timezone: this.tasks.timezone }, this.memoryProjection)
       return this.saved(task, 'created')
     }
     const controlText = text.trim().replace(/[.!]+$/u, '').trim()

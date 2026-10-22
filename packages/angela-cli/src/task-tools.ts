@@ -2,6 +2,7 @@ import type { cliMessages } from '@angela/i18n/cli'
 import type { Tool } from '@xsai/shared-chat'
 
 import type { RequestPrivacy } from './privacy-policy'
+import type { Task } from './task-schema'
 import type { Tasks } from './tasks'
 
 import { errorMessageFrom } from '@moeru/std'
@@ -56,9 +57,9 @@ export function taskContext(tasks: Tasks, host: 'terminal' | 'telegram' = 'termi
 }
 
 /** Uses the same executable Tool contract as memory and MCP, with validation before all storage mutations. */
-export function taskTools(tasks: Tasks, messages: typeof cliMessages.en.tasks, privacy?: RequestPrivacy, requestText = ''): Tool[] {
+export function taskTools(tasks: Tasks, messages: typeof cliMessages.en.tasks, privacy?: RequestPrivacy, requestText = '', projectionSource?: () => Promise<Task['memoryProjection']>): Tool[] {
   const definitions: { name: string, description: string, properties: object, required: string[], execute: (input: unknown) => Promise<unknown> }[] = [
-    { name: 'task_create', description: 'Create an everyday task requested by the user. Use recurrence for routines.', properties: fields, required: ['title', 'type'], execute: async input => await tasks.create(v.parse(taskCreate, input)) },
+    { name: 'task_create', description: 'Create an everyday task requested by the user. Use recurrence for routines.', properties: fields, required: ['title', 'type'], execute: async input => await tasks.create(v.parse(taskCreate, input), await projectionSource?.()) },
     { name: 'task_list', description: 'List tasks to answer schedule questions or find stable IDs before edits. Defaults to pending tasks.', properties: { status: { type: 'string', enum: ['pending', 'completed', 'cancelled', 'all'] }, type: fields.type, date: { type: 'string', description: 'YYYY-MM-DD in the local CLI timezone.' } }, required: [], execute: async input => await tasks.list(v.parse(listSchema, input)) },
     { name: 'task_update', description: 'Edit a task by its full ID. Null clears an optional field. Change dueAt to reschedule. Clear dueDate when adding dueAt.', properties: { id: { type: 'string' }, changes: { type: 'object', properties: { ...fields, dueAt: { ...fields.dueAt, type: ['string', 'null'] }, dueDate: { ...fields.dueDate, type: ['string', 'null'] }, recurrence: { ...fields.recurrence, type: ['object', 'null'] }, context: { ...fields.context, type: ['string', 'null'] } }, required: [], additionalProperties: false } }, required: ['id', 'changes'], execute: async (input) => {
       const call = v.parse(updateSchema, input)
