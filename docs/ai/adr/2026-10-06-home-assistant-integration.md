@@ -22,11 +22,11 @@ process, behind typed tools that the renderer mounts for the model.
 
 | Concern | Location |
 | --- | --- |
-| Address, token, and every outbound request | `apps/stage-tamagotchi/src/main/services/airi/home-assistant/` |
-| IPC contract | `apps/stage-tamagotchi/src/shared/eventa/home-assistant.ts` |
+| Address, token, and every outbound request | `apps/desktop/src/main/services/airi/home-assistant/` |
+| IPC contract | `apps/desktop/src/shared/eventa/home-assistant.ts` |
 | Home Assistant API client and its validation | `packages/stage-ui/src/libs/home-assistant/client.ts` |
 | Tool definitions | `packages/stage-ui/src/tools/home-assistant.ts` |
-| Tool mounting and the settings page | `apps/stage-tamagotchi/src/renderer/` |
+| Tool mounting and the settings page | `apps/desktop/src/renderer/` |
 
 The mechanism follows `computer-use` and `mcp-servers`, which are the two
 existing main-process services that hand tools to the model.

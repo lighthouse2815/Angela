@@ -38,6 +38,6 @@ jobs:
       - name: CLI build
         run: pnpm -F @angela/cli build
       - name: CLI lint
-        run: pnpm exec eslint packages/airi-cli/src packages/airi-cli/scripts
+        run: pnpm exec eslint packages/angela-cli/src packages/angela-cli/scripts
       - name: Built CLI smoke check
-        run: node packages/airi-cli/dist/bin/run.mjs --help
+        run: node packages/angela-cli/dist/bin/run.mjs --help

@@ -27,7 +27,7 @@ export default defineConfig({
         runtime: electron({
           name: 'electron',
           prepare: new URL('./src/runtimes/prepare-electron.ts', import.meta.url).href,
-          entry: join(import.meta.dirname, '../../apps/stage-tamagotchi/out/main/index.js'),
+          entry: join(import.meta.dirname, '../../apps/desktop/out/main/index.js'),
           args: ['--no-sandbox'],
           cwd: join(import.meta.dirname, '../..'),
           temporaryUserData: {

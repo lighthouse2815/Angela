@@ -6,9 +6,9 @@ export default defineConfig({
   test: {
     projects: [
       'server/apps/api',
-      'apps/stage-tamagotchi/vitest.node.config.ts',
+      'apps/desktop/vitest.node.config.ts',
       'packages/cap-vite',
-      'packages/airi-cli',
+      'packages/angela-cli',
       'integrations/discord-bot',
       'packages/local-config',
       'packages/ccc',

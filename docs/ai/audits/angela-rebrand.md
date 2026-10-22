@@ -11,8 +11,8 @@ The Kirie-only `stage-host-context` alias changes with its Vite and TypeScript m
 
 | Manifest | Package |
 | --- | --- |
-| `apps/stage-tamagotchi-kirie/package.json` | `@angela/desktop-kirie` |
-| `apps/stage-tamagotchi/package.json` | `@angela/desktop` |
+| `apps/desktop-kirie/package.json` | `@angela/desktop-kirie` |
+| `apps/desktop/package.json` | `@angela/desktop` |
 | `apps/stage-web/package.json` | `@angela/web` |
 | `engines/stage-tamagotchi-godot/package.json` | `@angela/stage-tamagotchi-godot` |
 | `integrations/discord-bot/package.json` | `@angela/discord-bot` |
@@ -23,7 +23,7 @@ The Kirie-only `stage-host-context` alias changes with its Vite and TypeScript m
 | `integrations/vscode/airi-plugin-vscode/package.json` | `@angela/plugin-vscode` |
 | `integrations/vscode/vscode-airi/package.json` | `airi-vscode` |
 | `package.json` | `@angela/root` |
-| `packages/airi-cli/package.json` | `@angela/cli` |
+| `packages/angela-cli/package.json` | `@angela/cli` |
 | `packages/audio/package.json` | `@angela/audio` |
 | `packages/better-ws/package.json` | `@angela/better-ws` |
 | `packages/cap-vite/package.json` | `@angela/cap-vite` |
@@ -140,3 +140,20 @@ Checks set `pnpm_config_verify_deps_before_run=false` after explicit installatio
 This prevents pnpm from running the full postinstall during each formatting change.
 
 - Root `pnpm lint`: passed, zero errors. Existing warnings remain.
+
+## Structural paths
+
+| Previous directory | Current directory |
+| --- | --- |
+| `packages/airi-cli` | `packages/angela-cli` |
+| `apps/stage-tamagotchi` | `apps/desktop` |
+| `apps/stage-tamagotchi-kirie` | `apps/desktop-kirie` |
+
+The CLI, web, and desktop build graph retains all 50 tasks and every dependency edge.
+The lockfile importer paths change in the same commit. No external resolution changes.
+
+- Frozen installation passed after the moves.
+- CLI build, typecheck, and built `--help` passed.
+- CLI path/configuration/MCP/perception checks: 8 files and 58 tests passed.
+- Desktop plugin/profile checks: 2 files and 68 tests passed.
+- ESLint on modified configuration and source files passed with zero errors.

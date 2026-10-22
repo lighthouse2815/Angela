@@ -58,7 +58,7 @@ Two baselines serve different purposes:
 - `836a68c`: runtime with legacy recall, before Memory V2 capture. Startup uses three alternating process samples.
 - `2156d51`: Memory V2 before WAL and batching. This baseline permits consolidation and contention comparisons.
 
-The [raw before data](../../../packages/airi-cli/benchmarks/memory-v2-before-tuning.json) and [raw after data](../../../packages/airi-cli/benchmarks/memory-v2-after.json) include percentile samples and query plans.
+The [raw before data](../../../packages/angela-cli/benchmarks/memory-v2-before-tuning.json) and [raw after data](../../../packages/angela-cli/benchmarks/memory-v2-after.json) include percentile samples and query plans.
 
 | Operation | Before tuning, ms | After, ms |
 | --- | ---: | ---: |
@@ -98,8 +98,8 @@ Warm requests now persist observations and compile an episode. That adds approxi
 This cost preserves crash-safe memory. Production provider latency is excluded from this fixture.
 Those startup samples retain one scope. The Telegram lifecycle measurements below exercise the actual adapter instead.
 
-The [startup samples](../../../packages/airi-cli/benchmarks/runtime-startup-after.json) retain every process result.
-The [legacy samples](../../../packages/airi-cli/benchmarks/runtime-startup-before.json) use the same request fixture.
+The [startup samples](../../../packages/angela-cli/benchmarks/runtime-startup-after.json) retain every process result.
+The [legacy samples](../../../packages/angela-cli/benchmarks/runtime-startup-before.json) use the same request fixture.
 
 Every startup sample ended with zero runtime states, event listeners, reminder routes, and reminder timers.
 The memory benchmark ended with zero Recall indexes, watchers, timers, and embedding clients.
@@ -151,8 +151,8 @@ Root typecheck initially failed at pnpm's launcher. Running the installed native
 Run commands from the repository root, one at a time:
 
 ```sh
-pnpm exec tsx packages/airi-cli/scripts/benchmark-memory-v2.ts WAL memory-v2-result.json
-pnpm exec tsx packages/airi-cli/scripts/benchmark-runtime-startup.ts startup-result.json
+pnpm exec tsx packages/angela-cli/scripts/benchmark-memory-v2.ts WAL memory-v2-result.json
+pnpm exec tsx packages/angela-cli/scripts/benchmark-runtime-startup.ts startup-result.json
 pnpm -F @angela/cli exec vitest run --config vitest.config.ts src/memory-v2 --maxWorkers=1
 ```
 
@@ -196,7 +196,7 @@ Context preparation includes store initialization, Recall, and tool preparation.
 SQLite timing includes directory creation, permissions, database open, and schema work. It does not isolate SQLite syscall time.
 The first mode also pays process module warmup. Warm percentiles exclude each mode's first request.
 This run supports bounded warm reuse. It does not predict real network or model latency.
-Raw measurements: `packages/airi-cli/benchmarks/telegram-lifecycle-before.json`.
+Raw measurements: `packages/angela-cli/benchmarks/telegram-lifecycle-before.json`.
 
 ## Telegram lifecycle closure
 
@@ -266,7 +266,7 @@ No garbage collection or FinalizationRegistry callback is a correctness conditio
 - `pnpm typecheck --concurrency=1`: **53/53 tasks**, 52 cached, with the changed CLI checked again.
 - Root typecheck required the installed native pnpm binary on PATH because the local wrapper lacks a shebang.
 - `pnpm -F @angela/cli build` and the built executable `--help`: passed after the deadline adjustment.
-- `pnpm exec eslint packages/airi-cli/src packages/airi-cli/scripts`: passed with no package errors.
+- `pnpm exec eslint packages/angela-cli/src packages/angela-cli/scripts`: passed with no package errors.
 - `pnpm lint`: passed. ESLint reported 0 errors and 603 warnings. The Oxlint phase reported 12 warnings.
 - `.github/workflows/cli-core.yml` runs the full CLI gate on PR #1 with one job and one Vitest worker.
 - The first [successful core run](https://github.com/lighthouse2815/Angela/actions/runs/39723476242) verified fresh install and prerequisite builds.
@@ -288,6 +288,6 @@ The 19 existing root Vitest failures remain outside this task. They were not mod
 Desktop IPC, Discord companion memory expansion, automatic dream, and background LLM work remain deferred.
 Live Telegram transport, real models/embeddings, voice, and camera require separate production checks.
 
-Raw evidence: [Telegram lifecycle](../../../packages/airi-cli/benchmarks/telegram-lifecycle-after.json),
-[resource cycles](../../../packages/airi-cli/benchmarks/session-resources-after.json), and
-[reproduction commands](../../../packages/airi-cli/benchmarks/README.md#telegram-lifecycle-closure).
+Raw evidence: [Telegram lifecycle](../../../packages/angela-cli/benchmarks/telegram-lifecycle-after.json),
+[resource cycles](../../../packages/angela-cli/benchmarks/session-resources-after.json), and
+[reproduction commands](../../../packages/angela-cli/benchmarks/README.md#telegram-lifecycle-closure).

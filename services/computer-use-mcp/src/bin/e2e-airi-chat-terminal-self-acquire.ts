@@ -75,7 +75,7 @@ const packageDir = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const repoDir = resolve(packageDir, '../..')
 const preferredDebugPort = Number(env.AIRI_E2E_DEBUG_PORT || '9222')
 const runId = new Date().toISOString().replaceAll(':', '-').replaceAll('.', '-')
-const repoChangesCommand = 'git diff --stat -- services/computer-use-mcp packages/stage-ui apps/stage-tamagotchi'
+const repoChangesCommand = 'git diff --stat -- services/computer-use-mcp packages/stage-ui apps/desktop'
 const summaryMarker = 'Terminal self-acquire demo complete.'
 const DOTENV_LINE_SPLIT_RE = /\r?\n/u
 const QUOTED_VALUE_RE = /^['"]|['"]$/gu
@@ -223,7 +223,7 @@ async function findAvailablePort(preferredPort: number, attempts = 20) {
 
 async function terminateExistingStageTamagotchiInstances() {
   const patterns = [
-    resolve(repoDir, 'apps', 'stage-tamagotchi'),
+    resolve(repoDir, 'apps', 'desktop'),
     '@angela/desktop',
     resolve(repoDir, 'node_modules', '.pnpm', 'electron@'),
   ]

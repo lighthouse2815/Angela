@@ -26,9 +26,9 @@ Do not require slash commands for normal use. Slash commands are a management/de
 Before coding:
 
 1. Read the root `AGENTS.md` completely and follow it.
-2. Inspect `packages/airi-cli` and reuse existing persistence, chat/tool, config, logging, prompt, voice, Telegram, and test patterns where applicable.
+2. Inspect `packages/angela-cli` and reuse existing persistence, chat/tool, config, logging, prompt, voice, Telegram, and test patterns where applicable.
 3. Search before creating utilities. Do not introduce one-off storage, validation, time, or error-handling patterns if equivalents already exist.
-4. Keep the feature inside `packages/airi-cli` unless existing architecture clearly requires a shared package.
+4. Keep the feature inside `packages/angela-cli` unless existing architecture clearly requires a shared package.
 5. Do not add a new dependency without first checking whether the repository already has a suitable dependency or utility.
 6. Use kebab-case file names.
 7. Use Valibot for persisted-data/tool-input schemas where validation is required, consistent with root rules.
@@ -131,7 +131,7 @@ Task store  Scheduler
 Recommended domain split, adjusted to the actual repo structure:
 
 ```text
-packages/airi-cli/src/
+packages/angela-cli/src/
   tasks/
     types.ts
     schema.ts
@@ -522,7 +522,7 @@ Follow this order unless repository architecture provides a strong reason not to
 9. Recurrence.
 10. CLI notifier.
 11. Voice integration if it can be done cleanly without expanding scope.
-12. Update `packages/airi-cli/README.md` with the actual user-facing behavior that was implemented.
+12. Update `packages/angela-cli/README.md` with the actual user-facing behavior that was implemented.
 13. Run checks required by `AGENTS.md`.
 
 Do not start the background daemon milestone until the in-process V1 is correct and tested.
@@ -558,17 +558,17 @@ This milestone is done when:
 - daily/weekly routines work;
 - scheduler logic has deterministic fake-clock tests;
 - CLI prompt remains usable when a reminder appears;
-- relevant `packages/airi-cli` tests pass;
+- relevant `packages/angela-cli` tests pass;
 - relevant typecheck passes;
 - `pnpm lint` passes or any unrelated pre-existing failures are clearly reported;
-- `packages/airi-cli/README.md` documents the implemented functionality;
+- `packages/angela-cli/README.md` documents the implemented functionality;
 - no unrelated coding-agent features are added.
 
 ---
 
 ## Instruction to Codex
 
-Implement this plan completely for `packages/airi-cli`, following the actual current architecture of the repository and all applicable `AGENTS.md` instructions.
+Implement this plan completely for `packages/angela-cli`, following the actual current architecture of the repository and all applicable `AGENTS.md` instructions.
 
 Do not stop after only scaffolding the domain types. Continue through the usable V1 described above, including tests and documentation. If the repository already contains an equivalent mechanism, integrate or refactor toward it instead of duplicating it.
 

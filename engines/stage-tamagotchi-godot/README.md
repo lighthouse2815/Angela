@@ -293,7 +293,7 @@ The output directories intentionally match electron-builder's `${os}` names:
 - Linux: `out/linux`
 - macOS: `out/mac`
 
-`apps/stage-tamagotchi/electron-builder.config.ts` copies the matching directory
+`apps/desktop/electron-builder.config.ts` copies the matching directory
 into `resources/godot-stage` via `extraResources`. To inspect an unpacked
 Electron build locally, run:
 

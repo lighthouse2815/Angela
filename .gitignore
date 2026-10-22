@@ -138,7 +138,7 @@ plugins/development
 plugins-local
 plugins-development
 
-apps/stage-tamagotchi/electron.vite.config.*.mjs
+apps/desktop/electron.vite.config.*.mjs
 docs/superpowers
 docs/research
 

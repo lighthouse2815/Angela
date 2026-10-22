@@ -14,7 +14,7 @@ This note is a factual status memo for the current desktop lane work in this rec
 - The following baselines already exist in code:
   - `/Users/liuziheng/airi/services/computer-use-mcp/src/executors/macos-local.ts`
     - saves the real cursor position and restores it with `CGWarpMouseCursorPosition(...)`
-  - `/Users/liuziheng/airi/apps/stage-tamagotchi/src/main/windows/shared/window.ts`
+  - `/Users/liuziheng/airi/apps/desktop/src/main/windows/shared/window.ts`
     - `makeWindowPassThrough()` uses ignore-mouse-events + non-focusable overlay behavior
   - `/Users/liuziheng/airi/services/computer-use-mcp/src/browser-dom/cdp-bridge.ts`
     - 5-second heartbeat with teardown after 3 consecutive failures
@@ -41,10 +41,10 @@ These are the remaining real issues, ordered by severity.
 ### 2. Overlay lifecycle / RPC readiness still needs a live-window pass on this recut branch.
 
 - Files currently being worked on:
-  - `/Users/liuziheng/airi-desktop-recut/apps/stage-tamagotchi/src/main/windows/desktop-overlay/rpc/contracts.ts`
-  - `/Users/liuziheng/airi-desktop-recut/apps/stage-tamagotchi/src/main/windows/desktop-overlay/rpc/index.electron.ts`
-  - `/Users/liuziheng/airi-desktop-recut/apps/stage-tamagotchi/src/renderer/pages/desktop-overlay-polling.ts`
-  - `/Users/liuziheng/airi-desktop-recut/apps/stage-tamagotchi/src/renderer/pages/desktop-overlay-polling.test.ts`
+  - `/Users/liuziheng/airi-desktop-recut/apps/desktop/src/main/windows/desktop-overlay/rpc/contracts.ts`
+  - `/Users/liuziheng/airi-desktop-recut/apps/desktop/src/main/windows/desktop-overlay/rpc/index.electron.ts`
+  - `/Users/liuziheng/airi-desktop-recut/apps/desktop/src/renderer/pages/desktop-overlay-polling.ts`
+  - `/Users/liuziheng/airi-desktop-recut/apps/desktop/src/renderer/pages/desktop-overlay-polling.test.ts`
 - Current state:
   - the readiness contract is already wired in `desktop-overlay/rpc/index.electron.ts`
   - the renderer poll controller already waits on readiness and handles degraded state
@@ -53,7 +53,7 @@ These are the remaining real issues, ordered by severity.
 
 ### 3. Local overlay live-window smoke exists in the recut branch, but it still needs a live run on this branch.
 
-- The smoke is now wired in `apps/stage-tamagotchi/package.json` as
+- The smoke is now wired in `apps/desktop/package.json` as
   `smoke:desktop-overlay-live-window`.
 - The shared candidate-selection helper is unit-tested.
 - What is still missing here is a fresh pass on this recut branch with the real
@@ -64,7 +64,7 @@ These are the remaining real issues, ordered by severity.
 
 These items are real ideas or cleanup work, but they are not the thing that should block the line right now.
 
-- Eager overlay init cleanliness in `apps/stage-tamagotchi/src/main/index.ts`
+- Eager overlay init cleanliness in `apps/desktop/src/main/index.ts`
 - Refactoring nested browser-dom routing logic for readability
 - Turning `macos-local.ts` into instant-warp-only fallback with zero motion trace
 - Rewriting overlay visuals, ghost pointer polish, or extra renderer debug UI

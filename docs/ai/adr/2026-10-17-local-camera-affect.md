@@ -4,7 +4,7 @@ Status: accepted
 
 ## Existing architecture
 
-`packages/airi-cli/src/bin/run.ts` owns the terminal loop, slash commands, SIGINT/SIGTERM handling, and cleanup.
+`packages/angela-cli/src/bin/run.ts` owns the terminal loop, slash commands, SIGINT/SIGTERM handling, and cleanup.
 `Chat.send` already accepts request-only system context alongside persisted conversation turns.
 `Context.prepare` keeps system context during compaction and summarizes historical turns only.
 CLI services read environment settings, use Valibot at data boundaries, and report localized diagnostics through stderr.
@@ -116,7 +116,7 @@ Commands executed:
 
 | Command | Result |
 | --- | --- |
-| `python3 -m unittest discover -s packages/airi-cli/python/camera-worker -p test.py` | 11 passed |
+| `python3 -m unittest discover -s packages/angela-cli/python/camera-worker -p test.py` | 11 passed |
 | `pnpm -F @angela/cli exec vitest run src/perception` | 33 passed |
 | `pnpm -F @angela/cli test` | 163 passed, one baseline failure |
 | `pnpm -F @angela/i18n test` | 20 passed |
@@ -127,8 +127,8 @@ Commands executed:
 | `pnpm lint` | Baseline plan error described above |
 | `pnpm typecheck` | Default heap exhausted in stage-ui |
 | `NODE_OPTIONS=--max-old-space-size=8192 pnpm typecheck --concurrency=2` | Manually interrupted because of memory pressure |
-| `packages/airi-cli/python/camera-worker/.venv/bin/python packages/airi-cli/python/camera-worker/worker.py --check` | Dependencies and models available |
-| `packages/airi-cli/python/camera-worker/.venv/bin/python packages/airi-cli/python/camera-worker/worker.py --smoke` | Real models processed a synthetic black frame |
+| `packages/angela-cli/python/camera-worker/.venv/bin/python packages/angela-cli/python/camera-worker/worker.py --check` | Dependencies and models available |
+| `packages/angela-cli/python/camera-worker/.venv/bin/python packages/angela-cli/python/camera-worker/worker.py --smoke` | Real models processed a synthetic black frame |
 
 Targeted `moeru-lint` checks covered the changed CLI sources, i18n strings, README, fixtures, and this ADR without errors or warnings.
 
@@ -143,20 +143,20 @@ No live camera tests or threshold changes belong to this correction.
 | `third_party/openseeface/**` | Complete unchanged upstream source, models, and license notices |
 | `third_party/README.md` | Revision, subtree provenance, required source/model inventory |
 | `.gitignore`, `eslint.config.ts` | Ignore local Python artifacts and preserve vendored formatting |
-| `packages/airi-cli/package.json`, `pnpm-lock.yaml` | Reuse the existing Eventa catalog dependency and include worker source files |
-| `packages/airi-cli/python/camera-worker/worker.py` | Capture, OpenSeeFace adapter, diagnostics, JSONL producer |
-| `packages/airi-cli/python/camera-worker/test.py` | Hardware-free worker tests |
-| `packages/airi-cli/python/camera-worker/pyproject.toml`, `uv.lock` | Independent locked CPU runtime |
-| `packages/airi-cli/python/camera-worker/README.md` | Runtime setup and standalone commands |
-| `packages/airi-cli/src/perception/observation.ts`, `observation.test.ts` | Protocol, neutral observations, Eventa contract and validation tests |
-| `packages/airi-cli/src/perception/openseeface-provider.ts`, `openseeface-provider.test.ts` | Child lifecycle, provider and camera-command tests |
-| `packages/airi-cli/src/perception/affect-engine.ts`, `affect-engine.test.ts` | Temporal smoothing and observable cue tests |
-| `packages/airi-cli/src/perception/camera-context.ts`, `camera-context.test.ts` | Current compact state, freshness, and separate commentary policy |
-| `packages/airi-cli/src/perception/camera.ts` | Session opt-in, commands, health notices and composition |
-| `packages/airi-cli/src/perception/pipeline.test.ts` | Process-to-model integration and persistence checks |
-| `packages/airi-cli/src/perception/fixtures/worker.py`, `smile-screen.json` | Real subprocess fixture without inference dependencies |
-| `packages/airi-cli/src/perception/README.md` | Domain semantics and exact default thresholds |
-| `packages/airi-cli/src/bin/run.ts` | Commands, indicator, request context and lifecycle wiring |
+| `packages/angela-cli/package.json`, `pnpm-lock.yaml` | Reuse the existing Eventa catalog dependency and include worker source files |
+| `packages/angela-cli/python/camera-worker/worker.py` | Capture, OpenSeeFace adapter, diagnostics, JSONL producer |
+| `packages/angela-cli/python/camera-worker/test.py` | Hardware-free worker tests |
+| `packages/angela-cli/python/camera-worker/pyproject.toml`, `uv.lock` | Independent locked CPU runtime |
+| `packages/angela-cli/python/camera-worker/README.md` | Runtime setup and standalone commands |
+| `packages/angela-cli/src/perception/observation.ts`, `observation.test.ts` | Protocol, neutral observations, Eventa contract and validation tests |
+| `packages/angela-cli/src/perception/openseeface-provider.ts`, `openseeface-provider.test.ts` | Child lifecycle, provider and camera-command tests |
+| `packages/angela-cli/src/perception/affect-engine.ts`, `affect-engine.test.ts` | Temporal smoothing and observable cue tests |
+| `packages/angela-cli/src/perception/camera-context.ts`, `camera-context.test.ts` | Current compact state, freshness, and separate commentary policy |
+| `packages/angela-cli/src/perception/camera.ts` | Session opt-in, commands, health notices and composition |
+| `packages/angela-cli/src/perception/pipeline.test.ts` | Process-to-model integration and persistence checks |
+| `packages/angela-cli/src/perception/fixtures/worker.py`, `smile-screen.json` | Real subprocess fixture without inference dependencies |
+| `packages/angela-cli/src/perception/README.md` | Domain semantics and exact default thresholds |
+| `packages/angela-cli/src/bin/run.ts` | Commands, indicator, request context and lifecycle wiring |
 | `packages/i18n/src/cli.ts` | English and Vietnamese messages and command suggestions |
-| `packages/airi-cli/README.md` | Actual setup, privacy behavior, commands, settings and limitations |
+| `packages/angela-cli/README.md` | Actual setup, privacy behavior, commands, settings and limitations |
 | This ADR | Architecture and validation record |

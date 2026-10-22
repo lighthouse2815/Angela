@@ -64,7 +64,7 @@ Group controls by the decision they support. Keep descriptions next to their fie
 
 The [web settings layout](./packages/stage-layouts/src/layouts/settings.vue) owns web page padding, safe areas, the header, and the settings scroll container.
 
-Electron uses its own [settings layout](./apps/stage-tamagotchi/src/renderer/layouts/settings.vue). Apply settings changes to the layout that owns the target application.
+Electron uses its own [settings layout](./apps/desktop/src/renderer/layouts/settings.vue). Apply settings changes to the layout that owns the target application.
 
 ### Existing spacing references
 

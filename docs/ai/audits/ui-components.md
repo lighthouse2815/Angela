@@ -31,8 +31,8 @@ Review that export before adding a showcase or removing it. This batch does not 
 | --- | ---: | ---: | ---: |
 | `apps/stage-web/` | 26 | 16 | 7 |
 | `../dev-in-future/apps/stage-pocket/` | 23 | 13 | 5 |
-| `apps/stage-tamagotchi/` | 91 | 50 | 14 |
-| `apps/stage-tamagotchi-kirie/` | 76 | 42 | 13 |
+| `apps/desktop/` | 91 | 50 | 14 |
+| `apps/desktop-kirie/` | 76 | 42 | 13 |
 | `packages/stage-layouts/` | 33 | 12 | 5 |
 | `packages/stage-pages/` | 129 | 105 | 37 |
 | `packages/stage-ui/` | 153 | 82 | 40 |
@@ -44,7 +44,7 @@ The Kirie application repeats several desktop control implementations. Treat the
 | Source | Finding | Direction |
 | --- | --- | --- |
 | [packages/stage-layouts/src/components/Widgets/ChatToolbarButton.vue:12](../../../packages/stage-layouts/src/components/Widgets/ChatToolbarButton.vue#L12) | A local button owns size, surface, active state, focus, and press feedback. | Compose GhostButton or BasicButton. Preserve its active surface and slot contract. |
-| [apps/stage-tamagotchi/src/renderer/components/chat-window/chat-speech-mute-button.vue:22](../../../apps/stage-tamagotchi/src/renderer/components/chat-window/chat-speech-mute-button.vue#L22) | A native icon button duplicates shared focus and press behavior. | Keep speech state local. Use GhostButton or IconButton for the control. |
+| [apps/desktop/src/renderer/components/chat-window/chat-speech-mute-button.vue:22](../../../apps/desktop/src/renderer/components/chat-window/chat-speech-mute-button.vue#L22) | A native icon button duplicates shared focus and press behavior. | Keep speech state local. Use GhostButton or IconButton for the control. |
 | [packages/stage-ui/src/components/scenarios/chat/components/image-attachment-preview.vue:14](../../../packages/stage-ui/src/components/scenarios/chat/components/image-attachment-preview.vue#L14) | A native delete button owns an overlay surface and interaction styles. | Use IconButton. Preserve the circular overlay, accessible name, and stopped click propagation. |
 | [packages/stage-ui/src/components/layouts/page-header.vue:82](../../../packages/stage-ui/src/components/layouts/page-header.vue#L82) | The back action uses a native button without its own accessible label. | Use IconButton and provide a localized accessible name. |
 | [packages/stage-ui/src/components/scenarios/providers/provider-validation-alerts.vue:34](../../../packages/stage-ui/src/components/scenarios/providers/provider-validation-alerts.vue#L34) | Validation actions use multiple native buttons. | Use Button or GhostButton. Retain the validation state and action handlers. |

@@ -12,7 +12,7 @@ if (values.help) {
   process.stdout.write('pnpm package:cli [--out PATH] [--skip-build]\nBuilds a portable directory and .tar.gz for this OS, architecture, and Node ABI. Requires pnpm and tar.\n')
   process.exit(0)
 }
-const manifest = JSON.parse(await readFile(join(root, 'packages', 'airi-cli', 'package.json'), 'utf8'))
+const manifest = JSON.parse(await readFile(join(root, 'packages', 'angela-cli', 'package.json'), 'utf8'))
 const destination = resolve(values.out ?? join(root, 'dist', `angela-${manifest.version}-${process.platform}-${process.arch}-node${process.versions.modules}`))
 const within = relative(root, destination)
 if (!within || (!within.startsWith(`..${sep}`) && !isAbsolute(within) && !within.startsWith(`dist${sep}`)))

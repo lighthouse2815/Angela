@@ -11,7 +11,7 @@ plan for a full CLI in this PR.
 
 ## Shipped Terminal Client
 
-[`packages/airi-cli`](../../packages/airi-cli/README.md) provides text chat, MCP terminal tools, host approval, and saved sessions.
+[`packages/angela-cli`](../../packages/angela-cli/README.md) provides text chat, MCP terminal tools, host approval, and saved sessions.
 It uses generation events from `core-agent` and tool calls over stdio MCP.
 The runner event envelope and Chafa renderer below remain proposals.
 
@@ -31,7 +31,7 @@ The correct dependency order is:
 
 ## Confirmed Decisions
 
-1. Future CLI package location: `packages/airi-cli`.
+1. Future CLI package location: `packages/angela-cli`.
 2. First integration channel: in-process runner callback.
 3. JSONL over stdin/file remains a follow-up adapter for replay, fixtures, and
    tooling interoperability.
@@ -51,12 +51,12 @@ The correct dependency order is:
 ## Proposed Location Split
 
 - Core runtime: `services/computer-use-mcp`.
-- CLI package: `packages/airi-cli`.
+- CLI package: `packages/angela-cli`.
 - Event contract: initially colocated with the runner that emits it, then
   exported for CLI consumption.
-- Text renderer: `packages/airi-cli/src/renderers/text.ts`.
-- Chafa adapter: `packages/airi-cli/src/renderers/chafa-avatar.ts`.
-- JSONL adapter: `packages/airi-cli/src/adapters/jsonl.ts`.
+- Text renderer: `packages/angela-cli/src/renderers/text.ts`.
+- Chafa adapter: `packages/angela-cli/src/renderers/chafa-avatar.ts`.
+- JSONL adapter: `packages/angela-cli/src/adapters/jsonl.ts`.
 
 ## Runner Event Contract Draft
 
@@ -236,7 +236,7 @@ Initial CLI flags:
 
 ### Stage 2: Text CLI
 
-- scaffold `packages/airi-cli`
+- scaffold `packages/angela-cli`
 - consume runner events
 - render run, step, tool, error, and final report state in plain text
 
@@ -267,7 +267,7 @@ Layering:
 
 - no renderer code in `computer-use-mcp` runtime
 - no `chafa` dependency in runtime packages
-- CLI code stays under `packages/airi-cli`
+- CLI code stays under `packages/angela-cli`
 
 Runtime:
 

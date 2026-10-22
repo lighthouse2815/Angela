@@ -58,8 +58,8 @@ in
 
     echo Setting up asset cache
     ln -s "$assets" .cache
-    mkdir apps/stage-tamagotchi/src/renderer/.cache
-    ln -s "$assets" apps/stage-tamagotchi/src/renderer/.cache/assets
+    mkdir apps/desktop/src/renderer/.cache
+    ln -s "$assets" apps/desktop/src/renderer/.cache/assets
 
     runHook postConfigure
   '';
@@ -68,7 +68,7 @@ in
     runHook preBuild
 
     pnpm -F @angela/desktop... run build
-    cd apps/stage-tamagotchi
+    cd apps/desktop
     pnpm exec electron-builder build \
       --dir --${if stdenvNoCC.isLinux then "linux" else "mac"} \
       -c.electronDist="${electron.dist}" \

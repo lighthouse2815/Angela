@@ -82,7 +82,7 @@ describe('createVADStates', () => {
     // NOTICE:
     // The page can call start from both the init continuation and the stream/loaded watcher.
     // This fake Web Audio graph keeps the regression focused on duplicate source-node wiring.
-    // Source/context: apps/stage-tamagotchi/src/renderer/pages/index.vue can restart VAD around stream changes.
+    // Source/context: apps/desktop/src/renderer/pages/index.vue can restart VAD around stream changes.
     // Removal condition: replace this with browser-mode Web Audio graph lifecycle coverage.
     const createdSources: FakeAudioNode[] = []
     class ReconnectAudioContext extends FakeAudioContext {

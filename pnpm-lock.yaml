@@ -1353,7 +1353,7 @@ importers:
         specifier: 'catalog:'
         version: 2.9.0
 
-  apps/stage-tamagotchi:
+  apps/desktop:
     dependencies:
       '@auv-js/cli':
         specifier: 'catalog:'
@@ -1916,7 +1916,7 @@ importers:
         specifier: 'catalog:'
         version: 0.1.0
 
-  apps/stage-tamagotchi-kirie:
+  apps/desktop-kirie:
     dependencies:
       '@date-fns/utc':
         specifier: 'catalog:'
@@ -3192,7 +3192,7 @@ importers:
         specifier: 'catalog:'
         version: 1.6.0
 
-  packages/airi-cli:
+  packages/angela-cli:
     dependencies:
       '@modelcontextprotocol/sdk':
         specifier: 'catalog:'

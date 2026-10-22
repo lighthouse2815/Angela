@@ -202,7 +202,7 @@ async function findAvailablePort(preferredPort: number, attempts = 20) {
 
 async function terminateExistingStageTamagotchiInstances() {
   const patterns = [
-    resolve(repoDir, 'apps', 'stage-tamagotchi'),
+    resolve(repoDir, 'apps', 'desktop'),
     '@angela/desktop',
     resolve(repoDir, 'node_modules', '.pnpm', 'electron@'),
   ]

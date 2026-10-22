@@ -41,7 +41,7 @@ pnpm cli --resume ID_PHIEN
 ```
 
 CLI hỏi xác nhận trước khi gọi công cụ. Model không được tự phê duyệt thao tác.
-Xem [hướng dẫn CLI](./packages/airi-cli/README.md) để cấu hình provider, MCP và thư mục lưu phiên.
+Xem [hướng dẫn CLI](./packages/angela-cli/README.md) để cấu hình provider, MCP và thư mục lưu phiên.
 
 ## Cấu hình dùng chung trên máy
 

@@ -144,7 +144,7 @@ These are the real gaps. Do not talk yourself into thinking terminal lane is ful
 
 ### 1. Desktop approval semantics are improved, but still need one more explicit review
 
-`apps/stage-tamagotchi/src/renderer/App.vue` now distinguishes:
+`apps/desktop/src/renderer/App.vue` now distinguishes:
 
 - `terminal_and_apps`
 - `pty_session`
@@ -169,8 +169,8 @@ If you are continuing terminal lane work, read these first:
 4. `src/bin/e2e-terminal-self-acquire.ts`
 5. `src/bin/e2e-airi-chat-terminal-self-acquire.ts`
 6. `src/support-matrix.ts`
-7. `apps/stage-tamagotchi/src/renderer/App.vue`
-8. `apps/stage-tamagotchi/src/renderer/modules/computer-use-approval.ts`
+7. `apps/desktop/src/renderer/App.vue`
+8. `apps/desktop/src/renderer/modules/computer-use-approval.ts`
 
 That set is enough to reconstruct the current terminal-lane-v2 state without rereading the entire repo.
 

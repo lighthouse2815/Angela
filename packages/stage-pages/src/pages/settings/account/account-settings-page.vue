@@ -304,7 +304,7 @@ async function handleSendSetPasswordLink() {
   try {
     // NOTICE:
     // `redirectTo` MUST live on the API server origin, not on the current
-    // browser origin. This page is shared with apps/stage-tamagotchi,
+    // browser origin. This page is shared with apps/desktop,
     // whose Electron renderer loads from `file://` — `window.location.origin`
     // would put a `file://` URL into the reset email and break the flow
     // for any user who clicks from their inbox. The auth UI is hosted at

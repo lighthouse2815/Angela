@@ -275,7 +275,7 @@ Với phiên bản hiện tại, kiểm tra khả năng native bằng:
 Để kiểm tra CLI thật qua daemon riêng, chạy:
 
 ```bash
-AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AIRI_COMPUTER_USE_LIVE=1 mise exec -- pnpm exec vitest run --config apps/stage-tamagotchi/vitest.node.config.ts apps/stage-tamagotchi/src/main/services/airi/computer-use/runtime.test.ts
+AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AIRI_COMPUTER_USE_LIVE=1 mise exec -- pnpm exec vitest run --config apps/desktop/vitest.node.config.ts apps/desktop/src/main/services/airi/computer-use/runtime.test.ts
 ```
 
 Kiểm thử gọi trợ giúp và một tham số sai. Kiểm thử không đưa chuột hoặc bàn phím vào ứng dụng.
@@ -390,7 +390,7 @@ Không mở terminal hoặc chỉnh tài liệu trong workspace hiện tại.
 Sau khi cấp quyền uinput tạm thời, chạy từ thư mục gốc repository:
 
 ```bash
-AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AUV_LINUX_INPUT_BACKEND=uinput mise exec -- pnpm exec tsx apps/stage-tamagotchi/scripts/computer-use-model-smoke.ts
+AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AUV_LINUX_INPUT_BACKEND=uinput mise exec -- pnpm exec tsx apps/desktop/scripts/computer-use-model-smoke.ts
 ```
 
 Mặc định dùng VS Code tại `/usr/share/code/code`. Đổi bằng `SMOKE_CODE_BINARY` nếu cài ở nơi khác.

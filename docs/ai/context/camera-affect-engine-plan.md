@@ -55,7 +55,7 @@ Camera / Affect Engine
 Before coding:
 
 1. Read the root `AGENTS.md` completely and follow it.
-2. Inspect `packages/airi-cli` and reuse existing process, logging, config, lifecycle, cleanup, event, prompt/context, and test patterns.
+2. Inspect `packages/angela-cli` and reuse existing process, logging, config, lifecycle, cleanup, event, prompt/context, and test patterns.
 3. Search before creating utilities.
 4. Keep Angela-owned integration code in the normal project structure. Keep imported upstream source isolated under `third_party/`.
 5. Do not rewrite unrelated CLI architecture as part of this feature.
@@ -135,7 +135,7 @@ Angela/
 │       ├── models/
 │       └── upstream source...
 │
-└── packages/airi-cli/src/
+└── packages/angela-cli/src/
     └── perception/
         ├── camera/
         ├── face/
@@ -309,7 +309,7 @@ Tasks:
 Suggested Angela-owned worker path:
 
 ```text
-packages/airi-cli/python/camera_worker/
+packages/angela-cli/python/camera_worker/
 ```
 
 or an equivalent existing location for auxiliary runtimes.
@@ -956,7 +956,7 @@ When possible, isolate integrations into small commits to reduce merge conflicts
 
 Follow this order unless current architecture strongly suggests otherwise:
 
-1. Read `AGENTS.md` and inspect `packages/airi-cli`.
+1. Read `AGENTS.md` and inspect `packages/angela-cli`.
 2. Vendor OpenSeeFace under `third_party/openseeface/` with licenses preserved.
 3. Record upstream revision/provenance.
 4. Create minimal Python camera worker around vendored source.
@@ -973,7 +973,7 @@ Follow this order unless current architecture strongly suggests otherwise:
 15. Implement `CameraContextProvider`.
 16. Integrate compact soft cues into the existing Angela context/prompt pipeline.
 17. Add optional calibration.
-18. Update `packages/airi-cli/README.md` with actual implemented behavior and dependency/setup requirements.
+18. Update `packages/angela-cli/README.md` with actual implemented behavior and dependency/setup requirements.
 19. Run all checks required by `AGENTS.md`.
 
 Do not add advanced emotion models before the V1 pipeline is stable.
