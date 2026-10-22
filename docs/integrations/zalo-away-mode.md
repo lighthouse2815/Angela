@@ -154,3 +154,153 @@ Personal Zalo automation is unofficial. Zalo can change its protocol, expire ses
 Whitelist checks and rate limits reduce this adapter's scope. They do not guarantee that Zalo permits automation.
 No anti-bot bypass, CAPTCHA bypass, limit bypass, bulk messaging, or unsolicited outreach is implemented.
 The owner must accept the account risk before authenticating a personal account.
+
+## Local setup and QR login
+
+Use Node.js 22.13 or later and the repository's pinned pnpm version.
+From the repository root, install dependencies and build the CLI dependencies:
+
+```sh
+pnpm install
+pnpm build:cli
+```
+
+Configure Angela's existing provider with `angela setup`, or use the existing CLI environment configuration.
+A local compatible provider can use an empty API key.
+Zalo transport itself needs no paid API key.
+Login, status, whitelist, and Away commands do not require a model configuration.
+The foreground host loads the existing provider for `assistant-reply`.
+
+These examples use the built executable from the repository root:
+
+```sh
+node packages/angela-cli/dist/bin/run.mjs zalo login
+```
+
+The command prints the private QR image path. Open that image locally.
+Scan it with the Zalo mobile app, then confirm authentication on the phone.
+The QR flow expires after three minutes or when Zalo declines or expires the code.
+It never retries QR authentication without owner action.
+After success, the command saves cookies, IMEI, user agent, and authenticated account ID.
+It removes the QR image before exit.
+
+```sh
+node packages/angela-cli/dist/bin/run.mjs zalo status
+node packages/angela-cli/dist/bin/run.mjs zalo allow 123456789
+node packages/angela-cli/dist/bin/run.mjs away mode assistant-reply
+node packages/angela-cli/dist/bin/run.mjs away on
+node packages/angela-cli/dist/bin/run.mjs zalo run
+```
+
+Replace `123456789` with the contact's stable Zalo sender ID.
+Denied inbound DMs appear in the private audit records with their sender IDs.
+The MVP does not resolve names or scan a friend directory.
+Keep the foreground host running while the owner is away.
+This can run beside the regular Angela terminal process.
+Starting the regular chat alone does not start a Zalo listener.
+
+Restart `zalo run` to restore the saved session without QR login.
+`zalo status` reports saved local state. Its `connection: not-probed` field does not assert a live connection.
+Successful listener restoration logs `connected` after the WebSocket handshake.
+If restore fails, stop the host and run `zalo login` again.
+
+The Zalo host accepts these owner commands through its local terminal:
+
+```text
+/away on
+/away status
+/away mode notify-only
+/away mode assistant-reply
+/zalo allow 123456789
+/zalo deny 123456789
+/zalo allowed
+/away off
+```
+
+The regular interactive Angela CLI also routes these commands locally.
+External Zalo senders cannot execute them.
+The owner can change state from a second terminal with `angela away ...` and `angela zalo allow|deny|allowed`.
+`/away off` prints the deterministic session summary to the terminal that runs the command.
+Ctrl+C stops the host without disabling the persisted Away state.
+
+Stop the host before `angela zalo login` or `angela zalo logout`.
+Logout erases local credentials. It does not revoke the server-side linked device.
+Revoke that session in Zalo for server-side logout.
+After an unclean process exit, a host or write lock can remain.
+Confirm that no corresponding process runs before manually removing its stale lock.
+No command automatically deletes a lock from another process.
+
+## Local paths and VPS migration
+
+The default data root is `~/.angela/sessions`. `ANGELA_DATA_DIR` or `--data-dir` selects another root.
+All owner commands and the listener must use the same root and authenticated account.
+The local storage implementations own all paths:
+
+```text
+<data-root>/zalo/
+  zalo-credentials.json
+  zalo-login-qr.png              # temporary, private
+  zalo-host.lock                 # active host lease
+  <sha256(account-id)>/
+    away.json
+    messages/<sha256(message-identity)>.json
+```
+
+Local today: one Angela process with a local store and a private Zalo session.
+Future VPS: one Angela process with persistent storage and a secure credential store.
+Away business logic, authorization, and runtime integration do not require a rewrite.
+A database implementation can replace `AwayModeStore` while retaining atomic message claims and account isolation.
+A vault can replace `ZaloCredentialStore`. The host composition owns the future distributed lease choice.
+This MVP deploys neither a VPS nor a distributed worker.
+
+Before VPS deployment:
+
+1. Complete the real-account acceptance flow below.
+2. Run one listener per account and use durable storage across restarts.
+3. Restrict storage permissions and protect backups of credentials and external message logs.
+4. Select a secure credential implementation or an encrypted persistent volume.
+5. Configure the existing model provider without source-controlled secrets.
+6. Define audit retention and disk capacity monitoring before logs become large.
+7. Configure supervised shutdown and visible disconnect alerts.
+8. Review session revocation, protocol compatibility, and the risk of account suspension.
+
+Do not delete message tombstones to free space without reviewing duplicate-delivery consequences.
+
+## Real-account acceptance
+
+Automated tests mock the Zalo transport boundary. They do not authenticate a real account.
+Live end-to-end verification remains outstanding until the owner completes these steps:
+
+1. Authenticate with `zalo login` and scan the QR code.
+2. Start `zalo run`, stop it, and restart it without another QR scan.
+3. Allow one contact, select `assistant-reply`, and enable Away Mode.
+4. Send a text DM from that contact and confirm the public Angela identity in the reply.
+5. Send a private-information request and an instruction to execute a privileged tool.
+6. Confirm that neither request reveals owner data or performs an action.
+7. Send a DM from a contact outside the whitelist and confirm that no reply arrives.
+8. Disable Away Mode and inspect the attributed summary and pending message candidates.
+
+Until this flow passes, this repository provides a tested implementation, not verified live Zalo delivery.
+
+## Automated verification on 2026-10-22
+
+The complete CLI suite includes transport, policy, runtime, owner commands, and existing adapter regression tests.
+The Zalo and model network boundaries use mocks. No real account was authenticated.
+
+| Command | Result |
+| --- | --- |
+| `pnpm -F @angela/cli exec vitest run --maxWorkers=2` | 444 tests passed across 55 files, including 31 new tests |
+| `pnpm -F @angela/cli typecheck` | Passed |
+| `pnpm -F @angela/i18n typecheck` | Passed |
+| `NODE_OPTIONS=--max-old-space-size=4096 pnpm typecheck --concurrency=1` | 53 workspace tasks passed |
+| `pnpm lint` | Passed with zero errors and 603 warnings in existing code |
+| `pnpm -F @angela/i18n build` | Passed |
+| `pnpm -F @angela/cli build` | Passed with an existing task-command chunking warning |
+| `node packages/angela-cli/dist/bin/run.mjs zalo --help` | Passed |
+| `git diff --check` | Passed |
+
+Verification added `--config.verify-deps-before-run=false` to pnpm commands to prevent implicit dependency installation in this worktree.
+The installed pnpm bootstrap lacks an executable shebang. Turbo verification used a temporary local shell wrapper for that bootstrap.
+Neither measure changes project source, dependency versions, validation rules, or compiler configuration.
+The default two-gigabyte Node heap failed in `stage-ui`. The four-gigabyte full typecheck passed.
+Two Vitest workers avoid resource contention with the parallel companion evaluation task.

@@ -30,6 +30,11 @@ import { Terminal } from '../terminal'
  *                    -> McpTools -> MCP client -> tool server
  */
 async function main() {
+  if (process.argv[2] === 'zalo' || process.argv[2] === 'away') {
+    const { runZalo } = await import('../zalo-command')
+    await runZalo(process.argv.slice(3), process.env, process.argv[2] === 'away')
+    return
+  }
   if (process.argv[2] === 'eval') {
     const { runEvaluation } = await import('../evaluation')
     await runEvaluation(process.argv.slice(3), process.env)
@@ -73,7 +78,7 @@ async function main() {
   const config = await readConfig(process.argv.slice(2), process.env)
   const messages = config.messages
   if (config.help) {
-    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela eval [--help]\nangela setup [--help]\nangela reminders install|start|stop|status|run [--help]\nangela doctor [--json] [--help]\nangela telegram [--help]\nangela discord [--help]\nangela voice start|stop|status [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
+    process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela eval [--help]\nangela setup [--help]\nangela reminders install|start|stop|status|run [--help]\nangela doctor [--json] [--help]\nangela telegram [--help]\nangela discord [--help]\nangela zalo login|logout|status|run [--help]\nangela away on|off|status [--help]\nangela voice start|stop|status [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
       ['--model', messages.model],
       ['--provider', messages.provider],
       ['--config', messages.configFile],
@@ -407,7 +412,9 @@ async function main() {
           try {
             if (/^\/camera(?:\s|$)/u.test(text))
               camera ??= new (await import('../perception/camera')).Camera(process.env, messages)
-            const response = await camera?.command(text, active.signal) ?? await scope.command(text, active.signal)
+            const response = /^\/(?:away|zalo)(?:\s|$)/u.test(text)
+              ? await (await import('../zalo-command')).ownerAwayCommand(text, config.dataDir, messages)
+              : await camera?.command(text, active.signal) ?? await scope.command(text, active.signal)
             if (response !== undefined) {
               process.stderr.write(`${response}\n`)
               continue

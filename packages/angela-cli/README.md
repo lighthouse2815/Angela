@@ -3,6 +3,20 @@
 Chat with Angela from a Node.js terminal. The CLI uses Angela's existing provider and generation runtime.
 Angela can manage everyday tasks and deliver reminders while the terminal process remains open.
 
+## Personal Zalo Away Mode
+
+`angela zalo login` authenticates a personal account through a private QR image.
+`angela zalo run` restores its saved session and starts the foreground DM listener.
+Use `/zalo allow ID`, `/away on`, and `/away off` in its local terminal.
+The regular interactive CLI also accepts these owner commands.
+
+Auto-reply defaults to deny. Only whitelisted text DMs receive public Angela responses while Away Mode is enabled.
+The external Zalo runtime has no owner memory, privileged tools, or automatic memory writes.
+`assistant-reply` selects fixed public templates through the production runtime. It does not send unrestricted generated prose.
+
+Personal account automation is unofficial and carries account suspension risk.
+See [Zalo setup, security boundaries, limitations, and VPS migration](../../docs/integrations/zalo-away-mode.md).
+
 ## Runtime and memory
 
 CLI, Telegram, and Discord use `AngelaRuntime` for context, tools, generation, and lifecycle events.
