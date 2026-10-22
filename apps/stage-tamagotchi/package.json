@@ -24,7 +24,7 @@
     "build": "electron-vite build",
     "postinstall": "electron-builder install-app-deps",
     "build:unpack": "pnpm run build && electron-builder --dir",
-    "build:flatpak": "pnpm run build:unpack && flatpak-builder --user --install-deps-from=flathub ./flatpak ai.moeru.airi.flatpak.yml --force-clean",
+    "build:flatpak": "pnpm run build:unpack && flatpak-builder --user --install-deps-from=flathub ./flatpak io.github.lighthouse2815.angela.flatpak.yml --force-clean",
     "build:win": "pnpm run build && electron-builder --win",
     "build:mac": "pnpm run build && electron-builder --mac",
     "build:linux": "pnpm run build && electron-builder --linux",
@@ -233,7 +233,7 @@
     "yauzl": "catalog:"
   },
   "build": {
-    "appId": "ai.moeru.airi",
+    "appId": "io.github.lighthouse2815.angela",
     "extends": "electron-builder.config.ts"
   },
   "productName": "Angela"
