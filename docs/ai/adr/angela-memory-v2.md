@@ -7,6 +7,7 @@ Personal Memory JSON, project checkpoints, tasks, session JSON, and skills keep 
 The `dataDir` remains the private user boundary. Page scope is the canonical workspace inside that boundary.
 
 Pages carry an explicit tier, claim key, authority, salience, expiry, and version.
+Expiry offsets normalize to UTC before SQLite compares their timestamps.
 SQLite triggers update page projections inside the page transaction.
 Access reinforcement has a SQL cooldown and never rewrites FTS or vectors.
 Supersession removes the old projection and retains its explicit history.

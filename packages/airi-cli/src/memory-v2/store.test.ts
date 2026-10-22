@@ -127,6 +127,14 @@ it('bounds salience and rejects invalid values before mutation', async () => {
   expect(() => store.write({ ...input, salience: Number.NaN })).toThrow()
 })
 
+it('normalizes expiry offsets before SQLite compares timestamps', async () => {
+  const { store } = await setup()
+  const page = store.write({ ...input, expiresAt: '2026-10-22T01:00:00+01:00' })
+  expect(page.expiresAt).toBe('2026-10-22T00:00:00.000Z')
+  expect(store.read(page.id, 'workspace', false, '2026-10-22T00:30:00.000Z')).toBeUndefined()
+  expect(store.read(page.id, 'workspace', false, '2026-10-21T23:30:00.000Z')?.id).toBe(page.id)
+})
+
 it('does not duplicate replayed writes or observations and bounds the working capture window', async () => {
   const { store } = await setup()
   const first = store.write(input)

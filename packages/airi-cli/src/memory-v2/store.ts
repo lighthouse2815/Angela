@@ -22,7 +22,7 @@ const inputSchema = v.object({
   salience: v.optional(v.pipe(v.number(), v.finite()), 1),
   pinned: v.optional(v.boolean()),
   sourceSessionId: v.optional(v.pipe(v.string(), v.maxLength(200))),
-  expiresAt: v.optional(v.pipe(v.string(), v.isoTimestamp())),
+  expiresAt: v.optional(v.pipe(v.string(), v.isoTimestamp(), v.transform(value => new Date(value).toISOString()))),
   expectedVersion: v.optional(v.nullable(v.string())),
 })
 
