@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Angela
+Exec=angela %U
+Terminal=false
+Type=Application
+Icon=io.github.lighthouse2815.angela
+StartupWMClass=Angela
+Comment=Angela is an AI companion for conversation, learning, voice interaction, and desktop assistance.
+Categories=Utility;
+
