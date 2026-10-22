@@ -67,6 +67,31 @@ describe('production path', () => {
     expect(observation.events).toContainEqual(expect.objectContaining({ type: 'request.completed' }))
   })
 
+  it.each([
+    { name: 'project_memory', field: 'project', args: { expected_revision: 0, snapshot: { goal: 'Project backend dùng .NET.', status: 'active', decisions: [], completed: [], blockers: [], nextStep: '' }, source_quote: 'Project backend dùng .NET.' } },
+    { name: 'skill_save', field: 'skills', args: { name: 'backend-build', description: 'Build the backend', instructions: 'Run the backend build and inspect its result.', verification_quote: 'Project backend dùng .NET.', expected_version: null } },
+    { name: 'task_create', field: 'tasks', args: { title: 'Build the .NET backend', type: 'todo' } },
+  ])('includes actual $name writes in the durable-state probe', async ({ name, field, args }) => {
+    let called = false
+    const transport: GenerationProvider = { generation: model => ({ protocol: 'chat-completions', config: {
+      model,
+      baseURL: 'https://transport.invalid/v1/',
+      fetch: async () => {
+        const choice = called
+          ? { delta: { role: 'assistant', content: 'Saved.' }, finish_reason: 'stop' }
+          : { delta: { role: 'assistant', tool_calls: [{ index: 0, id: 'probe-call', type: 'function', function: { name, arguments: JSON.stringify(args) } }] }, finish_reason: 'tool_calls' }
+        called = true
+        return new Response(`data: ${JSON.stringify({ choices: [{ index: 0, ...choice }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } })
+      },
+    } }) }
+    const observation = await observe({ ...item.input, sources: [], history: [], query: 'Project backend dùng .NET. Save a build workflow and create a task to build it.' }, { model: 'transport-test', provider: transport })
+    expect(observation.infrastructureError).toBeUndefined()
+    expect(JSON.stringify(observation.streamEvents)).toContain('saved')
+    const durable: unknown = JSON.parse(observation.durableText)
+    expect(durable).toMatchObject({ [field]: field === 'project' ? expect.objectContaining({ snapshot: expect.objectContaining({ goal: 'Project backend dùng .NET.' }) }) : expect.arrayContaining([expect.any(Object)]) })
+    expect(observation.durableText).toContain('.NET')
+  })
+
   it('keeps provider failure separate from an empty or fabricated model answer', async () => {
     const broken: GenerationProvider = { generation: model => ({ protocol: 'chat-completions', config: { model, baseURL: 'https://transport.invalid/', fetch: async () => {
       throw new TypeError('Network unavailable')

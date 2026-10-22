@@ -14,9 +14,12 @@ import { cliMessages } from '@angela/i18n/cli'
 import * as v from 'valibot'
 
 import { Memory } from '../../packages/angela-cli/src/memory'
+import { ProjectMemory } from '../../packages/angela-cli/src/project-memory'
 import { RecallIndex } from '../../packages/angela-cli/src/recall-index'
 import { AngelaRuntime } from '../../packages/angela-cli/src/runtime/runtime'
 import { buildTools } from '../../packages/angela-cli/src/runtime/tool-registry'
+import { Sessions } from '../../packages/angela-cli/src/sessions'
+import { Skills } from '../../packages/angela-cli/src/skills'
 import { Tasks } from '../../packages/angela-cli/src/tasks'
 
 /** A recorded request contains the actual protocol body, including injected context and tool definitions. Headers are excluded. */
@@ -207,7 +210,17 @@ export async function observe(input: Input, target?: Target, timeoutMs = 45_000)
       const index = await RecallIndex.open(dataDir)
       try {
         const pages = index.origins().filter(id => id.startsWith('memory:')).map(id => index.read(id)?.text)
-        observation.durableText = JSON.stringify({ personal: input.invalidMemory ? 'invalid' : await memorySnapshot(dataDir), pages, observations: index.memory.observations(workspace, sessionId) })
+        const archives = new Sessions(dataDir, cliMessages.vi)
+        const sessions = await Promise.all((await archives.list()).map(record => archives.read(record.id)))
+        observation.durableText = JSON.stringify({
+          personal: input.invalidMemory ? 'invalid' : await memorySnapshot(dataDir),
+          pages,
+          observations: index.memory.observations(workspace, sessionId),
+          project: await (await ProjectMemory.open(dataDir, workspace, cliMessages.vi)).read(),
+          skills: await new Skills(dataDir, cliMessages.vi).list(),
+          tasks: await new Tasks(dataDir, cliMessages.vi.tasks).list(),
+          sessions,
+        })
       }
       finally { index.close() }
     }

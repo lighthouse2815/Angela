@@ -134,3 +134,9 @@ Inspect raw answers and judge decisions before selecting any production fix.
 Keep the dataset and baseline unchanged when comparing later fixes.
 
 If pnpm attempts an unrelated automatic install, set `pnpm_config_verify_deps_before_run=false` for the command.
+
+## Privacy storage probe
+
+The durable-state probe reads personal facts, Memory V2 pages and observations, project checkpoints, skills, tasks, and saved session archives.
+It inspects disposable production stores after runtime shutdown. Tool status alone cannot establish that protected text stayed out of storage.
+Regression tests execute real project, skill, and task writes to check probe coverage. Frozen cases and judge expectations remain unchanged.
