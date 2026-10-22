@@ -11,6 +11,7 @@ import * as v from 'valibot'
 
 import { MemoryStore } from './memory-v2/store'
 import { authority } from './memory-v2/types'
+import { searchTerms, supportsContext } from './recall-query'
 
 const hitSchema = v.object({ id: v.string(), kind: v.picklist(['personal', 'skill', 'history', 'episodic', 'semantic', 'procedural']), scope: v.string(), origin: v.string(), version: v.string(), text: v.string(), updatedAt: v.string() })
 /** Indexed excerpts always retain a source identity. They are untrusted historical data, not live tool evidence. */
@@ -189,9 +190,8 @@ export class RecallIndex {
       this.sql('UPDATE excerpts SET vector=?,namespace=? WHERE id=? AND version=?').run(new Uint8Array(item.vector.buffer, item.vector.byteOffset, item.vector.byteLength), namespace, item.id, item.version)
   }
 
-  search(query: string, scope: string, namespace?: string, vector?: Float32Array, excludedOrigin = '') {
-    const ignored = new Set('a an the is are was were i you me my we to of in on and or for this that what how please toi ban minh la thi ma va co cho cua cac cai voi duoc lam gi nhu hay khong mot nhung'.split(' '))
-    const terms = [...new Set(query.normalize('NFD').replace(/\p{M}/gu, '').replace(/đ/giu, 'd').toLowerCase().match(/[\p{L}\p{N}_-]+/gu) ?? [])].filter(term => term.length > 1 && !ignored.has(term)).slice(-32)
+  search(query: string, scope: string, namespace?: string, vector?: Float32Array, excludedOrigin = '', automatic = false) {
+    const terms = searchTerms(query)
     const lexical = terms.length
       ? this.sql(`SELECT excerpts.*,p.authority AS memoryAuthority,p.salience AS memorySalience FROM search JOIN excerpts ON excerpts.rowid=search.rowid
           LEFT JOIN memory_pages p ON p.id=substr(excerpts.id,8) AND excerpts.kind IN ('episodic','semantic','procedural')
@@ -220,7 +220,11 @@ export class RecallIndex {
         ranked.set(hit.id, { hit, score: (previous?.score ?? 0) + weight / (60 + rank + 1) })
       })
     }
-    return [...ranked.values()].sort((a, b) => b.score - a.score || b.hit.updatedAt.localeCompare(a.hit.updatedAt)).map(item => item.hit)
+    const semanticIds = new Set(semantic.map(row => String(row.id)))
+    return [...ranked.values()]
+      .sort((a, b) => b.score - a.score || b.hit.updatedAt.localeCompare(a.hit.updatedAt))
+      .filter(({ hit }) => !automatic || semanticIds.has(hit.id) || supportsContext(query, hit.text))
+      .map(item => item.hit)
   }
 
   stats(namespace?: string, dimensions?: number) {

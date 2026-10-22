@@ -377,7 +377,7 @@ export class Recall {
     return hit.version === `${information.ino}:${information.size}:${information.mtimeMs}`
   }
 
-  async search(query: string, allWorkspaces = false, signal?: AbortSignal, reinforce = true) {
+  async search(query: string, allWorkspaces = false, signal?: AbortSignal, reinforce = true, automatic = false) {
     const started = performance.now()
     if (!(await this.settings.read()).enabled || /^(?:hi|hello|hey|chào|xin chào|alo|cảm ơn|thanks|ok|ừ)[!.,\s]*$/iu.test(query.trim()))
       return []
@@ -404,7 +404,7 @@ export class Recall {
       day = new Date()
     }
     const date = day ? localDate(day) : undefined
-    const hits = this.database().search(date ? `${searchText} ${date}` : searchText, allWorkspaces ? '*' : this.workspace, this.client?.namespace, vector, `history:${this.sessionId}`).filter(hit => !date || hit.kind !== 'history' || localDate(new Date(hit.updatedAt)) === date)
+    const hits = this.database().search(date ? `${searchText} ${date}` : searchText, allWorkspaces ? '*' : this.workspace, this.client?.namespace, vector, `history:${this.sessionId}`, automatic).filter(hit => !date || hit.kind !== 'history' || localDate(new Date(hit.updatedAt)) === date)
     const selected: RecallHit[] = []
     let personal: Awaited<ReturnType<Memory['read']>> | undefined
     try {
@@ -458,7 +458,7 @@ export class Recall {
     }
     // Chat already owns this session's working history. Explicit memory_search still exposes its complete episode when requested.
     const currentEpisode = this.database().memory.current(this.workspace, 'episodic', `session:${this.sessionId}`)
-    const hits = (await this.search(query, false, signal, false)).filter(hit => hit.id !== `memory:${currentEpisode?.id}`)
+    const hits = (await this.search(query, false, signal, false, true)).filter(hit => hit.id !== `memory:${currentEpisode?.id}`)
     const selectedIds = core?.enabled ? core.entries.filter(entry => entry.core).map(entry => entry.id) : []
     let remaining = settings.budget
     const parts: string[] = []
