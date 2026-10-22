@@ -1,0 +1,47 @@
+{
+  "node": "v26.11.1",
+  "mode": "cli",
+  "samples": [
+    {
+      "label": "cli.idle",
+      "rss": 193208320,
+      "heapUsed": 41013520,
+      "heapTotal": 82759680,
+      "external": 5670975,
+      "resources": [
+        "FSReqPromise",
+        "PipeWrap"
+      ]
+    },
+    {
+      "label": "cli.message.1",
+      "rss": 195342336,
+      "heapUsed": 42967712,
+      "heapTotal": 83546112,
+      "external": 6872471,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "label": "cli.message.20",
+      "rss": 195735552,
+      "heapUsed": 43832688,
+      "heapTotal": 93507584,
+      "external": 6938071,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "label": "closed",
+      "rss": 195866624,
+      "heapUsed": 43816192,
+      "heapTotal": 93507584,
+      "external": 6938071,
+      "resources": [
+        "PipeWrap"
+      ]
+    }
+  ]
+}
