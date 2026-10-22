@@ -109,3 +109,29 @@ it('bounds simultaneous contexts and cancels active generation before shutdown c
   expect(runtime.activeStateCount).toBe(0)
   expect(() => runtime.open(options)).toThrow('closed')
 })
+
+it('shares one reminder timer and one store scheduler across channels and releases adapter destinations separately', async () => {
+  vi.useFakeTimers()
+  const { runtime, directory } = await setup()
+  try {
+    const firstOwner = {}
+    const secondOwner = {}
+    const first = await runtime.reminders(directory, { notify: async () => {} }, () => {}, firstOwner)
+    const second = await runtime.reminders(directory, { notify: async () => {} }, () => {}, secondOwner)
+    expect(first).toBe(second)
+    for (let index = 0; index < 20; index++)
+      await runtime.reminders(join(directory, String(index)), { notify: async () => {} }, () => {})
+    expect(runtime.reminderRouteCount).toBe(21)
+    expect(vi.getTimerCount()).toBe(1)
+    await runtime.releaseReminders(directory, firstOwner)
+    expect(runtime.reminderRouteCount).toBe(21)
+    await runtime.releaseReminders(directory, secondOwner)
+    expect(runtime.reminderRouteCount).toBe(20)
+    await runtime.close()
+    expect(vi.getTimerCount()).toBe(0)
+    expect(runtime.resourceCounts).toEqual({ states: 0, listeners: 0, reminderRoutes: 0, reminderTimers: 0 })
+  }
+  finally {
+    vi.useRealTimers()
+  }
+})

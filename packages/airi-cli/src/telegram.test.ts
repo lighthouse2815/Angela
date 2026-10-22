@@ -181,6 +181,7 @@ it('allows local help and status without a model request, and resets only the se
   await message('Old conversation')
   await vi.waitFor(() => expect(reply).toHaveBeenCalledWith('Xin chào'))
   await idle()
+  await idle()
   await message('/new')
   await vi.waitFor(() => expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramNew))
   await idle()
@@ -290,7 +291,7 @@ it('requires a fresh confirmation for a pending server action and rejects replay
 
 it('isolates full access by chat, resolves a waiting approval, and resets access with a new conversation', async () => {
   const fetch = vi.fn<typeof globalThis.fetch>().mockImplementation(async () => completion('Finished'))
-  const { message, reply, invoke, host, connectTools } = await connect(fetch)
+  const { message, reply, invoke, host, connectTools, idle } = await connect(fetch)
   fetch.mockResolvedValueOnce(toolCompletion())
   await message('Run pwd')
   await vi.waitFor(() => expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramApproval))
@@ -305,9 +306,10 @@ it('isolates full access by chat, resolves a waiting approval, and resets access
   await vi.waitFor(() => expect(invoke).toHaveBeenCalledTimes(3))
   expect(invoke.mock.calls[2]).toEqual(['desktop_approve_pending_action', { id: 'full-pending' }])
   await vi.waitFor(() => expect(reply.mock.calls.filter(call => call[0] === 'Finished')).toHaveLength(2))
-  expect(connectTools).toHaveBeenCalledOnce()
+  expect(connectTools).toHaveBeenCalledTimes(2)
   await message('/permistion', 200)
   expect(reply.mock.calls.at(-1)?.[0]).toContain(cliMessages.vi.permissionAsk)
+  await idle()
   await message('/new')
   await vi.waitFor(() => expect(reply).toHaveBeenCalledWith(cliMessages.vi.telegramNew))
   await message('/permistion')

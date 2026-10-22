@@ -19,12 +19,14 @@ import { buildContext } from './context-builder'
 import { EventBus } from './event-bus'
 import { buildTools } from './tool-registry'
 
+interface ReminderTarget { notifier: ReminderNotifier & { pause?: () => void, resume?: () => void }, onError: (error: unknown) => void }
+
 /** Adapters share this host and retain only active logical contexts. Construction performs no IO or capability initialization. */
 export class AngelaRuntime {
   readonly events = new EventBus()
   private readonly states = new Map<string, RuntimeSession>()
   private closing?: Promise<void>
-  private readonly remindersByStore = new Map<string, { tasks: Promise<Tasks>, ready: Promise<ReminderScheduler>, notifier: ReminderNotifier & { pause?: () => void, resume?: () => void }, dueAt: number }>()
+  private readonly remindersByStore = new Map<string, { tasks: Promise<Tasks>, ready: Promise<ReminderScheduler>, targets: Map<object, ReminderTarget>, dueAt: number }>()
   private reminderTimer?: ReturnType<typeof setTimeout>
   private delivering?: Promise<void>
 
@@ -51,21 +53,41 @@ export class AngelaRuntime {
   }
 
   /** Registers a disk-backed reminder route. A store has one scheduler, and all stores share one reconciliation timer. */
-  reminders(dataDir: string, notifier: ReminderNotifier & { pause?: () => void, resume?: () => void }, onError: (error: unknown) => void) {
+  reminders(dataDir: string, notifier: ReminderNotifier & { pause?: () => void, resume?: () => void }, onError: (error: unknown) => void, owner: object = this) {
     if (this.closing)
       return Promise.reject(new Error('Runtime is closed'))
     const existing = this.remindersByStore.get(dataDir)
-    if (existing)
+    if (existing) {
+      if (!existing.targets.has(owner)) {
+        if (existing.targets.size >= 3)
+          return Promise.reject(new Error('Runtime reminder destination limit reached'))
+        existing.targets.set(owner, { notifier, onError })
+      }
       return existing.ready
+    }
     // Personal hosts retain small routes for allowed users, never their conversations, recall, or tool clients.
     if (this.remindersByStore.size >= 128)
       return Promise.reject(new Error('Runtime reminder route limit reached'))
+    const targets = new Map<object, ReminderTarget>([[owner, { notifier, onError }]])
     const tasks = import('../tasks').then(({ Tasks }) => new Tasks(dataDir, this.messages.tasks))
     const ready = (async () => {
       const { ReminderScheduler } = await import('../reminder-scheduler')
-      const scheduler = new ReminderScheduler(await tasks, notifier, onError, (delay) => {
+      const target = () => {
+        let selected: ReminderTarget | undefined
+        for (const value of targets.values())
+          selected = value
+        return selected
+      }
+      const scheduler = new ReminderScheduler(await tasks, {
+        notify: async (...args) => {
+          const destination = target()
+          if (!destination)
+            throw new Error('Reminder destination was released')
+          await destination.notifier.notify(...args)
+        },
+      }, error => target()?.onError(error), (delay) => {
         const route = this.remindersByStore.get(dataDir)
-        if (route) {
+        if (route?.ready === ready) {
           route.dueAt = Date.now() + delay
           this.armReminders()
         }
@@ -79,7 +101,7 @@ export class AngelaRuntime {
         throw error
       }
     })()
-    this.remindersByStore.set(dataDir, { tasks, ready, notifier, dueAt: Number.POSITIVE_INFINITY })
+    this.remindersByStore.set(dataDir, { tasks, ready, targets, dueAt: Number.POSITIVE_INFINITY })
     return ready
   }
 
@@ -92,16 +114,31 @@ export class AngelaRuntime {
     return new Tasks(dataDir, this.messages.tasks)
   }
 
-  pauseReminders(dataDir: string) {
-    this.remindersByStore.get(dataDir)?.notifier.pause?.()
+  pauseReminders(dataDir: string, owner: object = this) {
+    this.remindersByStore.get(dataDir)?.targets.get(owner)?.notifier.pause?.()
   }
 
-  resumeReminders(dataDir: string) {
-    this.remindersByStore.get(dataDir)?.notifier.resume?.()
+  resumeReminders(dataDir: string, owner: object = this) {
+    this.remindersByStore.get(dataDir)?.targets.get(owner)?.notifier.resume?.()
+  }
+
+  /** Removes one adapter's notification destination without closing another channel's route for the same store. */
+  async releaseReminders(dataDir: string, owner: object = this) {
+    const route = this.remindersByStore.get(dataDir)
+    route?.targets.delete(owner)
+    if (route && !route.targets.size) {
+      this.remindersByStore.delete(dataDir)
+      await (await route.ready).close()
+      this.armReminders()
+    }
   }
 
   get reminderRouteCount() {
     return this.remindersByStore.size
+  }
+
+  get resourceCounts() {
+    return { states: this.states.size, listeners: this.events.listenerCount, reminderRoutes: this.remindersByStore.size, reminderTimers: Number(Boolean(this.reminderTimer)) }
   }
 
   private armReminders() {

@@ -2,6 +2,8 @@ import type { cliMessages } from '@proj-airi/i18n/cli'
 import type { GenerationProvider } from '@proj-airi/provider-inference'
 import type { Context } from 'grammy'
 
+import type { McpTools } from './mcp'
+import type { RuntimeSession } from './runtime/runtime'
 import type { SavedRequest } from './sessions'
 
 import process from 'node:process'
@@ -21,19 +23,16 @@ import { Bot, InlineKeyboard } from 'grammy'
 import { Chat } from './chat'
 import { readConfig } from './config'
 import { formatRequestError } from './errors'
-import { McpTools } from './mcp'
 import { describeTool, Output } from './output'
 import { Permissions } from './permissions'
+import { ReminderNotifications } from './reminder-notifications'
+import { AngelaRuntime } from './runtime/runtime'
 import { Sessions } from './sessions'
-import { TelegramCompanion } from './telegram-companion'
 
 interface ChatState {
   permissions: Permissions
-  tools?: McpTools
-  output?: Output
-  checkpoint?: (status?: SavedRequest['status']) => Promise<void>
+  touched: number
   pending?: { id: string, finish: (approved: boolean) => void }
-  companion?: Promise<TelegramCompanion>
 }
 
 /** Owns private chat jobs. Each chat has one persisted session and at most one active generation. */
@@ -41,6 +40,9 @@ export class TelegramChat {
   private readonly jobs = new Map<number, { controller: AbortController, done: Promise<void> }>()
   private closing = false
   private readonly chats = new Map<number, ChatState>()
+  private readonly ownsRuntime: boolean
+  private readonly runtime: AngelaRuntime
+  private closingPromise?: Promise<void>
 
   constructor(
     private readonly bot: Bot,
@@ -50,9 +52,12 @@ export class TelegramChat {
     private readonly workspace: string,
     private readonly messages: typeof cliMessages.en,
     private readonly allowedUsers: ReadonlySet<number>,
-    private readonly connectTools: (sessionId: string, confirm: ConstructorParameters<typeof McpTools>[1], signal: AbortSignal) => Promise<McpTools>,
+    private readonly connectTools: (sessionId: string, confirm: ConstructorParameters<typeof McpTools>[1], signal: AbortSignal) => Promise<McpTools | undefined>,
     private readonly companionConfig: { dataDir: string, env: NodeJS.ProcessEnv, locale: string, baseUrl?: string, apiKey: string, sharedUserId?: number },
+    runtime?: AngelaRuntime,
   ) {
+    this.ownsRuntime = !runtime
+    this.runtime = runtime ?? new AngelaRuntime(model, provider, messages, companionConfig.env, companionConfig)
     bot.use(async (ctx, next) => {
       // Check the sender before commands, typing indicators, session reads, or provider requests.
       if (!this.closing && ctx.chat?.type === 'private' && ctx.from && this.allowedUsers.has(ctx.from.id))
@@ -84,7 +89,7 @@ export class TelegramChat {
           await ctx.reply(messages.telegramBusy)
           return
         }
-        await this.reply(ctx.chat.id, await (await this.companion(ctx.chat.id)).command(`/cancel ${ctx.match}`) ?? messages.tasks.usage)
+        await this.reply(ctx.chat.id, await this.command(ctx.chat.id, `/cancel ${ctx.match}`) ?? messages.tasks.usage)
         return
       }
       const job = this.jobs.get(ctx.chat.id)
@@ -121,7 +126,7 @@ export class TelegramChat {
       if (ctx.message.text.startsWith('/') && !reset) {
         try {
           const text = ctx.message.text.replace(/^\/([a-z_-]+)@\w+/u, '/$1')
-          await this.reply(ctx.chat.id, await (await this.companion(ctx.chat.id)).command(text) ?? messages.telegramCommands)
+          await this.reply(ctx.chat.id, await this.command(ctx.chat.id, text) ?? messages.telegramCommands)
         }
         catch {
           await ctx.reply(messages.telegramRequestFailed)
@@ -132,51 +137,63 @@ export class TelegramChat {
     })
   }
 
-  /** Restarts reminder delivery for allowed private users without waiting for another message after host restart. */
+  /** Restarts disk-backed reminder routes without creating per-user recall, model state, or tool clients. */
   async start() {
     for (const user of this.allowedUsers) {
       if (this.closing)
         break
-      await this.companion(user)
+      await this.reminders(user)
     }
   }
 
-  private companion(chatId: number) {
-    const state = this.state(chatId)
-    state.companion ??= (async () => {
-      const root = this.companionConfig.sharedUserId === chatId
-        ? this.companionConfig.dataDir
-        : join(this.companionConfig.dataDir, 'telegram', 'companions', String(this.bot.botInfo.id), String(chatId))
-      const companion = new TelegramCompanion(root, this.workspace, this.sessionId(chatId), this.messages, this.companionConfig.locale, this.companionConfig.env, this.companionConfig, (text, signal) => this.reply(chatId, text, signal))
-      try {
-        await companion.start()
-        return companion
-      }
-      catch (error) {
-        await companion.close()
-        state.companion = undefined
-        throw error
-      }
-    })()
-    return state.companion
+  private root(chatId: number) {
+    return this.companionConfig.sharedUserId === chatId
+      ? this.companionConfig.dataDir
+      : join(this.companionConfig.dataDir, 'telegram', 'companions', String(this.bot.botInfo.id), String(chatId))
   }
 
-  /** Stops accepting updates, cancels generations, and waits for session locks to release. */
-  async close() {
+  private reminders(chatId: number) {
+    return this.runtime.reminders(this.root(chatId), new ReminderNotifications(this.messages.tasks, this.companionConfig.locale, (text, _tasks, signal) => this.reply(chatId, text, signal)), () => {
+      void this.reply(chatId, this.messages.tasks.failed).catch(() => {})
+    }, this)
+  }
+
+  private async command(chatId: number, text: string) {
+    const scope = this.runtime.open({ dataDir: this.root(chatId), workspace: this.workspace, sessionId: this.sessionId(chatId), channel: 'telegram', locale: this.companionConfig.locale })
+    try {
+      await this.reminders(chatId)
+      return await scope.command(text)
+    }
+    finally {
+      await scope.close()
+    }
+  }
+
+  /** Cancels generations before releasing resources. Disk-only reminder routes survive request eviction until host shutdown. */
+  close() {
     this.closing = true
-    for (const job of this.jobs.values())
-      job.controller.abort()
-    await Promise.all([...this.jobs.values()].map(job => job.done))
-    await Promise.all([...this.chats.values()].map(state => state.tools?.close()))
-    await Promise.all([...this.chats.values()].map(async state => (await state.companion)?.close()))
-    this.chats.clear()
+    this.closingPromise ??= (async () => {
+      for (const job of this.jobs.values())
+        job.controller.abort()
+      await Promise.allSettled([...this.jobs.values()].map(job => job.done))
+      if (this.ownsRuntime)
+        await this.runtime.close()
+      else
+        await Promise.allSettled([...this.allowedUsers].map(user => this.runtime.releaseReminders(this.root(user), this)))
+      this.chats.clear()
+    })()
+    return this.closingPromise
+  }
+
+  get stateCounts() {
+    return { jobs: this.jobs.size, chats: this.chats.size, runtime: this.runtime.activeStateCount }
   }
 
   private async startRequest(ctx: Context, text: string, reset: boolean, resume = false) {
     if (!ctx.chat)
       return
     const chatId = ctx.chat.id
-    if (this.jobs.has(chatId)) {
+    if (this.jobs.has(chatId) || this.jobs.size >= 8) {
       await ctx.reply(this.messages.telegramBusy)
       return
     }
@@ -199,11 +216,17 @@ export class TelegramChat {
   }
 
   private state(chatId: number) {
+    const now = Date.now()
+    for (const [id, cached] of this.chats) {
+      if (!this.jobs.has(id) && (now - cached.touched >= 10 * 60_000 || (this.chats.size >= 32 && id !== chatId)))
+        this.chats.delete(id)
+    }
     let state = this.chats.get(chatId)
     if (!state) {
-      state = { permissions: new Permissions(this.messages) }
+      state = { permissions: new Permissions(this.messages), touched: now }
       this.chats.set(chatId, state)
     }
+    state.touched = now
     return state
   }
 
@@ -255,6 +278,7 @@ export class TelegramChat {
     signal?.throwIfAborted()
     signal?.addEventListener('abort', abort, { once: true })
     const timer = setTimeout(abort, 30_000)
+    timer.unref()
     try {
       for (let offset = 0; offset < characters.length; offset += 2000) {
         signal?.throwIfAborted()
@@ -323,7 +347,7 @@ export class TelegramChat {
     let deliveredProgress = ''
     let editing: Promise<void> | undefined
     let progressId: number | undefined
-    let companion: TelegramCompanion | undefined
+    let scope: RuntimeSession | undefined
     const sink = new Writable({ write(chunk, _encoding, callback) {
       progress = Array.from(progress + String(chunk)).slice(-1500).join('')
       callback()
@@ -335,7 +359,7 @@ export class TelegramChat {
         return Promise.resolve()
       request = { ...request, status: status ?? request.status, progress: progress.trim(), updatedAt: new Date().toISOString() }
       const snapshot = request
-      saving = saving.then(() => session.save(chat.conversation, !['answered', 'delivery_failed', 'delivered'].includes(snapshot.status), snapshot))
+      saving = saving.then(() => session.saveChat(chat, !['answered', 'delivery_failed', 'delivered'].includes(snapshot.status), snapshot))
       return saving.catch((error: unknown) => {
         persistence.abort(error)
         throw error
@@ -357,8 +381,6 @@ export class TelegramChat {
     }
     try {
       if (reset) {
-        await state.tools?.close()
-        state.tools = undefined
         state.permissions = new Permissions(this.messages)
         await session.save(chat.conversation, false, null)
         await ctx.reply(this.messages.telegramNew)
@@ -373,8 +395,6 @@ export class TelegramChat {
           await ctx.reply(this.messages.telegramCannotResume)
           return
         }
-        await state.tools?.close()
-        state.tools = undefined
         state.permissions = new Permissions(this.messages)
         text = previous.text
         request = { ...previous, status: 'running', failure: undefined, updatedAt: now }
@@ -392,8 +412,6 @@ export class TelegramChat {
       else {
         request = { id: randomUUID(), text, status: 'running', startedAt: now, updatedAt: now, progress: '' }
       }
-      state.output = output
-      state.checkpoint = checkpoint
       output.start()
       await checkpoint()
       const status = await ctx.reply(this.messages.thinking)
@@ -406,26 +424,32 @@ export class TelegramChat {
       typing()
       timer = setInterval(typing, 2000)
       timer.unref()
-      state.tools ??= await this.connectTools(this.sessionId(chatId), async (request, approvalSignal) => {
-        state.output?.approval(request)
-        try {
-          await state.checkpoint?.('awaiting_approval')
-          const approved = await this.confirm(chatId, request, approvalSignal)
-          state.output?.decided(approved)
-          await state.checkpoint?.('running')
-          return approved
-        }
-        catch (error) {
-          state.output?.decided(false)
-          throw error
-        }
-      }, requestSignal)
-      companion = await this.companion(chatId)
-      const prepared = await companion.prepare(text, session.record.id, requestSignal)
+      await this.reminders(chatId)
+      this.runtime.pauseReminders(this.root(chatId), this)
+      scope = this.runtime.open({
+        dataDir: this.root(chatId),
+        workspace: this.workspace,
+        sessionId: session.record.id,
+        channel: 'telegram',
+        locale: this.companionConfig.locale,
+        connectMcp: async connectionSignal => await this.connectTools(this.sessionId(chatId), async (request, approvalSignal) => {
+          output.approval(request)
+          try {
+            await checkpoint('awaiting_approval')
+            const approved = await this.confirm(chatId, request, approvalSignal)
+            output.decided(approved)
+            await checkpoint('running')
+            return approved
+          }
+          catch (error) {
+            output.decided(false)
+            throw error
+          }
+        }, connectionSignal),
+      })
       let answer = ''
-      await chat.send(text, {
+      await scope.send(chat, text, {
         abortSignal: requestSignal,
-        tools: [...state.tools.definitions(), ...prepared.tools],
         prepareConversation: async (conversation) => {
           await checkpoint()
           return conversation
@@ -441,7 +465,7 @@ export class TelegramChat {
               await checkpoint()
           }
         },
-      }, [recoveryContext, prepared.context].filter(Boolean).join('\n\n'))
+      }, recoveryContext)
       requestSignal.throwIfAborted()
       if (!answer.trim())
         throw new Error(this.messages.emptyResponse)
@@ -458,10 +482,6 @@ export class TelegramChat {
       await checkpoint('delivered')
     }
     catch (error) {
-      if (requestSignal.aborted) {
-        await state.tools?.close()
-        state.tools = undefined
-      }
       let failure = this.messages.telegramRequestFailed
       if (signal.aborted)
         failure = this.closing ? this.messages.telegramJobStates.interrupted : this.messages.telegramCancelled
@@ -483,13 +503,16 @@ export class TelegramChat {
       if (timer)
         clearInterval(timer)
       output.stop()
-      state.output = undefined
-      state.checkpoint = undefined
       await editing
       await flush()
       await saving.catch(() => {})
-      await companion?.finish()
-      await session.close()
+      try {
+        await scope?.close()
+      }
+      finally {
+        this.runtime.resumeReminders(this.root(chatId), this)
+        await session.close()
+      }
     }
   }
 }
@@ -498,7 +521,7 @@ export class TelegramChat {
  * Starts the local Telegram host with the CLI's provider and persistence boundaries.
  *
  * Call stack:
- * runTelegram -> readConfig -> TelegramChat -> Chat.send -> core-agent.streamFrom
+ * runTelegram -> readConfig -> TelegramChat -> RuntimeSession.send -> Chat.send -> core-agent.streamFrom
  *                            -> Sessions -> local session files
  */
 export async function runTelegram(args: string[], env: NodeJS.ProcessEnv) {
@@ -521,7 +544,7 @@ export async function runTelegram(args: string[], env: NodeJS.ProcessEnv) {
   if (!token || !/^\d+:[\w-]+$/.test(token))
     throw new Error(help.messages.telegramTokenMissing)
   const ids = merged.ANGELA_TELEGRAM_ALLOWED_USER_IDS?.split(',').map(id => id.trim())
-  if (!ids?.length || ids.some(id => !/^\d+$/.test(id) || !Number.isSafeInteger(Number(id)) || Number(id) <= 0))
+  if (!ids?.length || ids.length > 128 || ids.some(id => !/^\d+$/.test(id) || !Number.isSafeInteger(Number(id)) || Number(id) <= 0))
     throw new Error(help.messages.telegramUsersMissing)
   const config = await readConfig(args, merged)
   if (config.help || config.list)
@@ -538,7 +561,12 @@ export async function runTelegram(args: string[], env: NodeJS.ProcessEnv) {
   if (!provider)
     throw new Error(messages.unsupportedProvider)
   const bot = new Bot(token)
-  const host = new TelegramChat(bot, provider, config.model, new Sessions(join(config.dataDir, 'telegram'), messages), workspace, messages, new Set(ids.map(Number)), async (id, confirm, signal) => await McpTools.connect(config, workspace, join(config.dataDir, 'telegram', 'computer-use', id), confirm, messages, merged, signal), {
+  const host = new TelegramChat(bot, provider, config.model, new Sessions(join(config.dataDir, 'telegram'), messages), workspace, messages, new Set(ids.map(Number)), async (id, confirm, signal) => {
+    if (!config.computerUse && !config.mcpCommand)
+      return undefined
+    const { McpTools } = await import('./mcp')
+    return await McpTools.connect(config, workspace, join(config.dataDir, 'telegram', 'computer-use', id), confirm, messages, merged, signal)
+  }, {
     dataDir: config.dataDir,
     env: merged,
     locale: config.locale,
