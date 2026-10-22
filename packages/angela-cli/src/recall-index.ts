@@ -194,7 +194,7 @@ export class RecallIndex {
   recentSession(scope: string, excludedSessionId: string) {
     const rows = this.sql(`WITH eligible AS (
       SELECT e.*,CASE WHEN e.kind='history' THEN substr(e.origin,9) ELSE p.sourceSessionId END AS sessionId
-      FROM excerpts e LEFT JOIN memory_pages p ON e.id='memory:'||p.id
+      FROM excerpts e LEFT JOIN memory_pages p ON p.id=substr(e.id,8) AND e.kind='episodic'
       WHERE (?='*' OR e.scope=?)
         AND (e.kind='history' OR (e.kind='episodic' AND p.kind='session' AND p.status<>'superseded'))
         AND (p.expiresAt IS NULL OR p.expiresAt>?)
@@ -243,7 +243,7 @@ export class RecallIndex {
     const semanticIds = new Set(semantic.map(row => String(row.id)))
     return [...ranked.values()]
       .sort((a, b) => b.score - a.score || b.hit.updatedAt.localeCompare(a.hit.updatedAt))
-      .filter(({ hit }) => !automatic || semanticIds.has(hit.id) || supportsContext(query, hit.text))
+      .filter(({ hit }) => !automatic || semanticIds.has(hit.id) || supportsContext(query, hit.text, hit.kind))
       .map(item => item.hit)
   }
 

@@ -1,4 +1,4 @@
-const ignored = new Set('a an the is are was were i you me my we to of in on and or for this that what how please toi ban minh la thi ma va co cho cua cac cai voi duoc lam gi nhu hay khong mot nhung'.split(' '))
+const ignored = new Set('a an the is are was were i you me my we to of in on and or for this that what how please toi ban minh la thi ma va co cho cua cac cai voi duoc lam gi nhu hay khong mot nhung tôi bạn mình là thì mà và có của các cái với được làm gì như không một những muốn muon'.split(' '))
 
 /**
  * Folds Vietnamese spelling for search without changing stored source text.
@@ -10,19 +10,42 @@ export function normalizeSearch(text: string) {
   return text.normalize('NFD').replace(/\p{M}/gu, '').replace(/đ/giu, 'd').toLowerCase()
 }
 
-/** Query length and unique terms retain the existing FTS candidate bound. */
+/** Personal names share a relation across common labels. Subject qualifiers still need their own evidence. */
+function names(text: string) {
+  return /\b(?:biet danh|ten goi|goi (?:bang )?ten|duoc goi|goi la|cach xung ho|nickname|preferred name|call me)\b/u.test(normalizeSearch(text))
+}
+
+/** Query expansion stays bounded and works with existing FTS projections, without a database rebuild. */
 export function searchTerms(query: string) {
-  return [...new Set(normalizeSearch(query).match(/[\p{L}\p{N}_-]+/gu) ?? [])].filter(term => term.length > 1 && !ignored.has(term)).slice(-32)
+  const text = names(query) ? `${query} goi ten nickname` : query
+  return [...new Set(normalizeSearch(text).match(/[\p{L}\p{N}_-]+/gu) ?? [])].filter(term => term.length > 1 && !ignored.has(term)).slice(-32)
 }
 
 /**
- * Rank alone is not relevance. Multiword queries need two distinct matching content terms.
- * Single-term diagnostic lookups need that exact token. Accepted vector candidates supply independent semantic evidence upstream.
+ * Rank alone is not relevance. Two content tokens provide corroboration beyond one ambiguous word.
+ * A one-token lookup requires that exact token. A typed procedure plus a topical token also supplies two independent signals.
  */
-export function supportsContext(query: string, text: string) {
-  const content = searchTerms(normalizeSearch(query).replace(/\b(?:giai thich|vi sao|the nao|nhu the nao|la gi|nao|khi|vao|hien tai)\b/gu, ' '))
+export function supportsContext(query: string, text: string, kind?: string) {
+  // Remove grammar before accent folding. English "an" and Vietnamese "bạn" must not erase "ăn" or "bản".
+  const original = query.normalize('NFC').toLowerCase().match(/[\p{L}\p{N}_-]+/gu) ?? []
+  let content = [...new Set(original.filter(term => !ignored.has(term)).map(normalizeSearch))]
+  const topic = normalizeSearch(query).replace(/\b(?:giai thich|vi sao|nhu the nao|the nao|la gi|hien tai|o dau|nao|khi|vao)\b/gu, ' ')
+  const topicWords = new Set(topic.match(/[\p{L}\p{N}_-]+/gu) ?? [])
+  content = content.filter(term => topicWords.has(term))
   const words = new Set(normalizeSearch(text).match(/[\p{L}\p{N}_-]+/gu) ?? [])
+  if (names(query)) {
+    const nameWords = new Set('biet danh ten goi duoc bang la cach xung ho nickname preferred name call me nho remember recall'.split(' '))
+    content = content.filter(term => !nameWords.has(term))
+    content.push('personal_name')
+    if (names(text))
+      words.add('personal_name')
+  }
   const matches = content.filter(term => words.has(term)).length
+  if (kind === 'procedural' && /\b(?:quy trinh|workflow|procedure)\b/u.test(normalizeSearch(query))) {
+    const procedureWords = new Set('quy trinh workflow procedure dung use using'.split(' '))
+    if (content.some(term => !procedureWords.has(term) && words.has(term)))
+      return true
+  }
   return content.length > 0 && matches >= Math.min(content.length, 2)
 }
 

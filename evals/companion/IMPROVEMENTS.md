@@ -50,3 +50,27 @@ An archived overview and bounded source excerpts cover the session without injec
 Tests cover five recap phrasings, two historical dates, a newer foreign workspace, current-session exclusion and episodic-only stores.
 Negative tests cover topical past references, an empty eligible history, expiry, suppression and supersession.
 This checkpoint recalls all eight general-recap cases. The full lexical recall metric becomes 100/106.
+
+## Language and bounded query expansion
+
+Name, nickname and preferred form of address share a narrow relation. Query expansion uses existing FTS tokens and existing projections.
+Subject qualifiers still need evidence. A question about Lan cannot accept another person's preferred name based on the relation alone.
+Recent-session page joins use the existing primary-key index. SQLite query-plan inspection confirmed an indexed lookup instead of a page scan.
+No new index or schema change was required.
+
+No synonym table maps learning goals to dataset answers. Existing optional vectors remain the route for broader semantic paraphrases.
+
+Grammar removal now precedes accent folding at the context gate.
+This preserves Vietnamese `ăn` and `bản` instead of erasing them as English `an` or Vietnamese `bạn`.
+Stored source text stays unchanged. Existing indexed pages need no migration or rebuild.
+A procedural tier plus a topical token also supplies two independent signals for an explicit workflow question.
+
+The original 21 failures now have a dedicated regression suite using unchanged cases and baseline IDs.
+Sixteen corrected cases must pass every label. Five unresolved semantic paraphrases retain all contamination and safety checks.
+A complete-corpus test enforces the requested recall and contamination targets, alongside baseline context and pass-rate floors.
+No test asserts that an unresolved quality failure is correct behavior.
+
+Current lexical checkpoint: 101/106 recall hits, 98/106 context hits, 120/128 complete passes.
+Wrong-memory, supersession, false-shared-memory and irrelevant injection counts are zero.
+Eight semantic paraphrases remain excluded from automatic context. Three previously passed through incidental lexical matches.
+This conservative policy does not infer a semantic relationship that lexical retrieval cannot establish.

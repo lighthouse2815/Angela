@@ -65,3 +65,18 @@ it('selects only a prior session and excludes expired, suppressed and superseded
   expect(index.recentSession('workspace', 'current').map(hit => hit.id)).toEqual([`memory:${revised.id}`])
   expect(index.recentSession('another-workspace', 'current')).toEqual([])
 })
+
+it('recalls a saved name through a different wording after reopening the existing index', async () => {
+  const index = await setup()
+  const { directory } = resources.at(-1)!
+  const page = index.memory.write({ tier: 'semantic', kind: 'preference', key: 'name', scope: 'workspace', title: 'Personal preference', body: 'Tôi muốn được gọi là Khoai Môn.', authority: 'user' })
+  const reader = await RecallIndex.open(directory)
+  try {
+    expect(reader.search('biet danh cua toi la gi?', 'workspace')[0]?.id).toBe(`memory:${page.id}`)
+    expect(reader.search('biet danh cua toi la gi?', 'workspace', undefined, undefined, '', true)[0]?.id).toBe(`memory:${page.id}`)
+    expect(reader.search('biet danh cua toi la gi?', 'another-workspace')).toEqual([])
+  }
+  finally {
+    reader.close()
+  }
+})

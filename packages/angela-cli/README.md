@@ -46,6 +46,22 @@ Telegram's `/memory used` diagnostics apply to its active Recall lifecycle, whic
 
 See [memory measurements and the initial resource audit](benchmarks/README.md) for commands, raw metrics, and remaining hotspots.
 
+## Recall relevance
+
+Automatic context uses a relevance gate after FTS/vector ranking and before source validation, budget selection, and reinforcement.
+Multiword lexical queries need two content tokens. A single-token lookup needs that exact token.
+An explicit workflow query can use procedure identity plus a topical token.
+The existing vector similarity floor remains separate. RRF rank and authority alone cannot admit an unrelated source.
+Explicit memory search remains broad so the caller can inspect candidates with `memory_read`.
+
+General questions about an earlier conversation select bounded evidence from the latest eligible prior session.
+The intent needs past-time language, conversation language and no remaining topic.
+Topical questions retain lexical/vector retrieval. Current sessions, other workspace scopes, suppressed sources and expired pages remain excluded from general recaps.
+Name and nickname queries share narrow wording expansion. Subject qualifiers still need evidence.
+No new provider, embedding model, database, or background model task is enabled.
+
+See [companion quality results](../../evals/companion/IMPROVEMENTS.md) for metrics, remaining paraphrase gaps and regression commands.
+
 ## Run
 
 From the repository root, install workspace dependencies and build the required packages:
