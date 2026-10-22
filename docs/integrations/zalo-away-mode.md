@@ -65,10 +65,17 @@ A different account starts with its own empty whitelist.
 `notify-only` saves the external message and sends the fixed identity and offline notification.
 It does not call the model or perform owner actions.
 
-`assistant-reply` calls the production runtime to choose a greeting, notification, clarification, receipt, or privacy refusal.
+`assistant-reply` is safe model classification followed by a fixed response template.
+It calls the production runtime to choose a greeting, notification, clarification, receipt, or privacy refusal.
 It deliberately limits conversation to these public templates.
 It does not offer unrestricted generated prose or persistent multi-turn conversations.
 The model deadline is 30 seconds. Failure returns the fixed offline notification.
+Provider configuration and runtime initialization are lazy, on the first authorized `assistant-reply` request.
+`notify-only` needs no generation provider, model, API credential, `AngelaRuntime` instance, or runtime responder.
+Switching from notify-only to assistant-reply in the local CLI activates lazy initialization on the next eligible message.
+A missing model or unavailable provider logs `runtime_failed` and returns the offline notification without stopping the listener.
+Provider initialization failure remains cached until host restart. It never turns into repeated initialization attempts for each inbound DM.
+A later phase can add `assistant-conversation` with bounded multi-turn history. That mode is not part of this MVP.
 
 Authorization is checked again after generation and before send.
 Disabling Away Mode, changing its session, or revoking a sender cancels that reply.
@@ -191,11 +198,12 @@ pnpm install
 pnpm build:cli
 ```
 
-Configure Angela's existing provider with `angela setup`, or use the existing CLI environment configuration.
+For model classification, configure Angela's existing provider with `angela setup`, or use the existing CLI environment configuration.
+For free notify-only operation, leave generation configuration unset.
 A local compatible provider can use an empty API key.
 Zalo transport itself needs no paid API key.
 Login, status, whitelist, and Away commands do not require a model configuration.
-The foreground host loads the existing provider for `assistant-reply`.
+The foreground host loads the existing provider only when an authorized `assistant-reply` request needs it.
 
 These examples use the built executable from the repository root:
 
@@ -220,7 +228,11 @@ node packages/angela-cli/dist/bin/run.mjs zalo run
 
 Replace `123456789` with the contact's stable Zalo sender ID.
 Denied inbound DMs appear in the bounded contact audit with their sender IDs, without message text.
-The MVP does not resolve names or scan a friend directory.
+Use `angela zalo recent` or `/zalo recent` to inspect the 20 most recent contacts from this metadata audit.
+Output includes stable sender ID, bounded display name, last-seen timestamp, and callback count. It excludes message text.
+JSON encoding escapes control characters in contact names before terminal display.
+Contact counts reset after eviction. Contacts observed only while Away Mode is disabled are excluded.
+This owner-only command does not resolve names, scan a friend directory, or grant whitelist access.
 Keep the foreground host running while the owner is away.
 This can run beside the regular Angela terminal process.
 Starting the regular chat alone does not start a Zalo listener.
@@ -240,12 +252,13 @@ The Zalo host accepts these owner commands through its local terminal:
 /zalo allow 123456789
 /zalo deny 123456789
 /zalo allowed
+/zalo recent
 /away off
 ```
 
 The regular interactive Angela CLI also routes these commands locally.
 External Zalo senders cannot execute them.
-The owner can change state from a second terminal with `angela away ...` and `angela zalo allow|deny|allowed`.
+The owner can change state from a second terminal with `angela away ...` and `angela zalo allow|deny|allowed|recent`.
 `/away off` prints the deterministic session summary to the terminal that runs the command.
 Ctrl+C stops the host without disabling the persisted Away state.
 
@@ -297,16 +310,17 @@ Use the built-in retention policy. Do not manually delete recent or unfinished c
 ## Real-account acceptance
 
 Automated tests mock the Zalo transport boundary. They do not authenticate a real account.
-Live end-to-end verification remains outstanding until the owner completes these steps:
+Live status: **pending owner acceptance test**. The owner must complete these steps:
 
 1. Authenticate with `zalo login` and scan the QR code.
-2. Start `zalo run`, stop it, and restart it without another QR scan.
-3. Allow one contact, select `assistant-reply`, and enable Away Mode.
-4. Send a text DM from that contact and confirm the public Angela identity in the reply.
-5. Send a private-information request and an instruction to execute a privileged tool.
-6. Confirm that neither request reveals owner data or performs an action.
-7. Send a DM from a contact outside the whitelist and confirm that no reply arrives.
-8. Disable Away Mode and inspect the attributed summary and pending message candidates.
+2. Start `zalo run`, stop it, and restore the session without another QR scan.
+3. Whitelist one stable contact ID and inspect `zalo recent`.
+4. Enable Away Mode and select the intended reply mode.
+5. Send a whitelisted text DM and confirm the public Angela identity in the reply.
+6. Send a non-whitelisted DM and confirm that no reply arrives.
+7. Send a privacy request and confirm that no private owner information is disclosed.
+8. Request privileged tools and confirm that no action or owner commitment occurs.
+9. Disable Away Mode and inspect the attributed summary and pending candidates.
 
 Until this flow passes, this repository provides a tested implementation, not verified live Zalo delivery.
 

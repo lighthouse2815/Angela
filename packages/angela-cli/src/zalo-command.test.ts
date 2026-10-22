@@ -11,6 +11,7 @@ import { cliMessages } from '@angela/i18n/cli'
 import { afterEach, expect, it } from 'vitest'
 
 import { LocalZaloCredentialStore } from './adapters/zalo/zalo-credential-store'
+import { LocalAwayModeStore } from './away/away-mode-store'
 
 const directories: string[] = []
 afterEach(async () => {
@@ -54,4 +55,26 @@ it('provides login help without authentication and erases local session secrets 
   expect((await run(['zalo', 'logout'])).stdout).toContain(cliMessages.en.away.logout)
   expect(await credentials.load()).toBeNull()
   expect((await run(['away', 'on'])).stdout.trim()).toBe(cliMessages.en.away.missing)
+}, 20_000)
+
+it('shows recent contact metadata through owner CLI without exposing message content or authorizing display names', async () => {
+  const { root, run } = await setup()
+  await new LocalAwayModeStore(join(root, 'zalo'), '111').observeContact({
+    channel: 'zalo',
+    source: 'zalo',
+    sourceType: 'external-user',
+    accountId: '111',
+    senderId: '222',
+    senderName: 'Minh\u001B[31m',
+    conversationId: '222',
+    messageId: '1',
+    text: 'PRIVATE_MESSAGE_CONTENT',
+    receivedAt: new Date().toISOString(),
+    isSelf: false,
+  })
+  const result = await run(['zalo', 'recent'])
+  expect(JSON.parse(result.stdout)).toEqual([expect.objectContaining({ senderId: '222', senderName: 'Minh\u001B[31m', messageCount: 1 })])
+  expect(result.stdout).not.toContain('PRIVATE_MESSAGE_CONTENT')
+  expect(result.stdout).not.toContain('\u001B')
+  expect((await run(['zalo', 'allowed'])).stdout.trim()).toBe('[]')
 }, 20_000)

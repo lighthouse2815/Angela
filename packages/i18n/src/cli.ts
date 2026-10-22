@@ -1,12 +1,12 @@
 const en = {
   away: {
-    usage: 'angela zalo login|logout|status|run|allow ID|deny ID|allowed [--data-dir PATH] [--locale en|vi]\nangela away on|off|status|mode notify-only|assistant-reply\nIn chat: /away on|off|status|mode MODE and /zalo allow ID|deny ID|allowed.',
+    usage: 'angela zalo login|logout|status|run|allow ID|deny ID|allowed|recent [--data-dir PATH] [--locale en|vi]\nangela away on|off|status|mode notify-only|assistant-reply\nIn chat: /away on|off|status|mode MODE and /zalo allow ID|deny ID|allowed|recent.',
     offline: 'The account owner is offline. I am Angela, their AI assistant. You can leave a message for their review.',
     received: 'I am Angela, the account owner’s AI assistant. Your message is saved for their review. The owner will decide whether to act.',
     clarify: 'I am Angela, the account owner’s AI assistant. What message do you want to leave for the owner?',
     private: 'I am Angela, the account owner’s AI assistant. I cannot share private information or make decisions for the owner. Please ask them directly.',
     greeting: 'Hello! I am Angela, the account owner’s AI assistant. The owner is offline. How can I help you leave a message?',
-    invalid: 'Invalid Away Mode command. Use /away on|off|status|mode notify-only|assistant-reply or /zalo allow ID|deny ID|allowed.',
+    invalid: 'Invalid Away Mode command. Use /away on|off|status|mode notify-only|assistant-reply or /zalo allow ID|deny ID|allowed|recent.',
     summary: 'While you were away (external messages, not owner commitments):',
     count: 'messages',
     replies: 'replies sent',
@@ -310,13 +310,13 @@ const en = {
 
 const vi: typeof en = {
   away: {
-    usage: 'angela zalo login|logout|status|run|allow ID|deny ID|allowed [--data-dir PATH] [--locale en|vi]\nangela away on|off|status|mode notify-only|assistant-reply\nTrong chat: /away on|off|status|mode MODE và /zalo allow ID|deny ID|allowed.',
+    usage: 'angela zalo login|logout|status|run|allow ID|deny ID|allowed|recent [--data-dir PATH] [--locale en|vi]\nangela away on|off|status|mode notify-only|assistant-reply\nTrong chat: /away on|off|status|mode MODE và /zalo allow ID|deny ID|allowed|recent.',
     offline: 'Chủ tài khoản đang offline. Mình là Angela, trợ lý AI của chủ tài khoản. Bạn có thể để lại lời nhắn để chủ tài khoản xem khi quay lại.',
     received: 'Mình là Angela, trợ lý AI của chủ tài khoản. Mình đã lưu lời nhắn để chủ tài khoản xem. Chủ tài khoản sẽ tự quyết định việc thực hiện.',
     clarify: 'Mình là Angela, trợ lý AI của chủ tài khoản. Bạn muốn để lại lời nhắn gì cho chủ tài khoản?',
     private: 'Mình là Angela, trợ lý AI của chủ tài khoản. Mình không thể chia sẻ thông tin riêng tư hoặc quyết định thay chủ tài khoản. Bạn hãy hỏi trực tiếp chủ tài khoản nhé.',
     greeting: 'Chào bạn! Mình là Angela, trợ lý AI của chủ tài khoản. Chủ tài khoản đang offline. Bạn muốn để lại lời nhắn gì?',
-    invalid: 'Lệnh Away Mode không hợp lệ. Dùng /away on|off|status|mode notify-only|assistant-reply hoặc /zalo allow ID|deny ID|allowed.',
+    invalid: 'Lệnh Away Mode không hợp lệ. Dùng /away on|off|status|mode notify-only|assistant-reply hoặc /zalo allow ID|deny ID|allowed|recent.',
     summary: 'Trong lúc bạn offline (lời nhắn từ bên ngoài, không phải cam kết của bạn):',
     count: 'tin nhắn',
     replies: 'lần trả lời đã gửi',

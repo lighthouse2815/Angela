@@ -189,3 +189,18 @@ it('does not read historical records to rate limit incoming messages and isolate
   expect(history).not.toHaveBeenCalled()
   expect(send).toHaveBeenCalledTimes(4)
 })
+
+it('audits denied contacts by stable ID without persisting content or granting display-name privileges', async () => {
+  const { service, receive, store, send, reply } = await setup()
+  await service.command('/away on')
+  await service.command('/away mode assistant-reply')
+  await service.command('/zalo allow 222')
+  await receive({ senderId: '333', conversationId: '333', senderName: '222', text: 'PRIVATE_EXTERNAL_CONTENT' })
+  const recent = JSON.parse(await service.command('/zalo recent') ?? '')
+  expect(recent).toEqual([expect.objectContaining({ senderId: '333', senderName: '222', messageCount: 1 })])
+  expect(JSON.stringify(recent)).not.toContain('PRIVATE_EXTERNAL_CONTENT')
+  expect(await store.records()).toEqual([])
+  expect(send).not.toHaveBeenCalled()
+  expect(reply).not.toHaveBeenCalled()
+  expect((await store.state()).allowedUsers).toEqual(['222'])
+})

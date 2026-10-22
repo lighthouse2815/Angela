@@ -1,5 +1,8 @@
 import type { cliMessages } from '@angela/i18n/cli'
 
+import type { AwayRuntimeResponder } from './away/away-runtime-responder'
+import type { AngelaRuntime } from './runtime/runtime'
+
 import process from 'node:process'
 
 import { homedir } from 'node:os'
@@ -8,7 +11,6 @@ import { createInterface } from 'node:readline'
 import { parseArgs } from 'node:util'
 
 import { cliMessages as translations } from '@angela/i18n/cli'
-import { getGenerationProvider, listProviders } from '@angela/provider-inference'
 
 import * as v from 'valibot'
 
@@ -57,7 +59,7 @@ export async function runZalo(args: string[], env: NodeJS.ProcessEnv, awayComman
     process.stdout.write(`${messages.away.usage}\n`)
     return
   }
-  if (awayCommand || ['allow', 'deny', 'allowed'].includes(action)) {
+  if (awayCommand || ['allow', 'deny', 'allowed', 'recent'].includes(action)) {
     const text = `/${awayCommand ? 'away' : 'zalo'} ${config.positionals.join(' ')}`
     process.stdout.write(`${await ownerAwayCommand(text, config.dataDir, messages) ?? messages.away.invalid}\n`)
     return
@@ -98,21 +100,32 @@ export async function runZalo(args: string[], env: NodeJS.ProcessEnv, awayComman
     const saved = await credentials.load()
     if (!saved)
       throw new Error(messages.away.missing)
-    const providerConfig = await readConfig(args.slice(1), env)
-    if (providerConfig.help || providerConfig.list)
-      throw new Error(messages.away.invalid)
-    const definition = listProviders().find(provider => provider.id === providerConfig.definitionId)
-    const provider = definition && getGenerationProvider(await definition.createProvider(providerConfig.providerConfig))
-    if (!provider)
-      throw new Error(messages.away.failure)
-    const { AngelaRuntime } = await import('./runtime/runtime')
-    const { AwayRuntimeResponder } = await import('./away/away-runtime-responder')
     const { ZaloAdapter } = await import('./adapters/zalo/zalo-adapter')
     const log = (event: string, fields?: { messageId?: string, reason?: string }) => {
       process.stderr.write(`${JSON.stringify({ channel: 'zalo', event, ...fields })}\n`)
     }
-    const runtime = new AngelaRuntime(providerConfig.model, provider, messages, env, providerConfig)
-    const service = new AwayModeService(new LocalAwayModeStore(root, saved.accountId), messages.away, log, new AwayRuntimeResponder(runtime, config.dataDir))
+    let runtime: AngelaRuntime | undefined
+    let responder: Promise<AwayRuntimeResponder> | undefined
+    const service = new AwayModeService(new LocalAwayModeStore(root, saved.accountId), messages.away, log, {
+      reply: async (message, signal) => {
+        // Notify-only never enters this path. Initialization failure stays cached until restart and falls back through AwayModeService.
+        responder ??= (async () => {
+          const providerConfig = await readConfig(args.slice(1), env)
+          if (providerConfig.help || providerConfig.list)
+            throw new Error(messages.away.invalid)
+          const { getGenerationProvider, listProviders } = await import('@angela/provider-inference')
+          const definition = listProviders().find(provider => provider.id === providerConfig.definitionId)
+          const provider = definition && getGenerationProvider(await definition.createProvider(providerConfig.providerConfig))
+          if (!provider)
+            throw new Error(messages.away.failure)
+          const { AngelaRuntime } = await import('./runtime/runtime')
+          const { AwayRuntimeResponder } = await import('./away/away-runtime-responder')
+          runtime = new AngelaRuntime(providerConfig.model, provider, messages, env, providerConfig)
+          return new AwayRuntimeResponder(runtime, config.dataDir)
+        })()
+        return await (await responder).reply(message, signal)
+      },
+    })
     const adapter = new ZaloAdapter(client, service, saved.accountId, log)
     const input = createInterface({ input: process.stdin, terminal: false })
     let commands = Promise.resolve()
@@ -131,7 +144,7 @@ export async function runZalo(args: string[], env: NodeJS.ProcessEnv, awayComman
       input.close()
       await adapter.close()
       await commands
-      await runtime.close()
+      await runtime?.close()
     }
   }
   catch {
