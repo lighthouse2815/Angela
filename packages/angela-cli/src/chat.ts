@@ -1,16 +1,20 @@
 import type { Conversation, StreamEvent, StreamOptions } from '@angela/core-agent'
 import type { GenerationProvider } from '@angela/provider-inference'
 
+import type { RequestPrivacy } from './privacy-policy'
+
 import { randomUUID } from 'node:crypto'
 
 import { streamFrom } from '@angela/core-agent'
 import { cliMessages } from '@angela/i18n/cli'
 
 import { Context } from './context'
+import { durableConversation, protectConversation, requestPrivacy } from './privacy-policy'
 
 /** Owns one serial conversation. Failed generations never append an incomplete assistant turn. */
 export class Chat {
   private active = false
+  private privacyState?: RequestPrivacy
   readonly context: Context
   readonly conversation: Conversation = { turns: [] }
 
@@ -30,6 +34,24 @@ export class Chat {
           this.context.restore(turn.content.flatMap(part => part.type === 'text' ? [part.text] : []).join('\n'))
       }
     }
+    durableConversation(this.conversation)
+    for (const turn of this.conversation.turns) {
+      if (turn.type === 'user') {
+        const text = turn.content.flatMap(part => part.type === 'text' ? [part.text] : []).join('\n')
+        this.privacyState = requestPrivacy(text, true, this.privacyState)
+      }
+    }
+  }
+
+  get privacy() {
+    return this.privacyState
+  }
+
+  /** The first protected request closes the archive prefix. Later turns can still use the complete working conversation. */
+  applyPrivacy(privacy: RequestPrivacy) {
+    this.privacyState = privacy
+    if (!privacy.durableMemoryAllowed)
+      protectConversation(this.conversation)
   }
 
   get isSending() {
@@ -38,6 +60,7 @@ export class Chat {
 
   /** The caller serializes sends and owns cancellation and event rendering. */
   async send(text: string, options: StreamOptions, memory = '') {
+    this.applyPrivacy(requestPrivacy(text, true, this.privacyState))
     this.conversation.turns.push({ type: 'user', id: randomUUID(), content: [{ type: 'text', text }] })
     let conversation = this.conversation
     if (memory) {

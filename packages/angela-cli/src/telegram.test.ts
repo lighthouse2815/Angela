@@ -624,3 +624,31 @@ it('maps repeated Telegram messages, two users and reset to logical session boun
     await runtime.close()
   }
 })
+
+it('keeps protected conversation turns in RAM across Telegram requests and clears them on new session', async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>().mockImplementation(async () => completion('I will help in this session.'))
+  const { message, host, directory } = await connect(fetch)
+  await message('Đừng lưu: tôi đang học tiếng Ý.')
+  await vi.waitFor(() => expect(host.stateCounts.jobs).toBe(0), { timeout: 10000 })
+  const sessions = new Sessions(directory, cliMessages.vi)
+  for (const file of await sessions.list())
+    expect(JSON.stringify(await sessions.read(file.id))).not.toContain('tiếng Ý')
+  await message('Tôi đang học ngôn ngữ nào?')
+  await vi.waitFor(() => expect(host.stateCounts.jobs).toBe(0), { timeout: 10000 })
+  expect(String(fetch.mock.calls.at(-1)?.[1]?.body)).toContain('tiếng Ý')
+  await message('/new')
+  await vi.waitFor(() => expect(host.stateCounts.jobs).toBe(0), { timeout: 10000 })
+  await message('Xin chào phiên mới')
+  await vi.waitFor(() => expect(host.stateCounts.jobs).toBe(0), { timeout: 10000 })
+  expect(String(fetch.mock.calls.at(-1)?.[1]?.body)).not.toContain('tiếng Ý')
+})
+
+it('excludes disabled-memory request text from Telegram recovery checkpoints before generation', async () => {
+  const { message, host, directory } = await connect(undefined, undefined, 100)
+  await new Memory(directory, cliMessages.vi).setEnabled(false)
+  await message('Nhớ giúp tôi là tôi muốn học .NET.')
+  await vi.waitFor(() => expect(host.stateCounts.jobs).toBe(0), { timeout: 10000 })
+  const sessions = new Sessions(directory, cliMessages.vi)
+  for (const file of await sessions.list())
+    expect(JSON.stringify(await sessions.read(file.id))).not.toContain('tôi muốn học .NET')
+})

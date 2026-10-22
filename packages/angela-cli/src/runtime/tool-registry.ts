@@ -6,6 +6,7 @@ import type { ContextSources } from './context-builder'
 import type { EventPayload } from './events'
 
 import { sanitize } from '../memory-v2/sanitize'
+import { durableWriteRejection, requestPrivacy } from '../privacy-policy'
 import { taskTools } from '../task-tools'
 
 /** Host-verified evidence is separate from raw SDK completion. Result text is bounded before memory capture. */
@@ -18,35 +19,65 @@ export interface ToolObservation {
 
 /** Builds request-local tools and verification evidence. Tool implementations retain their existing policy and storage owners. */
 export async function buildTools(sources: ContextSources, text: string, sessionId: string, mcp?: McpTools) {
+  const privacy = sources.privacy ?? requestPrivacy(text, sources.memory ? (await sources.memory.read()).enabled : true)
   const observations: string[] = []
   const verified: string[] = []
   const calls = new Map<string, string>()
   const resultSchema = mcp ? (await import('@modelcontextprotocol/sdk/types.js')).CallToolResultSchema : undefined
   const tools: Tool[] = []
-  if (mcp)
-    tools.push(...mcp.definitions())
+  if (mcp) {
+    tools.push(...mcp.definitions().map(tool => tool.function.name === 'builtIn_mcpCallTool' && !privacy.durableMemoryAllowed && !privacy.projectWritesAllowed
+      ? { ...tool, execute: async () => ({ status: 'rejected', reason: privacy.reason }) }
+      : tool))
+  }
   if (sources.memory) {
     try {
-      tools.push(...await sources.memory.tools(text, sessionId))
+      tools.push(...await sources.memory.tools(text, sessionId, privacy))
     }
     catch { sources.warn(sources.messages.memoryUnavailable) }
   }
   if (sources.project) {
     try {
-      tools.push(...await sources.project.tools(text, sessionId, observations))
+      tools.push(...await sources.project.tools(text, sessionId, observations, privacy))
     }
     catch { sources.warn(sources.messages.projectMemoryUnavailable) }
   }
   if (sources.tasks)
-    tools.push(...taskTools(sources.tasks, sources.messages.tasks))
+    tools.push(...taskTools(sources.tasks, sources.messages.tasks, privacy))
   const recall = sources.recall
   if (recall) {
     tools.push(...recall.tools())
     try {
-      tools.push(...await recall.pageTools(text, verified))
+      tools.push(...await recall.pageTools(text, verified, privacy))
     }
     catch { sources.warn(sources.messages.memoryUnavailable) }
-    tools.push(...recall.skills.tools(text, verified, sessionId, () => recall.changed(false)))
+    tools.push(...recall.skills.tools(text, verified, sessionId, () => recall.changed(false), privacy))
+  }
+  const domains = new Map<string, 'personal' | 'project' | 'task' | 'workflow'>([
+    ['personal_memory', 'personal'],
+    ['project_memory', 'project'],
+    ['memory_page_save', 'workflow'],
+    ['skill_save', 'workflow'],
+    ['task_create', 'task'],
+    ['task_update', 'task'],
+    ['task_complete', 'task'],
+    ['task_cancel', 'task'],
+    ['task_snooze', 'task'],
+  ])
+  for (const tool of tools) {
+    const domain = domains.get(tool.function.name)
+    const execute = tool.execute
+    if (!domain || !execute || !sources.memory)
+      continue
+    tool.execute = async (input, options) => {
+      // A different channel can disable personal memory after tools enter the model request.
+      const current = requestPrivacy(text, (await sources.memory!.read()).enabled, privacy)
+      const forgetting = domain === 'personal' && input && typeof input === 'object' && 'action' in input && input.action === 'forget'
+      const rejection = forgetting ? undefined : durableWriteRejection(current, domain, input)
+      if (rejection)
+        return rejection
+      return await execute(input, options)
+    }
   }
   return {
     tools,

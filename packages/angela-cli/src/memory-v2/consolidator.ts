@@ -1,3 +1,4 @@
+import type { RequestPrivacy } from '../privacy-policy'
 import type { AngelaEvent } from '../runtime/events'
 import type { MemoryStore } from './store'
 import type { MemoryPage, Observation } from './types'
@@ -78,9 +79,11 @@ export class MemoryConsolidator {
 
 /** A request owns its capture handle. No global listeners can route one user's text into another user's database. */
 export class MemoryCapture {
-  constructor(private readonly store: MemoryStore, private readonly scope: string, private readonly sessionId: string) {}
+  constructor(private readonly store: MemoryStore, private readonly scope: string, private readonly sessionId: string, private readonly privacy?: RequestPrivacy) {}
 
   record(event: AngelaEvent, text = '', verified = false) {
+    if (this.privacy?.durableMemoryAllowed === false)
+      return
     if (event.sessionId !== this.sessionId || event.workspace !== this.scope)
       throw new Error('Observation scope mismatch')
     if (event.type === 'tool.call' || event.type === 'request.completed' || (event.type === 'tool.result' && !verified && event.outcome !== 'failed'))
@@ -94,6 +97,8 @@ export class MemoryCapture {
   }
 
   finish(userText: string) {
+    if (this.privacy?.durableMemoryAllowed === false)
+      return undefined
     const consolidator = new MemoryConsolidator(this.store)
     const episode = consolidator.consolidate(this.scope, this.sessionId)
     if (episode)

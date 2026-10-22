@@ -636,6 +636,29 @@ Disabling interruption (`ANGELA_VOICE_BARGE_IN=0`) also skips automatic echo can
 If only one device override is set, Angela keeps separate listening and speaking turns.
 A forced process kill or machine crash prevents cleanup. Restarting the audio service removes remaining modules.
 
+## Request privacy
+
+`RuntimeSession.send` resolves request privacy before automatic capture or model generation.
+Vietnamese and English no-store directives and bounded credential detection protect the complete request.
+Tool policy uses this provenance before model-selected excerpts. Paraphrases cannot authorize a write.
+Rejected writes return a reason without the protected value and produce no verified save event.
+
+Protected requests skip observations, episodes, automatic learning, pages, personal facts, skills, project checkpoints, and task writes.
+MCP discovery remains available. Protected requests cannot call arbitrary MCP operations because their storage effects are unknown.
+Personal-memory disable also rejects personal writes under the storage lock.
+Independent project checkpoints and explicitly requested tasks remain available for their own domains.
+A personal learning goal cannot use those stores as replacement memory.
+
+The conversation retains protected turns and summaries in RAM. Session files retain only the prefix before protection.
+Telegram recovery checkpoints omit protected request text, progress, and answers.
+Telegram retains private working conversations within its existing bounded cache until `/new`, eviction, or host shutdown.
+Later turns inherit protection because they can derive facts from earlier context.
+Start a new conversation to resume durable capture. Existing unrelated memories remain intact.
+
+Detection uses deterministic phrases and credential formats, not semantic classification or a complete DLP system.
+Provider requests still include current conversation text. This boundary controls Angela's local durable stores.
+Zalo external senders retain their separate runtime boundary without owner memory, Recall, tasks, MCP, or long-term capture.
+
 ## Personal memory
 
 Personal memory stores facts and preferences across CLI sessions that use the same data directory.

@@ -4,6 +4,7 @@ import type { cliMessages } from '@angela/i18n/cli'
 import type { GenerationProvider } from '@angela/provider-inference'
 import type { Tool } from '@xsai/shared-chat'
 
+import type { RequestPrivacy } from './privacy-policy'
 import type { RecallHit } from './recall-index'
 
 import { watch } from 'node:fs'
@@ -173,10 +174,10 @@ export class Recall {
   }
 
   /** Capture honors the existing privacy switches. The handle belongs only to this request and its exact workspace. */
-  async capture() {
-    if (!await this.automaticMemoryEnabled())
+  async capture(privacy?: RequestPrivacy) {
+    if (privacy?.durableMemoryAllowed === false || !await this.automaticMemoryEnabled())
       return undefined
-    return new MemoryCapture(this.database().memory, this.workspace, this.sessionId)
+    return new MemoryCapture(this.database().memory, this.workspace, this.sessionId, privacy)
   }
 
   /** Reads current policy at each durable-write boundary, including changes from another active channel. */
@@ -596,10 +597,10 @@ export class Recall {
   }
 
   /** Native page writes use current-turn evidence. The model cannot assign its own authority. */
-  async pageTools(text: string, verified: readonly string[]) {
+  async pageTools(text: string, verified: readonly string[], privacy?: RequestPrivacy) {
     if (!await this.automaticMemoryEnabled())
       return []
-    return pageTools(this.database().memory, this.workspace, this.sessionId, text, verified).map(tool => ({
+    return pageTools(this.database().memory, this.workspace, this.sessionId, text, verified, privacy).map(tool => ({
       ...tool,
       execute: async (input, options) => {
         if (!await this.automaticMemoryEnabled())

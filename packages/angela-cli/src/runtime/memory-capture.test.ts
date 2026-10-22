@@ -138,3 +138,24 @@ it('labels disabled personal memory without disabling independent project tools'
   expect(await (await scope.project()).read()).toMatchObject({ enabled: true, snapshot: null })
   await scope.close()
 })
+
+// Generation baseline: evals/companion-generation/baseline.json, dont_store_001.
+// ROOT CAUSE: Capture preceded privacy detection. Protected requests now skip durable capture before the first user event.
+it.each([
+  'Đừng lưu: tôi đang học tiếng Ý.',
+  'Don\'t remember this: I\'m preparing for IELTS.',
+])('keeps a no-store request out of observations and episodes: %s', async (text) => {
+  const { runtime, directory } = await setup()
+  const sessionId = randomUUID()
+  const scope = runtime.open({ dataDir: directory, workspace: directory, sessionId, channel: 'cli' })
+  await scope.send(new Chat(runtime.model, runtime.provider, directory), text, {})
+  await scope.close()
+  const index = await RecallIndex.open(directory)
+  try {
+    expect(index.memory.observations(directory, sessionId)).toHaveLength(0)
+    expect(index.memory.current(directory, 'episodic', `session:${sessionId}`)).toBeUndefined()
+  }
+  finally {
+    index.close()
+  }
+})

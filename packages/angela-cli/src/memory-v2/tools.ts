@@ -4,6 +4,8 @@ import type { MemoryStore } from './store'
 
 import * as v from 'valibot'
 
+import { durableWriteRejection, requestPrivacy } from '../privacy-policy'
+
 const saveSchema = v.object({
   tier: v.picklist(['semantic', 'procedural']),
   kind: v.picklist(['architecture', 'decision', 'gotcha', 'workflow']),
@@ -15,7 +17,7 @@ const saveSchema = v.object({
 })
 
 /** Authority comes from exact user or verified tool evidence. Personal preferences remain under Personal Memory's existing tools. */
-export function pageTools(store: MemoryStore, scope: string, sessionId: string, userText: string, verified: readonly string[]): Tool[] {
+export function pageTools(store: MemoryStore, scope: string, sessionId: string, userText: string, verified: readonly string[], privacy = requestPrivacy(userText)): Tool[] {
   return [{
     type: 'function',
     function: {
@@ -37,6 +39,9 @@ export function pageTools(store: MemoryStore, scope: string, sessionId: string, 
       },
     },
     execute: (input, options) => {
+      const rejection = durableWriteRejection(privacy, 'workflow', input)
+      if (rejection)
+        return rejection
       const parsed = v.safeParse(saveSchema, input)
       if (!parsed.success)
         return { status: 'rejected', reason: 'invalid-input' }

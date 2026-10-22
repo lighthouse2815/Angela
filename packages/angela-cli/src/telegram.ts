@@ -2,6 +2,7 @@ import type { cliMessages } from '@angela/i18n/cli'
 import type { GenerationProvider } from '@angela/provider-inference'
 import type { Context } from 'grammy'
 
+import type { Chat } from './chat'
 import type { McpTools } from './mcp'
 import type { RuntimeSession } from './runtime/runtime'
 import type { SavedRequest } from './sessions'
@@ -22,13 +23,16 @@ import { Bot, InlineKeyboard } from 'grammy'
 
 import { readConfig } from './config'
 import { formatRequestError } from './errors'
+import { Memory } from './memory'
 import { describeTool, Output } from './output'
 import { Permissions } from './permissions'
+import { requestPrivacy } from './privacy-policy'
 import { ReminderNotifications } from './reminder-notifications'
 import { AngelaRuntime } from './runtime/runtime'
 import { Sessions } from './sessions'
 
 interface ChatState {
+  privateChat?: Chat
   permissions: Permissions
   touched: number
   pending?: { id: string, finish: (approved: boolean) => void }
@@ -348,7 +352,9 @@ export class TelegramChat {
     const persistence = new AbortController()
     const deadline = new AbortController()
     const requestSignal = AbortSignal.any([signal, persistence.signal, deadline.signal])
-    const chat = await this.runtime.createChat(this.workspace, reset ? undefined : session.restore())
+    if (reset)
+      state.privateChat = undefined
+    const chat = state.privateChat ?? await this.runtime.createChat(this.workspace, reset ? undefined : session.restore())
     let request: SavedRequest | undefined
     let saving: Promise<void> = Promise.resolve()
     let timer: ReturnType<typeof setInterval> | undefined
@@ -428,6 +434,15 @@ export class TelegramChat {
       else {
         request = { id: randomUUID(), text, status: 'running', startedAt: now, updatedAt: now, progress: '' }
       }
+      const memory = new Memory(this.root(chatId), this.messages)
+      let memoryEnabled = false
+      try {
+        memoryEnabled = (await memory.read()).enabled
+      }
+      catch { /* Unreadable personal memory cannot authorize durable personal data. */ }
+      chat.applyPrivacy(requestPrivacy(text, memoryEnabled, chat.privacy))
+      if (!chat.privacy?.durableMemoryAllowed)
+        state.privateChat = chat
       output.start()
       await checkpoint()
       const status = await ctx.reply(this.messages.thinking)

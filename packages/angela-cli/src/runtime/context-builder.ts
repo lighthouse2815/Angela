@@ -1,6 +1,7 @@
 import type { cliMessages } from '@angela/i18n/cli'
 
 import type { Memory } from '../memory'
+import type { RequestPrivacy } from '../privacy-policy'
 import type { ProjectMemory } from '../project-memory'
 import type { Recall } from '../recall'
 import type { Tasks } from '../tasks'
@@ -9,6 +10,7 @@ import { taskContext } from '../task-tools'
 
 /** Only enabled request capabilities enter context construction. No source or prompt is cached here. */
 export interface ContextSources {
+  privacy?: RequestPrivacy
   memory?: Memory
   project?: ProjectMemory
   recall?: Recall
@@ -23,11 +25,19 @@ export async function buildContext(sources: ContextSources, text: string, signal
   const parts: string[] = []
   if (extra)
     parts.push(extra)
+  if (sources.privacy && !sources.privacy.durableMemoryAllowed) {
+    parts.push([
+      `Request privacy: ${sources.privacy.reason}. Current personal information stays within this conversation.`,
+      'Durable writes of protected content are rejected, including paraphrases in project memory, pages, skills, and tasks.',
+      'Use protected information to answer in this session. Never claim it was durably saved after a rejection.',
+    ].join('\n'))
+  }
   if (sources.memory) {
     try {
       if (!(await sources.memory.read()).enabled) {
         parts.push([
           'Personal memory is disabled. Use current personal information only within this conversation.',
+          'If the user asks you to remember personal information, explicitly say that personal memory is disabled and durable saving is unavailable.',
           'Do not save personal facts, preferences, or learning goals to project memory, skills, or technical pages as a substitute.',
           'Do not claim durable personal saving. Independent project checkpoints and explicitly requested tasks retain their own controls.',
         ].join('\n'))

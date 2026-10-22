@@ -10,6 +10,7 @@ import * as v from 'valibot'
 
 import { MemoryFile } from './memory-file'
 import { sanitize } from './memory-v2/sanitize'
+import { durableWriteRejection, requestPrivacy } from './privacy-policy'
 import { RecallIndex, sourceVersion } from './recall-index'
 
 const textSchema = v.pipe(v.string(), v.trim(), v.minLength(1), v.maxLength(500))
@@ -61,6 +62,9 @@ export class Memory {
 
   /** Text limits and duplicate detection apply to direct commands and model tools alike. */
   async remember(text: string, id?: string, expectedText?: string, metadata?: { core?: boolean, source?: { quote: string, sessionId?: string } }) {
+    const privacy = requestPrivacy(text, true, requestPrivacy(metadata?.source?.quote ?? ''))
+    if (!privacy.durableMemoryAllowed)
+      throw new Error(privacy.reason)
     const parsed = v.safeParse(textSchema, text)
     if (!parsed.success)
       throw new Error(this.messages.memoryText)
@@ -142,7 +146,7 @@ export class Memory {
   }
 
   /** Model edits require current-turn evidence. Saved facts must be verbatim excerpts, never inferred summaries. */
-  async tools(userText: string, sessionId?: string): Promise<Tool[]> {
+  async tools(userText: string, sessionId?: string, privacy = requestPrivacy(userText)): Promise<Tool[]> {
     const state = await this.read()
     if (!state.enabled)
       return []
@@ -172,8 +176,15 @@ export class Memory {
         if (!call.success)
           return { status: 'rejected', reason: this.messages.memoryUsage }
         const { action, id, text, source_quote, core } = call.output
+        if (action !== 'forget') {
+          const rejection = durableWriteRejection(privacy, 'personal', call.output)
+          if (rejection)
+            return rejection
+        }
         const current = await this.read()
-        if (!userText.includes(source_quote) || (text !== null && !source_quote.includes(text)) || !current.enabled)
+        if (!current.enabled)
+          return { status: 'rejected', reason: 'memory-disabled' }
+        if (!userText.includes(source_quote) || (text !== null && !source_quote.includes(text)))
           return { status: 'rejected', reason: this.messages.memoryEvidence }
         if (text !== null && sanitize(text, 500) !== text)
           return { status: 'rejected', reason: 'sensitive-content' }

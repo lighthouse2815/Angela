@@ -12,6 +12,7 @@ import { errorMessageFrom } from '@moeru/std'
 import * as v from 'valibot'
 
 import { MemoryFile } from './memory-file'
+import { durableWriteRejection, requestPrivacy, sensitiveContent } from './privacy-policy'
 
 const shortText = v.pipe(v.string(), v.trim(), v.maxLength(800))
 const items = (limit: number) => v.pipe(v.array(v.pipe(v.string(), v.trim(), v.minLength(1), v.maxLength(400))), v.maxLength(limit))
@@ -92,6 +93,8 @@ export class ProjectMemory {
 
   /** Full checkpoints replace obsolete blockers. Revision checks reject concurrent or replayed writes without losing either session's work. */
   async save(snapshot: v.InferOutput<typeof snapshotSchema>, expectedRevision: number, sessionId: string) {
+    if (sensitiveContent(JSON.stringify(snapshot)))
+      throw new Error('sensitive-content')
     const input = v.parse(snapshotSchema, snapshot)
     const stored = input.status === 'done' ? { ...input, blockers: [], nextStep: '' } : input
     const sourceSession = v.parse(v.pipe(v.string(), v.uuid()), sessionId)
@@ -130,7 +133,7 @@ export class ProjectMemory {
   }
 
   /** Evidence is limited to the current user message and host-observed MCP output, never the model's own answer or memory-tool output. */
-  async tools(userText: string, sessionId: string, observations: readonly string[]): Promise<Tool[]> {
+  async tools(userText: string, sessionId: string, observations: readonly string[], privacy = requestPrivacy(userText)): Promise<Tool[]> {
     if (!(await this.read()).enabled)
       return []
     return [{
@@ -162,6 +165,9 @@ export class ProjectMemory {
         },
       },
       execute: async (input, options) => {
+        const rejection = durableWriteRejection(privacy, 'project', input)
+        if (rejection)
+          return rejection
         const parsed = v.safeParse(updateSchema, input)
         if (!parsed.success)
           return { status: 'rejected', reason: this.messages.projectMemoryUsage }

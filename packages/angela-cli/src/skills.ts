@@ -11,6 +11,7 @@ import { parseDocument, stringify } from 'yaml'
 import * as v from 'valibot'
 
 import { MemoryFile } from './memory-file'
+import { durableWriteRejection, requestPrivacy, sensitiveContent } from './privacy-policy'
 import { RecallIndex } from './recall-index'
 
 const nameSchema = v.pipe(v.string(), v.regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/u), v.maxLength(64))
@@ -111,6 +112,8 @@ export class Skills {
 
   /** Writes one skill atomically under an exclusive lock. Version checks prevent overwriting a workflow changed by another session. */
   async save(input: v.InferOutput<typeof saveSchema>, provenance?: { sessionId: string, kind: 'user' | 'tool' }) {
+    if (sensitiveContent(JSON.stringify(input)))
+      throw new Error('sensitive-content')
     const skill = v.parse(saveSchema, input)
     const directory = join(this.directory, skill.name)
     await mkdir(directory, { recursive: true, mode: 0o700 })
@@ -153,7 +156,7 @@ export class Skills {
     }
   }
 
-  tools(userText: string, observations: readonly string[], sessionId: string, onChange: () => Promise<void>): Tool[] {
+  tools(userText: string, observations: readonly string[], sessionId: string, onChange: () => Promise<void>, privacy = requestPrivacy(userText)): Tool[] {
     return [{
       type: 'function',
       function: {
@@ -162,6 +165,9 @@ export class Skills {
         parameters: { type: 'object', properties: { name: { type: 'string' }, description: { type: 'string' }, instructions: { type: 'string' }, verification_quote: { type: 'string' }, expected_version: { type: ['string', 'null'], description: 'Version returned by skill read for updates. Null for new skills.' } }, required: ['name', 'description', 'instructions', 'verification_quote', 'expected_version'], additionalProperties: false },
       },
       execute: async (input, options) => {
+        const rejection = durableWriteRejection(privacy, 'workflow', input)
+        if (rejection)
+          return rejection
         const parsed = v.safeParse(saveSchema, input)
         if (!parsed.success)
           return { status: 'rejected', reason: this.messages.skillsUsage }

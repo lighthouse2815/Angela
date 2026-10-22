@@ -19,6 +19,7 @@ import process from 'node:process'
 
 import { randomUUID } from 'node:crypto'
 
+import { requestPrivacy } from '../privacy-policy'
 import { buildContext } from './context-builder'
 import { EventBus } from './event-bus'
 import { buildTools } from './tool-registry'
@@ -366,6 +367,7 @@ export class RuntimeSession {
   private request?: Promise<void>
   private closing?: Promise<void>
   private lastRequest?: Omit<BaseAngelaEvent, 'id' | 'timestamp'>
+  private lastPrivacyAllowed = true
   private sessionStarted = false
   private lastReason: 'completed' | 'aborted' | 'failed' = 'completed'
 
@@ -453,6 +455,9 @@ export class RuntimeSession {
       return undefined
     if (!text.startsWith('/'))
       return undefined
+    const privacy = requestPrivacy(text)
+    if (!privacy.durableMemoryAllowed)
+      return JSON.stringify({ status: 'rejected', reason: privacy.reason })
     if (text === '/memory consolidate')
       return JSON.stringify(await (await this.recall())?.enrich(this.runtime.model, this.runtime.provider, signal))
     if (/^\/(?:tasks|today|done|cancel|snooze)(?:\s|$)/u.test(text)) {
@@ -541,6 +546,14 @@ export class RuntimeSession {
         } }
         if (this.options.channel !== 'discord' && this.options.channel !== 'zalo') {
           sources.memory = await this.memory()
+          let memoryEnabled = false
+          try {
+            memoryEnabled = (await sources.memory.read()).enabled
+          }
+          catch { sources.warn(this.runtime.messages.memoryUnavailable) }
+          sources.privacy = requestPrivacy(text, memoryEnabled, chat.privacy)
+          chat.applyPrivacy(sources.privacy)
+          this.lastPrivacyAllowed = sources.privacy.durableMemoryAllowed
           sources.tasks = await this.tasks()
           if (this.options.channel === 'cli' || this.options.channel === 'desktop')
             sources.project = await this.project()
@@ -548,7 +561,8 @@ export class RuntimeSession {
           recall = sources.recall
           envelope.workspace = sources.project?.workspace ?? this.options.workspace
           try {
-            capture = await sources.recall?.capture()
+            if (sources.privacy.durableMemoryAllowed)
+              capture = await sources.recall?.capture(sources.privacy)
           }
           catch { sources.warn(this.runtime.messages.memoryUnavailable) }
         }
@@ -641,7 +655,7 @@ export class RuntimeSession {
           const event: AngelaEvent = { ...this.lastRequest, id: randomUUID(), timestamp: new Date().toISOString(), type: 'session.ended', reason: this.lastReason }
           this.runtime.events.emit(event)
           try {
-            const capture = await (await this.retrieval)?.capture()
+            const capture = this.lastPrivacyAllowed ? await (await this.retrieval)?.capture() : undefined
             capture?.record(event)
             capture?.finish('')
           }

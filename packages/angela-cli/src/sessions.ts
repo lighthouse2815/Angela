@@ -15,6 +15,8 @@ import { chatMessagesToTurns, conversationToChatMessages } from '@angela/core-ag
 
 import * as v from 'valibot'
 
+import { durableConversation, requestPrivacy } from './privacy-policy'
+
 // CLI sessions use portable text messages. Provider-native continuation stays in memory for the current process.
 const messagesSchema: v.GenericSchema<Message[]> = v.array(v.variant('role', [
   v.object({ role: v.literal('system'), content: v.string() }),
@@ -217,6 +219,28 @@ export class Session {
 
   /** Saves full history on disk, then releases compacted turns and the portable snapshot from RAM. */
   async saveChat(chat: Chat, interrupted: boolean, request: SavedRequest | null | undefined = this.record.request) {
+    // Telegram checkpoints can precede runtime capture and include the full recovery request.
+    if (request)
+      chat.applyPrivacy(requestPrivacy(request.text, true, chat.privacy))
+    const durable = durableConversation(chat.conversation)
+    if (durable !== chat.conversation) {
+      let messages = conversationToChatMessages(durable, false)
+      const priorOffset = this.record.working?.offset ?? 0
+      if (priorOffset) {
+        const previous = await readFile(join(this.directory, `${this.record.id}.json`), 'utf8')
+        const archived = v.parse(sessionSchema, JSON.parse(previous)).messages.slice(0, priorOffset)
+        messages = [...archived, ...messages.filter(message => message.role !== 'system')]
+      }
+      await this.write(v.parse(sessionSchema, {
+        ...this.record,
+        messages,
+        interrupted,
+        updatedAt: new Date().toISOString(),
+        request: undefined,
+      }))
+      this.record.messages = []
+      return
+    }
     // Tool checkpoints cannot retire history while the current generation still owns its prepared turn projection.
     const generationActive = chat.isSending
     const checkpoint = generationActive ? { summary: this.record.working?.summary ?? '', turns: 0 } : chat.context.checkpoint(chat.conversation)
@@ -250,9 +274,9 @@ export class Session {
     const record = v.parse(sessionSchema, {
       ...this.record,
       updatedAt: new Date().toISOString(),
-      messages: v.parse(messagesSchema, conversationToChatMessages(conversation, false)),
+      messages: v.parse(messagesSchema, conversationToChatMessages(durableConversation(conversation), false)),
       interrupted,
-      request: request ?? undefined,
+      request: durableConversation(conversation) === conversation && (!request || requestPrivacy(request.text).durableMemoryAllowed) ? request ?? undefined : undefined,
       working: undefined,
     })
     await this.write(record)

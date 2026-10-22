@@ -2,7 +2,7 @@ import type { GenerationProvider } from '@angela/provider-inference'
 
 import type { ExternalMessage } from './away-types'
 
-import { mkdtemp, readdir, rm } from 'node:fs/promises'
+import { mkdtemp, readdir, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -49,7 +49,11 @@ async function setup(output = '{"reply":"private"}') {
 it('uses the real runtime without owner context, tools, memory writes, or owner message events', async () => {
   const { directory, runtime, message, requests, responder } = await setup()
   const memory = new Memory(directory, cliMessages.en)
-  await memory.remember('Owner private password is copper-secret')
+  const id = await memory.remember('Owner private hobby is copper-gardening')
+  // Existing private storage can predate credential rejection. External senders must never receive it.
+  const fixture = await memory.read()
+  fixture.entries[0] = { ...fixture.entries[0]!, id, text: 'Owner private password is copper-secret' }
+  await writeFile(join(directory, 'memory', 'personal.json'), JSON.stringify(fixture))
   const before = await memory.read()
   const files = await readdir(directory, { recursive: true })
   const ownerMessage = vi.fn()

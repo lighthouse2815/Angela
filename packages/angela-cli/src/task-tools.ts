@@ -1,12 +1,14 @@
 import type { cliMessages } from '@angela/i18n/cli'
 import type { Tool } from '@xsai/shared-chat'
 
+import type { RequestPrivacy } from './privacy-policy'
 import type { Tasks } from './tasks'
 
 import { errorMessageFrom } from '@moeru/std'
 
 import * as v from 'valibot'
 
+import { durableWriteRejection } from './privacy-policy'
 import { taskCreate, taskDate, taskId, taskTime, taskUpdate } from './task-schema'
 import { taskDuration } from './task-time'
 
@@ -53,7 +55,7 @@ export function taskContext(tasks: Tasks, host: 'terminal' | 'telegram' = 'termi
 }
 
 /** Uses the same executable Tool contract as memory and MCP, with validation before all storage mutations. */
-export function taskTools(tasks: Tasks, messages: typeof cliMessages.en.tasks): Tool[] {
+export function taskTools(tasks: Tasks, messages: typeof cliMessages.en.tasks, privacy?: RequestPrivacy): Tool[] {
   const definitions: { name: string, description: string, properties: object, required: string[], execute: (input: unknown) => Promise<unknown> }[] = [
     { name: 'task_create', description: 'Create an everyday task requested by the user. Use recurrence for routines.', properties: fields, required: ['title', 'type'], execute: async input => await tasks.create(v.parse(taskCreate, input)) },
     { name: 'task_list', description: 'List tasks to answer schedule questions or find stable IDs before edits. Defaults to pending tasks.', properties: { status: { type: 'string', enum: ['pending', 'completed', 'cancelled', 'all'] }, type: fields.type, date: { type: 'string', description: 'YYYY-MM-DD in the local CLI timezone.' } }, required: [], execute: async input => await tasks.list(v.parse(listSchema, input)) },
@@ -75,6 +77,11 @@ export function taskTools(tasks: Tasks, messages: typeof cliMessages.en.tasks): 
     type: 'function',
     function: { name: definition.name, description: definition.description, parameters: { type: 'object', properties: definition.properties, required: definition.required, additionalProperties: false } },
     execute: async (input, options) => {
+      if (privacy && definition.name !== 'task_list') {
+        const rejection = durableWriteRejection(privacy, 'task', input)
+        if (rejection)
+          return rejection
+      }
       options.abortSignal?.throwIfAborted()
       try {
         return { status: definition.name === 'task_list' ? 'listed' : 'saved', result: await definition.execute(input) }
