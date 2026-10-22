@@ -800,7 +800,7 @@ async function main() {
     })
 
     mcpClient = new Client({
-      name: '@proj-airi/computer-use-mcp-e2e-airi-discord-agentic',
+      name: '@proj-airi/computer-use-mcp-e2e-angela-discord-agentic',
       version: '0.1.0',
     })
 

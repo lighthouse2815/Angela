@@ -103,7 +103,7 @@ This is the current service-level proof for terminal lane v2.
 
 ### 5. Angela chat self-acquire demo is now on the v2 path
 
-`src/bin/e2e-airi-chat-terminal-self-acquire.ts` follows the same product story:
+`src/bin/e2e-angela-chat-terminal-self-acquire.ts` follows the same product story:
 
 - no harness-side `pty_create`
 - Angela calls the real workflow
@@ -167,7 +167,7 @@ If you are continuing terminal lane work, read these first:
 2. `src/workflows/surface-resolver.ts`
 3. `src/terminal/interactive-patterns.ts`
 4. `src/bin/e2e-terminal-self-acquire.ts`
-5. `src/bin/e2e-airi-chat-terminal-self-acquire.ts`
+5. `src/bin/e2e-angela-chat-terminal-self-acquire.ts`
 6. `src/support-matrix.ts`
 7. `apps/desktop/src/renderer/App.vue`
 8. `apps/desktop/src/renderer/modules/computer-use-approval.ts`
