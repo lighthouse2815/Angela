@@ -1,5 +1,5 @@
 > Desktop development keeps the API types and shared contracts here.
-> Auth, Compose, Caddy, and Railway files moved to [dev-infuture](../../dev-in-future/README.md).
+> Auth, Compose, Caddy, and Railway files moved to [dev-in-future](../../dev-in-future/README.md).
 > The local desktop does not require this hosted stack.
 
 # Angela Backend
@@ -11,22 +11,22 @@ while production deployment configuration remains in `proj-airi/airi-railway`.
 ## Layout
 
 - `apps/api`: resource API, business domains, database migrations, and API runtime.
-- `apps/auth`: standalone Better Auth and OIDC service.
+- `../dev-in-future/server/apps/auth`: deferred Better Auth and OIDC source outside this repository.
 - `packages/auth-shared`: Auth-owned database schema and principal contracts.
 - `packages/server-sdk-shared`: Eventa contracts for the hosted chat WebSocket.
-- `dev/caddy`: local-only public edge routing for the shared Auth/API origin.
-- `docker-compose.yaml`: complete local API + Auth + PostgreSQL + Redis + Caddy stack.
+- `../dev-in-future/server/dev/caddy` and `server/docker-compose.yaml`: deferred routing and backend stack outside this repository.
 
 ## Run locally
 
-From the repository root:
+Run the retained API from the repository root:
 
 ```sh
-pnpm dev:backend
+pnpm -F @angela/api-server dev
 ```
 
-The command uses `../dev-in-future/server/docker-compose.yaml` and exposes only Caddy at
-`http://localhost:6112`.
+The complete backend stack requires the deferred Auth, Compose, Caddy, and catalog files.
+Read the [restoration guide](../../dev-in-future/README.md) before building that stack.
+The root backend shortcut is absent. Docker cannot copy the deferred source from outside its build context.
 
 ## Railway deployment
 

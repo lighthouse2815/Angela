@@ -14,7 +14,6 @@ Examples:
 pnpm exec cap-vite -- ios --target <DEVICE_ID_OR_SIMULATOR_NAME>
 pnpm exec cap-vite -- --host 0.0.0.0 --port 5173 -- android --target <DEVICE_ID_OR_SIMULATOR_NAME> --flavor release
 CAPACITOR_DEVICE_ID_IOS=<DEVICE_ID_OR_SIMULATOR_NAME> pnpm exec cap-vite -- ios
-pnpm -F @proj-airi/stage-pocket run dev:ios -- --target <DEVICE_ID_OR_SIMULATOR_NAME>
 ```
 
 - Arguments before `--` are forwarded to `vite`.

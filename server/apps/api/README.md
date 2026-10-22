@@ -190,17 +190,9 @@ pnpm -F @angela/api-server exec vitest run
 pnpm -F @angela/api-server build
 ```
 
-Run the complete local backend from the repository root:
-
-```sh
-pnpm dev:backend
-```
-
-For source-level debugging, start `@angela/api-server` and
-`@proj-airi/auth-server` separately instead.
-
-`../dev-in-future/server/docker-compose.yaml` exposes the local Caddy gateway at `http://localhost:6112` and keeps
-the API and Auth container ports private.
+The complete backend stack is deferred outside this repository.
+Read the [restoration guide](../../../../dev-in-future/README.md) before using Auth, Compose, or Caddy.
+The root backend shortcut is absent. The commands above apply to the retained API workspace.
 
 ## Service boundaries
 
