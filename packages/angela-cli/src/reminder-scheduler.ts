@@ -1,3 +1,5 @@
+import type { OpenLoop } from './open-loops'
+import type { ProactiveActivity } from './proactive-policy'
 import type { Task } from './task-schema'
 import type { Tasks } from './tasks'
 
@@ -6,7 +8,12 @@ import { taskDue } from './task-time'
 import { deliveryLeaseMs } from './tasks'
 
 /** Resolution confirms text presentation. Implementations must honor cancellation and run verify immediately before the external side effect. */
+export interface ProactiveSource {
+  refresh: (signal: AbortSignal, activity: ProactiveActivity, tasks: readonly Task[]) => Promise<void>
+}
+
 export interface ReminderNotifier {
+  notifyOpenLoop?: (loop: OpenLoop, signal: AbortSignal, verify: () => Promise<void>) => Promise<void>
   notify: (tasks: readonly Task[], overdue: boolean, signal: AbortSignal, verify?: () => Promise<void>) => Promise<void>
 }
 
@@ -20,9 +27,10 @@ export class ReminderScheduler {
   private started = false
   private startup = true
   private reportedError = false
+  private readonly sourceErrors = new Set<ProactiveSource>()
   private lastActivityAt?: number
 
-  constructor(private readonly tasks: Tasks, private readonly notifier: ReminderNotifier, private readonly onError: (error: unknown) => void, private readonly scheduleShared?: (delay: number) => void, private readonly policy = new ProactivePolicy()) {}
+  constructor(private readonly tasks: Tasks, private readonly notifier: ReminderNotifier, private readonly onError: (error: unknown) => void, private readonly scheduleShared?: (delay: number) => void, private readonly policy = new ProactivePolicy(), private readonly sources: readonly ProactiveSource[] = []) {}
 
   async start() {
     if (this.started || this.lifetime.signal.aborted)
@@ -122,6 +130,20 @@ export class ReminderScheduler {
     }
     const snapshot = await this.tasks.list({ status: 'all' })
     const activity = this.activity(snapshot)
+    for (const source of this.sources) {
+      if (this.lifetime.signal.aborted)
+        return
+      try {
+        await source.refresh(this.lifetime.signal, activity, snapshot)
+        this.sourceErrors.delete(source)
+      }
+      catch (error) {
+        if (!this.lifetime.signal.aborted && !this.sourceErrors.has(source)) {
+          this.sourceErrors.add(source)
+          this.onError(error)
+        }
+      }
+    }
     const next = snapshot.map(task => this.policy.evaluate(task, this.tasks.now(), activity).nextAt).filter(value => value !== undefined).sort((a, b) => a - b)[0]
     this.schedule(next === undefined ? 60_000 : Math.min(60_000, Math.max(0, next - this.tasks.now())))
   }

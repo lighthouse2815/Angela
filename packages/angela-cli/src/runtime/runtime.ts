@@ -7,6 +7,7 @@ import type { Clock } from '../clock'
 import type { McpTools } from '../mcp'
 import type { Memory } from '../memory'
 import type { MemoryCapture } from '../memory-v2/consolidator'
+import type { OpenLoop } from '../open-loops'
 import type { ProactiveOptions } from '../proactive-policy'
 import type { ProjectMemory } from '../project-memory'
 import type { Recall } from '../recall'
@@ -24,6 +25,9 @@ import { randomUUID } from 'node:crypto'
 
 import { ActiveCommitments } from '../active-commitments'
 import { SystemClock } from '../clock'
+import { OpenLoopConversation } from '../open-loop-conversation'
+import { OpenLoopSource } from '../open-loop-source'
+import { OpenLoops } from '../open-loops'
 import { requestPrivacy } from '../privacy-policy'
 import { proactiveCandidate } from '../proactive-candidate'
 import { ProactivePolicy } from '../proactive-policy'
@@ -225,7 +229,13 @@ export class AngelaRuntime {
           selected = value
         return selected
       }
-      const scheduler = new ReminderScheduler(await tasks, {
+      const delivery: ReminderNotifier = {
+        notifyOpenLoop: async (...args) => {
+          const destination = target()
+          if (!destination?.notifier.notifyOpenLoop)
+            throw new Error('Open loop destination is unavailable')
+          await destination.notifier.notifyOpenLoop(...args)
+        },
         notify: async (...args) => {
           const destination = target()
           if (!destination)
@@ -241,13 +251,18 @@ export class AngelaRuntime {
               this.events.emit({ id: randomUUID(), type: 'proactive.prompted', timestamp: new Date(this.clock.now()).toISOString(), correlationId, channel: 'system', taskId: task.id, candidateId: candidate.id, reason: candidate.reason })
           }
         },
-      }, error => target()?.onError(error), (delay) => {
+      }
+      const loops = this.openLoops(dataDir)
+      const source = new OpenLoopSource(loops, this.clock, (await tasks).timezone, this.proactive, delivery, async () => Boolean(target()?.notifier.notifyOpenLoop) && ![...this.states.values()].some(state => state.options.dataDir === dataDir && state.resourceCounts.requests > 0) && await this.openLoopsEnabled(dataDir), (id) => {
+        this.events.emit({ id: randomUUID(), type: 'proactive.candidate', timestamp: new Date(this.clock.now()).toISOString(), correlationId: randomUUID(), channel: 'system', loopId: id.slice('open_loop:'.length), candidateId: id, reason: 'implicit_open_loop' })
+      }, await tasks)
+      const scheduler = new ReminderScheduler(await tasks, delivery, error => target()?.onError(error), (delay) => {
         const route = this.remindersByStore.get(dataDir)
         if (route?.ready === ready) {
           route.dueAt = this.clock.now() + delay
           this.armReminders()
         }
-      }, this.proactive)
+      }, this.proactive, [source])
       try {
         await scheduler.start()
         return scheduler
@@ -269,11 +284,40 @@ export class AngelaRuntime {
     if (!tasks) {
       if (this.taskStores.size >= 256)
         throw new Error('Runtime task store limit reached')
-      tasks = import('../tasks').then(({ Tasks }) => new Tasks(dataDir, this.messages.tasks, this.clock, this.env.ANGELA_TIMEZONE))
+      tasks = import('../tasks').then(({ Tasks }) => {
+        const store = new Tasks(dataDir, this.messages.tasks, this.clock, this.env.ANGELA_TIMEZONE)
+        store.subscribe(async (change) => {
+          if (change.type === 'task.created' || change.type === 'task.updated') {
+            await this.openLoops(dataDir).reconcile(await store.list({ status: 'all' })).catch(() => {
+              this.events.emit({ id: randomUUID(), type: 'open_loop.unavailable', timestamp: new Date(this.clock.now()).toISOString(), correlationId: randomUUID(), channel: 'system' })
+            })
+          }
+        })
+        return store
+      })
       this.taskStores.set(dataDir, tasks)
       void tasks.catch(() => this.taskStores.delete(dataDir))
     }
     return await tasks
+  }
+
+  /** Reads existing automatic-memory controls without opening an index, watcher, model, or embedding client. */
+  async openLoopsEnabled(dataDir: string) {
+    const { Recall } = await import('../recall')
+    return await new Recall(dataDir, '', '', this.messages, {}, this.defaults).automaticMemoryEnabled()
+  }
+
+  openLoops(dataDir: string) {
+    return new OpenLoops(dataDir, this.messages.tasks, this.clock, (change) => {
+      const payload: EventPayload = change.type === 'proactive.prompted'
+        ? { type: 'proactive.prompted', loopId: change.loopId, candidateId: `open_loop:${change.loopId}`, reason: 'implicit_open_loop' }
+        : change
+      this.events.emit({ ...payload, id: randomUUID(), timestamp: new Date(this.clock.now()).toISOString(), correlationId: randomUUID(), channel: 'system' })
+    })
+  }
+
+  async mentionOpenLoop(options: SessionOptions, loop: OpenLoop) {
+    await new ActiveCommitments({ ...options, messages: this.messages.tasks }, () => options.warn?.(this.messages.tasks.unavailable)).mentionReferences([{ kind: 'open_loop', id: loop.id }], 'notification', this.clock.now())
   }
 
   /** Notification routing supplies the destination's exact session identity, even while its runtime context is cold. */
@@ -413,6 +457,10 @@ export class RuntimeSession {
 
   async mentionCommitments(tasks: readonly Task[]) {
     await this.activeCommitments.mention(tasks, 'notification', this.runtime.clock.now())
+  }
+
+  async mentionOpenLoop(loop: OpenLoop) {
+    await this.activeCommitments.mentionReferences([{ kind: 'open_loop', id: loop.id }], 'notification', this.runtime.clock.now())
   }
 
   /** Acquisitions refresh request-bound connectors only after the previous release completes. */
@@ -585,7 +633,7 @@ export class RuntimeSession {
       try {
         signal.throwIfAborted()
         const warnings: string[] = []
-        const sources: ContextSources = { channel: this.options.channel, messages: this.runtime.messages, warn: (message) => {
+        const sources: ContextSources = { workspace: this.options.workspace, channel: this.options.channel, messages: this.runtime.messages, warn: (message) => {
           // Adapter presentation does not deliver evidence to the model. Keep a bounded request-local copy for both paths.
           if (warnings.length < 8 && !warnings.includes(message))
             warnings.push(message)
@@ -619,6 +667,22 @@ export class RuntimeSession {
         }
         await emit({ type: this.options.channel === 'zalo' ? 'external.message' : 'user.message' }, text)
         if (sources.tasks && sources.privacy) {
+          let openLoopReply: string | undefined
+          try {
+            if (sources.privacy.durableMemoryAllowed && await this.runtime.openLoopsEnabled(this.options.dataDir)) {
+              sources.openLoops = this.runtime.openLoops(this.options.dataDir)
+              openLoopReply = await new OpenLoopConversation(sources.openLoops, this.activeCommitments, sources.tasks, this.options.workspace, this.options.sessionId, this.runtime.messages.tasks).handle(text, sources.privacy)
+            }
+          }
+          catch { sources.warn(this.runtime.messages.tasks.openLoopUnavailable) }
+          if (openLoopReply) {
+            await this.activeCommitments.advance(this.runtime.clock.now())
+            await chat.respond(text, openLoopReply, options)
+            assistant = openLoopReply
+            completed = true
+            await emit({ type: 'assistant.message' }, assistant)
+            return
+          }
           const { CommitmentConversation } = await import('../commitment-conversation')
           const projection = capture ? await sources.recall?.commitmentSource() : undefined
           const response = await new CommitmentConversation(sources.tasks, this.runtime.messages.tasks, this.options.locale ?? 'en', projection, this.activeCommitments).handle(text, chat.conversation, sources.privacy)
@@ -661,15 +725,10 @@ export class RuntimeSession {
           },
         }, warnings.length ? [context, ...warnings].filter(Boolean).join('\n\n') : context)
         if (sources.tasks && sources.privacy?.taskWritesAllowed) {
-          const ids = new Set(assistant.match(/[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}/giu)?.map(id => id.toLowerCase()))
-          if (ids.size) {
-            try {
-              const mentioned = (await sources.tasks.list({ status: 'all' })).filter(task => ids.has(task.id))
-              if (mentioned.length)
-                await this.activeCommitments.mention(mentioned, 'conversation', this.runtime.clock.now())
-            }
-            catch { sources.warn(this.runtime.messages.tasks.unavailable) }
+          try {
+            await this.activeCommitments.mentionText(assistant, await sources.tasks.list({ status: 'all' }), this.runtime.clock.now())
           }
+          catch { sources.warn(this.runtime.messages.tasks.unavailable) }
         }
         completed = true
         await emit({ type: 'assistant.message' }, assistant)

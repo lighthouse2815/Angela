@@ -1,3 +1,5 @@
+import type { OpenLoopChange } from '../open-loops'
+
 /** Request identities isolate concurrent channels without retaining a trace or provider payload. */
 export interface BaseAngelaEvent {
   id: string
@@ -22,6 +24,10 @@ export type AngelaEvent = BaseAngelaEvent & (
   | { type: 'reminder.delivered', taskId: string }
   | { type: 'reminder.due', taskId: string }
   | { type: 'proactive.prompted', taskId: string, candidateId: string, reason: 'due_commitment' | 'overdue_commitment' | 'explicit_follow_up' }
+  | { type: 'proactive.prompted', loopId: string, candidateId: string, reason: 'implicit_open_loop' }
+  | { type: 'proactive.candidate', loopId: string, candidateId: string, reason: 'implicit_open_loop' }
+  | { type: 'open_loop.unavailable' }
+  | Exclude<OpenLoopChange, { type: 'proactive.prompted' }>
   | { type: 'project.changed', revision: number }
   | { type: 'memory.changed', memoryId: string, action: 'saved' | 'deleted' }
   | { type: 'session.started' }

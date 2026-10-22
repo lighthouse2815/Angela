@@ -60,6 +60,17 @@ export class ActiveCommitments {
     await this.mentionReferences(tasks.map(task => ({ kind: 'task', id: task.id })), source, now)
   }
 
+  /** Recognizes verified task IDs or complete title phrases in an assistant reply. One reply remains one group. */
+  async mentionText(text: string, tasks: readonly Task[], now: number) {
+    const ids = new Set(text.match(/[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}/giu)?.map(id => id.toLowerCase()))
+    const words = ` ${text.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}+#]+/gu, ' ')} `
+    const mentioned = tasks.filter((task) => {
+      const title = task.title.normalize('NFKC').toLowerCase().replace(/[^\p{L}\p{N}+#]+/gu, ' ').trim()
+      return ids.has(task.id) || (title.length >= 4 && words.includes(` ${title} `))
+    })
+    await this.mention(mentioned, 'conversation', now)
+  }
+
   /** Returns the whole latest group. Callers cannot filter an ambiguous group into a unique pending target. */
   async current(now: number): Promise<readonly FocusReference[]> {
     await this.load()
@@ -79,14 +90,18 @@ export class ActiveCommitments {
           break
         if (turn.type !== 'assistant')
           continue
-        const content = JSON.stringify(turn)
-        const mentioned = tasks.filter(task => content.includes(task.id))
-        if (!mentioned.length)
+        const content = JSON.stringify(turn.rounds.flatMap(round => [...round.content.filter(part => part.type !== 'tool'), ...round.toolInvocations.flatMap(invocation => invocation.execution.status === 'succeeded' ? invocation.execution.output : [])]))
+        const ids = [...new Set(content.match(/[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}/giu)?.map(id => id.toLowerCase()))]
+        if (!ids.length)
           continue
-        references = mentioned.filter((task) => {
+        const mentioned = tasks.filter(task => ids.includes(task.id))
+        if (mentioned.length !== ids.length || mentioned.some((task) => {
           const timestamp = Date.parse(task.lastNotifiedAt ?? task.updatedAt)
-          return now >= timestamp && now - timestamp <= 6 * 3_600_000
-        }).map(task => ({ kind: 'task', id: task.id }))
+          return now < timestamp || now - timestamp > 6 * 3_600_000
+        })) {
+          return []
+        }
+        references = ids.map(id => ({ kind: 'task', id }))
         break
       }
     }

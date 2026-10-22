@@ -201,7 +201,7 @@ async function main() {
     let pendingUtterance: string | undefined
     let voiceReady = false
     let reminderWake: AbortController | undefined
-    const notifications = new ReminderNotifications(messages.tasks, config.locale, async (text, announced) => {
+    const notifications = new ReminderNotifications(messages.tasks, config.locale, async (text, announced, _signal, loop) => {
       if (input) {
         await input.notify(text)
       }
@@ -210,8 +210,11 @@ async function main() {
           process.stderr.write(`\n${text}\n`, error => error ? reject(error) : resolve())
         })
       }
-      if (announced.length) {
-        await scope.mentionCommitments(announced)
+      if (loop)
+        await scope.mentionOpenLoop(loop)
+      if (announced.length || loop) {
+        if (announced.length)
+          await scope.mentionCommitments(announced)
         chat.conversation.turns.push(...chatMessagesToTurns([{ role: 'assistant', content: text }]))
       }
       if (voiceReady && !input?.hasInput)

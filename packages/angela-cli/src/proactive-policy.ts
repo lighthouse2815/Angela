@@ -70,15 +70,15 @@ export class ProactivePolicy {
     let nextAt = candidate.earliestAt
     if (candidate.lastPromptedAt !== undefined)
       nextAt = Math.max(nextAt, candidate.lastPromptedAt + (this.options.cooldownMs ?? 0))
-    if (candidate.reason === 'explicit_follow_up') {
+    if (candidate.reason === 'explicit_follow_up' || candidate.reason === 'implicit_open_loop') {
       if (activity.lastActivityAt !== undefined)
-        nextAt = Math.max(nextAt, activity.lastActivityAt + (this.options.recentActivityMs ?? 120_000))
+        nextAt = Math.max(nextAt, activity.lastActivityAt + (candidate.reason === 'implicit_open_loop' ? Math.max(900_000, this.options.recentActivityMs ?? 0) : this.options.recentActivityMs ?? 120_000))
       if (activity.lastFollowUpAt !== undefined)
-        nextAt = Math.max(nextAt, activity.lastFollowUpAt + this.followUpCooldownMs)
+        nextAt = Math.max(nextAt, activity.lastFollowUpAt + (candidate.reason === 'implicit_open_loop' ? Math.max(8 * 3_600_000, this.followUpCooldownMs) : this.followUpCooldownMs))
       if (activity.followUpClaimUntil !== undefined)
         nextAt = Math.max(nextAt, activity.followUpClaimUntil)
     }
-    const quiet = this.options.quietHours
+    const quiet = this.options.quietHours ?? (candidate.reason === 'implicit_open_loop' ? { start: 22, end: 8 } : undefined)
     if (quiet && quiet.start !== quiet.end) {
       const hour = Number(new Intl.DateTimeFormat('en', { timeZone: timezone, hour: '2-digit', hourCycle: 'h23' }).format(now))
       const overnight = quiet.start > quiet.end

@@ -5,7 +5,7 @@ import { deliveryDue, followUpExpiry, taskDue } from './task-time'
 /** A traceable view of an authoritative task occurrence. It has no independent persistence or semantic-memory source. */
 export interface ProactiveCandidate {
   id: string
-  reason: 'due_commitment' | 'overdue_commitment' | 'explicit_follow_up'
+  reason: 'due_commitment' | 'overdue_commitment' | 'explicit_follow_up' | 'implicit_open_loop'
   subject: string
   sourceId: string
   createdAt: string
@@ -19,7 +19,7 @@ export interface ProactiveCandidate {
 }
 
 /** Candidate identity uses the task and occurrence. Snoozes create a new occurrence without duplicating the commitment. */
-export function proactiveCandidate(task: Task, now: number): ProactiveCandidate | undefined {
+export function proactiveCandidate(task: Task, now: number): (ProactiveCandidate & { reason: 'due_commitment' | 'overdue_commitment' | 'explicit_follow_up' }) | undefined {
   const occurrence = taskDue(task)
   if (!occurrence)
     return undefined

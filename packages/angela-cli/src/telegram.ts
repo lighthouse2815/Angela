@@ -158,11 +158,16 @@ export class TelegramChat {
   }
 
   private reminders(chatId: number) {
-    return this.runtime.reminders(this.root(chatId), new ReminderNotifications(this.messages.tasks, this.companionConfig.locale, async (text, tasks, signal) => {
+    return this.runtime.reminders(this.root(chatId), new ReminderNotifications(this.messages.tasks, this.companionConfig.locale, async (text, tasks, signal, loop) => {
       await this.reply(chatId, text, signal)
-      await this.runtime.mentionCommitments({ dataDir: this.root(chatId), workspace: this.workspace, sessionId: this.sessionId(chatId), channel: 'telegram', warn: () => {
-        void this.reply(chatId, this.messages.tasks.unavailable).catch(() => {})
-      } }, tasks)
+      if (loop) {
+        await this.runtime.mentionOpenLoop({ dataDir: this.root(chatId), workspace: this.workspace, sessionId: this.sessionId(chatId), channel: 'telegram' }, loop)
+      }
+      else {
+        await this.runtime.mentionCommitments({ dataDir: this.root(chatId), workspace: this.workspace, sessionId: this.sessionId(chatId), channel: 'telegram', warn: () => {
+          void this.reply(chatId, this.messages.tasks.unavailable).catch(() => {})
+        } }, tasks)
+      }
     }), () => {
       void this.reply(chatId, this.messages.tasks.failed).catch(() => {})
     }, this)

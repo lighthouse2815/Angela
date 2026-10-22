@@ -69,3 +69,35 @@ it('resolves only the latest focus group and never falls back after its task bec
   }
   finally { await rm(dataDir, { recursive: true, force: true }) }
 })
+
+it('keeps focus through unrelated replies, switches on a later named event, and preserves batch ambiguity', async () => {
+  const dataDir = await mkdtemp(join(tmpdir(), 'angela-named-focus-'))
+  try {
+    const now = Date.parse('2026-10-23T09:00:00Z')
+    const tasks = new Tasks(dataDir, cliMessages.en.tasks, () => now, 'UTC')
+    const first = await tasks.create({ title: 'Task A', type: 'todo' })
+    const second = await tasks.create({ title: 'Task B', type: 'todo' })
+    const active = new ActiveCommitments()
+    await active.mention([first], 'notification', now)
+    await active.mentionText('Java uses JVM.', [first, second], now)
+    expect(await active.resolve({ turns: [] }, await tasks.list(), now)).toEqual([first])
+    await tasks.complete(first.id)
+    await active.mentionText('Task B thế nào?', [first, second], now)
+    expect(await active.resolve({ turns: [] }, await tasks.list(), now)).toEqual([second])
+    await active.mentionText('Task A và Task B tới đâu rồi?', [first, second], now)
+    expect(await active.resolve({ turns: [] }, await tasks.list(), now)).toEqual([])
+  }
+  finally { await rm(dataDir, { recursive: true, force: true }) }
+})
+
+it('does not fall through a latest history focus containing a removed task ID', async () => {
+  const dataDir = await mkdtemp(join(tmpdir(), 'angela-missing-focus-'))
+  try {
+    const now = Date.parse('2026-10-23T09:00:00Z')
+    const tasks = new Tasks(dataDir, cliMessages.en.tasks, () => now, 'UTC')
+    const older = await tasks.create({ title: 'Older task', type: 'todo' })
+    const history = { turns: chatMessagesToTurns([{ role: 'assistant', content: older.id }, { role: 'assistant', content: randomUUID() }]) }
+    expect(await new ActiveCommitments().resolve(history, [older], now)).toEqual([])
+  }
+  finally { await rm(dataDir, { recursive: true, force: true }) }
+})

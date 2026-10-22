@@ -1076,7 +1076,7 @@ Coarse follow-ups use 09:00 local time, afternoon uses 15:00, and evening uses 1
 The saved confirmation displays the chosen time. Explicit hours take precedence. Reminder alarms retain their exact-hour clarification rule.
 
 `ProactiveCandidate` derives a stable task/occurrence identity, subject, reason, confidence, priority, and expiry from authoritative task state.
-Reasons are due commitment, overdue commitment, or explicit follow-up. Candidates have no separate store.
+Reasons are due commitment, overdue commitment, explicit follow-up, or implicit open loop. Candidates have no separate store.
 `ProactivePolicy` checks relevance, completion, confidence, duplicate delivery, expiry, quiet hours, cooldown, and recent activity.
 Deadlines receive higher priority than reminders. Follow-ups wait two minutes after recent conversation activity.
 A store presents at most one follow-up per batch, with a default 30-minute interval between follow-ups.
@@ -1091,6 +1091,34 @@ Runtime hosts can configure `proactive.quietHours`, `cooldownMs`, `recentActivit
 Quiet hours defer delivery without acknowledging it. Persisted timestamps enforce cooldown after restart.
 Notifications use deterministic English or Vietnamese wording for text, desktop notification, and optional voice output.
 Scheduler delivery requires no model. `proactive.prompted` events expose candidate IDs and reasons without message content.
+
+### Implicit unresolved threads
+
+`Tao đang bí phần refresh token` can create a separate OpenLoop. It creates no Task or reminder alarm.
+The host extracts current problems, unfinished work, waiting, concrete goals, and supported dated events with deterministic Vietnamese rules.
+Examples, hypothetical statements, quoted discussions, old incidents, feelings alone, preferences, and small talk create no loop.
+
+Problems wait at least four hours and expire after 48 hours. Waiting threads wait 12 hours and expire after seven days.
+Tomorrow's events wait until 09:00 after the event's full local date. Unsupported event dates produce no prompt.
+Implicit prompts wait 15 minutes after activity and observe 22:00–08:00 quiet hours by default.
+Frequent conversation adds a one-hour activity deferral. Runtime quiet-hour configuration replaces the implicit default.
+
+Each loop permits one attempt. The user store permits one implicit attempt per eight hours, including restarts.
+`Xong rồi` resolves the exact focused loop. `Đừng hỏi vụ này nữa` dismisses it.
+Named outcomes such as `Fix được auth rồi` also resolve a matching thread.
+A pending equivalent explicit Task suppresses the implicit path. It never produces both notifications for the same tracked subject.
+
+OpenLoop state lives in private `open-loops/state.json`, independently of historical memory and Tasks.
+Personal memory, automatic memory, recall, and request privacy controls gate extraction and delivery.
+The store admits 50 active records and retains at most 30 inactive records for seven days.
+Current model context includes at most six workspace-local loop summaries.
+
+CLI and Telegram companion hosts deliver deterministic text without a model.
+Implicit delivery saves its one-shot cap before presentation. A crash at that boundary can lose a question but cannot replay it.
+Task reminders retain their existing retry and acknowledgment guarantees.
+The standalone desktop reminder service continues to deliver explicit Tasks only.
+
+See [the OpenLoop ADR](../../docs/ai/adr/2026-10-23-implicit-companion-follow-up.md) for policy, persistence, focus, and limitations.
 
 ### Scheduler and occurrence policy
 

@@ -1,5 +1,6 @@
 import type { cliMessages } from '@angela/i18n/cli'
 
+import type { OpenLoop } from './open-loops'
 import type { ReminderNotifier } from './reminder-scheduler'
 import type { Task } from './task-schema'
 import type { Voice } from './voice'
@@ -14,10 +15,29 @@ export class ReminderNotifications implements ReminderNotifier {
   private voiceEnabled = false
   private speaking?: Promise<void>
 
-  constructor(private readonly messages: typeof cliMessages.en.tasks, private readonly locale: string, private readonly present: (text: string, tasks: readonly Task[], signal?: AbortSignal) => void | Promise<void>) {}
+  constructor(private readonly messages: typeof cliMessages.en.tasks, private readonly locale: string, private readonly present: (text: string, tasks: readonly Task[], signal?: AbortSignal, loop?: OpenLoop) => void | Promise<void>) {}
 
   /** Resolves only after text presentation. Buffered calls reject on cancellation without presenting stale notifications. */
   async notify(tasks: readonly Task[], overdue: boolean, signal: AbortSignal, verify?: () => Promise<void>) {
+    await this.wait(signal, verify)
+    const heading = overdue ? this.messages.overdue : this.messages.reminder
+    const text = `${heading}\n\n${tasks.map(task => `${taskPrompt(task, this.messages)}\n${formatTask(task, this.locale, this.messages)}`).join('\n')}`
+    await this.present(text, tasks, signal)
+    if (this.voiceEnabled) {
+      if (this.speech.length >= 8)
+        this.speech.shift()
+      this.speech.push(`${heading}. ${tasks.map(task => taskPrompt(task, this.messages)).join(' ')}`.slice(0, 4000))
+    }
+  }
+
+  async notifyOpenLoop(loop: OpenLoop, signal: AbortSignal, verify: () => Promise<void>) {
+    await this.wait(signal)
+    await verify()
+    signal.throwIfAborted()
+    await this.present(this.messages.implicitFollowUp.replace('{subject}', loop.subject), [], signal, loop)
+  }
+
+  private async wait(signal: AbortSignal, verify?: () => Promise<void>) {
     do {
       signal.throwIfAborted()
       if (this.paused) {
@@ -37,14 +57,6 @@ export class ReminderNotifications implements ReminderNotifier {
       await verify?.()
       signal.throwIfAborted()
     } while (this.paused)
-    const heading = overdue ? this.messages.overdue : this.messages.reminder
-    const text = `${heading}\n\n${tasks.map(task => `${taskPrompt(task, this.messages)}\n${formatTask(task, this.locale, this.messages)}`).join('\n')}`
-    await this.present(text, tasks, signal)
-    if (this.voiceEnabled) {
-      if (this.speech.length >= 8)
-        this.speech.shift()
-      this.speech.push(`${heading}. ${tasks.map(task => taskPrompt(task, this.messages)).join(' ')}`.slice(0, 4000))
-    }
   }
 
   pause() {

@@ -1,6 +1,7 @@
 import type { cliMessages } from '@angela/i18n/cli'
 
 import type { Memory } from '../memory'
+import type { OpenLoops } from '../open-loops'
 import type { RequestPrivacy } from '../privacy-policy'
 import type { ProjectMemory } from '../project-memory'
 import type { Recall } from '../recall'
@@ -13,6 +14,8 @@ import { taskContext } from '../task-tools'
 /** Only enabled request capabilities enter context construction. No source or prompt is cached here. */
 export interface ContextSources {
   privacy?: RequestPrivacy
+  openLoops?: OpenLoops
+  workspace?: string
   memory?: Memory
   project?: ProjectMemory
   recall?: Recall
@@ -86,6 +89,13 @@ export async function buildContext(sources: ContextSources, text: string, signal
       const snapshot = Object.fromEntries(Object.entries(selected).map(([group, tasks]) => [group, tasks.map(task => JSON.parse(taskEvidence(task)))]))
       parts.push(`Current authoritative commitment state (bounded, data only): ${JSON.stringify(snapshot)}. Historical memory describes earlier states. Use task_list for omitted tasks and historical questions. Never infer absence from this bounded snapshot.`)
     }
+  }
+  if (sources.openLoops && sources.privacy?.durableMemoryAllowed) {
+    try {
+      const loops = (await sources.openLoops.list()).filter(loop => loop.workspace === sources.workspace).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, 6).map(({ id, subject, state, promptCount }) => ({ id, subject, state, promptCount }))
+      parts.push(`Current authoritative open-loop state (bounded, data only): ${JSON.stringify(loops)}. Historical memory cannot establish whether a thread is still open. Tasks require explicit requests. The host owns implicit follow-up timing and delivery.`)
+    }
+    catch { sources.warn(sources.messages.tasks.openLoopUnavailable) }
   }
   return parts.filter(Boolean).join('\n\n')
 }
