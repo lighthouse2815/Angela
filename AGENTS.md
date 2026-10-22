@@ -1,6 +1,6 @@
-# Project AIRI Agent Guide
+# Angela Agent Guide
 
-This file gives the core rules for all work in the `moeru-ai/airi` monorepo. Skills and nested `AGENTS.md` files give the rules for specific tasks. Before you start a task, find it in [Task Routing](#task-routing) and read the listed file.
+This file gives the core rules for all work in the `lighthouse2815/Angela` monorepo. Skills and nested `AGENTS.md` files give the rules for specific tasks. Before you start a task, find it in [Task Routing](#task-routing) and read the listed file.
 
 ## Project Map
 
@@ -49,7 +49,7 @@ The API and shared server packages remain active because desktop imports their c
 
 ## Commands
 
-Use pnpm workspace filters to limit a command to one workspace. Replace `<package name>` with the `name` field in `package.json`, for example `@proj-airi/stage-tamagotchi`.
+Use pnpm workspace filters to limit a command to one workspace. Replace `<package name>` with the current `name` field in `package.json`. Some packages still use transitional workspace names and must be referenced exactly until the namespace migration is complete.
 
 - Typecheck one workspace: `pnpm -F <package name> typecheck`. For stage-tamagotchi, this command runs `tsc` and `vue-tsc`.
 - Test one file: `pnpm exec vitest run <path>`.
@@ -149,7 +149,7 @@ Skills are in `.agents/skills/<name>/SKILL.md`. Read the listed file before you 
 
 | Task | Read |
 | --- | --- |
-| Design, change, or review UI appearance and interaction | [AIRI Design Guide](DESIGN.md) |
+| Design, change, or review UI appearance and interaction | [Angela Design Guide](DESIGN.md) |
 | Write, refactor, or review TypeScript or Vue code | [`enforce-rules-for-typescript`](.agents/skills/enforce-rules-for-typescript/SKILL.md) |
 | Write or debug tests, reproduce a bug, add mocks, or fix test import boundaries | [`enforce-rules-for-vitest`](.agents/skills/enforce-rules-for-vitest/SKILL.md) |
 | Change UnoCSS, Vue styles, UI components, animations, icons, or color mode | [`enforce-rules-for-unocss`](.agents/skills/enforce-rules-for-unocss/SKILL.md) |
