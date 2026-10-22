@@ -325,25 +325,44 @@ Live status: **pending owner acceptance test**. The owner must complete these st
 
 Until this flow passes, this repository provides a tested implementation, not verified live Zalo delivery.
 
+## Rebase and merge preparation
+
+This branch is rebased onto main commit `9f77e80ff7c1eec0efef4968844f2313357ce4bc`.
+Main advanced during the task, so the initial rebase onto `5a51329` was followed by a second rebase.
+The only content conflict was the warning callback in `RuntimeSession.send()`.
+Resolution keeps main's bounded warning collection and adapter notification, then excludes Zalo from private context and memory capture.
+The new memory-disabled context policy remains unchanged.
+The event union keeps `external.message` separate from owner `user.message`.
+The final diff contains no edits to companion generation or recall evaluation data, reports, harnesses, or runners.
+The workspace catalog and lockfile preserve main's evaluation importer and add only the pinned Zalo transport dependencies.
+The CLI entrypoint retains its existing command routing and loads generation setup only when a command needs it.
+
 ## Automated verification on 2026-10-22
 
-The complete CLI suite includes transport, policy, runtime, owner commands, and existing adapter regression tests.
-The Zalo and model network boundaries use mocks. No real account was authenticated.
+The CLI suite includes transport, retention, persistent rate windows, runtime isolation, owner commands, and existing adapter regression tests.
+The Zalo transport and model network boundaries use mocks. No real account was authenticated.
+Tests cover the classification boundary, not live Zalo delivery or unrestricted conversation quality.
 
 | Command | Result |
 | --- | --- |
-| `pnpm -F @angela/cli exec vitest run --maxWorkers=2` | 444 tests passed across 55 files, including 31 new tests |
+| `pnpm -F @angela/cli exec vitest run --maxWorkers=2` | 460 tests passed across 57 files, including 45 Zalo/Away tests |
+| `pnpm -F @angela/cli exec vitest run src/cli.test.ts src/zalo-command.test.ts src/zalo-host.test.ts --maxWorkers=2` | 25 entrypoint regression tests passed after lazy import changes |
+| `pnpm -F @angela/evals-companion-generation test` | 71 tests passed across two files |
+| `pnpm -F @angela/evals-companion test` | 45 recall evaluation and regression tests passed across two files |
+| `pnpm -F @angela/evals-companion-generation check:dataset` | 57 cases, 12 categories, 29 rules passed schema checks |
+| `pnpm -F @angela/evals-companion check:dataset` | 128 cases across 16 categories passed schema checks |
 | `pnpm -F @angela/cli typecheck` | Passed |
-| `pnpm -F @angela/i18n typecheck` | Passed |
-| `NODE_OPTIONS=--max-old-space-size=4096 pnpm typecheck --concurrency=1` | 53 workspace tasks passed |
+| `pnpm -F @angela/evals-companion-generation typecheck` | Passed |
+| `pnpm -F @angela/evals-companion typecheck` | Passed |
+| `NODE_OPTIONS=--max-old-space-size=4096 pnpm typecheck --concurrency=1` | 53 workspace tasks passed, including CLI and i18n |
 | `pnpm lint` | Passed with zero errors and 603 warnings in existing code |
 | `pnpm -F @angela/i18n build` | Passed |
-| `pnpm -F @angela/cli build` | Passed with an existing task-command chunking warning |
-| `node packages/angela-cli/dist/bin/run.mjs zalo --help` | Passed |
+| `pnpm -F @angela/cli build` | Passed |
 | `git diff --check` | Passed |
+| `pnpm --filter @angela/evals-companion-generation... --filter @angela/evals-companion... install --ignore-scripts --frozen-lockfile` | Passed without lockfile changes |
 
-Verification added `--config.verify-deps-before-run=false` to pnpm commands to prevent implicit dependency installation in this worktree.
-The installed pnpm bootstrap lacks an executable shebang. Turbo verification used a temporary local shell wrapper for that bootstrap.
+Verification adds `--config.verify-deps-before-run=false` to pnpm commands to prevent implicit dependency installation in this worktree.
+The installed pnpm bootstrap lacks an executable shebang. Turbo verification uses an ignored local shell wrapper for that bootstrap.
 Neither measure changes project source, dependency versions, validation rules, or compiler configuration.
-The default two-gigabyte Node heap failed in `stage-ui`. The four-gigabyte full typecheck passed.
-Two Vitest workers avoid resource contention with the parallel companion evaluation task.
+The four-gigabyte Node heap supports the repository's Vue typechecks. Two Vitest workers limit resource contention.
+No paid live generation ran. Real-account Zalo status remains **pending owner acceptance test**.
