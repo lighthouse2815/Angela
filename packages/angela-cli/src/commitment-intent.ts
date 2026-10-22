@@ -50,5 +50,5 @@ function hasCreationPayload(action: string, suffix: string) {
     return /^[.!]*$/u.test(tail) || /^:\s*\S/u.test(tail)
   // A task noun alone cannot distinguish managing work from building software. Require an explicit purpose, title, personal activity, or time.
   return /^(?:to\s+\S|:\s*\S)/u.test(tail)
-    || /^for\s+(?:(?:my|our|me|tomorrow|today|tonight)\b|(?:next|this)\s+(?:week|month|morning|afternoon|evening|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b|(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b|(?:at\s+)?\d{1,2}(?::\d{2})?(?:\s*[ap]m\b|(?=\s*(?:to\b|[.!]*$))))/u.test(tail)
+    || /^for\s+(?:(?:my|our|me|tomorrow|today|tonight)\b|(?:next|this)\s+(?:week|month|morning|afternoon|evening|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b|(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b|(?:at\s+)?\d{1,2}(?::\d{2})?(?:\s*[ap]m\b|(?=\s*(?:to\b|[.!]*$)))|\S+ing\b)/u.test(tail)
 }

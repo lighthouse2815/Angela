@@ -89,7 +89,7 @@ it('uses local dates across midnight and asks about past times or DST ambiguity'
   expect(parseReminderTime('1/11/2026 1:30', Date.parse('2026-10-31T00:00:00Z'), 'America/New_York').status).toBe('clarify')
 })
 
-it.each(['Create a task to study LINQ.', 'Add a reminder for tomorrow at 9.', 'Save this as a task.', 'Schedule a reminder to call Minh at 8.', 'Add a todo: submit my report.', 'Create a task to implement the auth endpoint.', 'Add a todo to refactor the reminder scheduler.'])('authorizes semantic task phrases: %s', (text) => {
+it.each(['Create a task to study LINQ.', 'Create a task for studying LINQ.', 'Add a reminder for tomorrow at 9.', 'Save this as a task.', 'Schedule a reminder to call Minh at 8.', 'Add a todo: submit my report.', 'Create a task to implement the auth endpoint.', 'Add a todo to refactor the reminder scheduler.'])('authorizes semantic task phrases: %s', (text) => {
   expect(classifyCommitmentIntent(text)).toBe('create')
 })
 it.each(['Create a parser for reminder syntax.', 'Add validation for reminder timestamps.', 'Nhắc tôi học lúc 9h là một ví dụ hợp lệ.'])('rejects technical objects and suffix meta framing: %s', (text) => {

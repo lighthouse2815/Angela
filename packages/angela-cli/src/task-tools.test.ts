@@ -181,6 +181,7 @@ it.each([
 
 it.each([
   'Create a task to study LINQ.',
+  'Create a task for studying LINQ.',
   'Create a task to finish the reminder service.',
   'Create a task to implement the auth endpoint.',
   'Add a todo: submit my report.',
