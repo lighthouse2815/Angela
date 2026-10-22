@@ -41,7 +41,7 @@ else {
 }
 
 export default {
-  appId: 'ai.moeru.airi',
+  appId: 'io.github.lighthouse2815.angela',
   productName: 'Angela',
   directories: {
     output: 'dist',
@@ -120,14 +120,14 @@ export default {
     },
   ],
   extraMetadata: {
-    name: 'ai.moeru.airi',
+    name: 'angela',
     main: 'out/main/index.js',
-    homepage: 'https://airi.moeru.ai/docs/',
-    repository: 'https://github.com/moeru-ai/airi',
+    homepage: 'https://github.com/lighthouse2815/Angela',
+    repository: 'https://github.com/lighthouse2815/Angela',
     license: 'MIT',
   },
   win: {
-    executableName: 'airi',
+    executableName: 'angela',
     // NOTICE: Keep `channel: 'latest-${arch}'` for architecture-aware updater metadata.
     // electron-builder expands `${arch}` at publish-time (for example: `latest-x64`, `latest-arm64`),
     // and electron-updater later consumes that expanded channel to resolve platform-specific *.yml files.
@@ -223,11 +223,11 @@ export default {
       channel: 'latest-${arch}',
     },
     extendInfo: {
-      NSAppleEventsUsageDescription: 'AIRI uses Automation to control apps for computer-use tasks.',
-      NSMicrophoneUsageDescription: 'AIRI requires microphone access for voice interaction',
-      NSSpeechRecognitionUsageDescription: 'AIRI uses Apple Speech to transcribe voice interactions on this device',
-      NSCameraUsageDescription: 'AIRI requires camera access for vision understanding',
-      NSBluetoothAlwaysUsageDescription: 'AIRI uses Bluetooth to read game controller input',
+      NSAppleEventsUsageDescription: 'Angela uses Automation to control apps for computer-use tasks.',
+      NSMicrophoneUsageDescription: 'Angela requires microphone access for voice interaction',
+      NSSpeechRecognitionUsageDescription: 'Angela uses Apple Speech to transcribe voice interactions on this device',
+      NSCameraUsageDescription: 'Angela requires camera access for vision understanding',
+      NSBluetoothAlwaysUsageDescription: 'Angela uses Bluetooth to read game controller input',
     },
     // For self-publishing, testing, and distribution after modified the code without access to
     // an Apple Developer account, comment and uncomment the following 4 lines.
@@ -237,7 +237,7 @@ export default {
     hardenedRuntime: true,
     // notarize: false,
     notarize: true,
-    executableName: 'airi',
+    executableName: 'angela',
     icon: useIconFormattedMacAppIcon ? 'icon.icon' : 'icon.icns',
   },
   dmg: {
@@ -258,7 +258,7 @@ export default {
     category: 'Utility',
     synopsis: 'AI companion for conversation and learning.',
     description: 'Angela is an AI companion for conversation, learning, voice interaction, and desktop assistance.',
-    executableName: 'airi',
+    executableName: 'angela',
     artifactName: '${productName}-${version}-linux-${arch}.${ext}',
     icon: 'build/icons/icon.png',
   },
