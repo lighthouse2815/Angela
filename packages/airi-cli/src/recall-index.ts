@@ -5,13 +5,19 @@ import { DatabaseSync } from 'node:sqlite'
 
 import * as v from 'valibot'
 
-const hitSchema = v.object({ id: v.string(), kind: v.picklist(['personal', 'skill', 'history']), scope: v.string(), origin: v.string(), version: v.string(), text: v.string(), updatedAt: v.string() })
+import { MemoryStore } from './memory-v2/store'
+
+const hitSchema = v.object({ id: v.string(), kind: v.picklist(['personal', 'skill', 'history', 'episodic', 'semantic', 'procedural']), scope: v.string(), origin: v.string(), version: v.string(), text: v.string(), updatedAt: v.string() })
 /** Indexed excerpts always retain a source identity. They are untrusted historical data, not live tool evidence. */
 export type RecallHit = v.InferOutput<typeof hitSchema>
 
 /** Owns a disposable private FTS5 index. JSON sessions, personal records and SKILL.md remain authoritative. */
 export class RecallIndex {
-  private constructor(private readonly database: DatabaseSync) {}
+  readonly memory: MemoryStore
+
+  private constructor(private readonly database: DatabaseSync) {
+    this.memory = new MemoryStore(database)
+  }
 
   static async open(dataDir: string) {
     const directory = join(dataDir, 'memory')

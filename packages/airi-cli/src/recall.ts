@@ -285,6 +285,9 @@ export class Recall {
       }
     }
     for (const origin of index.origins()) {
+      // Durable pages own their projections transactionally. File reconciliation cannot prune them.
+      if (origin.startsWith('memory:'))
+        continue
       if (!seen.has(origin))
         index.remove(origin)
     }
@@ -323,6 +326,10 @@ export class Recall {
 
   /** Verifies source versions at the read boundary, including cross-process edits, disable switches and deleted sessions. */
   private async valid(hit: RecallHit) {
+    if (hit.origin.startsWith('memory:')) {
+      const page = this.database().memory.read(hit.id.slice(7), hit.scope)
+      return page?.version === hit.version && hit.text === `${page.title}\n${page.abstract}\n${page.body}`
+    }
     if (hit.kind === 'personal') {
       const state = await this.memory.read()
       return state.enabled && hit.version === sourceVersion(JSON.stringify(state)) && state.entries.some(entry => `personal:${entry.id}` === hit.id && entry.text === hit.text)
@@ -387,6 +394,8 @@ export class Recall {
         break
     }
     this.lastSearchMs = Math.round((performance.now() - started) * 100) / 100
+    for (const scope of new Set(selected.filter(hit => hit.origin.startsWith('memory:')).map(hit => hit.scope)))
+      this.database().memory.reinforce(selected.filter(hit => hit.scope === scope && hit.origin.startsWith('memory:')).map(hit => hit.id.slice(7)), scope)
     return selected
   }
 
