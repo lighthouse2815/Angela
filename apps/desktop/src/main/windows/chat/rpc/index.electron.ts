@@ -2,16 +2,16 @@ import type { createContext } from '@moeru/eventa/adapters/electron/main'
 import type { BrowserWindow } from 'electron'
 
 import type { I18n } from '../../../libs/i18n'
-import type { ServerChannel } from '../../../services/airi/channel-server'
-import type { McpManager } from '../../../services/airi/mcp-servers'
+import type { ServerChannel } from '../../../services/angela/channel-server'
+import type { McpManager } from '../../../services/angela/mcp-servers'
 import type { SettingsWindowManager } from '../../settings'
 import type { WidgetsWindowManager } from '../../widgets'
 
 import { defineInvokeHandler } from '@moeru/eventa'
 
 import { electronOpenMainDevtools, electronOpenSettings } from '../../../../shared/eventa'
-import { createMcpServersService } from '../../../services/airi/mcp-servers'
-import { createWidgetsService } from '../../../services/airi/widgets'
+import { createMcpServersService } from '../../../services/angela/mcp-servers'
+import { createWidgetsService } from '../../../services/angela/widgets'
 import { setupBaseWindowElectronInvokes } from '../../shared/window'
 
 /** Registers the services that every chat renderer uses, in both chat modes. */

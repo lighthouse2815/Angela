@@ -1,8 +1,8 @@
 import type { BrowserWindow } from 'electron'
 
 import type { I18n } from '../../../libs/i18n'
-import type { ServerChannel } from '../../../services/airi/channel-server'
-import type { McpManager } from '../../../services/airi/mcp-servers'
+import type { ServerChannel } from '../../../services/angela/channel-server'
+import type { McpManager } from '../../../services/angela/mcp-servers'
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -38,7 +38,7 @@ vi.mock('../../shared/window', () => ({
   setupBaseWindowElectronInvokes: setupBaseWindowElectronInvokesMock,
 }))
 
-vi.mock('../../../services/airi/mcp-servers', () => ({
+vi.mock('../../../services/angela/mcp-servers', () => ({
   createMcpServersService: createMcpServersServiceMock,
 }))
 

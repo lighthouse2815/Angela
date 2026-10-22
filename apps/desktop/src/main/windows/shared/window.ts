@@ -3,14 +3,14 @@ import type { createContext } from '@moeru/eventa/adapters/electron/main'
 import type { BrowserWindow, BrowserWindowConstructorOptions, Rectangle } from 'electron'
 
 import type { I18n } from '../../libs/i18n'
-import type { ServerChannel } from '../../services/airi/channel-server'
+import type { ServerChannel } from '../../services/angela/channel-server'
 
 import { isRendererUnavailable } from '@angela/electron-vueuse/main'
 import { shell } from 'electron'
 import { isMacOS, isWindows } from 'std-env'
 
-import { createServerChannelService } from '../../services/airi/channel-server'
-import { createI18nService } from '../../services/airi/i18n'
+import { createServerChannelService } from '../../services/angela/channel-server'
+import { createI18nService } from '../../services/angela/i18n'
 import { createAppService, createPowerMonitorService, createScreenService, createSystemPreferencesService, createWindowService } from '../../services/electron'
 
 export function toggleWindowShow(window?: BrowserWindow | null): void {

@@ -1,7 +1,7 @@
 import type {
   GameletIframeRequestPayload as GameletIframeInvokePayload,
   GameletIframeResponsePayload,
-} from '@angela/plugin-sdk-tamagotchi/gamelet'
+} from '@angela/plugin-sdk-desktop/gamelet'
 import type { ServerOptions } from '@angela/server-runtime/server'
 import type {
   ShortcutAccelerator,

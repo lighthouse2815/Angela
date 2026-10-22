@@ -3,7 +3,7 @@ import type { ShortcutAccelerator, ShortcutBinding } from '@angela/stage-shared/
 import type { globalAppConfigSchema } from '../../configs/global'
 import type { Config } from '../../libs/electron/persistence'
 import type { I18n } from '../../libs/i18n'
-import type { ServerChannel } from '../../services/airi/channel-server'
+import type { ServerChannel } from '../../services/angela/channel-server'
 import type { GlobalShortcutService } from '../../services/electron/global-shortcut'
 import type { ChatWindowManager } from '../chat'
 

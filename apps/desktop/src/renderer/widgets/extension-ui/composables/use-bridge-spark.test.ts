@@ -1,4 +1,4 @@
-import { widgetsIframeBroadcastEvent } from '@angela/plugin-sdk-tamagotchi/widgets'
+import { widgetsIframeBroadcastEvent } from '@angela/plugin-sdk-desktop/widgets'
 import { describe, expect, it, vi } from 'vitest'
 
 import { publishWidgetSparkNotifyReaction } from './use-bridge-spark'

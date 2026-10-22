@@ -1,5 +1,5 @@
-import { gameletIframeRequest } from '@angela/plugin-sdk-tamagotchi/gamelet'
-import { widgetsIframeInitEvent, widgetsIframePublishEvent } from '@angela/plugin-sdk-tamagotchi/widgets'
+import { gameletIframeRequest } from '@angela/plugin-sdk-desktop/gamelet'
+import { widgetsIframeInitEvent, widgetsIframePublishEvent } from '@angela/plugin-sdk-desktop/widgets'
 import { defineInvoke, defineInvokeHandler } from '@moeru/eventa'
 import { createContext } from '@moeru/eventa/adapters/window-message'
 import { describe, expect, it } from 'vitest'

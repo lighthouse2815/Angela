@@ -20,7 +20,7 @@ import { binaryPath } from '@auv-js/cli/binary'
 import { errorMessageFrom } from '@moeru/std'
 import { app, BrowserWindow, clipboard, screen } from 'electron'
 
-import { createComputerUseRuntime } from '../src/main/services/airi/computer-use/runtime'
+import { createComputerUseRuntime } from '../src/main/services/angela/computer-use/runtime'
 import { waitFor } from './lib/remote-debug'
 
 const reportDir = resolve(env.SMOKE_REPORT_DIR || join(import.meta.dirname, '../../../.cache', `computer-use-input-${Date.now()}`))

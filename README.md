@@ -8,7 +8,7 @@ Dùng Node.js và pnpm theo phiên bản trong `.tool-versions`.
 
 ```bash
 pnpm install
-pnpm dev:tamagotchi
+pnpm dev:desktop
 ```
 
 Giai đoạn hiện tại ưu tiên desktop/local AI. Các module tạm hoãn nằm trong

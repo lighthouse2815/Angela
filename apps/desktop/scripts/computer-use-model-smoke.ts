@@ -23,8 +23,8 @@ import { join, resolve } from 'node:path'
 import { binaryPath } from '@auv-js/cli/binary'
 import { errorMessageFrom } from '@moeru/std'
 
-import { createComputerUseRuntime } from '../src/main/services/airi/computer-use/runtime'
-import { WaylandClipboard } from '../src/main/services/airi/computer-use/wayland-clipboard'
+import { createComputerUseRuntime } from '../src/main/services/angela/computer-use/runtime'
+import { WaylandClipboard } from '../src/main/services/angela/computer-use/wayland-clipboard'
 import { CdpClient, findAvailablePort, findDebugTarget, waitFor, waitForRemoteDebug } from './lib/remote-debug'
 
 const root = resolve(import.meta.dirname, '../../..')

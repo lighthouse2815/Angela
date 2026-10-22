@@ -1,6 +1,6 @@
 import type { SparkNotifyPerformanceResult, SparkNotifyReactionOptions } from '@angela/stage-ui/stores/mods/api/spark-notify-reaction'
 
-import { widgetsIframeBroadcastEvent } from '@angela/plugin-sdk-tamagotchi/widgets'
+import { widgetsIframeBroadcastEvent } from '@angela/plugin-sdk-desktop/widgets'
 import { sparkNotifyReactionOptionsSchema } from '@angela/stage-ui/stores/mods/api/spark-notify-reaction'
 import { array, finite, looseObject, nonEmpty, number, optional, pipe, record, safeParse, string, trim, unknown } from 'valibot'
 

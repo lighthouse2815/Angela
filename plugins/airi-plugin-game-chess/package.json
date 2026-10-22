@@ -14,7 +14,7 @@
   "dependencies": {
     "@angela/plugin-protocol": "workspace:*",
     "@angela/plugin-sdk": "workspace:*",
-    "@angela/plugin-sdk-tamagotchi": "workspace:*",
+    "@angela/plugin-sdk-desktop": "workspace:*",
     "@angela/ui": "workspace:^",
     "@moeru/eventa": "catalog:",
     "@moeru/std": "catalog:",

@@ -3,8 +3,8 @@ import type { InferOutput } from 'valibot'
 
 import type { ChatButtonState, ChatDraftHandover, ChatWindowMode, ChatWindowPreferences } from '../../../shared/eventa'
 import type { I18n } from '../../libs/i18n'
-import type { ServerChannel } from '../../services/airi/channel-server'
-import type { McpManager } from '../../services/airi/mcp-servers'
+import type { ServerChannel } from '../../services/angela/channel-server'
+import type { McpManager } from '../../services/angela/mcp-servers'
 import type { SettingsWindowManager } from '../settings'
 import type { WidgetsWindowManager } from '../widgets'
 

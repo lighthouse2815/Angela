@@ -23,8 +23,6 @@ export default defineConfig({
     '**/assets/live2d/models/**',
     'apps/desktop/out/**',
     'apps/desktop/src/bindings/**',
-    'apps/stage-tamagotchi-electron/out/**',
-    'apps/stage-tamagotchi-electron/src/renderer/bindings/**',
     '**/flatpak/**',
     '**/flatpak-repo/**',
     '**/drizzle/**',
@@ -35,7 +33,7 @@ export default defineConfig({
     'CLAUDE.md', // Skip the symbolic link
   ],
 }, {
-  name: 'airi/slop',
+  name: 'angela/slop',
   files: ['**/*.{js,mjs,cjs,jsx,ts,mts,cts,tsx,vue}'],
   plugins: { slop },
   // Full inspection keeps editor and CI results independent of Git history.

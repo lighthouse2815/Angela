@@ -176,13 +176,13 @@ pnpm exec vitest run --config apps/desktop/vitest.config.ts --project browser us
 Run the focused runtime tests:
 
 ```sh
-pnpm -F @angela/desktop exec vitest run src/main/services/airi/computer-use/runtime.test.ts
+pnpm -F @angela/desktop exec vitest run src/main/services/angela/computer-use/runtime.test.ts
 ```
 
 For learning directory access, IPC, and request selection, run from the repository root:
 
 ```sh
-pnpm exec vitest run --config apps/desktop/vitest.node.config.ts apps/desktop/src/main/services/airi/study-workspace apps/desktop/src/renderer/stores/tools/built-in.test.ts
+pnpm exec vitest run --config apps/desktop/vitest.node.config.ts apps/desktop/src/main/services/angela/study-workspace apps/desktop/src/renderer/stores/tools/built-in.test.ts
 ```
 
 Set `AIRI_COMPUTER_USE_LIVE=1` to include the CLI/private-daemon test. Set `AUV_BINARY_PATH` to test a native development build.

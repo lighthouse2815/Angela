@@ -1,5 +1,5 @@
 import type { I18n } from '../../libs/i18n'
-import type { ServerChannel } from '../../services/airi/channel-server'
+import type { ServerChannel } from '../../services/angela/channel-server'
 
 import { join, resolve } from 'node:path'
 
@@ -14,7 +14,7 @@ import icon from '../../../../resources/icon.png?asset'
 import { electronOnboardingClose } from '../../../shared/eventa'
 import { baseUrl, getElectronMainDirname, load, withHashRoute } from '../../libs/electron/location'
 import { createReusableWindow } from '../../libs/electron/window-manager'
-import { createAuthService } from '../../services/airi/auth'
+import { createAuthService } from '../../services/angela/auth'
 import { protectPrivilegedWindowNavigation, toggleWindowShow } from '../shared'
 import { setupBaseWindowElectronInvokes } from '../shared/window'
 

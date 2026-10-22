@@ -2,7 +2,7 @@ import type { BrowserWindow, BrowserWindowConstructorOptions, Rectangle } from '
 import type { InferOutput } from 'valibot'
 
 import type { I18n } from '../../libs/i18n'
-import type { ServerChannel } from '../../services/airi/channel-server'
+import type { ServerChannel } from '../../services/angela/channel-server'
 
 import { createHash } from 'node:crypto'
 import { join, resolve } from 'node:path'

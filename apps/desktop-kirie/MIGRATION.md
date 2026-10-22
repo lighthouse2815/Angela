@@ -144,12 +144,12 @@ The [original Kirie App.vue](https://github.com/BeanDz/airi/blob/ef7eb50e5a76265
 
 | Gap | Retained implementation | Removed startup connection |
 | --- | --- | --- |
-| GAP-010 | [Channel settings](src-web/src/renderer/stores/settings/server-channel.ts), [channel store](../../packages/stage-ui/src/stores/mods/api/channel-server.ts), and [Electron service](../desktop/src/main/services/airi/channel-server/index.ts) | Fetch host configuration, apply it, and initialize the channel. |
+| GAP-010 | [Channel settings](src-web/src/renderer/stores/settings/server-channel.ts), [channel store](../../packages/stage-ui/src/stores/mods/api/channel-server.ts), and [Electron service](../desktop/src/main/services/angela/channel-server/index.ts) | Fetch host configuration, apply it, and initialize the channel. |
 | GAP-010 | [Context bridge](../../packages/stage-ui/src/stores/mods/api/context-bridge.ts) and [character orchestrator](../../packages/stage-ui/src/stores/character/orchestrator/store.ts) | Set the Spark host role, initialize both stores, and dispose the context bridge. These depend on the channel. |
-| GAP-023 | [Plugin tools](src-web/src/renderer/stores/tools/plugins.ts), [inspector](../../packages/stage-ui/src/stores/devtools/plugin-host-debug.ts), and [Electron host](../desktop/src/main/services/airi/plugins/host/index.ts) | Install the inspector bridge, discover tools, subscribe to changes, register provider queries, and publish capabilities. |
-| GAP-024 | [Artistry store](../../packages/stage-ui/src/stores/modules/artistry.ts) and [Electron bridge](../desktop/src/main/services/airi/widgets/artistry-bridge.ts) | Observe configuration, deduplicate snapshots, and send configuration to the host. |
-| GAP-025 | [MCP tools](src-web/src/renderer/stores/tools/mcp.ts) and [Electron service](../desktop/src/main/services/airi/mcp-servers/index.ts) | Discover MCP tools when the main renderer becomes leader. |
-| Model rendering scope | [Electron Godot sidecar](../desktop/src/main/services/airi/godot-stage/index.ts) | Query sidecar status, subscribe to changes, and select the Godot renderer. |
+| GAP-023 | [Plugin tools](src-web/src/renderer/stores/tools/plugins.ts), [inspector](../../packages/stage-ui/src/stores/devtools/plugin-host-debug.ts), and [Electron host](../desktop/src/main/services/angela/plugins/host/index.ts) | Install the inspector bridge, discover tools, subscribe to changes, register provider queries, and publish capabilities. |
+| GAP-024 | [Artistry store](../../packages/stage-ui/src/stores/modules/artistry.ts) and [Electron bridge](../desktop/src/main/services/angela/widgets/artistry-bridge.ts) | Observe configuration, deduplicate snapshots, and send configuration to the host. |
+| GAP-025 | [MCP tools](src-web/src/renderer/stores/tools/mcp.ts) and [Electron service](../desktop/src/main/services/angela/mcp-servers/index.ts) | Discover MCP tools when the main renderer becomes leader. |
+| Model rendering scope | [Electron Godot sidecar](../desktop/src/main/services/angela/godot-stage/index.ts) | Query sidecar status, subscribe to changes, and select the Godot renderer. |
 
 When a gap reopens, implement its host handlers and runtime ownership before restoring its startup connection.
 For GAP-010, initialize the channel before the context bridge and character orchestrator. Keep their setup and cleanup responsibilities explicit.

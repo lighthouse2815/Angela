@@ -51,7 +51,7 @@
     "@angela/local-config": "workspace:^",
     "@angela/model-driver-lipsync": "workspace:^",
     "@angela/pipelines-audio": "workspace:^",
-    "@angela/plugin-sdk-tamagotchi": "workspace:^",
+    "@angela/plugin-sdk-desktop": "workspace:^",
     "@angela/provider-inference": "workspace:^",
     "@angela/server-sdk": "workspace:*",
     "@angela/stage-layouts": "workspace:^",

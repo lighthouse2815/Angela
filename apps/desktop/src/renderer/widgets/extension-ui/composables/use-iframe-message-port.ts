@@ -1,4 +1,4 @@
-import type { WidgetsIframeInitPayload } from '@angela/plugin-sdk-tamagotchi/widgets'
+import type { WidgetsIframeInitPayload } from '@angela/plugin-sdk-desktop/widgets'
 import type { PluginHostModuleSummary } from '@angela/stage-shared/plugin-host'
 import type { MaybeElementRef } from '@vueuse/core'
 import type { ComputedRef } from 'vue'
@@ -8,7 +8,7 @@ import {
   widgetsIframeInitEvent,
   widgetsIframePublishEvent,
   widgetsIframeReadyEvent,
-} from '@angela/plugin-sdk-tamagotchi/widgets'
+} from '@angela/plugin-sdk-desktop/widgets'
 import { createContext } from '@moeru/eventa/adapters/window-message'
 import { errorMessageFrom } from '@moeru/std'
 import { unrefElement } from '@vueuse/core'

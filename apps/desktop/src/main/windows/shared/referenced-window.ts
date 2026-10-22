@@ -2,7 +2,7 @@ import type { BrowserWindow } from 'electron'
 
 import type { createRequestWindowEventa, RequestWindowPayload } from '../../../shared/eventa'
 import type { I18n } from '../../libs/i18n'
-import type { ServerChannel } from '../../services/airi/channel-server'
+import type { ServerChannel } from '../../services/angela/channel-server'
 
 import { safeClose } from '@angela/electron-vueuse/main'
 import { defineInvokeHandler } from '@moeru/eventa'

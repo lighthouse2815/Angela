@@ -12,8 +12,8 @@
 import type { BrowserWindow } from 'electron'
 
 import type { I18n } from '../../../libs/i18n'
-import type { ServerChannel } from '../../../services/airi/channel-server'
-import type { McpManager } from '../../../services/airi/mcp-servers'
+import type { ServerChannel } from '../../../services/angela/channel-server'
+import type { McpManager } from '../../../services/angela/mcp-servers'
 import type { DesktopOverlayReadiness } from './contracts'
 
 import { errorMessageFromValue } from '@angela/stage-shared'
@@ -22,7 +22,7 @@ import { createContext } from '@moeru/eventa/adapters/electron/main'
 import { ipcMain } from 'electron'
 
 import { getDesktopOverlayReadinessContract } from '../../../../shared/eventa'
-import { createMcpServersService } from '../../../services/airi/mcp-servers'
+import { createMcpServersService } from '../../../services/angela/mcp-servers'
 import { setupBaseWindowElectronInvokes } from '../../shared/window'
 
 export async function setupDesktopOverlayElectronInvokes(params: {

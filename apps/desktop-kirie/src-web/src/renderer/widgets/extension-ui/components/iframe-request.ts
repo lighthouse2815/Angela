@@ -1,4 +1,4 @@
-import type { GameletIframeResponsePayload } from '@angela/plugin-sdk-tamagotchi/gamelet'
+import type { GameletIframeResponsePayload } from '@angela/plugin-sdk-desktop/gamelet'
 import type { EventContext } from '@moeru/eventa'
 
 import type {
@@ -6,7 +6,7 @@ import type {
   WidgetsIframeRequestResultPayload,
 } from '../../../../shared/eventa'
 
-import { gameletIframeRequest } from '@angela/plugin-sdk-tamagotchi/gamelet'
+import { gameletIframeRequest } from '@angela/plugin-sdk-desktop/gamelet'
 import { defineInvoke } from '@moeru/eventa'
 import { errorMessageFrom } from '@moeru/std'
 

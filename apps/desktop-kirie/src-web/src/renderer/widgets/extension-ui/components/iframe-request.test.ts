@@ -1,4 +1,4 @@
-import { gameletIframeRequest } from '@angela/plugin-sdk-tamagotchi/gamelet'
+import { gameletIframeRequest } from '@angela/plugin-sdk-desktop/gamelet'
 import { createContext, defineInvokeHandler } from '@moeru/eventa'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 

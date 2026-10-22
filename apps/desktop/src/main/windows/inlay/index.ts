@@ -1,5 +1,5 @@
 import type { I18n } from '../../libs/i18n'
-import type { ServerChannel } from '../../services/airi/channel-server'
+import type { ServerChannel } from '../../services/angela/channel-server'
 import type { GlobalShortcutService } from '../../services/electron/global-shortcut'
 
 import { join, resolve } from 'node:path'

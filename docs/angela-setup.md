@@ -275,7 +275,7 @@ Với phiên bản hiện tại, kiểm tra khả năng native bằng:
 Để kiểm tra CLI thật qua daemon riêng, chạy:
 
 ```bash
-AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AIRI_COMPUTER_USE_LIVE=1 mise exec -- pnpm exec vitest run --config apps/desktop/vitest.node.config.ts apps/desktop/src/main/services/airi/computer-use/runtime.test.ts
+AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AIRI_COMPUTER_USE_LIVE=1 mise exec -- pnpm exec vitest run --config apps/desktop/vitest.node.config.ts apps/desktop/src/main/services/angela/computer-use/runtime.test.ts
 ```
 
 Kiểm thử gọi trợ giúp và một tham số sai. Kiểm thử không đưa chuột hoặc bàn phím vào ứng dụng.

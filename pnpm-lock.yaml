@@ -1451,9 +1451,9 @@ importers:
       '@angela/pipelines-audio':
         specifier: workspace:^
         version: link:../../packages/pipelines-audio
-      '@angela/plugin-sdk-tamagotchi':
+      '@angela/plugin-sdk-desktop':
         specifier: workspace:^
-        version: link:../../packages/plugin-sdk-tamagotchi
+        version: link:../../packages/plugin-sdk-desktop
       '@angela/provider-inference':
         specifier: workspace:^
         version: link:../../packages/provider-inference
@@ -2014,9 +2014,9 @@ importers:
       '@angela/pipelines-audio':
         specifier: workspace:^
         version: link:../../packages/pipelines-audio
-      '@angela/plugin-sdk-tamagotchi':
+      '@angela/plugin-sdk-desktop':
         specifier: workspace:^
-        version: link:../../packages/plugin-sdk-tamagotchi
+        version: link:../../packages/plugin-sdk-desktop
       '@angela/server-sdk':
         specifier: workspace:*
         version: link:../../packages/server-sdk
@@ -3678,7 +3678,7 @@ importers:
         specifier: 'catalog:'
         version: 1.51.0
 
-  packages/plugin-sdk-tamagotchi:
+  packages/plugin-sdk-desktop:
     dependencies:
       '@moeru/eventa':
         specifier: 'catalog:'
@@ -3778,7 +3778,7 @@ importers:
         specifier: catalog:vitest
         version: 4.1.11(@opentelemetry/api@1.9.1)(@types/node@26.2.0)(@vitest/browser-playwright@4.1.11)(@vitest/coverage-v8@4.1.11)(jsdom@30.0.1(@noble/hashes@2.3.0)(canvas@3.2.3))(vite@8.2.2(@types/node@26.2.0)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.0(supports-color@10.2.2))(terser@5.50.0)(tsx@4.23.12)(yaml@2.9.0))
 
-  packages/scenarios-stage-tamagotchi-browser:
+  packages/scenarios-desktop-browser:
     dependencies:
       '@moeru/std':
         specifier: 'catalog:'
@@ -3833,7 +3833,7 @@ importers:
         specifier: 'catalog:'
         version: 3.3.11(typescript@6.0.3)
 
-  packages/scenarios-stage-tamagotchi-electron:
+  packages/scenarios-desktop-electron:
     dependencies:
       '@moeru/std':
         specifier: 'catalog:'
@@ -5311,9 +5311,9 @@ importers:
       '@angela/plugin-sdk':
         specifier: workspace:*
         version: link:../../packages/plugin-sdk
-      '@angela/plugin-sdk-tamagotchi':
+      '@angela/plugin-sdk-desktop':
         specifier: workspace:*
-        version: link:../../packages/plugin-sdk-tamagotchi
+        version: link:../../packages/plugin-sdk-desktop
       '@angela/ui':
         specifier: workspace:^
         version: link:../../packages/ui
