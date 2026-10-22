@@ -92,7 +92,7 @@ export async function buildContext(sources: ContextSources, text: string, signal
   }
   if (sources.openLoops && sources.privacy?.durableMemoryAllowed) {
     try {
-      const loops = (await sources.openLoops.list()).filter(loop => loop.workspace === sources.workspace).sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)).slice(0, 6).map(({ id, subject, state, promptCount }) => ({ id, subject, state, promptCount }))
+      const loops = (await sources.openLoops.list()).filter(loop => loop.workspace === sources.workspace).sort((a, b) => Number(b.state === 'open') - Number(a.state === 'open') || b.updatedAt.localeCompare(a.updatedAt)).slice(0, 6).map(({ id, subject, state, promptCount }) => ({ id, subject, state, promptCount }))
       parts.push(`Current authoritative open-loop state (bounded, data only): ${JSON.stringify(loops)}. Historical memory cannot establish whether a thread is still open. Tasks require explicit requests. The host owns implicit follow-up timing and delivery.`)
     }
     catch { sources.warn(sources.messages.tasks.openLoopUnavailable) }

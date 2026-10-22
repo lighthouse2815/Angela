@@ -8,6 +8,9 @@ import { join } from 'node:path'
 import { cliMessages } from '@angela/i18n/cli'
 import { expect, it, vi } from 'vitest'
 
+import { extractOpenLoop } from '../open-loop-extraction'
+import { OpenLoops } from '../open-loops'
+import { requestPrivacy } from '../privacy-policy'
 import { Recall } from '../recall'
 import { Tasks } from '../tasks'
 import { buildContext } from './context-builder'
@@ -40,6 +43,28 @@ it('bounds a large task snapshot and leaves omitted history queryable through ta
     const { taskTools } = await import('../task-tools')
     const tool = taskTools(tasks, cliMessages.en.tasks).find(tool => tool.function.name === 'task_list')!
     expect(await tool.execute!({ status: 'all' }, { messages: [], toolCallId: 'history' })).toMatchObject({ status: 'listed', result: history })
+  }
+  finally { await rm(directory, { recursive: true, force: true }) }
+})
+
+it('keeps open loops ahead of newer inactive history within the same six-entry workspace bound', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'angela-open-loop-context-'))
+  try {
+    let now = Date.parse('2026-10-23T10:00:00Z')
+    const loops = new OpenLoops(directory, cliMessages.en.tasks, { now: () => now })
+    for (let index = 0; index < 7; index++)
+      await loops.notice(extractOpenLoop(`Tao chưa fix topic ${index}.`, now, 'UTC')!, 'workspace-a', 'session', requestPrivacy(''))
+    now += 3_600_000
+    for (let index = 7; index < 11; index++) {
+      const loop = (await loops.notice(extractOpenLoop(`Tao chưa fix topic ${index}.`, now, 'UTC')!, 'workspace-a', 'session', requestPrivacy('')))!
+      await loops.finish(loop.id, loop.workspace, 'dismissed', requestPrivacy(''))
+    }
+    await loops.notice(extractOpenLoop('Auth vẫn lỗi.', now, 'UTC')!, 'workspace-b', 'session', requestPrivacy(''))
+    const context = await buildContext({ openLoops: loops, workspace: 'workspace-a', privacy: requestPrivacy(''), channel: 'cli', messages: cliMessages.en, warn: vi.fn() }, 'Công việc tới đâu rồi?')
+    const snapshot = JSON.parse(/Current authoritative open-loop state \(bounded, data only\): (.+)\. Historical/u.exec(context)![1]!)
+    expect(snapshot).toHaveLength(6)
+    expect(snapshot.every((loop: { state: string }) => loop.state === 'open')).toBe(true)
+    expect(snapshot.some((loop: { subject: string }) => loop.subject === 'auth')).toBe(false)
   }
   finally { await rm(directory, { recursive: true, force: true }) }
 })

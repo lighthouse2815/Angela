@@ -165,6 +165,7 @@ The store admits at most 50 open loops. It rejects excess admissions without evi
 Inactive history retains at most 30 records for seven days. Expiry runs under the store lock.
 The storage file remains bounded by the existing 128,000-character storage contract.
 Model context includes at most six workspace-local loop summaries, each with a subject of at most 120 characters.
+Open threads sort before inactive history, then by update time.
 Metadata observers run after persistence and cannot change authoritative results.
 Corrupted files remain untouched. Source errors are reported without stopping Task reminders.
 
