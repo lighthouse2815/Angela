@@ -10,7 +10,6 @@ import { realpath, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import { chatMessagesToTurns } from '@angela/core-agent'
-import { getGenerationProvider, listProviders } from '@angela/provider-inference'
 import { errorMessageFrom } from '@moeru/std'
 
 import { readConfig } from '../config'
@@ -18,7 +17,6 @@ import { formatRequestError } from '../errors'
 import { Output } from '../output'
 import { Permissions } from '../permissions'
 import { ReminderNotifications } from '../reminder-notifications'
-import { AngelaRuntime } from '../runtime/runtime'
 import { Sessions } from '../sessions'
 import { Terminal } from '../terminal'
 
@@ -111,12 +109,14 @@ async function main() {
     throw new Error(messages.invalidWorkspace)
   const session = await sessions.open(workspace, config.resume)
   try {
+    const { getGenerationProvider, listProviders } = await import('@angela/provider-inference')
     const definition = listProviders().find(provider => provider.id === config.definitionId)
     if (!definition)
       throw new Error(`${messages.unsupportedProvider}: ${config.definitionId}`)
     const provider = getGenerationProvider(await definition.createProvider(config.providerConfig))
     if (!provider)
       throw new Error(`${messages.unsupportedProvider}: ${config.definitionId}`)
+    const { AngelaRuntime } = await import('../runtime/runtime')
     const runtime = new AngelaRuntime(config.model, provider, messages, process.env, config)
     const chat = await runtime.createChat(workspace, session.restore(), true, Number(process.env.ANGELA_CONTEXT_TOKENS ?? 32_000))
     const modelTarget = { model: config.model, chatProvider: provider, providerId: definition.id }

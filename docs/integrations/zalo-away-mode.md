@@ -72,6 +72,7 @@ It does not offer unrestricted generated prose or persistent multi-turn conversa
 The model deadline is 30 seconds. Failure returns the fixed offline notification.
 Provider configuration and runtime initialization are lazy, on the first authorized `assistant-reply` request.
 `notify-only` needs no generation provider, model, API credential, `AngelaRuntime` instance, or runtime responder.
+The CLI entrypoint imports generation setup only after dispatching Zalo and other owner commands.
 Switching from notify-only to assistant-reply in the local CLI activates lazy initialization on the next eligible message.
 A missing model or unavailable provider logs `runtime_failed` and returns the offline notification without stopping the listener.
 Provider initialization failure remains cached until host restart. It never turns into repeated initialization attempts for each inbound DM.
