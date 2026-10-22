@@ -232,3 +232,108 @@ Evaluate extraction and dedupe against a consented Vietnamese conversation corpu
 - `95531c2`: intent and latest-focus corrections. Pushed to `origin/main`.
 - `488bf93`: implicit OpenLoop foundation. Pushed to `origin/main`.
 - This audit accompanies the final review-fix commit, which includes technical-object guards, shared turn boundaries, and calendar timing.
+
+## Final hardening pass
+
+Inspected baseline: `62d250fc45fba1965f6c1696d53e46a5385a8000`.
+Implementation head before this audit addendum: `774a626a378770c62689e76b5bd3ce5be7040380`.
+
+### Reproduced bugs
+
+The adversarial task matrix reproduced coding false positives for reminder services, task endpoints, components, repositories, controllers, hooks, pages, CRUD, DTOs, tables, queues, microservices, APIs, Quartz jobs, and Hangfire jobs.
+The existing positive regex also rejected valid coding subjects when they were inside a real task-management request.
+The shared-data-dir suppression test reproduced a cross-workspace dismissal when a Task had no compatible workspace check.
+The generic reminder wording produced `Phần thầy...` for a waiting loop.
+Named forget and do-not-ask phrases did not consistently stop current-scope OpenLoop delivery.
+The previous `present` name hid that the one-shot attempt was committed before adapter delivery.
+
+### Final intent guard
+
+`classifyCommitmentIntent` now requires a task-management payload after English creation objects.
+The payload must contain an explicit purpose (`to ...`), title (`: ...`), personal activity, or supported time phrase.
+Bare `task`, `todo`, and `reminder` nouns cannot authorize `task_create`.
+Technical nouns cannot authorize coding requests.
+Coding content remains valid after an explicit management phrase.
+For example, `Create a task to implement the auth endpoint` remains valid.
+`Create a task endpoint` remains uncertain.
+Local extraction and `taskTools` use the same classifier and the same direct hard guard.
+
+### Final ownership and suppression
+
+Tasks remain global per `dataDir`. The existing host-owned `memoryProjection.scope` supplies workspace provenance when the runtime creates a task.
+`OpenLoops.reconcile` suppresses only when normalized subject and exact scope both match.
+A Task from another workspace, a Task with absent provenance, and free-form `Task.context` do not suppress.
+This keeps same-workspace suppression while choosing duplicate prompts over cross-workspace state loss.
+Canonical project scope is assigned before OpenLoop extraction. Nested Git directories use the existing ProjectMemory canonical root.
+No Task schema, task lease, or reminder scheduler contract changed.
+
+### Final wording
+
+`ReminderNotifications` selects a localized template from `OpenLoop.kind`:
+
+- `problem`: `Vụ {subject} lúc trước xử lý tới đâu rồi?` / `How is the {subject} issue from earlier going?`
+- `work_in_progress`: `Phần {subject} lúc trước làm tới đâu rồi?` / `How is work on {subject} from earlier going?`
+- `waiting`: `{subject} đã phản hồi chưa?` / `Has {subject} responded yet?`
+- `goal`: `Phần {subject} bạn định làm đã xong chưa?` / `Have you finished {subject} as planned?`
+- `upcoming_event`: `Buổi {subject} hôm trước diễn ra thế nào?` / `How did the {subject} event go?`
+
+Redundant leading prefixes are removed for presentation only. Identity keys remain unchanged.
+
+### Final forget and dismissal semantics
+
+Named forms include `Quên vụ auth đi`, `Quên chuyện auth đi`, `Đừng nhớ chuyện auth nữa`, `Đừng hỏi tôi về auth nữa`, `Đừng nhắc chuyện auth nữa`, and `Không cần theo dõi vụ auth nữa`.
+They dismiss only a matching OpenLoop in the current workspace.
+Generic forms such as `Quên chuyện đó đi` require one exact current OpenLoop focus. Ambiguity returns clarification.
+`Đừng hỏi` leaves personal memory unchanged.
+`Quên` or `Đừng nhớ` also calls the existing `Memory.forget` path for one unambiguous matching personal record.
+Multiple records, disabled personal memory, or forget-storage failure leave personal records unchanged and direct the user to `/memory`.
+Tracking remains dismissed even when memory removal fails.
+The existing broad `/forget` and `/memory` commands retain their own behavior. No broad destructive deletion was added.
+Protected or meta requests do not broaden dismissal.
+
+### Final delivery semantics
+
+`OpenLoops.present` is now `OpenLoops.reservePresentation`.
+The method commits the one-shot attempt before the adapter call.
+A failure after reservation and before confirmed external presentation can lose the follow-up.
+This includes process crash, Telegram API error, stdout write failure, adapter exception, and network failure.
+Reserved implicit attempts are not retried. Task reminders retain their existing delivery guarantees.
+
+### Final tests
+
+Added or extended tests cover:
+
+- coding-intent false positives and valid coding task subjects through both extraction and `task_create`;
+- same-workspace suppression, cross-workspace isolation, absent provenance, and Telegram/shared-user routing;
+- all five kind-specific English and Vietnamese templates;
+- named forget, do-not-ask, generic ambiguity, personal-memory cleanup, memory failure, and disabled-memory behavior;
+- reservation failures across adapter, network, stdout, and process-style retry boundaries;
+- OpenLoop context ordering with open loops before inactive history.
+
+### Final validation
+
+- `pnpm --config.verify-deps-before-run=false -F @angela/cli test --maxWorkers=2`: **PASS**, 72 files, 812 tests.
+- `pnpm --config.verify-deps-before-run=false -F @angela/cli typecheck`: **PASS** when run after i18n build completes.
+- `pnpm --config.verify-deps-before-run=false -F @angela/cli build`: **PASS**.
+- `pnpm --config.verify-deps-before-run=false -F @angela/i18n typecheck`: **PASS**.
+- `pnpm --config.verify-deps-before-run=false -F @angela/i18n build`: **PASS**.
+- `pnpm --config.verify-deps-before-run=false lint`: **PASS**, zero errors and 603 repository warnings. No changed file has a lint diagnostic.
+- `git diff --check`: **PASS**.
+- Authoritative infrastructure diff against the inspected baseline: **empty** for `tasks.ts`, `task-schema.ts`, `reminder-scheduler.ts`, `recall.ts`, and `memory-v2/commitment-projection.ts`.
+- Root `typecheck --concurrency=2`: previously reached the package checks, then stopped at the existing `@angela/stage-ui` JavaScript heap OOM. No unrelated workspace was changed.
+
+### Final hardening commits
+
+- `2c0aa2c`: positive task-management intent guard.
+- `a3a4e06`: workspace-compatible OpenLoop suppression.
+- `8395d74`: kind-specific localized wording.
+- `ef5a119`: forget and do-not-ask dismissal semantics plus reservation naming.
+- `97a0180`: open-loop context ordering.
+- `774a626`: final documentation and bounded context test.
+
+These commits are pushed to `origin/main`. The only uncommitted paths are pre-existing deletions of `LICENSE` and `third_party/openseeface/LICENSE`, which were not touched by this work.
+
+## Closure decision
+
+The Proactive Companion Loop milestone is **CLOSED** for this scope.
+The remaining limitations are documented: conservative deterministic extraction, running CLI or Telegram host for implicit delivery, and the known root `stage-ui` OOM.
