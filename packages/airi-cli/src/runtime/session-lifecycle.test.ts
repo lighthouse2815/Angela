@@ -82,6 +82,8 @@ it('evicts idle sessions on TTL without another acquire and reopens durable epis
   await first.close()
   expect(runtime.resourceCounts.warmSessions).toBe(1)
   await vi.advanceTimersByTimeAsync(1001)
+  expect(runtime.resourceCounts.states).toBe(0)
+  expect(runtime.resourceCounts.warmSessions).toBe(0)
   const second = await runtime.acquire(session)
   expect(second).not.toBe(first)
   expect(ended).toHaveBeenCalledTimes(1)
@@ -147,6 +149,7 @@ it('isolates every cache key dimension and keeps Discord immediate release polic
   const { runtime, session, directory } = await setup()
   const first = await runtime.acquire(session)
   await (await first.memory()).remember('User A prefers copper tea', undefined, undefined, { core: true })
+  await first.send(await runtime.createChat(directory), 'Choose copper tea architecture for user A', {})
   await first.close()
   for (const options of [
     { ...session, dataDir: join(directory, 'user-b') },
@@ -156,8 +159,10 @@ it('isolates every cache key dimension and keeps Discord immediate release polic
   ]) {
     const other = await runtime.acquire(options)
     expect(other).not.toBe(first)
-    if (options.dataDir !== directory)
+    if (options.dataDir !== directory) {
       expect((await (await other.memory()).read()).entries).toEqual([])
+      expect(await (await other.recall())!.search('copper tea architecture')).toEqual([])
+    }
     await other.close()
     if (options.channel === 'discord')
       expect(() => other.retain()).toThrow()
@@ -244,4 +249,72 @@ it('reports observer failures through bounded runtime diagnostics without failin
   expect(runtime.events.diagnostics.failures).toBe(1)
   expect(JSON.stringify(diagnostic.mock.calls)).not.toContain('private')
   await scope.close()
+})
+
+it('keeps the eight active-context limit independent of a full idle cache', async () => {
+  const { runtime, session } = await setup({ telegramSessions: { maxIdle: 16 } })
+  for (let i = 0; i < 16; i++) {
+    const scope = await runtime.acquire({ ...session, sessionId: randomUUID() })
+    await scope.close()
+  }
+  expect(runtime.resourceCounts.warmSessions).toBe(16)
+  expect(runtime.activeStateCount).toBe(0)
+  for (let i = 0; i < 8; i++)
+    await runtime.acquire({ ...session, sessionId: randomUUID() })
+  expect(runtime.activeStateCount).toBe(8)
+  expect(runtime.resourceCounts.states).toBe(24)
+  await expect(runtime.acquire({ ...session, sessionId: randomUUID() })).rejects.toThrow('limit')
+  await runtime.close()
+  expect(Object.values(runtime.resourceCounts).every(count => count === 0)).toBe(true)
+})
+
+it('awaits retirement of the same key while another user can acquire concurrently', async () => {
+  const { runtime, session } = await setup()
+  const first = await runtime.acquire(session)
+  await first.recall()
+  await first.close()
+  const gate = Promise.withResolvers<void>()
+  const original = Recall.prototype.close
+  const close = vi.spyOn(Recall.prototype, 'close').mockImplementation(async function (this: Recall) {
+    await gate.promise
+    await original.call(this)
+  })
+  const resetting = runtime.reset(session)
+  await vi.waitFor(() => expect(close).toHaveBeenCalledTimes(1))
+  let resolved = false
+  const acquiring = runtime.acquire(session).then((scope) => {
+    resolved = true
+    return scope
+  })
+  await Promise.resolve()
+  await Promise.resolve()
+  expect(resolved).toBe(false)
+  expect(runtime.resourceCounts.retiringSessions).toBe(1)
+  const other = await runtime.acquire({ ...session, sessionId: randomUUID() })
+  await other.close()
+  gate.resolve()
+  await resetting
+  const second = await acquiring
+  expect(second).not.toBe(first)
+  expect(runtime.resourceCounts.retiringSessions).toBe(0)
+  await second.close()
+})
+
+it('does not start an already cancelled first request and starts the next request exactly once', async () => {
+  const { runtime, session, directory } = await setup()
+  const started = vi.fn()
+  const ended = vi.fn()
+  runtime.events.on('session.started', started)
+  runtime.events.on('session.ended', ended)
+  const scope = await runtime.acquire(session)
+  await expect(scope.send(await runtime.createChat(directory), 'Already cancelled', { abortSignal: AbortSignal.abort() })).rejects.toThrow()
+  expect(started).not.toHaveBeenCalled()
+  await scope.close()
+  const next = await runtime.acquire(session)
+  await next.send(await runtime.createChat(directory), 'Choose copper release', {})
+  await next.close()
+  expect(started).toHaveBeenCalledTimes(1)
+  expect(ended).not.toHaveBeenCalled()
+  await runtime.close()
+  expect(ended).toHaveBeenCalledTimes(1)
 })
