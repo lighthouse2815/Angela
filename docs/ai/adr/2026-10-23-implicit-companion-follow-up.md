@@ -140,7 +140,9 @@ A crash or transport failure after this write can lose a question. It cannot cau
 The `proactive.prompted` event records the committed attempt, not confirmed receipt by the user.
 Task reminders retain their existing at-least-once presentation and acknowledgment behavior.
 
-No generation provider is called for delivery. English and Vietnamese templates provide the final message.
+No generation provider is called for delivery. English and Vietnamese templates provide kind-specific problem, work, waiting, goal, and event questions.
+Presentation strips redundant leading subject prefixes without changing identity keys.
+For example, waiting for `thầy` produces `Thầy đã phản hồi chưa?`.
 A provider failure during ordinary chat does not erase a valid user-grounded loop already persisted by the host.
 
 ## Privacy, bounds, and failures

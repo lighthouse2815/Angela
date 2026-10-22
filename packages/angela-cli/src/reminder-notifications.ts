@@ -34,7 +34,9 @@ export class ReminderNotifications implements ReminderNotifier {
     await this.wait(signal)
     await verify()
     signal.throwIfAborted()
-    await this.present(this.messages.implicitFollowUp.replace('{subject}', loop.subject), [], signal, loop)
+    const subject = loop.subject.trim().replace(/^(?:(?:phần|vụ|việc|chuyện|buổi|part|event)\s+)+/iu, '')
+    const text = this.messages.implicitFollowUp[loop.kind].replace('{subject}', subject)
+    await this.present(text.charAt(0).toLocaleUpperCase(this.locale) + text.slice(1), [], signal, loop)
   }
 
   private async wait(signal: AbortSignal, verify?: () => Promise<void>) {

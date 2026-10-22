@@ -79,7 +79,7 @@ it.each(['Xong rồi.', 'Đừng hỏi vụ này nữa.'])('recovers a real impl
   })
   await scheduler.refresh()
   expect(presented).toHaveLength(1)
-  expect(presented[0]?.text).toBe('Phần refresh token lúc trước tới đâu rồi?')
+  expect(presented[0]?.text).toBe('Vụ refresh token lúc trước xử lý tới đâu rồi?')
   expect(presented[0]?.loop?.id).toBe(loop.id)
   expect(events.find(event => event.type === 'proactive.candidate')).toMatchObject({ reason: 'implicit_open_loop', candidateId: `open_loop:${loop.id}` })
   expect(JSON.stringify(events)).not.toContain('refresh token')

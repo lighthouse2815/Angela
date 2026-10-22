@@ -1,3 +1,4 @@
+import type { OpenLoop } from './open-loops'
 import type { Task } from './task-schema'
 
 import { randomUUID } from 'node:crypto'
@@ -118,4 +119,21 @@ it('bounds pending voice announcements while preserving every text reminder', as
   expect(speak).toHaveBeenCalledTimes(8)
   expect(speak.mock.calls[0][0]).toContain('Reminder 32')
   expect(speak.mock.calls.at(-1)?.[0]).toContain('Reminder 39')
+})
+
+it.each([
+  ['problem', 'refresh token', 'Vụ refresh token lúc trước xử lý tới đâu rồi?', 'How is the refresh token issue from earlier going?'],
+  ['work_in_progress', 'phần backend', 'Phần backend lúc trước làm tới đâu rồi?', 'How is work on backend from earlier going?'],
+  ['waiting', 'thầy', 'Thầy đã phản hồi chưa?', 'Has thầy responded yet?'],
+  ['goal', 'phần backend', 'Phần backend bạn định làm đã xong chưa?', 'Have you finished backend as planned?'],
+  ['upcoming_event', 'buổi bảo vệ', 'Buổi bảo vệ hôm trước diễn ra thế nào?', 'How did the bảo vệ event go?'],
+] as const)('renders deterministic %s wording in both locales', async (kind, subject, viText, enText) => {
+  const loop: OpenLoop = { id: randomUUID(), kind, subject, key: 'subject', workspace: 'workspace', sourceSessionId: 'session', state: 'open', createdAt: '2026-10-23T10:00:00Z', updatedAt: '2026-10-23T10:00:00Z', expiresAt: '2026-10-25T10:00:00Z', confidence: 0.98, salience: 0.9, promptCount: 0 }
+  for (const [locale, expected] of [['vi', viText], ['en', enText]] as const) {
+    const present = vi.fn()
+    const verify = vi.fn().mockResolvedValue(undefined)
+    await new ReminderNotifications(cliMessages[locale].tasks, locale, present).notifyOpenLoop(loop, new AbortController().signal, verify)
+    expect(verify).toHaveBeenCalledOnce()
+    expect(present.mock.calls[0]?.[0]).toBe(expected)
+  }
 })
