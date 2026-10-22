@@ -1,6 +1,6 @@
 import { useElectronEventaInvoke } from '@angela/electron-vueuse'
 import { usePiniaSynced } from '@angela/stage-ui/libs/pinia'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { useLearningMemoryStore } from '@angela/stage-ui/stores/modules/learning-memory'
 import { useIntervalFn } from '@vueuse/core'
 import { onScopeDispose, watch } from 'vue'
@@ -10,7 +10,7 @@ import { learningReviewsNotify } from '../../shared/eventa/learning-reviews'
 /** Checks active-character reviews once per minute while this renderer owns leadership. Scope disposal stops future checks and receipts. */
 export function useLearningReviewReminders() {
   const memory = useLearningMemoryStore()
-  const cards = useAiriCardStore()
+  const cards = useAngelaCardStore()
   const runtime = usePiniaSynced()
   const notify = useElectronEventaInvoke(learningReviewsNotify)
   let disposed = false

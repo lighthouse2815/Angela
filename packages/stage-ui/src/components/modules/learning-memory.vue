@@ -8,13 +8,13 @@ import { useNow } from '@vueuse/core'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useAiriCardStore } from '../../stores/modules/airi-card'
+import { useAngelaCardStore } from '../../stores/modules/angela-card'
 import { useLearningMemoryStore } from '../../stores/modules/learning-memory'
 
 const { t, locale } = useI18n()
 const dateFormat = computed(() => new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium', timeStyle: 'short' }))
 const store = useLearningMemoryStore()
-const cards = useAiriCardStore()
+const cards = useAngelaCardStore()
 const characterId = computed(() => cards.activeCardId)
 const entries = computed(() => store.forCharacter(characterId.value))
 const now = useNow({ interval: 60000 })

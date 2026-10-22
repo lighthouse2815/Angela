@@ -8,11 +8,11 @@ interface SavedCardPayload {
   activated: boolean
 }
 
-interface UseAiriCardEditorPageOptions {
+interface UseAngelaCardEditorPageOptions {
   cardId?: MaybeRefOrGetter<string | undefined>
 }
 
-export function useAiriCardEditorPage(options: UseAiriCardEditorPageOptions = {}) {
+export function useAngelaCardEditorPage(options: UseAngelaCardEditorPageOptions = {}) {
   const route = useRoute()
   const router = useRouter()
   const isDirty = ref(false)
@@ -28,7 +28,7 @@ export function useAiriCardEditorPage(options: UseAiriCardEditorPageOptions = {}
     if (router.options.history.state.back)
       router.back()
     else
-      void router.replace('/settings/airi-card')
+      void router.replace('/settings/angela-card')
   }
 
   function handleSectionChange(section: string) {
@@ -54,7 +54,7 @@ export function useAiriCardEditorPage(options: UseAiriCardEditorPageOptions = {}
     showUnsavedChangesDialog.value = false
     allowLeave = true
     // 使用 replace 完成被拦截的返回，避免在历史记录中留下重复的列表页。
-    void router.replace(pendingRoutePath || '/settings/airi-card').finally(() => {
+    void router.replace(pendingRoutePath || '/settings/angela-card').finally(() => {
       allowLeave = false
     })
   }
@@ -77,7 +77,7 @@ export function useAiriCardEditorPage(options: UseAiriCardEditorPageOptions = {}
       return
 
     await router.replace({
-      path: `/settings/airi-card/${encodeURIComponent(payload.cardId)}/edit`,
+      path: `/settings/angela-card/${encodeURIComponent(payload.cardId)}/edit`,
       query: route.query,
     })
   }

@@ -91,7 +91,7 @@ export interface ArtistryProvider {
 }
 
 /**
- * Per-card artistry settings stored in AiriExtension.modules.artistry
+ * Per-card artistry settings stored in AngelaExtension.modules.artistry
  */
 export interface ArtistryModuleSettings {
   /** Active provider ID (e.g. "comfyui", "replicate") */

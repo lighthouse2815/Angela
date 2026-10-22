@@ -8,7 +8,7 @@ import { computed, onScopeDispose, reactive, ref, watch } from 'vue'
 import cozyTeaCornerInPastelHuesUrl from '../assets/backgrounds/cozy-tea-corner-in-pastel-hues.avif'
 import cuteStreamingRoomWithPastelDecorUrl from '../assets/backgrounds/cute-streaming-room-with-pastel-decor.avif'
 
-import { useAiriCardStore } from './modules/airi-card'
+import { useAngelaCardStore } from './modules/angela-card'
 
 export interface BackgroundEntry {
   id: string
@@ -203,10 +203,10 @@ export const useBackgroundStore = defineStore('background-entries', () => {
 
   // Find the active background URL for the current character
   const activeBackgroundUrl = computed(() => {
-    const airiCardStore = useAiriCardStore()
-    if (!airiCardStore.activeCard)
+    const angelaCardStore = useAngelaCardStore()
+    if (!angelaCardStore.activeCard)
       return null
-    const bgId = airiCardStore.activeCard.extensions?.airi?.modules?.activeBackgroundId
+    const bgId = angelaCardStore.activeCard.extensions?.airi?.modules?.activeBackgroundId
     if (!bgId || bgId === 'none') {
       return null
     }
@@ -249,8 +249,8 @@ export const useBackgroundStore = defineStore('background-entries', () => {
 
   // List of available backgrounds for the current character
   const availableBackgrounds = computed(() => {
-    const airiCardStore = useAiriCardStore()
-    return getCharacterBackgrounds.value(airiCardStore.activeCardId)
+    const angelaCardStore = useAngelaCardStore()
+    return getCharacterBackgrounds.value(angelaCardStore.activeCardId)
   })
 
   const getCharacterJournalEntries = computed(() => (characterId?: string) => {
@@ -264,8 +264,8 @@ export const useBackgroundStore = defineStore('background-entries', () => {
 
   // The 'journal' store functionality needs to access just the journal entries for the active char
   const journalEntries = computed(() => {
-    const airiCardStore = useAiriCardStore()
-    return getCharacterJournalEntries.value(airiCardStore.activeCardId)
+    const angelaCardStore = useAngelaCardStore()
+    return getCharacterJournalEntries.value(angelaCardStore.activeCardId)
   })
 
   async function addBackground(
@@ -276,13 +276,13 @@ export const useBackgroundStore = defineStore('background-entries', () => {
     characterId?: string | null,
     remixId?: string,
   ) {
-    const airiCardStore = useAiriCardStore()
+    const angelaCardStore = useAngelaCardStore()
     const id = `${STORAGE_PREFIX}${nanoid()}`
 
     // Default to active card if journal and no charId provided
     const resolvedCharacterId = characterId !== undefined
       ? characterId
-      : ((type === 'journal' || type === 'selfie') ? airiCardStore.activeCardId : null)
+      : ((type === 'journal' || type === 'selfie') ? angelaCardStore.activeCardId : null)
 
     const entry: BackgroundEntry = {
       id,

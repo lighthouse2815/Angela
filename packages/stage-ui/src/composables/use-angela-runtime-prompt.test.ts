@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { useAiriRuntimePrompt } from './use-airi-runtime-prompt'
+import { useAngelaRuntimePrompt } from './use-angela-runtime-prompt'
 
 const i18nMock = vi.hoisted(() => ({
   hasTranslation: vi.fn<(key: string, locale: string) => boolean>(),
@@ -15,17 +15,17 @@ vi.mock('vue-i18n', () => ({
   }),
 }))
 
-describe('useAiriRuntimePrompt', () => {
+describe('useAngelaRuntimePrompt', () => {
   it('returns no prompt for a locale that still uses the combined prompt', () => {
     i18nMock.hasTranslation.mockReturnValue(false)
 
-    expect(useAiriRuntimePrompt().value).toBe('')
+    expect(useAngelaRuntimePrompt().value).toBe('')
   })
 
   it('assembles the emotion and emoji prompt for a split locale', () => {
     i18nMock.hasTranslation.mockReturnValue(true)
 
-    const prompt = useAiriRuntimePrompt().value
+    const prompt = useAngelaRuntimePrompt().value
 
     expect(prompt).toContain('base.prompt.emotion')
     expect(prompt).toContain('base.prompt.suffix')

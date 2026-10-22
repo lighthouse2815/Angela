@@ -1,4 +1,4 @@
-import type { AiriCard } from './modules'
+import type { AngelaCard } from './modules'
 
 import { defineInvokeHandler } from '@moeru/eventa'
 import { createTestingPinia } from '@pinia/testing'
@@ -8,7 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { getSpeechBusContext, voiceSpeechCommand } from '../services/speech/bus'
 import { setCharacterLlmMarkerParserFactoryForTest, useCharacterStore } from './character'
 import { useChatSessionStore } from './chat/session-store'
-import { useAiriCardStore } from './modules'
+import { useAngelaCardStore } from './modules'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({
@@ -57,11 +57,11 @@ describe('store character', () => {
       return { status: 'accepted' }
     })
 
-    const airiCardStore = useAiriCardStore(pinia)
+    const angelaCardStore = useAngelaCardStore(pinia)
     // @ts-expect-error - testing purpose
-    airiCardStore.systemPrompt = 'You are a brave adventurer in Minecraft.'
+    angelaCardStore.systemPrompt = 'You are a brave adventurer in Minecraft.'
     // @ts-expect-error - testing purpose
-    airiCardStore.activeCard = {
+    angelaCardStore.activeCard = {
       name: 'Hero',
       version: '1.0',
       extensions: {
@@ -84,7 +84,7 @@ describe('store character', () => {
           },
         },
       },
-    } satisfies AiriCard
+    } satisfies AngelaCard
   })
 
   it('exposes name and system prompt from the active card', () => {

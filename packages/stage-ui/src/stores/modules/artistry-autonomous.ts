@@ -13,13 +13,13 @@ import { useAnalytics } from '../../composables/use-analytics'
 import { useBackgroundStore } from '../background'
 import { useChatSessionStore } from '../chat/session-store'
 import { useProviderStore } from '../providers/provider'
-import { useAiriCardStore } from './airi-card'
+import { useAngelaCardStore } from './angela-card'
 import { useArtistryStore } from './artistry'
 
 const artistLog = import.meta.env.DEV ? console.info.bind(console, '[AutonomousArtist]') : () => {}
 
 export const useAutonomousArtistryStore = defineStore('artistry-autonomous', () => {
-  const cardStore = useAiriCardStore()
+  const cardStore = useAngelaCardStore()
   const backgroundStore = useBackgroundStore()
   const artistryStore = useArtistryStore()
   const providersStore = useProviderStore()

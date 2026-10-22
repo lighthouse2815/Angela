@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Section } from '@angela/stage-ui/components'
 import { useAnalytics } from '@angela/stage-ui/composables'
-import { useAiriCardStore, useBackgroundStore } from '@angela/stage-ui/stores'
+import { useAngelaCardStore, useBackgroundStore } from '@angela/stage-ui/stores'
 import { Button, Callout } from '@angela/ui'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -9,7 +9,7 @@ import { useI18n } from 'vue-i18n'
 const { t } = useI18n()
 const { trackSceneBackgroundSet } = useAnalytics()
 const backgroundStore = useBackgroundStore()
-const cardStore = useAiriCardStore()
+const cardStore = useAngelaCardStore()
 
 const fileInputRef = ref<HTMLInputElement>()
 

@@ -6,7 +6,7 @@ import { watch } from 'vue'
 
 import { useBuildInfo } from '../../composables/use-build-info'
 import { useAuthStore } from '../../stores/auth'
-import { useAiriCardStore } from '../../stores/modules/airi-card'
+import { useAngelaCardStore } from '../../stores/modules/angela-card'
 import { useSettingsAnalytics } from '../../stores/settings/analytics'
 import {
   captureAnalyticsEvent,
@@ -129,7 +129,7 @@ class Analytics implements AnalyticsRecorder {
         identifyAnalyticsUser(authStore.user.id)
     })
 
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     watch(() => cardStore.activeCardId, (next, previous) => {
       if (!next || !previous || previous === next)
         return

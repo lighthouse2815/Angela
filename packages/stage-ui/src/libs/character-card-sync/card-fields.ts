@@ -1,4 +1,4 @@
-import type { AiriCard } from '../../types/airiCard'
+import type { AngelaCard } from '../../types/angela-card'
 import type { DocumentFields } from '../document-sync'
 
 import { isEqual } from 'es-toolkit'
@@ -58,7 +58,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  * splitCard({ name: 'Luna', extensions: { airi: { modules: { speech: { provider: 'a' } }, agents: {} } } })
  * // => { '/name': 'Luna', '/extensions/airi/modules/speech': { provider: 'a' }, '/extensions/airi/agents': {} }
  */
-export function splitCard(card: AiriCard, builtIns: AiriCard[] = []): DocumentFields {
+export function splitCard(card: AngelaCard, builtIns: AngelaCard[] = []): DocumentFields {
   const fields: DocumentFields = {}
 
   function collect(container: Record<string, unknown>, path: string[]) {
@@ -93,7 +93,7 @@ export function splitCard(card: AiriCard, builtIns: AiriCard[] = []): DocumentFi
  *
  * The result is not validated. The caller must normalize it before use.
  */
-export function joinCard(fields: DocumentFields, builtIn?: AiriCard): Record<string, unknown> {
+export function joinCard(fields: DocumentFields, builtIn?: AngelaCard): Record<string, unknown> {
   const card: Record<string, unknown> = {}
 
   for (const [key, value] of Object.entries({ ...(builtIn && splitCard(builtIn)), ...fields })) {

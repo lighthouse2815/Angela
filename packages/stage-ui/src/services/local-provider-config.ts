@@ -5,7 +5,7 @@ import { isEqual } from 'es-toolkit'
 
 import * as v from 'valibot'
 
-import { useAiriCardStore } from '../stores/modules/airi-card'
+import { useAngelaCardStore } from '../stores/modules/angela-card'
 import { useConsciousnessStore } from '../stores/modules/consciousness'
 import { useProviderConfigStore } from '../stores/providers/config'
 
@@ -17,7 +17,7 @@ import { useProviderConfigStore } from '../stores/providers/config'
 export async function connectLocalProviderConfig(transport: LocalConfigTransport, isOwner: () => boolean, onError: (error: unknown) => void) {
   const providers = useProviderConfigStore()
   const consciousness = useConsciousnessStore()
-  const cards = useAiriCardStore()
+  const cards = useAngelaCardStore()
   let baseline = emptyLocalConfig
   let revision: string | undefined
   let initialized = false

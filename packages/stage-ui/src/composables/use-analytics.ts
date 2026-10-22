@@ -770,7 +770,7 @@ export function useAnalytics() {
   }
 
   // ─── Angela card (ccv3 character card) events ──────────────────────────
-  // `card_created` is emitted store-side (`stores/modules/airi-card.ts`)
+  // `card_created` is emitted store-side (`stores/modules/angela-card.ts`)
   // because creation has three entry points; edit has exactly one
   // user-driven entry (the creation dialog in edit mode), so it lives
   // here. Background card writes (autonomous artistry, image journal,

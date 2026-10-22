@@ -1,6 +1,6 @@
 import type { ccv3 } from '@angela/ccc'
 
-import type { AiriCard, AiriExtension } from '../types/airiCard'
+import type { AngelaCard, AngelaExtension } from '../types/angela-card'
 
 import JSZip from 'jszip'
 
@@ -9,7 +9,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { DisplayModelFormat, useDisplayModelsStore } from '../stores/display-models'
-import { exportAiriCardPackage, importAiriCardPackage } from './airi-card-import-export'
+import { exportAngelaCardPackage, importAngelaCardPackage } from './angela-card-import-export'
 
 describe('airi card package import/export', () => {
   it('preserves all configured wake pronunciations while excluding local conflict ownership', async () => {
@@ -18,8 +18,8 @@ describe('airi card package import/export', () => {
     const card = createCard()
     card.extensions.airi.modules.displayModelId = undefined
     card.extensions.airi.wakeWords = [{ text: 'Angela', modelId: 'kws-vocabulary', pronunciations: [['a', 'ri'], ['ai', 'li']] }]
-    const exported = await exportAiriCardPackage({ card, displayModelsStore })
-    const imported = await importAiriCardPackage({ file: new File([exported], 'voice-card.zip'), displayModelsStore })
+    const exported = await exportAngelaCardPackage({ card, displayModelsStore })
+    const imported = await importAngelaCardPackage({ file: new File([exported], 'voice-card.zip'), displayModelsStore })
     expect(airiFrom(imported).wakeWords).toEqual(card.extensions.airi.wakeWords)
     expect(airiFrom(imported)).not.toHaveProperty('pronunciationOwners')
   })
@@ -43,10 +43,10 @@ describe('airi card package import/export', () => {
     })
     mockAddDisplayModel(displayModelsStore, 'display-model-imported')
 
-    const exported = await exportAiriCardPackage({ card: createCard(), displayModelsStore })
+    const exported = await exportAngelaCardPackage({ card: createCard(), displayModelsStore })
     const zip = await JSZip.loadAsync(await exported.arrayBuffer())
     const cardJson = await readJson<ccv3.CharacterCardV3>(zip, 'card.json')
-    const imported = await importAiriCardPackage({ file: new File([exported], 'card.zip'), displayModelsStore })
+    const imported = await importAngelaCardPackage({ file: new File([exported], 'card.zip'), displayModelsStore })
     const airi = airiFrom(cardJson)
 
     expect(fetch).toHaveBeenCalledWith('/assets/avatar.vrm')
@@ -66,7 +66,7 @@ describe('airi card package import/export', () => {
     const source = exportToJSON(createCard('preset-live2d-1'))
     source.data.extensions.third_party = { token: 'do-not-import' }
 
-    const imported = await importAiriCardPackage({
+    const imported = await importAngelaCardPackage({
       file: await packageFile(source),
       displayModelsStore,
     })
@@ -100,7 +100,7 @@ describe('airi card package import/export', () => {
     ] as const
 
     for (const [file, expected] of cases)
-      await expect(importAiriCardPackage({ file, displayModelsStore })).rejects.toMatchObject(expected)
+      await expect(importAngelaCardPackage({ file, displayModelsStore })).rejects.toMatchObject(expected)
   })
 
   it('preserves Tachie archives and their compound extension', async () => {
@@ -115,12 +115,12 @@ describe('airi card package import/export', () => {
     })
     mockAddDisplayModel(displayModelsStore, 'imported-tachie')
 
-    const exported = await exportAiriCardPackage({
+    const exported = await exportAngelaCardPackage({
       card: createCard('tachie-model'),
       displayModelsStore,
     })
     const zip = await JSZip.loadAsync(await exported.arrayBuffer())
-    const imported = await importAiriCardPackage({
+    const imported = await importAngelaCardPackage({
       file: new File([exported], 'card.zip'),
       displayModelsStore,
     })
@@ -154,7 +154,7 @@ function mockAddDisplayModel(store: ReturnType<typeof useDisplayModelsStore>, id
   }))
 }
 
-function createCard(displayModelId = 'preset-vrm-1'): AiriCard {
+function createCard(displayModelId = 'preset-vrm-1'): AngelaCard {
   return {
     name: 'Angela / Test Card',
     nickname: 'Tester',
@@ -195,6 +195,6 @@ async function readJson<T = Record<string, unknown>>(zip: JSZip, path: string): 
   return JSON.parse(await zip.file(path)!.async('string')) as T
 }
 
-function airiFrom(card: ccv3.CharacterCardV3): AiriExtension {
-  return card.data.extensions.airi as AiriExtension
+function airiFrom(card: ccv3.CharacterCardV3): AngelaExtension {
+  return card.data.extensions.airi as AngelaExtension
 }

@@ -13,7 +13,7 @@ import { injectKeyPiniaSynced } from '../../libs/pinia/synced-context'
 import { useAuthStore } from '../auth'
 import { useProviderConfigStore } from '../providers/config'
 import { useProviderStore } from '../providers/provider'
-import { useAiriCardStore } from './airi-card'
+import { useAngelaCardStore } from './angela-card'
 import { useSpeechStore } from './speech'
 
 const syncedContexts: Array<{
@@ -37,7 +37,7 @@ function createSyncedContext(namespace: string, leadership: LeadershipMode, with
     setup() {
       speechStore = useSpeechStore()
       if (withCards)
-        useAiriCardStore()
+        useAngelaCardStore()
       return () => null
     },
   })
@@ -92,7 +92,7 @@ describe('speech synchronization', () => {
     await leader.speechStore.selectProviderModel(provider, 'model-a', 'old')
     await vi.waitFor(() => expect(leader.speechStore.availableVoices[provider]?.[0]?.id).toBe('old'))
     await vi.waitFor(() => expect(follower.speechStore.activeSpeechVoice?.id).toBe('old'))
-    const cards = useAiriCardStore(leader.pinia)
+    const cards = useAngelaCardStore(leader.pinia)
     await cards.initialize()
     const id = await cards.addCard({
       name: 'Saved voice',

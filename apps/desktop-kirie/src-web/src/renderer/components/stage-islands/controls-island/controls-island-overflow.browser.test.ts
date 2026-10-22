@@ -1,10 +1,10 @@
-import type { AiriCard } from '@angela/stage-ui/stores/modules/airi-card'
+import type { AngelaCard } from '@angela/stage-ui/stores/modules/angela-card'
 
 import type { ControlsIslandDock } from './use-controls-island-placement'
 
 import en from '@angela/i18n/locales/en'
 
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { useArtistryStore } from '@angela/stage-ui/stores/modules/artistry'
 import { useConsciousnessStore } from '@angela/stage-ui/stores/modules/consciousness'
 import { useSpeechStore } from '@angela/stage-ui/stores/modules/speech'
@@ -89,7 +89,7 @@ function mountControlsIsland(dock: ControlsIslandDock, size: typeof sizes[number
         setup() {
           // Seed the profile store without invoking the stage's asynchronous
           // runtime initialization. The profile form only needs an active card.
-          const cards = useAiriCardStore()
+          const cards = useAngelaCardStore()
           // Create the stores that card duplication reads while Vue still has
           // a component setup context. The action itself can then reuse them.
           useArtistryStore()
@@ -110,7 +110,7 @@ function mountControlsIsland(dock: ControlsIslandDock, size: typeof sizes[number
                 agents: {},
               },
             },
-          } satisfies AiriCard
+          } satisfies AngelaCard
           cards.cards.set('default', defaultCard)
           return () => h(ControlsIsland)
         },
@@ -132,7 +132,7 @@ function mountControlsIsland(dock: ControlsIslandDock, size: typeof sizes[number
   })
   useSettings(pinia).controlsIslandIconSize = size
 
-  return { cards: useAiriCardStore(pinia), auth: authState, dock: dockRef, i18n, screen, settings: useSettings(pinia) }
+  return { cards: useAngelaCardStore(pinia), auth: authState, dock: dockRef, i18n, screen, settings: useSettings(pinia) }
 }
 
 beforeEach(() => {

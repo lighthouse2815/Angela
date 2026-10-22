@@ -19,7 +19,7 @@ import { computed, shallowRef, toRaw } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { getConversationAnalyticsSurface } from '../composables'
-import { useAiriRuntimePrompt } from '../composables/use-airi-runtime-prompt'
+import { useAngelaRuntimePrompt } from '../composables/use-angela-runtime-prompt'
 import { activeTurnSpan, startSpan } from '../composables/use-io-tracer'
 import { useChatVision } from '../composables/vision/use-chat-vision'
 import { useVisionInference } from '../composables/vision/use-vision-inference'
@@ -45,7 +45,7 @@ import { describeChatImages, replaceToolResultImages } from './chat/image-projec
 import { useChatSessionStore } from './chat/session-store'
 import { useChatStreamStore } from './chat/stream-store'
 import { useContextObservabilityStore } from './devtools/context-observability'
-import { useAiriCardStore } from './modules/airi-card'
+import { useAngelaCardStore } from './modules/angela-card'
 import { useAutonomousArtistryStore } from './modules/artistry-autonomous'
 import { useConsciousnessStore } from './modules/consciousness'
 import { useHearingStore } from './modules/hearing'
@@ -220,7 +220,7 @@ const UNREADABLE_EARLIER_IMAGE = 'The user attached an image here earlier. The v
 
 export const useChatStore = defineStore('chat', () => {
   const { t } = useI18n()
-  const runtimePrompt = useAiriRuntimePrompt()
+  const runtimePrompt = useAngelaRuntimePrompt()
   const authStore = useAuthStore()
   const llmStore = useLLM()
   const llmToolsStore = useLlmToolsStore()
@@ -238,7 +238,7 @@ export const useChatStore = defineStore('chat', () => {
   const chatSession = useChatSessionStore()
   const chatStream = useChatStreamStore()
   const chatContext = useChatContextStore()
-  const cardStore = useAiriCardStore()
+  const cardStore = useAngelaCardStore()
   const wakeWords = useWakeWordsStore()
   const stickersStore = useStickersStore()
   const learningMemoryStore = useLearningMemoryStore()

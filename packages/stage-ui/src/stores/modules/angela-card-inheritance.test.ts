@@ -1,6 +1,6 @@
 import type { Session, User } from 'better-auth'
 
-import type { AiriCard } from '../../types/airiCard'
+import type { AngelaCard } from '../../types/angela-card'
 
 import { PiniaColada } from '@pinia/colada'
 import { createPinia, setActivePinia } from 'pinia'
@@ -10,7 +10,7 @@ import { createApp, nextTick, toRaw } from 'vue'
 import { DEFAULT_ARTISTRY_WIDGET_SPAWNING_PROMPT } from '../../constants/prompts/character-defaults'
 import { OFFICIAL_SPEECH_PROVIDER_ID } from '../../libs/providers/providers/official'
 import { useAuthStore } from '../auth'
-import { useAiriCardStore } from './airi-card'
+import { useAngelaCardStore } from './angela-card'
 import { useArtistryStore } from './artistry'
 import { useConsciousnessStore } from './consciousness'
 import { useSpeechStore } from './speech'
@@ -29,7 +29,7 @@ vi.mock('localforage', () => ({
   },
 }))
 
-function card(provider = '', model = ''): AiriCard {
+function card(provider = '', model = ''): AngelaCard {
   return {
     name: 'Imported card',
     version: '1.0.0',
@@ -65,7 +65,7 @@ describe('card inheritance with real module stores', () => {
     const consciousness = useConsciousnessStore()
     consciousness.activeProvider = 'global-provider'
     consciousness.activeModel = 'global-model'
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     await cards.initialize()
     const explicit = await cards.addCard(card('card-provider', 'card-model'), 'import')
     const inherited = await cards.addCard(card(), 'import')
@@ -81,7 +81,7 @@ describe('card inheritance with real module stores', () => {
     const vision = useVisionStore()
     vision.activeProvider = 'global-provider'
     vision.activeModel = 'global-model'
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     await cards.initialize()
     const uploaded = card()
     uploaded.extensions.airi.modules.vision.provider = 'another-provider'
@@ -93,7 +93,7 @@ describe('card inheritance with real module stores', () => {
 
   // https://github.com/moeru-ai/airi/pull/2332
   it('preserves explicit no-speech on the default card', async () => {
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     const muted = card()
     muted.extensions.airi.modules.speech.provider = 'speech-noop'
     cards.cards.set('default', muted)
@@ -103,7 +103,7 @@ describe('card inheritance with real module stores', () => {
   })
 
   it('keeps the default artistry instruction on a fresh profile', async () => {
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     await cards.initialize()
     expect(cards.activeCard?.extensions.airi.modules.artistry?.widgetInstruction).toBe(DEFAULT_ARTISTRY_WIDGET_SPAWNING_PROMPT)
     expect(cards.systemPrompt).toContain(DEFAULT_ARTISTRY_WIDGET_SPAWNING_PROMPT)
@@ -113,7 +113,7 @@ describe('card inheritance with real module stores', () => {
     const consciousness = useConsciousnessStore()
     consciousness.activeProvider = 'global-provider'
     consciousness.activeModel = 'global-model'
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     await cards.initialize()
     const id = await cards.addCard(card('card-provider', 'card-model'), 'import')
     await cards.activateCard(id)
@@ -126,7 +126,7 @@ describe('card inheritance with real module stores', () => {
     const consciousness = useConsciousnessStore()
     consciousness.activeProvider = 'global-provider'
     consciousness.activeModel = 'global-model'
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     await cards.initialize()
     const id = await cards.addCard(card('global-provider'), 'import')
     await cards.activateCard(id)
@@ -138,14 +138,14 @@ describe('card inheritance with real module stores', () => {
     const consciousness = useConsciousnessStore()
     consciousness.activeProvider = 'global-provider'
     consciousness.activeModel = 'global-model'
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     await cards.initialize()
     const id = await cards.addCard({ name: 'Portable card', version: '1.0.0', description: '' }, 'import')
     expect(cards.getCard(id)?.extensions.airi.modules.consciousness).toEqual({ provider: '', model: '' })
   })
 
   it('preserves imported extension fields while filling module defaults', async () => {
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     await cards.initialize()
     const uploaded = card()
     const extensions = {
@@ -168,7 +168,7 @@ describe('card inheritance with real module stores', () => {
     const consciousness = useConsciousnessStore()
     consciousness.activeProvider = 'removed-provider'
     consciousness.activeModel = 'global-model'
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     await cards.initialize()
     const id = await cards.addCard(card('removed-provider', 'card-model'), 'import')
     await cards.activateCard(id)
@@ -185,7 +185,7 @@ describe('card inheritance with real module stores', () => {
     speech.activeSpeechProvider = 'speech-provider'
     speech.activeSpeechModel = 'global-model'
     speech.activeSpeechVoiceId = 'global-voice'
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     await cards.initialize()
     const uploaded = card()
     uploaded.extensions.airi.modules.speech.model = 'card-model'
@@ -203,7 +203,7 @@ describe('card inheritance with real module stores', () => {
     artistry.globalProvider = 'comfyui'
     artistry.globalModel = 'global-model'
     artistry.globalProviderOptions = { workflow: 'global-workflow' }
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     await cards.initialize()
     const uploaded = card()
     uploaded.extensions.airi.modules.artistry = { enabled: true, provider: 'replicate', model: '' }
@@ -224,7 +224,7 @@ describe('card inheritance with real module stores', () => {
     const consciousness = useConsciousnessStore(leader)
     consciousness.activeProvider = 'global-provider'
     consciousness.activeModel = 'global-model'
-    const cards = useAiriCardStore(leader)
+    const cards = useAngelaCardStore(leader)
     await cards.initialize()
     const id = await cards.addCard(card('card-provider', 'card-model'), 'import')
     await cards.activateCard(id)
@@ -240,7 +240,7 @@ describe('card inheritance with real module stores', () => {
     const followerConsciousness = useConsciousnessStore(follower)
     followerConsciousness.activeProvider = 'card-provider'
     followerConsciousness.activeModel = 'card-model'
-    const followerCards = useAiriCardStore(follower)
+    const followerCards = useAngelaCardStore(follower)
     const updates = vi.fn()
     followerConsciousness.$subscribe(updates, { flush: 'sync' })
     followerCards.$patch(snapshot)
@@ -254,7 +254,7 @@ describe('card inheritance with real module stores', () => {
   })
 
   it('keeps card overrides unchanged across login, logout, and another activation', async () => {
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     await cards.initialize()
     const id = await cards.addCard(card('official-provider', 'auto'), 'import')
     await cards.activateCard(id)
@@ -320,7 +320,7 @@ describe('card inheritance with real module stores', () => {
     await nextTick()
     expect(voiceRequests).toHaveLength(0)
 
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     await cards.initialize()
     await cards.configureForAuthentication(true)
 
@@ -375,7 +375,7 @@ describe('card inheritance with real module stores', () => {
     await nextTick()
     expect(voiceRequests).toHaveLength(0)
 
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     await cards.initialize()
     let configured = false
     const setup = cards.configureForAuthentication(true).then(() => {
@@ -395,7 +395,7 @@ describe('card inheritance with real module stores', () => {
   })
 
   it('does not write login defaults into empty uploaded-card fields', async () => {
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     await cards.initialize()
     const id = await cards.addCard(card(), 'import')
     await cards.activateCard(id)
@@ -409,7 +409,7 @@ describe('card inheritance with real module stores', () => {
 
   // https://github.com/moeru-ai/airi/pull/2332#discussion_r3820590225
   it('reapplies model and voice overrides after login fills inherited providers', async () => {
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     await cards.initialize()
     const uploaded = card('', 'card-model')
     uploaded.extensions.airi.modules.speech.voice_id = 'card-voice'

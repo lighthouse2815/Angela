@@ -1,4 +1,4 @@
-import type { AiriCard } from '../../types/airiCard'
+import type { AngelaCard } from '../../types/angela-card'
 
 import { PiniaColada } from '@pinia/colada'
 import { createPinia, disposePinia } from 'pinia'
@@ -11,7 +11,7 @@ import { createMemoryHistory, createRouter } from 'vue-router'
 
 import CharacterSwitcherDrawer from './character-switcher-drawer.vue'
 
-import { useAiriCardStore } from '../../stores/modules/airi-card'
+import { useAngelaCardStore } from '../../stores/modules/angela-card'
 import { useConsciousnessStore } from '../../stores/modules/consciousness'
 import { useSpeechStore } from '../../stores/modules/speech'
 
@@ -30,7 +30,7 @@ afterEach(() => {
   localStorage.clear()
 })
 
-function card(name: string): AiriCard {
+function card(name: string): AngelaCard {
   return {
     name,
     version: '1.0.0',
@@ -56,7 +56,7 @@ async function mountSwitcher(name = 'ReLU') {
   }
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: [{ path: '/', component: { template: '<div />' } }, { path: '/settings/airi-card', component: { template: '<div />' } }],
+    routes: [{ path: '/', component: { template: '<div />' } }, { path: '/settings/angela-card', component: { template: '<div />' } }],
   })
   await router.push('/')
   let initialization: Promise<void> | undefined
@@ -67,7 +67,7 @@ async function mountSwitcher(name = 'ReLU') {
       // initialization resumes after an await, outside the component context.
       useConsciousnessStore()
       useSpeechStore()
-      initialization = useAiriCardStore().initialize()
+      initialization = useAngelaCardStore().initialize()
     },
     template: '<header style="display:flex;width:100%"><span style="width:44px;flex-shrink:0" /><CharacterSwitcherDrawer /><span style="width:44px;flex-shrink:0" /></header>',
   }), {
@@ -82,7 +82,7 @@ async function mountSwitcher(name = 'ReLU') {
     },
   })
   await initialization
-  return { screen, router, store: useAiriCardStore(pinia) }
+  return { screen, router, store: useAngelaCardStore(pinia) }
 }
 
 // https://github.com/moeru-ai/airi/actions/runs/34237304157/job/102098223378
@@ -102,7 +102,7 @@ it('selects a character through the real store and opens character management', 
   await expect.element(page.getByRole('dialog')).not.toBeInTheDocument()
   await screen.getByTestId('character-selector-button').click()
   await page.getByRole('button', { name: 'Manage characters' }).click()
-  await expect.poll(() => router.currentRoute.value.path).toBe('/settings/airi-card')
+  await expect.poll(() => router.currentRoute.value.path).toBe('/settings/angela-card')
 })
 
 it('truncates long titles and restores trigger focus on dismissal', async () => {

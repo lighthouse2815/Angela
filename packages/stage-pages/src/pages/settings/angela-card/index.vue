@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Alert } from '@angela/stage-ui/components'
-import { AiriCardPackageError, importAiriCardPackage } from '@angela/stage-ui/services/airi-card-import-export'
+import { AngelaCardPackageError, importAngelaCardPackage } from '@angela/stage-ui/services/angela-card-import-export'
 import { useAuthStore } from '@angela/stage-ui/stores/auth'
 import { useDisplayModelsStore } from '@angela/stage-ui/stores/display-models'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { Button, InputFileCard } from '@angela/ui'
 import { ComboboxSelect } from '@angela/ui/components/form'
 import { storeToRefs } from 'pinia'
@@ -21,7 +21,7 @@ import WakeWordConflictAlert from './components/wake-word-conflict-alert.vue'
 import { formatRelativeTime } from './composables/relative-time'
 
 const { t, locale } = useI18n()
-const cardStore = useAiriCardStore()
+const cardStore = useAngelaCardStore()
 const displayModelsStore = useDisplayModelsStore()
 const { addCard, removeCard } = cardStore
 const { cards, activeCardId, cardSyncStates, cloudSyncEnabled } = storeToRefs(cardStore)
@@ -60,12 +60,12 @@ watch(inputFiles, async (newFiles) => {
     return
 
   try {
-    await addCard(await importAiriCardPackage({ file, displayModelsStore }), 'import')
+    await addCard(await importAngelaCardPackage({ file, displayModelsStore }), 'import')
     toast(t('settings.pages.card.imported'))
   }
   catch (error) {
     console.error('Error processing card package:', error)
-    toast(t(error instanceof AiriCardPackageError && error.code === 'missing-file'
+    toast(t(error instanceof AngelaCardPackageError && error.code === 'missing-file'
       ? 'settings.pages.card.import_missing_file'
       : 'settings.pages.card.import_invalid_file'))
   }
@@ -143,11 +143,11 @@ function handleEditCard(cardId: string) {
     console.error(`Card with id ${cardId} not found`)
     return
   }
-  void router.push(`/settings/airi-card/${encodeURIComponent(cardId)}/edit`)
+  void router.push(`/settings/angela-card/${encodeURIComponent(cardId)}/edit`)
 }
 
 function handleCardCreationDialog() {
-  void router.push('/settings/airi-card/new')
+  void router.push('/settings/angela-card/new')
 }
 
 // Card activation
@@ -187,7 +187,7 @@ watch(() => [route.query.cardId, route.query.tab], ([cardId, tab]) => {
   // Artistry or other editing tabs go to Creation/Edit dialog
   else if (['artistry', 'identity', 'behavior', 'modules', 'settings'].includes(targetTab)) {
     void router.replace({
-      path: `/settings/airi-card/${encodeURIComponent(cardId)}/edit`,
+      path: `/settings/angela-card/${encodeURIComponent(cardId)}/edit`,
       query: { section: targetTab },
     })
     return
@@ -525,6 +525,7 @@ function getModuleShortName(id: string, module: 'consciousness' | 'voice') {
 </template>
 
 <route lang="yaml">
+alias: /settings/airi-card
 meta:
   layout: settings
   titleKey: settings.pages.card.title

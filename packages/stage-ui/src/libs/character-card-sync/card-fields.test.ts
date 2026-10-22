@@ -1,10 +1,10 @@
-import type { AiriCard } from '../../types/airiCard'
+import type { AngelaCard } from '../../types/angela-card'
 
 import { describe, expect, it } from 'vitest'
 
 import { joinCard, splitCard } from './card-fields'
 
-const card: AiriCard = {
+const card: AngelaCard = {
   name: 'Luna',
   version: '1.0.0',
   description: 'A calm character',
@@ -67,7 +67,7 @@ describe('joinCard', () => {
 })
 
 describe('the built-in card', () => {
-  const builtIn: AiriCard = {
+  const builtIn: AngelaCard = {
     name: 'ReLU',
     version: '1.0.0',
     description: 'Built-in description',
@@ -75,7 +75,7 @@ describe('the built-in card', () => {
   }
 
   it('leaves out the parts that equal the built-in card', () => {
-    const edited: AiriCard = { ...builtIn, systemPrompt: 'Be kind', extensions: { airi: { ...builtIn.extensions.airi, modules: { ...builtIn.extensions.airi.modules, speech: { provider: 'a', model: 'b', voice_id: 'c' } } } } }
+    const edited: AngelaCard = { ...builtIn, systemPrompt: 'Be kind', extensions: { airi: { ...builtIn.extensions.airi, modules: { ...builtIn.extensions.airi.modules, speech: { provider: 'a', model: 'b', voice_id: 'c' } } } } }
 
     expect(splitCard(builtIn, [builtIn])).toEqual({})
     expect(splitCard(edited, [builtIn])).toEqual({

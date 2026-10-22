@@ -16,7 +16,7 @@ import { extractMessageText } from '../../../../libs/chat-sync'
 import { useAuthStore } from '../../../../stores/auth'
 import { useChatStore } from '../../../../stores/chat'
 import { useChatSessionStore } from '../../../../stores/chat/session-store'
-import { useAiriCardStore } from '../../../../stores/modules/airi-card'
+import { useAngelaCardStore } from '../../../../stores/modules/angela-card'
 import { useConsciousnessStore } from '../../../../stores/modules/consciousness'
 
 const props = withDefaults(defineProps<{
@@ -34,7 +34,7 @@ const now = useNow({ interval: 60_000 })
 const chatSession = useChatSessionStore()
 const chat = useChatStore()
 const { sessionMetas, sessionMessages, activeSessionId } = storeToRefs(chatSession)
-const { activeCardId } = storeToRefs(useAiriCardStore())
+const { activeCardId } = storeToRefs(useAngelaCardStore())
 const { userId } = storeToRefs(useAuthStore())
 const { activeModel } = storeToRefs(useConsciousnessStore())
 const { trackChatSessionSelected, trackChatSessionStarted } = useAnalytics()

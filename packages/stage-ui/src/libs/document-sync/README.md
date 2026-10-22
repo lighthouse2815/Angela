@@ -39,7 +39,7 @@ Client, in `packages/stage-ui`:
 2. Call `synchronize` with a client for the route, the stored sync state, and the functions that read and write the local documents.
 3. Call `history` and `snapshot` on the client of `createDocumentSyncClient` to read past revisions. Both return `null` when the document, or that revision of it, is gone.
 
-`server/apps/api/src/services/domain/character-cards.ts`, `stores/modules/airi-card.ts`, and `libs/character-card-sync/card-fields.ts` are the reference use.
+`server/apps/api/src/services/domain/character-cards.ts`, `stores/modules/angela-card.ts`, and `libs/character-card-sync/card-fields.ts` are the reference use.
 
 ```ts
 import { createDocumentSyncClient, synchronize } from '../libs/document-sync'

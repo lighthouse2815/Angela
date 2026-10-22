@@ -16,6 +16,12 @@
     "directory": "packages/stage-ui"
   },
   "exports": {
+    "./stores/modules/airi-card": "./src/stores/modules/angela-card.ts",
+    "./services/airi-card-editor": "./src/services/angela-card-editor.ts",
+    "./services/airi-card-import-export": "./src/services/angela-card-import-export.ts",
+    "./services/airi-card-modules": "./src/services/angela-card-modules.ts",
+    "./types/airiCard": "./src/types/angela-card.ts",
+    "./composables/use-airi-runtime-prompt": "./src/composables/use-angela-runtime-prompt.ts",
     ".": "./src/components/index.ts",
     "./components/scenarios/chat": "./src/components/scenarios/chat/index.ts",
     "./components/scenarios/home-assistant": "./src/components/scenarios/home-assistant/index.ts",

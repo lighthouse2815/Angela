@@ -3,7 +3,7 @@ import type { WakeWord } from '@angela/stage-ui/libs/voice/wake-words'
 
 import { WakeWordStatus } from '@angela/stage-ui/components'
 import { wakeWordKey } from '@angela/stage-ui/libs/voice/wake-words'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { useWakeWordDetectionStore } from '@angela/stage-ui/stores/wake-word-detection'
 import { useWakeWordsStore } from '@angela/stage-ui/stores/wake-words'
 import { SettingsCard } from '@angela/ui'
@@ -26,7 +26,7 @@ type PronunciationState = 'active' | 'paused' | 'other' | 'unsupported'
 const NO_WAKE_WORDS: readonly WakeWord[] = Object.freeze([])
 
 const { t } = useI18n()
-const cards = useAiriCardStore()
+const cards = useAngelaCardStore()
 const wakeWords = useWakeWordsStore()
 const detection = useWakeWordDetectionStore()
 

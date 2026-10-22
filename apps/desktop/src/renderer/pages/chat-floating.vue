@@ -3,7 +3,7 @@ import type { ChatFloatingState } from '../../shared/eventa'
 
 import { getElectronEventaContext, useElectronEventaInvoke, useElectronMouseInElement } from '@angela/electron-vueuse'
 import { ChatSessionsDrawer } from '@angela/stage-ui/components'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { useEventListener, useLocalStorage } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, onScopeDispose, shallowRef, useTemplateRef, watch } from 'vue'
@@ -27,7 +27,7 @@ import { dismissOverlays, useChatFloatingClickThrough } from '../composables/use
 import { useDanmakuFeedExpiry } from '../composables/use-danmaku-feed-expiry'
 import { useControlsIslandStore } from '../stores/controls-island'
 
-const { activeCard } = storeToRefs(useAiriCardStore())
+const { activeCard } = storeToRefs(useAngelaCardStore())
 const sessionsDrawerOpen = shallowRef(false)
 const interactiveArea = useTemplateRef<InstanceType<typeof InteractiveArea>>('interactive-area')
 const { t } = useI18n()

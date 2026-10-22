@@ -2,7 +2,7 @@
 import { useElectronEventaInvoke } from '@angela/electron-vueuse'
 import { VoiceDrafts } from '@angela/stage-ui/components/scenarios/chat'
 import { useChatSessionStore } from '@angela/stage-ui/stores/chat/session-store'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { useVoiceControlsStore } from '@angela/stage-ui/stores/voice-controls'
 import { useEventListener, useTimeoutFn } from '@vueuse/core'
 import { computed, nextTick, shallowRef, watch } from 'vue'
@@ -34,7 +34,7 @@ const LEVEL_BARS = [0.55, 0.85, 1, 0.75, 0.5] as const
 const { t } = useI18n()
 const controls = useVoiceControlsStore()
 const sessions = useChatSessionStore()
-const cards = useAiriCardStore()
+const cards = useAngelaCardStore()
 const returnHome = useElectronEventaInvoke(electronInlayReturnHome)
 // The window stays above other apps, so only what the page paints takes the pointer.
 const { hitTest } = useChatFloatingClickThrough({ pinned: true })

@@ -8,10 +8,10 @@ import { createApp, h, ref } from 'vue'
 import { createI18n } from 'vue-i18n'
 import { createMemoryHistory, createRouter, RouterView } from 'vue-router'
 
-import CardEditor from '../../../../stage-pages/src/pages/settings/airi-card/components/CardEditor.vue'
+import CardEditor from '../../../../stage-pages/src/pages/settings/angela-card/components/CardEditor.vue'
 
 import { useProviderConfigStore } from '../providers/config'
-import { useAiriCardStore } from './airi-card'
+import { useAngelaCardStore } from './angela-card'
 import { useSpeechStore } from './speech'
 
 // https://github.com/moeru-ai/airi/pull/2490#discussion_r3967236115
@@ -55,7 +55,7 @@ it.each(['completed', 'unmounted', 'replaced'])('isolates card preview responses
     await vi.waitFor(() => expect(speech.availableVoices['microsoft-speech']?.[0]?.id).toBe('runtime'))
     speech.activeSpeechVoiceId = 'runtime'
     await speech.ensureActiveSpeechVoice()
-    const cards = useAiriCardStore(pinia)
+    const cards = useAngelaCardStore(pinia)
     /** Creates an inactive draft so changing the dialog never activates it. */
     async function draft(model: string) {
       return cards.addCard({

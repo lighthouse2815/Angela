@@ -10,7 +10,7 @@ const RUNTIME_PROMPT_KEYS = [
 ]
 
 /** Returns the localized emotion and emoji prompt for each model request. */
-export function useAiriRuntimePrompt() {
+export function useAngelaRuntimePrompt() {
   const { locale, t, te } = useI18n()
 
   return computed(() => {
@@ -27,3 +27,6 @@ export function useAiriRuntimePrompt() {
     ].join('\n\n')
   })
 }
+
+/** Supported alias for existing runtime prompt consumers. */
+export { useAngelaRuntimePrompt as useAiriRuntimePrompt }

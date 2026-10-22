@@ -8,7 +8,7 @@ import type { UnwrapRef } from 'vue'
 import type z from 'zod'
 
 import type { StreamEvent } from '../../ai/chat-llm/llm'
-import type { AiriCard } from '../../modules'
+import type { AngelaCard } from '../../modules'
 
 import { renderConversationPreview } from '@angela/core-agent'
 import { tool } from '@xsai/tool'
@@ -21,7 +21,7 @@ import { sparkNotifyCommandSchema, useCharacterOrchestratorStore } from '.'
 import { useCharacterStore } from '..'
 import { useLLM } from '../../ai/chat-llm/llm'
 import { useModsServerChannelStore } from '../../mods/api/channel-server'
-import { useAiriCardStore, useConsciousnessStore } from '../../modules'
+import { useAngelaCardStore, useConsciousnessStore } from '../../modules'
 import { useProviderStore } from '../../providers/provider'
 
 vi.mock('vue-i18n', () => ({
@@ -125,11 +125,11 @@ describe('store character-orchestrator', () => {
     consciousnessStore.activeProvider = 'mock-provider'
     consciousnessStore.activeModel = 'mock-model'
 
-    const airiCardStore = useAiriCardStore(pinia)
+    const angelaCardStore = useAngelaCardStore(pinia)
     // @ts-expect-error - testing purpose
-    airiCardStore.systemPrompt = 'You are a brave adventurer in Minecraft.'
+    angelaCardStore.systemPrompt = 'You are a brave adventurer in Minecraft.'
     // @ts-expect-error - testing purpose
-    airiCardStore.activeCard = {
+    angelaCardStore.activeCard = {
       name: 'Hero',
       version: '1.0',
       extensions: {
@@ -152,7 +152,7 @@ describe('store character-orchestrator', () => {
           },
         },
       },
-    } satisfies AiriCard
+    } satisfies AngelaCard
   })
 
   it('handles immediate spark:notify with reaction and commands', async () => {

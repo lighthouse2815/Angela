@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import type { AiriCard } from '@angela/stage-ui/stores/modules/airi-card'
+import type { AngelaCard } from '@angela/stage-ui/stores/modules/angela-card'
 
 import DOMPurify from 'dompurify'
 
 import { useAnalytics } from '@angela/stage-ui/composables'
 import { useDownload } from '@angela/stage-ui/composables/download'
-import { exportAiriCardPackage } from '@angela/stage-ui/services/airi-card-import-export'
+import { exportAngelaCardPackage } from '@angela/stage-ui/services/angela-card-import-export'
 import { useAuthStore } from '@angela/stage-ui/stores/auth'
 import { useBackgroundStore } from '@angela/stage-ui/stores/background'
 import { useDisplayModelsStore } from '@angela/stage-ui/stores/display-models'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { Button, GhostButton, Select } from '@angela/ui'
 import { storeToRefs } from 'pinia'
 import {
@@ -41,7 +41,7 @@ const emit = defineEmits<{
 
 const { t, te, locale } = useI18n()
 const { trackSceneBackgroundSet } = useAnalytics()
-const cardStore = useAiriCardStore()
+const cardStore = useAngelaCardStore()
 const backgroundStore = useBackgroundStore()
 const displayModelsStore = useDisplayModelsStore()
 
@@ -53,7 +53,7 @@ const isRefreshingGallery = ref(false)
 const isExportingCard = shallowRef(false)
 
 // Get selected card data
-const selectedCard = computed<AiriCard | undefined>(() => {
+const selectedCard = computed<AngelaCard | undefined>(() => {
   if (!props.cardId)
     return undefined
   return cardStore.getCard(props.cardId)
@@ -124,7 +124,7 @@ async function handleExportCard() {
   isExportingCard.value = true
   try {
     useDownload(
-      await exportAiriCardPackage({ card: selectedCard.value, displayModelsStore }),
+      await exportAngelaCardPackage({ card: selectedCard.value, displayModelsStore }),
       `${selectedCard.value.name.trim()}.zip`,
     ).download()
     toast(t('settings.pages.card.exported'))

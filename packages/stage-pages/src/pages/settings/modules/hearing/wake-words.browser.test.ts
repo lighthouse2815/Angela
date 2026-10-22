@@ -2,7 +2,7 @@ import en from '@angela/i18n/locales/en'
 
 import { kwsModel } from '@angela/stage-ui/libs/voice/kws-model-info'
 import { wakeWordKey } from '@angela/stage-ui/libs/voice/wake-words'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { useWakeWordsStore } from '@angela/stage-ui/stores/wake-words'
 import { createPinia, disposePinia } from 'pinia'
 import { afterEach, describe, expect, it } from 'vitest'
@@ -47,7 +47,7 @@ async function renderWithConflict() {
     },
   })
 
-  const cards = useAiriCardStore(pinia)
+  const cards = useAngelaCardStore(pinia)
   const wakeWords = useWakeWordsStore(pinia)
   const aria = await cards.addCard({ name: 'Aria', version: '1.0.0' }, 'scratch')
   const luna = await cards.addCard({ name: 'Luna', version: '1.0.0' }, 'scratch')

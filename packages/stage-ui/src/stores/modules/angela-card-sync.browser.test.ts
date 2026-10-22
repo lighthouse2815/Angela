@@ -10,7 +10,7 @@ import { createApp } from 'vue'
 import { CHARACTER_CARD_SYNC_FLAG } from '../../libs/feature-flags'
 import { useAuthStore } from '../auth'
 import { useFeatureFlagsStore } from '../feature-flags'
-import { useAiriCardStore } from './airi-card'
+import { useAngelaCardStore } from './angela-card'
 
 vi.mock('vue-i18n', () => ({
   useI18n: () => ({ locale: { value: 'en' }, t: (key: string) => key }),
@@ -29,7 +29,7 @@ function createContext(runtime: SyncedPiniaRuntime) {
   // Cloud sync is off by default. Most of these tests exercise the sync
   // itself, so turn it on for this window the same way a user would.
   useFeatureFlagsStore(pinia).setPreference(CHARACTER_CARD_SYNC_FLAG.key, true)
-  return { pinia, auth: useAuthStore(pinia), cards: useAiriCardStore(pinia) }
+  return { pinia, auth: useAuthStore(pinia), cards: useAngelaCardStore(pinia) }
 }
 
 interface ServerDocument {

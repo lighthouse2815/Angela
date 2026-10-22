@@ -1,6 +1,6 @@
 import type { Card } from '@angela/ccc'
 
-import type { AiriExtension } from '../types/airiCard'
+import type { AngelaExtension } from '../types/angela-card'
 
 import {
   check,
@@ -16,16 +16,16 @@ import {
   unknown,
 } from 'valibot'
 
-export type AiriCardDraftValidationError = 'name' | 'version' | 'invalid_artistry_json'
+export type AngelaCardDraftValidationError = 'name' | 'version' | 'invalid_artistry_json'
 
 /** Module settings owned by the Angela Card editor form. */
-interface AiriCardEditorModules {
-  consciousness: AiriExtension['modules']['consciousness']
-  vision: AiriExtension['modules']['vision']
-  speech: Pick<AiriExtension['modules']['speech'], 'provider' | 'model' | 'voice_id'>
+interface AngelaCardEditorModules {
+  consciousness: AngelaExtension['modules']['consciousness']
+  vision: AngelaExtension['modules']['vision']
+  speech: Pick<AngelaExtension['modules']['speech'], 'provider' | 'model' | 'voice_id'>
   displayModelId?: string
   artistry: Pick<
-    NonNullable<AiriExtension['modules']['artistry']>,
+    NonNullable<AngelaExtension['modules']['artistry']>,
     | 'provider'
     | 'model'
     | 'promptPrefix'
@@ -42,10 +42,10 @@ interface AiriCardEditorModules {
  *
  * Empty strings mean that the card inherits the corresponding global setting.
  */
-export function getAiriCardEditorModuleSettings(
+export function getAngelaCardEditorModuleSettings(
   card: Card | undefined,
-): Pick<AiriCardEditorModules, 'consciousness' | 'vision' | 'speech' | 'displayModelId'> {
-  const modules = getAiriCardModules(card?.extensions?.airi)
+): Pick<AngelaCardEditorModules, 'consciousness' | 'vision' | 'speech' | 'displayModelId'> {
+  const modules = getAngelaCardModules(card?.extensions?.airi)
 
   return {
     consciousness: {
@@ -65,13 +65,13 @@ export function getAiriCardEditorModuleSettings(
   }
 }
 
-type CardWithAiriExtension = Card & {
+type CardWithAngelaExtension = Card & {
   extensions: NonNullable<Card['extensions']> & {
-    airi: AiriExtension
+    airi: AngelaExtension
   }
 }
 
-export type AiriCardDraftValidationResult
+export type AngelaCardDraftValidationResult
   = | {
     success: true
     output: {
@@ -81,7 +81,7 @@ export type AiriCardDraftValidationResult
   }
   | {
     success: false
-    error: AiriCardDraftValidationError
+    error: AngelaCardDraftValidationError
   }
 
 const cardDraftSchema = object({
@@ -104,7 +104,7 @@ const artistryOptionsSchema = pipe(
  * required name and version fields. Artistry options must be a JSON object
  * when present.
  */
-export function safeParseAiriCardDraft(card: Card, artistryOptionsJson: string): AiriCardDraftValidationResult {
+export function safeParseAngelaCardDraft(card: Card, artistryOptionsJson: string): AngelaCardDraftValidationResult {
   const cardResult = safeParse(cardDraftSchema, card)
   if (!cardResult.success) {
     const invalidField = cardResult.issues[0]?.path?.[0]?.key
@@ -149,11 +149,11 @@ export function safeParseAiriCardDraft(card: Card, artistryOptionsJson: string):
  * including body models, backgrounds, advanced speech/artistry settings, and
  * agent configuration.
  */
-export function applyAiriCardEditorModules(
+export function applyAngelaCardEditorModules(
   card: Card,
-  edited: AiriCardEditorModules,
-): CardWithAiriExtension {
-  const existing = isAiriExtension(card.extensions?.airi)
+  edited: AngelaCardEditorModules,
+): CardWithAngelaExtension {
+  const existing = isAngelaExtension(card.extensions?.airi)
     ? card.extensions.airi
     : undefined
 
@@ -181,13 +181,13 @@ export function applyAiriCardEditorModules(
   }
 }
 
-function isAiriExtension(value: unknown): value is AiriExtension {
+function isAngelaExtension(value: unknown): value is AngelaExtension {
   return isRecord(value)
     && isRecord(value.modules)
     && isRecord(value.agents)
 }
 
-function getAiriCardModules(value: unknown): Record<string, unknown> | undefined {
+function getAngelaCardModules(value: unknown): Record<string, unknown> | undefined {
   if (!isRecord(value) || !isRecord(value.modules))
     return undefined
 
@@ -204,4 +204,15 @@ function getModuleString(module: unknown, key: string): string {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+/** Supported aliases for existing card editor consumers. */
+export {
+  applyAngelaCardEditorModules as applyAiriCardEditorModules,
+  getAngelaCardEditorModuleSettings as getAiriCardEditorModuleSettings,
+  safeParseAngelaCardDraft as safeParseAiriCardDraft,
+}
+export type {
+  AngelaCardDraftValidationError as AiriCardDraftValidationError,
+  AngelaCardDraftValidationResult as AiriCardDraftValidationResult,
 }

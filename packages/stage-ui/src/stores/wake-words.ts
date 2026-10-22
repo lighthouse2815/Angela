@@ -5,14 +5,14 @@ import { defineStore } from 'pinia'
 import { computed } from 'vue'
 
 import { resolveWakeWords, validateWakeWords } from '../libs/voice/wake-words'
-import { useAiriCardStore } from './modules/airi-card'
+import { useAngelaCardStore } from './modules/angela-card'
 
 /** Cards without wake words share one immutable empty value across catalog updates. */
 const EMPTY_WAKE_WORDS: readonly WakeWord[] = Object.freeze([])
 
 /** Pronunciation choices belong to this device library. Card import and export never include these choices. */
 export const useWakeWordsStore = defineStore('wake-words', () => {
-  const cards = useAiriCardStore()
+  const cards = useAngelaCardStore()
   const owners = useLocalStorageManualReset<Record<string, string>>('settings/voice/pronunciation-owners', {})
   const catalog = computed(() => resolveWakeWords([...cards.cards].map(([characterId, card]) => ({ characterId, words: card.extensions.airi.wakeWords ?? EMPTY_WAKE_WORDS })), owners.value))
 

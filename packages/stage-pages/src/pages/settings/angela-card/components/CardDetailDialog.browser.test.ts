@@ -3,7 +3,7 @@ import en from '@angela/i18n/locales/en'
 import { CHARACTER_CARD_SYNC_FLAG } from '@angela/stage-ui/libs/feature-flags'
 import { useAuthStore } from '@angela/stage-ui/stores/auth'
 import { useFeatureFlagsStore } from '@angela/stage-ui/stores/feature-flags'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { createPinia, disposePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { cleanup, render } from 'vitest-browser-vue'
@@ -35,7 +35,7 @@ describe('card detail dialog history tab', () => {
   })
 
   // The store calls `useI18n()` at its own setup, so the first call to
-  // `useAiriCardStore` must happen while a component with the i18n plugin is
+  // `useAngelaCardStore` must happen while a component with the i18n plugin is
   // mounted. Mounting the dialog on a placeholder id before the card exists
   // gives the store that context, and `rerender` then points it at the card.
   async function renderDialog() {
@@ -45,7 +45,7 @@ describe('card detail dialog history tab', () => {
         plugins: [pinia, createI18n({ legacy: false, locale: 'en', messages: { en } })],
       },
     })
-    const cardId = await useAiriCardStore(pinia).addCard({ name: 'Luna', version: '1.0.0' }, 'scratch')
+    const cardId = await useAngelaCardStore(pinia).addCard({ name: 'Luna', version: '1.0.0' }, 'scratch')
     await screen.rerender({ cardId })
     return { screen, cardId }
   }
@@ -92,7 +92,7 @@ describe('card detail dialog history tab', () => {
     await expect.element(screen.getByText('Restore this version?')).toBeVisible()
     await screen.getByRole('button', { name: 'Restore', exact: true }).click()
 
-    await expect.poll(() => useAiriCardStore(pinia).cards.get(cardId)?.name).toBe('Nova')
+    await expect.poll(() => useAngelaCardStore(pinia).cards.get(cardId)?.name).toBe('Nova')
   })
 
   it('does not offer a history tab for a signed-in user who has not turned cloud sync on', async () => {

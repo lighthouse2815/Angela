@@ -19,7 +19,7 @@ import StepProviderSelection from './step-provider-selection.vue'
 import StepWelcome from './step-welcome.vue'
 
 import { useAnalytics } from '../../../../composables/use-analytics'
-import { useAiriCardStore } from '../../../../stores/modules/airi-card'
+import { useAngelaCardStore } from '../../../../stores/modules/angela-card'
 import { useConsciousnessStore } from '../../../../stores/modules/consciousness'
 import { useProviderConfigStore } from '../../../../stores/providers/config'
 import { useProviderStore } from '../../../../stores/providers/provider'
@@ -45,7 +45,7 @@ const providersStore = useProviderStore()
 const providerStore = useProviderConfigStore()
 const { allChatProvidersMetadata } = storeToRefs(providersStore)
 const consciousnessStore = useConsciousnessStore()
-const cardStore = useAiriCardStore()
+const cardStore = useAngelaCardStore()
 const {
   activeProvider,
 } = storeToRefs(consciousnessStore)

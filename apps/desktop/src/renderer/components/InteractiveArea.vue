@@ -16,7 +16,7 @@ import { useChatStore } from '@angela/stage-ui/stores/chat'
 import { useChatSessionStore } from '@angela/stage-ui/stores/chat/session-store'
 import { useChatStreamStore } from '@angela/stage-ui/stores/chat/stream-store'
 import { useJournalPreviewStore } from '@angela/stage-ui/stores/journal-preview'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { useConsciousnessStore } from '@angela/stage-ui/stores/modules/consciousness'
 import { BasicTextarea, GhostButton } from '@angela/ui'
 import { until, useLocalStorage } from '@vueuse/core'
@@ -87,12 +87,12 @@ const chatSession = useChatSessionStore()
 const chatStream = useChatStreamStore()
 const backgroundStore = useBackgroundStore()
 const journalPreviewStore = useJournalPreviewStore()
-const airiCardStore = useAiriCardStore()
+const angelaCardStore = useAngelaCardStore()
 
 const { activeSessionId, messages } = storeToRefs(chatSession)
 const { streamingMessage } = storeToRefs(chatStream)
 const { activeTurns } = storeToRefs(chatStore)
-const { activeCard, activeCardId } = storeToRefs(airiCardStore)
+const { activeCard, activeCardId } = storeToRefs(angelaCardStore)
 const { chatReady } = storeToRefs(useConsciousnessStore())
 const openSettings = useElectronEventaInvoke(electronOpenSettings)
 

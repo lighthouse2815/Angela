@@ -91,6 +91,40 @@ It changes these paths and their private symbols:
 The migration also changes private Minecraft planner helpers from Airi to Angela.
 Existing wire events, environment variables, configuration keys, and external identifiers stay compatible.
 
+Character card source files, types, stores, editor services, and runtime prompt composables now use Angela names.
+Package export aliases keep the original card API names available.
+The canonical settings route is `/settings/angela-card`. Vue Router aliases preserve the original card routes.
+Persisted card keys, the Pinia store ID, the ZIP format, and `extensions.airi` keep their existing values.
+Sticker filenames use `angela-*`. Sticker IDs retain their existing values for saved messages and translations.
+
+The local checkout is now `/home/lighthouse2815/Projects/Angela/angela`.
+The checkout directory name is outside Git. GitHub records only paths inside that directory.
+Deferred source paths in the sibling `dev-in-future` directory now target `../angela`.
+
+Native contract and VRM extension filenames now use Angela. Their Godot UIDs stay unchanged.
+Both native C# projects build with zero warnings and errors.
+Four E2E entrypoints now use `e2e-angela-*` filenames. Existing npm script names remain aliases of the new commands.
+The E2E service typecheck passes. Live E2E commands are not run because they control desktop applications.
+
+Card checks pass: 58 Node tests and 19 browser tests.
+The Electron desktop build passes for main, preload, and renderer.
+The renamed VS Code packages pass typecheck and build. Frozen workspace installation passes.
+Discord passes 22 tests. Minecraft bridge checks pass 14 tests. WebSocket checks pass 27 tests.
+
+Other checks expose existing limits in optional workspaces:
+
+- Minecraft typecheck reports `vec3` version conflicts and inferred-array errors outside the renamed modules.
+- X typecheck reports two unused parser declarations.
+- Chess has no source configuration beside its manifest. Its typecheck cannot find `tsconfig.json`.
+- Claude Code plugin build reports a missing `dist/run.js` binary target. Its build emits `dist/run.mjs`.
+- Web extension typecheck reports existing shared UI and extension-identity errors.
+- Minecraft planner tests cannot start their sandbox on Node 26 because it rejects `--experimental-transform-types`.
+
+The planner keeps supported `notifyAiri` and `updateAiriContext` aliases for saved scripts.
+
+The filename scan now finds 14 source paths with `airi` in their names.
+They contain skill invocation resources, plugin manifests, original animation assets, the upstream installer, and the upstream documentation script.
+
 ## Reproduce the scan
 
 The scan covers tracked text, including hidden files and the lockfile.

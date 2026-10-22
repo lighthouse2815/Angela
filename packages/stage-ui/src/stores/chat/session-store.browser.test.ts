@@ -10,7 +10,7 @@ import { createI18n } from 'vue-i18n'
 
 import { chatSessionsRepo } from '../../database/repos/chat-sessions.repo'
 import { useAuthStore } from '../auth'
-import { useAiriCardStore } from '../modules/airi-card'
+import { useAngelaCardStore } from '../modules/angela-card'
 
 vi.mock('../../database/repos/chat-sessions.repo', () => ({
   chatSessionsRepo: {
@@ -105,7 +105,7 @@ function createSyncedContext(namespace: string, leadership: LeadershipMode) {
   localStorage.setItem('airi-cards', JSON.stringify([['default', card], ['background-character', card]]))
   const app = createApp(defineComponent({ setup() {
     useAuthStore()
-    useAiriCardStore()
+    useAngelaCardStore()
     return () => h('div')
   } }))
   app.use(pinia).use(createI18n({ legacy: false, locale: 'en', messages: { en: {} }, missingWarn: false, fallbackWarn: false }))
@@ -157,7 +157,7 @@ describe('chat session synchronization', () => {
     const leader = createSyncedContext(namespace, 'leader-only')
     await vi.waitFor(() => expect(leader.runtime.isLeader()).toBe(true))
     setActivePinia(leader.pinia)
-    const cards = useAiriCardStore()
+    const cards = useAngelaCardStore()
     const background = cards.getCard('background-character')!
     cards.cards.set('background-character', { ...background, systemPrompt: 'Background character prompt' })
     const store = useChatSessionStore()

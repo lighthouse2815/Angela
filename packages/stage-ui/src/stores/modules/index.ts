@@ -1,4 +1,4 @@
-export * from './airi-card'
+export * from './angela-card'
 export * from './consciousness'
 export * from './consciousness-settings'
 export * from './discord'

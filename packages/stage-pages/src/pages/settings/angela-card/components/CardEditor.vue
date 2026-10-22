@@ -1,17 +1,17 @@
 <script setup lang="ts">
 // 角色卡编辑页的核心表单，路由壳只负责把卡片 ID 和当前分区传进来。
 import type { Card } from '@angela/ccc'
-import type { AiriExtension } from '@angela/stage-ui/stores/modules/airi-card'
+import type { AngelaExtension } from '@angela/stage-ui/stores/modules/angela-card'
 import type { VoiceInfo } from '@angela/stage-ui/stores/providers/provider'
 import type { Ref } from 'vue'
 
 import { isCustomProvidersDisabled } from '@angela/stage-shared'
 import { useAnalytics } from '@angela/stage-ui/composables'
 import { DEFAULT_ARTISTRY_WIDGET_INSTRUCTION } from '@angela/stage-ui/constants/prompts/artistry-instruction'
-import { applyAiriCardEditorModules, getAiriCardEditorModuleSettings, safeParseAiriCardDraft } from '@angela/stage-ui/services/airi-card-editor'
-import { resolveModuleSelection } from '@angela/stage-ui/services/airi-card-modules'
+import { applyAngelaCardEditorModules, getAngelaCardEditorModuleSettings, safeParseAngelaCardDraft } from '@angela/stage-ui/services/angela-card-editor'
+import { resolveModuleSelection } from '@angela/stage-ui/services/angela-card-modules'
 import { useDisplayModelsStore } from '@angela/stage-ui/stores/display-models'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { useConsciousnessStore } from '@angela/stage-ui/stores/modules/consciousness'
 import { useVisionStore } from '@angela/stage-ui/stores/modules/vision'
 import { useProviderStore } from '@angela/stage-ui/stores/providers/provider'
@@ -47,9 +47,9 @@ interface LegacyArtistrySettings {
   options?: Record<string, unknown>
 }
 
-type AiriExtensionWithLegacyArtistry = AiriExtension & {
+type AngelaExtensionWithLegacyArtistry = AngelaExtension & {
   artistry?: LegacyArtistrySettings
-  modules?: AiriExtension['modules'] & {
+  modules?: AngelaExtension['modules'] & {
     artistry?: LegacyArtistrySettings
   }
 }
@@ -64,7 +64,7 @@ const dirty = defineModel<boolean>('dirty', { default: false })
 
 const { t } = useI18n()
 const { trackCardEdited } = useAnalytics()
-const cardStore = useAiriCardStore()
+const cardStore = useAngelaCardStore()
 const consciousnessStore = useConsciousnessStore()
 const visionStore = useVisionStore()
 const providersStore = useProviderStore()
@@ -442,9 +442,9 @@ function createCardDraft(): Card {
 function initializeCard(): Card {
   // Extract existing card data if in edit mode
   const existingCard = (isEditMode.value && props.cardId) ? cardStore.getCard(props.cardId) : undefined
-  const airiExt = existingCard?.extensions?.airi as AiriExtensionWithLegacyArtistry | undefined
+  const airiExt = existingCard?.extensions?.airi as AngelaExtensionWithLegacyArtistry | undefined
 
-  const moduleSettings = getAiriCardEditorModuleSettings(existingCard)
+  const moduleSettings = getAngelaCardEditorModuleSettings(existingCard)
   selectedConsciousnessProvider.value = moduleSettings.consciousness.provider
   selectedConsciousnessModel.value = moduleSettings.consciousness.model
   selectedVisionProvider.value = moduleSettings.vision.provider
@@ -643,7 +643,7 @@ async function handleSave(activate: boolean) {
       }
     }
 
-    const draftResult = safeParseAiriCardDraft(toRaw(card.value), selectedArtistryConfigStr.value)
+    const draftResult = safeParseAngelaCardDraft(toRaw(card.value), selectedArtistryConfigStr.value)
     if (!draftResult.success) {
       showError.value = true
       errorMessage.value = t(`settings.pages.card.creation.errors.${draftResult.error}`)
@@ -652,7 +652,7 @@ async function handleSave(activate: boolean) {
 
     showError.value = false
     const { card: rawCard, artistryOptions } = draftResult.output
-    const cardWithModules = applyAiriCardEditorModules(rawCard, {
+    const cardWithModules = applyAngelaCardEditorModules(rawCard, {
       consciousness: {
         provider: selectedConsciousnessProvider.value,
         model: selectedConsciousnessModel.value,

@@ -6,7 +6,7 @@ import { computed, createApp, defineComponent, h, nextTick } from 'vue'
 import { createI18n } from 'vue-i18n'
 
 import { useAuthStore } from '../auth'
-import { useAiriCardStore } from '../modules/airi-card'
+import { useAngelaCardStore } from '../modules/angela-card'
 
 let pinia: ReturnType<typeof createPinia>
 
@@ -18,13 +18,13 @@ const userIdRef = computed({
   },
 })
 const activeCardIdRef = computed({
-  get: () => useAiriCardStore(pinia).activeCardId,
-  set: (id: string) => { useAiriCardStore(pinia).activeCardId = id },
+  get: () => useAngelaCardStore(pinia).activeCardId,
+  set: (id: string) => { useAngelaCardStore(pinia).activeCardId = id },
 })
 const systemPromptRef = computed({
-  get: () => useAiriCardStore(pinia).systemPrompt,
+  get: () => useAngelaCardStore(pinia).systemPrompt,
   set: (prompt: string) => {
-    const card = useAiriCardStore(pinia).getCard('default')
+    const card = useAngelaCardStore(pinia).getCard('default')
     if (!card)
       throw new Error('Missing test character')
     card.systemPrompt = prompt
@@ -114,7 +114,7 @@ beforeEach(() => {
   localStorage.clear()
   app = createApp(defineComponent({ setup() {
     useAuthStore()
-    useAiriCardStore().cards.set('default', {
+    useAngelaCardStore().cards.set('default', {
       name: 'Test character',
       version: '1.0',
       extensions: { airi: { agents: {}, modules: {

@@ -12,7 +12,7 @@ import { useChatStore } from '../stores/chat'
 import { useChatSessionStore } from '../stores/chat/session-store'
 import { useDisplayModelsStore } from '../stores/display-models'
 import { useMcpStore } from '../stores/mcp'
-import { useAiriCardStore } from '../stores/modules/airi-card'
+import { useAngelaCardStore } from '../stores/modules/angela-card'
 import { useConsciousnessStore } from '../stores/modules/consciousness'
 import { useConsciousnessSettingsStore } from '../stores/modules/consciousness-settings'
 import { useDiscordStore } from '../stores/modules/discord'
@@ -51,7 +51,7 @@ export function useDataMaintenance() {
   const minecraftStore = useMinecraftStore()
   const mcpStore = useMcpStore()
   const onboardingStore = useOnboardingStore()
-  const airiCardStore = useAiriCardStore()
+  const angelaCardStore = useAngelaCardStore()
 
   async function deleteAllModels() {
     await displayModelsStore.resetDisplayModels()
@@ -117,7 +117,7 @@ export function useDataMaintenance() {
     threeStore.resetModelStore()
     mcpStore.resetState()
     onboardingStore.resetSetupState()
-    airiCardStore.resetState()
+    angelaCardStore.resetState()
   }
 
   async function deleteAllData() {

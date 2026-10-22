@@ -16,7 +16,7 @@ import OnboardingDialog from './onboarding.vue'
 import StepProviderConfiguration from './step-provider-configuration.vue'
 
 import { useAuthStore } from '../../../../stores/auth'
-import { useAiriCardStore } from '../../../../stores/modules/airi-card'
+import { useAngelaCardStore } from '../../../../stores/modules/angela-card'
 import { useSpeechStore } from '../../../../stores/modules/speech'
 import { useProviderConfigStore } from '../../../../stores/providers/config'
 import { useProviderStore } from '../../../../stores/providers/provider'
@@ -40,12 +40,12 @@ function createSyncedContext(namespace: string, leadership: LeadershipMode) {
   pinia.use(runtime.plugin)
   let providerStore: ReturnType<typeof useProviderStore> | undefined
   let providerConfigStore: ReturnType<typeof useProviderConfigStore> | undefined
-  let cardStore: ReturnType<typeof useAiriCardStore> | undefined
+  let cardStore: ReturnType<typeof useAngelaCardStore> | undefined
   const app = createApp({
     setup() {
       providerStore = useProviderStore()
       providerConfigStore = useProviderConfigStore()
-      cardStore = useAiriCardStore()
+      cardStore = useAngelaCardStore()
       useSpeechStore()
       return () => null
     },

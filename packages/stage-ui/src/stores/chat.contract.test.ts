@@ -271,7 +271,7 @@ vi.mock('./modules/consciousness', () => ({
 }))
 
 vi.mock('./modules/airi-card', () => ({
-  useAiriCardStore: () => ({
+  useAngelaCardStore: () => ({
     activeCard: undefined,
     getCard: () => undefined,
     getModules: (id: string) => ({

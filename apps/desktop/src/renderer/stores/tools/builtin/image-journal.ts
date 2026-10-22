@@ -4,7 +4,7 @@ import type { JsonSchema } from 'xsschema'
 
 import { artistryGenerateHeadless, errorMessageFromValue } from '@angela/stage-shared'
 import { useBackgroundStore } from '@angela/stage-ui/stores/background'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { resolveArtistryConfigFromStore, useArtistryStore } from '@angela/stage-ui/stores/modules/artistry'
 import { defineInvoke } from '@moeru/eventa'
 import { createContext } from '@moeru/eventa/adapters/electron/renderer'
@@ -74,7 +74,7 @@ async function executeCreateImageJournalEntry(params: { prompt?: string, title?:
     throw new Error('prompt is required for image_journal.create')
 
   const backgroundStore = useBackgroundStore()
-  const cardStore = useAiriCardStore()
+  const cardStore = useAngelaCardStore()
   const activeCard = cardStore.activeCard
   const globalArtistryConfig = getArtistryConfig()
 
@@ -179,7 +179,7 @@ async function executeSetAsBackground(params: { query?: string }) {
     return 'Error: query is required for image_journal.apply. Provide a title or ID to search for.'
 
   const backgroundStore = useBackgroundStore()
-  const cardStore = useAiriCardStore()
+  const cardStore = useAngelaCardStore()
   const cardId = cardStore.activeCardId
   const query = params.query.toLowerCase().trim()
 

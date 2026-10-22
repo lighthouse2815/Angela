@@ -1,10 +1,10 @@
 import type { Card } from '@angela/ccc'
 
-import type { AiriExtension } from '../types/airiCard'
+import type { AngelaExtension } from '../types/angela-card'
 
 import { describe, expect, it } from 'vitest'
 
-import { applyAiriCardEditorModules, getAiriCardEditorModuleSettings, safeParseAiriCardDraft } from './airi-card-editor'
+import { applyAngelaCardEditorModules, getAngelaCardEditorModuleSettings, safeParseAngelaCardDraft } from './angela-card-editor'
 
 describe('airi card editor validation', () => {
   // https://github.com/moeru-ai/airi/issues/2108
@@ -17,7 +17,7 @@ describe('airi card editor validation', () => {
     //
     // We fixed this by preserving draft input and normalizing only required
     // boundary fields through the shared Valibot schema.
-    const result = safeParseAiriCardDraft({
+    const result = safeParseAngelaCardDraft({
       ...createCard(),
       name: '  ReLU Chan  ',
       description: '',
@@ -42,26 +42,26 @@ describe('airi card editor validation', () => {
 
   // https://github.com/moeru-ai/airi/issues/2108
   it('rejects invalid required fields and Artistry JSON for Issue #2108', () => {
-    expect(safeParseAiriCardDraft({ ...createCard(), name: '   ' }, '{}')).toEqual({
+    expect(safeParseAngelaCardDraft({ ...createCard(), name: '   ' }, '{}')).toEqual({
       success: false,
       error: 'name',
     })
-    expect(safeParseAiriCardDraft({ ...createCard(), version: 'v1' }, '{}')).toEqual({
+    expect(safeParseAngelaCardDraft({ ...createCard(), version: 'v1' }, '{}')).toEqual({
       success: false,
       error: 'version',
     })
-    expect(safeParseAiriCardDraft(createCard(), '[]')).toEqual({
+    expect(safeParseAngelaCardDraft(createCard(), '[]')).toEqual({
       success: false,
       error: 'invalid_artistry_json',
     })
-    expect(safeParseAiriCardDraft(createCard(), '{')).toEqual({
+    expect(safeParseAngelaCardDraft(createCard(), '{')).toEqual({
       success: false,
       error: 'invalid_artistry_json',
     })
   })
 
   it('treats blank Artistry options as absent', () => {
-    const result = safeParseAiriCardDraft(createCard(), '   ')
+    const result = safeParseAngelaCardDraft(createCard(), '   ')
 
     expect(result.success).toBe(true)
     if (!result.success)
@@ -95,8 +95,8 @@ describe('airi card editor validation', () => {
       },
     }
 
-    const moduleSettings = getAiriCardEditorModuleSettings(uploadedCard)
-    const savedCard = applyAiriCardEditorModules({
+    const moduleSettings = getAngelaCardEditorModuleSettings(uploadedCard)
+    const savedCard = applyAngelaCardEditorModules({
       ...uploadedCard,
       description: 'Edited imported card',
     }, {
@@ -130,7 +130,7 @@ describe('airi card editor validation', () => {
     //
     // We fix this by applying the editor-owned fields as a structured patch
     // over the existing extension.
-    const existing: AiriExtension = {
+    const existing: AngelaExtension = {
       modules: {
         consciousness: { provider: 'old-chat', model: 'old-chat-model' },
         vision: { provider: 'old-vision', model: 'old-vision-model' },
@@ -160,7 +160,7 @@ describe('airi card editor validation', () => {
       },
     }
 
-    const result = applyAiriCardEditorModules({
+    const result = applyAngelaCardEditorModules({
       ...createCard(),
       extensions: {
         thirdParty: { keep: true },

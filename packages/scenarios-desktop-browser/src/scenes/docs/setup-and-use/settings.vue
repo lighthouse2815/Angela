@@ -3,7 +3,7 @@ import { useSceneReady } from '@vishot/mockup-desktop-vue'
 
 import settingsShot from '../../../../artifacts/raw/02-settings-window.avif'
 import websocketSettingsShot from '../../../../artifacts/raw/03-websocket-settings.avif'
-import airiCardShot from '../../../../artifacts/raw/05-character-card.avif'
+import angelaCardShot from '../../../../artifacts/raw/05-character-card.avif'
 import providersShot from '../../../../artifacts/raw/06-providers.avif'
 import dataShot from '../../../../artifacts/raw/07-data.avif'
 import systemGeneralShot from '../../../../artifacts/raw/08-system-general.avif'
@@ -32,7 +32,7 @@ import { WindowRoot } from '../../../components/platforms/macos-26/containers/wi
 useSceneReady([
   settingsShot,
   websocketSettingsShot,
-  airiCardShot,
+  angelaCardShot,
   providersShot,
   dataShot,
   systemGeneralShot,
@@ -82,7 +82,7 @@ meta:
   <SceneCaptureLayout name="manual-airi-card" :platform-ui-scale="1.25">
     <template #windows>
       <WindowRoot :style="{ left: '50%', top: '84px', transform: 'translateX(-50%)' }">
-        <img :src="airiCardShot" :class="['w-120']">
+        <img :src="angelaCardShot" :class="['w-120']">
       </WindowRoot>
     </template>
   </SceneCaptureLayout>

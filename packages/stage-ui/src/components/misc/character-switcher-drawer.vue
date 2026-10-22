@@ -6,11 +6,11 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
 import { useDisplayModelsStore } from '../../stores/display-models'
-import { useAiriCardStore } from '../../stores/modules/airi-card'
+import { useAngelaCardStore } from '../../stores/modules/angela-card'
 
 const { t } = useI18n()
 const router = useRouter()
-const cardStore = useAiriCardStore()
+const cardStore = useAngelaCardStore()
 const { cards, activeCard, activeCardId } = storeToRefs(cardStore)
 const { displayModels } = storeToRefs(useDisplayModelsStore())
 const open = shallowRef(false)
@@ -56,7 +56,7 @@ function finishClose() {
   failed.value = false
   if (manageAfterClose.value) {
     manageAfterClose.value = false
-    void router.push('/settings/airi-card')
+    void router.push('/settings/angela-card')
   }
 }
 </script>

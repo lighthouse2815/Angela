@@ -8,7 +8,7 @@ import { createSyncedPiniaPlugin } from 'pinia-plugin-synced'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { createApp, nextTick } from 'vue'
 
-import { useAiriCardStore } from '../stores/modules/airi-card'
+import { useAngelaCardStore } from '../stores/modules/angela-card'
 import { useConsciousnessStore } from '../stores/modules/consciousness'
 import { useProviderConfigStore } from '../stores/providers/config'
 import { connectLocalProviderConfig } from './local-provider-config'
@@ -30,7 +30,7 @@ function createContext(runtime?: SyncedPiniaRuntime) {
   createApp({}).use(pinia).use(PiniaColada)
   setActivePinia(pinia)
   instances.push(pinia)
-  return { pinia, cards: useAiriCardStore(pinia), providers: useProviderConfigStore(pinia), consciousness: useConsciousnessStore(pinia) }
+  return { pinia, cards: useAngelaCardStore(pinia), providers: useProviderConfigStore(pinia), consciousness: useConsciousnessStore(pinia) }
 }
 
 // The host transport is an external boundary. Pinia, storage, and browser replication run unchanged.

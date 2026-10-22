@@ -2,7 +2,7 @@ import type { Card, ccv3 } from '@angela/ccc'
 import type { GenericSchema, InferOutput } from 'valibot'
 
 import type { DisplayModel, useDisplayModelsStore } from '../stores/display-models'
-import type { AiriCard, AiriExtension } from '../types/airiCard'
+import type { AngelaCard, AngelaExtension } from '../types/angela-card'
 
 import JSZip from 'jszip'
 
@@ -24,7 +24,7 @@ const MODEL_EXT: Partial<Record<DisplayModelFormat, string>> = {
 }
 
 type DisplayModelsStore = ReturnType<typeof useDisplayModelsStore>
-type ShareableAiriCard = Card & { extensions: { airi: AiriExtension } }
+type ShareableAngelaCard = Card & { extensions: { airi: AngelaExtension } }
 
 const manifestSchema = object({
   format: literal(FORMAT),
@@ -60,13 +60,13 @@ const characterCardV3Schema = object({
 
 type CharacterCardPackageJson = InferOutput<typeof characterCardV3Schema>
 
-type AiriCardPackageErrorCode = 'missing-file' | 'invalid-file'
+type AngelaCardPackageErrorCode = 'missing-file' | 'invalid-file'
 type Manifest = InferOutput<typeof manifestSchema>
 
-export class AiriCardPackageError extends Error {
-  constructor(public readonly code: AiriCardPackageErrorCode, message: string, options?: { cause?: unknown }) {
+export class AngelaCardPackageError extends Error {
+  constructor(public readonly code: AngelaCardPackageErrorCode, message: string, options?: { cause?: unknown }) {
     super(message, options)
-    this.name = 'AiriCardPackageError'
+    this.name = 'AngelaCardPackageError'
   }
 }
 
@@ -78,8 +78,8 @@ export class AiriCardPackageError extends Error {
  * the selected display model. Unreviewed CCv3 metadata, custom extensions,
  * agent prompts, and machine-local runtime references are omitted.
  */
-export async function exportAiriCardPackage({ card, displayModelsStore }: { card: AiriCard, displayModelsStore: DisplayModelsStore }): Promise<Blob> {
-  const exportableCard = cardFromAiriCard(card)
+export async function exportAngelaCardPackage({ card, displayModelsStore }: { card: AngelaCard, displayModelsStore: DisplayModelsStore }): Promise<Blob> {
+  const exportableCard = cardFromAngelaCard(card)
   const displayModel = await exportDisplayModel(exportableCard, displayModelsStore)
   const manifest = {
     format: FORMAT,
@@ -105,7 +105,7 @@ export async function exportAiriCardPackage({ card, displayModelsStore }: { card
  * path: package authors cannot smuggle custom extensions, agent prompts, or
  * machine-local references into persisted Angela state.
  */
-export async function importAiriCardPackage({ file, displayModelsStore }: { file: File, displayModelsStore: DisplayModelsStore }): Promise<ccv3.CharacterCardV3> {
+export async function importAngelaCardPackage({ file, displayModelsStore }: { file: File, displayModelsStore: DisplayModelsStore }): Promise<ccv3.CharacterCardV3> {
   const zip = await loadZip(file)
   const manifest = await readJsonFile(zip, MANIFEST_PATH, manifestSchema)
   const cardJson = await readJsonFile(zip, manifest.card.path, characterCardV3Schema)
@@ -114,7 +114,7 @@ export async function importAiriCardPackage({ file, displayModelsStore }: { file
   return exportToJSON(cardFromCharacterCard(cardJson, displayModelId))
 }
 
-async function exportDisplayModel(card: ShareableAiriCard, store: DisplayModelsStore) {
+async function exportDisplayModel(card: ShareableAngelaCard, store: DisplayModelsStore) {
   const displayModelId = card.extensions.airi.modules.displayModelId
   if (!displayModelId)
     return
@@ -182,7 +182,7 @@ async function readJsonFile<S extends GenericSchema>(zip: JSZip, path: string, s
   }
 }
 
-function cardFromAiriCard(card: AiriCard): ShareableAiriCard {
+function cardFromAngelaCard(card: AngelaCard): ShareableAngelaCard {
   return {
     name: card.name,
     nickname: card.nickname,
@@ -198,7 +198,7 @@ function cardFromAiriCard(card: AiriCard): ShareableAiriCard {
   }
 }
 
-function cardFromCharacterCard(card: CharacterCardPackageJson, displayModelId?: string): ShareableAiriCard {
+function cardFromCharacterCard(card: CharacterCardPackageJson, displayModelId?: string): ShareableAngelaCard {
   const data = card.data
   return {
     name: data.name,
@@ -215,7 +215,7 @@ function cardFromCharacterCard(card: CharacterCardPackageJson, displayModelId?: 
   }
 }
 
-function sanitizeAiri(value: unknown, displayModelIdOverride?: string): AiriExtension {
+function sanitizeAiri(value: unknown, displayModelIdOverride?: string): AngelaExtension {
   const source = isRecord(value) ? value : {}
   const modules = isRecord(source.modules) ? source.modules : {}
   const artistry = isRecord(modules.artistry) ? modules.artistry : {}
@@ -260,7 +260,7 @@ function stringValue(value: unknown) {
   return typeof value === 'string' ? value : ''
 }
 
-function isSpawnMode(value: unknown): value is NonNullable<AiriExtension['modules']['artistry']>['spawnMode'] {
+function isSpawnMode(value: unknown): value is NonNullable<AngelaExtension['modules']['artistry']>['spawnMode'] {
   return value === 'bg' || value === 'widget' || value === 'inline' || value === 'bg_widget'
 }
 
@@ -280,6 +280,13 @@ async function displayModelPayload(model: DisplayModel): Promise<{ data: ArrayBu
   }
 }
 
-function error(code: AiriCardPackageErrorCode, message: string, options?: { cause?: unknown }) {
-  return new AiriCardPackageError(code, message, options)
+function error(code: AngelaCardPackageErrorCode, message: string, options?: { cause?: unknown }) {
+  return new AngelaCardPackageError(code, message, options)
+}
+
+/** Supported aliases for existing card package consumers. */
+export {
+  AngelaCardPackageError as AiriCardPackageError,
+  exportAngelaCardPackage as exportAiriCardPackage,
+  importAngelaCardPackage as importAiriCardPackage,
 }

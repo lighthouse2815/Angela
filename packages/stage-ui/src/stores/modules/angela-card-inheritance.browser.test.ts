@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApp, nextTick } from 'vue'
 
 import { useProviderStore } from '../providers/provider'
-import { useAiriCardStore } from './airi-card'
+import { useAngelaCardStore } from './angela-card'
 import { useConsciousnessStore } from './consciousness'
 import { useVisionStore } from './vision'
 
@@ -27,7 +27,7 @@ function createContext(runtime?: SyncedPiniaRuntime) {
   createApp({}).use(pinia).use(PiniaColada)
   setActivePinia(pinia)
   piniaInstances.push(pinia)
-  return { pinia, cards: useAiriCardStore(pinia), consciousness: useConsciousnessStore(pinia) }
+  return { pinia, cards: useAngelaCardStore(pinia), consciousness: useConsciousnessStore(pinia) }
 }
 
 describe('persisted and replicated card defaults', () => {

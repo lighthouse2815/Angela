@@ -1,2 +1,2 @@
-export type * from './airiCard'
+export type * from './angela-card'
 export * from './chat'

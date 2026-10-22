@@ -8,7 +8,7 @@ import { createI18n } from 'vue-i18n'
 
 import LearningMemory from './learning-memory.vue'
 
-import { useAiriCardStore } from '../../stores/modules/airi-card'
+import { useAngelaCardStore } from '../../stores/modules/angela-card'
 import { useLearningMemoryStore } from '../../stores/modules/learning-memory'
 
 import '@unocss/reset/tailwind.css'
@@ -85,7 +85,7 @@ it.each([
     global: { plugins: [pinia, createI18n({ legacy: false, locale, messages: { en, vi: viLocale } })] },
   })
   const store = useLearningMemoryStore(pinia)
-  const cards = useAiriCardStore(pinia)
+  const cards = useAngelaCardStore(pinia)
   await store.save('other', 'topic', 'Another character lesson')
   await expect.element(view.getByText('Another character lesson')).not.toBeInTheDocument()
   await expect.element(view.getByRole('button', { name: saveLabel, exact: true })).toBeDisabled()

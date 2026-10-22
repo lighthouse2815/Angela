@@ -8,7 +8,7 @@ import { initializeAnalytics } from '@angela/stage-ui/libs/product-signals'
 import { useAuthStore } from '@angela/stage-ui/stores/auth'
 import { useChatStore } from '@angela/stage-ui/stores/chat'
 import { useDisplayModelsStore } from '@angela/stage-ui/stores/display-models'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { useConsciousnessStore } from '@angela/stage-ui/stores/modules/consciousness'
 import { useHearingStore } from '@angela/stage-ui/stores/modules/hearing'
 import { useSpeechStore } from '@angela/stage-ui/stores/modules/speech'
@@ -105,7 +105,7 @@ function createFullStageRuntime() {
   const authStore = useAuthStore()
   const onboardingStore = useOnboardingStore()
   const displayModelsStore = useDisplayModelsStore()
-  const cardStore = useAiriCardStore()
+  const cardStore = useAngelaCardStore()
   const inferencePreload = useInferencePreload()
   const stageWindowLifecycleStore = useStageWindowLifecycleStore()
   const settingsAudioDeviceStore = useSettingsAudioDevice()

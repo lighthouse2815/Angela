@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useElectronEventaInvoke } from '@angela/electron-vueuse'
 import { useBackgroundStore } from '@angela/stage-ui/stores/background'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { ScrollableArea } from '@angela/ui'
 import { computed, ref, watch } from 'vue'
 
@@ -23,7 +23,7 @@ const props = withDefaults(defineProps<{
   progress: 0,
 })
 
-const cardStore = useAiriCardStore()
+const cardStore = useAngelaCardStore()
 const backgroundStore = useBackgroundStore()
 
 // NOTICE: Comfy.vue is a display-only widget. All journal ingestion is

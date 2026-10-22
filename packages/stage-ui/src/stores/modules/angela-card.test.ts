@@ -1,4 +1,4 @@
-import type { AiriCard } from './airi-card'
+import type { AngelaCard } from './angela-card'
 
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -6,7 +6,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { splitCard } from '../../libs/character-card-sync'
 import { useProviderStore } from '../providers/provider'
 import { useSettingsStageModel } from '../settings/stage-model'
-import { useAiriCardStore } from './airi-card'
+import { useAngelaCardStore } from './angela-card'
 import { useConsciousnessStore } from './consciousness'
 import { useSpeechStore } from './speech'
 import { useVisionStore } from './vision'
@@ -118,7 +118,7 @@ describe('airi-card store', () => {
     const consciousnessStore = useConsciousnessStore()
     const speechStore = useSpeechStore()
     const visionStore = useVisionStore()
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
 
     await cardStore.initialize()
 
@@ -143,7 +143,7 @@ describe('airi-card store', () => {
     const consciousnessStore = useConsciousnessStore()
     const speechStore = useSpeechStore()
     const visionStore = useVisionStore()
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
 
     consciousnessStore.activeProvider = ''
     consciousnessStore.activeModel = ''
@@ -186,7 +186,7 @@ describe('airi-card store', () => {
   })
 
   it('preserves ambiguous old default speech settings', async () => {
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     cardStore.cards.set('default', {
       name: 'Angela',
       version: '1.0.0',
@@ -223,7 +223,7 @@ describe('airi-card store', () => {
     const consciousnessStore = useConsciousnessStore()
     const speechStore = useSpeechStore()
     const visionStore = useVisionStore()
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     await cardStore.initialize()
 
     consciousnessStore.activeProvider = 'official-provider'
@@ -253,7 +253,7 @@ describe('airi-card store', () => {
   // action. State replication remains free of runtime side effects.
   it('applies card settings only through the activation command', async () => {
     const stageModelStore = useSettingsStageModel()
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     await cardStore.initialize()
 
     const vrmCardId = await cardStore.addCard({
@@ -309,7 +309,7 @@ describe('airi-card store', () => {
     // The chat session store only reads the active card ID and system prompt,
     // but creating the card store also created every runtime module store.
     // The speech store then loaded provider voices in each auxiliary window.
-    useAiriCardStore(pinia)
+    useAngelaCardStore(pinia)
 
     expect(pinia.state.value.speech).toBeUndefined()
     expect(pinia.state.value.consciousness).toBeUndefined()
@@ -324,7 +324,7 @@ describe('airi-card store', () => {
     const stageModelStore = useSettingsStageModel()
     stageModelStore.stageModelSelected = 'preset-live2d-1'
 
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     await cardStore.initialize()
 
     expect(await cardStore.updateActiveCardDisplayModel('preset-vrm-1')).toBe(true)
@@ -348,7 +348,7 @@ describe('airi-card store', () => {
   //
   // We fixed this by storing the catalog default on the card.
   it('keeps the catalog default of a selected vision provider when the card applies again', async () => {
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     await cardStore.initialize()
     useProviderStore().providerRuntimeState = {
       'apple-vision': { models: [], defaultModel: 'system', modelStatus: 'ready', modelError: null },
@@ -375,10 +375,10 @@ describe('airi-card store', () => {
     const stageModelStore = useSettingsStageModel()
     stageModelStore.stageModelSelected = 'preset-live2d-1'
 
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     await cardStore.initialize()
 
-    const card: AiriCard = {
+    const card: AngelaCard = {
       name: 'VRM card',
       version: '1.0.0',
       description: 'Card with a VRM display model',
@@ -405,7 +405,7 @@ describe('airi-card store', () => {
     const stageModelStore = useSettingsStageModel()
     stageModelStore.stageModelSelected = 'preset-live2d-1'
 
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     await cardStore.initialize()
 
     const cardId = await cardStore.addCard({
@@ -455,7 +455,7 @@ describe('airi-card store', () => {
   // We prevent the feedback loop by applying runtime settings only through an
   // explicit card command, never in response to a state snapshot.
   it('does not reapply runtime settings for an unchanged synchronized card snapshot', async () => {
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     await cardStore.initialize()
 
     const cardId = await cardStore.addCard({
@@ -476,7 +476,7 @@ describe('airi-card store', () => {
     await cardStore.activateCard(cardId)
 
     const applicationsBeforeSnapshot = resetArtistryToGlobal.mock.calls.length
-    const synchronizedCards = new Map<string, AiriCard>(JSON.parse(JSON.stringify([...cardStore.cards])))
+    const synchronizedCards = new Map<string, AngelaCard>(JSON.parse(JSON.stringify([...cardStore.cards])))
 
     cardStore.$patch({ cards: synchronizedCards })
 
@@ -494,7 +494,7 @@ describe('airi-card store', () => {
     const stageModelStore = useSettingsStageModel()
     stageModelStore.stageModelSelected = 'preset-live2d-1'
 
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     await cardStore.initialize()
     await cardStore.updateActiveCardDisplayModel('preset-vrm-1')
     stageModelStore.stageModelSelected = 'preset-live2d-1'
@@ -509,7 +509,7 @@ describe('airi-card store', () => {
    * it('updates speech config on the active card', () => {})
    */
   it('updates speech config on the active card', async () => {
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     await cardStore.initialize()
 
     expect(await cardStore.updateActiveCardSpeech({ provider: 'elevenlabs', model: 'eleven_multilingual_v2', voice_id: 'aria' })).toBe(true)
@@ -521,7 +521,7 @@ describe('airi-card store', () => {
   })
 
   it('keeps position-sensitive CCv3 fields separate from the stable system prompt', async () => {
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     await cardStore.initialize()
 
     const cardId = await cardStore.addCard({
@@ -564,7 +564,7 @@ describe('airi-card store', () => {
   })
 
   it('falls back to the default card when the active custom card is deleted', async () => {
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     await cardStore.initialize()
 
     const cardId = await cardStore.addCard({
@@ -582,7 +582,7 @@ describe('airi-card store', () => {
   })
 
   it('keeps the built-in fallback card when deletion is requested directly', async () => {
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     await cardStore.initialize()
 
     expect(await cardStore.removeCard('default')).toBe(false)
@@ -591,7 +591,7 @@ describe('airi-card store', () => {
   })
 
   it('preserves a valid persisted active card during initialization', async () => {
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     const cardId = await cardStore.addCard({
       name: 'Persisted active card',
       version: '1.0.0',
@@ -606,7 +606,7 @@ describe('airi-card store', () => {
   })
 
   it('repairs a dangling persisted active card during initialization', async () => {
-    const cardStore = useAiriCardStore()
+    const cardStore = useAngelaCardStore()
     cardStore.activeCardId = 'missing-card'
 
     await cardStore.initialize()
@@ -619,7 +619,7 @@ describe('airi-card store', () => {
     const noChanges = { upserts: {}, removals: [], conflictCopies: [] }
 
     it('stores a card from another device without a local change to its parts', async () => {
-      const cardStore = useAiriCardStore()
+      const cardStore = useAngelaCardStore()
       await cardStore.initialize()
       const remoteParts = splitCard({ ...cardStore.builtInCard, name: 'Luna' })
 
@@ -631,7 +631,7 @@ describe('airi-card store', () => {
     })
 
     it('reports a change to the content of the selected card', async () => {
-      const cardStore = useAiriCardStore()
+      const cardStore = useAngelaCardStore()
       await cardStore.initialize()
       const parts = splitCard({ ...cardStore.builtInCard, name: 'Luna' })
 
@@ -642,7 +642,7 @@ describe('airi-card store', () => {
     })
 
     it('selects the built-in card when another device deleted the selected card', async () => {
-      const cardStore = useAiriCardStore()
+      const cardStore = useAngelaCardStore()
       await cardStore.initialize()
       const cardId = await cardStore.addCard({ name: 'Luna', version: '1.0.0' }, 'scratch')
       await cardStore.activateCard(cardId)
@@ -656,7 +656,7 @@ describe('airi-card store', () => {
     })
 
     it('keeps a conflict copy as a new card', async () => {
-      const cardStore = useAiriCardStore()
+      const cardStore = useAngelaCardStore()
       await cardStore.initialize()
       const fields = splitCard({ ...cardStore.builtInCard, name: 'Luna', description: 'Local version' })
 
@@ -674,7 +674,7 @@ describe('airi-card store', () => {
       ['has no name', { '/description': 'No name' }],
       ['has wake words that are not a list', { '/name': 'Luna', '/version': '1.0.0', '/extensions/airi/wakeWords': 'not a list' }],
     ])('rejects a card from another device that %s and applies the others', async (_, brokenFields) => {
-      const cardStore = useAiriCardStore()
+      const cardStore = useAngelaCardStore()
       await cardStore.initialize()
       const goodFields = splitCard({ ...cardStore.builtInCard, name: 'Luna' })
 
@@ -693,7 +693,7 @@ describe('airi-card store', () => {
     //
     // We fixed this by making copies only for cards that were not rejected.
     it('creates no conflict copy for a card that it rejects', async () => {
-      const cardStore = useAiriCardStore()
+      const cardStore = useAngelaCardStore()
       await cardStore.initialize()
       const cardId = await cardStore.addCard({ name: 'Luna', version: '1.0.0', description: 'Local version' }, 'scratch')
       const localFields = splitCard(cardStore.cards.get(cardId)!)
@@ -717,7 +717,7 @@ describe('airi-card store', () => {
     //
     // We fixed this by reading every card before the first write.
     it('keeps the local card when its conflict copy cannot be read', async () => {
-      const cardStore = useAiriCardStore()
+      const cardStore = useAngelaCardStore()
       await cardStore.initialize()
       const cardId = await cardStore.addCard({ name: 'Luna', version: '1.0.0', description: 'Local version' }, 'scratch')
       const remoteFields = splitCard({ ...cardStore.cards.get(cardId)!, description: 'Remote version' })
@@ -736,7 +736,7 @@ describe('airi-card store', () => {
     // Each device creates the built-in card in its own language. Only the edits travel between devices.
     describe('the built-in card', () => {
       it('shows the built-in parts that the remote edits do not replace', async () => {
-        const cardStore = useAiriCardStore()
+        const cardStore = useAngelaCardStore()
         await cardStore.initialize()
         const builtInDescription = cardStore.cards.get('default')?.description
 
@@ -747,7 +747,7 @@ describe('airi-card store', () => {
       })
 
       it('goes back to the built-in part when the remote edit is gone', async () => {
-        const cardStore = useAiriCardStore()
+        const cardStore = useAngelaCardStore()
         await cardStore.initialize()
         cardStore.applySynchronizedCards({ ...noChanges, upserts: { default: { '/systemPrompt': 'Be kind' } } })
 
@@ -757,7 +757,7 @@ describe('airi-card store', () => {
       })
 
       it('keeps the edits of the built-in card as a complete conflict copy', async () => {
-        const cardStore = useAiriCardStore()
+        const cardStore = useAngelaCardStore()
         await cardStore.initialize()
 
         cardStore.applySynchronizedCards({ ...noChanges, conflictCopies: [{ documentId: 'default', fields: { '/systemPrompt': 'Mine' } }] })

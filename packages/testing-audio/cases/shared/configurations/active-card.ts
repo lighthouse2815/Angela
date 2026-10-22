@@ -1,8 +1,8 @@
-import type { AiriCard, AiriExtension } from '@angela/stage-ui/types'
+import type { AngelaCard, AngelaExtension } from '@angela/stage-ui/types'
 
 import type { AudioInputSession } from '../../../src/types'
 
-type ActiveCardModules = Partial<Pick<AiriExtension['modules'], 'consciousness' | 'speech'>>
+type ActiveCardModules = Partial<Pick<AngelaExtension['modules'], 'consciousness' | 'speech'>>
 
 /** Updates Provider selections that the active Angela Card reapplies during application startup. */
 export async function configureActiveCardModules(
@@ -15,7 +15,7 @@ export async function configureActiveCardModules(
       throw new Error('The Angela Card store is not initialized.')
 
     const activeCardId = localStorage.getItem('airi-card-active-id') ?? 'default'
-    const cards = JSON.parse(serializedCards) as Array<[string, AiriCard]>
+    const cards = JSON.parse(serializedCards) as Array<[string, AngelaCard]>
     const activeCard = cards.find(([cardId]) => cardId === activeCardId)?.[1]
     if (!activeCard)
       throw new Error(`The active Angela Card "${activeCardId}" does not exist.`)

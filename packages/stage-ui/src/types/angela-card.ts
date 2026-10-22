@@ -9,7 +9,7 @@ import type { WakeWord } from '../libs/voice/wake-words'
  * fields they do not own so independent runtime modules can evolve without
  * losing each other's configuration.
  */
-export interface AiriExtension {
+export interface AngelaExtension {
   wakeWords?: WakeWord[]
   modules: {
     consciousness: {
@@ -71,8 +71,11 @@ export interface AiriExtension {
 }
 
 /** Character card normalized with the Angela extension required by the runtime. */
-export interface AiriCard extends Card {
+export interface AngelaCard extends Card {
   extensions: {
-    airi: AiriExtension
+    airi: AngelaExtension
   } & Card['extensions']
 }
+
+/** Supported names for consumers of the original character-card API. */
+export type { AngelaCard as AiriCard, AngelaExtension as AiriExtension }

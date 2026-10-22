@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Alert, ErrorContainer, RadioCardManySelect, RadioCardSimple } from '@angela/stage-ui/components'
 import { useAnalytics } from '@angela/stage-ui/composables'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { useConsciousnessStore } from '@angela/stage-ui/stores/modules/consciousness'
 import { useConsciousnessSettingsStore } from '@angela/stage-ui/stores/modules/consciousness-settings'
 import { useProviderConfigStore } from '@angela/stage-ui/stores/providers/config'
@@ -14,7 +14,7 @@ import { RouterLink } from 'vue-router'
 
 const providersStore = useProviderStore()
 const providerStore = useProviderConfigStore()
-const airiCardStore = useAiriCardStore()
+const angelaCardStore = useAngelaCardStore()
 const consciousnessStore = useConsciousnessStore()
 const consciousnessSettingsStore = useConsciousnessSettingsStore()
 const { configuredProviders } = storeToRefs(providerStore)
@@ -45,7 +45,7 @@ watch(activeProvider, async (provider) => {
 }, { immediate: true })
 
 async function persistSelection() {
-  await airiCardStore.updateActiveCardConsciousness({ provider: activeProvider.value, model: activeModel.value })
+  await angelaCardStore.updateActiveCardConsciousness({ provider: activeProvider.value, model: activeModel.value })
 }
 
 function updateCustomModelName(value: string) {
@@ -62,7 +62,7 @@ async function selectModel(modelId: string) {
 }
 
 async function handleDeleteProvider(providerId: string) {
-  await airiCardStore.clearProviderSelections(providerId)
+  await angelaCardStore.clearProviderSelections(providerId)
   await providersStore.deleteProvider(providerId)
 }
 

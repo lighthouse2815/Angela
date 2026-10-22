@@ -12,7 +12,7 @@ import { useChatStore } from '@angela/stage-ui/stores/chat'
 import { useDisplayModelsStore } from '@angela/stage-ui/stores/display-models'
 import { useModsServerChannelStore } from '@angela/stage-ui/stores/mods/api/channel-server'
 import { useContextBridgeStore } from '@angela/stage-ui/stores/mods/api/context-bridge'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { useArtistryStore } from '@angela/stage-ui/stores/modules/artistry'
 import { useConsciousnessStore } from '@angela/stage-ui/stores/modules/consciousness'
 import { useHearingStore } from '@angela/stage-ui/stores/modules/hearing'
@@ -52,7 +52,7 @@ const characterOrchestratorStore = useCharacterOrchestratorStore()
 const settingsAudioDeviceStore = useSettingsAudioDevice()
 const { showingSetup } = storeToRefs(onboardingStore)
 const { isDark } = useTheme()
-const cardStore = useAiriCardStore()
+const cardStore = useAngelaCardStore()
 useArtistryStore()
 useConsciousnessStore()
 useHearingStore()

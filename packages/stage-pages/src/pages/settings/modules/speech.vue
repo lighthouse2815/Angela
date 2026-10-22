@@ -12,7 +12,7 @@ import {
 } from '@angela/stage-ui/components'
 import { useAnalytics } from '@angela/stage-ui/composables'
 import { OFFICIAL_SPEECH_PROVIDER_ID, OFFICIAL_SPEECH_STREAMING_PROVIDER_ID } from '@angela/stage-ui/libs/providers/providers/official'
-import { useAiriCardStore } from '@angela/stage-ui/stores'
+import { useAngelaCardStore } from '@angela/stage-ui/stores'
 import { useSpeechStore } from '@angela/stage-ui/stores/modules/speech'
 import { useProviderConfigStore } from '@angela/stage-ui/stores/providers/config'
 import { useProviderStore } from '@angela/stage-ui/stores/providers/provider'
@@ -35,7 +35,7 @@ const { t } = useI18n()
 const providersStore = useProviderStore()
 const providerStore = useProviderConfigStore()
 const speechStore = useSpeechStore()
-const airiCardStore = useAiriCardStore()
+const angelaCardStore = useAngelaCardStore()
 const { allAudioSpeechProvidersMetadata, moduleSpeechProvidersMetadata } = storeToRefs(providersStore)
 const {
   activeSpeechProvider,
@@ -390,7 +390,7 @@ watch(activeSpeechModel, () => {
 })
 
 async function persistSelection() {
-  await airiCardStore.updateActiveCardSpeech({
+  await angelaCardStore.updateActiveCardSpeech({
     provider: activeSpeechProvider.value,
     model: activeSpeechModel.value,
     voice_id: activeSpeechVoiceId.value,
@@ -593,7 +593,7 @@ async function handleDeleteProvider(providerId: string) {
     return
   }
 
-  await airiCardStore.clearProviderSelections(providerId)
+  await angelaCardStore.clearProviderSelections(providerId)
   await providersStore.deleteProvider(providerId)
 }
 </script>

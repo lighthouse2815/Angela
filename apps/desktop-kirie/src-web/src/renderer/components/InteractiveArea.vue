@@ -14,7 +14,7 @@ import { useChatStore } from '@angela/stage-ui/stores/chat'
 import { useChatSessionStore } from '@angela/stage-ui/stores/chat/session-store'
 import { useChatStreamStore } from '@angela/stage-ui/stores/chat/stream-store'
 import { useJournalPreviewStore } from '@angela/stage-ui/stores/journal-preview'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { BasicTextarea } from '@angela/ui'
 import { useLocalStorage } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
@@ -39,12 +39,12 @@ const chatSession = useChatSessionStore()
 const chatStream = useChatStreamStore()
 const backgroundStore = useBackgroundStore()
 const journalPreviewStore = useJournalPreviewStore()
-const airiCardStore = useAiriCardStore()
+const angelaCardStore = useAngelaCardStore()
 
 const { activeSessionId, messages } = storeToRefs(chatSession)
 const { streamingMessage } = storeToRefs(chatStream)
 const { activeTurns } = storeToRefs(chatStore)
-const { activeCard, activeCardId } = storeToRefs(airiCardStore)
+const { activeCard, activeCardId } = storeToRefs(angelaCardStore)
 
 type ChatImageAttachment = Extract<NonNullable<ChatSendPayload['attachments']>[number], { type: 'image', data: string }>
 
@@ -109,7 +109,7 @@ const latestImageEntries = computed(() => {
 function navigateToImageJournal() {
   if (!activeCardId.value)
     return
-  router.push(`/settings/airi-card?cardId=${activeCardId.value}&tab=gallery`)
+  router.push(`/settings/angela-card?cardId=${activeCardId.value}&tab=gallery`)
 }
 
 async function handleSend() {

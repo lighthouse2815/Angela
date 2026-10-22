@@ -1,8 +1,8 @@
 import type { Card, ccv3 } from '@angela/ccc'
 
 import type { DocumentFields, DocumentSnapshot, DocumentSyncClient, LocalDocumentChanges } from '../../libs/document-sync'
-import type { CardModuleDefaults } from '../../services/airi-card-modules'
-import type { AiriCard, AiriExtension } from '../../types/airiCard'
+import type { CardModuleDefaults } from '../../services/angela-card-modules'
+import type { AngelaCard, AngelaExtension } from '../../types/angela-card'
 
 import localeMessages from '@angela/i18n/locales'
 
@@ -26,7 +26,7 @@ import { CHARACTER_CARD_SYNC_FLAG } from '../../libs/feature-flags'
 import { captureAnalyticsEvent } from '../../libs/product-signals'
 import { SERVER_URL } from '../../libs/server'
 import { wakeWordSchema } from '../../libs/voice/wake-words'
-import { resolveModuleSelection } from '../../services/airi-card-modules'
+import { resolveModuleSelection } from '../../services/angela-card-modules'
 import { useAuthStore } from '../auth'
 import { useFeatureFlagsStore } from '../feature-flags'
 import { useProviderConfigStore } from '../providers/config'
@@ -38,7 +38,8 @@ import { configureAsDefaultsIfEmpty, unconfigureAuthenticationProviders } from '
 import { useSpeechStore } from './speech'
 import { useVisionStore } from './vision'
 
-export type { AiriCard, AiriExtension } from '../../types/airiCard'
+export type { AngelaCard, AngelaExtension } from '../../types/angela-card'
+export type { AngelaCard as AiriCard, AngelaExtension as AiriExtension } from '../../types/angela-card'
 
 /**
  * Where a card stands with the account. `refused` means that the server does
@@ -64,10 +65,10 @@ const builtInDescriptions = Object.values(localeMessages).flatMap((messages) => 
   return parsed.success ? [parsed.output.base.prompt.prefix] : []
 })
 
-/** The members that every card needs before `newAiriCard` can normalize it. */
+/** The members that every card needs before `newAngelaCard` can normalize it. */
 const synchronizedCardSchema = looseObject({ name: string(), version: string() })
 
-function resolveSystemPrompt(card: AiriCard | undefined): string {
+function resolveSystemPrompt(card: AngelaCard | undefined): string {
   if (!card)
     return ''
 
@@ -84,7 +85,7 @@ function resolveSystemPrompt(card: AiriCard | undefined): string {
   return systemPromptParts.join('\n\n')
 }
 
-export const useAiriCardStore = defineStore('airi-card', () => {
+export const useAngelaCardStore = defineStore('airi-card', () => {
   const { t } = useI18n()
   const { userId } = storeToRefs(useAuthStore())
   const featureFlagsStore = useFeatureFlagsStore()
@@ -94,7 +95,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
   // Pinia synchronization owns cross-window updates. Local storage only loads
   // and saves this renderer's durable copy; listening to storage events here
   // would create a second cross-window state channel and echo cloned maps.
-  const cards = useLocalStorageManualReset<Map<string, AiriCard>>('airi-cards', new Map(), { listenToStorageChanges: false })
+  const cards = useLocalStorageManualReset<Map<string, AngelaCard>>('airi-cards', new Map(), { listenToStorageChanges: false })
   const activeCardId = useLocalStorageManualReset<string>('airi-card-active-id', 'default', { listenToStorageChanges: false })
   let initialized = false
 
@@ -105,7 +106,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     listenToStorageChanges: false,
     serializer: StorageSerializers.object,
   })
-  let appliedModules: AiriExtension['modules'] | undefined
+  let appliedModules: AngelaExtension['modules'] | undefined
   let pendingAuthenticationSetup: Promise<void> | undefined
 
   const activeCard = computed(() => cards.value.get(activeCardId.value))
@@ -241,9 +242,9 @@ export const useAiriCardStore = defineStore('airi-card', () => {
    * from an existing card (profile switcher). Required so a new call site
    * can't silently degrade creation attribution.
    */
-  const addCard = async (card: AiriCard | Card | ccv3.CharacterCardV3, source: 'scratch' | 'import' | 'duplicate') => {
+  const addCard = async (card: AngelaCard | Card | ccv3.CharacterCardV3, source: 'scratch' | 'import' | 'duplicate') => {
     const newCardId = nanoid()
-    cards.value.set(newCardId, newAiriCard(card))
+    cards.value.set(newCardId, newAngelaCard(card))
     captureAnalyticsEvent('card_created', { card_id: newCardId, source })
     return newCardId
   }
@@ -269,7 +270,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     return true
   }
 
-  const updateCard = async (id: string, updates: AiriCard | Card | ccv3.CharacterCardV3) => {
+  const updateCard = async (id: string, updates: AngelaCard | Card | ccv3.CharacterCardV3) => {
     await pendingAuthenticationSetup
     const existingCard = cards.value.get(id)
     if (!existingCard)
@@ -280,7 +281,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
       ...updates,
     }
 
-    const card = newAiriCard(updatedCard)
+    const card = newAngelaCard(updatedCard)
     cards.value.set(id, card)
     if (id === activeCardId.value)
       await applyActiveCardSettings(card)
@@ -292,13 +293,13 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     return cards.value.get(id)
   }
 
-  function updateActiveCardModules(patch: (extension: AiriExtension) => Partial<AiriExtension['modules']>) {
+  function updateActiveCardModules(patch: (extension: AngelaExtension) => Partial<AngelaExtension['modules']>) {
     const cardId = activeCardId.value
     const card = cards.value.get(cardId)
     if (!card)
       return false
 
-    const extension = resolveAiriExtension(card)
+    const extension = resolveAngelaExtension(card)
     cards.value.set(cardId, {
       ...card,
       extensions: {
@@ -324,7 +325,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     return updated
   }
 
-  async function updateActiveCardConsciousness(consciousness: AiriExtension['modules']['consciousness']) {
+  async function updateActiveCardConsciousness(consciousness: AngelaExtension['modules']['consciousness']) {
     await pendingAuthenticationSetup
     const updated = updateActiveCardModules(() => ({ consciousness }))
     if (updated)
@@ -332,7 +333,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     return updated
   }
 
-  async function updateActiveCardVision(vision: AiriExtension['modules']['vision']) {
+  async function updateActiveCardVision(vision: AngelaExtension['modules']['vision']) {
     await pendingAuthenticationSetup
     const updated = updateActiveCardModules(() => ({ vision }))
     if (updated)
@@ -357,7 +358,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     return await updateActiveCardVision({ provider, model })
   }
 
-  async function updateActiveCardSpeech(speech: Pick<AiriExtension['modules']['speech'], 'provider' | 'model' | 'voice_id'>) {
+  async function updateActiveCardSpeech(speech: Pick<AngelaExtension['modules']['speech'], 'provider' | 'model' | 'voice_id'>) {
     await pendingAuthenticationSetup
     const updated = updateActiveCardModules(({ modules }) => ({
       speech: {
@@ -396,11 +397,11 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     await applyActiveCardSettings()
   }
 
-  function resolveAiriExtension(card: Card | ccv3.CharacterCardV3): AiriExtension {
+  function resolveAngelaExtension(card: Card | ccv3.CharacterCardV3): AngelaExtension {
     // Get existing extension if available
     const existingExtension = ('data' in card
       ? card.data?.extensions?.airi
-      : card.extensions?.airi) as AiriExtension
+      : card.extensions?.airi) as AngelaExtension
 
     // Create default modules config
     const defaultModules = {
@@ -479,7 +480,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     }
   }
 
-  function newAiriCard(card: Card | ccv3.CharacterCardV3): AiriCard {
+  function newAngelaCard(card: Card | ccv3.CharacterCardV3): AngelaCard {
     // Handle ccv3 format if needed
     if ('data' in card) {
       const ccv3Card = card as ccv3.CharacterCardV3
@@ -513,7 +514,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
         tags: ccv3Card.data.tags ?? [],
         extensions: {
           ...ccv3Card.data.extensions,
-          airi: resolveAiriExtension(ccv3Card),
+          airi: resolveAngelaExtension(ccv3Card),
         },
       }
     }
@@ -522,7 +523,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
       ...card,
       extensions: {
         ...card.extensions,
-        airi: resolveAiriExtension(card),
+        airi: resolveAngelaExtension(card),
       },
     }
   }
@@ -532,7 +533,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
    * with the same id, so synchronization compares a device's card with it to
    * find the edits of the user.
    */
-  const builtInCard = computed(() => newAiriCard({
+  const builtInCard = computed(() => newAngelaCard({
     name: 'Angela',
     version: '1.0.0',
     description: t('base.prompt.prefix'),
@@ -611,7 +612,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     // the run must not treat it as deleted.
     function readCard(id: string, fields: DocumentFields) {
       try {
-        return newAiriCard(parse(synchronizedCardSchema, joinCard(fields, builtInFor(id))))
+        return newAngelaCard(parse(synchronizedCardSchema, joinCard(fields, builtInFor(id))))
       }
       catch (error) {
         console.warn('[character-card-sync] Ignored a card that this device cannot read:', id, errorMessageFrom(error))
@@ -636,7 +637,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     for (const { id, card } of copies) {
       if (!card || rejected.has(id))
         continue
-      cards.value.set(nanoid(), newAiriCard({ ...card, name: t('settings.pages.card.sync.conflict_copy_name', { name: card.name }) }))
+      cards.value.set(nanoid(), newAngelaCard({ ...card, name: t('settings.pages.card.sync.conflict_copy_name', { name: card.name }) }))
     }
 
     for (const id of changes.removals) {
@@ -763,7 +764,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     // Every card field synchronizes, so the snapshot is the whole card at that
     // revision. Replace the card instead of merging it with `updateCard`. A
     // merge keeps the fields that were added after the revision.
-    const card = newAiriCard(parse(synchronizedCardSchema, joinCard(fieldsOfSnapshot(snapshot), builtInFor(id))))
+    const card = newAngelaCard(parse(synchronizedCardSchema, joinCard(fieldsOfSnapshot(snapshot), builtInFor(id))))
     cards.value.set(id, card)
     if (id === activeCardId.value)
       await applyActiveCardSettings(card)
@@ -796,7 +797,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
       return false
 
     const card = parse(synchronizedCardSchema, joinCard(fieldsOfSnapshot(snapshot), builtInFor(id)))
-    cards.value.set(id, newAiriCard(card))
+    cards.value.set(id, newAngelaCard(card))
     if (!cards.value.has(activeCardId.value))
       activeCardId.value = 'default'
     return true
@@ -847,7 +848,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
 
     try {
       // The store action routes the run to the leader. A call to the local function would run in this window.
-      await useAiriCardStore().synchronizeCards()
+      await useAngelaCardStore().synchronizeCards()
     }
     catch (error) {
       console.error('[character-card-sync] Failed to request synchronization:', errorMessageFrom(error))
@@ -924,7 +925,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     return resolveModules(card.extensions.airi.modules, defaults)
   }
 
-  function resolveModules(modules: AiriExtension['modules'], defaults: CardModuleDefaults): CardModuleDefaults {
+  function resolveModules(modules: AngelaExtension['modules'], defaults: CardModuleDefaults): CardModuleDefaults {
     const speechSelection = resolveModuleSelection(modules.speech, defaults.speech)
     const resolved: CardModuleDefaults = {
       consciousness: resolveModuleSelection(modules.consciousness, defaults.consciousness),
@@ -967,7 +968,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
       return
 
     // TODO: Minecraft Agent, etc
-    const extension = resolveAiriExtension(newCard)
+    const extension = resolveAngelaExtension(newCard)
     if (!extension)
       return
 
@@ -1061,7 +1062,7 @@ export const useAiriCardStore = defineStore('airi-card', () => {
         },
         displayModelId: stageModel.stageModelSelected,
         activeBackgroundId: activeCard.value?.extensions?.airi?.modules?.activeBackgroundId,
-      } satisfies AiriExtension['modules']
+      } satisfies AngelaExtension['modules']
     }),
     systemPrompt: computed(() => resolveSystemPrompt(activeCard.value)),
   }
@@ -1087,3 +1088,6 @@ export const useAiriCardStore = defineStore('airi-card', () => {
     state: true,
   },
 })
+
+/** Supported alias that shares the same store and persisted data. */
+export { useAngelaCardStore as useAiriCardStore }

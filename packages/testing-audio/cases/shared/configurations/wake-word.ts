@@ -1,5 +1,5 @@
 import type { WakeWord } from '@angela/stage-ui/libs/voice/wake-words'
-import type { AiriCard } from '@angela/stage-ui/types'
+import type { AngelaCard } from '@angela/stage-ui/types'
 
 import type { AudioInputPreflightCallback, AudioInputPreflightContext } from '../../../src/types'
 
@@ -58,7 +58,7 @@ export function configureWakeWord(resolve: WakeWordResolver): AudioInputPrefligh
         throw new Error('The Angela Card store is not initialized.')
 
       const activeCardId = localStorage.getItem('airi-card-active-id') ?? 'default'
-      const cards = JSON.parse(serializedCards) as Array<[string, AiriCard]>
+      const cards = JSON.parse(serializedCards) as Array<[string, AngelaCard]>
       const activeCard = cards.find(([cardId]) => cardId === activeCardId)?.[1]
       if (!activeCard)
         throw new Error(`The active Angela Card "${activeCardId}" does not exist.`)

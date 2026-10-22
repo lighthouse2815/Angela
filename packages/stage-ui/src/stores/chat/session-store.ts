@@ -27,7 +27,7 @@ import {
 import { captureAnalyticsEvent } from '../../libs/product-signals'
 import { SERVER_URL } from '../../libs/server'
 import { useAuthStore } from '../auth'
-import { useAiriCardStore } from '../modules/airi-card'
+import { useAngelaCardStore } from '../modules/angela-card'
 import { mergeLoadedSessionMessages } from './session-message-merge'
 
 /**
@@ -64,7 +64,7 @@ const useChatSessionSelectionStore = defineStore('chat-session-selection', () =>
 
 export const useChatSessionStore = defineStore('chat-session', () => {
   const { userId, token: authToken } = storeToRefs(useAuthStore())
-  const cards = useAiriCardStore()
+  const cards = useAngelaCardStore()
   const { activeCardId, systemPrompt } = storeToRefs(cards)
 
   const chatSessionSelection = useChatSessionSelectionStore()

@@ -3,13 +3,13 @@ import { render } from 'vitest-browser-vue'
 import { defineComponent, h, onMounted } from 'vue'
 import { createMemoryHistory, createRouter, createWebHistory, RouterView } from 'vue-router'
 
-import { useAiriCardEditorPage } from './use-airi-card-editor-page'
+import { useAngelaCardEditorPage } from './use-angela-card-editor-page'
 
 it('blocks route changes until the user discards dirty card edits', async () => {
-  let editorPage: ReturnType<typeof useAiriCardEditorPage> | undefined
+  let editorPage: ReturnType<typeof useAngelaCardEditorPage> | undefined
   const editorRoute = defineComponent({
     setup() {
-      editorPage = useAiriCardEditorPage()
+      editorPage = useAngelaCardEditorPage()
       onMounted(() => {
         editorPage!.isDirty.value = true
       })
@@ -42,10 +42,10 @@ it('blocks route changes until the user discards dirty card edits', async () => 
 })
 
 it('returns to the list without leaving a duplicate history entry', async () => {
-  let editorPage: ReturnType<typeof useAiriCardEditorPage> | undefined
+  let editorPage: ReturnType<typeof useAngelaCardEditorPage> | undefined
   const editorRoute = defineComponent({
     setup() {
-      editorPage = useAiriCardEditorPage()
+      editorPage = useAngelaCardEditorPage()
       return () => h('div', 'Editor')
     },
   })
@@ -53,14 +53,14 @@ it('returns to the list without leaving a duplicate history entry', async () => 
     history: createWebHistory(),
     routes: [
       { path: '/before', component: { template: '<div>Before</div>' } },
-      { path: '/settings/airi-card', component: { template: '<div>List</div>' } },
-      { path: '/settings/airi-card/:cardId/edit', component: editorRoute },
+      { path: '/settings/angela-card', component: { template: '<div>List</div>' } },
+      { path: '/settings/angela-card/:cardId/edit', component: editorRoute },
     ],
   })
 
   await router.push('/before')
-  await router.push('/settings/airi-card')
-  await router.push('/settings/airi-card/card-1/edit')
+  await router.push('/settings/angela-card')
+  await router.push('/settings/angela-card/card-1/edit')
   render(defineComponent(() => () => h(RouterView)), {
     global: {
       plugins: [router],
@@ -70,7 +70,7 @@ it('returns to the list without leaving a duplicate history entry', async () => 
   await vi.waitFor(() => expect(editorPage).toBeDefined())
   editorPage?.handleBack()
 
-  await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/settings/airi-card'))
+  await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/settings/angela-card'))
 
   router.back()
   await vi.waitFor(() => expect(router.currentRoute.value.path).toBe('/before'))

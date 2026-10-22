@@ -21,7 +21,7 @@ import Spine from './spine.vue'
 import Tachie from './tachie.vue'
 import VRM from './vrm.vue'
 
-import { useAiriCardStore } from '../../../../stores/modules/airi-card'
+import { useAngelaCardStore } from '../../../../stores/modules/angela-card'
 import { useSettings } from '../../../../stores/settings'
 import { ModelSelectorDialog } from '../../dialogs/model-selector'
 import { resolveModelSettingsPanelRenderer } from './runtime'
@@ -53,7 +53,7 @@ const emit = defineEmits<ModelSettingsPanelEmits>()
 const { t } = useI18n()
 const modelSelectorOpen = ref(false)
 const settingsStore = useSettings()
-const airiCardStore = useAiriCardStore()
+const angelaCardStore = useAngelaCardStore()
 const { stageModelRenderer, stageModelSelected, stageModelSelectedDisplayModel } = storeToRefs(settingsStore)
 
 const effectiveRenderer = computed(() => resolveModelSettingsPanelRenderer({
@@ -63,7 +63,7 @@ const effectiveRenderer = computed(() => resolveModelSettingsPanelRenderer({
 
 async function handleModelPick(selectedModel: DisplayModel | undefined) {
   stageModelSelected.value = selectedModel?.id ?? ''
-  await airiCardStore.updateActiveCardDisplayModel(selectedModel?.id)
+  await angelaCardStore.updateActiveCardDisplayModel(selectedModel?.id)
   await settingsStore.updateStageModel()
 }
 </script>

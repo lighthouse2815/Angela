@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChatSessionsDrawer } from '@angela/stage-ui/components'
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { storeToRefs } from 'pinia'
 import { shallowRef, useTemplateRef } from 'vue'
 
@@ -12,7 +12,7 @@ import ChatPageShell from './chat-page-shell.vue'
 
 import { useChatDraftHandover } from '../composables/use-chat-draft-handover'
 
-const { activeCard } = storeToRefs(useAiriCardStore())
+const { activeCard } = storeToRefs(useAngelaCardStore())
 const sessionsDrawerOpen = shallowRef(false)
 const interactiveArea = useTemplateRef<InstanceType<typeof InteractiveArea>>('interactive-area')
 

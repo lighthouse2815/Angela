@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useAiriCardStore } from '@angela/stage-ui/stores/modules/airi-card'
+import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
 import { useWakeWordsStore } from '@angela/stage-ui/stores/wake-words'
 import { Button, SettingsCard } from '@angela/ui'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
-const cards = useAiriCardStore()
+const cards = useAngelaCardStore()
 const wakeWords = useWakeWordsStore()
 
 function characterName(characterId: string) {

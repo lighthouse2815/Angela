@@ -7,7 +7,7 @@ import { computed, reactive, ref } from 'vue'
 import { useLlmmarkerParser } from '../../composables/llm-marker-parser'
 import { SpeechClient as Speech } from '../../services/speech/speech-client'
 import { useChatSessionStore } from '../chat/session-store'
-import { useAiriCardStore } from '../modules'
+import { useAngelaCardStore } from '../modules'
 
 export * from './notebook'
 export * from './orchestrator'
@@ -35,7 +35,7 @@ export function setCharacterLlmMarkerParserFactoryForTest(factory: ParserFactory
 }
 
 export const useCharacterStore = defineStore('character', () => {
-  const { activeCard, systemPrompt } = storeToRefs(useAiriCardStore())
+  const { activeCard, systemPrompt } = storeToRefs(useAngelaCardStore())
 
   const name = computed(() => activeCard.value?.name ?? '')
 

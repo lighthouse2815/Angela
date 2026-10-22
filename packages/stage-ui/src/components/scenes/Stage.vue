@@ -39,7 +39,7 @@ import { useAudioContext, useSpeakingStore } from '../../stores/audio'
 import { useBackgroundStore } from '../../stores/background'
 import { useChatStore } from '../../stores/chat'
 import { useChatSessionStore } from '../../stores/chat/session-store'
-import { useAiriCardStore } from '../../stores/modules/airi-card'
+import { useAngelaCardStore } from '../../stores/modules/angela-card'
 import { useSpeechStore } from '../../stores/modules/speech'
 import { useSettingsPresenceBubble } from '../../stores/presence-bubble'
 import { useSettings } from '../../stores/settings'
@@ -381,7 +381,7 @@ watch(() => voice.activeTurns, (turns) => {
     speechVoicing.value = false
 })
 
-const cards = useAiriCardStore()
+const cards = useAngelaCardStore()
 const disconnectVoiceOutput = voice.connectOutput((turn) => {
   const output = {
     playback,

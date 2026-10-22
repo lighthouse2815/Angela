@@ -7,7 +7,7 @@ import { computed, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { useChatSessionStore } from '../../../../stores/chat/session-store'
-import { useAiriCardStore } from '../../../../stores/modules/airi-card'
+import { useAngelaCardStore } from '../../../../stores/modules/angela-card'
 import { useVoiceControlsStore } from '../../../../stores/voice-controls'
 
 const props = withDefaults(defineProps<{
@@ -34,7 +34,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const controls = useVoiceControlsStore()
 const sessions = useChatSessionStore()
-const cards = useAiriCardStore()
+const cards = useAngelaCardStore()
 const sending = ref(false)
 
 /** Drafts that the user can still edit. A draft that the host is sending is on its way to the chat and stays hidden. */
