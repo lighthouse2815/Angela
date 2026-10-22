@@ -4,6 +4,7 @@ import type { MemoryPage, Observation } from './types'
 
 import { createHash } from 'node:crypto'
 
+import { keepTokens } from './policy'
 import { sanitize } from './sanitize'
 
 /** Zero-provider session compiler. Replays produce the same page, with bounded evidence and explicit source labels. */
@@ -26,17 +27,19 @@ export class MemoryConsolidator {
       }
       if (!values.includes(text))
         values.push(text)
-      if (values.length > 10)
+      if (values.length > (label === 'Artifact' ? 48 : 6))
         values.shift()
     }
     if (previous) {
       for (const line of previous.body.split('\n')) {
-        const match = /^(User|Decision|Completed|Failed|Fact|Workflow|Next step|Tool|Commitment): (.+)$/u.exec(line)
+        const match = /^(User|Decision|Completed|Failed|Fact|Workflow|Next step|Tool|Commitment|Artifact): (.+)$/u.exec(line)
         if (match)
           append(match[1]!, match[2]!)
       }
     }
     for (const item of substantive) {
+      for (const fact of keepTokens(item.text))
+        append('Artifact', fact)
       const text = `${item.timestamp.slice(0, 10)} ${item.text.replace(/\s+/gu, ' ').slice(0, 650)}`
       if (item.type === 'user.message')
         append(/\b(?:decid|chọn|quyết định|ưu tiên)/iu.test(item.text) ? 'Decision' : 'User', text)
@@ -53,8 +56,9 @@ export class MemoryConsolidator {
       else if (item.type === 'assistant.message')
         append('Commitment', `Assistant report, unverified: ${text}`)
     }
-    const body = [`Goal: ${goal}`, ...[...groups].flatMap(([label, values]) => values.map(text => `${label}: ${text}`))].join('\n').slice(0, 24_000)
-    return this.store.write({ tier: 'episodic', kind: 'session', scope, key: `session:${sessionId}`, title: goal.slice(0, 160), body, abstract: goal, authority: 'episode', salience: groups.has('Decision') || groups.has('Completed') ? 1.5 : 0.75, sourceSessionId: sessionId })
+    const labels = ['Decision', 'Completed', 'Failed', 'Fact', 'Workflow', 'Next step', 'Artifact', 'User', 'Tool', 'Commitment']
+    const body = [`Goal: ${goal}`, ...labels.flatMap(label => groups.get(label)?.map(text => `${label}: ${text}`) ?? [])].join('\n').slice(0, 24_000)
+    return this.store.write({ tier: 'episodic', kind: 'session', scope, key: `session:${sessionId}`, title: goal.slice(0, 160), body, abstract: goal, authority: 'episode', salience: groups.has('Decision') || groups.has('Completed') ? 1.5 : 0.75, sourceSessionId: sessionId, expectedVersion: previous?.version ?? null })
   }
 
   /** Explicit workflow statements can become procedures without inferring a lasting preference from casual behavior. */

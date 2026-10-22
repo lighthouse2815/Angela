@@ -57,6 +57,7 @@ export class Recall {
   private client?: Embeddings
   private embeddingConfigError = false
   private closed = false
+  private foreground = false
   private lastUsed: RecallHit[] = []
   private readonly readableAcrossWorkspaces = new Set<string>()
   private readonly problems = new Set<string>()
@@ -123,7 +124,11 @@ export class Recall {
   private background() {
     if (this.closed)
       return
-    void this.refresh().then(() => this.embed()).catch(() => this.problem('index'))
+    void this.refresh().then(() => {
+      if (!this.foreground && !this.closed)
+        this.database().memory.age(this.workspace)
+      return this.embed()
+    }).catch(() => this.problem('index'))
   }
 
   async close() {
@@ -309,11 +314,11 @@ export class Recall {
   }
 
   private async embed() {
-    if (!this.client || this.embedding || this.closed)
+    if (!this.client || this.embedding || this.closed || this.foreground)
       return
     const client = this.client
     this.embedding = (async () => {
-      while (!this.closed) {
+      while (!this.closed && !this.foreground) {
         const settings = await this.settings.read()
         if (!settings.enabled || !settings.semantic)
           break
@@ -419,6 +424,7 @@ export class Recall {
 
   /** Core facts and matching personal details share one bounded profile. Other sources are marked historical and cannot authorize actions. */
   async prepare(query: string, signal?: AbortSignal) {
+    this.foreground = true
     this.lastUsed = []
     this.readableAcrossWorkspaces.clear()
     const settings = await this.settings.read()
@@ -559,6 +565,7 @@ export class Recall {
   }
 
   finishRequest() {
+    this.foreground = false
     this.readableAcrossWorkspaces.clear()
     this.lastUsed = this.lastUsed.slice(-50).map(hit => ({ ...hit, text: hit.text.slice(0, 1200) }))
   }
@@ -615,6 +622,8 @@ export class Recall {
   }
 
   async command(text: string, signal?: AbortSignal): Promise<string | undefined> {
+    if (text === '/memory age')
+      return JSON.stringify({ compacted: this.database().memory.age(this.workspace) })
     const purge = /^\/memory purge memory:([\da-f-]{36})$/iu.exec(text)
     if (purge) {
       this.database().memory.purge(purge[1]!, this.workspace)

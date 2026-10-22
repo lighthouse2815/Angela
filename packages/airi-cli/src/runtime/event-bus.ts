@@ -27,8 +27,16 @@ export class EventBus {
   }
 
   emit(event: AngelaEvent) {
-    for (const handler of this.listeners.get(event.type)?.values() ?? [])
-      handler(event)
+    const errors: unknown[] = []
+    for (const handler of this.listeners.get(event.type)?.values() ?? []) {
+      try {
+        handler(event)
+      }
+      catch (error) {
+        errors.push(error)
+      }
+    }
+    return errors
   }
 
   get listenerCount() {

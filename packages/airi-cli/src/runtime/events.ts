@@ -24,6 +24,7 @@ export type AngelaEvent = BaseAngelaEvent & (
   | { type: 'session.started' }
   | { type: 'session.ended', reason: 'completed' | 'aborted' | 'failed' }
   | { type: 'request.failed', reason: 'aborted' | 'failed' }
+  | { type: 'request.completed' }
 )
 
 /** Distributes omission over event variants so producers retain discriminated payload checks. */

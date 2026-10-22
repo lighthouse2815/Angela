@@ -42,7 +42,7 @@ export class AngelaRuntime {
     if (!state) {
       if (this.states.size >= 8)
         throw new Error('Runtime active context limit reached')
-      state = new RuntimeSession(this, options, () => this.states.delete(key))
+      state = new RuntimeSession(this, { ...options }, () => this.states.delete(key))
       this.states.set(key, state)
     }
     state.retain()
@@ -85,6 +85,9 @@ export class AngelaRuntime {
           if (!destination)
             throw new Error('Reminder destination was released')
           await destination.notifier.notify(...args)
+          const correlationId = randomUUID()
+          for (const task of args[0])
+            this.events.emit({ id: randomUUID(), type: 'reminder.delivered', timestamp: new Date().toISOString(), correlationId, channel: 'system', taskId: task.id })
         },
       }, error => target()?.onError(error), (delay) => {
         const route = this.remindersByStore.get(dataDir)
@@ -215,6 +218,8 @@ export class RuntimeSession {
   private client?: Promise<McpTools | undefined>
   private request?: Promise<void>
   private closing?: Promise<void>
+  private lastRequest?: Omit<BaseAngelaEvent, 'id' | 'timestamp'>
+  private lastReason: 'completed' | 'aborted' | 'failed' = 'completed'
 
   constructor(private readonly runtime: AngelaRuntime, readonly options: SessionOptions, private readonly removed: () => void) {}
 
@@ -297,7 +302,7 @@ export class RuntimeSession {
       return response
     }
     if (/^\/(?:memory|remember|forget)(?:\s|$)/u.test(text)) {
-      const recallCommand = /^\/memory (?:used|status|search|search-all|read|budget|reindex|recall|history|semantic|purge)(?:\s|$)/u.test(text)
+      const recallCommand = /^\/memory (?:used|status|search|search-all|read|budget|reindex|recall|history|semantic|purge|age)(?:\s|$)/u.test(text)
       const response = recallCommand ? await (await this.recall())?.command(text, signal) : await (await this.memory()).command(text)
       if (!recallCommand && response !== undefined && this.retrieval)
         await (await this.retrieval)?.changed()
@@ -318,6 +323,8 @@ export class RuntimeSession {
       return Promise.reject(new Error('Context already has an active request'))
     const signal = options.abortSignal ? AbortSignal.any([options.abortSignal, this.lifetime.signal]) : this.lifetime.signal
     const envelope: Omit<BaseAngelaEvent, 'id' | 'timestamp'> = { correlationId: randomUUID(), sessionId: this.options.sessionId, channel: this.options.channel, workspace: this.options.workspace }
+    const started = !this.lastRequest
+    this.lastRequest = envelope
     let capture: MemoryCapture | undefined
     const emit = (payload: EventPayload, evidence = '', verified = false) => {
       const event: AngelaEvent = { ...envelope, ...payload, id: randomUUID(), timestamp: new Date().toISOString() }
@@ -350,7 +357,8 @@ export class RuntimeSession {
           }
           catch { sources.warn(this.runtime.messages.memoryUnavailable) }
         }
-        emit({ type: 'session.started' })
+        if (started)
+          emit({ type: 'session.started' })
         emit({ type: 'user.message' }, text)
         const context = await buildContext(sources, text, signal, extra)
         registry = await buildTools(sources, text, this.options.sessionId, await this.mcp(signal))
@@ -381,7 +389,9 @@ export class RuntimeSession {
       finally {
         if (!completed)
           emit({ type: 'request.failed', reason: signal.aborted ? 'aborted' : 'failed' }, signal.aborted ? 'Request interrupted' : 'Request failed')
-        emit({ type: 'session.ended', reason: completed ? 'completed' : signal.aborted ? 'aborted' : 'failed' })
+        this.lastReason = completed ? 'completed' : signal.aborted ? 'aborted' : 'failed'
+        if (completed)
+          emit({ type: 'request.completed' })
         try {
           capture?.finish(text)
         }
@@ -411,6 +421,16 @@ export class RuntimeSession {
       this.lifetime.abort()
       try {
         await this.request?.catch(() => {})
+        if (this.lastRequest) {
+          const event: AngelaEvent = { ...this.lastRequest, id: randomUUID(), timestamp: new Date().toISOString(), type: 'session.ended', reason: this.lastReason }
+          this.runtime.events.emit(event)
+          try {
+            const capture = await (await this.retrieval)?.capture()
+            capture?.record(event)
+            capture?.finish('')
+          }
+          catch { this.options.warn?.(this.runtime.messages.memoryUnavailable) }
+        }
         await Promise.allSettled([
           this.client?.then(client => client?.close()),
           this.retrieval?.then(recall => recall?.close()),
@@ -423,6 +443,9 @@ export class RuntimeSession {
         this.checkpoint = undefined
         this.retrieval = undefined
         this.client = undefined
+        this.lastRequest = undefined
+        this.options.connectMcp = undefined
+        this.options.warn = undefined
         this.removed()
       }
     })()

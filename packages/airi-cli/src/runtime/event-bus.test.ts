@@ -37,3 +37,16 @@ it('bounds listeners and releases repeated subscription lifecycles', () => {
   bus.close()
   expect(bus.listenerCount).toBe(0)
 })
+
+it('isolates a failing observer and reports its error without preventing later listeners', () => {
+  const bus = new EventBus()
+  const error = new Error('observer failed')
+  const handler = vi.fn()
+  bus.on('user.message', () => {
+    throw error
+  })
+  bus.on('user.message', handler)
+  const event: AngelaEvent = { id: 'event', type: 'user.message', timestamp: new Date().toISOString(), correlationId: 'request' }
+  expect(bus.emit(event)).toEqual([error])
+  expect(handler).toHaveBeenCalledExactlyOnceWith(event)
+})

@@ -92,3 +92,12 @@ it('never stores ordinary assistant answers as verified facts or tool success', 
   capture.record({ ...event, type: 'tool.result', toolCallId: 'call', toolName: 'unknown', outcome: 'unverified' }, 'Succeeded')
   expect(store.stats().observations).toBe(0)
 })
+
+it('preserves literal diagnostics outside the prose excerpt before session compaction', async () => {
+  const { store, consolidator } = await setup()
+  store.observe(base)
+  store.observe({ ...base, id: 'long-tool', type: 'tool.result', verified: true, text: `${'routine output '.repeat(100)} HTTP 503 in src/important.ts` })
+  const page = consolidator.consolidate('workspace', 'session')!
+  expect(page.body).toContain('src/important.ts')
+  expect(page.body).toContain('HTTP 503')
+})

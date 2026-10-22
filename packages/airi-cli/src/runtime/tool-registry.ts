@@ -73,7 +73,7 @@ export async function buildTools(sources: ContextSources, text: string, sessionI
             let remaining = 16_000
             for (const block of parsed.data.content) {
               if (block.type === 'text' && remaining > 0) {
-                const excerpt = block.text.slice(0, remaining)
+                const excerpt = sanitize(block.text, remaining)
                 excerpts.push(excerpt)
                 remaining -= excerpt.length
               }
@@ -103,8 +103,10 @@ export async function buildTools(sources: ContextSources, text: string, sessionI
             }
             else if (toolName === 'project_memory' && 'revision' in result && typeof result.revision === 'number') {
               evidence.domain = { type: 'project.changed', revision: result.revision }
+              if ('snapshot' in result)
+                evidence.text = `Project checkpoint: ${sanitize(JSON.stringify(result.snapshot), 3000)}`
             }
-            else if (toolName === 'personal_memory' && 'id' in result && typeof result.id === 'string') {
+            else if ((toolName === 'personal_memory' || toolName === 'memory_page_save') && 'id' in result && typeof result.id === 'string') {
               evidence.domain = { type: 'memory.changed', memoryId: result.id, action: result.status === 'deleted' ? 'deleted' : 'saved' }
             }
           }

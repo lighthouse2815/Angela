@@ -78,3 +78,23 @@ it('honors memory off and isolates identical sessions in different Telegram user
     }
   }
 })
+
+it('emits session boundaries only once across several requests and ends the session on release', async () => {
+  const { runtime, directory } = await setup()
+  const scope = runtime.open({ dataDir: directory, workspace: directory, sessionId: randomUUID(), channel: 'telegram' })
+  let started = 0
+  let ended = 0
+  runtime.events.on('session.started', () => {
+    started++
+  })
+  runtime.events.on('session.ended', () => {
+    ended++
+  })
+  const chat = new Chat(runtime.model, runtime.provider, directory)
+  await scope.send(chat, 'Choose SQLite for local memory', {})
+  await scope.send(chat, 'Keep the architecture native', {})
+  expect(started).toBe(1)
+  expect(ended).toBe(0)
+  await scope.close()
+  expect(ended).toBe(1)
+})
