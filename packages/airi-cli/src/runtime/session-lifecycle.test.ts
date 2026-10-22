@@ -231,3 +231,17 @@ it('closes every Recall after 100 release and LRU cycles', async () => {
   expect(closed).toHaveBeenCalledTimes(100)
   expect(Object.values(runtime.resourceCounts).every(count => count === 0)).toBe(true)
 })
+
+it('reports observer failures through bounded runtime diagnostics without failing requests', async () => {
+  const diagnostic = vi.fn()
+  const { runtime, session, directory } = await setup({ observerError: diagnostic })
+  runtime.events.on('user.message', () => {
+    throw new Error('private-payload-in-observer-error')
+  })
+  const scope = await runtime.acquire(session)
+  await expect(scope.send(await runtime.createChat(directory), 'Choose copper release', {})).resolves.toBeUndefined()
+  expect(diagnostic).toHaveBeenCalledExactlyOnceWith({ eventType: 'user.message', failures: 1 })
+  expect(runtime.events.diagnostics.failures).toBe(1)
+  expect(JSON.stringify(diagnostic.mock.calls)).not.toContain('private')
+  await scope.close()
+})

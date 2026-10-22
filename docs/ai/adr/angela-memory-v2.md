@@ -155,3 +155,11 @@ Host shutdown aborts requests, waits for retiring contexts, and closes all owned
 A cancelled request does not end a warm session. A later message can reuse its Recall.
 A reopened persistent conversation starts another runtime session segment after eviction or process restart.
 Memory pages stay durable across those segments. No new background LLM work is enabled.
+
+## Observer diagnostics
+
+Observers cannot fail a request. `EventBus.emit` still returns observer exceptions to explicit callers.
+The bus also retains at most 16 metadata diagnostics and one saturating failure counter.
+Each diagnostic contains only the event type and failure count. Error messages, event objects, and private payloads are excluded.
+The runtime writes at most 16 metadata warnings per host. `RuntimeOptions.observerError` can replace this callback.
+A callback failure is isolated. Shutdown clears listeners, diagnostics, and the callback reference.

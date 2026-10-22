@@ -12,7 +12,10 @@ import type { ReminderNotifier, ReminderScheduler } from '../reminder-scheduler'
 import type { Skills } from '../skills'
 import type { Tasks } from '../tasks'
 import type { ContextSources } from './context-builder'
+import type { ObserverDiagnostic } from './event-bus'
 import type { AngelaEvent, BaseAngelaEvent, EventPayload } from './events'
+
+import process from 'node:process'
 
 import { randomUUID } from 'node:crypto'
 
@@ -22,6 +25,8 @@ import { buildTools } from './tool-registry'
 
 /** Telegram retention is independent of the existing eight active-context limit. */
 export interface RuntimeOptions {
+  /** Receives at most 16 metadata warnings per host. The EventBus retains the latest 16 diagnostics. */
+  observerError?: (diagnostic: ObserverDiagnostic) => void
   telegramSessions?: {
     /** @default 32 */
     maxIdle?: number
@@ -34,7 +39,7 @@ interface ReminderTarget { notifier: ReminderNotifier & { pause?: () => void, re
 
 /** Adapters share active contexts. Telegram can retain bounded idle contexts through acquire. Construction performs no IO. */
 export class AngelaRuntime {
-  readonly events = new EventBus()
+  readonly events: EventBus
   private readonly states = new Map<string, RuntimeSession>()
   private closing?: Promise<void>
   // Idle entries are ordered by last release. Retiring entries are detached before asynchronous cleanup.
@@ -48,6 +53,9 @@ export class AngelaRuntime {
   private delivering?: Promise<void>
 
   constructor(readonly model: string, readonly provider: GenerationProvider, readonly messages: typeof cliMessages.en, readonly env: NodeJS.ProcessEnv = {}, readonly defaults: { baseUrl?: string, apiKey: string } = { apiKey: '' }, options: RuntimeOptions = {}) {
+    this.events = new EventBus(options.observerError ?? ((diagnostic) => {
+      process.stderr.write(`Angela runtime observer failure: type=${diagnostic.eventType} count=${diagnostic.failures}\n`)
+    }))
     this.maxIdle = options.telegramSessions?.maxIdle ?? 32
     this.idleTtlMs = options.telegramSessions?.idleTtlMs ?? 10 * 60_000
     if (!Number.isInteger(this.maxIdle) || this.maxIdle < 0 || this.maxIdle > 64)
