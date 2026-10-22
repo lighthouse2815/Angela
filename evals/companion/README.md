@@ -7,6 +7,7 @@ Mục tiêu là đo memory, retrieval và context. Bộ này không chấm trí 
 Không dùng API trả phí. Không sửa production code để đạt điểm.
 
 Xem [report baseline](./REPORT.md) và [kết quả JSON](./baseline.json).
+Xem [cải thiện Recall](./IMPROVEMENTS.md) và [kết quả sau sửa](./after.json).
 
 ## Dataset và schema
 
