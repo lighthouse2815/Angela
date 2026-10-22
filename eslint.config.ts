@@ -14,6 +14,7 @@ export default defineConfig({
 }, {
   ignores: [
     'third_party/**', // Preserve imported upstream sources.
+    'apps/desktop-kirie/addons/**', // Kirie installs third-party Godot dependencies here.
     'cspell.config.yaml',
     'cspell.config.yml',
     'crowdin.yaml',
