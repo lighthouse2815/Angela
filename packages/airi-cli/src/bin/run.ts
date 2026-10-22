@@ -1,13 +1,10 @@
 #!/usr/bin/env node
 
-import type { Tool } from '@xsai/shared-chat'
-
 import process from 'node:process'
 
 import { realpath, stat } from 'node:fs/promises'
 import { join } from 'node:path'
 
-import { CallToolResultSchema } from '@modelcontextprotocol/sdk/types.js'
 import { errorMessageFrom } from '@moeru/std'
 import { chatMessagesToTurns } from '@proj-airi/core-agent'
 import { getGenerationProvider, listProviders } from '@proj-airi/provider-inference'
@@ -27,12 +24,13 @@ import { Recall } from '../recall'
 import { ReminderNotifications } from '../reminder-notifications'
 import { ReminderScheduler } from '../reminder-scheduler'
 import { runReminders } from '../reminders'
+import { buildContext } from '../runtime/context-builder'
+import { buildTools } from '../runtime/tool-registry'
 import { runSessionCommand } from '../session-command'
 import { Sessions } from '../sessions'
 import { runSetup } from '../setup'
 import { StreamingSpeech } from '../streaming-speech'
 import { taskCommand } from '../task-commands'
-import { taskContext, taskTools } from '../task-tools'
 import { Tasks } from '../tasks'
 import { runTelegram } from '../telegram'
 import { Terminal } from '../terminal'
@@ -225,85 +223,35 @@ async function main() {
       try {
         output.start()
         await session.save(chat.conversation, true)
-        const projectObservations: string[] = []
-        const verifiedObservations: string[] = []
-        const projectCalls = new Set<string>()
-        let projectContext = ''
-        let projectTools: Tool[] = []
+        const sources = { memory, project, tasks, recall: recallReady ? recall : undefined, channel: 'cli' as const, messages, warn: (message: string) => process.stderr.write(`\n${message}\n`) }
+        const context = await buildContext(sources, text, active.signal)
+        const requestTools = await buildTools(sources, text, session.record.id, mcp)
+        const tools = requestTools.tools
         try {
-          projectContext = await project.context()
-          projectTools = await project.tools(text, session.record.id, projectObservations)
-        }
-        catch {
-          projectContext = ''
-          process.stderr.write(`\n${messages.projectMemoryUnavailable}\n`)
-        }
-        let memoryContext = ''
-        let memoryTools: Tool[] = []
-        try {
-          memoryTools = await memory.tools(text, session.record.id)
-        }
-        catch {
-          process.stderr.write(`\n${messages.memoryUnavailable}\n`)
-        }
-        try {
-          if (recallReady) {
-            const prepared = await recall.prepare(text, active.signal)
-            memoryContext = prepared.context
-            if (prepared.warning)
-              process.stderr.write(`\n${prepared.warning}\n`)
-          }
-          else {
-            const state = await memory.read()
-            memoryContext = await memory.context(state.entries.filter(entry => entry.core).map(entry => entry.id))
-          }
-        }
-        catch {
-          memoryContext = ''
-          active.signal.throwIfAborted()
-          process.stderr.write(`\n${recallReady ? messages.recallInvalid : messages.memoryUnavailable}\n`)
-        }
-        const tools = [...(mcp?.definitions() ?? []), ...memoryTools, ...projectTools, ...taskTools(tasks, messages.tasks), ...(recallReady ? [...recall.tools(), ...recall.skills.tools(text, verifiedObservations, session.record.id, () => recall.changed(false))] : [])]
-        await chat.send(text, {
-          abortSignal: active.signal,
-          tools,
-          resolveStep: async () => ({
-            ...modelTarget,
-            systemPrompt: [persona, camera.getContext()].filter(Boolean).join('\n\n'),
+          await chat.send(text, {
+            abortSignal: active.signal,
             tools,
-          }),
-          diagnostics: {
+            resolveStep: async () => ({
+              ...modelTarget,
+              systemPrompt: [persona, camera.getContext()].filter(Boolean).join('\n\n'),
+              tools,
+            }),
+            diagnostics: {
             // The send catch owns the final message. SDK promise diagnostics must not print the same failure again.
-            error() {},
-            warn() { output.retry() },
-          },
-          onStreamEvent: async (event) => {
-            output.event(event)
-            if (event.type === 'tool-call' && event.toolName === 'builtIn_mcpCallTool')
-              projectCalls.add(event.toolCallId)
-            if ((event.type === 'tool-result' || event.type === 'tool-error') && projectCalls.delete(event.toolCallId) && event.result) {
-              const observation = typeof event.result === 'string' ? event.result : JSON.stringify(event.result)
-              projectObservations.push(observation.slice(0, 20_000))
-              if (event.type === 'tool-result') {
-                try {
-                  const result = CallToolResultSchema.safeParse(typeof event.result === 'string' ? JSON.parse(event.result) : event.result)
-                  const backend = result.success ? result.data.structuredContent?.backendResult : undefined
-                  const failed = backend && typeof backend === 'object' && (('timedOut' in backend && backend.timedOut) || ('exitCode' in backend && backend.exitCode !== undefined && backend.exitCode !== null && backend.exitCode !== 0))
-                  if (result.success && !result.data.isError && !failed) {
-                    verifiedObservations.push(observation.slice(0, 20_000))
-                    if (verifiedObservations.length > 8)
-                      verifiedObservations.shift()
-                  }
-                }
-                catch { /* Unrecognized payloads cannot establish verification evidence. */ }
-              }
-              if (projectObservations.length > 8)
-                projectObservations.shift()
-            }
-            if (event.type === 'text-delta')
-              await speech?.push(event.text)
-          },
-        }, [memoryContext, projectContext, taskContext(tasks)].filter(Boolean).join('\n\n'))
+              error() {},
+              warn() { output.retry() },
+            },
+            onStreamEvent: async (event) => {
+              output.event(event)
+              requestTools.observe(event)
+              if (event.type === 'text-delta')
+                await speech?.push(event.text)
+            },
+          }, context)
+        }
+        finally {
+          requestTools.close()
+        }
         if (!output.hasText)
           throw new Error(messages.emptyResponse)
         completed = true

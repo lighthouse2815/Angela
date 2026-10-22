@@ -1,0 +1,54 @@
+import type { cliMessages } from '@proj-airi/i18n/cli'
+
+import type { Memory } from '../memory'
+import type { ProjectMemory } from '../project-memory'
+import type { Recall } from '../recall'
+import type { Tasks } from '../tasks'
+
+import { taskContext } from '../task-tools'
+
+/** Only enabled request capabilities enter context construction. No source or prompt is cached here. */
+export interface ContextSources {
+  memory?: Memory
+  project?: ProjectMemory
+  recall?: Recall
+  tasks?: Tasks
+  channel: 'cli' | 'telegram' | 'discord'
+  messages: typeof cliMessages.en
+  warn: (message: string) => void
+}
+
+/** Reads selected recall excerpts and bounded checkpoints. Task history and full skill instructions stay on disk. */
+export async function buildContext(sources: ContextSources, text: string, signal?: AbortSignal, extra = '') {
+  const parts: string[] = []
+  if (extra)
+    parts.push(extra)
+  try {
+    if (sources.recall) {
+      const prepared = await sources.recall.prepare(text, signal)
+      if (prepared.context)
+        parts.push(prepared.context)
+      if (prepared.warning)
+        sources.warn(prepared.warning)
+    }
+    else if (sources.memory) {
+      const state = await sources.memory.read()
+      parts.push(await sources.memory.context(state.entries.filter(entry => entry.core).map(entry => entry.id)))
+    }
+  }
+  catch {
+    signal?.throwIfAborted()
+    sources.warn(sources.recall ? sources.messages.recallInvalid : sources.messages.memoryUnavailable)
+  }
+  if (sources.project) {
+    try {
+      parts.push(await sources.project.context())
+    }
+    catch {
+      sources.warn(sources.messages.projectMemoryUnavailable)
+    }
+  }
+  if (sources.tasks)
+    parts.push(taskContext(sources.tasks, sources.channel === 'telegram' ? 'telegram' : 'terminal'))
+  return parts.filter(Boolean).join('\n\n')
+}
