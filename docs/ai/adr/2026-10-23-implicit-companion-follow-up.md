@@ -89,6 +89,13 @@ Subject aliases and prefix removal avoid exact-title-only matching.
 `Xong rồi` and `Đừng hỏi vụ này nữa` require one exact focused OpenLoop.
 Named outcomes use the current workspace. A notification focus can resolve its exact loop across workspaces in the same user store.
 An ambiguous outcome never completes another Task.
+Named opt-outs include `Quên vụ auth đi`, `Đừng nhớ chuyện auth nữa`, and `Đừng hỏi tôi về auth nữa`.
+They dismiss only a matching current-workspace thread. Generic opt-outs require one exact current focus and otherwise request clarification.
+A do-not-ask request changes proactive tracking only.
+An explicit forget also uses existing `Memory.forget` for one matching personal record, including its existing cleanup and stale-write checks.
+Multiple matching records, disabled personal memory, or removal failure leave personal memory unchanged and direct the user to `/memory`.
+Tracking stays dismissed even when personal-memory removal fails. No broad historical deletion is introduced.
+Explicit opt-out remains available when automatic capture is disabled or the current request prohibits new durable content.
 
 ## Timing and eligibility
 
@@ -166,6 +173,6 @@ This foundation recognizes a bounded Vietnamese grammar. It does not understand 
 Authentication alias matching can over-merge related problems. Other topics require normalized equality.
 Implicit delivery needs a running CLI or Telegram companion host. Voice and standalone background implicit prompts are not implemented.
 At-most-once delivery deliberately accepts possible loss after reservation. It does not promise exactly-once network receipt.
-OpenLoop history remains separate from semantic-memory purge commands. Resolve or dismiss the focused thread to stop follow-up.
+OpenLoop history remains separate from semantic-memory purge commands. Natural-language forget requests dismiss tracking and use existing personal-memory forgetting when unambiguous.
 
 Next milestone: evaluate extraction and dedupe against a consented Vietnamese conversation corpus before expanding the grammar.

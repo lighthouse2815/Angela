@@ -106,7 +106,8 @@ export class OpenLoops {
   }
 
   async finish(id: string, workspace: string, target: 'resolved' | 'dismissed', privacy: RequestPrivacy) {
-    if (durableWriteRejection(privacy, 'personal', id))
+    // Like personal-memory forgetting, an explicit opt-out can remove tracking without granting consent to create durable content.
+    if (target !== 'dismissed' && durableWriteRejection(privacy, 'personal', id))
       return false
     let changed = false
     await this.edit((state) => {

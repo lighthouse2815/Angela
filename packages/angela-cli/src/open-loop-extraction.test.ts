@@ -61,3 +61,17 @@ it('uses local calendar dates across daylight saving changes', () => {
   const friday = Date.parse('2026-10-30T10:00:00-04:00')
   expect(extractOpenLoop('Mai tao có buổi bảo vệ.', friday, 'America/New_York')?.earliestFollowUpAt).toBe('2026-11-01T14:00:00.000Z')
 })
+
+it.each([
+  ['Quên vụ auth đi.', 'auth'],
+  ['Quên chuyện auth đi.', 'auth'],
+  ['Đừng nhớ chuyện auth nữa.', 'auth'],
+  ['Đừng hỏi tôi về auth nữa.', 'auth'],
+  ['Đừng hỏi vụ auth nữa.', 'auth'],
+  ['Đừng nhắc chuyện auth nữa.', 'auth'],
+  ['Đừng hỏi về auth nữa.', 'auth'],
+  ['Không cần theo dõi vụ auth nữa.', 'auth'],
+  ['Quên chuyện đó đi.', undefined],
+])('recognizes a request to stop tracking: %s', (text, key) => {
+  expect(openLoopOutcome(text)).toMatchObject({ state: 'dismissed', ...(key ? { key } : {}) })
+})

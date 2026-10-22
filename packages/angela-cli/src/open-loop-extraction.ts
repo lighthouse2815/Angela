@@ -80,17 +80,19 @@ export function extractOpenLoop(text: string, now: number, timezone: string): Op
 }
 
 /** Named outcomes use subject identity. Unqualified outcomes need the exact conversation focus. */
-export function openLoopOutcome(text: string): { state: 'resolved' | 'dismissed', key?: string } | undefined {
+export function openLoopOutcome(text: string): { state: 'resolved' | 'dismissed', key?: string, forgetMemory?: true } | undefined {
   if (isOpenLoopDiscussion(text))
     return undefined
   const value = text.normalize('NFKC').toLowerCase().trim().replace(/[.!]+$/u, '').replace(/^(?:tao|tôi|mình)\s+/u, '')
   if (/^(?:đã\s+)?(?:làm\s+)?xong(?: rồi)?$/u.test(value))
     return { state: 'resolved' }
-  if (/^(?:đừng hỏi (?:vụ|việc|chuyện) này nữa|không cần quan tâm chuyện đó nữa)$/u.test(value))
-    return { state: 'dismissed' }
-  const dismissed = /^bỏ\s+(?:vụ|chuyện|phần)\s+(\S.{0,119}?)\s+đi$/u.exec(value)
-  if (dismissed)
-    return { state: 'dismissed', key: openLoopKey(dismissed[1]!) }
+  const dismissed = /^(?:quên|bỏ)\s+(?:(?:vụ|chuyện|việc|phần)\s+)?(\S.{0,119}?)\s+đi$/u.exec(value)
+    ?? /^(?:đừng (?:nhắc|hỏi|nhớ)|không cần (?:theo dõi|quan tâm))(?:\s+(?:tôi|tao|mình))?(?:\s+(?:về|vụ|chuyện|việc|phần))?\s+(\S.{0,119}?)\s+nữa$/u.exec(value)
+  if (dismissed) {
+    const key = openLoopKey(dismissed[1]!)
+    const generic = /^(?:này|đó|nó|cái này|cái đó)$/u.test(key)
+    return { state: 'dismissed', ...(generic ? {} : { key }), ...(/^(?:quên|đừng nhớ)\s/u.test(value) ? { forgetMemory: true } : {}) }
+  }
   const fixed = /^(?:đã\s+)?(?:fix|sửa)\s+được\s+(\S.{0,119}?)\s+rồi$/u.exec(value)
     ?? /^xong\s+(?:phần\s+)?(\S.{0,119}?)\s+rồi$/u.exec(value)
     ?? /^(\S.{0,100}?)\s+(?:đã\s+)?(?:trả lời|phản hồi|confirm)\s+rồi$/u.exec(value)

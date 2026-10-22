@@ -253,3 +253,45 @@ it('does not let another workspace task prevent later loop extraction', async ()
   await first.send(await runtime.createChat(workspaceA), 'Auth vẫn lỗi.', {})
   expect(await runtime.openLoops(directory).list()).toMatchObject([{ workspace: workspaceA, key: 'auth', state: 'open' }])
 })
+
+it.each(['Quên vụ auth đi.', 'Đừng nhớ chuyện auth nữa.', 'Đừng hỏi tôi về auth nữa.'])('dismisses a named loop offline and prevents future delivery: %s', async (text) => {
+  const { directory, options, generation, createRuntime, notifications, presented, advance } = await setup()
+  const runtime = createRuntime()
+  const scope = runtime.open(options)
+  const chat = await runtime.createChat(directory)
+  await scope.send(chat, 'Auth vẫn lỗi.', {})
+  await (await scope.memory()).remember('Tôi đang học auth.')
+  generation.mockImplementation(() => {
+    throw new Error('Offline dismissal uses no model')
+  })
+  await scope.send(chat, text, {})
+  expect((await runtime.openLoops(directory).list())[0]?.state).toBe('dismissed')
+  expect((await (await scope.memory()).read()).entries).toHaveLength(text.startsWith('Đừng hỏi') ? 1 : 0)
+  advance(5)
+  await runtime.reminders(directory, notifications(runtime), (error) => {
+    throw error
+  })
+  expect(presented).toHaveLength(0)
+  expect(generation).toHaveBeenCalledTimes(1)
+})
+
+it('honors explicit opt-out while automatic memory is off and stays dismissed after it is re-enabled', async () => {
+  const { directory, options, generation, createRuntime, notifications, presented, advance } = await setup()
+  const runtime = createRuntime()
+  const scope = runtime.open(options)
+  const chat = await runtime.createChat(directory)
+  await scope.send(chat, 'Auth vẫn lỗi.', {})
+  const memory = await scope.memory()
+  await memory.setAutomatic(false)
+  generation.mockImplementation(() => {
+    throw new Error('Opt-out uses no model')
+  })
+  await scope.send(chat, 'Quên vụ auth đi.', {})
+  expect((await runtime.openLoops(directory).list())[0]?.state).toBe('dismissed')
+  await memory.setAutomatic(true)
+  advance(5)
+  await runtime.reminders(directory, notifications(runtime), (error) => {
+    throw error
+  })
+  expect(presented).toHaveLength(0)
+})

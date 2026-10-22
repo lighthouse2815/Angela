@@ -1106,6 +1106,10 @@ Frequent conversation adds a one-hour activity deferral. Runtime quiet-hour conf
 Each loop permits one attempt. The user store permits one implicit attempt per eight hours, including restarts.
 `Xong rồi` resolves the exact focused loop. `Đừng hỏi vụ này nữa` dismisses it.
 Named outcomes such as `Fix được auth rồi` also resolve a matching thread.
+`Quên vụ auth đi` and `Đừng hỏi tôi về auth nữa` dismiss only a matching current-workspace loop.
+A generic forget request needs one exact focus. Ambiguity requests clarification.
+Explicit forgetting also removes one matching personal record through existing memory cleanup. Multiple matches require selection through `/memory`.
+A do-not-ask request leaves personal records intact. Explicit opt-out still works with automatic memory disabled.
 A pending equivalent explicit Task suppresses the implicit path only when its host-owned workspace provenance matches.
 Tasks without provenance or from another workspace cannot silently dismiss the thread.
 
