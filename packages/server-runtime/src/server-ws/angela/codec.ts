@@ -4,7 +4,7 @@ import { MessageHeartbeatKind } from '@angela/server-shared/types'
 import { parse, stringify } from 'superjson'
 import { check, objectWithRest, pipe, safeParse, string, unknown } from 'valibot'
 
-const invalidAiriWebSocketEventFormatMessage = 'Invalid WebSocket event format.'
+const invalidAngelaWebSocketEventFormatMessage = 'Invalid WebSocket event format.'
 
 const eventDataSchema = pipe(
   unknown(),
@@ -29,7 +29,7 @@ export class InvalidEventError extends Error {
   readonly source?: unknown
 
   constructor(options: InvalidEventErrorOptions = {}) {
-    super(invalidAiriWebSocketEventFormatMessage, { cause: options.cause })
+    super(invalidAngelaWebSocketEventFormatMessage, { cause: options.cause })
     this.name = 'InvalidEventError'
     this.source = options.source
   }

@@ -1,8 +1,8 @@
 import type { Client } from '@angela/server-sdk'
 import type { Logg } from '@guiiai/logg'
 
-import type { AiriBridge } from '../airi/airi-bridge'
-import type { MinecraftContextService } from '../airi/minecraft-context-service'
+import type { AngelaBridge } from '../angela/angela-bridge'
+import type { MinecraftContextService } from '../angela/minecraft-context-service'
 import type { EventBus } from './event-bus'
 import type { RuleEngine } from './perception/rules'
 
@@ -11,8 +11,8 @@ import { fileURLToPath } from 'node:url'
 import { useLogg } from '@guiiai/logg'
 import { asClass, asFunction, asValue, createContainer, InjectionMode } from 'awilix'
 
-import { AiriBridge as AiriBridgeImpl } from '../airi/airi-bridge'
-import { MinecraftContextService as MinecraftContextServiceImpl } from '../airi/minecraft-context-service'
+import { AngelaBridge as AngelaBridgeImpl } from '../angela/angela-bridge'
+import { MinecraftContextService as MinecraftContextServiceImpl } from '../angela/minecraft-context-service'
 import { config } from '../composables/config'
 import { TaskExecutor } from './action/task-executor'
 import { Brain } from './conscious/brain'
@@ -31,12 +31,12 @@ export interface ContainerServices {
   taskExecutor: TaskExecutor
   brain: Brain
   reflexManager: ReflexManager
-  airiClient: Client
-  airiBridge: AiriBridge
+  angelaClient: Client
+  angelaBridge: AngelaBridge
   minecraftContextService: MinecraftContextService
 }
 
-export function createAgentContainer(airiClient: Client) {
+export function createAgentContainer(angelaClient: Client) {
   const container = createContainer<ContainerServices>({
     injectionMode: InjectionMode.PROXY,
     strict: true,
@@ -44,15 +44,15 @@ export function createAgentContainer(airiClient: Client) {
 
   // Register services
   container.register({
-    airiClient: asValue(airiClient),
+    angelaClient: asValue(angelaClient),
 
-    airiBridge: asFunction(({ eventBus }: { eventBus: EventBus }) =>
-      new AiriBridgeImpl(airiClient, eventBus),
+    angelaBridge: asFunction(({ eventBus }: { eventBus: EventBus }) =>
+      new AngelaBridgeImpl(angelaClient, eventBus),
     ).singleton(),
 
-    minecraftContextService: asFunction(({ airiBridge }) =>
+    minecraftContextService: asFunction(({ angelaBridge }) =>
       new MinecraftContextServiceImpl({
-        airiBridge,
+        angelaBridge,
         serverHost: config.bot.host,
         serverPort: config.bot.port,
         masterUsername: config.bot.masterUsername,
@@ -120,7 +120,7 @@ export function createAgentContainer(airiClient: Client) {
         reflexManager: c.resolve('reflexManager'),
         taskExecutor: c.resolve('taskExecutor'),
         logger: c.resolve('logger'),
-        airiBridge: c.resolve('airiBridge'),
+        angelaBridge: c.resolve('angelaBridge'),
         minecraftContextService: c.resolve('minecraftContextService'),
       })),
 

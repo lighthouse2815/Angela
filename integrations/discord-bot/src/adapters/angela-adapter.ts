@@ -50,7 +50,7 @@ function normalizeDiscordMetadata(discord?: Discord): Discord | undefined {
 }
 
 export class DiscordAdapter {
-  private airiClient?: ServerChannel
+  private angelaClient?: ServerChannel
   private discordClient: Client
   private discordToken: string
   private voiceManager?: VoiceManager
@@ -87,7 +87,7 @@ export class DiscordAdapter {
     })
 
     // Initialize Angela client
-    this.airiClient = config.respond
+    this.angelaClient = config.respond
       ? undefined
       : new ServerChannel({
           name: 'discord',
@@ -108,7 +108,7 @@ export class DiscordAdapter {
 
   private setupEventHandlers(): void {
     // Handle configuration from UI
-    this.airiClient?.onEvent('module:configure', async (event) => {
+    this.angelaClient?.onEvent('module:configure', async (event) => {
       if (this.isReconnecting) {
         log.warn('A reconnect is already in progress, skipping this configuration event.')
         return
@@ -166,14 +166,14 @@ export class DiscordAdapter {
     })
 
     // Handle input from Angela system
-    this.airiClient?.onEvent('input:text', async (event) => {
+    this.angelaClient?.onEvent('input:text', async (event) => {
       log.log('Received input from Angela system:', event.data.text)
       // Process Discord-related commands
       // For now, we'll just log the input
     })
 
     // Handle output from Angela system (IA response)
-    this.airiClient?.onEvent('output:gen-ai:chat:message', async (event) => {
+    this.angelaClient?.onEvent('output:gen-ai:chat:message', async (event) => {
       try {
         const message = event.data.message
         const discordContext = event.data['gen-ai:chat']?.input?.data.discord
@@ -191,7 +191,7 @@ export class DiscordAdapter {
       }
     })
 
-    this.airiClient?.onEvent('output:gen-ai:chat:complete', async (event) => {
+    this.angelaClient?.onEvent('output:gen-ai:chat:complete', async (event) => {
       const context = event.data['gen-ai:chat']?.input?.data.discord
       const content = event.data.message.content
       await this.voiceManager?.handleResponse(context, typeof content === 'string' ? content : '')
@@ -357,8 +357,8 @@ export class DiscordAdapter {
   private async sendInput(input: WebSocketEventOf<'input:text'>, signal?: AbortSignal) {
     if (this.closing)
       return
-    if (this.airiClient) {
-      this.airiClient.send(input)
+    if (this.angelaClient) {
+      this.angelaClient.send(input)
       return
     }
     const controller = new AbortController()
@@ -416,7 +416,7 @@ export class DiscordAdapter {
       this.releaseVoice()
       await this.voiceLoading?.catch(() => {})
       await this.discordClient.destroy()
-      this.airiClient?.close()
+      this.angelaClient?.close()
       log.log('Discord adapter stopped')
     }
     catch (error) {

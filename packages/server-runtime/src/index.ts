@@ -46,35 +46,35 @@ import {
   isInvalidEventError,
   parseEvent,
   stringifyEvent,
-} from './server-ws/airi/codec'
+} from './server-ws/angela/codec'
 import {
   createConsumerOrchestrator,
   isConsumerDeliveryMode,
   normalizeConsumerMode,
   normalizeConsumerPriority,
-} from './server-ws/airi/consumers'
+} from './server-ws/angela/consumers'
 import {
   resolveHealthCheckIntervalMs,
   serverWsDefaultHeartbeatTtlMs,
-} from './server-ws/airi/liveness'
+} from './server-ws/angela/liveness'
 import {
   createEventMetadata,
   createResponses,
-} from './server-ws/airi/responses'
+} from './server-ws/angela/responses'
 import {
   forEachEventMiddlewares,
   resolveEventDelivery,
-} from './server-ws/airi/routing'
+} from './server-ws/angela/routing'
 
-interface AiriWsMessage {
+interface AngelaWsMessage {
   text: () => string
 }
 
-interface AiriWsPeerState {
+interface AngelaWsPeerState {
   rawPeer: CrossWsPeer
 }
 
-function airiPeerFromRaw(rawPeer: CrossWsPeer): Peer {
+function angelaPeerFromRaw(rawPeer: CrossWsPeer): Peer {
   // CrossWS peers expose the connection fields Angela historically used directly
   // (`id`, `send`, `close`, `remoteAddress`, and `request`). Keep the cast in
   // this adapter boundary so protocol code below still depends on the Angela peer
@@ -82,13 +82,13 @@ function airiPeerFromRaw(rawPeer: CrossWsPeer): Peer {
   return rawPeer as Peer
 }
 
-function rawPeerFrom(wsPeer: WsPeer<AiriWsMessage, AiriWsPeerState>): Peer | undefined {
+function rawPeerFrom(wsPeer: WsPeer<AngelaWsMessage, AngelaWsPeerState>): Peer | undefined {
   const rawPeer = wsPeer.state?.rawPeer
   if (!rawPeer) {
     return undefined
   }
 
-  return airiPeerFromRaw(rawPeer)
+  return angelaPeerFromRaw(rawPeer)
 }
 
 /**
@@ -519,7 +519,7 @@ export function setupApp(options?: AppOptions): { app: H3, closeAllPeers: () => 
 
   // === WebSocket Server Handlers ===
   // Handles Angela peer lifecycle: open, message, error, close.
-  const wsServer = createWsServer<AiriWsMessage, AiriWsPeerState>({
+  const wsServer = createWsServer<AngelaWsMessage, AngelaWsPeerState>({
     peers: {
       unhealthyTimeout: heartbeatTtlMs,
       closeTimeout: heartbeatTtlMs * 2,
@@ -1112,7 +1112,7 @@ export function setupApp(options?: AppOptions): { app: H3, closeAllPeers: () => 
       return { rawPeer }
     },
     error({ peer, rawPeer, error }) {
-      handlePeerError(peer ? rawPeerFrom(peer) ?? airiPeerFromRaw(rawPeer) : airiPeerFromRaw(rawPeer), error)
+      handlePeerError(peer ? rawPeerFrom(peer) ?? angelaPeerFromRaw(rawPeer) : angelaPeerFromRaw(rawPeer), error)
     },
   }))
 

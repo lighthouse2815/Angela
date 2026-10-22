@@ -1,7 +1,7 @@
 import { isAuthenticationServerErrorMessage } from '@angela/server-shared'
 import { errorMessageFrom } from '@moeru/std'
 
-interface AiriClientLike {
+interface AngelaClientLike {
   connect: () => Promise<void>
 }
 
@@ -12,7 +12,7 @@ interface LoggerLike {
 }
 
 /** Starts a background connection and reports each failure category once until the connection succeeds. */
-export function startAiriClientConnection(client: AiriClientLike, deps: {
+export function startAngelaClientConnection(client: AngelaClientLike, deps: {
   logger: LoggerLike
   url: string
 }) {

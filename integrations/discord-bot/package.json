@@ -16,8 +16,8 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/airi-adapter.d.mts",
-      "default": "./dist/airi-adapter.mjs"
+      "types": "./dist/angela-adapter.d.mts",
+      "default": "./dist/angela-adapter.mjs"
     }
   },
   "files": [

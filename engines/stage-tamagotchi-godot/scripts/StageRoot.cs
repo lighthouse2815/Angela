@@ -114,7 +114,7 @@ public partial class StageRoot : Node3D
     {
         if (_devObservationAdapter != null)
         {
-            _devObservationAdapter.AiriBridgeConnected = true;
+            _devObservationAdapter.AngelaBridgeConnected = true;
         }
 
         _bridge.SendEnvelope("stage.ready");
@@ -124,7 +124,7 @@ public partial class StageRoot : Node3D
     {
         if (_devObservationAdapter != null)
         {
-            _devObservationAdapter.AiriBridgeConnected = false;
+            _devObservationAdapter.AngelaBridgeConnected = false;
         }
 
         if (_shutdownRequested)

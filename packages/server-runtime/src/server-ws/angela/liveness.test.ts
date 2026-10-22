@@ -6,7 +6,7 @@ import {
   serverWsMinimumHealthCheckIntervalMs,
 } from './liveness'
 
-describe('airi websocket liveness policy', () => {
+describe('angela WebSocket liveness policy', () => {
   it('uses the Angela default heartbeat TTL', () => {
     expect(serverWsDefaultHeartbeatTtlMs).toBe(60_000)
     expect(resolveHealthCheckIntervalMs(serverWsDefaultHeartbeatTtlMs)).toBe(12_000)

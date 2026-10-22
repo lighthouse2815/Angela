@@ -1,12 +1,12 @@
 import type { WebSocketBaseEvent, WebSocketEvents } from '@angela/server-shared/types'
 
-import type { ConsumerStickyAssignment } from './server-ws/airi/consumers'
+import type { ConsumerStickyAssignment } from './server-ws/angela/consumers'
 
 import { describe, expect, it } from 'vitest'
 
-import { heartbeatFrameFrom } from './server-ws/airi/codec'
-import { selectConsumerPeerId } from './server-ws/airi/consumers'
-import { resolveEventDelivery } from './server-ws/airi/routing'
+import { heartbeatFrameFrom } from './server-ws/angela/codec'
+import { selectConsumerPeerId } from './server-ws/angela/consumers'
+import { resolveEventDelivery } from './server-ws/angela/routing'
 
 function createInputTextEvent(
   overrides: Partial<WebSocketBaseEvent<'input:text', WebSocketEvents['input:text']>> = {},

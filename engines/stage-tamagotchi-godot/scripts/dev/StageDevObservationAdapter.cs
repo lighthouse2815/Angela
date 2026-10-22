@@ -27,7 +27,7 @@ public sealed class StageDevObservationAdapter : IDisposable
     private string _instancePath;
     private bool _disposed;
 
-    public bool AiriBridgeConnected
+    public bool AngelaBridgeConnected
     {
         get;
         set;
@@ -251,7 +251,7 @@ public sealed class StageDevObservationAdapter : IDisposable
                 {
                     pid = _processId,
                     projectPath = _projectPath,
-                    airiBridgeConnected = AiriBridgeConnected,
+                    angelaBridgeConnected = AngelaBridgeConnected,
                 },
             },
         });

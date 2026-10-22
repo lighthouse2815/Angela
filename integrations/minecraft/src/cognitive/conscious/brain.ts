@@ -1,8 +1,8 @@
 import type { Logg } from '@guiiai/logg'
 import type { Message } from '@xsai/shared-chat'
 
-import type { AiriBridge } from '../../airi/airi-bridge'
-import type { MinecraftContextService } from '../../airi/minecraft-context-service'
+import type { AngelaBridge } from '../../angela/angela-bridge'
+import type { MinecraftContextService } from '../../angela/minecraft-context-service'
 import type { ConversationUpdateEvent } from '../../debug/types'
 import type { Action } from '../../libs/mineflayer/action'
 import type { TaskExecutor } from '../action/task-executor'
@@ -42,7 +42,7 @@ interface BrainDeps {
   logger: Logg
   taskExecutor: TaskExecutor
   reflexManager: ReflexManager
-  airiBridge: AiriBridge
+  angelaBridge: AngelaBridge
   minecraftContextService: MinecraftContextService
 }
 
@@ -762,10 +762,10 @@ export class Brain {
       getNoActionBudget: () => this.getNoActionBudgetState(),
       forgetConversation: () => this.forgetConversation(),
       history: this.historyRuntime,
-      notifyAiri: (headline: string, note?: string, urgency?: 'immediate' | 'soon' | 'later') =>
-        this.deps.airiBridge.sendNotify(headline, note, urgency),
-      updateAiriContext: (text: string, hints?: string[], lane?: string) =>
-        this.deps.airiBridge.sendContextUpdate(text, hints, lane),
+      notifyAngela: (headline: string, note?: string, urgency?: 'immediate' | 'soon' | 'later') =>
+        this.deps.angelaBridge.sendNotify(headline, note, urgency),
+      updateAngelaContext: (text: string, hints?: string[], lane?: string) =>
+        this.deps.angelaBridge.sendContextUpdate(text, hints, lane),
     }
   }
 
@@ -776,7 +776,7 @@ export class Brain {
     return signal.type === 'chat_message'
   }
 
-  private isAiriCommandEvent(event: BotEvent): boolean {
+  private isAngelaCommandEvent(event: BotEvent): boolean {
     if (event.type !== 'perception')
       return false
     const signal = event.payload as PerceptionSignal
@@ -1781,7 +1781,7 @@ export class Brain {
       return
     if (this.isPlayerChatEvent(event))
       this.resetNoActionFollowupBudget('player_chat')
-    if (this.isAiriCommandEvent(event))
+    if (this.isAngelaCommandEvent(event))
       this.resetNoActionFollowupBudget('airi_command')
 
     const turnId = ++this.turnCounter

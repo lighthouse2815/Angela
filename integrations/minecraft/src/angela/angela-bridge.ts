@@ -30,8 +30,8 @@ interface SparkCommandData {
  * Returns:
  * - Event handlers and send operations for the Minecraft side of the Angela server seam.
  */
-export class AiriBridge {
-  private readonly logger = useLogg('airi-bridge').useGlobalConfig()
+export class AngelaBridge {
+  private readonly logger = useLogg('angela-bridge').useGlobalConfig()
   private commandAvailable = false
   private commandHandler: ((event: { data: SparkCommandData }) => void) | null = null
   private contextUpdateHandler: ((event: { data: ContextUpdate }) => void) | null = null
@@ -101,7 +101,7 @@ export class AiriBridge {
     this.client.onEvent('spark:command', this.commandHandler as Parameters<typeof this.client.onEvent<'spark:command'>>[1])
     this.client.onEvent('context:update', this.contextUpdateHandler as Parameters<typeof this.client.onEvent<'context:update'>>[1])
     this.client.onEvent('module:announced', this.moduleAnnouncedHandler as Parameters<typeof this.client.onEvent<'module:announced'>>[1])
-    this.logger.log('AiriBridge initialized, listening for spark:command, context:update, and module:announced')
+    this.logger.log('AngelaBridge initialized, listening for spark:command, context:update, and module:announced')
   }
 
   destroy(): void {
@@ -118,7 +118,7 @@ export class AiriBridge {
       this.moduleAnnouncedHandler = null
     }
     this.moduleAnnouncedListeners.clear()
-    this.logger.log('AiriBridge destroyed')
+    this.logger.log('AngelaBridge destroyed')
   }
 
   sendNotify(headline: string, note?: string, urgency: 'immediate' | 'soon' | 'later' = 'soon'): void {

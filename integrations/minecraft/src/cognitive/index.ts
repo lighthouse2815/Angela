@@ -16,17 +16,17 @@ export function CognitiveEngine(options: CognitiveEngineOptions): MineflayerPlug
   return {
     async created(bot) {
       // Create container and get required services
-      container = createAgentContainer(options.airiClient)
+      container = createAgentContainer(options.angelaClient)
 
       const perceptionPipeline = container.resolve('perceptionPipeline')
       const brain = container.resolve('brain')
       const reflexManager = container.resolve('reflexManager')
       const taskExecutor = container.resolve('taskExecutor')
-      const airiBridge = container.resolve('airiBridge')
+      const angelaBridge = container.resolve('angelaBridge')
       const minecraftContextService = container.resolve('minecraftContextService')
       const debugService = DebugService.getInstance()
 
-      airiBridge.init()
+      angelaBridge.init()
       minecraftContextService.init()
 
       if (config.debug.mcp) {
@@ -156,8 +156,8 @@ export function CognitiveEngine(options: CognitiveEngineOptions): MineflayerPlug
         const minecraftContextService = container.resolve('minecraftContextService')
         minecraftContextService.destroy()
 
-        const airiBridge = container.resolve('airiBridge')
-        airiBridge.destroy()
+        const angelaBridge = container.resolve('angelaBridge')
+        angelaBridge.destroy()
 
         const brain = container.resolve('brain')
         brain.destroy()

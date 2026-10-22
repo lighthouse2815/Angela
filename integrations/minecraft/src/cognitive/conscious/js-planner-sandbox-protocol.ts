@@ -50,7 +50,7 @@ export interface BridgeAvailability {
   botCall: boolean
   forgetConversation: boolean
   getNoActionBudget: boolean
-  notifyAiri: boolean
+  notifyAngela: boolean
   patternFind: boolean
   patternGet: boolean
   patternIds: boolean
@@ -58,7 +58,7 @@ export interface BridgeAvailability {
   queryBlockAt: boolean
   queryMap: boolean
   setNoActionBudget: boolean
-  updateAiriContext: boolean
+  updateAngelaContext: boolean
 }
 
 export interface SandboxWorkerRequest {

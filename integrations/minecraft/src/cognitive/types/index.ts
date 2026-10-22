@@ -8,7 +8,7 @@ export interface MineflayerWithAgents extends Mineflayer {
 }
 
 export interface CognitiveEngineOptions {
-  airiClient: Client
+  angelaClient: Client
 }
 
 // TODO: currently stimulus is just chat events, consider renaming to 'input' or 'user_interaction'

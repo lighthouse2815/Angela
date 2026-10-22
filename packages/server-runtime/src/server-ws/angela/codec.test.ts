@@ -10,7 +10,7 @@ import {
   stringifyEvent,
 } from './codec'
 
-describe('airi websocket codec', () => {
+describe('angela WebSocket codec', () => {
   it('parses superjson encoded events', () => {
     const event: WebSocketEvent = {
       type: 'module:authenticate',

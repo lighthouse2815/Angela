@@ -48,7 +48,7 @@ function createMockBot() {
 
   const bot = {
     bot: {
-      username: 'AiriBot',
+      username: 'AngelaBot',
       entity: { position: selfPosition },
       health: 20,
       food: 20,

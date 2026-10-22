@@ -9,7 +9,7 @@ import { pathfinder as MineflayerPathfinder } from 'mineflayer-pathfinder'
 import { plugin as MineflayerPVP } from 'mineflayer-pvp'
 import { plugin as MineflayerTool } from 'mineflayer-tool'
 
-import { startAiriClientConnection } from './airi/start-background-client'
+import { startAngelaClientConnection } from './angela/start-background-client'
 import { CognitiveEngine } from './cognitive'
 import { config, initEnv } from './composables/config'
 import { MinecraftRuntimeConfigManager } from './composables/runtime-config'
@@ -70,8 +70,8 @@ async function main() {
   }
 
   // Connect airi server
-  let airiConnectionLifecycle: ReturnType<typeof startAiriClientConnection> | null = null
-  const airiClient = new Client({
+  let angelaConnectionLifecycle: ReturnType<typeof startAngelaClientConnection> | null = null
+  const angelaClient = new Client({
     name: config.airi.clientName,
     url: config.airi.wsBaseUrl,
     token: config.airi.token || undefined,
@@ -86,10 +86,10 @@ async function main() {
     // the connection recovers immediately once the loop frees up.
     // Root cause (the periodic event-loop stall itself) is tracked separately.
     heartbeat: { readTimeout: 120_000, pingInterval: 20_000 },
-    onError: error => airiConnectionLifecycle?.reportUnavailable(error),
-    onClose: () => airiConnectionLifecycle?.reportDisconnected(),
+    onError: error => angelaConnectionLifecycle?.reportUnavailable(error),
+    onClose: () => angelaConnectionLifecycle?.reportDisconnected(),
   })
-  airiConnectionLifecycle = startAiriClientConnection(airiClient, {
+  angelaConnectionLifecycle = startAngelaClientConnection(angelaClient, {
     logger,
     url: config.airi.wsBaseUrl,
   })
@@ -127,7 +127,7 @@ async function main() {
           viewerInitialized = true
         }
 
-        await bot.loadPlugin(CognitiveEngine({ airiClient }))
+        await bot.loadPlugin(CognitiveEngine({ angelaClient }))
 
         // Setup Tool Executor for Debug Dashboard
         const { setupToolExecutor } = await import('./debug/tool-executor')
@@ -169,7 +169,7 @@ async function main() {
     await activeRuntime.updateBotConfig(runtimeSnapshot.effectiveBotConfig)
   }
 
-  airiClient.onEvent('module:configure', async (event) => {
+  angelaClient.onEvent('module:configure', async (event) => {
     try {
       await applyConfiguredRuntime(event.data.config)
     }
@@ -192,7 +192,7 @@ async function main() {
         // TODO: Add an explicit Angela-side deregistration path on shutdown instead of relying on
         // websocket close / heartbeat expiry. Right now the Minecraft page can briefly sit in a
         // stale state after the bot exits, which is annoying and easy to misread as still online.
-        airiClient.close()
+        angelaClient.close()
         exit(0)
       })
   })

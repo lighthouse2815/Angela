@@ -111,7 +111,7 @@ export class MinecraftContextService {
   private readonly masterUsername?: string
 
   constructor(private readonly deps: {
-    airiBridge: MinecraftContextBridge
+    angelaBridge: MinecraftContextBridge
     serverHost: string
     serverPort: number
     masterUsername?: string
@@ -127,7 +127,7 @@ export class MinecraftContextService {
       return
     }
 
-    this.unsubscribeModuleAnnounced = this.deps.airiBridge.onModuleAnnounced((event) => {
+    this.unsubscribeModuleAnnounced = this.deps.angelaBridge.onModuleAnnounced((event) => {
       const destinations = collectFrontendDestinations(event)
       if (destinations.length === 0) {
         return
@@ -139,7 +139,7 @@ export class MinecraftContextService {
 
   bindBot(bot: MinecraftContextBot) {
     this.runtimeBot = bot
-    this.deps.airiBridge.setCommandAvailable(true)
+    this.deps.angelaBridge.setCommandAvailable(true)
     this.refreshStatusSnapshot()
     this.publishStatus({ force: true })
 
@@ -160,7 +160,7 @@ export class MinecraftContextService {
       this.refreshTimer = null
     }
 
-    this.deps.airiBridge.setCommandAvailable(false)
+    this.deps.angelaBridge.setCommandAvailable(false)
     this.runtimeBot = null
     this.currentSnapshot = null
 
@@ -194,7 +194,7 @@ export class MinecraftContextService {
       update.destinations = options.destinations
     }
 
-    this.deps.airiBridge.sendContextUpdate(update)
+    this.deps.angelaBridge.sendContextUpdate(update)
     this.lastPublishedText = text
   }
 

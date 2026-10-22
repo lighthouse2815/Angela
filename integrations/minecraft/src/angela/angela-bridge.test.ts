@@ -4,7 +4,7 @@ import type { EventBus } from '../cognitive/event-bus'
 
 import { describe, expect, it, vi } from 'vitest'
 
-import { AiriBridge } from './airi-bridge'
+import { AngelaBridge } from './angela-bridge'
 
 interface TestCommandEvent {
   data: {
@@ -32,10 +32,10 @@ function createBridgeHarness(options: { commandAvailable?: boolean } = {}) {
   }
   // NOTICE:
   // The bridge consumes only send/onEvent/offEvent and emit, while the production classes own many unrelated fields.
-  // The root cause is that AiriBridge accepts concrete Client and EventBus classes instead of narrow structural ports.
-  // Source/context: integrations/minecraft/src/airi/airi-bridge.ts constructor.
+  // The root cause is that AngelaBridge accepts concrete Client and EventBus classes instead of narrow structural ports.
+  // Source/context: integrations/minecraft/src/angela/angela-bridge.ts constructor.
   // Remove this cast when the bridge constructor accepts dedicated client and event-bus interfaces.
-  const bridge = new AiriBridge(client as unknown as Client, eventBus as unknown as EventBus)
+  const bridge = new AngelaBridge(client as unknown as Client, eventBus as unknown as EventBus)
   bridge.init()
   bridge.setCommandAvailable(options.commandAvailable ?? true)
 
@@ -46,7 +46,7 @@ function createBridgeHarness(options: { commandAvailable?: boolean } = {}) {
  * @example
  * bridge.setCommandAvailable(true) lets a generic `spark:command` wake the Minecraft brain.
  */
-describe('airiBridge spark command routing', () => {
+describe('angelaBridge spark command routing', () => {
   /**
    * @example
    * expect(eventBus.emit).toHaveBeenCalledWith(expect.objectContaining({ type: 'signal:airi_command' }))

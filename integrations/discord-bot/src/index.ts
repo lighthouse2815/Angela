@@ -2,7 +2,7 @@ import process, { env } from 'node:process'
 
 import { Format, LogLevel, setGlobalFormat, setGlobalLogLevel, useLogg } from '@guiiai/logg'
 
-import { DiscordAdapter } from './adapters/airi-adapter'
+import { DiscordAdapter } from './adapters/angela-adapter'
 
 setGlobalFormat(Format.Pretty)
 setGlobalLogLevel(LogLevel.Log)

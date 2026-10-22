@@ -4,13 +4,13 @@ import { Client, parseEvent } from '@angela/server-sdk'
 import { describe, expect, it, vi } from 'vitest'
 import { WebSocketServer } from 'ws'
 
-import { startAiriClientConnection } from './start-background-client'
+import { startAngelaClientConnection } from './start-background-client'
 
 function createLogger() {
   const logger = {
     log: vi.fn<(message: string) => void>(),
     warn: vi.fn<(message: string) => void>(),
-    withFields: vi.fn<(fields: Record<string, unknown>) => Parameters<typeof startAiriClientConnection>[1]['logger']>(),
+    withFields: vi.fn<(fields: Record<string, unknown>) => Parameters<typeof startAngelaClientConnection>[1]['logger']>(),
   }
   logger.withFields.mockReturnValue(logger)
   return logger
@@ -27,7 +27,7 @@ describe('background Angela connection', () => {
       const error = new Error(message)
       const logger = createLogger()
       const client = { connect: vi.fn().mockRejectedValue(error) }
-      const lifecycle = startAiriClientConnection(client, { logger, url: 'ws://localhost:6121/ws' })
+      const lifecycle = startAngelaClientConnection(client, { logger, url: 'ws://localhost:6121/ws' })
 
       lifecycle.reportUnavailable(error)
       await vi.waitFor(() => expect(logger.warn).toHaveBeenCalled())
@@ -43,7 +43,7 @@ describe('background Angela connection', () => {
 
   it('keeps background retry guidance for network failures', async () => {
     const logger = createLogger()
-    const lifecycle = startAiriClientConnection({ connect: () => new Promise<void>(() => {}) }, { logger, url: 'ws://localhost:6121/ws' })
+    const lifecycle = startAngelaClientConnection({ connect: () => new Promise<void>(() => {}) }, { logger, url: 'ws://localhost:6121/ws' })
     lifecycle.reportUnavailable(new Error('ECONNREFUSED'))
     lifecycle.reportUnavailable(new Error('ECONNREFUSED'))
 
@@ -54,7 +54,7 @@ describe('background Angela connection', () => {
 
   it('reports authentication failure after an earlier network failure', () => {
     const logger = createLogger()
-    const lifecycle = startAiriClientConnection({ connect: () => new Promise<void>(() => {}) }, { logger, url: 'ws://localhost:6121/ws' })
+    const lifecycle = startAngelaClientConnection({ connect: () => new Promise<void>(() => {}) }, { logger, url: 'ws://localhost:6121/ws' })
     lifecycle.reportUnavailable(new Error('ECONNREFUSED'))
     lifecycle.reportUnavailable(new Error('invalid token'))
 
@@ -64,7 +64,7 @@ describe('background Angela connection', () => {
 
   it('explains authentication when connect rejects without an error callback', async () => {
     const logger = createLogger()
-    startAiriClientConnection({ connect: () => Promise.reject(new Error('invalid token')) }, { logger, url: 'ws://localhost:6121/ws' })
+    startAngelaClientConnection({ connect: () => Promise.reject(new Error('invalid token')) }, { logger, url: 'ws://localhost:6121/ws' })
 
     await vi.waitFor(() => expect(logger.warn).toHaveBeenCalledTimes(1))
     expect(logger.warn.mock.calls[0][0]).toContain('AIRI_WS_TOKEN')
@@ -73,7 +73,7 @@ describe('background Angela connection', () => {
   it('reports a new authentication failure after the connection succeeds', async () => {
     const connection = Promise.withResolvers<void>()
     const logger = createLogger()
-    const lifecycle = startAiriClientConnection({ connect: () => connection.promise }, { logger, url: 'ws://localhost:6121/ws' })
+    const lifecycle = startAngelaClientConnection({ connect: () => connection.promise }, { logger, url: 'ws://localhost:6121/ws' })
     lifecycle.reportUnavailable(new Error('invalid token'))
     lifecycle.reportUnavailable(new Error('invalid token'))
     expect(logger.warn).toHaveBeenCalledTimes(1)
@@ -117,7 +117,7 @@ describe('background Angela connection', () => {
 
     const url = `ws://127.0.0.1:${address.port}/ws`
     const logger = createLogger()
-    let lifecycle: ReturnType<typeof startAiriClientConnection> | undefined
+    let lifecycle: ReturnType<typeof startAngelaClientConnection> | undefined
     const client = new Client({
       name: 'minecraft',
       url,
@@ -128,7 +128,7 @@ describe('background Angela connection', () => {
       onError: error => lifecycle?.reportUnavailable(error),
     })
     try {
-      lifecycle = startAiriClientConnection(client, { logger, url })
+      lifecycle = startAngelaClientConnection(client, { logger, url })
       await vi.waitFor(() => expect(client.connectionStatus).toBe('failed'))
       expect(received).toHaveBeenCalledWith(event)
       expect(logger.warn).toHaveBeenCalledTimes(1)

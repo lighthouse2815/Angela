@@ -5,7 +5,7 @@ import packageJSON from '../../../package.json'
 
 import { createEventMetadata, createResponses } from './responses'
 
-describe('airi websocket responses', () => {
+describe('angela WebSocket responses', () => {
   it('creates server metadata with source and parent event ids', () => {
     const metadata = createEventMetadata('server-1', 'parent-event-1')
 

@@ -6,7 +6,7 @@ import { ChannelManager, ChannelType, Client, DMChannel, Events, REST } from 'di
 import { afterEach, expect, it, vi } from 'vitest'
 
 import { VoiceManager } from '../bots/discord/commands'
-import { DiscordAdapter } from './airi-adapter'
+import { DiscordAdapter } from './angela-adapter'
 
 const bridge = vi.hoisted(() => ({ handlers: new Map<string, (event: unknown) => Promise<void>>(), close: vi.fn() }))
 vi.mock('@angela/server-sdk', () => ({

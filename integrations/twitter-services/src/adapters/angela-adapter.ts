@@ -5,8 +5,8 @@ import type { TwitterServices } from '../types/services'
 import * as fs from 'node:fs/promises'
 
 /**
- * Airi Adapter
- * Adapts the X service as an Airi module
+ * Angela Adapter
+ * Adapts the X service as an Angela module
  */
 import { Client } from '@angela/server-sdk'
 
@@ -19,7 +19,7 @@ import { parseTwitterCommand } from '../parsers/command-parser'
 import { errorToMessage } from '../utils/error'
 import { logger } from '../utils/logger'
 
-export interface AiriAdapterConfig {
+export interface AngelaAdapterConfig {
   url?: string
   token?: string
   credentials: {
@@ -37,13 +37,13 @@ export interface XConfig {
   accessTokenSecret?: string
 }
 
-export class AiriAdapter {
+export class AngelaAdapter {
   private client: Client
   private ctx: Context
   private twitterServices: TwitterServices
-  private config: AiriAdapterConfig
+  private config: AngelaAdapterConfig
 
-  constructor(ctx: Context, config: AiriAdapterConfig) {
+  constructor(ctx: Context, config: AngelaAdapterConfig) {
     this.ctx = ctx
     this.config = config
     this.client = new Client({
@@ -78,7 +78,7 @@ export class AiriAdapter {
 
         // Check if any credentials have changed
         const newCreds = event.data.config
-        const credKeys: (keyof AiriAdapterConfig['credentials'])[] = ['apiKey', 'apiSecret', 'accessToken', 'accessTokenSecret']
+        const credKeys: (keyof AngelaAdapterConfig['credentials'])[] = ['apiKey', 'apiSecret', 'accessToken', 'accessTokenSecret']
         const credsChanged = credKeys.some(key => key in newCreds && newCreds[key] !== this.config.credentials[key])
 
         if (credsChanged) {
@@ -283,31 +283,31 @@ ${tweets.map((t: Tweet) => `- ${t.author.displayName}: ${t.text.substring(0, 80)
   }
 
   /**
-   * Start the AiriAdapter and connect to the Angela server
+   * Start the AngelaAdapter and connect to the Angela server
    */
   async start(): Promise<void> {
-    logger.main.log('Starting Airi adapter for X...')
+    logger.main.log('Starting Angela adapter for X...')
     try {
       await this.client.connect()
-      logger.main.log('Airi adapter for X started successfully')
+      logger.main.log('Angela adapter for X started successfully')
     }
     catch (error) {
-      logger.main.errorWithError('Failed to start Airi adapter for X:', error)
+      logger.main.errorWithError('Failed to start Angela adapter for X:', error)
       throw error
     }
   }
 
   /**
-   * Stop the AiriAdapter and disconnect from the Angela server
+   * Stop the AngelaAdapter and disconnect from the Angela server
    */
   async stop(): Promise<void> {
-    logger.main.log('Stopping Airi adapter for X...')
+    logger.main.log('Stopping Angela adapter for X...')
     try {
       this.client.close()
-      logger.main.log('Airi adapter for X stopped')
+      logger.main.log('Angela adapter for X stopped')
     }
     catch (error) {
-      logger.main.errorWithError('Error stopping Airi adapter for X:', error)
+      logger.main.errorWithError('Error stopping Angela adapter for X:', error)
       throw error
     }
   }

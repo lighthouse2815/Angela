@@ -480,8 +480,8 @@ export interface RuntimeGlobals {
   setNoActionBudget?: (value: number) => { ok: true, remaining: number, default: number, max: number }
   getNoActionBudget?: () => { remaining: number, default: number, max: number }
   forgetConversation?: () => { ok: true, cleared: string[] }
-  notifyAiri?: (headline: string, note?: string, urgency?: 'immediate' | 'soon' | 'later') => void
-  updateAiriContext?: (text: string, hints?: string[], lane?: string) => void
+  notifyAngela?: (headline: string, note?: string, urgency?: 'immediate' | 'soon' | 'later') => void
+  updateAngelaContext?: (text: string, hints?: string[], lane?: string) => void
   history?: unknown
   llmInput?: {
     systemPrompt: string
@@ -804,7 +804,7 @@ export class JavaScriptPlanner {
         botCall: Boolean(globals.mineflayer),
         forgetConversation: Boolean(globals.forgetConversation),
         getNoActionBudget: Boolean(globals.getNoActionBudget),
-        notifyAiri: Boolean(globals.notifyAiri),
+        notifyAngela: Boolean(globals.notifyAngela),
         patternFind: Boolean(globals.patterns?.find),
         patternGet: Boolean(globals.patterns?.get),
         patternIds: Boolean(globals.patterns?.ids),
@@ -812,7 +812,7 @@ export class JavaScriptPlanner {
         queryBlockAt: Boolean(globals.mineflayer),
         queryMap: Boolean(globals.mineflayer),
         setNoActionBudget: Boolean(globals.setNoActionBudget),
-        updateAiriContext: Boolean(globals.updateAiriContext),
+        updateAngelaContext: Boolean(globals.updateAngelaContext),
       },
       memoryLimitMb: this.memoryLimitMb,
       runtime: this.buildRuntimeSnapshot(globals),
@@ -881,15 +881,15 @@ export class JavaScriptPlanner {
       case 'forgetConversation':
         return cloneStructured(globals.forgetConversation?.() ?? null)
 
-      case 'notifyAiri':
-        return cloneStructured(globals.notifyAiri?.(
+      case 'notifyAngela':
+        return cloneStructured(globals.notifyAngela?.(
           args[0] as string,
           args[1] as string | undefined,
           args[2] as 'immediate' | 'soon' | 'later' | undefined,
         ) ?? null)
 
-      case 'updateAiriContext':
-        return cloneStructured(globals.updateAiriContext?.(
+      case 'updateAngelaContext':
+        return cloneStructured(globals.updateAngelaContext?.(
           args[0] as string,
           args[1] as string[] | undefined,
           args[2] as string | undefined,
@@ -971,8 +971,8 @@ export class JavaScriptPlanner {
       { name: 'lastRun', kind: 'object', readonly: true },
       { name: 'prevRun', kind: 'object', readonly: true },
       { name: 'lastAction', kind: 'object', readonly: true },
-      { name: 'notifyAiri', kind: 'function', readonly: true },
-      { name: 'updateAiriContext', kind: 'function', readonly: true },
+      { name: 'notifyAngela', kind: 'function', readonly: true },
+      { name: 'updateAngelaContext', kind: 'function', readonly: true },
     ]
 
     const valueByName: Record<string, unknown> = {
@@ -1029,8 +1029,8 @@ export class JavaScriptPlanner {
       'lastRun': this.persistedLastRun,
       'prevRun': this.persistedLastRun,
       'lastAction': this.persistedLastAction,
-      'notifyAiri': globals.notifyAiri ?? null,
-      'updateAiriContext': globals.updateAiriContext ?? null,
+      'notifyAngela': globals.notifyAngela ?? null,
+      'updateAngelaContext': globals.updateAngelaContext ?? null,
       'skip': '[Function skip]',
       'use': '[Function use]',
       'log': '[Function log]',
@@ -1335,11 +1335,11 @@ globalThis.getNoActionBudget = __plannerAvailability.getNoActionBudget
 globalThis.forget_conversation = __plannerAvailability.forgetConversation
   ? () => __plannerCallBridge('forgetConversation', [])
   : null
-globalThis.notifyAiri = __plannerAvailability.notifyAiri
-  ? (headline, note, urgency) => __plannerCallBridge('notifyAiri', [headline, note, urgency])
+globalThis.notifyAngela = __plannerAvailability.notifyAngela
+  ? (headline, note, urgency) => __plannerCallBridge('notifyAngela', [headline, note, urgency])
   : null
-globalThis.updateAiriContext = __plannerAvailability.updateAiriContext
-  ? (text, hints, lane) => __plannerCallBridge('updateAiriContext', [text, hints, lane])
+globalThis.updateAngelaContext = __plannerAvailability.updateAngelaContext
+  ? (text, hints, lane) => __plannerCallBridge('updateAngelaContext', [text, hints, lane])
   : null
 
 delete globalThis.querySeed

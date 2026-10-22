@@ -80,7 +80,7 @@ function createPerceptionEvent() {
   } as any
 }
 
-function createAiriCommandEvent() {
+function createAngelaCommandEvent() {
   return {
     type: 'perception',
     payload: {
@@ -314,7 +314,7 @@ inv;
     brain.giveUpReason = 'stuck'
     brain.setNoActionFollowupBudget(0)
 
-    await brain.processEvent({} as any, createAiriCommandEvent())
+    await brain.processEvent({} as any, createAngelaCommandEvent())
 
     expect(brain.givenUp).toBe(false)
     expect(brain.giveUpReason).toBeUndefined()
@@ -538,7 +538,7 @@ describe('brain queue coalescing', () => {
     brain.queue = [
       { event: createNonResumingPerceptionEvent(), resolve: vi.fn(), reject: vi.fn() },
       { event: createFeedbackEvent(), resolve: vi.fn(), reject: vi.fn() },
-      { event: createAiriCommandEvent(), resolve: vi.fn(), reject: vi.fn() },
+      { event: createAngelaCommandEvent(), resolve: vi.fn(), reject: vi.fn() },
     ]
 
     brain.coalesceQueue()

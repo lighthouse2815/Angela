@@ -75,6 +75,19 @@ Hosted-provider endpoints, model URLs, Player2 identifiers, and external service
 - Local variable names and test fixture labels can still describe those old contracts.
   They do not establish upstream ownership of Angela's new work or independent authorship of derivative sources.
 
+## Follow-up migration
+
+The 2026-10-23 migration changes private adapter and bridge names to Angela.
+It changes these paths and their private symbols:
+
+- `integrations/discord-bot/src/adapters/airi-adapter.ts` to `angela-adapter.ts`
+- `integrations/twitter-services/src/adapters/airi-adapter.ts` to `angela-adapter.ts`
+- `integrations/minecraft/src/airi` to `src/angela`
+- `packages/server-runtime/src/server-ws/airi` to `server-ws/angela`
+
+The migration also changes private Minecraft planner helpers from Airi to Angela.
+Existing wire events, environment variables, configuration keys, and external identifiers stay compatible.
+
 ## Reproduce the scan
 
 The scan covers tracked text, including hidden files and the lockfile.

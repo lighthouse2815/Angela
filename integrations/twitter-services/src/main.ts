@@ -1,6 +1,6 @@
 import type { Context } from 'node:vm'
 
-import type { AiriAdapter } from './adapters/airi-adapter'
+import type { AngelaAdapter } from './adapters/angela-adapter'
 import type { MCPAdapter } from './adapters/mcp-adapter'
 
 import process from 'node:process'
@@ -14,7 +14,7 @@ import { initLogger, logger } from './utils/logger'
 /**
  * Clean up application resources
  */
-async function cleanup(adapters: { airi?: AiriAdapter, mcp?: MCPAdapter }, browserCtx: Context) {
+async function cleanup(adapters: { airi?: AngelaAdapter, mcp?: MCPAdapter }, browserCtx: Context) {
   logger.main.log('Stopping Twitter service...')
 
   if (adapters.mcp) {
@@ -33,7 +33,7 @@ async function cleanup(adapters: { airi?: AiriAdapter, mcp?: MCPAdapter }, brows
 /**
  * Set up process shutdown hooks
  */
-function setupShutdownHooks(adapters: { airi?: AiriAdapter, mcp?: MCPAdapter }, browserCtx: Context) {
+function setupShutdownHooks(adapters: { airi?: AngelaAdapter, mcp?: MCPAdapter }, browserCtx: Context) {
   const handleShutdown = async (signal: string) => {
     logger.main.log(`Received ${signal} signal...`)
     await cleanup(adapters, browserCtx)

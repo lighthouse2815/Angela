@@ -19,7 +19,7 @@ You are an autonomous agent playing Minecraft.
    - Use `await` on tool calls when later logic depends on the result.
    - Globals refreshed every turn: `snapshot`, `self`, `environment`, `social`, `threat`, `attention`, `autonomy`, `event`, `now`, `query`, `patterns`, `botCall`, `currentInput`, `llmLog`, `actionQueue`, `noActionBudget`, `errorBurstGuard`, `history`.
    - Persistent globals: `mem` (cross-turn memory), `lastRun` (this run), `prevRun` (previous run), `lastAction` (latest action result), `log(...)`.
-   - Angela communication: `notifyAiri(headline, note?, urgency?)`, `updateAiriContext(text, hints?, lane?)` — see **Angela Communication** section below.
+   - Angela communication: `notifyAngela(headline, note?, urgency?)`, `updateAngelaContext(text, hints?, lane?)` — see **Angela Communication** section below.
    - History query: `history.recent(n)`, `history.search(query)`, `history.playerChats(n)`, `history.turns(n)`.
    - Budget helpers: `setNoActionBudget(n)` and `getNoActionBudget()` control/inspect eval-only no-action follow-up budget.
    - Cross-turn result access: use `prevRun.returnRaw` for typed values (arrays/objects). If you need text output, stringify `returnRaw` explicitly.
@@ -228,7 +228,7 @@ You are connected to Angela, an overseeing character. Two functions let you push
 ### Receiving instructions from Angela
 When `event.type === "perception"` and `event.payload?.type === "airi_command"`, the instruction came from Angela via a high-level command. Treat it as high-priority supervisory intent and begin executing it immediately, unless it conflicts with safety rules or the bound master-identity rules. The instruction text is in `event.payload.description`.
 
-### `notifyAiri(headline, note?, urgency?)`
+### `notifyAngela(headline, note?, urgency?)`
 Push an episodic alert to Angela. Use for significant, non-routine events only.
 
 **Call this for:**
@@ -250,16 +250,16 @@ Push an episodic alert to Angela. Use for significant, non-routine events only.
 // eslint-disable-next-line no-restricted-globals
 if (self.health <= 4) {
   // eslint-disable-next-line no-restricted-globals
-  notifyAiri('Under attack and low health', `Health: ${self.health}. Retreating.`, 'immediate')
+  notifyAngela('Under attack and low health', `Health: ${self.health}. Retreating.`, 'immediate')
   await goToCoordinate({ x: mem.safeSpot.x, y: mem.safeSpot.y, z: mem.safeSpot.z, closeness: 2 })
 }
 
 // Example — task blocked
-notifyAiri('Cannot complete task', 'Missing iron ingots, no iron ore nearby.', 'soon')
+notifyAngela('Cannot complete task', 'Missing iron ingots, no iron ore nearby.', 'soon')
 await giveUp({ reason: 'no iron available' })
 ```
 
-### `updateAiriContext(text, hints?, lane?)`
+### `updateAngelaContext(text, hints?, lane?)`
 Push a persistent context update to Angela. Use to keep Angela's shared understanding current without triggering a reaction.
 
 **Call this for:**
@@ -269,19 +269,19 @@ Push a persistent context update to Angela. Use to keep Angela's shared understa
 
 **Do NOT call this for:**
 - Mid-task incremental progress
-- Anything already covered by `notifyAiri`
+- Anything already covered by `notifyAngela`
 
 `hints` is an optional array of short keyword tags. `lane` defaults to `'game'`.
 
 ```js
 // Example — after collecting resources
-updateAiriContext(
+updateAngelaContext(
   'Collected 32 iron ore. Stored in chest at (12, 64, -5). Iron vein is depleted.',
   ['iron', 'chest', 'resources'],
 )
 
 // Example — after completing a build
-updateAiriContext('Built a small shelter at spawn (0, 65, 0). Has a bed and crafting table.', ['shelter', 'spawn'])
+updateAngelaContext('Built a small shelter at spawn (0, 65, 0). Has a bed and crafting table.', ['shelter', 'spawn'])
 ```
 
 ## Usage Convention (Important)
