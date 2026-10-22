@@ -251,7 +251,7 @@ public sealed class StageDevObservationAdapter : IDisposable
                 {
                     pid = _processId,
                     projectPath = _projectPath,
-                    angelaBridgeConnected = AngelaBridgeConnected,
+                    airiBridgeConnected = AngelaBridgeConnected,
                 },
             },
         });

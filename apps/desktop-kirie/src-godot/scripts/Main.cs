@@ -39,7 +39,7 @@ public partial class Main : Node
             return;
         }
 
-        var registry = AiriDesktopContracts.Register(
+        var registry = AngelaDesktopContracts.Register(
             GdKiriePlatform.Register(new KirieEventaJsonRegistry()));
         _eventa = _kirie.CreateEventaContext(registry);
         _platform = GdKiriePlatform.Attach(_eventa.Context, window);

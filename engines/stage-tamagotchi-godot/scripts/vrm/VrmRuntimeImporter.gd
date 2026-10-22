@@ -7,7 +7,7 @@ extends RefCounted
 # Remove this bridge only when the add-on exposes a stable runtime API for direct C# use.
 
 const vrm_constants = preload("res://addons/vrm/vrm_constants.gd")
-const vrm_extension_class = preload("res://scripts/vrm/AiriVrmRuntimeExtension.gd")
+const vrm_extension_class = preload("res://scripts/vrm/AngelaVrmRuntimeExtension.gd")
 
 # NOTICE:
 # Godot exposes this named-skin-bind flag through EditorSceneFormatImporter, but

@@ -21,7 +21,7 @@ Runtime import is routed through:
 ```text
 scripts/vrm/VrmAvatarLoader.cs
   -> scripts/vrm/VrmRuntimeImporter.gd
-    -> scripts/vrm/AiriVrmRuntimeExtension.gd
+    -> scripts/vrm/AngelaVrmRuntimeExtension.gd
       -> addons/vrm/vrm_extension.gd
 ```
 
@@ -55,7 +55,7 @@ The current Angela runtime bridge covers the VRM 0.x path:
 
 ```text
 extensions.VRM
-  -> scripts/vrm/AiriVrmRuntimeExtension.gd
+  -> scripts/vrm/AngelaVrmRuntimeExtension.gd
     -> addons/vrm/vrm_extension.gd
 ```
 
@@ -77,7 +77,7 @@ claimed as supported.
 
 ## Angela Runtime Extension
 
-`AiriVrmRuntimeExtension.gd` extends the vendored V-Sekai VRM 0.x extension.
+`AngelaVrmRuntimeExtension.gd` extends the vendored V-Sekai VRM 0.x extension.
 It exists because Godot 4.6 reports an internal missing-key error when
 `GLTFState.get_additional_data(&"vrm/already_processed")` reads an unset key.
 

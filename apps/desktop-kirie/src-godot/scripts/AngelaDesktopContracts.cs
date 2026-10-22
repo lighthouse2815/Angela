@@ -158,7 +158,7 @@ internal static class AiriDesktopEvents
         new("eventa:event:airi:windows:spotlight:shortcut-changed");
 }
 
-internal static class AiriDesktopContracts
+internal static class AngelaDesktopContracts
 {
     public static KirieEventaJsonRegistry Register(KirieEventaJsonRegistry registry)
     {
