@@ -531,7 +531,12 @@ export class RuntimeSession {
       try {
         signal.throwIfAborted()
         const warnings: string[] = []
-        const sources: ContextSources = { channel: this.options.channel, messages: this.runtime.messages, warn: message => this.options.warn ? this.options.warn(message) : warnings.push(message) }
+        const sources: ContextSources = { channel: this.options.channel, messages: this.runtime.messages, warn: (message) => {
+          // Adapter presentation does not deliver evidence to the model. Keep a bounded request-local copy for both paths.
+          if (warnings.length < 8 && !warnings.includes(message))
+            warnings.push(message)
+          this.options.warn?.(message)
+        } }
         if (this.options.channel !== 'discord') {
           sources.memory = await this.memory()
           sources.tasks = await this.tasks()

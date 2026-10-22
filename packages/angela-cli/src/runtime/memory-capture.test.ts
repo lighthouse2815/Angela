@@ -1,7 +1,7 @@
 import type { GenerationProvider } from '@angela/provider-inference'
 
 import { randomUUID } from 'node:crypto'
-import { mkdtemp, rm } from 'node:fs/promises'
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -97,4 +97,44 @@ it('emits session boundaries only once across several requests and ends the sess
   expect(ended).toBe(0)
   await scope.close()
   expect(ended).toBe(1)
+})
+
+// Generation baseline: evals/companion-generation/baseline.json, recall_unavailable_001.
+// ROOT CAUSE: Adapter warning callbacks prevented warnings from entering generation. Runtime now retains both delivery paths.
+it('includes unavailable-memory evidence in generation when the adapter owns warning output', async () => {
+  const { runtime, directory } = await setup()
+  await mkdir(join(directory, 'memory'), { recursive: true })
+  await writeFile(join(directory, 'memory', 'personal.json'), '{invalid')
+  const warnings: string[] = []
+  const scope = runtime.open({ dataDir: directory, workspace: directory, sessionId: randomUUID(), channel: 'telegram', warn: message => warnings.push(message) })
+  let prepared = ''
+  await scope.send(new Chat(runtime.model, runtime.provider, directory), 'Can you read my saved food preference?', {
+    prepareConversation: async (conversation) => {
+      prepared = JSON.stringify(conversation)
+      return conversation
+    },
+  })
+  expect(warnings).toContain(cliMessages.en.memoryUnavailable)
+  expect(prepared).toContain(cliMessages.en.memoryUnavailable)
+  expect(prepared).toContain(cliMessages.en.recallPartial)
+  await scope.close()
+})
+
+// Generation baseline: evals/companion-generation/baseline.json, memory_disabled_001.
+// ROOT CAUSE: Missing personal-memory state let generation substitute project storage. Context now labels that boundary explicitly.
+it('labels disabled personal memory without disabling independent project tools', async () => {
+  const { runtime, directory } = await setup()
+  const scope = runtime.open({ dataDir: directory, workspace: directory, sessionId: randomUUID(), channel: 'cli' })
+  await (await scope.memory()).setEnabled(false)
+  let prepared = ''
+  await scope.send(new Chat(runtime.model, runtime.provider, directory), 'Remember my Japanese learning goal', {
+    prepareConversation: async (conversation) => {
+      prepared = JSON.stringify(conversation)
+      return conversation
+    },
+  })
+  expect(prepared).toContain('Personal memory is disabled')
+  expect(prepared).toContain('Do not save personal facts, preferences, or learning goals to project memory')
+  expect(await (await scope.project()).read()).toMatchObject({ enabled: true, snapshot: null })
+  await scope.close()
 })

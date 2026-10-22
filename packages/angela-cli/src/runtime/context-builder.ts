@@ -23,6 +23,18 @@ export async function buildContext(sources: ContextSources, text: string, signal
   const parts: string[] = []
   if (extra)
     parts.push(extra)
+  if (sources.memory) {
+    try {
+      if (!(await sources.memory.read()).enabled) {
+        parts.push([
+          'Personal memory is disabled. Use current personal information only within this conversation.',
+          'Do not save personal facts, preferences, or learning goals to project memory, skills, or technical pages as a substitute.',
+          'Do not claim durable personal saving. Independent project checkpoints and explicitly requested tasks retain their own controls.',
+        ].join('\n'))
+      }
+    }
+    catch { sources.warn(sources.messages.memoryUnavailable) }
+  }
   try {
     if (sources.recall) {
       const prepared = await sources.recall.prepare(text, signal)
