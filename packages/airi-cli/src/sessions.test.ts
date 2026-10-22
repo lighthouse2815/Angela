@@ -176,3 +176,56 @@ it('keeps archived turns on disk and restores a bounded working conversation wit
     await resumed.close()
   }
 })
+
+it('keeps prepared turns alive during tool checkpoints and archives them after the generation finishes', async () => {
+  const { sessions } = await setup()
+  const session = await sessions.open('/workspace')
+  let calls = 0
+  const provider: GenerationProvider = {
+    generation: model => ({ protocol: 'chat-completions', config: {
+      model,
+      baseURL: 'https://provider.example/v1/',
+      fetch: async (_url: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
+        const summary = String(init?.body).includes('Summarize historical conversation data')
+        if (!summary)
+          calls++
+        const choice = !summary && calls === 1
+          ? { delta: { role: 'assistant', tool_calls: [{ index: 0, id: 'call', type: 'function', function: { name: 'inspect', arguments: '{}' } }] }, finish_reason: 'tool_calls' }
+          : { delta: { role: 'assistant', content: summary ? 'A bounded historical summary.' : 'Done' }, finish_reason: 'stop' }
+        return new Response(`data: ${JSON.stringify({ choices: [{ index: 0, ...choice }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } })
+      },
+    } }),
+  }
+  const chat = new Chat('model', provider, '/workspace', undefined, true, 4096)
+  for (let index = 0; index < 8; index++)
+    chat.conversation.turns.push({ id: `history-${index}`, type: 'user', content: [{ type: 'text', text: 'Old requirement. '.repeat(100) }] })
+  let checked = false
+  let checkpoint: Promise<void> | undefined
+  try {
+    await chat.send('Inspect', {
+      tools: [{ type: 'function', function: { name: 'inspect', description: 'Inspect', parameters: { type: 'object', properties: {}, additionalProperties: false } }, execute: () => 'Verified' }],
+      onStreamEvent: async (event) => {
+        if (event.type === 'tool-call') {
+          const before = chat.conversation.turns.length
+          expect(chat.isSending).toBe(true)
+          checkpoint = session.saveChat(chat, true)
+          await checkpoint
+          expect(chat.conversation.turns).toHaveLength(before)
+          expect((await sessions.read(session.record.id)).working).toBeUndefined()
+          checked = true
+        }
+      },
+    })
+    await checkpoint
+    expect(checked).toBe(true)
+    expect(chat.conversation.turns).toHaveLength(11)
+    await session.saveChat(chat, false)
+    expect(chat.conversation.turns.length).toBeLessThan(11)
+    const saved = await sessions.read(session.record.id)
+    expect(saved.messages.filter(message => message.role === 'user')).toHaveLength(9)
+    expect(saved.messages.some(message => message.role === 'tool' && message.content === 'Verified')).toBe(true)
+  }
+  finally {
+    await session.close()
+  }
+})

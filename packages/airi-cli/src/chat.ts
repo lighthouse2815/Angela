@@ -1,4 +1,4 @@
-import type { Conversation, StreamOptions } from '@proj-airi/core-agent'
+import type { Conversation, StreamEvent, StreamOptions } from '@proj-airi/core-agent'
 import type { GenerationProvider } from '@proj-airi/provider-inference'
 
 import { randomUUID } from 'node:crypto'
@@ -10,6 +10,7 @@ import { Context } from './context'
 
 /** Owns one serial conversation. Failed generations never append an incomplete assistant turn. */
 export class Chat {
+  private active = false
   readonly context: Context
   readonly conversation: Conversation = { turns: [] }
 
@@ -31,6 +32,10 @@ export class Chat {
     }
   }
 
+  get isSending() {
+    return this.active
+  }
+
   /** The caller serializes sends and owns cancellation and event rendering. */
   async send(text: string, options: StreamOptions, memory = '') {
     this.conversation.turns.push({ type: 'user', id: randomUUID(), content: [{ type: 'text', text }] })
@@ -46,20 +51,61 @@ export class Chat {
         turns.push(this.conversation.turns[index]!)
       conversation = { turns }
     }
-    await streamFrom({
-      model: this.model,
-      chatProvider: this.provider,
-      conversation,
-      options: {
-        ...options,
-        prepareConversation: async (conversation, target) => {
-          const prepared = options.prepareConversation ? await options.prepareConversation(conversation, target) : conversation
-          return await this.context.prepare(prepared, this.model, this.provider, options)
+    const lifetime = new AbortController()
+    const signal = options.abortSignal ? AbortSignal.any([options.abortSignal, lifetime.signal]) : lifetime.signal
+    const pending = new Set<Promise<void>>()
+    let callbackError: unknown
+    let callbackFailed = false
+    const deliver = (event: StreamEvent): void | Promise<void> => {
+      if (event.type === 'finish') {
+        return (async () => {
+          await Promise.all(pending)
+          if (callbackFailed)
+            throw callbackError
+          await options.onStreamEvent?.(event)
+        })()
+      }
+      if (pending.size >= 64) {
+        const error = new Error('Too many pending stream callbacks')
+        lifetime.abort(error)
+        throw error
+      }
+      const result = options.onStreamEvent?.(event)
+      if (!result)
+        return
+      const tracked = result.catch((error: unknown) => {
+        callbackError = error
+        callbackFailed = true
+        lifetime.abort(error)
+      }).finally(() => { pending.delete(tracked) })
+      pending.add(tracked)
+      return result
+    }
+    this.active = true
+    try {
+      await streamFrom({
+        model: this.model,
+        chatProvider: this.provider,
+        conversation,
+        options: {
+          ...options,
+          abortSignal: signal,
+          onStreamEvent: deliver,
+          prepareConversation: async (conversation, target) => {
+            const prepared = options.prepareConversation ? await options.prepareConversation(conversation, target) : conversation
+            return await this.context.prepare(prepared, this.model, this.provider, { ...options, abortSignal: signal })
+          },
+          onGeneratedTurn: (turn) => {
+            this.conversation.turns.push(turn)
+          },
         },
-        onGeneratedTurn: (turn) => {
-          this.conversation.turns.push(turn)
-        },
-      },
-    })
+      })
+    }
+    finally {
+      await Promise.all(pending)
+      pending.clear()
+      lifetime.abort()
+      this.active = false
+    }
   }
 }

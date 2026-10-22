@@ -1,5 +1,7 @@
 import type { GenerationProvider } from '@proj-airi/provider-inference'
 
+import type { AngelaEvent } from './events'
+
 import { randomUUID } from 'node:crypto'
 import { mkdtemp, readdir, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -88,6 +90,11 @@ it('closes every recall lifecycle after repeated request/release cycles without 
   }
   expect(start).toHaveBeenCalledTimes(40)
   expect(close).toHaveBeenCalledTimes(40)
+  for (const recall of start.mock.contexts) {
+    if (!(recall instanceof Recall))
+      throw new Error('Unexpected recall lifecycle owner')
+    expect(recall.resourceCounts).toEqual({ indexes: 0, watchers: 0, timers: 0, embeddings: 0 })
+  }
   expect(process.getActiveResourcesInfo().filter(type => ['Timeout', 'FSEventWrap'].includes(type)).length).toBeLessThanOrEqual(resources.length)
 })
 
@@ -134,4 +141,23 @@ it('shares one reminder timer and one store scheduler across channels and releas
   finally {
     vi.useRealTimers()
   }
+})
+
+it('emits correlated tool lifecycle metadata without copying arguments or tool results into events', async () => {
+  const tool = { id: 'memory-call', type: 'function', function: { name: 'personal_memory', arguments: JSON.stringify({ action: 'remember', id: null, text: 'My name is Lan', source_quote: 'My name is Lan', core: true }) } }
+  const fetch = vi.fn<typeof globalThis.fetch>()
+    .mockResolvedValueOnce(new Response(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', tool_calls: [{ index: 0, ...tool }] }, finish_reason: 'tool_calls' }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } }))
+    .mockResolvedValueOnce(completion('Saved'))
+  const { runtime, options, directory, provider } = await setup(fetch)
+  const scope = runtime.open(options)
+  const events: AngelaEvent[] = []
+  for (const type of ['user.message', 'assistant.message', 'tool.call', 'tool.result', 'tool.error'] as const)
+    runtime.events.on(type, event => events.push(event))
+  await scope.send(new Chat('model', provider, directory), 'My name is Lan', {})
+  expect(events.map(event => event.type)).toEqual(['user.message', 'tool.call', 'tool.result', 'assistant.message'])
+  expect(new Set(events.map(event => event.correlationId)).size).toBe(1)
+  expect(events[1]).toMatchObject({ toolCallId: 'memory-call', toolName: 'personal_memory' })
+  expect(JSON.stringify(events)).not.toContain('My name is Lan')
+  expect((await (await scope.memory()).read()).entries[0]?.text).toBe('My name is Lan')
+  await scope.close()
 })

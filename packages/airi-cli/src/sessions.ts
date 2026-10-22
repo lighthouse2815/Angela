@@ -48,7 +48,7 @@ const requestSchema = v.object({
 /** The latest Telegram request shares its session's atomic snapshot and exclusive writer lock. */
 export type SavedRequest = v.InferOutput<typeof requestSchema>
 
-const sessionSchema = v.object({
+const sessionSchema = v.pipe(v.object({
   version: v.literal(1),
   id: v.pipe(v.string(), v.uuid()),
   workspace: v.string(),
@@ -58,7 +58,7 @@ const sessionSchema = v.object({
   messages: messagesSchema,
   request: v.optional(requestSchema),
   working: v.optional(v.object({ offset: v.pipe(v.number(), v.integer(), v.minValue(0)), summary: v.pipe(v.string(), v.maxLength(3000)) })),
-})
+}), v.check(record => !record.working || record.working.offset <= record.messages.length))
 type Record = v.InferOutput<typeof sessionSchema>
 const lockOwnerSchema = v.object({ pid: v.pipe(v.number(), v.integer(), v.minValue(1)), hostname: v.string() })
 
@@ -218,7 +218,9 @@ export class Session {
 
   /** Saves full history on disk, then releases compacted turns and the portable snapshot from RAM. */
   async saveChat(chat: Chat, interrupted: boolean, request: SavedRequest | null | undefined = this.record.request) {
-    const checkpoint = chat.context.checkpoint(chat.conversation)
+    // Tool checkpoints cannot retire history while the current generation still owns its prepared turn projection.
+    const generationActive = chat.isSending
+    const checkpoint = generationActive ? { summary: this.record.working?.summary ?? '', turns: 0 } : chat.context.checkpoint(chat.conversation)
     const priorOffset = this.record.working?.offset ?? 0
     const current = conversationToChatMessages(chat.conversation, false)
     let messages = current
@@ -239,7 +241,8 @@ export class Session {
       working: checkpoint.summary ? { offset, summary: checkpoint.summary } : undefined,
     })
     await this.write(record)
-    chat.context.release(chat.conversation)
+    if (!generationActive)
+      chat.context.release(chat.conversation)
     this.record.messages = []
   }
 
