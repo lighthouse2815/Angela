@@ -15,7 +15,7 @@ let
 in
 
 stdenvNoCC.mkDerivation (final: {
-  pname = "airi";
+  pname = "angela";
   version = (builtins.fromJSON (builtins.readFile ../package.json)).version;
 
   src = lib.cleanSourceWith {
@@ -38,7 +38,7 @@ stdenvNoCC.mkDerivation (final: {
 
   # Cache of assets downloaded during vite build
   assets = stdenvNoCC.mkDerivation {
-    pname = "airi-assets";
+    pname = "angela-assets";
     inherit (final) version src pnpmDeps;
 
     nativeBuildInputs = [
@@ -73,17 +73,15 @@ stdenvNoCC.mkDerivation (final: {
   };
 
   meta = {
-    description = "Self-hostable AI waifu / companion / VTuber";
+    description = "Angela AI companion for conversation and learning";
     longDescription = ''
-      AIRI is a soul container of AI waifu / virtual characters to bring them into our world,
-      wishing to achieve Neuro-sama's altitude. It's completely LLM and AI driven, capable of
-      realtime voice chat, playing Minecraft and Factorio. It can be run in browser or on desktop.
-      This is the desktop version.
+      Angela is an AI companion for conversation, learning, voice interaction,
+      and desktop assistance. This package builds the desktop application.
     '';
-    homepage = "https://github.com/moeru-ai/airi";
-    changelog = "https://github.com/moeru-ai/airi/releases/tag/v${final.version}";
-    # While airi itself is licensed under MIT, it uses the nonfree Cubism SDK. Whether it's
-    # redistributable remains a question, so we say it's not.
+    homepage = "https://github.com/lighthouse2815/Angela";
+    changelog = "https://github.com/lighthouse2815/Angela/releases/tag/v${final.version}";
+    # The desktop bundle includes the nonfree Cubism SDK, so this package remains
+    # marked unfree even though Angela's own source is MIT licensed.
     license = lib.licenses.unfree;
     platforms = [
       "x86_64-linux"
@@ -92,6 +90,6 @@ stdenvNoCC.mkDerivation (final: {
       "aarch64-darwin"
     ];
     mainProgram = final.pname;
-    maintainers = with lib.maintainers; [ weathercold ];
+    maintainers = [ ];
   };
 })
