@@ -84,6 +84,9 @@ It changes these paths and their private symbols:
 - `integrations/twitter-services/src/adapters/airi-adapter.ts` to `angela-adapter.ts`
 - `integrations/minecraft/src/airi` to `src/angela`
 - `packages/server-runtime/src/server-ws/airi` to `server-ws/angela`
+- `integrations/vscode/airi-plugin-vscode` to `angela-plugin-vscode`
+- `integrations/vscode/vscode-airi` to `vscode-angela`
+- four local `plugins/airi-plugin-*` directories to `plugins/angela-plugin-*`
 
 The migration also changes private Minecraft planner helpers from Airi to Angela.
 Existing wire events, environment variables, configuration keys, and external identifiers stay compatible.

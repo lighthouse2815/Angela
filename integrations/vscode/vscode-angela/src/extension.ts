@@ -6,7 +6,7 @@ import { noop } from 'es-toolkit'
 import { injeca, lifecycle } from 'injeca'
 import { commands, window, workspace } from 'vscode'
 
-import { Client } from './airi'
+import { Client } from './angela'
 import { ContextCollector } from './context-collector'
 
 interface IntervalHandle {
@@ -30,7 +30,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Initialize
   const vscodeContext = injeca.provide('vscode:context', () => context)
-  const client = injeca.provide('proj-airi:client', () => new Client())
+  const client = injeca.provide('angela:client', () => new Client())
   const contextCollector = injeca.provide('self:context-collector', () => new ContextCollector(contextLines))
   const eventListeners = injeca.provide('self:event-listeners', () => [] as vscode.Disposable[])
   const controlLoopInterval = injeca.provide('self:control-loop:interval:send', () => {
@@ -72,7 +72,7 @@ async function setup(params: {
   isEnabled: boolean
   sendInterval: number
 }) {
-  // Connect to Airi Channel Server
+  // Connect to Angela Server Channel
   if (params.isEnabled) {
     const connected = await params.client.connect()
     if (connected) {
@@ -232,7 +232,7 @@ function stopMonitoring(params: { controlLoopInterval: IntervalHandle }) {
  * Deactivate the plugin
  */
 export async function deactivate() {
-  const { client } = await injeca.resolve({ client: { key: 'proj-airi:client' } as unknown as ProvidedBy<Client> })
+  const { client } = await injeca.resolve({ client: { key: 'angela:client' } as unknown as ProvidedBy<Client> })
   const { eventListeners } = await injeca.resolve({ eventListeners: { key: 'self:event-listeners' } as unknown as ProvidedBy<vscode.Disposable[]> })
   const { controlLoopInterval } = await injeca.resolve({ controlLoopInterval: { key: 'self:control-loop:interval:send' } as unknown as ProvidedBy<IntervalHandle> })
 
