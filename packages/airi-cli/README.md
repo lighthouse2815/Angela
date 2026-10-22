@@ -1043,3 +1043,18 @@ These fixtures measure a small set of behaviors. They do not establish general m
 The clarification check uses a simple question/selection phrase heuristic. Model answers can vary across runs.
 Normal automated tests use a local provider boundary to verify the evaluator and remain independent of live credentials.
 Run the live command separately when comparing providers or changing models. Keep its results distinct from unit-test results.
+
+## Core PR validation
+
+The `Angela CLI core` workflow runs on pull requests into `main`.
+It installs frozen dependencies without the root postinstall, then builds only CLI prerequisites with one workspace worker.
+Tests, typecheck, build, package lint, and the built CLI smoke check run in one job.
+Vitest uses one worker and 30-second test and hook limits.
+Node 26.11.1 and the package-manager version in the root manifest define the reproduction environment.
+The gate excludes full monorepo tests. Existing unrelated failures remain documented in the Memory V2 audit.
+
+Telegram uses `AngelaRuntime.acquire` to retain Recall after each message.
+Internal `RuntimeOptions.telegramSessions` defaults to 32 idle entries and a ten-minute TTL.
+The cache uses exact user storage, workspace, session, and channel identities.
+MCP clients and request callbacks close after each request. Active contexts retain the existing concurrency limit of eight.
+Reset, eviction, and host shutdown end the runtime session segment. Persisted conversation and memory survive eviction and process restart.
