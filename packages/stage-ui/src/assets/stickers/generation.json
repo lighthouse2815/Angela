@@ -13,7 +13,7 @@
     {
       "id": "style-anchor",
       "role": "Chibi identity and style",
-      "file": "airi-happy.png"
+      "file": "angela-happy.png"
     }
   ],
   "assets": [
@@ -23,7 +23,7 @@
       "emotions": [
         "happy"
       ],
-      "file": "airi-happy.png",
+      "file": "angela-happy.png",
       "sha256": "e7083b82d0a63564011a2cd2158b56282d9042a3264e4ece19fcc9bf0ab17ca1",
       "width": 1254,
       "height": 1254,
@@ -52,7 +52,7 @@
       "emotions": [
         "sad"
       ],
-      "file": "airi-sad.png",
+      "file": "angela-sad.png",
       "sha256": "1ff8494653f8dd69116796d89449c6158422fe373fb3b878a653d840f32f95da",
       "width": 1254,
       "height": 1254,
@@ -82,7 +82,7 @@
       "emotions": [
         "confused"
       ],
-      "file": "airi-confused.png",
+      "file": "angela-confused.png",
       "sha256": "a20cca1aff820817e91e4d76ea7b02aec4c604ea158d5663d5acfc3eed28362d",
       "width": 1254,
       "height": 1254,
@@ -112,7 +112,7 @@
       "emotions": [
         "surprised"
       ],
-      "file": "airi-surprised.png",
+      "file": "angela-surprised.png",
       "sha256": "a6424b79e9388bebf577b72f21b5c3c9396c3c155976f544fba2b3ad76f218ca",
       "width": 1254,
       "height": 1254,
@@ -143,7 +143,7 @@
         "thanks",
         "affectionate"
       ],
-      "file": "airi-thanks.png",
+      "file": "angela-thanks.png",
       "sha256": "d24a9c03d23eb9d10b9de774295f1c6df311eaafbc42d16f25ae307b413d13c5",
       "width": 1254,
       "height": 1254,
@@ -181,7 +181,7 @@
         "celebrate",
         "happy"
       ],
-      "file": "airi-celebrate.png",
+      "file": "angela-celebrate.png",
       "sha256": "ec565ce38dfb06cf0e3b04ce2edcb007768efbd0dea1d14515fcb73017ab91d1",
       "width": 1254,
       "height": 1254,
@@ -218,7 +218,7 @@
       "emotions": [
         "angry"
       ],
-      "file": "airi-angry.png",
+      "file": "angela-angry.png",
       "sha256": "e03772d3d56c2d5829b791e1221ca65885b6e434ce4c06134f5898f6abd894ef",
       "width": 1254,
       "height": 1254,
@@ -255,7 +255,7 @@
       "emotions": [
         "tired"
       ],
-      "file": "airi-tired.png",
+      "file": "angela-tired.png",
       "sha256": "16e9725c0fe9887b21fb1f2848dd0a166e660f2b131039271418ad782d8e2753",
       "width": 1254,
       "height": 1254,
@@ -286,7 +286,7 @@
         "affectionate",
         "happy"
       ],
-      "file": "airi-affectionate.png",
+      "file": "angela-affectionate.png",
       "sha256": "368f7922b333cce707993216895ae4be84992f2ee28d8db9e2e560c2acab9644",
       "width": 1254,
       "height": 1254,
@@ -323,7 +323,7 @@
       "emotions": [
         "awkward"
       ],
-      "file": "airi-awkward.png",
+      "file": "angela-awkward.png",
       "sha256": "e8c5cd068ac4ef47610aa87304242025d9c74c61c606e6babfcb533ba308836e",
       "width": 1254,
       "height": 1254,
@@ -360,7 +360,7 @@
       "emotions": [
         "agree"
       ],
-      "file": "airi-agree.png",
+      "file": "angela-agree.png",
       "sha256": "dde3b956f9a0b106fd52f202c56cdc81e0c22c305941ace39ec8934a51e9f463",
       "width": 1254,
       "height": 1254,
@@ -390,7 +390,7 @@
       "emotions": [
         "disagree"
       ],
-      "file": "airi-disagree.png",
+      "file": "angela-disagree.png",
       "sha256": "b0e406ec76ff0651b5ff1ab578052c5e3bb5a42d6eef2615f817e7ca64ec84ba",
       "width": 1254,
       "height": 1254,

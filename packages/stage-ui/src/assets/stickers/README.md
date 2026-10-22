@@ -25,18 +25,18 @@ Transparent output was requested. The final PNGs retain their generated alpha ch
 
 | File | Name | Emotion tags |
 | --- | --- | --- |
-| `airi-happy.png` | Happy | happy |
-| `airi-sad.png` | Sad | sad |
-| `airi-confused.png` | Confused | confused |
-| `airi-surprised.png` | Surprised | surprised |
-| `airi-thanks.png` | Thank you | thanks, affectionate |
-| `airi-celebrate.png` | Celebration | celebrate, happy |
-| `airi-angry.png` | Angry | angry |
-| `airi-tired.png` | Tired | tired |
-| `airi-affectionate.png` | Love | affectionate, happy |
-| `airi-awkward.png` | Awkward | awkward |
-| `airi-agree.png` | Yes | agree |
-| `airi-disagree.png` | No thanks | disagree |
+| `angela-happy.png` | Happy | happy |
+| `angela-sad.png` | Sad | sad |
+| `angela-confused.png` | Confused | confused |
+| `angela-surprised.png` | Surprised | surprised |
+| `angela-thanks.png` | Thank you | thanks, affectionate |
+| `angela-celebrate.png` | Celebration | celebrate, happy |
+| `angela-angry.png` | Angry | angry |
+| `angela-tired.png` | Tired | tired |
+| `angela-affectionate.png` | Love | affectionate, happy |
+| `angela-awkward.png` | Awkward | awkward |
+| `angela-agree.png` | Yes | agree |
+| `angela-disagree.png` | No thanks | disagree |
 
 ## Inspection
 
