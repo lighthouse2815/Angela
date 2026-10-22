@@ -47,7 +47,7 @@ export async function buildTools(sources: ContextSources, text: string, sessionI
     catch { sources.warn(sources.messages.projectMemoryUnavailable) }
   }
   if (sources.tasks)
-    tools.push(...taskTools(sources.tasks, sources.messages.tasks, privacy))
+    tools.push(...taskTools(sources.tasks, sources.messages.tasks, privacy, text))
   const recall = sources.recall
   if (recall) {
     tools.push(...recall.tools())
@@ -80,10 +80,6 @@ export async function buildTools(sources: ContextSources, text: string, sessionI
       const rejection = forgetting ? undefined : durableWriteRejection(current, domain, input)
       if (rejection)
         return rejection
-      if (tool.function.name === 'task_create' && (!/nhắc|(?:tạo|thêm|lưu)\s+(?:việc|lịch|tác vụ)|\b(?:remind|schedule|add|create|save)\b/iu.test(text)
-        || /(?:^|[\s,:;.!?])(?:chắc|có lẽ|nếu|ví dụ|đừng|không cần|maybe|perhaps|do not|don't)(?:$|[\s,:;.!?])|["“”]/iu.test(text))) {
-        return { status: 'rejected', reason: sources.messages.tasks.clarifyTime }
-      }
       return await execute(input, options)
     }
   }

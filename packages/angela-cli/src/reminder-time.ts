@@ -25,7 +25,8 @@ export function parseReminderTime(text: string, now: number, timezone: string): 
     return { status: 'resolved', remindAt: new Date(now + delay).toISOString(), remainder }
   }
   const calendar = /(?<![\p{L}\d/])(?:ngày mai|mai|hôm nay|tối nay|thứ (?:hai|ba|tư|năm|sáu|bảy)|chủ nhật|cuối tuần|ngày\s+\d{1,2}|\d{1,2}\/\d{1,2}(?:\/\d{4})?)(?![\p{L}\d/])/iu.exec(remainder)
-  const hour = /(?<![\d.])(\d{1,2})(?:h(\d{1,2})?|:(\d{2})|\s*giờ)(?:\s*(sáng|chiều|tối))?(?![\p{L}\d])/iu.exec(remainder)
+  const hourPattern = /(?<![\d.])(\d{1,2})(?:h(\d{1,2})?|:(\d{2})|\s*giờ)(?:\s*(sáng|chiều|tối))?(?![\p{L}\d])/iu
+  let hour = hourPattern.exec(remainder)
   if (!calendar && !hour)
     return { status: 'missing', remainder }
   const today = localDate(now, timezone)
@@ -67,6 +68,8 @@ export function parseReminderTime(text: string, now: number, timezone: string): 
     }
   }
   const date = new Date(wallDay).toISOString().slice(0, 10)
+  // Calendar phrases can overlap the hour suffix, for example "8h tối nay".
+  hour = hourPattern.exec(remainder)
   if (!hour)
     return { status: 'clarify', date, remainder: remainder.trim() }
   remainder = remainder.replace(hour[0], '').replace(/(?:^|\s)lúc(?=\s|$)/iu, ' ').trim()

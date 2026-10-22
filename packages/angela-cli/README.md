@@ -1189,3 +1189,10 @@ Internal `RuntimeOptions.telegramSessions` defaults to 32 idle entries and a ten
 The cache uses exact user storage, workspace, session, and channel identities.
 MCP clients and request callbacks close after each request. Active contexts retain the existing concurrency limit of eight.
 Reset, eviction, and host shutdown end the runtime session segment. Persisted conversation and memory survive eviction and process restart.
+
+## Commitment intent safety
+
+Local extraction and `task_create` share a deterministic intent classifier.
+Only direct requests authorize creation. Meta discussion, examples, quotes, code, predictions, negation, and hypothetical requests cannot create tasks.
+Ambiguous requests with multiple actions require clarification. Missing request provenance also rejects model-created tasks.
+Alarm requests retain their exact-time clarification rules.

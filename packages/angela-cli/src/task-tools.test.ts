@@ -14,6 +14,25 @@ const messages = cliMessages.en.tasks
 const now = Date.parse('2026-10-17T16:00:00Z')
 const options = { messages: [], toolCallId: 'task-test' }
 
+it.each([
+  '',
+  'Tại sao câu mai 9h nhắc tao học lại tạo reminder?',
+  'Parser hiểu "mai 9h nhắc tao học" ra sao?',
+  'Tôi muốn test câu mai 9h nhắc tao học.',
+  '`Mai 9h nhắc tao học LINQ`',
+  'Ví dụ: mai 9h nhắc tao học LINQ.',
+  'Nếu mai tôi rảnh thì nhắc tôi học.',
+  'Đừng nhắc tôi học.',
+  'Mai chắc tôi học LINQ.',
+  'Có lẽ tối nay tôi học.',
+  'Mai 9h nhắc tôi học LINQ và 10h nhắc tôi làm auth.',
+])('guards task_create itself against model bypass: %s', async (text) => {
+  const { tasks } = await setup()
+  const tools = taskTools(tasks, messages, undefined, text)
+  expect(await tools[0]!.execute!({ title: 'Study', type: 'reminder', dueAt: '2026-10-18T09:00:00Z' }, options)).toMatchObject({ status: 'rejected' })
+  expect(await tasks.list()).toHaveLength(0)
+})
+
 afterEach(async () => {
   await Promise.all(directories.splice(0).map(directory => rm(directory, { recursive: true, force: true })))
 })
@@ -22,7 +41,7 @@ async function setup() {
   const directory = await mkdtemp(join(tmpdir(), 'angela-task-tools-'))
   directories.push(directory)
   const tasks = new Tasks(directory, messages, () => now, 'Asia/Ho_Chi_Minh')
-  const tools = taskTools(tasks, messages)
+  const tools = taskTools(tasks, messages, undefined, 'Create a task')
   const call = async (name: string, input: unknown) => await tools.find(tool => tool.function.name === name)!.execute!(input, options)
   return { tasks, tools, call }
 }

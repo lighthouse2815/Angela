@@ -1,10 +1,37 @@
 import { expect, it } from 'vitest'
 
 import { extractCommitment } from './commitment-extraction'
+import { classifyCommitmentIntent } from './commitment-intent'
 import { parseReminderTime } from './reminder-time'
 
 const now = Date.parse('2026-10-22T07:00:00+07:00')
 const zone = 'Asia/Ho_Chi_Minh'
+
+it.each([
+  ['Tại sao câu "mai 9h nhắc tao học LINQ" lại tạo reminder?', 'meta'],
+  ['Parser xử lý câu mai 9h nhắc tao học LINQ thế nào?', 'meta'],
+  ['Nếu user nói mai 9h nhắc tôi học thì hệ thống làm gì?', 'hypothetical'],
+  ['Ví dụ người dùng có thể nói mai 9h nhắc tôi học.', 'meta'],
+  ['Câu `mai 9h nhắc tao học` có hợp lệ không?', 'meta'],
+  ['Tôi đang test câu mai 9h nhắc tôi học LINQ.', 'meta'],
+  ['Tôi muốn test câu mai 9h nhắc tao học.', 'meta'],
+  ['Đừng tạo reminder khi tôi nói "mai 9h nhắc tao học".', 'negative'],
+  ['Không cần nhắc tôi việc đó.', 'negative'],
+  ['Nếu mai tôi rảnh thì nhắc tôi học.', 'hypothetical'],
+  ['`Mai 9h nhắc tao học LINQ`', 'quoted'],
+  ['"Mai 9h nhắc tao học LINQ"', 'quoted'],
+  ['Mai chắc tôi học LINQ.', 'uncertain'],
+  ['Có lẽ tối nay tôi học.', 'uncertain'],
+  ['Mai 9h nhắc tôi học LINQ và 10h nhắc tôi làm auth.', 'uncertain'],
+])('classifies and refuses non-action intent: %s', (text, intent) => {
+  expect(classifyCommitmentIntent(text)).toBe(intent)
+  expect(extractCommitment(text, now, zone).isCommitment).toBe(false)
+})
+
+it.each(['Nhắc tôi họp lúc 14h.', 'Ngày 25 lúc 9h nhắc tôi đóng học phí.', 'Nhắc tôi gửi báo cáo lúc 8h tối nay.', '10 phút nữa nhắc tôi uống nước.'])('accepts direct requests: %s', (text) => {
+  expect(classifyCommitmentIntent(text)).toBe('create')
+  expect(extractCommitment(text, now, zone)).toMatchObject({ isCommitment: true, time: { status: 'resolved' } })
+})
 
 it.each([
   ['Mai 9h nhắc tao học LINQ.', 'học LINQ', '2026-10-23T02:00:00.000Z'],

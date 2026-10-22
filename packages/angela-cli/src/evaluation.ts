@@ -76,7 +76,8 @@ export class Evaluation {
     const now = Date.now()
     const tasks = new Tasks(directory, this.messages.tasks, () => now, 'Asia/Ho_Chi_Minh')
     if (id === 'relative-time') {
-      await this.request('20 phút nữa nhắc tôi học tiếng Trung.', taskTools(tasks, this.messages.tasks), taskContext(tasks), directory, calls, signal)
+      const text = '20 phút nữa nhắc tôi học tiếng Trung.'
+      await this.request(text, taskTools(tasks, this.messages.tasks, undefined, text), taskContext(tasks), directory, calls, signal)
       const saved = await tasks.list()
       return {
         used_task_create: calls.includes('task_create'),
