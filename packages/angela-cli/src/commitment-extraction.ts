@@ -11,7 +11,7 @@ export type CommitmentExtraction
 /** Does not turn predictions, negations, quotations, or hypothetical reminders into persistent commitments. */
 export function extractCommitment(text: string, now: number, timezone: string): CommitmentExtraction {
   const request = /(?:nhớ\s+)?nhắc(?:\s+(?:tao|tôi|mình|tớ|bạn|em|anh))?|gọi\s+(?:tôi|tao|mình)/iu.exec(text)
-  if (!request || classifyCommitmentIntent(text) !== 'create')
+  if (!request || classifyCommitmentIntent(text) !== 'create' || /[.!;]/u.test(text.slice(0, request.index)))
     return { isCommitment: false, confidence: 0 }
   const parsed = parseReminderTime(text.replace(request[0], ''), now, timezone)
   const title = parsed.remainder.replace(/^[\s,:.!?]+|[\s,.!?]+$/gu, '').trim()

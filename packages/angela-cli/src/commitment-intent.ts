@@ -24,6 +24,8 @@ export function classifyCommitmentIntent(text: string): CommitmentIntent {
     return 'none'
   // Only temporal expressions and direct-request prefixes can precede the action.
   const prefix = value.slice(0, action.index)
+    .split(/[.!;]/u)
+    .at(-1)!
     .replace(/(?:ngày\s+)?mai|hôm nay|tối nay|thứ (?:hai|ba|tư|năm|sáu|bảy)|chủ nhật|cuối tuần|ngày\s+\d{1,2}|\d{1,2}\/\d{1,2}(?:\/\d{4})?/gu, '')
     .replace(/(?:\d+|một|hai|ba|bốn|năm|sáu|bảy|tám|chín|mười)\s*(?:phút|tiếng|giờ)\s+nữa|\d{1,2}(?:h\d{0,2}|:\d{2}|\s*giờ)/gu, '')
     .replace(/(?:^|\s)(?:lúc|vào|sáng|chiều|tối|nhớ|hãy|xin|làm ơn|tôi muốn|tao muốn|please|tomorrow|today)(?=\s|$)/gu, '')

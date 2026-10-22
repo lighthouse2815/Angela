@@ -7,6 +7,11 @@ import { parseReminderTime } from './reminder-time'
 const now = Date.parse('2026-10-22T07:00:00+07:00')
 const zone = 'Asia/Ho_Chi_Minh'
 
+it('authorizes a direct task clause after a separate statement without consuming the whole request locally', () => {
+  expect(classifyCommitmentIntent('Tôi tên là Lan. Thêm việc học tiếng Trung vào danh sách.')).toBe('create')
+  expect(extractCommitment('Tôi tên là Lan. Mai 9h nhắc tôi học.', now, zone).isCommitment).toBe(false)
+})
+
 it.each([
   ['Tại sao câu "mai 9h nhắc tao học LINQ" lại tạo reminder?', 'meta'],
   ['Parser xử lý câu mai 9h nhắc tao học LINQ thế nào?', 'meta'],
