@@ -5,7 +5,7 @@ Historical experiment baseline: Kirie 0.6.5, Godot 4.7.2, macOS Metal Forward+.
 
 This review analyzes framework boundaries, abstractions, ownership, and implementation methods.
 It does not extend the [platform acceptance matrix](../MIGRATION.md#capability-matrix) or close Windows CEF shutdown.
-The [immutable full review](https://github.com/BeanDz/airi/blob/ef7eb50e5a76265f2675e9072a7430d2dc46f09c/apps/desktop-kirie/docs/ablation-review.md) retains per-experiment logs and commands.
+The [immutable full review](https://github.com/BeanDz/airi/blob/ef7eb50e5a76265f2675e9072a7430d2dc46f09c/apps/stage-tamagotchi-kirie/docs/ablation-review.md) retains per-experiment logs and commands.
 
 ## Whole-framework decisions
 

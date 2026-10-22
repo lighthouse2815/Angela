@@ -5,7 +5,7 @@
 Each result applies only to its platform, dependency baseline, and checked flow.
 Builds and route checks do not establish native acceptance or coverage for later changes.
 
-The [immutable full record](https://github.com/BeanDz/airi/blob/ef7eb50e5a76265f2675e9072a7430d2dc46f09c/apps/desktop-kirie/docs/verification.md) retains commands, route lists, and capture IDs.
+The [immutable full record](https://github.com/BeanDz/airi/blob/ef7eb50e5a76265f2675e9072a7430d2dc46f09c/apps/stage-tamagotchi-kirie/docs/verification.md) retains commands, route lists, and capture IDs.
 Temporary local artifacts are evidence references, not repository fixtures.
 
 ## Recorded checks

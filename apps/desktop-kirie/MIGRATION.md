@@ -140,7 +140,7 @@ Do not expose Artistry credentials in the renderer or depend on browser CORS for
 
 The Kirie bootstrap no longer connects these deferred services. Their stores, contracts, and Electron implementations remain as migration references.
 Removing startup calls does not remove indirect store creation or every page entry.
-The [original Kirie App.vue](https://github.com/BeanDz/airi/blob/ef7eb50e5a76265f2675e9072a7430d2dc46f09c/apps/desktop-kirie/src-web/src/renderer/App.vue#L136-L361) preserves the removed startup order and subscriptions.
+The [original Kirie App.vue](https://github.com/BeanDz/airi/blob/ef7eb50e5a76265f2675e9072a7430d2dc46f09c/apps/stage-tamagotchi-kirie/src-web/src/renderer/App.vue#L136-L361) preserves the removed startup order and subscriptions.
 
 | Gap | Retained implementation | Removed startup connection |
 | --- | --- | --- |
@@ -210,5 +210,5 @@ For an IPC change, include a real request and response.
 Complete an independent review before acceptance.
 
 [Platform verification](docs/verification.md) and [ablation review](docs/ablation-review.md) retain dated evidence.
-The [full previous migration record](https://github.com/BeanDz/airi/blob/ef7eb50e5a76265f2675e9072a7430d2dc46f09c/apps/desktop-kirie/MIGRATION.md) retains longer narratives.
+The [full previous migration record](https://github.com/BeanDz/airi/blob/ef7eb50e5a76265f2675e9072a7430d2dc46f09c/apps/stage-tamagotchi-kirie/MIGRATION.md) retains longer narratives.
 This document reorganization adds no runtime acceptance.
