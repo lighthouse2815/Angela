@@ -49,6 +49,36 @@ On macOS, grant Accessibility and Screen Recording permissions to the launching 
 Some application actions also need Automation permission. If `app.probePermissions` reports missing screen-recording permission, a capture can contain only the desktop background despite exit code zero. Available commands depend on the OS and AUV backend.
 Use this feature for local native applications. It does not expose a remote-device gateway or replace the separate `services/computer-use-mcp` service.
 
+### Angela Browser
+
+New desktop MCP configurations include `angela-browser`. Existing configurations stay unchanged.
+The server supplies navigation, accessibility snapshots, forms, tabs, uploads, screenshots, PDF output, and browser debugging.
+The existing MCP bridge discovers these tools and registers them with the chat model.
+Use a model that supports tool calls.
+
+Install Node.js with npm and `npx` on the desktop host. The first server start downloads the pinned runtime.
+The default browser is Chrome. Install Chrome before the first browser action.
+
+For an existing configuration:
+
+1. Open **Settings → Modules → MCP** and open the configuration file.
+2. Run `pnpm -F @angela/desktop setup:browser /absolute/path/to/mcp.json` from the repository root.
+3. In MCP settings, apply and restart the servers.
+4. Check that `angela-browser` runs and its connection test lists browser tools.
+5. Ask Angela to open a website, read its content, and complete a form.
+
+The setup command preserves other servers and any existing `angela-browser` entry, including disabled entries.
+Browser tools use the existing MCP registration path. The **Use computer** switch controls native AUV tools separately.
+Disable `angela-browser` in MCP settings to remove browser access.
+
+The browser uses a persistent automation profile. Sign in inside that browser to retain sessions.
+To connect an existing Chrome instance, append `--cdp-endpoint` and its local endpoint to the server arguments.
+For a browser without a visible window, append `--headless`.
+Keep profile data and downloaded private files outside Git.
+
+The runtime uses the published `@playwright/mcp` package at version `0.0.83` under Apache-2.0.
+Its package retains the required third-party license notices. Angela Browser is the integration name.
+
 ### Literal text and Vietnamese
 
 Use `computer_use_paste_text` for literal text, including Vietnamese, after focusing the intended input.

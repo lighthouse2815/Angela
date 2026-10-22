@@ -29,6 +29,7 @@
     "build:mac": "pnpm run build && electron-builder --mac",
     "build:linux": "pnpm run build && electron-builder --linux",
     "smoke:computer-use-input": "install-electron && electron scripts/fixtures/computer-use-input.cjs",
+    "setup:browser": "tsx scripts/setup-browser.ts",
     "setup:computer-use": "tsx scripts/setup-computer-use.ts",
     "rename-artifacts": "mkdir -p bundle && tsx scripts/rename-artifacts.ts",
     "merge-latest-mac": "tsx scripts/merge-latest-mac.ts",

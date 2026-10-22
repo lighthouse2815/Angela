@@ -24,6 +24,7 @@ import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/
 import { defineInvokeHandler } from '@moeru/eventa'
 import { app, shell } from 'electron'
 
+import { browserServerConfig, browserServerName } from '../../../../shared/browser-mcp'
 import {
   electronMcpApplyAndRestart,
   electronMcpCallTool,
@@ -60,7 +61,7 @@ export interface McpManager {
 }
 
 const defaultMcpConfig: ElectronMcpConfigFile = {
-  mcpServers: {},
+  mcpServers: { [browserServerName]: browserServerConfig },
 }
 const toolNameSeparator = '::'
 const mcpRequestTimeoutMsec = 10_000
@@ -323,15 +324,17 @@ export function createMcpManager(): McpManager {
       throw new Error(`mcp server is not running: ${serverName}`)
     }
 
+    // Browser navigation can use 60 seconds before it reports a timeout.
+    const requestOptions = serverName === browserServerName
+      ? { timeout: 90_000, maxTotalTimeout: 90_000 }
+      : { timeout: mcpRequestTimeoutMsec, maxTotalTimeout: mcpRequestMaxTotalTimeoutMsec }
+
     let result
     try {
       result = await session.client.callTool({
         name: toolName,
         arguments: payload.arguments ?? {},
-      }, undefined, {
-        timeout: mcpRequestTimeoutMsec,
-        maxTotalTimeout: mcpRequestMaxTotalTimeoutMsec,
-      })
+      }, undefined, requestOptions)
     }
     catch (error) {
       const fallbackToolName = resolveFallbackToolName(toolName)
@@ -348,10 +351,7 @@ export function createMcpManager(): McpManager {
       result = await session.client.callTool({
         name: fallbackToolName,
         arguments: payload.arguments ?? {},
-      }, undefined, {
-        timeout: mcpRequestTimeoutMsec,
-        maxTotalTimeout: mcpRequestMaxTotalTimeoutMsec,
-      })
+      }, undefined, requestOptions)
     }
 
     const normalized: ElectronMcpCallToolResult = {}
