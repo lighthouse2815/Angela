@@ -16,7 +16,7 @@ Only episodic pages decay. Pinned, semantic, procedural, and core Personal Memor
 ## Reference implementation
 
 The reference checkout lives outside Angela at `../ai-memory-reference`. It is neither a dependency nor a service.
-The source revision is recorded in the final validation report.
+Reference revision: `1c86aebc14addccc7ac875913d565c681bfa4a50`.
 
 | Angela behavior | Reference production code | Reference tests and invariant |
 | --- | --- | --- |
@@ -27,6 +27,10 @@ The source revision is recorded in the final validation report.
 | Capture privacy | `ai-memory-core/src/sanitize.rs` | Sanitize before truncation and persistence |
 | Authority | `ai-memory-store/src/belief.rs`, `reader.rs` | Weaker inferred evidence cannot replace explicit facts |
 | Retrieval evaluation | `ai-memory-consolidate/tests/suite/recall_eval.rs` | Fixed corpus and probes measure recall positions and pollution |
+| Zero-provider summaries | `ai-memory-hooks/src/synth.rs`, `session_end_equivalence.rs` | Provider-free evidence remains useful. Replayed session endings are equivalent |
+| Optional enrichment | `ai-memory-consolidate/src/consolidator.rs`, `consolidator_oracle.rs` | Structured candidates need source evidence. Failure preserves the original episode |
+| Aging passes | `ai-memory-consolidate/src/sweep.rs`, tests `compaction_sweep.rs` | Tier policy precedes compaction. Hot access protects otherwise old episodes |
+| Incremental embeddings | `ai-memory-consolidate/src/embed.rs`, tests `embed_backfill.rs` | Unchanged text reuses vectors. A stale generation cannot replace a newer version |
 
 Angela uses a 90-day episodic half-life. The reference default scalar decay differs.
 Angela uses SQL reinforcement throttling instead of an unbounded process map.
@@ -34,6 +38,9 @@ Compaction replaces the cold body locally. It does not create Git-backed copies 
 Forget operations remove page projections, vectors, edges, and derived copies.
 
 Team servers, Rust crates, memory sidecars, Git-backed personal memory, admin infrastructure, and cross-machine sync are excluded.
+Cold-cluster deduplication and dream passes were reviewed in `cold_cluster.rs`, `dream.rs`, and their sweep tests.
+Angela initially deduplicates exact and normalized replays within a claim. It does not automatically merge similar independent facts.
+Dream clustering needs a larger evaluation corpus before it can change durable knowledge safely.
 
 ## Runtime capture
 
@@ -115,3 +122,7 @@ Destructive operations checkpoint obsolete WAL frames before returning success.
 If an external reader prevents that checkpoint, cleanup reports an error and requires a retry after the reader releases its snapshot.
 An idempotent purge retries physical cleanup even when the earlier call already deleted the page.
 Credential filtering also covers English and Vietnamese declarations. Sensitive claim keys and kinds are rejected before storage.
+Personal corrections purge derived data while the existing personal-file lock is held, before the atomic JSON replacement.
+A cleanup failure leaves the authoritative old fact available for an explicit retry.
+Identity-only source-version tombstones reject stale personal snapshots from another indexer after the purge completes.
+New explicit facts have new source versions and remain eligible for indexing.

@@ -9,7 +9,7 @@ import { errorMessageFrom } from '@moeru/std'
 import * as v from 'valibot'
 
 import { MemoryFile } from './memory-file'
-import { RecallIndex } from './recall-index'
+import { RecallIndex, sourceVersion } from './recall-index'
 
 const textSchema = v.pipe(v.string(), v.trim(), v.minLength(1), v.maxLength(500))
 const idSchema = v.pipe(v.string(), v.uuid())
@@ -33,16 +33,16 @@ export class Memory {
   }
 
   private async edit(change: (state: State) => void, target?: () => string | undefined, purgeAll = false, forgotten?: () => { text: string, sessionId?: string } | undefined) {
-    if (purgeAll || target?.())
-      await RecallIndex.invalidate(this.dataDir, 'personal', target?.())
-    await this.file.edit(change)
-    try {
-      if (purgeAll || target?.())
-        await RecallIndex.invalidate(this.dataDir, 'personal', target?.(), forgotten?.())
-    }
-    catch {
-      throw new Error(this.messages.recallCleanup)
-    }
+    await this.file.edit(async (state) => {
+      const previousVersion = sourceVersion(JSON.stringify(state))
+      change(state)
+      v.parse(stateSchema, state)
+      try {
+        if (purgeAll || target?.())
+          await RecallIndex.invalidate(this.dataDir, 'personal', target?.(), { ...forgotten?.(), previousVersion })
+      }
+      catch { throw new Error(this.messages.recallCleanup) }
+    })
   }
 
   /** Missing storage is enabled and empty. Invalid storage is never silently overwritten. */

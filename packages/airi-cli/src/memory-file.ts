@@ -31,13 +31,13 @@ export class MemoryFile<T> {
     }
   }
 
-  async edit(change: (state: T) => void) {
+  async edit(change: (state: T) => unknown) {
     const pending = this.writes.then(() => this.write(change))
     this.writes = pending.then(() => {}, () => {})
     await pending
   }
 
-  private async write(change: (state: T) => void) {
+  private async write(change: (state: T) => unknown) {
     await mkdir(this.directory, { recursive: true, mode: 0o700 })
     const lockPath = join(this.directory, `${this.name}.lock`)
     const lock = await open(lockPath, 'wx', 0o600).catch(() => {
@@ -46,7 +46,7 @@ export class MemoryFile<T> {
     const temporary = join(this.directory, `${randomUUID()}.tmp`)
     try {
       const state = await this.read()
-      change(state)
+      await change(state)
       const source = JSON.stringify(v.parse(this.schema, state))
       if (source.length > 128_000)
         throw new Error(this.errors.invalid)

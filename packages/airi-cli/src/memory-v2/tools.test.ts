@@ -4,16 +4,18 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { cliMessages } from '@proj-airi/i18n/cli'
-import { afterEach, expect, it } from 'vitest'
+import { afterEach, expect, it, vi } from 'vitest'
 
 import { Memory } from '../memory'
 import { Recall } from '../recall'
-import { RecallIndex } from '../recall-index'
+import { RecallIndex, sourceVersion } from '../recall-index'
 import { Sessions } from '../sessions'
+import { MemoryStore } from './store'
 import { pageTools } from './tools'
 
 const resources: { index: RecallIndex, directory: string }[] = []
 afterEach(async () => {
+  vi.restoreAllMocks()
   for (const { index, directory } of resources.splice(0)) {
     index.close()
     await rm(directory, { recursive: true, force: true })
@@ -27,6 +29,40 @@ async function setup() {
 }
 
 const call = { tier: 'semantic', kind: 'architecture', key: 'database', title: 'Database', body: 'Use SQLite', source_quote: 'Use SQLite', expected_version: null }
+
+it('retains the authoritative fact when derived cleanup fails so forgetting can be retried', async () => {
+  const { directory } = await setup()
+  const memory = new Memory(directory, cliMessages.en)
+  const id = await memory.remember('I prefer copper releases')
+  const cleanup = vi.spyOn(MemoryStore.prototype, 'forgetText').mockImplementation(() => {
+    throw new Error('storage cleanup failed')
+  })
+  await expect(memory.forget(id)).rejects.toThrow(cliMessages.en.recallCleanup)
+  expect((await memory.read()).entries).toContainEqual(expect.objectContaining({ id, text: 'I prefer copper releases' }))
+  await expect(memory.remember('I prefer silver releases', id)).rejects.toThrow(cliMessages.en.recallCleanup)
+  expect((await memory.read()).entries[0]?.text).toBe('I prefer copper releases')
+  cleanup.mockRestore()
+  await memory.forget(id)
+  expect((await memory.read()).entries).toEqual([])
+})
+
+it('rejects a stale personal projection after forgetting without blocking later explicit facts', async () => {
+  const { directory, index } = await setup()
+  const memory = new Memory(directory, cliMessages.en)
+  const id = await memory.remember('I prefer copper releases')
+  const previous = await memory.read()
+  const oldVersion = sourceVersion(JSON.stringify(previous))
+  const oldHit = { id: `personal:${id}`, kind: 'personal' as const, scope: '', text: previous.entries[0]!.text, updatedAt: previous.entries[0]!.updatedAt }
+  index.replace('personal', oldVersion, [oldHit])
+  await memory.forget(id)
+  index.replace('personal', oldVersion, [oldHit])
+  expect(index.read(oldHit.id)).toBeUndefined()
+  expect(index.search('copper', 'workspace')).toEqual([])
+  const freshId = await memory.remember('I prefer silver releases')
+  const fresh = await memory.read()
+  index.replace('personal', sourceVersion(JSON.stringify(fresh)), [{ ...oldHit, id: `personal:${freshId}`, text: fresh.entries[0]!.text }])
+  expect(index.search('silver', 'workspace')).toHaveLength(1)
+})
 
 it('requires verbatim evidence and never lets the model select its own authority', async () => {
   const { store } = await setup()

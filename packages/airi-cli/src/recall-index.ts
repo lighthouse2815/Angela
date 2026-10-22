@@ -42,6 +42,7 @@ export class RecallIndex {
         PRAGMA journal_size_limit=4194304;
         BEGIN IMMEDIATE;
         CREATE TABLE IF NOT EXISTS sources(origin TEXT PRIMARY KEY, version TEXT NOT NULL);
+        CREATE TABLE IF NOT EXISTS invalidated_sources(origin TEXT NOT NULL,version TEXT NOT NULL,PRIMARY KEY(origin,version));
         CREATE TABLE IF NOT EXISTS excerpts(
           rowid INTEGER PRIMARY KEY, id TEXT UNIQUE NOT NULL, kind TEXT NOT NULL, scope TEXT NOT NULL,
           origin TEXT NOT NULL, version TEXT NOT NULL, text TEXT NOT NULL, updatedAt TEXT NOT NULL, tokens TEXT NOT NULL,
@@ -105,6 +106,10 @@ export class RecallIndex {
   replace(origin: string, version: string, hits: Omit<RecallHit, 'version' | 'origin'>[]) {
     this.database.exec('BEGIN IMMEDIATE')
     try {
+      if (origin === 'personal' && this.sql('SELECT 1 FROM invalidated_sources WHERE origin=? AND version=?').get(origin, version)) {
+        this.database.exec('COMMIT')
+        return
+      }
       const old = new Set(this.sql('SELECT id FROM excerpts WHERE origin=?').all(origin).map(row => String(row.id)))
       const upsert = this.sql(`INSERT INTO excerpts(id,kind,scope,origin,version,text,updatedAt,tokens) VALUES(?,?,?,?,?,?,?,search_text(?))
         ON CONFLICT(id) DO UPDATE SET kind=excluded.kind,scope=excluded.scope,origin=excluded.origin,version=excluded.version,
@@ -125,9 +130,11 @@ export class RecallIndex {
     }
   }
 
-  remove(origin: string, id?: string) {
+  remove(origin: string, id?: string, previousVersion?: string) {
     this.database.exec('BEGIN IMMEDIATE')
     try {
+      if (previousVersion)
+        this.sql('INSERT OR IGNORE INTO invalidated_sources VALUES(?,?)').run(origin, previousVersion)
       this.sql('DELETE FROM excerpts WHERE origin=? AND (? IS NULL OR id=?)').run(origin, id ?? null, id ?? null)
       this.sql('DELETE FROM sources WHERE origin=?').run(origin)
       // FTS5 secure-delete also removes obsolete token entries from its segment index.
@@ -221,7 +228,7 @@ export class RecallIndex {
   }
 
   /** Writers purge derived copies without creating an index for users who have not enabled retrieval. */
-  static async invalidate(dataDir: string, origin: string, id?: string, forgotten?: { text: string, sessionId?: string }) {
+  static async invalidate(dataDir: string, origin: string, id?: string, forgotten?: { text?: string, sessionId?: string, previousVersion?: string }) {
     try {
       await stat(join(dataDir, 'memory', 'recall.sqlite'))
     }
@@ -234,9 +241,9 @@ export class RecallIndex {
     try {
       if (origin.startsWith('history:'))
         index.memory.purgeSession(origin.slice(8))
-      if (forgotten)
+      if (forgotten?.text)
         index.memory.forgetText(forgotten.text, forgotten.sessionId)
-      index.remove(origin, id)
+      index.remove(origin, id, forgotten?.previousVersion)
       index.memory.reclaim()
     }
     finally {
