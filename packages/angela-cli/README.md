@@ -3,6 +3,54 @@
 Chat with Angela from a Node.js terminal. The CLI uses Angela's existing provider and generation runtime.
 Angela can manage everyday tasks and deliver reminders while the terminal process remains open.
 
+## Angela Gateway
+
+The CLI includes a local multi-account provider engine. Users do not install a separate gateway application.
+From the source checkout, run `pnpm build:cli` first. Portable releases include the built server.
+
+```sh
+angela gateway start
+```
+
+In another terminal:
+
+```sh
+angela gateway login
+angela gateway password --show
+angela gateway accounts
+angela gateway models
+angela gateway use --model PROVIDER_ALIAS/MODEL_ID
+angela
+```
+
+`login [PROVIDER]` prints the bundled dashboard address. OAuth and special imports use that local browser interface.
+The dashboard contains the complete imported provider registry, not a small CLI-only subset.
+Available models and quotas depend on your provider accounts.
+Keep the foreground gateway running. Ctrl+C stops it.
+
+Key-based accounts can use `angela gateway add --provider ID --name NAME`.
+Supply the provider credential through `ANGELA_GATEWAY_PROVIDER_KEY`, not a command-line argument.
+For provider-specific fields, pass `--credentials-file PATH` with `apiKey` and optional `providerSpecificData`.
+Keep credential files private and outside Git.
+
+`enable ACCOUNT_ID`, `disable ACCOUNT_ID`, and `test ACCOUNT_ID` manage existing accounts.
+`test` can contact the provider. `keys` lists metadata without credential values.
+`key --show` explicitly prints the shared inference key. `password --show` prints the initial dashboard password.
+If you changed the dashboard password, use the new password instead.
+
+The default endpoint is `http://127.0.0.1:20129/v1/`.
+`--port` selects another port. Apply the same option to commands that access that instance.
+`--data-dir` or `ANGELA_GATEWAY_DATA_DIR` selects another private account directory.
+The default directory is `$XDG_CONFIG_HOME/angela/gateway`, or `~/.config/angela/gateway` without XDG configuration.
+This directory is separate from CLI memory and session data. Do not share it or commit it.
+
+`use --model` saves the shared key through the existing private configuration file.
+It preserves other provider entries and supports `--config PATH` or `ANGELA_CONFIG`.
+Explicit chat flags and environment overrides still take precedence over saved configuration.
+The inference key cannot manage provider accounts. Remote exposure and background service installation are not part of this integration.
+
+See [Angela Gateway](../provider-gateway/README.md) for build details and source provenance.
+
 ## Personal Zalo Away Mode
 
 `angela zalo login` authenticates a personal account through a private QR image.

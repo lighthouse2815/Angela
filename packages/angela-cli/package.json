@@ -29,6 +29,7 @@
     "@angela/computer-use-mcp": "workspace:^",
     "@angela/core-agent": "workspace:^",
     "@angela/discord-bot": "workspace:*",
+    "@angela/gateway": "workspace:^",
     "@angela/i18n": "workspace:^",
     "@angela/local-config": "workspace:^",
     "@angela/pipelines-audio": "workspace:^",

@@ -3224,6 +3224,9 @@ importers:
 
   packages/angela-cli:
     dependencies:
+      '@angela/gateway':
+        specifier: workspace:^
+        version: link:../provider-gateway
       '@modelcontextprotocol/sdk':
         specifier: 'catalog:'
         version: 1.30.0(supports-color@10.2.2)(zod@4.4.3)
@@ -3728,6 +3731,8 @@ importers:
       xsschema:
         specifier: 'catalog:'
         version: 0.5.1(@valibot/to-json-schema@1.7.1(valibot@1.4.2(typescript@6.0.3)))(zod-to-json-schema@3.25.2(zod@4.4.3))(zod@4.4.3)
+
+  packages/provider-gateway: {}
 
   packages/provider-inference:
     dependencies:

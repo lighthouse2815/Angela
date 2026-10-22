@@ -167,6 +167,10 @@ packages/i18n/glossary/glossary.tbx
 apps/*/public/sherpaw/
 apps/*/src/renderer/public/sherpaw/
 
+# Private state and generated build files for the vendored gateway.
+third_party/angela-gateway/.next/
+third_party/angela-gateway/node_modules/
+third_party/angela-gateway/.data/
 # Zalo personal session material and account-scoped external message logs
 **/zalo-credentials.json
 **/zalo-login-qr.png

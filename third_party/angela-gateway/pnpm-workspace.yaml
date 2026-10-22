@@ -1,0 +1,7 @@
+packages:
+  - .
+nodeLinker: hoisted
+minimumReleaseAge: 4320
+allowBuilds:
+  better-sqlite3: false
+  sharp: false

@@ -28,6 +28,11 @@ import { Terminal } from '../terminal'
  *                    -> McpTools -> MCP client -> tool server
  */
 async function main() {
+  if (process.argv[2] === 'gateway') {
+    const { runGateway } = await import('../gateway-command')
+    await runGateway(process.argv.slice(3), process.env)
+    return
+  }
   if (process.argv[2] === 'tasks' || process.argv[2] === 'task') {
     const { runTaskCli } = await import('../task-cli')
     await runTaskCli(process.argv.slice(3), process.env, process.argv[2] === 'tasks')
@@ -82,6 +87,7 @@ async function main() {
   const messages = config.messages
   if (config.help) {
     process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela tasks [all]\nangela task show|done|cancel|snooze ID [DURATION]\nangela eval [--help]\nangela setup [--help]\nangela reminders install|start|stop|status|run [--help]\nangela doctor [--json] [--help]\nangela telegram [--help]\nangela discord [--help]\nangela zalo login|logout|status|run [--help]\nangela away on|off|status [--help]\nangela voice start|stop|status [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
+      ['angela gateway --help', messages.gateway.description],
       ['--model', messages.model],
       ['--provider', messages.provider],
       ['--config', messages.configFile],

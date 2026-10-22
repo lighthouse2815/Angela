@@ -1,6 +1,10 @@
 {
   "$schema": "https://turborepo.com/schema.json",
   "tasks": {
+    "@angela/gateway#build": {
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/third_party/angela-gateway/**", "!$TURBO_ROOT$/third_party/angela-gateway/node_modules/**", "!$TURBO_ROOT$/third_party/angela-gateway/.next/**"],
+      "outputs": ["dist/**"]
+    },
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"]

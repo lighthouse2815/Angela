@@ -10,6 +10,7 @@ This document supplements existing notices. It does not replace them or change t
 
 | Source or component | Provenance and notices |
 | --- | --- |
+| Angela Gateway provider engine | Derived from [decolua/9router](https://github.com/decolua/9router). Keep the [MIT license](./third_party/angela-gateway/LICENSE) and [revision record](./third_party/angela-gateway/README.angela.md). |
 | Desktop, Kirie, web, shared packages, integrations, and engine | Derivative AIRI sources. Root [LICENSE](./LICENSE) and Git history retain attribution. |
 | `packages/ccc` | [MIT notice](./packages/ccc/LICENSE), copyright Moeru AI. |
 | `packages/stage-ui-spine` | [Package notices](./packages/stage-ui-spine/LICENSE.md) distinguish MIT source from the Spine Runtimes license. |

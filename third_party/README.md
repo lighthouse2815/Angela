@@ -1,5 +1,12 @@
 # Vendored sources
 
+## Angela Gateway
+
+The provider engine lives in [angela-gateway](./angela-gateway).
+Its [source record](./angela-gateway/README.angela.md) gives the upstream revision, MIT license, import scope, and local changes.
+Angela builds and distributes it through [the gateway package](../packages/provider-gateway).
+No separate upstream application is required at runtime.
+
 ## OpenSeeFace
 
 - Upstream: <https://github.com/emilianavt/OpenSeeFace>
