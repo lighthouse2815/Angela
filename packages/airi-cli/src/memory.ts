@@ -32,13 +32,13 @@ export class Memory {
     this.file = new MemoryFile<State>(join(dataDir, 'memory'), 'personal', stateSchema, () => ({ version: 1, enabled: true, autoEnabled: true, entries: [] }), { invalid: messages.memoryInvalid, locked: messages.memoryLocked })
   }
 
-  private async edit(change: (state: State) => void, target?: () => string | undefined, purgeAll = false) {
+  private async edit(change: (state: State) => void, target?: () => string | undefined, purgeAll = false, forgotten?: () => { text: string, sessionId?: string } | undefined) {
     if (purgeAll || target?.())
       await RecallIndex.invalidate(this.dataDir, 'personal', target?.())
     await this.file.edit(change)
     try {
       if (purgeAll || target?.())
-        await RecallIndex.invalidate(this.dataDir, 'personal', target?.())
+        await RecallIndex.invalidate(this.dataDir, 'personal', target?.(), forgotten?.())
     }
     catch {
       throw new Error(this.messages.recallCleanup)
@@ -66,6 +66,7 @@ export class Memory {
     if (id && !v.safeParse(idSchema, id).success)
       throw new Error(this.messages.memoryMissing)
     let savedId = id ?? ''
+    let replacedText: { text: string, sessionId?: string } | undefined
     await this.edit((state) => {
       if (!state.enabled)
         throw new Error(this.messages.memoryDisabled)
@@ -81,6 +82,8 @@ export class Memory {
         throw new Error(this.messages.memoryCoreLimit)
       const now = new Date().toISOString()
       if (current) {
+        if (current.text !== parsed.output)
+          replacedText = { text: current.text, sessionId: current.source?.sessionId }
         current.text = parsed.output
         current.updatedAt = now
         if (metadata?.core !== undefined)
@@ -92,11 +95,12 @@ export class Memory {
         savedId = randomUUID()
         state.entries.push({ id: savedId, text: parsed.output, createdAt: now, updatedAt: now, core: metadata?.core ?? false, source: metadata?.source ?? { quote: parsed.output } })
       }
-    }, () => savedId ? `personal:${savedId}` : undefined)
+    }, () => savedId ? `personal:${savedId}` : undefined, false, () => replacedText)
     return savedId
   }
 
   async forget(id: string, expectedText?: string) {
+    let forgotten: { text: string, sessionId?: string } | undefined
     await this.edit((state) => {
       const index = state.entries.findIndex(entry => entry.id === id)
       if (index < 0)
@@ -107,8 +111,9 @@ export class Memory {
         if (state.entries[index]!.text !== expectedText)
           throw new Error(this.messages.memoryChanged)
       }
+      forgotten = { text: state.entries[index]!.text, sessionId: state.entries[index]!.source?.sessionId }
       state.entries.splice(index, 1)
-    }, () => `personal:${id}`)
+    }, () => `personal:${id}`, false, () => forgotten)
   }
 
   /** Saved text is request-local context, never persisted as a system turn in chat history. */

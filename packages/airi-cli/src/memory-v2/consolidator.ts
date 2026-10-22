@@ -77,13 +77,13 @@ export class MemoryCapture {
   record(event: AngelaEvent, text = '', verified = false) {
     if (event.sessionId !== this.sessionId || event.workspace !== this.scope)
       throw new Error('Observation scope mismatch')
-    if (event.type === 'tool.call' || (event.type === 'tool.result' && !verified))
+    if (event.type === 'tool.call' || (event.type === 'tool.result' && !verified && event.outcome !== 'failed'))
       return
     if (event.type === 'user.message' && /^(?:hi|hello|hey|chào|xin chào|thanks|ok|ừ|cảm ơn)[!.,\s]*$/iu.test(text.trim()))
       return
-    if (event.type === 'assistant.message' && !/\b(?:I will|I'll|tôi sẽ|mình sẽ)\b/iu.test(text))
+    if (event.type === 'assistant.message' && !/\b(?:I will|I'll)\b|tôi sẽ|mình sẽ/iu.test(text))
       return
-    const observation: Observation = { id: event.id, type: event.type, correlationId: event.correlationId, sessionId: this.sessionId, scope: this.scope, channel: event.channel ?? 'system', timestamp: event.timestamp, text: sanitize(text), verified }
+    const observation: Observation = { id: event.id, type: event.type === 'tool.result' && event.outcome === 'failed' ? 'tool.error' : event.type, correlationId: event.correlationId, sessionId: this.sessionId, scope: this.scope, channel: event.channel ?? 'system', timestamp: event.timestamp, text: sanitize(text), verified }
     this.store.observe(observation)
   }
 

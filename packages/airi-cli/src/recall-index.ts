@@ -1,3 +1,5 @@
+import type { MemoryAuthority } from './memory-v2/types'
+
 import { createHash } from 'node:crypto'
 import { chmod, mkdir, stat } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -6,12 +8,13 @@ import { DatabaseSync } from 'node:sqlite'
 import * as v from 'valibot'
 
 import { MemoryStore } from './memory-v2/store'
+import { authority } from './memory-v2/types'
 
 const hitSchema = v.object({ id: v.string(), kind: v.picklist(['personal', 'skill', 'history', 'episodic', 'semantic', 'procedural']), scope: v.string(), origin: v.string(), version: v.string(), text: v.string(), updatedAt: v.string() })
 /** Indexed excerpts always retain a source identity. They are untrusted historical data, not live tool evidence. */
 export type RecallHit = v.InferOutput<typeof hitSchema>
 
-/** Owns a disposable private FTS5 index. JSON sessions, personal records and SKILL.md remain authoritative. */
+/** Owns private durable pages and derived retrieval. Existing JSON stores and skills retain their authority. */
 export class RecallIndex {
   readonly memory: MemoryStore
 
@@ -143,18 +146,31 @@ export class RecallIndex {
     const ignored = new Set('a an the is are was were i you me my we to of in on and or for this that what how please toi ban minh la thi ma va co cho cua cac cai voi duoc lam gi nhu hay khong mot nhung'.split(' '))
     const terms = [...new Set(query.normalize('NFD').replace(/\p{M}/gu, '').replace(/đ/giu, 'd').toLowerCase().match(/[\p{L}\p{N}_-]+/gu) ?? [])].filter(term => term.length > 1 && !ignored.has(term)).slice(-32)
     const lexical = terms.length
-      ? this.database.prepare(`SELECT excerpts.* FROM search JOIN excerpts ON excerpts.rowid=search.rowid
-          WHERE search MATCH ? AND (?='*' OR excerpts.scope='' OR excerpts.scope=?) AND excerpts.origin<>? ORDER BY bm25(search) LIMIT 80`).all(terms.map(term => `"${term}"`).join(' OR '), scope, scope, excludedOrigin)
+      ? this.database.prepare(`SELECT excerpts.*,p.authority AS memoryAuthority,p.salience AS memorySalience FROM search JOIN excerpts ON excerpts.rowid=search.rowid
+          LEFT JOIN memory_pages p ON p.id=substr(excerpts.id,8) AND excerpts.kind IN ('episodic','semantic','procedural')
+          WHERE search MATCH ? AND (?='*' OR excerpts.scope='' OR excerpts.scope=?) AND excerpts.origin<>?
+            AND (p.expiresAt IS NULL OR p.expiresAt>?) ORDER BY bm25(search) LIMIT 80`).all(terms.map(term => `"${term}"`).join(' OR '), scope, scope, excludedOrigin, new Date().toISOString())
       : []
     const semantic = namespace && vector
-      ? this.database.prepare(`SELECT *,similarity(vector,?) AS score FROM excerpts WHERE namespace=? AND length(vector)=? AND (?='*' OR scope='' OR scope=?) AND origin<>? ORDER BY score DESC LIMIT 80`).all(new Uint8Array(vector.buffer, vector.byteOffset, vector.byteLength), namespace, vector.byteLength, scope, scope, excludedOrigin).filter(row => Number(row.score) >= 0.35)
+      ? this.database.prepare(`SELECT excerpts.*,p.authority AS memoryAuthority,p.salience AS memorySalience,similarity(vector,?) AS score FROM excerpts
+          LEFT JOIN memory_pages p ON p.id=substr(excerpts.id,8) AND excerpts.kind IN ('episodic','semantic','procedural')
+          WHERE namespace=? AND length(vector)=? AND (?='*' OR excerpts.scope='' OR excerpts.scope=?) AND excerpts.origin<>?
+            AND (p.expiresAt IS NULL OR p.expiresAt>?) ORDER BY score DESC LIMIT 80`).all(new Uint8Array(vector.buffer, vector.byteOffset, vector.byteLength), namespace, vector.byteLength, scope, scope, excludedOrigin, new Date().toISOString()).filter(row => Number(row.score) >= 0.35)
       : []
     const ranked = new Map<string, { hit: RecallHit, score: number }>()
     for (const results of [lexical, semantic]) {
       results.forEach((row, rank) => {
         const hit = v.parse(hitSchema, row)
         const previous = ranked.get(hit.id)
-        ranked.set(hit.id, { hit, score: (previous?.score ?? 0) + 1 / (60 + rank + 1) })
+        // Relevance generates candidates first. Bounded authority resolves close contests without hiding targeted historical evidence.
+        let weight = hit.kind === 'personal' ? 1.25 : hit.kind === 'skill' ? 1.1 : 1
+        if (row.memoryAuthority) {
+          weight += 0.03 * (authority[String(row.memoryAuthority) as MemoryAuthority] ?? 0)
+          weight += 0.03 * Math.max(0.25, Math.min(2, Number(row.memorySalience)))
+          if (hit.kind === 'semantic' || hit.kind === 'procedural')
+            weight += 0.02
+        }
+        ranked.set(hit.id, { hit, score: (previous?.score ?? 0) + weight / (60 + rank + 1) })
       })
     }
     return [...ranked.values()].sort((a, b) => b.score - a.score || b.hit.updatedAt.localeCompare(a.hit.updatedAt)).map(item => item.hit)
@@ -165,7 +181,7 @@ export class RecallIndex {
   }
 
   /** Writers purge derived copies without creating an index for users who have not enabled retrieval. */
-  static async invalidate(dataDir: string, origin: string, id?: string) {
+  static async invalidate(dataDir: string, origin: string, id?: string, forgotten?: { text: string, sessionId?: string }) {
     try {
       await stat(join(dataDir, 'memory', 'recall.sqlite'))
     }
@@ -176,6 +192,10 @@ export class RecallIndex {
     }
     const index = await RecallIndex.open(dataDir)
     try {
+      if (origin.startsWith('history:'))
+        index.memory.purgeSession(origin.slice(8))
+      if (forgotten)
+        index.memory.forgetText(forgotten.text, forgotten.sessionId)
       index.remove(origin, id)
     }
     finally {

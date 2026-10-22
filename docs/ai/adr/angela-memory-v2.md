@@ -52,3 +52,20 @@ The zero-provider compiler creates an episodic page after each request, includin
 Its original goal survives observation-window rollover. Section limits bound summaries and keep repeated consolidation idempotent.
 Only host-verified results count as successful tools. Assistant commitments carry an explicit unverified label.
 Explicit `Workflow: ...` and `Quy trình: ...` statements can create procedural pages with source-episode edges.
+
+## Native knowledge and forgetting
+
+`memory_page_save` saves technical semantic and procedural pages from verbatim current-user or verified-tool quotes.
+The host assigns authority. A transactional version check rejects concurrent stale replacements.
+Personal preferences continue through `personal_memory`. Inferred technical pages cannot replace stronger explicit pages.
+
+`/memory purge memory:<id>` removes a page claim, all its versions, and downstream derived pages.
+Personal corrections and forget operations also remove captured copies and matching history projections.
+Identity-only session tombstones prevent late events or reindexing from restoring forgotten facts.
+The affected session's automatic captures stop. This favors privacy over retention of its other captured details.
+User-visible conversation archives retain their existing explicit `angela sessions delete <id>` lifecycle.
+Deleting an archive also purges its Memory V2 derivatives.
+
+FTS and optional vectors still feed reciprocal-rank fusion. Bounded authority and tier signals resolve close ranking contests.
+History remains eligible when the query specifically matches it. Semantic knowledge has no automatic recency penalty.
+The deterministic evaluation measures facts, episodes, decisions, procedures, supersession, contradictions, noise, and compaction recall.

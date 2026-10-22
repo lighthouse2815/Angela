@@ -295,7 +295,7 @@ export class RuntimeSession {
       return response
     }
     if (/^\/(?:memory|remember|forget)(?:\s|$)/u.test(text)) {
-      const recallCommand = /^\/memory (?:used|status|search|search-all|read|budget|reindex|recall|history|semantic)(?:\s|$)/u.test(text)
+      const recallCommand = /^\/memory (?:used|status|search|search-all|read|budget|reindex|recall|history|semantic|purge)(?:\s|$)/u.test(text)
       const response = recallCommand ? await (await this.recall())?.command(text, signal) : await (await this.memory()).command(text)
       if (!recallCommand && response !== undefined && this.retrieval)
         await (await this.retrieval)?.changed()

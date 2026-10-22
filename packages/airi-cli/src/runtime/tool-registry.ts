@@ -41,7 +41,7 @@ export async function buildTools(sources: ContextSources, text: string, sessionI
     tools.push(...taskTools(sources.tasks, sources.messages.tasks))
   const recall = sources.recall
   if (recall)
-    tools.push(...recall.tools(), ...recall.skills.tools(text, verified, sessionId, () => recall.changed(false)))
+    tools.push(...recall.tools(), ...await recall.pageTools(text, verified), ...recall.skills.tools(text, verified, sessionId, () => recall.changed(false)))
   return {
     tools,
     observe(event: StreamEvent): ToolObservation | undefined {

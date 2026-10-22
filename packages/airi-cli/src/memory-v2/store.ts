@@ -20,9 +20,10 @@ const inputSchema = v.object({
   abstract: v.optional(v.pipe(v.string(), v.maxLength(1000)), ''),
   authority: v.keyof(v.object({ inference: v.unknown(), episode: v.unknown(), consolidated: v.unknown(), project: v.unknown(), verified: v.unknown(), personal: v.unknown(), user: v.unknown() })),
   salience: v.optional(v.pipe(v.number(), v.finite()), 1),
-  pinned: v.optional(v.boolean(), false),
+  pinned: v.optional(v.boolean()),
   sourceSessionId: v.optional(v.pipe(v.string(), v.maxLength(200))),
   expiresAt: v.optional(v.pipe(v.string(), v.isoTimestamp())),
+  expectedVersion: v.optional(v.nullable(v.string())),
 })
 
 /** Owns authoritative memory in RecallIndex's connection. Every mutation and its FTS projection commit together. */
@@ -117,7 +118,7 @@ export class MemoryStore {
 
   /** Reads require an exact scope. Superseded pages remain available only through explicit history reads. */
   read(id: string, scope: string, history = false, now = new Date().toISOString()) {
-    return this.page(this.sql('SELECT * FROM memory_pages WHERE id=? AND scope=? AND (? OR status<>\'superseded\') AND (expiresAt IS NULL OR expiresAt>?)').get(id, scope, Number(history), now))
+    return this.page(this.sql('SELECT * FROM memory_pages WHERE id=? AND scope=? AND (? OR (status<>\'superseded\' AND (expiresAt IS NULL OR expiresAt>?)))').get(id, scope, Number(history), now))
   }
 
   current(scope: string, tier: MemoryPage['tier'], key: string) {
@@ -133,11 +134,14 @@ export class MemoryStore {
     const normalized = createHash('sha256').update(body.normalize('NFKC').toLocaleLowerCase('en').replace(/\s+/gu, ' ').trim()).digest('hex')
     return this.transaction(() => {
       const previous = this.current(value.scope, value.tier, value.key)
+      if (value.expectedVersion !== undefined && (previous?.version ?? null) !== value.expectedVersion)
+        throw new Error('Memory version conflict')
+      const pinned = value.pinned ?? previous?.pinned ?? false
       if (previous && (authority[value.authority] < authority[previous.authority] || (previous.pinned && value.authority !== 'user')))
         throw new Error('Memory authority rejects replacement')
-      if (previous?.body === body && previous.title === title && previous.abstract === abstract && previous.authority === value.authority && previous.pinned === value.pinned && previous.salience === Math.max(0.25, Math.min(2, value.salience)) && previous.expiresAt === (value.expiresAt ?? null))
-        return previous
       const duplicate = this.page(this.sql('SELECT * FROM memory_pages WHERE scope=? AND tier=? AND kind=? AND normalized=? AND status<>\'superseded\' AND key=?').get(value.scope, value.tier, value.kind, normalized, value.key))
+      if (previous && duplicate?.id === previous.id && previous.title === title && previous.abstract === abstract && previous.authority === value.authority && previous.pinned === pinned && previous.salience === Math.max(0.25, Math.min(2, value.salience)) && previous.expiresAt === (value.expiresAt ?? null))
+        return previous
       if (duplicate && !previous)
         return duplicate
       const id = randomUUID()
@@ -145,12 +149,12 @@ export class MemoryStore {
         this.sql('UPDATE memory_pages SET status=\'superseded\' WHERE id=?').run(previous.id)
       const version = createHash('sha256').update(JSON.stringify([id, title, body, abstract, value.authority])).digest('hex')
       this.sql(`INSERT INTO memory_pages(id,tier,kind,scope,key,title,body,abstract,status,authority,salience,pinned,createdAt,updatedAt,expiresAt,sourceSessionId,version,normalized)
-        VALUES(?,?,?,?,?,?,?,?,'active',?,?,?,?,?,?,?,?,?)`).run(id, value.tier, value.kind, value.scope, value.key, title, body, abstract, value.authority, Math.max(0.25, Math.min(2, value.salience)), Number(value.pinned), previous?.createdAt ?? now, now, value.expiresAt ?? null, value.sourceSessionId ?? null, version, normalized)
+        VALUES(?,?,?,?,?,?,?,?,'active',?,?,?,?,?,?,?,?,?)`).run(id, value.tier, value.kind, value.scope, value.key, title, body, abstract, value.authority, Math.max(0.25, Math.min(2, value.salience)), Number(pinned), previous?.createdAt ?? now, now, value.expiresAt ?? null, value.sourceSessionId ?? null, version, normalized)
       if (previous) {
         this.sql('UPDATE memory_pages SET supersededBy=? WHERE id=?').run(id, previous.id)
         this.link(id, previous.id, 'supersedes', value.scope, now)
       }
-      return this.read(id, value.scope, false, now)!
+      return this.read(id, value.scope, true, now)!
     })
   }
 
@@ -180,7 +184,7 @@ export class MemoryStore {
   /** Retains 256 sanitized observations per session. Replayed event IDs cannot create duplicate evidence. */
   observe(event: Observation) {
     this.transaction(() => {
-      if (this.sql('SELECT 1 FROM memory_suppression WHERE scope=? AND sessionId=?').get(event.scope, event.sessionId))
+      if (this.suppressed(event.scope, event.sessionId))
         return
       this.sql('INSERT OR IGNORE INTO memory_observations(id,type,correlationId,sessionId,scope,channel,timestamp,text,verified) VALUES(?,?,?,?,?,?,?,?,?)')
         .run(event.id, event.type, event.correlationId, event.sessionId, event.scope, event.channel, event.timestamp, sanitize(event.text), Number(event.verified))
@@ -200,6 +204,11 @@ export class MemoryStore {
       text: String(row.text),
       verified: Boolean(row.verified),
     }))
+  }
+
+  /** Tombstones contain identities only, never forgotten personal text. Late capture and history rebuilds fail closed. */
+  suppressed(scope: string, sessionId: string) {
+    return Boolean(this.sql('SELECT 1 FROM memory_suppression WHERE (scope=? OR scope=\'*\') AND sessionId=?').get(scope, sessionId))
   }
 
   /** Batches only cold episodic candidates. Compacted pages remain searchable and cannot enter a compaction loop. */
@@ -226,6 +235,10 @@ export class MemoryStore {
     if (!page)
       return
     this.transaction(() => {
+      if (page.sourceSessionId) {
+        this.sql('INSERT OR IGNORE INTO memory_suppression VALUES(?,?)').run(scope, page.sourceSessionId)
+        this.sql('DELETE FROM memory_observations WHERE scope=? AND sessionId=?').run(scope, page.sourceSessionId)
+      }
       this.sql(`WITH RECURSIVE doomed(id) AS (
         SELECT id FROM memory_pages WHERE scope=? AND tier=? AND key=?
         UNION SELECT e.fromId FROM memory_edges e JOIN doomed d ON e.toId=d.id WHERE e.relation='derived_from'
@@ -234,19 +247,27 @@ export class MemoryStore {
   }
 
   /** Removes captured copies of a forgotten fact and suppresses later replay from the affected sessions. */
-  forgetText(text: string) {
+  forgetText(text: string, sessionId?: string) {
     if (!text.trim())
       return
     this.transaction(() => {
+      if (sessionId)
+        this.sql('INSERT OR IGNORE INTO memory_suppression VALUES(\'*\',?)').run(sessionId)
+      this.sql('INSERT OR IGNORE INTO memory_suppression SELECT scope,substr(origin,9) FROM excerpts WHERE kind=\'history\' AND instr(lower(text),lower(?))>0').run(text)
       this.sql('INSERT OR IGNORE INTO memory_suppression SELECT scope,sessionId FROM memory_observations WHERE instr(lower(text),lower(?))>0').run(text)
       this.sql('DELETE FROM memory_pages WHERE sourceSessionId IN (SELECT sessionId FROM memory_observations WHERE instr(lower(text),lower(?))>0) OR instr(lower(body),lower(?))>0 OR instr(lower(abstract),lower(?))>0').run(text, text, text)
-      this.sql('DELETE FROM memory_observations WHERE (scope,sessionId) IN (SELECT scope,sessionId FROM memory_suppression)').run()
+      this.sql('DELETE FROM memory_pages WHERE sourceSessionId IN (SELECT sessionId FROM memory_suppression WHERE scope=\'*\')').run()
+      this.sql('DELETE FROM memory_observations WHERE EXISTS(SELECT 1 FROM memory_suppression s WHERE (s.scope=memory_observations.scope OR s.scope=\'*\') AND s.sessionId=memory_observations.sessionId)').run()
+      this.sql('DELETE FROM excerpts WHERE kind=\'history\' AND EXISTS(SELECT 1 FROM memory_suppression s WHERE (s.scope=excerpts.scope OR s.scope=\'*\') AND s.sessionId=substr(excerpts.origin,9))').run()
+      this.sql('DELETE FROM sources WHERE origin LIKE \'history:%\' AND NOT EXISTS(SELECT 1 FROM excerpts e WHERE e.origin=sources.origin)').run()
     })
   }
 
   purgeSession(sessionId: string) {
     this.transaction(() => {
+      this.sql('INSERT OR IGNORE INTO memory_suppression VALUES(\'*\',?)').run(sessionId)
       this.sql('INSERT OR IGNORE INTO memory_suppression SELECT scope,sessionId FROM memory_observations WHERE sessionId=?').run(sessionId)
+      this.sql('INSERT OR IGNORE INTO memory_suppression SELECT scope,sourceSessionId FROM memory_pages WHERE sourceSessionId=?').run(sessionId)
       this.sql('DELETE FROM memory_pages WHERE sourceSessionId=?').run(sessionId)
       this.sql('DELETE FROM memory_observations WHERE sessionId=?').run(sessionId)
     })

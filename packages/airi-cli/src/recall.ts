@@ -16,6 +16,7 @@ import { Embeddings } from './embeddings'
 import { Memory } from './memory'
 import { MemoryFile } from './memory-file'
 import { MemoryCapture } from './memory-v2/consolidator'
+import { pageTools } from './memory-v2/tools'
 import { ProjectMemory } from './project-memory'
 import { RecallIndex, sourceVersion } from './recall-index'
 import { Sessions } from './sessions'
@@ -243,6 +244,8 @@ export class Recall {
           if (this.closed)
             return
           const id = name.slice(0, -5)
+          if (index.memory.suppressed(this.workspace, id))
+            continue
           // The current conversation already belongs to Chat, including its compaction policy.
           if (id === this.sessionId) {
             // Another CLI can own a current snapshot in the shared index. Exclude it at query time instead of deleting it.
@@ -337,6 +340,8 @@ export class Recall {
   /** Verifies source versions at the read boundary, including cross-process edits, disable switches and deleted sessions. */
   private async valid(hit: RecallHit) {
     if (hit.origin.startsWith('memory:')) {
+      if (!(await this.memory.read()).enabled)
+        return false
       const page = this.database().memory.read(hit.id.slice(7), hit.scope)
       return page?.version === hit.version && hit.text === `${page.title}\n${page.abstract}\n${page.body}`
     }
@@ -353,6 +358,8 @@ export class Recall {
       return false
     const id = hit.origin.slice(8)
     if (!hit.origin.startsWith('history:') || !v.safeParse(v.pipe(v.string(), v.uuid()), id).success)
+      return false
+    if (this.database().memory.suppressed(hit.scope, id))
       return false
     const information = await stat(join(this.dataDir, `${id}.json`))
     return hit.version === `${information.ino}:${information.size}:${information.mtimeMs}`
@@ -555,6 +562,13 @@ export class Recall {
     this.lastUsed = this.lastUsed.slice(-50).map(hit => ({ ...hit, text: hit.text.slice(0, 1200) }))
   }
 
+  /** Native page writes use current-turn evidence. The model cannot assign its own authority. */
+  async pageTools(text: string, verified: readonly string[]) {
+    const settings = await this.settings.read()
+    const personal = await this.memory.read()
+    return settings.enabled && personal.enabled ? pageTools(this.database().memory, this.workspace, this.sessionId, text, verified) : []
+  }
+
   async changed(clearUsed = true) {
     if (clearUsed)
       this.lastUsed = []
@@ -565,6 +579,12 @@ export class Recall {
   }
 
   async command(text: string, signal?: AbortSignal): Promise<string | undefined> {
+    const purge = /^\/memory purge memory:([\da-f-]{36})$/iu.exec(text)
+    if (purge) {
+      this.database().memory.purge(purge[1]!, this.workspace)
+      this.lastUsed = []
+      return JSON.stringify({ status: 'deleted', id: `memory:${purge[1]}` })
+    }
     if (text === '/memory used') {
       const sources = await Promise.all(this.lastUsed.map(async (hit) => {
         try {
