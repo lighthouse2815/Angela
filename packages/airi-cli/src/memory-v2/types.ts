@@ -46,6 +46,7 @@ export interface PageInput {
   pinned?: boolean
   sourceSessionId?: string
   expiresAt?: string
+  expectedVersion?: string | null
 }
 
 /** Sanitized observations retain request identity without raw arguments or provider payloads. */

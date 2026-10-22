@@ -15,7 +15,7 @@ export function formatTask(task: Task, locale: string, messages: typeof cliMessa
 }
 
 /** Direct commands share the same service as model tools. Normal messages pass through unchanged. */
-export async function taskCommand(text: string, tasks: Tasks, messages: typeof cliMessages.en.tasks, locale: string): Promise<string | undefined> {
+export async function taskCommand(text: string, tasks: Tasks, messages: typeof cliMessages.en.tasks, locale: string, onSaved?: (task: Task) => Promise<void>): Promise<string | undefined> {
   const [command, selection, duration, ...extra] = text.trim().split(/\s+/u)
   if (!['/tasks', '/today', '/done', '/cancel', '/snooze'].includes(command!))
     return undefined
@@ -42,5 +42,6 @@ export async function taskCommand(text: string, tasks: Tasks, messages: typeof c
       return messages.usage
     saved = await tasks.snooze(selection, new Date(tasks.now() + delay).toISOString())
   }
+  await onSaved?.(saved)
   return `${messages.saved}\n${formatTask(saved, locale, messages)}`
 }

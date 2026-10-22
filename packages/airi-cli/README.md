@@ -647,7 +647,8 @@ It is stored as private plaintext at `<data-dir>/memory/personal.json`. The defa
 Saved facts are sent to the currently selected chat provider. Do not save credentials or secrets.
 Enabled core profile facts and relevant personal records are refreshed before each CLI request. Disabling it removes saved context and tools from later requests.
 Earlier conversation messages, tool results, and saved session history remain unchanged after disabling or forgetting a fact.
-A new session avoids previous conversation context. Resuming an old session can still expose its earlier messages.
+A new session starts a fresh working conversation. Saved facts and selected memory pages remain available to recall.
+Resuming an old session can still expose its earlier messages.
 Deleting a chat session does not delete personal memory.
 
 Parallel tool edits in one CLI process are serialized. Each write locks the memory file and replaces it atomically. Other writers report a lock error instead of losing edits.
@@ -662,6 +663,38 @@ and separation of durable facts from transcripts in [OpenClaw](https://docs.open
 Angela uses its existing local store and tool runtime. It does not add these frameworks as dependencies.
 Selected personal records enter model context with their IDs. Recall excerpts also carry source dates and versions.
 Assistant identity and behavior stay in the base system prompt. User memories cannot change tool approval settings.
+
+## Memory V2
+
+Working memory stays in the active conversation and checkpoints.
+Meaningful requests, verified tool outcomes, task changes, decisions, and failures produce bounded episodic pages without an extra model call.
+Technical facts use semantic pages. Explicit `Workflow: ...` or `Quy trình: ...` statements can create procedural pages.
+The existing Personal Memory remains the owner of explicit personal facts.
+
+Pages share `memory/recall.sqlite`, its FTS5 index, and its optional vector projection.
+Superseded pages stay out of normal recall. Cold episodes compact while preserving bounded decisions and literal diagnostics.
+Pinned and durable knowledge do not age automatically.
+
+```text
+/memory status
+/memory search SQLite
+/memory read memory:PAGE_ID
+/memory consolidate
+/memory age
+/memory purge memory:PAGE_ID
+```
+
+`/memory consolidate` optionally enriches the current episode with the configured provider. Basic summaries remain available when that provider fails.
+`/memory age` runs one bounded compaction pass. `/memory purge` deletes the claim, its versions, and downstream derived pages.
+Replace `memory:PAGE_ID` with an ID returned by memory search.
+
+Automatic capture requires personal memory, automatic writes, and recall to be enabled.
+`/memory auto off` stops automatic capture. Existing pages remain searchable while personal memory and recall remain enabled.
+`/memory history off` controls raw archive indexing. `/memory semantic off` controls embedding retrieval. These switches do not disable the new page tiers.
+Private Telegram users keep separate databases unless the existing owner-sharing option is explicitly configured.
+Desktop renderer chat retains its existing memory flow.
+
+See [the architecture](../../docs/ai/adr/angela-memory-v2.md) and [the evaluation report](../../docs/ai/audits/angela-memory-v2.md) for invariants, measurements, and limitations.
 
 ## Project memory
 
@@ -1010,3 +1043,18 @@ These fixtures measure a small set of behaviors. They do not establish general m
 The clarification check uses a simple question/selection phrase heuristic. Model answers can vary across runs.
 Normal automated tests use a local provider boundary to verify the evaluator and remain independent of live credentials.
 Run the live command separately when comparing providers or changing models. Keep its results distinct from unit-test results.
+
+## Core PR validation
+
+The `Angela CLI core` workflow runs on pull requests into `main`.
+It installs frozen dependencies without the root postinstall, then builds only CLI prerequisites with one workspace worker.
+Tests, typecheck, build, package lint, and the built CLI smoke check run in one job.
+Vitest uses one worker and 30-second test and hook limits.
+Node 26.11.1 and the package-manager version in the root manifest define the reproduction environment.
+The gate excludes full monorepo tests. Existing unrelated failures remain documented in the Memory V2 audit.
+
+Telegram uses `AngelaRuntime.acquire` to retain Recall after each message.
+Internal `RuntimeOptions.telegramSessions` defaults to 32 idle entries and a ten-minute TTL.
+The cache uses exact user storage, workspace, session, and channel identities.
+MCP clients and request callbacks close after each request. Active contexts retain the existing concurrency limit of eight.
+Reset, eviction, and host shutdown end the runtime session segment. Persisted conversation and memory survive eviction and process restart.

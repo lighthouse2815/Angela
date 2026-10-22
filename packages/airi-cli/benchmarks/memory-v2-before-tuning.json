@@ -1,0 +1,228 @@
+{
+  "node": "v26.11.1",
+  "mode": "DELETE",
+  "rows": 2000,
+  "syntheticEmbeddingFixture": true,
+  "openMs": 355.286824,
+  "sqliteMode": {
+    "journal_mode": "delete"
+  },
+  "synchronous": {
+    "synchronous": 2
+  },
+  "sqliteWriteMs": {
+    "p50": 10.133859999999913,
+    "p95": 16.184815999997227,
+    "total": 23026.68784900007
+  },
+  "coldRecallMs": 5.459714000000531,
+  "warmRecallMs": {
+    "p50": 2.588138999999501,
+    "p95": 3.297436999997444,
+    "total": 280.4190260000105
+  },
+  "pageWriteMs": {
+    "p50": 10.269638999998278,
+    "p95": 11.44065799999953,
+    "total": 1092.1123099999968
+  },
+  "observationWriteMs": {
+    "p50": 9.729502000001958,
+    "p95": 158.9850719999995,
+    "total": 3442.4574299999877
+  },
+  "coldConsolidationMs": 17.868252999996912,
+  "replayedConsolidationMs": {
+    "p50": 1.274584999999206,
+    "p95": 2.1535860000003595,
+    "total": 43.26735199999894
+  },
+  "vectorPersistMs": {
+    "p50": 11.60626300000149,
+    "p95": 871.2256340000022,
+    "total": 9443.51806899998
+  },
+  "backgroundContentionWriteMs": {
+    "p50": 12.23265800000081,
+    "p95": 17.58479200000147,
+    "total": 1283.4594329999818
+  },
+  "backgroundReads": {
+    "reads": 1,
+    "errors": 0
+  },
+  "queryPlans": [
+    {
+      "id": 3,
+      "parent": 0,
+      "notused": 46,
+      "detail": "SEARCH memory_pages USING INDEX memory_current (scope=? AND tier=? AND key=?)"
+    }
+  ],
+  "agingQueryPlan": [
+    {
+      "id": 5,
+      "parent": 0,
+      "notused": 49,
+      "detail": "SEARCH memory_pages USING INDEX memory_aging (tier=? AND status=? AND updatedAt<?)"
+    }
+  ],
+  "coldContextBuildMs": 36773.837984000005,
+  "warmContextBuildMs": {
+    "p50": 2.958515999998781,
+    "p95": 3.6762520000047516,
+    "total": 89.7334440000268
+  },
+  "quality": {
+    "probes": [
+      {
+        "name": "fact-recall",
+        "found": true,
+        "positions": [
+          1
+        ],
+        "noise": 0,
+        "returned": 1
+      },
+      {
+        "name": "episodic-recall",
+        "found": true,
+        "positions": [
+          1
+        ],
+        "noise": 0,
+        "returned": 1
+      },
+      {
+        "name": "project-decision",
+        "found": true,
+        "positions": [
+          1
+        ],
+        "noise": 0,
+        "returned": 1
+      },
+      {
+        "name": "procedural-recall",
+        "found": true,
+        "positions": [
+          1
+        ],
+        "noise": 0,
+        "returned": 1
+      },
+      {
+        "name": "current-preference",
+        "found": true,
+        "positions": [
+          1
+        ],
+        "noise": 0,
+        "returned": 1
+      },
+      {
+        "name": "contradiction",
+        "found": true,
+        "positions": [
+          1,
+          2
+        ],
+        "noise": 0,
+        "returned": 2
+      },
+      {
+        "name": "targeted-old-history",
+        "found": true,
+        "positions": [
+          1
+        ],
+        "noise": 0,
+        "returned": 1
+      }
+    ],
+    "afterCompaction": [
+      {
+        "name": "fact-recall",
+        "found": true,
+        "positions": [
+          1
+        ],
+        "noise": 0,
+        "returned": 1
+      },
+      {
+        "name": "episodic-recall",
+        "found": true,
+        "positions": [
+          1
+        ],
+        "noise": 0,
+        "returned": 1
+      },
+      {
+        "name": "project-decision",
+        "found": true,
+        "positions": [
+          1
+        ],
+        "noise": 0,
+        "returned": 1
+      },
+      {
+        "name": "procedural-recall",
+        "found": true,
+        "positions": [
+          1
+        ],
+        "noise": 0,
+        "returned": 1
+      },
+      {
+        "name": "current-preference",
+        "found": true,
+        "positions": [
+          1
+        ],
+        "noise": 0,
+        "returned": 1
+      },
+      {
+        "name": "contradiction",
+        "found": true,
+        "positions": [
+          1,
+          2
+        ],
+        "noise": 0,
+        "returned": 2
+      },
+      {
+        "name": "targeted-old-history",
+        "found": true,
+        "positions": [
+          1
+        ],
+        "noise": 0,
+        "returned": 1
+      }
+    ],
+    "recallAt5": 1,
+    "supersededAbsent": true,
+    "falsePositiveNoise": 0
+  },
+  "embeddingFixtureDocumentsPerSecond": 3082.034868832578,
+  "resourcesBeforeClose": {
+    "indexes": 1,
+    "watchers": 1,
+    "timers": 1,
+    "embeddings": 0
+  },
+  "resourcesAfterClose": {
+    "indexes": 0,
+    "watchers": 0,
+    "timers": 0,
+    "embeddings": 0
+  },
+  "sourceRevision": "2156d51",
+  "measuredDate": "2026-10-22"
+}

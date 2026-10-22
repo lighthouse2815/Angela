@@ -1,0 +1,233 @@
+{
+  "node": "v26.11.1",
+  "fixture": "deterministic SSE model and local Telegram HTTP API; real Bot/TelegramChat/Sessions/Memory V2/SQLite",
+  "units": "milliseconds; context includes stores, Recall and tool preparation; SQLite includes mkdir/chmod/open/schema; consolidation includes session end",
+  "results": [
+    {
+      "mode": "cold",
+      "first": {
+        "request": 134.13700400000016,
+        "firstText": 111.18697299999985,
+        "context": 24.057326999999987,
+        "recall": 7.545153999999911,
+        "sqlite": 6.352736999999934,
+        "consolidation": 4.0909529999998995
+      },
+      "second": {
+        "request": 42.56951500000014,
+        "firstText": 29.20421099999976,
+        "context": 21.58841100000018,
+        "recall": 9.921948000000157,
+        "sqlite": 9.665711999999985,
+        "consolidation": 5.128665999999612
+      },
+      "sequential10": {
+        "request": {
+          "p50": 29.139345999999932,
+          "p95": 44.78888000000006
+        },
+        "firstText": {
+          "p50": 19.119983000000047,
+          "p95": 29.20421099999976
+        },
+        "context": {
+          "p50": 10.662037999999939,
+          "p95": 22.076874000000316
+        },
+        "recall": {
+          "p50": 3.6089649999998983,
+          "p95": 9.921948000000157
+        },
+        "sqlite": {
+          "p50": 3.417221000000154,
+          "p95": 9.665711999999985
+        },
+        "consolidation": {
+          "p50": 3.1742699999999786,
+          "p95": 5.128665999999612
+        }
+      },
+      "subsequent30": {
+        "request": {
+          "p50": 22.005069999999705,
+          "p95": 42.56951500000014
+        },
+        "firstText": {
+          "p50": 13.46525500000007,
+          "p95": 28.4142310000002
+        },
+        "context": {
+          "p50": 7.450074999999742,
+          "p95": 21.58841100000018
+        },
+        "recall": {
+          "p50": 2.990045999999893,
+          "p95": 5.205241000000115
+        },
+        "sqlite": {
+          "p50": 2.7862609999997403,
+          "p95": 4.912685999999667
+        },
+        "consolidation": {
+          "p50": 3.0066670000005615,
+          "p95": 4.850709000000279
+        }
+      },
+      "multipleUsers": {
+        "request": {
+          "p50": 21.49494199999981,
+          "p95": 32.86572500000011
+        },
+        "firstText": {
+          "p50": 13.548511999999846,
+          "p95": 18.36737200000016
+        },
+        "context": {
+          "p50": 7.32492400000001,
+          "p95": 10.690049000000272
+        },
+        "recall": {
+          "p50": 2.488198999999895,
+          "p95": 4.026128999999855
+        },
+        "sqlite": {
+          "p50": 2.3986879999997655,
+          "p95": 3.9418399999999565
+        },
+        "consolidation": {
+          "p50": 2.8695520000001125,
+          "p95": 5.593877000000248
+        }
+      },
+      "sqliteOpens": 51,
+      "recallStarts": 51,
+      "beforeShutdown": {
+        "states": 0,
+        "listeners": 0,
+        "reminderRoutes": 4,
+        "reminderTimers": 1,
+        "liveRecalls": 0
+      },
+      "afterShutdown": {
+        "states": 0,
+        "listeners": 0,
+        "reminderRoutes": 0,
+        "reminderTimers": 0,
+        "liveRecalls": 0
+      }
+    },
+    {
+      "mode": "retained",
+      "first": {
+        "request": 22.68199199999981,
+        "firstText": 17.150532000000112,
+        "context": 8.895958000000064,
+        "recall": 5.7430819999999585,
+        "sqlite": 5.552640999999767,
+        "consolidation": 2.379196999999749
+      },
+      "second": {
+        "request": 13.57367099999965,
+        "firstText": 9.258037000000058,
+        "context": 2.8233900000000176,
+        "recall": 0,
+        "sqlite": 0,
+        "consolidation": 0.8509220000000823
+      },
+      "sequential10": {
+        "request": {
+          "p50": 11.468645999999808,
+          "p95": 15.281653000000006
+        },
+        "firstText": {
+          "p50": 7.049181000000317,
+          "p95": 10.936044000000038
+        },
+        "context": {
+          "p50": 3.4832579999997506,
+          "p95": 5.280894999999873
+        },
+        "recall": {
+          "p50": 0,
+          "p95": 0
+        },
+        "sqlite": {
+          "p50": 0,
+          "p95": 0
+        },
+        "consolidation": {
+          "p50": 0.8654370000003837,
+          "p95": 2.4143669999998565
+        }
+      },
+      "subsequent30": {
+        "request": {
+          "p50": 12.791643999999906,
+          "p95": 15.940546999999697
+        },
+        "firstText": {
+          "p50": 7.842051000000083,
+          "p95": 11.489097000000129
+        },
+        "context": {
+          "p50": 3.107947999999851,
+          "p95": 5.576450999999906
+        },
+        "recall": {
+          "p50": 0,
+          "p95": 0
+        },
+        "sqlite": {
+          "p50": 0,
+          "p95": 0
+        },
+        "consolidation": {
+          "p50": 1.0549519999999575,
+          "p95": 2.4143669999998565
+        }
+      },
+      "multipleUsers": {
+        "request": {
+          "p50": 11.794914999999946,
+          "p95": 17.145686999999725
+        },
+        "firstText": {
+          "p50": 7.128534999999829,
+          "p95": 13.073801999999887
+        },
+        "context": {
+          "p50": 3.526452000000063,
+          "p95": 6.947871000000305
+        },
+        "recall": {
+          "p50": 0,
+          "p95": 3.896088999999847
+        },
+        "sqlite": {
+          "p50": 0,
+          "p95": 3.8134390000000167
+        },
+        "consolidation": {
+          "p50": 0.8034250000000611,
+          "p95": 1.9125170000002072
+        }
+      },
+      "sqliteOpens": 4,
+      "recallStarts": 4,
+      "beforeShutdown": {
+        "states": 4,
+        "listeners": 0,
+        "reminderRoutes": 4,
+        "reminderTimers": 1,
+        "liveRecalls": 4
+      },
+      "afterShutdown": {
+        "states": 0,
+        "listeners": 0,
+        "reminderRoutes": 0,
+        "reminderTimers": 0,
+        "liveRecalls": 0
+      }
+    }
+  ]
+}

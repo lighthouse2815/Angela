@@ -1,9 +1,10 @@
 import type { Observation, PageInput } from './types'
 
 import { Buffer } from 'node:buffer'
-import { mkdtemp, readFile, rm } from 'node:fs/promises'
+import { mkdir, mkdtemp, readdir, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { DatabaseSync } from 'node:sqlite'
 
 import { afterEach, expect, it } from 'vitest'
 
@@ -96,11 +97,42 @@ it('reinforces once per minute in SQL without invalidating vectors or content ve
   expect(index.stats('test:model:2', 2).vectors).toBe(1)
 })
 
+it('carries reinforcement through revisions of the same session checkpoint', async () => {
+  const { store } = await setup()
+  const first = store.write({ ...input, tier: 'episodic', kind: 'session', sourceSessionId: 'session' })
+  const now = Date.now()
+  store.reinforce([first.id], 'workspace', now)
+  const second = store.write({ ...input, tier: 'episodic', kind: 'session', sourceSessionId: 'session', body: 'The session made further progress' })
+  store.reinforce([second.id], 'workspace', now + 1000)
+  expect(store.read(second.id, 'workspace')?.accessCount).toBe(1)
+  expect(store.read(second.id, 'workspace')?.lastAccessedAt).toBe(new Date(now).toISOString())
+})
+
+it('retains unchanged vectors and rejects stale embedding writes after content invalidation', async () => {
+  const { index } = await setup()
+  const hit = { id: 'history:fixture', kind: 'history' as const, scope: 'workspace', text: 'Same source text', updatedAt: '' }
+  index.replace('history:fixture', 'v1', [hit])
+  index.vectors('fixture:2', [{ id: hit.id, version: 'v1', vector: new Float32Array([1, 0]) }])
+  index.replace('history:fixture', 'v2', [hit])
+  expect(index.stats('fixture:2', 2).vectors).toBe(1)
+  index.replace('history:fixture', 'v3', [{ ...hit, text: 'Changed source text' }])
+  index.vectors('fixture:2', [{ id: hit.id, version: 'v2', vector: new Float32Array([1, 0]) }])
+  expect(index.stats('fixture:2', 2).vectors).toBe(0)
+})
+
 it('bounds salience and rejects invalid values before mutation', async () => {
   const { store } = await setup()
   expect(store.write({ ...input, salience: 99 }).salience).toBe(2)
   expect(store.write({ ...input, salience: -2 }).salience).toBe(0.25)
   expect(() => store.write({ ...input, salience: Number.NaN })).toThrow()
+})
+
+it('normalizes expiry offsets before SQLite compares timestamps', async () => {
+  const { store } = await setup()
+  const page = store.write({ ...input, expiresAt: '2026-10-22T01:00:00+01:00' })
+  expect(page.expiresAt).toBe('2026-10-22T00:00:00.000Z')
+  expect(store.read(page.id, 'workspace', false, '2026-10-22T00:30:00.000Z')).toBeUndefined()
+  expect(store.read(page.id, 'workspace', false, '2026-10-21T23:30:00.000Z')?.id).toBe(page.id)
 })
 
 it('does not duplicate replayed writes or observations and bounds the working capture window', async () => {
@@ -140,6 +172,23 @@ it('purges all claim versions, derived pages, vectors and edges without touching
   expect(store.read(unrelated.id, 'workspace')).toBeDefined()
 })
 
+it('purges later versions of derived knowledge and prevents replay of every contributing session', async () => {
+  const { store, index } = await setup()
+  const root = store.write({ ...input, sourceSessionId: 'root-session' })
+  const old = store.write({ ...input, key: 'derived', body: 'Derived old knowledge', authority: 'consolidated', sourceSessionId: 'derived-old' })
+  store.link(old.id, root.id, 'derived_from', 'workspace')
+  const current = store.write({ ...input, key: 'derived', body: 'Derived current knowledge', authority: 'consolidated', sourceSessionId: 'derived-current' })
+  for (const sessionId of ['derived-old', 'derived-current'])
+    store.observe({ ...observation, id: sessionId, sessionId, text: 'The original claim supports this inference' })
+  store.purge(root.id, 'workspace')
+  expect(store.read(current.id, 'workspace', true)).toBeUndefined()
+  expect(index.search('Derived', 'workspace')).toEqual([])
+  for (const sessionId of ['derived-old', 'derived-current']) {
+    expect(store.observations('workspace', sessionId)).toEqual([])
+    expect(store.suppressed('workspace', sessionId)).toBe(true)
+  }
+})
+
 it('forgets captured copies and prevents late session replay from restoring them', async () => {
   const { store, index } = await setup()
   store.observe({ ...observation, text: input.body })
@@ -148,6 +197,30 @@ it('forgets captured copies and prevents late session replay from restoring them
   store.observe({ ...observation, id: 'late-event', text: input.body })
   expect(store.observations('workspace', observation.sessionId)).toEqual([])
   expect(index.search('React', 'workspace')).toEqual([])
+})
+
+it('allows fresh requests after forgetting while rejecting late results from an older correlation', async () => {
+  const { store } = await setup()
+  store.observe(observation)
+  store.forgetText(observation.text)
+  const later = new Date(Date.now() + 1000).toISOString()
+  store.observe({ ...observation, id: 'late-result', timestamp: later })
+  expect(store.observations('workspace', 'session-1')).toEqual([])
+  store.observe({ ...observation, id: 'fresh-message', correlationId: 'new-request', timestamp: later, text: 'Build the next project' })
+  expect(store.observations('workspace', 'session-1')).toHaveLength(1)
+  expect(store.suppressed('workspace', 'session-1')).toBe(true)
+})
+
+it('keeps later independent explicit knowledge when deleting its former source session', async () => {
+  const { store } = await setup()
+  const root = store.write({ ...input, key: 'episode', tier: 'episodic', sourceSessionId: 'removed-session' })
+  const old = store.write({ ...input, key: 'derived', authority: 'consolidated', sourceSessionId: 'removed-session' })
+  store.link(old.id, root.id, 'derived_from', 'workspace')
+  const manual = store.write({ ...input, key: 'derived', body: 'A later explicit correction prefers Vue', authority: 'user', sourceSessionId: 'independent-session' })
+  store.purgeSession('removed-session')
+  expect(store.read(manual.id, 'workspace')?.body).toContain('Vue')
+  expect(store.read(old.id, 'workspace', true)).toBeUndefined()
+  expect(store.suppressed('workspace', 'independent-session')).toBe(false)
 })
 
 it('compacts only cold unpinned episodes and keeps literal facts searchable', async () => {
@@ -163,6 +236,25 @@ it('compacts only cold unpinned episodes and keeps literal facts searchable', as
   expect(index.search('E0433', 'workspace')[0]?.id).toBe(`memory:${episode.id}`)
   expect(store.read(durable.id, 'workspace')?.status).toBe('active')
   expect(store.read(pinned.id, 'workspace')?.status).toBe('active')
+})
+
+it('advances aging past hot old episodes across reopened connections', async () => {
+  const { store, directory } = await setup()
+  for (let n = 0; n < 5; n++) {
+    const page = store.write({ ...input, tier: 'episodic', key: `hot-${n}` }, '2010-01-01T00:00:00.000Z')
+    store.reinforce([page.id], 'workspace')
+  }
+  const cold = store.write({ ...input, tier: 'episodic', key: 'cold' }, '2020-01-01T00:00:00.000Z')
+  expect(store.age('workspace', Date.now(), 2)).toBe(0)
+  const another = await RecallIndex.open(directory)
+  try {
+    expect(another.memory.age('workspace', Date.now(), 2)).toBe(0)
+    expect(another.memory.age('workspace', Date.now(), 2)).toBe(1)
+    expect(another.memory.read(cold.id, 'workspace')?.status).toBe('compacted')
+  }
+  finally {
+    another.close()
+  }
 })
 
 it('keeps ai-memory retention invariants without aging durable or core knowledge', () => {
@@ -184,4 +276,77 @@ it('redacts private keys, JSON credentials, URL credentials, control sequences a
   expect(sanitize('postgres://user:pass@host/db')).toBe('[REDACTED]')
   expect(sanitize('123456789:AAabcdefghijklmnopqrstuvwxyz12345678')).toBe('[REDACTED]')
   expect(sanitize('\u001B[31mhello\u001B[0m')).toBe('hello')
+  expect(sanitize('max_tokens=2048 token_count=100')).toBe('max_tokens=2048 token_count=100')
+  expect(sanitize('password="unfinished secret')).not.toContain('unfinished secret')
+  expect(compact({ body: 'Summary\n\nUse captureObservation and session_id for correlation.', abstract: '' })).toContain('captureObservation')
+  expect(compact({ body: 'Summary\n\nUse captureObservation and session_id for correlation.', abstract: '' })).toContain('session_id')
+})
+
+it('removes forgotten bytes from the main database and WAL while another connection remains open', async () => {
+  const { store, directory } = await setup()
+  const phrase = 'forgotten-unique-secret-memory-5c67171cf7e2'
+  const page = store.write({ ...input, body: phrase })
+  const other = await RecallIndex.open(directory)
+  const files = async () => {
+    const paths = await readdir(join(directory, 'memory'))
+    return await Promise.all(paths.map(path => readFile(join(directory, 'memory', path))))
+  }
+  try {
+    expect((await files()).some(bytes => bytes.includes(Buffer.from(phrase)))).toBe(true)
+    store.purge(page.id, 'workspace')
+    expect(other.memory.read(page.id, 'workspace', true)).toBeUndefined()
+    expect((await files()).some(bytes => bytes.includes(Buffer.from(phrase)))).toBe(false)
+  }
+  finally {
+    other.close()
+  }
+})
+
+it('migrates the original identity-only tombstone schema without permitting deleted-session replay', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'angela-upgrade-'))
+  await mkdir(join(directory, 'memory'))
+  const previous = new DatabaseSync(join(directory, 'memory', 'recall.sqlite'))
+  previous.exec('CREATE TABLE memory_suppression(scope TEXT NOT NULL,sessionId TEXT NOT NULL,PRIMARY KEY(scope,sessionId)); INSERT INTO memory_suppression VALUES(\'workspace\',\'deleted\')')
+  previous.close()
+  const index = await RecallIndex.open(directory)
+  stores.push({ index, directory })
+  index.memory.observe({ ...observation, sessionId: 'deleted' })
+  expect(index.memory.observations('workspace', 'deleted')).toEqual([])
+  index.memory.observe({ ...observation, sessionId: 'new' })
+  expect(index.memory.observations('workspace', 'new')).toHaveLength(1)
+})
+
+it('redacts natural credential declarations and rejects credentials in claim identities', async () => {
+  const { store, index } = await setup()
+  const declarations = ['My password is sensitive-value', 'API key is sensitive-value', 'Mật khẩu của tôi là sensitive-value', 'mã truy cập: sensitive-value']
+  for (const [i, text] of declarations.entries()) {
+    expect(sanitize(text)).not.toContain('sensitive-value')
+    store.observe({ ...observation, id: `credential-${i}`, text })
+  }
+  expect(store.observations('workspace', 'session-1').every(item => !item.text.includes('sensitive-value'))).toBe(true)
+  expect(() => store.write({ ...input, key: 'ghp_sensitivecredential' })).toThrow('sensitive')
+  expect(() => store.write({ ...input, kind: 'password=sensitive-value' })).toThrow('sensitive')
+  expect(index.search('sensitive-value', 'workspace')).toEqual([])
+  expect(sanitize('Password reset is disabled. max_tokens=2000')).toBe('Password reset is disabled. max_tokens=2000')
+})
+
+it('retries physical purge after a reader releases its old WAL snapshot', async () => {
+  const { store, directory } = await setup()
+  const phrase = 'forgotten-wal-retry-b20843f7'
+  const page = store.write({ ...input, body: phrase })
+  const reader = new DatabaseSync(join(directory, 'memory', 'recall.sqlite'), { readOnly: true })
+  try {
+    reader.exec('BEGIN')
+    reader.prepare('SELECT id FROM memory_pages').all()
+    expect(() => store.purge(page.id, 'workspace')).toThrow('checkpoint is busy')
+    expect(store.read(page.id, 'workspace', true)).toBeUndefined()
+    reader.exec('ROLLBACK')
+    store.purge(page.id, 'workspace')
+    const paths = await readdir(join(directory, 'memory'))
+    for (const path of paths)
+      expect((await readFile(join(directory, 'memory', path))).includes(Buffer.from(phrase))).toBe(false)
+  }
+  finally {
+    reader.close()
+  }
 })

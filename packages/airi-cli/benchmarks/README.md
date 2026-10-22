@@ -1,5 +1,7 @@
 # Angela runtime memory measurements
 
+Memory V2 latency measurements and limitations are in [the Memory V2 report](../../../docs/ai/audits/angela-memory-v2.md).
+
 Run each scenario in a fresh Node process with explicit garbage collection:
 
 ```sh
@@ -82,3 +84,32 @@ Focused tests also verify closed Recall indexes/watchers/timers, MCP clients, Te
 - Reminder delivery retains small routes for authorized users to preserve background notifications. It does not evict reminders with conversation state.
 
 No EventStore, event history, worker pool, dependency, or local model was added.
+
+
+## Telegram lifecycle closure
+
+The Memory V2 audit contains the current lifecycle results and their limits.
+The older RSS measurements above describe the earlier immediate-release runtime.
+
+```sh
+pnpm exec tsx packages/airi-cli/scripts/benchmark-telegram-lifecycle.ts packages/airi-cli/benchmarks/telegram-lifecycle-after.json
+pnpm exec tsx packages/airi-cli/scripts/benchmark-session-resources.ts packages/airi-cli/benchmarks/session-resources-after.json
+```
+
+Run from the repository root with workspace dependencies already installed.
+In a worktree with shared dependencies, set `pnpm_config_verify_deps_before_run=false` to prevent automatic installation.
+Run each command separately. Both commands remove their temporary user data after completion.
+
+`telegram-lifecycle-before.json` records the starting runtime at `4bece26`.
+That baseline compares real immediate-release Telegram requests with an explicitly retained reference scope.
+`telegram-lifecycle-after.json` compares real Telegram requests with retention disabled and enabled on the same final runtime.
+It also measures four users, concurrent batches, and reopening after automatic TTL eviction.
+The concurrent request metric measures batch completion. First-text measurements remain specific to each request through async-local instrumentation.
+The benchmark sets TTL to one second for expiration checks. Production defaults remain ten minutes and 32 idle entries.
+All Telegram API calls and model responses use local deterministic fixtures. Runtime, persistence, Memory V2, and SQLite remain real.
+
+`session-resources-after.json` exercises 1,000 direct runtime cycles with real in-memory MCP transports and five reminder destinations.
+It records checkpoints at 100, 500, and 1,000 cycles with four retained idle sessions.
+Each closed Recall must report zero resources before instrumentation releases its reference.
+All live Recall, MCP, runtime, and reminder counts must be zero after shutdown.
+This resource fixture does not measure Telegram network latency or provider performance.

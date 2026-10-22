@@ -1,0 +1,427 @@
+{
+  "node": "v26.11.1",
+  "fixture": "deterministic SSE model and local Telegram HTTP API; real Bot/TelegramChat/Sessions/Memory V2/SQLite",
+  "units": "milliseconds; context includes stores, Recall and tool preparation; SQLite includes mkdir/chmod/open/schema; consolidation includes session end",
+  "results": [
+    {
+      "mode": "cold",
+      "maxIdle": 0,
+      "benchmarkTtlMs": 1000,
+      "productionDefaultTtlMs": 600000,
+      "first": {
+        "request": 111.41978999999992,
+        "firstText": 88.80053999999996,
+        "context": 19.58274499999993,
+        "recall": 5.938380000000052,
+        "sqlite": 4.893686000000116,
+        "consolidation": 4.706641999999874
+      },
+      "second": {
+        "request": 21.292480999999952,
+        "firstText": 13.606021999999939,
+        "context": 6.774946999999884,
+        "recall": 2.7913559999999507,
+        "sqlite": 2.699783000000025,
+        "consolidation": 2.1799029999999675
+      },
+      "sequential10": {
+        "request": {
+          "p50": 18.18482300000005,
+          "p95": 29.42480999999998
+        },
+        "firstText": {
+          "p50": 12.154111999999941,
+          "p95": 19.496050999999852
+        },
+        "context": {
+          "p50": 6.833541999999852,
+          "p95": 14.995488000000023
+        },
+        "recall": {
+          "p50": 2.747922000000017,
+          "p95": 3.751469000000043
+        },
+        "sqlite": {
+          "p50": 2.5996520000001055,
+          "p95": 3.508980000000065
+        },
+        "consolidation": {
+          "p50": 1.9750899999999092,
+          "p95": 3.06283899999994
+        }
+      },
+      "subsequent30": {
+        "request": {
+          "p50": 15.25315599999999,
+          "p95": 21.292480999999952
+        },
+        "firstText": {
+          "p50": 9.133180000000038,
+          "p95": 13.606021999999939
+        },
+        "context": {
+          "p50": 5.3233470000000125,
+          "p95": 9.51649999999995
+        },
+        "recall": {
+          "p50": 2.17062100000021,
+          "p95": 3.751469000000043
+        },
+        "sqlite": {
+          "p50": 2.073078000000123,
+          "p95": 3.508980000000065
+        },
+        "consolidation": {
+          "p50": 2.271534999999858,
+          "p95": 2.8288219999999455
+        }
+      },
+      "multipleUsers": {
+        "request": {
+          "p50": 13.148509000000104,
+          "p95": 15.583519000000024
+        },
+        "firstText": {
+          "p50": 7.959941000000072,
+          "p95": 8.982323000000179
+        },
+        "context": {
+          "p50": 4.443218999999999,
+          "p95": 5.33162399999992
+        },
+        "recall": {
+          "p50": 1.7543789999999717,
+          "p95": 2.386167999999998
+        },
+        "sqlite": {
+          "p50": 1.6884860000000117,
+          "p95": 2.28469199999995
+        },
+        "consolidation": {
+          "p50": 1.4995980000003328,
+          "p95": 2.791577999999845
+        }
+      },
+      "concurrent4UsersBatchCompletion": {
+        "request": {
+          "p50": 44.04682899999989,
+          "p95": 57.779033000000254
+        },
+        "firstText": {
+          "p50": 24.135771000000204,
+          "p95": 38.88933700000007
+        },
+        "context": {
+          "p50": 15.48392100000001,
+          "p95": 23.98850799999991
+        },
+        "recall": {
+          "p50": 5.790834999999788,
+          "p95": 11.114676000000145
+        },
+        "sqlite": {
+          "p50": 5.7056970000003275,
+          "p95": 11.065588999999818
+        },
+        "consolidation": {
+          "p50": 1.7168739999997342,
+          "p95": 2.5791839999997137
+        }
+      },
+      "sequentialCounts": {
+        "sqliteOpens": 51,
+        "recallStarts": 51
+      },
+      "beforeTtl": {
+        "requests": 0,
+        "controllers": 0,
+        "mcpClients": 0,
+        "indexes": 0,
+        "watchers": 0,
+        "recallTimers": 0,
+        "embeddings": 0,
+        "states": 0,
+        "warmSessions": 0,
+        "retiringSessions": 0,
+        "idleTimers": 0,
+        "listeners": 0,
+        "reminderRoutes": 4,
+        "reminderTimers": 1
+      },
+      "afterTtlEviction": {
+        "requests": 0,
+        "controllers": 0,
+        "mcpClients": 0,
+        "indexes": 0,
+        "watchers": 0,
+        "recallTimers": 0,
+        "embeddings": 0,
+        "states": 0,
+        "warmSessions": 0,
+        "retiringSessions": 0,
+        "idleTimers": 0,
+        "listeners": 0,
+        "reminderRoutes": 4,
+        "reminderTimers": 1
+      },
+      "afterTtl": {
+        "request": 12.631901000000198,
+        "firstText": 7.532671000000391,
+        "context": 3.7923600000003717,
+        "recall": 1.3598480000000563,
+        "sqlite": 1.3122660000003634,
+        "consolidation": 2.3088079999997717
+      },
+      "ttlCounts": {
+        "sqliteOpens": 1,
+        "recallStarts": 1
+      },
+      "beforeShutdown": {
+        "requests": 0,
+        "controllers": 0,
+        "mcpClients": 0,
+        "indexes": 0,
+        "watchers": 0,
+        "recallTimers": 0,
+        "embeddings": 0,
+        "states": 0,
+        "warmSessions": 0,
+        "retiringSessions": 0,
+        "idleTimers": 0,
+        "listeners": 0,
+        "reminderRoutes": 4,
+        "reminderTimers": 1,
+        "liveRecalls": 0,
+        "telegramDeadlineTimers": 0
+      },
+      "afterShutdown": {
+        "requests": 0,
+        "controllers": 0,
+        "mcpClients": 0,
+        "indexes": 0,
+        "watchers": 0,
+        "recallTimers": 0,
+        "embeddings": 0,
+        "states": 0,
+        "warmSessions": 0,
+        "retiringSessions": 0,
+        "idleTimers": 0,
+        "listeners": 0,
+        "reminderRoutes": 0,
+        "reminderTimers": 0,
+        "liveRecalls": 0,
+        "telegramDeadlineTimers": 0
+      }
+    },
+    {
+      "mode": "warm",
+      "maxIdle": 32,
+      "benchmarkTtlMs": 1000,
+      "productionDefaultTtlMs": 600000,
+      "first": {
+        "request": 10.240789999999834,
+        "firstText": 7.960087999999814,
+        "context": 4.463392999999996,
+        "recall": 2.5122740000001613,
+        "sqlite": 2.4580040000000736,
+        "consolidation": 0.5522599999999329
+      },
+      "second": {
+        "request": 6.846536999999898,
+        "firstText": 3.447157999999945,
+        "context": 1.5260789999997542,
+        "recall": 0,
+        "sqlite": 0,
+        "consolidation": 1.1139479999997093
+      },
+      "sequential10": {
+        "request": {
+          "p50": 6.930735999999797,
+          "p95": 10.022429000000102
+        },
+        "firstText": {
+          "p50": 3.889893000000029,
+          "p95": 7.046078000000307
+        },
+        "context": {
+          "p50": 1.6995060000003832,
+          "p95": 2.6738110000001143
+        },
+        "recall": {
+          "p50": 0,
+          "p95": 0
+        },
+        "sqlite": {
+          "p50": 0,
+          "p95": 0
+        },
+        "consolidation": {
+          "p50": 0.7440099999998893,
+          "p95": 1.2304490000001351
+        }
+      },
+      "subsequent30": {
+        "request": {
+          "p50": 7.36166699999967,
+          "p95": 13.664976000000024
+        },
+        "firstText": {
+          "p50": 4.3862709999998515,
+          "p95": 7.2473549999999705
+        },
+        "context": {
+          "p50": 1.7701979999997093,
+          "p95": 3.8246530000001258
+        },
+        "recall": {
+          "p50": 0,
+          "p95": 0
+        },
+        "sqlite": {
+          "p50": 0,
+          "p95": 0
+        },
+        "consolidation": {
+          "p50": 0.8787160000001677,
+          "p95": 1.361728999999741
+        }
+      },
+      "multipleUsers": {
+        "request": {
+          "p50": 8.481666000000132,
+          "p95": 11.310404999999719
+        },
+        "firstText": {
+          "p50": 4.821334000000206,
+          "p95": 8.332418999999845
+        },
+        "context": {
+          "p50": 1.8974210000001221,
+          "p95": 4.113382000000001
+        },
+        "recall": {
+          "p50": 0,
+          "p95": 2.071965000000091
+        },
+        "sqlite": {
+          "p50": 0,
+          "p95": 2.0142729999997755
+        },
+        "consolidation": {
+          "p50": 0.7206169999999474,
+          "p95": 1.3192370000001574
+        }
+      },
+      "concurrent4UsersBatchCompletion": {
+        "request": {
+          "p50": 27.420294999999896,
+          "p95": 30.65443899999991
+        },
+        "firstText": {
+          "p50": 15.85618199999999,
+          "p95": 17.73746300000039
+        },
+        "context": {
+          "p50": 7.51269400000001,
+          "p95": 9.044259999999667
+        },
+        "recall": {
+          "p50": 0,
+          "p95": 0
+        },
+        "sqlite": {
+          "p50": 0,
+          "p95": 0
+        },
+        "consolidation": {
+          "p50": 0.778878999999506,
+          "p95": 1.8110619999997652
+        }
+      },
+      "sequentialCounts": {
+        "sqliteOpens": 4,
+        "recallStarts": 4
+      },
+      "beforeTtl": {
+        "requests": 0,
+        "controllers": 4,
+        "mcpClients": 0,
+        "indexes": 4,
+        "watchers": 4,
+        "recallTimers": 4,
+        "embeddings": 0,
+        "states": 4,
+        "warmSessions": 4,
+        "retiringSessions": 0,
+        "idleTimers": 1,
+        "listeners": 0,
+        "reminderRoutes": 4,
+        "reminderTimers": 1
+      },
+      "afterTtlEviction": {
+        "requests": 0,
+        "controllers": 0,
+        "mcpClients": 0,
+        "indexes": 0,
+        "watchers": 0,
+        "recallTimers": 0,
+        "embeddings": 0,
+        "states": 0,
+        "warmSessions": 0,
+        "retiringSessions": 0,
+        "idleTimers": 0,
+        "listeners": 0,
+        "reminderRoutes": 4,
+        "reminderTimers": 1
+      },
+      "afterTtl": {
+        "request": 13.057424000000537,
+        "firstText": 9.096089000000575,
+        "context": 5.266655000000355,
+        "recall": 2.645695999999589,
+        "sqlite": 2.466165999999248,
+        "consolidation": 1.6016749999998865
+      },
+      "ttlCounts": {
+        "sqliteOpens": 1,
+        "recallStarts": 1
+      },
+      "beforeShutdown": {
+        "requests": 0,
+        "controllers": 1,
+        "mcpClients": 0,
+        "indexes": 1,
+        "watchers": 1,
+        "recallTimers": 1,
+        "embeddings": 0,
+        "states": 1,
+        "warmSessions": 1,
+        "retiringSessions": 0,
+        "idleTimers": 1,
+        "listeners": 0,
+        "reminderRoutes": 4,
+        "reminderTimers": 1,
+        "liveRecalls": 1,
+        "telegramDeadlineTimers": 0
+      },
+      "afterShutdown": {
+        "requests": 0,
+        "controllers": 0,
+        "mcpClients": 0,
+        "indexes": 0,
+        "watchers": 0,
+        "recallTimers": 0,
+        "embeddings": 0,
+        "states": 0,
+        "warmSessions": 0,
+        "retiringSessions": 0,
+        "idleTimers": 0,
+        "listeners": 0,
+        "reminderRoutes": 0,
+        "reminderTimers": 0,
+        "liveRecalls": 0,
+        "telegramDeadlineTimers": 0
+      }
+    }
+  ]
+}

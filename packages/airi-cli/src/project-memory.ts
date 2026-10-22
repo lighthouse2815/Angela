@@ -93,6 +93,7 @@ export class ProjectMemory {
   /** Full checkpoints replace obsolete blockers. Revision checks reject concurrent or replayed writes without losing either session's work. */
   async save(snapshot: v.InferOutput<typeof snapshotSchema>, expectedRevision: number, sessionId: string) {
     const input = v.parse(snapshotSchema, snapshot)
+    const stored = input.status === 'done' ? { ...input, blockers: [], nextStep: '' } : input
     const sourceSession = v.parse(v.pipe(v.string(), v.uuid()), sessionId)
     await this.file.edit((state) => {
       if (state.workspace !== this.workspace)
@@ -101,11 +102,12 @@ export class ProjectMemory {
         throw new Error(this.messages.projectMemoryDisabled)
       if (state.revision !== expectedRevision)
         throw new Error(this.messages.projectMemoryChanged)
-      state.snapshot = input.status === 'done' ? { ...input, blockers: [], nextStep: '' } : input
+      state.snapshot = stored
       state.updatedAt = new Date().toISOString()
       state.sourceSession = sourceSession
       state.revision++
     })
+    return stored
   }
 
   /** Recalled work is a historical report, never proof that files, tests, or tool side effects still match it. */
@@ -168,8 +170,8 @@ export class ProjectMemory {
           return { status: 'rejected', reason: this.messages.memoryEvidence }
         options.abortSignal?.throwIfAborted()
         try {
-          await this.save(snapshot, expected_revision, sessionId)
-          return { status: 'saved', revision: expected_revision + 1 }
+          const stored = await this.save(snapshot, expected_revision, sessionId)
+          return { status: 'saved', revision: expected_revision + 1, snapshot: stored }
         }
         catch (error) {
           options.abortSignal?.throwIfAborted()

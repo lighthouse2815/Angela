@@ -1,5 +1,6 @@
 import type { GenerationProvider } from '@proj-airi/provider-inference'
 
+import type { Memory } from '../memory'
 import type { AngelaEvent } from './events'
 
 import { randomUUID } from 'node:crypto'
@@ -14,6 +15,7 @@ import { afterEach, expect, it, vi } from 'vitest'
 import { Chat } from '../chat'
 import { McpTools } from '../mcp'
 import { Recall } from '../recall'
+import { RecallIndex } from '../recall-index'
 import { AngelaRuntime } from './runtime'
 
 const directories: string[] = []
@@ -27,6 +29,74 @@ afterEach(async () => {
 function completion(text: string) {
   return new Response(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', content: text }, finish_reason: 'stop' }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } })
 }
+
+it('captures successful task commands without model calls or cross-user observations', async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>(async () => completion('Unused'))
+  const { runtime, options, directory } = await setup(fetch)
+  const scope = runtime.open(options)
+  const events: AngelaEvent[] = []
+  runtime.events.on('task.completed', event => events.push(event))
+  runtime.events.on('task.updated', event => events.push(event))
+  const task = await (await scope.tasks()).create({ title: 'Ship the copper release', type: 'todo' })
+  await scope.command('/done invalid-id')
+  expect(events).toEqual([])
+  await scope.command(`/done ${task.id}`)
+  expect(events).toHaveLength(1)
+  expect(events[0]).toMatchObject({ type: 'task.completed', taskId: task.id, channel: 'telegram', sessionId: options.sessionId })
+  expect(events[0]?.correlationId).toBeTruthy()
+  expect(JSON.stringify(events)).not.toContain(task.title)
+  const index = await RecallIndex.open(directory)
+  try {
+    const episode = index.memory.current(directory, 'episodic', `session:${options.sessionId}`)
+    expect(episode?.body).toContain('Completed:')
+    expect(episode?.body).toContain(task.title)
+    expect(index.memory.observations(directory, 'another-session')).toEqual([])
+  }
+  finally { index.close() }
+  expect(fetch).not.toHaveBeenCalled()
+  await scope.close()
+})
+
+it('stops durable observations when automatic memory is disabled during a request', async () => {
+  let personal: Memory
+  const fetch = vi.fn<typeof globalThis.fetch>(async () => {
+    await personal.setAutomatic(false)
+    return completion('I will keep this disabled-memory commitment')
+  })
+  const { runtime, options, provider, directory } = await setup(fetch)
+  const scope = runtime.open(options)
+  personal = await scope.memory()
+  await scope.send(new Chat('model', provider, directory), 'Choose the copper release', {})
+  const index = await RecallIndex.open(directory)
+  try {
+    const observations = index.memory.observations(directory, options.sessionId)
+    expect(observations.some(item => item.type === 'user.message')).toBe(true)
+    expect(observations.some(item => item.type === 'assistant.message')).toBe(false)
+    expect(index.memory.current(directory, 'episodic', `session:${options.sessionId}`)).toBeUndefined()
+  }
+  finally { index.close() }
+  await scope.close()
+})
+
+it('does not relearn a forgotten fact from the same requests assistant confirmation', async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>()
+  const { runtime, options, provider, directory } = await setup(fetch)
+  const scope = runtime.open(options)
+  const id = await (await scope.memory()).remember('My name is Copper')
+  const tool = { id: 'forget-call', type: 'function', function: { name: 'personal_memory', arguments: JSON.stringify({ action: 'forget', id, text: null, source_quote: 'Please forget my saved name' }) } }
+  fetch.mockResolvedValueOnce(new Response(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', tool_calls: [{ index: 0, ...tool }] }, finish_reason: 'tool_calls' }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } }))
+    .mockResolvedValueOnce(completion('I will forget that My name is Copper'))
+  await scope.send(new Chat('model', provider, directory), 'Please forget my saved name', {})
+  expect((await (await scope.memory()).read()).entries).toEqual([])
+  const index = await RecallIndex.open(directory)
+  try {
+    expect(index.memory.observations(directory, options.sessionId)).toEqual([])
+    expect(index.search('Copper', directory)).toEqual([])
+    expect(index.memory.suppressed(directory, options.sessionId)).toBe(true)
+  }
+  finally { index.close() }
+  await scope.close()
+})
 
 async function setup(fetch: typeof globalThis.fetch = async () => completion('Hello')) {
   const directory = await mkdtemp(join(tmpdir(), 'angela-runtime-'))
@@ -138,7 +208,7 @@ it('shares one reminder timer and one store scheduler across channels and releas
     expect(runtime.reminderRouteCount).toBe(20)
     await runtime.close()
     expect(vi.getTimerCount()).toBe(0)
-    expect(runtime.resourceCounts).toEqual({ states: 0, listeners: 0, reminderRoutes: 0, reminderTimers: 0 })
+    expect(Object.values(runtime.resourceCounts).every(count => count === 0)).toBe(true)
   }
   finally {
     vi.useRealTimers()

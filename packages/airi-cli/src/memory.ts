@@ -9,7 +9,8 @@ import { errorMessageFrom } from '@moeru/std'
 import * as v from 'valibot'
 
 import { MemoryFile } from './memory-file'
-import { RecallIndex } from './recall-index'
+import { sanitize } from './memory-v2/sanitize'
+import { RecallIndex, sourceVersion } from './recall-index'
 
 const textSchema = v.pipe(v.string(), v.trim(), v.minLength(1), v.maxLength(500))
 const idSchema = v.pipe(v.string(), v.uuid())
@@ -32,17 +33,17 @@ export class Memory {
     this.file = new MemoryFile<State>(join(dataDir, 'memory'), 'personal', stateSchema, () => ({ version: 1, enabled: true, autoEnabled: true, entries: [] }), { invalid: messages.memoryInvalid, locked: messages.memoryLocked })
   }
 
-  private async edit(change: (state: State) => void, target?: () => string | undefined, purgeAll = false) {
-    if (purgeAll || target?.())
-      await RecallIndex.invalidate(this.dataDir, 'personal', target?.())
-    await this.file.edit(change)
-    try {
-      if (purgeAll || target?.())
-        await RecallIndex.invalidate(this.dataDir, 'personal', target?.())
-    }
-    catch {
-      throw new Error(this.messages.recallCleanup)
-    }
+  private async edit(change: (state: State) => void, target?: () => string | undefined, purgeAll = false, forgotten?: () => { text: string, sessionId?: string, activeSessionId?: string } | undefined) {
+    await this.file.edit(async (state) => {
+      const previousVersion = sourceVersion(JSON.stringify(state))
+      change(state)
+      v.parse(stateSchema, state)
+      try {
+        if (purgeAll || target?.())
+          await RecallIndex.invalidate(this.dataDir, 'personal', target?.(), { ...forgotten?.(), previousVersion })
+      }
+      catch { throw new Error(this.messages.recallCleanup) }
+    })
   }
 
   /** Missing storage is enabled and empty. Invalid storage is never silently overwritten. */
@@ -66,6 +67,7 @@ export class Memory {
     if (id && !v.safeParse(idSchema, id).success)
       throw new Error(this.messages.memoryMissing)
     let savedId = id ?? ''
+    let replacedText: { text: string, sessionId?: string } | undefined
     await this.edit((state) => {
       if (!state.enabled)
         throw new Error(this.messages.memoryDisabled)
@@ -81,6 +83,8 @@ export class Memory {
         throw new Error(this.messages.memoryCoreLimit)
       const now = new Date().toISOString()
       if (current) {
+        if (current.text !== parsed.output)
+          replacedText = { text: current.text, sessionId: current.source?.sessionId }
         current.text = parsed.output
         current.updatedAt = now
         if (metadata?.core !== undefined)
@@ -92,11 +96,12 @@ export class Memory {
         savedId = randomUUID()
         state.entries.push({ id: savedId, text: parsed.output, createdAt: now, updatedAt: now, core: metadata?.core ?? false, source: metadata?.source ?? { quote: parsed.output } })
       }
-    }, () => savedId ? `personal:${savedId}` : undefined)
+    }, () => savedId ? `personal:${savedId}` : undefined, false, () => replacedText)
     return savedId
   }
 
-  async forget(id: string, expectedText?: string) {
+  async forget(id: string, expectedText?: string, activeSessionId?: string) {
+    let forgotten: { text: string, sessionId?: string, activeSessionId?: string } | undefined
     await this.edit((state) => {
       const index = state.entries.findIndex(entry => entry.id === id)
       if (index < 0)
@@ -107,8 +112,9 @@ export class Memory {
         if (state.entries[index]!.text !== expectedText)
           throw new Error(this.messages.memoryChanged)
       }
+      forgotten = { text: state.entries[index]!.text, sessionId: state.entries[index]!.source?.sessionId, activeSessionId }
       state.entries.splice(index, 1)
-    }, () => `personal:${id}`)
+    }, () => `personal:${id}`, false, () => forgotten)
   }
 
   /** Saved text is request-local context, never persisted as a system turn in chat history. */
@@ -169,6 +175,8 @@ export class Memory {
         const current = await this.read()
         if (!userText.includes(source_quote) || (text !== null && !source_quote.includes(text)) || !current.enabled)
           return { status: 'rejected', reason: this.messages.memoryEvidence }
+        if (text !== null && sanitize(text, 500) !== text)
+          return { status: 'rejected', reason: 'sensitive-content' }
         if (current.autoEnabled !== autoEnabled)
           return { status: 'rejected', reason: this.messages.memoryChanged }
         if ((action === 'remember' && (!text || id)) || (action === 'update' && (!id || !text)) || (action === 'forget' && (!id || text !== null)))
@@ -179,7 +187,7 @@ export class Memory {
         options.abortSignal?.throwIfAborted()
         try {
           if (action === 'forget') {
-            await this.forget(id!, existing!.text)
+            await this.forget(id!, existing!.text, sessionId)
             return { status: 'deleted', id }
           }
           const saved = await this.remember(text!, id ?? undefined, existing?.text, { core, source: { quote: text!, sessionId } })

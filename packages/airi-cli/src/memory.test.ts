@@ -189,3 +189,14 @@ it('serializes parallel facts from one model turn and continues after a failed e
   await memory.remember('Tôi thích câu ngắn')
   expect((await memory.read()).entries).toHaveLength(4)
 })
+
+it('rejects credentials from model memory tools while keeping an existing safe fact', async () => {
+  const { memory } = await setup()
+  const id = await memory.remember('I prefer concise answers')
+  for (const text of ['My password is fake-credential', 'Mật khẩu của tôi là fake-credential', 'API_KEY=fake-credential']) {
+    const [tool] = await memory.tools(text)
+    for (const action of ['remember', 'update'])
+      expect(await tool!.execute!({ action, id: action === 'update' ? id : null, text, source_quote: text }, { messages: [], toolCallId: 'credential-test' })).toMatchObject({ status: 'rejected', reason: 'sensitive-content' })
+  }
+  expect((await memory.read()).entries).toEqual([expect.objectContaining({ id, text: 'I prefer concise answers' })])
+})
