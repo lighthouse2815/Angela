@@ -175,3 +175,23 @@ Temporary databases are deleted when each benchmark finishes.
 
 The next integration step, after core review, is an Electron IPC adapter that preserves renderer voice, image, approval, and session behavior.
 The next quality step is a larger anonymized corpus with paraphrases, overlapping distractors, and correction sequences.
+
+## Telegram production lifecycle baseline (PR #1)
+
+`benchmark-telegram-lifecycle.ts` drives real grammY updates through `TelegramChat`, session persistence, runtime, Memory V2, and SQLite.
+The model returns deterministic SSE text. A local HTTP server replaces Telegram delivery. No paid API is used.
+Each mode sends 31 messages to one session, then 20 messages across four users.
+The retained comparison adds one reference per scope. It represents the previous warm benchmark, not baseline production behavior.
+
+| Baseline mode | Request p50 / p95 | First text p50 / p95 | SQLite opens / Recall starts |
+| --- | --- | --- | --- |
+| Production open/send/close | 22.01 / 42.57 ms | 13.47 / 28.41 ms | 51 / 51 |
+| Retained reference | 12.79 / 15.94 ms | 7.84 / 11.49 ms | 4 / 4 |
+
+Percentiles use the 30 subsequent single-user messages. Counts cover all 51 requests.
+Request latency includes Telegram adapter persistence and local HTTP delivery. First text stops at the runtime stream event.
+Context preparation includes store initialization, Recall, and tool preparation.
+SQLite timing includes directory creation, permissions, database open, and schema work. It does not isolate SQLite syscall time.
+The first mode also pays process module warmup. Warm percentiles exclude each mode's first request.
+This run supports bounded warm reuse. It does not predict real network or model latency.
+Raw measurements: `packages/airi-cli/benchmarks/telegram-lifecycle-before.json`.
