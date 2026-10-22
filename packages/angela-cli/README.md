@@ -956,6 +956,11 @@ Inactive records sort by `updatedAt`, then stable task ID. Pending tasks are nev
 History is pruned further to keep the total within 100 records and the existing 128000-character storage bound.
 A valid larger history is read and pruned on the next mutation. Corrupted storage remains untouched.
 Competing writers can receive an explicit busy error and retry. A failed write never commits partial cleanup.
+Writer locks publish complete PID and hostname metadata through an atomic hard link.
+After a crash, the next write recovers a lock only when its same-host process is proven dead.
+CLI session resume uses the same recovery check. Active owners and unknown locks remain protected.
+Empty, corrupt, foreign-host, or abandoned recovery-marker locks require manual inspection.
+Task storage requires a local filesystem with atomic rename and hard-link support.
 
 The service exposes create, list, find, update, complete, cancel, and snooze operations.
 Date-only tasks retain their date without an alarm time. Snooze preserves the task ID and original due time.

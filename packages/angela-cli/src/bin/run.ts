@@ -112,7 +112,7 @@ async function main() {
   const workspace = await realpath(config.cwd ?? previousWorkspace ?? process.cwd())
   if (!(await stat(workspace)).isDirectory())
     throw new Error(messages.invalidWorkspace)
-  const session = await sessions.open(workspace, config.resume)
+  const session = await sessions.open(workspace, config.resume, { recoverAbandoned: true })
   try {
     const { getGenerationProvider, listProviders } = await import('@angela/provider-inference')
     const definition = listProviders().find(provider => provider.id === config.definitionId)

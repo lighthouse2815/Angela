@@ -4,17 +4,15 @@ import type { Message } from '@xsai/shared-chat'
 
 import type { Chat } from './chat'
 
-import process from 'node:process'
-
 import { randomUUID } from 'node:crypto'
-import { mkdir, open, readdir, readFile, rename, stat, unlink, writeFile } from 'node:fs/promises'
-import { hostname } from 'node:os'
+import { mkdir, readdir, readFile, rename, stat, unlink, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import { chatMessagesToTurns, conversationToChatMessages } from '@angela/core-agent'
 
 import * as v from 'valibot'
 
+import { acquireFileLock } from './file-lock'
 import { durableConversation, requestPrivacy } from './privacy-policy'
 
 // CLI sessions use portable text messages. Provider-native continuation stays in memory for the current process.
@@ -60,7 +58,6 @@ const sessionSchema = v.pipe(v.object({
   working: v.optional(v.object({ offset: v.pipe(v.number(), v.integer(), v.minValue(0)), summary: v.pipe(v.string(), v.maxLength(3000)) })),
 }), v.check(record => !record.working || record.working.offset <= record.messages.length))
 type Record = v.InferOutput<typeof sessionSchema>
-const lockOwnerSchema = v.object({ pid: v.pipe(v.number(), v.integer(), v.minValue(1)), hostname: v.string() })
 
 /** Owns the local session directory. Credentials and provider configuration never enter its records. */
 export class Sessions {
@@ -130,9 +127,8 @@ export class Sessions {
     this.validateId(id)
     await mkdir(this.directory, { recursive: true, mode: 0o700 })
     const lockPath = join(this.directory, `${id}.lock`)
-    const lock = await this.acquireLock(lockPath, options.recoverAbandoned ?? false)
+    const lock = await acquireFileLock(lockPath, `${this.messages.sessionLocked} ${lockPath}`, options.recoverAbandoned ?? false)
     try {
-      await lock.writeFile(JSON.stringify({ pid: process.pid, hostname: hostname() }))
       let record: Record
       try {
         record = await this.read(id)
@@ -159,48 +155,6 @@ export class Sessions {
 
   private validateId(id: string) {
     v.parse(v.pipe(v.string(), v.uuid(this.messages.invalidId)), id)
-  }
-
-  private async acquireLock(path: string, recoverAbandoned: boolean) {
-    const busy = () => new Error(`${this.messages.sessionLocked} ${path}`)
-    try {
-      return await open(path, 'wx', 0o600)
-    }
-    catch (error) {
-      if (!(error instanceof Error) || !('code' in error) || error.code !== 'EEXIST')
-        throw error
-      if (!recoverAbandoned)
-        throw busy()
-    }
-    // One recovery owner checks and replaces the old lock. Unknown owners and recovery collisions stay locked.
-    const recoveryPath = `${path}.recovery`
-    const recovery = await open(recoveryPath, 'wx', 0o600).catch(() => {
-      throw busy()
-    })
-    try {
-      const owner = await readFile(path, 'utf8').then(source => v.parse(lockOwnerSchema, JSON.parse(source))).catch(() => {
-        throw busy()
-      })
-      if (owner.hostname !== hostname())
-        throw busy()
-      try {
-        process.kill(owner.pid, 0)
-        throw busy()
-      }
-      catch (error) {
-        // Only ESRCH proves that the same-host owner exited. Permission errors cannot authorize recovery.
-        if (!(error instanceof Error) || !('code' in error) || error.code !== 'ESRCH')
-          throw busy()
-      }
-      await unlink(path)
-      return await open(path, 'wx', 0o600).catch(() => {
-        throw busy()
-      })
-    }
-    finally {
-      await recovery.close()
-      await unlink(recoveryPath)
-    }
   }
 }
 

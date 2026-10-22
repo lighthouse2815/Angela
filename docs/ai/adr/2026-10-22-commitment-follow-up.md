@@ -68,3 +68,17 @@ Memory policy can disable these records without disabling explicitly requested t
 
 Standalone task commands use the same service and capture path without constructing a model provider.
 The system remains local-first. No server, broker, or new dependency is required.
+
+## Writer crash recovery
+
+The session writer already identified abandoned locks through hostname and process ID.
+That implementation now lives in `file-lock.ts`, shared by sessions and `MemoryFile`.
+An atomic hard link publishes complete owner metadata before another process can observe the lock.
+Only ESRCH from a same-host process check permits recovery.
+Live owners, permission failures, unknown owner data, and foreign hosts remain locked.
+CLI resume enables this check. Task mutations always enable it.
+Unknown locks and abandoned recovery markers require manual inspection.
+The target filesystem must support local hard links and atomic rename.
+
+A process test kills a writer while `MemoryFile.edit` holds its lock.
+The restarted scheduler recovers that lock and delivers the previously saved reminder once.

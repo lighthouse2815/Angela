@@ -67,3 +67,45 @@ process.send({ status: 'ready' })
   expect((await claim()).filter(result => result.token)).toEqual([])
   expect((await tasks.find(task.id)).delivery?.status).toBe('delivered')
 }, 20_000)
+
+it('recovers an abandoned task writer after an OS-process crash and delivers the persisted occurrence once', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'angela-crashed-writer-'))
+  directories.push(directory)
+  const now = Date.parse('2026-10-23T09:00:00+07:00')
+  const tasks = new Tasks(directory, cliMessages.en.tasks, () => now)
+  const task = await tasks.create({ title: 'Survive a crashed writer', type: 'reminder', dueAt: new Date(now).toISOString() })
+  const fixture = join(directory, 'writer.mts')
+  const source = (name: string) => JSON.stringify(fileURLToPath(new URL(`./${name}.ts`, import.meta.url)))
+  await writeFile(fixture, `
+import process from 'node:process'
+import { MemoryFile } from ${source('memory-file')}
+import { taskState } from ${source('task-schema')}
+const file = new MemoryFile(${JSON.stringify(join(directory, 'tasks'))}, 'tasks', taskState, () => ({ version: 1, tasks: [] }), { invalid: 'invalid', locked: 'locked' })
+await file.edit(async () => {
+  process.send({ state: 'locked' })
+  await new Promise(() => {})
+})
+`)
+  const child = spawn(process.execPath, ['--import', fileURLToPath(import.meta.resolve('tsx')), fixture], { stdio: ['ignore', 'pipe', 'pipe', 'ipc'] })
+  children.push(child)
+  expect((await once(child, 'message'))[0]).toEqual({ state: 'locked' })
+  child.kill('SIGKILL')
+  await once(child, 'close')
+  const { ReminderScheduler } = await import('./reminder-scheduler')
+  const failures: unknown[] = []
+  let presentations = 0
+  const scheduler = new ReminderScheduler(new Tasks(directory, cliMessages.en.tasks, () => now), { notify: async () => {
+    presentations++
+  } }, error => failures.push(error))
+  try {
+    await scheduler.start()
+    await scheduler.refresh()
+    expect(failures).toHaveLength(0)
+    expect(presentations).toBe(1)
+    expect((await tasks.find(task.id)).delivery?.status).toBe('delivered')
+    expect((await tasks.find(task.id)).title).toBe(task.title)
+  }
+  finally {
+    await scheduler.close()
+  }
+}, 20_000)

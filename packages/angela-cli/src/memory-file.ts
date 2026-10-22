@@ -1,8 +1,10 @@
 import { randomUUID } from 'node:crypto'
-import { mkdir, open, readFile, rename, unlink, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rename, unlink, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import * as v from 'valibot'
+
+import { acquireFileLock } from './file-lock'
 
 /** Shares private, bounded, atomic storage between memory owners. Local writes queue before acquiring the cross-process lock. */
 export class MemoryFile<T> {
@@ -40,9 +42,7 @@ export class MemoryFile<T> {
   private async write(change: (state: T) => unknown) {
     await mkdir(this.directory, { recursive: true, mode: 0o700 })
     const lockPath = join(this.directory, `${this.name}.lock`)
-    const lock = await open(lockPath, 'wx', 0o600).catch(() => {
-      throw new Error(this.errors.locked)
-    })
+    const lock = await acquireFileLock(lockPath, this.errors.locked, true)
     const temporary = join(this.directory, `${randomUUID()}.tmp`)
     try {
       const state = await this.read()
