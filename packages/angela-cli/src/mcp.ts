@@ -42,7 +42,7 @@ export class McpTools {
     env: NodeJS.ProcessEnv,
     signal?: AbortSignal,
   ) {
-    const client = new Client({ name: '@proj-airi/airi-cli', version: '0.12.0-beta.5' })
+    const client = new Client({ name: '@angela/cli', version: '0.12.0-beta.5' })
     const childEnv: Record<string, string> = {}
     for (const [key, value] of Object.entries(env)) {
       if (value !== undefined && !['ANGELA_API_KEY', 'ANGELA_TELEGRAM_BOT_TOKEN'].includes(key))
