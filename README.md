@@ -1,7 +1,6 @@
 # Angela
 
-Angela là người bạn AI để trò chuyện tự nhiên bằng tiếng Việt, đồng hành và giúp bạn học khi cần.
-Dự án phát triển từ AIRI và giữ các tính năng, ứng dụng, game, plugin và tích hợp hiện có.
+Angela là người bạn AI để trò chuyện tự nhiên bằng tiếng Việt, đồng hành, hỗ trợ học tập và giúp xử lý các công việc hằng ngày.
 
 ## Chạy dự án
 
@@ -14,8 +13,7 @@ pnpm dev:tamagotchi
 
 Giai đoạn hiện tại ưu tiên desktop/local AI. Các module tạm hoãn nằm trong
 [`../dev-in-future/`](../dev-in-future/README.md) và không tham gia workspace mặc định.
-Thư mục này nằm ngoài Git repository `airi/` và chỉ được lưu local.
-Code trước khi chuyển vẫn có trong commit `d4e6d03` trên GitHub.
+Thư mục này nằm ngoài Git repository hiện tại và chỉ được lưu local.
 API và shared contract còn ở `server/` vì desktop vẫn sử dụng kiểu dữ liệu của chúng.
 
 Bản web:
@@ -26,7 +24,7 @@ pnpm dev:web
 
 ## Bản CLI
 
-CLI hỗ trợ chat streaming, công cụ terminal qua MCP và lưu/tiếp tục phiên.
+CLI hỗ trợ chat streaming, công cụ terminal qua MCP, memory dài hạn, task/reminder và lưu/tiếp tục phiên.
 Sau khi cài dependencies, build CLI cùng các package cần thiết:
 
 ```bash
@@ -62,18 +60,12 @@ Cấu hình bản hosted và đồng bộ qua tài khoản nằm ngoài phạm v
 ## AI và giọng nói
 
 Để bắt đầu với free tier, thêm Google Gemini và nhập API key từ Google AI Studio.
-Trong mô-đun Ý thức, chọn Google Gemini và `gemini-3.1-flash-lite` để bắt đầu trò chuyện.
+Trong mô-đun Ý thức, chọn Google Gemini và model phù hợp để bắt đầu trò chuyện.
 Free tier có hạn mức. Xem [thiết lập Gemini](./docs/angela-setup.md#google-gemini) trước khi dùng.
 Không ghi API key vào mã nguồn hoặc gửi key trong cuộc trò chuyện.
 
-Nếu dùng OpenAI có trả phí, các lựa chọn sau vẫn có sẵn:
-
-- Chat và vision: OpenAI, mô hình `gpt-5.4-mini`.
-- Nhận dạng giọng nói: OpenAI Audio Transcription, mô hình `gpt-4o-mini-transcribe`.
-- Phát giọng nói AI: OpenAI Audio Speech, mô hình `gpt-4o-mini-tts`, giọng `coral`.
-
-Chọn nhà cung cấp tương ứng trong mô-đun Ý thức, Thị giác, Nghe và Giọng nói.
-Các lựa chọn khác vẫn có sẵn. Một API key hợp lệ và quyền dùng mô hình là cần thiết để gọi API.
+Nếu dùng OpenAI có trả phí, có thể cấu hình riêng model cho chat, vision, nhận dạng giọng nói và phát giọng nói trong phần cài đặt.
+Các lựa chọn khác vẫn có sẵn. Một API key hợp lệ và quyền dùng model là cần thiết để gọi API.
 
 ## Tương tác laptop
 
@@ -81,12 +73,12 @@ Bản desktop có công cụ quan sát màn hình và tương tác ứng dụng.
 Khả năng thực tế phụ thuộc vào hệ điều hành, thư viện native và quyền của phiên desktop.
 Xem [thiết lập và kiểm tra](./docs/angela-setup.md) trước khi dùng công cụ.
 
-## Nguồn mã
+## Kiến trúc hiện tại
 
-Bản pitch hackathon gồm 20 slide nằm tại [`deploy/pitch`](./deploy/pitch/README.md).
+Runtime chung điều phối CLI, Telegram và các adapter khác. Memory V2 ghi observation, tổng hợp episodic/semantic/procedural memory và đưa dữ liệu trở lại Recall để xây context.
 
-Angela dựa trên [AIRI](https://github.com/moeru-ai/airi).
-Giữ nguyên [LICENSE](./LICENSE) và ghi nhận tác giả của nền mã gốc.
-[Tài liệu AIRI gốc](./docs/AIRI_README.md) mô tả các tính năng được giữ lại.
+Các tài liệu kiến trúc và audit nằm trong [`docs/ai`](./docs/ai/).
 
-Repository của Angela: https://github.com/lighthouse2815/Angela
+## Repository
+
+https://github.com/lighthouse2815/Angela
