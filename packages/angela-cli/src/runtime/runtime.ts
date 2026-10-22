@@ -343,7 +343,7 @@ export interface SessionOptions {
   dataDir: string
   workspace: string
   sessionId: string
-  channel: 'cli' | 'telegram' | 'discord' | 'desktop'
+  channel: 'cli' | 'telegram' | 'discord' | 'desktop' | 'zalo'
   locale?: string
   connectMcp?: (signal: AbortSignal) => Promise<McpTools | undefined>
   warn?: (message: string) => void
@@ -449,6 +449,8 @@ export class RuntimeSession {
   /** Normal text does not initialize stores through the command path. Remote skill imports remain disabled. */
   async command(text: string, signal?: AbortSignal) {
     signal?.throwIfAborted()
+    if (this.options.channel === 'zalo')
+      return undefined
     if (!text.startsWith('/'))
       return undefined
     if (text === '/memory consolidate')
@@ -487,7 +489,7 @@ export class RuntimeSession {
     const event: AngelaEvent = { ...payload, id: randomUUID(), timestamp: new Date().toISOString(), correlationId: randomUUID(), sessionId: this.options.sessionId, channel: this.options.channel, workspace }
     this.runtime.events.emit(event)
     try {
-      if (this.options.channel !== 'discord') {
+      if (this.options.channel !== 'discord' && this.options.channel !== 'zalo') {
         const capture = await (await this.recall())?.capture()
         capture?.record(event, evidence, true)
         capture?.finish('')
@@ -537,7 +539,7 @@ export class RuntimeSession {
             warnings.push(message)
           this.options.warn?.(message)
         } }
-        if (this.options.channel !== 'discord') {
+        if (this.options.channel !== 'discord' && this.options.channel !== 'zalo') {
           sources.memory = await this.memory()
           sources.tasks = await this.tasks()
           if (this.options.channel === 'cli' || this.options.channel === 'desktop')
@@ -554,9 +556,9 @@ export class RuntimeSession {
           this.sessionStarted = true
           await emit({ type: 'session.started' })
         }
-        await emit({ type: 'user.message' }, text)
+        await emit({ type: this.options.channel === 'zalo' ? 'external.message' : 'user.message' }, text)
         const context = await buildContext(sources, text, signal, extra)
-        registry = await buildTools(sources, text, this.options.sessionId, await this.mcp(signal))
+        registry = await buildTools(sources, text, this.options.sessionId, this.options.channel === 'zalo' ? undefined : await this.mcp(signal))
         signal.throwIfAborted()
         await chat.send(text, {
           ...options,
