@@ -43,12 +43,18 @@ export function classifyCommitmentIntent(text: string): CommitmentIntent {
 }
 
 function hasCreationPayload(action: string, suffix: string) {
-  if (!/^(?:create|add|schedule|save)\b/u.test(action))
+  if (!/^(?:create|add|schedule|save|tạo|thêm|lưu)\b/u.test(action))
     return true
   const tail = suffix.trim()
   if (/^save\b/u.test(action))
     return /^[.!]*$/u.test(tail) || /^:\s*\S/u.test(tail)
+  // These Vietnamese forms already explicitly address task management.
+  if (/^(?:tạo\s+lịch|thêm\s+việc|lưu\s+việc)\b/u.test(action))
+    return true
+  // Saving an existing item as a task has an explicit Vietnamese form too.
+  if (/^lưu\s+(?:task|todo|tác vụ)\b/u.test(action))
+    return /^(?:này\s+thành\s+task\b|:\s*\S)/u.test(tail)
   // A task noun alone cannot distinguish managing work from building software. Require an explicit purpose, title, personal activity, or time.
-  return /^(?:to\s+\S|:\s*\S)/u.test(tail)
+  return /^(?:to\s+\S|:\s*\S|để\s+\S|cho\s+(?:tôi|tao|mình|tớ|em|anh)\b\s*\S|vào\s+(?:danh\s+sách|list)\b\s*\S)/u.test(tail)
     || /^for\s+(?:(?:my|our|me|tomorrow|today|tonight)\b|(?:next|this)\s+(?:week|month|morning|afternoon|evening|monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b|(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b|(?:at\s+)?\d{1,2}(?::\d{2})?(?:\s*[ap]m\b|(?=\s*(?:to\b|[.!]*$)))|\S+ing\b)/u.test(tail)
 }

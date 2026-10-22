@@ -172,6 +172,17 @@ it.each([
   'Create a task API endpoint.',
   'Add a todo React component.',
   'Schedule a reminder job in Quartz.',
+  'Tạo task API endpoint.',
+  'Tạo task controller cho backend.',
+  'Tạo tác vụ reminder service.',
+  'Thêm todo component vào sidebar.',
+  'Thêm task table vào database.',
+  'Tạo task repository.',
+  'Tạo task DTO.',
+  'Tạo task CRUD.',
+  'Tạo reminder service.',
+  'Thêm reminder button.',
+  'Lưu task schema vào file.',
 ])('rejects software-development requests at task_create: %s', async (text) => {
   const { tasks } = await setup()
   const tool = taskTools(tasks, messages, undefined, text)[0]!
@@ -195,6 +206,14 @@ it.each([
   'Remind me tomorrow to finish the reminder service.',
   'Mai 9h nhắc tôi chạy test parser.',
   'Mai 9h nhắc tôi code reminder service.',
+  'Tạo task để học LINQ.',
+  'Tạo task để hoàn thành API endpoint.',
+  'Tạo tác vụ: refactor auth.',
+  'Thêm todo: làm slide.',
+  'Thêm việc học tiếng Trung.',
+  'Thêm việc để fix auth.',
+  'Tạo task để code reminder service.',
+  'Thêm todo để refactor reminder scheduler.',
 ])('authorizes explicit task management including coding subjects: %s', async (text) => {
   const { tasks } = await setup()
   const tool = taskTools(tasks, messages, undefined, text)[0]!

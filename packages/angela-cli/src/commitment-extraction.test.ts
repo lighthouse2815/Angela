@@ -101,3 +101,34 @@ it.each(['Create a task.', 'Schedule a reminder.', 'Add a todo.', 'Create a task
   expect(classifyCommitmentIntent(text)).not.toBe('create')
   expect(extractCommitment(text, now, zone).isCommitment).toBe(false)
 })
+
+it.each([
+  'Tạo task API endpoint.',
+  'Tạo task controller cho backend.',
+  'Tạo tác vụ reminder service.',
+  'Thêm todo component vào sidebar.',
+  'Thêm task table vào database.',
+  'Tạo task repository.',
+  'Tạo task DTO.',
+  'Tạo task CRUD.',
+  'Tạo reminder service.',
+  'Thêm reminder button.',
+  'Lưu task schema vào file.',
+])('requires task-management syntax after a Vietnamese object: %s', (text) => {
+  expect(classifyCommitmentIntent(text)).not.toBe('create')
+  expect(extractCommitment(text, now, zone).isCommitment).toBe(false)
+})
+
+it.each([
+  'Tạo task để học LINQ.',
+  'Tạo task để hoàn thành API endpoint.',
+  'Tạo tác vụ: refactor auth.',
+  'Thêm todo: làm slide.',
+  'Thêm việc học tiếng Trung.',
+  'Thêm việc để fix auth.',
+  'Lưu việc này thành task.',
+  'Tạo task để code reminder service.',
+  'Thêm todo để refactor reminder scheduler.',
+])('authorizes Vietnamese task-management syntax with coding subjects: %s', (text) => {
+  expect(classifyCommitmentIntent(text)).toBe('create')
+})
