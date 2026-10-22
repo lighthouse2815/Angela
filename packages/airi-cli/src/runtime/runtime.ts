@@ -5,13 +5,14 @@ import type { GenerationProvider } from '@proj-airi/provider-inference'
 import type { Chat } from '../chat'
 import type { McpTools } from '../mcp'
 import type { Memory } from '../memory'
+import type { MemoryCapture } from '../memory-v2/consolidator'
 import type { ProjectMemory } from '../project-memory'
 import type { Recall } from '../recall'
 import type { ReminderNotifier, ReminderScheduler } from '../reminder-scheduler'
 import type { Skills } from '../skills'
 import type { Tasks } from '../tasks'
 import type { ContextSources } from './context-builder'
-import type { BaseAngelaEvent } from './events'
+import type { AngelaEvent, BaseAngelaEvent, EventPayload } from './events'
 
 import { randomUUID } from 'node:crypto'
 
@@ -196,7 +197,7 @@ export interface SessionOptions {
   dataDir: string
   workspace: string
   sessionId: string
-  channel: 'cli' | 'telegram' | 'discord'
+  channel: 'cli' | 'telegram' | 'discord' | 'desktop'
   locale?: string
   connectMcp?: (signal: AbortSignal) => Promise<McpTools | undefined>
   warn?: (message: string) => void
@@ -248,7 +249,7 @@ export class RuntimeSession {
       const { Recall } = await import('../recall')
       const memory = await this.memory()
       const skills = await this.skills()
-      const workspace = this.options.channel === 'cli' ? (await this.project()).workspace : this.options.workspace
+      const workspace = this.options.channel === 'cli' || this.options.channel === 'desktop' ? (await this.project()).workspace : this.options.workspace
       const recall = new Recall(this.options.dataDir, workspace, this.options.sessionId, this.runtime.messages, this.runtime.env, this.runtime.defaults, memory, skills)
       try {
         await recall.start()
@@ -314,22 +315,41 @@ export class RuntimeSession {
     if (this.request)
       return Promise.reject(new Error('Context already has an active request'))
     const signal = options.abortSignal ? AbortSignal.any([options.abortSignal, this.lifetime.signal]) : this.lifetime.signal
-    const envelope: Omit<BaseAngelaEvent, 'timestamp'> = { correlationId: randomUUID(), sessionId: this.options.sessionId, channel: this.options.channel }
-    const emit = (event: Parameters<EventBus['emit']>[0]) => this.runtime.events.emit(event)
+    const envelope: Omit<BaseAngelaEvent, 'id' | 'timestamp'> = { correlationId: randomUUID(), sessionId: this.options.sessionId, channel: this.options.channel, workspace: this.options.workspace }
+    let capture: MemoryCapture | undefined
+    const emit = (payload: EventPayload, evidence = '', verified = false) => {
+      const event: AngelaEvent = { ...envelope, ...payload, id: randomUUID(), timestamp: new Date().toISOString() }
+      this.runtime.events.emit(event)
+      try {
+        capture?.record(event, evidence, verified)
+      }
+      catch {
+        capture = undefined
+        this.options.warn?.(this.runtime.messages.memoryUnavailable)
+      }
+    }
     this.request = (async () => {
       signal.throwIfAborted()
-      emit({ ...envelope, type: 'user.message', timestamp: new Date().toISOString() })
       let registry: Awaited<ReturnType<typeof buildTools>> | undefined
+      let completed = false
+      let assistant = ''
       try {
         const warnings: string[] = []
         const sources: ContextSources = { channel: this.options.channel, messages: this.runtime.messages, warn: message => this.options.warn ? this.options.warn(message) : warnings.push(message) }
         if (this.options.channel !== 'discord') {
           sources.memory = await this.memory()
           sources.tasks = await this.tasks()
-          if (this.options.channel === 'cli')
+          if (this.options.channel === 'cli' || this.options.channel === 'desktop')
             sources.project = await this.project()
           sources.recall = await this.recall()
+          envelope.workspace = sources.project?.workspace ?? this.options.workspace
+          try {
+            capture = await sources.recall?.capture()
+          }
+          catch { sources.warn(this.runtime.messages.memoryUnavailable) }
         }
+        emit({ type: 'session.started' })
+        emit({ type: 'user.message' }, text)
         const context = await buildContext(sources, text, signal, extra)
         registry = await buildTools(sources, text, this.options.sessionId, await this.mcp(signal))
         signal.throwIfAborted()
@@ -339,17 +359,32 @@ export class RuntimeSession {
           tools: registry.tools,
           resolveStep: options.resolveStep ? async () => ({ ...await options.resolveStep!(), tools: registry!.tools }) : undefined,
           onStreamEvent: async (event) => {
-            registry!.observe(event)
+            const observation = registry!.observe(event)
+            if (event.type === 'text-delta' && assistant.length < 4000)
+              assistant += event.text.slice(0, 4000 - assistant.length)
             if (event.type === 'tool-call')
-              emit({ ...envelope, type: 'tool.call', timestamp: new Date().toISOString(), toolCallId: event.toolCallId, toolName: event.toolName })
-            else if (event.type === 'tool-result' || event.type === 'tool-error')
-              emit({ ...envelope, type: event.type === 'tool-result' ? 'tool.result' : 'tool.error', timestamp: new Date().toISOString(), toolCallId: event.toolCallId })
+              emit({ type: 'tool.call', toolCallId: event.toolCallId, toolName: event.toolName })
+            else if (event.type === 'tool-error')
+              emit({ type: 'tool.error', toolCallId: event.toolCallId, toolName: observation?.toolName ?? 'unknown' }, observation?.text)
+            else if (event.type === 'tool-result')
+              emit({ type: 'tool.result', toolCallId: event.toolCallId, toolName: observation?.toolName ?? 'unknown', outcome: observation?.outcome ?? 'unverified' }, observation?.text, observation?.outcome === 'verified')
+            if (observation?.domain)
+              emit(observation.domain, observation.text, true)
             await options.onStreamEvent?.(event)
           },
         }, warnings.length ? [context, ...warnings].filter(Boolean).join('\n\n') : context)
-        emit({ ...envelope, type: 'assistant.message', timestamp: new Date().toISOString() })
+        completed = true
+        emit({ type: 'assistant.message' }, assistant)
       }
       finally {
+        if (!completed)
+          emit({ type: 'request.failed', reason: signal.aborted ? 'aborted' : 'failed' }, signal.aborted ? 'Request interrupted' : 'Request failed')
+        emit({ type: 'session.ended', reason: completed ? 'completed' : signal.aborted ? 'aborted' : 'failed' })
+        try {
+          capture?.finish(text)
+        }
+        catch { this.options.warn?.(this.runtime.messages.memoryUnavailable) }
+        capture = undefined
         registry?.close()
         await this.retrieval?.then(recall => recall?.finishRequest()).catch(() => {})
         if (signal.aborted) {

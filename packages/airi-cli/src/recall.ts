@@ -15,6 +15,7 @@ import * as v from 'valibot'
 import { Embeddings } from './embeddings'
 import { Memory } from './memory'
 import { MemoryFile } from './memory-file'
+import { MemoryCapture } from './memory-v2/consolidator'
 import { ProjectMemory } from './project-memory'
 import { RecallIndex, sourceVersion } from './recall-index'
 import { Sessions } from './sessions'
@@ -161,6 +162,15 @@ export class Recall {
     if (!this.index || this.closed)
       throw new Error(this.messages.recallInvalid)
     return this.index
+  }
+
+  /** Capture honors the existing privacy switches. The handle belongs only to this request and its exact workspace. */
+  async capture() {
+    const settings = await this.settings.read()
+    const personal = await this.memory.read()
+    if (!settings.enabled || !personal.enabled || !personal.autoEnabled)
+      return undefined
+    return new MemoryCapture(this.database().memory, this.workspace, this.sessionId)
   }
 
   private async refresh(signal?: AbortSignal) {
@@ -524,7 +534,7 @@ export class Recall {
       throw new Error(this.messages.recallInvalid)
     await this.refresh(signal)
     const hit = this.database().read(id)
-    if (!hit || !await this.valid(hit) || (hit.kind === 'history' && hit.scope !== this.workspace && !this.readableAcrossWorkspaces.has(hit.origin)))
+    if (!hit || !await this.valid(hit) || (hit.scope !== '' && hit.scope !== this.workspace && !this.readableAcrossWorkspaces.has(hit.origin)))
       throw new Error(this.messages.recallInvalid)
     if (hit.kind === 'personal') {
       const state = await this.memory.read()
@@ -535,6 +545,8 @@ export class Recall {
     }
     if (hit.kind === 'skill')
       return { ...hit, provenance: (await this.skills.read(hit.id.slice(6))).verification }
+    if (hit.origin.startsWith('memory:'))
+      this.database().memory.reinforce([hit.id.slice(7)], hit.scope)
     return hit
   }
 
@@ -566,7 +578,7 @@ export class Recall {
     }
     if (text === '/memory status') {
       await this.refresh(signal)
-      return JSON.stringify({ ...this.database().stats(this.client?.namespace, this.client?.dimensions), settings: await this.settings.read(), lastSearchMs: this.lastSearchMs, lastContextChars: this.lastContextChars, selectedSources: this.lastUsed.length, syncedAt: this.syncedAt, problems: [...this.problems], embedding: this.client?.status ?? (this.embeddingConfigError ? 'invalid' : 'not-configured') }, null, 2)
+      return JSON.stringify({ ...this.database().stats(this.client?.namespace, this.client?.dimensions), memory: this.database().memory.stats(), settings: await this.settings.read(), lastSearchMs: this.lastSearchMs, lastContextChars: this.lastContextChars, selectedSources: this.lastUsed.length, syncedAt: this.syncedAt, problems: [...this.problems], embedding: this.client?.status ?? (this.embeddingConfigError ? 'invalid' : 'not-configured') }, null, 2)
     }
     if (text.startsWith('/memory search '))
       return JSON.stringify(await this.search(text.slice(15), false, signal), null, 2)

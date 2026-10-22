@@ -6,7 +6,7 @@ import { EventBus } from './event-bus'
 
 it('delivers only to current subscribers and never replays events', () => {
   const bus = new EventBus()
-  const event: AngelaEvent = { type: 'user.message', timestamp: new Date().toISOString(), correlationId: 'request' }
+  const event: AngelaEvent = { id: 'event', type: 'user.message', timestamp: new Date().toISOString(), correlationId: 'request' }
   bus.emit(event)
   const handler = vi.fn()
   const unsubscribe = bus.on('user.message', handler)

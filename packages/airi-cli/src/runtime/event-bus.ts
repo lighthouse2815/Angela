@@ -4,22 +4,22 @@ type Handler = (event: AngelaEvent) => void
 
 /** Synchronous process-local delivery. No history, promises, queue, replay, or event payload survives emit. */
 export class EventBus {
-  private readonly listeners = new Map<AngelaEvent['type'], Set<Handler>>()
+  private readonly listeners = new Map<AngelaEvent['type'], Map<unknown, Handler>>()
 
   /** A subscriber owns its unsubscribe function. Each event type permits at most 32 distinct listeners. */
-  on(type: AngelaEvent['type'], handler: Handler) {
+  on<T extends AngelaEvent['type']>(type: T, handler: (event: Extract<AngelaEvent, { type: T }>) => void) {
     let handlers = this.listeners.get(type)
     if (!handlers) {
-      handlers = new Set()
+      handlers = new Map()
       this.listeners.set(type, handlers)
     }
     if (!handlers.has(handler) && handlers.size >= 32)
       throw new RangeError('Too many runtime event listeners')
-    handlers.add(handler)
+    handlers.set(handler, event => handler(event as Extract<AngelaEvent, { type: T }>))
     return () => this.off(type, handler)
   }
 
-  off(type: AngelaEvent['type'], handler: Handler) {
+  off<T extends AngelaEvent['type']>(type: T, handler: (event: Extract<AngelaEvent, { type: T }>) => void) {
     const handlers = this.listeners.get(type)
     handlers?.delete(handler)
     if (!handlers?.size)
@@ -27,7 +27,7 @@ export class EventBus {
   }
 
   emit(event: AngelaEvent) {
-    for (const handler of this.listeners.get(event.type) ?? [])
+    for (const handler of this.listeners.get(event.type)?.values() ?? [])
       handler(event)
   }
 

@@ -13,7 +13,7 @@ export interface ContextSources {
   project?: ProjectMemory
   recall?: Recall
   tasks?: Tasks
-  channel: 'cli' | 'telegram' | 'discord'
+  channel: 'cli' | 'telegram' | 'discord' | 'desktop'
   messages: typeof cliMessages.en
   warn: (message: string) => void
 }

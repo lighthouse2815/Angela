@@ -34,3 +34,21 @@ Compaction replaces the cold body locally. It does not create Git-backed copies 
 Forget operations remove page projections, vectors, edges, and derived copies.
 
 Team servers, Rust crates, memory sidecars, Git-backed personal memory, admin infrastructure, and cross-machine sync are excluded.
+
+## Runtime capture
+
+CLI and private Telegram requests use `RuntimeSession.send` for context, tools, model execution, events, and memory capture.
+Discord keeps its current text-only policy and does not initialize companion stores.
+The runtime accepts a desktop adapter without importing a desktop API.
+Transport adapters continue to own approval UI, delivery, voice, perception, and cancellation.
+
+Each event has a unique ID and request correlation ID, plus its session, channel, and workspace.
+The synchronous typed event bus retains listeners only. It never retains messages or tool results.
+Each request owns a private capture handle. It validates the exact session and workspace before writing an observation.
+Capture honors Personal Memory enable and automatic switches, and the recall enable switch.
+The store sanitizes observation text again before persistence and retains 256 observations per session.
+
+The zero-provider compiler creates an episodic page after each request, including interrupted requests.
+Its original goal survives observation-window rollover. Section limits bound summaries and keep repeated consolidation idempotent.
+Only host-verified results count as successful tools. Assistant commitments carry an explicit unverified label.
+Explicit `Workflow: ...` and `Quy trình: ...` statements can create procedural pages with source-episode edges.
