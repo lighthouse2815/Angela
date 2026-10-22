@@ -2799,6 +2799,12 @@ importers:
 
   engines/stage-tamagotchi-godot: {}
 
+  evals/companion:
+    devDependencies:
+      valibot:
+        specifier: 'catalog:'
+        version: 1.4.2(typescript@6.0.3)
+
   integrations/discord-bot:
     dependencies:
       '@discordjs/voice':

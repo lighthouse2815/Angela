@@ -1,0 +1,11 @@
+{
+  "name": "@angela/evals-companion",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "check:dataset": "tsx check-dataset.ts"
+  },
+  "devDependencies": {
+    "valibot": "catalog:"
+  }
+}

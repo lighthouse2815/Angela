@@ -68,6 +68,7 @@ packages:
   - integrations/**
   - services/**
   - examples/**
+  - evals/*
   - engines/**
   - apps/**
   - server/**
