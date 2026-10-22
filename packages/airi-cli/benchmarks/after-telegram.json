@@ -1,0 +1,57 @@
+{
+  "node": "v26.11.1",
+  "mode": "telegram",
+  "samples": [
+    {
+      "label": "telegram.idle",
+      "rss": 164433920,
+      "heapUsed": 37335032,
+      "heapTotal": 80396288,
+      "external": 5737061,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "label": "telegram.user.1.active",
+      "rss": 171454464,
+      "heapUsed": 40433544,
+      "heapTotal": 82493440,
+      "external": 6900922,
+      "resources": [
+        "PipeWrap",
+        "Timeout"
+      ]
+    },
+    {
+      "label": "telegram.user.1",
+      "rss": 172109824,
+      "heapUsed": 40908288,
+      "heapTotal": 82755584,
+      "external": 6938071,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "label": "telegram.users.24",
+      "rss": 172269568,
+      "heapUsed": 42228992,
+      "heapTotal": 84066304,
+      "external": 7003671,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "label": "closed",
+      "rss": 172269568,
+      "heapUsed": 42067568,
+      "heapTotal": 84066304,
+      "external": 7003671,
+      "resources": [
+        "PipeWrap"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "node": "v26.11.1",
+  "samples": [
+    {
+      "label": "entry.idle",
+      "rss": 177594368,
+      "heapUsed": 33071560,
+      "heapTotal": 77889536,
+      "external": 5905235
+    },
+    {
+      "label": "entry.message.1",
+      "rss": 187990016,
+      "heapUsed": 41089712,
+      "heapTotal": 81305600,
+      "external": 7787926
+    }
+  ]
+}

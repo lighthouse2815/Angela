@@ -4,9 +4,9 @@
   "samples": [
     {
       "label": "cli.idle",
-      "rss": 193208320,
-      "heapUsed": 41013520,
-      "heapTotal": 82759680,
+      "rss": 187969536,
+      "heapUsed": 41058960,
+      "heapTotal": 85118976,
       "external": 5670975,
       "resources": [
         "FSReqPromise",
@@ -15,9 +15,9 @@
     },
     {
       "label": "cli.message.1",
-      "rss": 195342336,
-      "heapUsed": 42967712,
-      "heapTotal": 83546112,
+      "rss": 189730816,
+      "heapUsed": 43015832,
+      "heapTotal": 86167552,
       "external": 6872471,
       "resources": [
         "PipeWrap"
@@ -25,9 +25,9 @@
     },
     {
       "label": "cli.message.20",
-      "rss": 195735552,
-      "heapUsed": 43832688,
-      "heapTotal": 93507584,
+      "rss": 189861888,
+      "heapUsed": 43881072,
+      "heapTotal": 86691840,
       "external": 6938071,
       "resources": [
         "PipeWrap"
@@ -35,9 +35,9 @@
     },
     {
       "label": "closed",
-      "rss": 195866624,
-      "heapUsed": 43816192,
-      "heapTotal": 93507584,
+      "rss": 189861888,
+      "heapUsed": 43870584,
+      "heapTotal": 86691840,
       "external": 6938071,
       "resources": [
         "PipeWrap"
