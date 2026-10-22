@@ -88,6 +88,8 @@ export class VoiceManager {
     }
     let room: Room | undefined
     try {
+      if (this.rooms.size >= 4)
+        throw new Error('Discord voice room limit reached')
       if (!channel.joinable || !channel.speakable)
         throw new Error('Voice channel permissions are unavailable')
       room = this.join(channel)
@@ -237,14 +239,14 @@ export class VoiceManager {
 
   private async capture(room: Room, userId: string) {
     if (room.paused || room.connection.state.status !== VoiceConnectionStatus.Ready
-      || this.rooms.get(room.channel.guild.id) !== room || room.captures.has(userId)) {
+      || this.rooms.get(room.channel.guild.id) !== room || room.captures.has(userId) || room.captures.size >= 4) {
       return
     }
     const member = room.channel.members.get(userId) ?? await room.channel.guild.members.fetch(userId).catch(() => undefined)
     // An uncached speaker must still belong to this live call before any provider receives their audio.
     if (!member || member.user.bot || member.voice.channelId !== room.channel.id || room.paused
       || room.connection.state.status !== VoiceConnectionStatus.Ready
-      || this.rooms.get(room.channel.guild.id) !== room || room.captures.has(userId)) {
+      || this.rooms.get(room.channel.guild.id) !== room || room.captures.has(userId) || room.captures.size >= 4) {
       return
     }
     const stream = room.connection.receiver.subscribe(userId, { end: { behavior: EndBehaviorType.AfterSilence, duration: 800 } })
@@ -259,6 +261,7 @@ export class VoiceManager {
       tooLong = true
       stream.destroy(new Error('Voice capture limit exceeded'))
     }, 30_000)
+    limit.unref()
     decoder.on('data', (chunk: Buffer) => {
       size += chunk.length
       if (size > DECODE_SAMPLE_RATE * 2 * 30) {
@@ -324,6 +327,7 @@ export class VoiceManager {
             this.interrupt(room)
           }
         }, 90_000)
+        deadline.unref()
         try {
           const text = await this.speech.transcribe(convertOpusToWav(utterance.pcm), turn.controller.signal)
           if (turn.controller.signal.aborted || room.turn !== turn)

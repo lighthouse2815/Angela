@@ -37,6 +37,8 @@ CLI mode stores history under the CLI data directory's `discord` folder.
 Each channel has separate text and voice conversations. Requests in one conversation run in order.
 CLI mode supports conversation only. It does not expose terminal tools, Telegram task commands, or the local microphone.
 Interrupting speech, pausing, leaving, and shutdown cancel local AI generation.
+Text chat does not import speech, Opus, or the voice transport. Voice commands load these modules once per process.
+A host permits four simultaneous calls and four active speaker captures per call. Leaving or shutdown releases their resources.
 Voice replies use call context and brief, spoken sentences. Unclear transcripts prompt a clarification instead of a guessed microphone diagnosis.
 The CLI rejects the observed Google gateway diagnostic and reports a localized call failure instead of reading the diagnostic aloud.
 Previously saved diagnostics remain in history files but stay outside model requests.

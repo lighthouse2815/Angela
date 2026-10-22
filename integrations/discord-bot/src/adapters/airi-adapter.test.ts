@@ -27,7 +27,7 @@ afterEach(async () => {
   bridge.close.mockClear()
 })
 
-it('routes only completed voice turns to speech and keeps their intermediate messages out of text delivery', async () => {
+it('ignores voice output without an active call and never initializes speech for stale replies', async () => {
   const fetch = vi.spyOn(ChannelManager.prototype, 'fetch').mockResolvedValue(null)
   const speech = vi.spyOn(VoiceManager.prototype, 'handleResponse')
   const adapter = new DiscordAdapter({ discordToken: 'test-token' })
@@ -41,19 +41,19 @@ it('routes only completed voice turns to speech and keeps their intermediate mes
   expect(fetch).not.toHaveBeenCalled()
   const completed: WebSocketEventOf<'output:gen-ai:chat:complete'> = { type: 'output:gen-ai:chat:complete', data: { ...data, toolCalls: [], usage: { promptTokens: 0, completionTokens: 0, totalTokens: 0, source: 'estimate-based' } } }
   await bridge.handlers.get(completed.type)!(completed)
-  expect(speech).toHaveBeenCalledWith(context, 'Hello Alice')
+  expect(speech).not.toHaveBeenCalled()
 })
 
-it('closes calls before disconnecting or replacing the bot configuration', async () => {
+it('keeps voice uninitialized when disabling a text-only bot and closes the server channel', async () => {
   const close = vi.spyOn(VoiceManager.prototype, 'close')
   const login = vi.spyOn(Client.prototype, 'login').mockResolvedValue('test-token')
   const adapter = new DiscordAdapter({ discordToken: 'test-token' })
   adapters.push(adapter)
   const event: WebSocketEventOf<'module:configure'> = { type: 'module:configure', data: { config: { enabled: false } } }
   await bridge.handlers.get('module:configure')!(event)
-  expect(close).toHaveBeenCalledOnce()
+  expect(close).not.toHaveBeenCalled()
   await adapter.stop()
-  expect(close).toHaveBeenCalledTimes(2)
+  expect(close).not.toHaveBeenCalled()
   expect(bridge.close).toHaveBeenCalledOnce()
   expect(login).not.toHaveBeenCalled()
 })
@@ -94,4 +94,24 @@ it('aborts local generations on shutdown and suppresses their late replies', asy
   completed.resolve('Late reply')
   await completed.promise
   expect(fetch).not.toHaveBeenCalled()
+})
+
+it('initializes voice on command and closes the loaded manager before shutdown completes', async () => {
+  const login = vi.spyOn(Client.prototype, 'login').mockResolvedValue('test-token')
+  const join = vi.spyOn(VoiceManager.prototype, 'handleJoinChannelCommand').mockResolvedValue()
+  const close = vi.spyOn(VoiceManager.prototype, 'close')
+  const adapter = new DiscordAdapter({ discordToken: 'test-token', respond: async () => 'Hello' })
+  adapters.push(adapter)
+  await adapter.start()
+  expect(join).not.toHaveBeenCalled()
+  const client = login.mock.contexts[0] as Client
+  EventEmitter.prototype.emit.call(client, Events.InteractionCreate, {
+    isChatInputCommand: () => true,
+    commandName: 'summon',
+    user: { tag: 'Alice' },
+  })
+  await vi.waitFor(() => expect(join).toHaveBeenCalledOnce())
+  expect(close).not.toHaveBeenCalled()
+  await adapter.stop()
+  expect(close).toHaveBeenCalledOnce()
 })
