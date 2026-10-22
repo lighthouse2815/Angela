@@ -327,10 +327,10 @@ Until this flow passes, this repository provides a tested implementation, not ve
 
 ## Rebase and merge preparation
 
-This branch is rebased onto main commit `9f77e80ff7c1eec0efef4968844f2313357ce4bc`.
-Main advanced during the task, so the initial rebase onto `5a51329` was followed by a second rebase.
-The only content conflict was the warning callback in `RuntimeSession.send()`.
-Resolution keeps main's bounded warning collection and adapter notification, then excludes Zalo from private context and memory capture.
+This branch is rebased onto main commit `840cb5611223a2a5c99b867e526bc9019028c8e4`.
+The final fetch and rebase completed without conflicts.
+The previous rebase resolved a warning callback conflict in `RuntimeSession.send()`.
+That resolution keeps main's bounded warning collection and adapter notification, then excludes Zalo from private context and memory capture.
 The new memory-disabled context policy remains unchanged.
 The event union keeps `external.message` separate from owner `user.message`.
 The final diff contains no edits to companion generation or recall evaluation data, reports, harnesses, or runners.
@@ -346,23 +346,24 @@ Tests cover the classification boundary, not live Zalo delivery or unrestricted 
 | Command | Result |
 | --- | --- |
 | `pnpm -F @angela/cli exec vitest run --maxWorkers=2` | 460 tests passed across 57 files, including 45 Zalo/Away tests |
-| `pnpm -F @angela/cli exec vitest run src/cli.test.ts src/zalo-command.test.ts src/zalo-host.test.ts --maxWorkers=2` | 25 entrypoint regression tests passed after lazy import changes |
+| `pnpm -F @angela/cli exec vitest run src/adapters/zalo src/away src/zalo-command.test.ts src/zalo-host.test.ts --maxWorkers=2` | 45 Zalo/Away tests passed across seven files |
 | `pnpm -F @angela/evals-companion-generation test` | 71 tests passed across two files |
 | `pnpm -F @angela/evals-companion test` | 45 recall evaluation and regression tests passed across two files |
 | `pnpm -F @angela/evals-companion-generation check:dataset` | 57 cases, 12 categories, 29 rules passed schema checks |
 | `pnpm -F @angela/evals-companion check:dataset` | 128 cases across 16 categories passed schema checks |
-| `pnpm -F @angela/cli typecheck` | Passed |
 | `pnpm -F @angela/evals-companion-generation typecheck` | Passed |
 | `pnpm -F @angela/evals-companion typecheck` | Passed |
-| `NODE_OPTIONS=--max-old-space-size=4096 pnpm typecheck --concurrency=1` | 53 workspace tasks passed, including CLI and i18n |
+| `NODE_OPTIONS=--max-old-space-size=4096 pnpm typecheck --concurrency=1 --force` | 53 workspace tasks passed without cached results, including CLI and i18n |
 | `pnpm lint` | Passed with zero errors and 603 warnings in existing code |
-| `pnpm -F @angela/i18n build` | Passed |
-| `pnpm -F @angela/cli build` | Passed |
-| `git diff --check` | Passed |
-| `pnpm --filter @angela/evals-companion-generation... --filter @angela/evals-companion... install --ignore-scripts --frozen-lockfile` | Passed without lockfile changes |
+| `pnpm build:cli` | Passed, including CLI dependencies |
+| `git diff --check` and `git diff --check origin/main...HEAD` | Passed |
 
 Verification adds `--config.verify-deps-before-run=false` to pnpm commands to prevent implicit dependency installation in this worktree.
-The installed pnpm bootstrap lacks an executable shebang. Turbo verification uses an ignored local shell wrapper for that bootstrap.
+The installed pnpm bootstrap lacks an executable shebang. Turbo verification uses a temporary shell wrapper outside the repository.
 Neither measure changes project source, dependency versions, validation rules, or compiler configuration.
 The four-gigabyte Node heap supports the repository's Vue typechecks. Two Vitest workers limit resource contention.
+An initial test run overlapped dependency builds and failed while `dist` files were absent. It also reported a timeout under concurrent load.
+The final test runs followed the completed build and full typecheck, with no concurrent build.
+No test, timeout, validation rule, or production source changed to obtain these results.
+The built CLI also returned `{"savedSession":false,"connection":"not-probed"}` from `zalo status` without a configured model.
 No paid live generation ran. Real-account Zalo status remains **pending owner acceptance test**.
