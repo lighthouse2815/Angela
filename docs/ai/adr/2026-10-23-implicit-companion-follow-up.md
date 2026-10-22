@@ -45,9 +45,11 @@ The standalone desktop reminder service retains explicit task delivery only.
 ## Intent and focus
 
 Local extraction and model task tools use `classifyCommitmentIntent` before persistence.
-English authorization requires phrases such as `create a task`, `add a todo`, `add a reminder`, or `save this as a task`.
+English authorization requires an explicit purpose, title, personal activity, or time clause after a creation object.
+Examples include `create a task to study`, `add a todo: submit my report`, and `add a reminder for tomorrow`.
+`save this as a task` also authorizes an explicit conversion of current context. Bare task nouns do not grant authority.
 Generic `create`, `add`, and `save` do not grant authority.
-The classifier checks example and implementation framing across the whole request. Technical objects such as a task parser do not grant authority.
+The classifier checks example and implementation framing across the whole request. Technical objects such as a task parser do not grant authority. Coding subjects inside valid management requests remain supported.
 Quotations, speculation, questions, and uncertain requests cannot authorize task creation.
 Direct reminders about testing a parser remain valid explicit requests.
 

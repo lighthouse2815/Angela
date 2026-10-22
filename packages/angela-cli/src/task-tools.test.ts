@@ -67,7 +67,7 @@ async function setup() {
   const directory = await mkdtemp(join(tmpdir(), 'angela-task-tools-'))
   directories.push(directory)
   const tasks = new Tasks(directory, messages, () => now, 'Asia/Ho_Chi_Minh')
-  const tools = taskTools(tasks, messages, undefined, 'Create a task')
+  const tools = taskTools(tasks, messages, undefined, 'Create a task to study Chinese.')
   const call = async (name: string, input: unknown) => await tools.find(tool => tool.function.name === name)!.execute!(input, options)
   return { tasks, tools, call }
 }
@@ -145,4 +145,58 @@ it('handles management commands with stable IDs and date filters without model r
 it.each(['/done', '/cancel', '/snooze', '/snooze 1 10m', '/done 1', '/today extra', '/tasks all extra'])('reports useful selection or usage errors: %s', async (text) => {
   const { tasks } = await setup()
   expect([messages.usage, messages.missing]).toContain(await taskCommand(text, tasks, messages, 'en'))
+})
+
+it.each([
+  'Create a reminder service.',
+  'Create a reminder service in TypeScript.',
+  'Add a todo component to the sidebar.',
+  'Create a task endpoint.',
+  'Create a task endpoint for the API.',
+  'Add a reminder button.',
+  'Create a task repository.',
+  'Create a todo repository.',
+  'Add a task controller.',
+  'Create a reminder hook.',
+  'Create a todo page.',
+  'Create a task page.',
+  'Build a reminder API.',
+  'Implement reminder scheduling.',
+  'Create task CRUD.',
+  'Create a task DTO.',
+  'Add a task table to Postgres.',
+  'Add a task table to the database.',
+  'Schedule a reminder job in Hangfire.',
+  'Add a reminder queue consumer.',
+  'Create a reminder microservice.',
+  'Create a task API endpoint.',
+  'Add a todo React component.',
+  'Schedule a reminder job in Quartz.',
+])('rejects software-development requests at task_create: %s', async (text) => {
+  const { tasks } = await setup()
+  const tool = taskTools(tasks, messages, undefined, text)[0]!
+  expect(await tool.execute!({ title: 'Coding request', type: 'todo' }, options)).toMatchObject({ status: 'rejected' })
+  expect(await tasks.list({ status: 'all' })).toEqual([])
+})
+
+it.each([
+  'Create a task to study LINQ.',
+  'Create a task to finish the reminder service.',
+  'Create a task to implement the auth endpoint.',
+  'Add a todo: submit my report.',
+  'Add a todo to implement auth.',
+  'Add a todo to refactor the reminder scheduler.',
+  'Add a reminder for tomorrow at 9.',
+  'Schedule a reminder to deploy the API at 8 PM.',
+  'Schedule a reminder for 9 PM to deploy the API.',
+  'Save this as a task: review auth.',
+  'Remind me tomorrow to finish the task endpoint.',
+  'Remind me tomorrow to finish the reminder service.',
+  'Mai 9h nhắc tôi chạy test parser.',
+  'Mai 9h nhắc tôi code reminder service.',
+])('authorizes explicit task management including coding subjects: %s', async (text) => {
+  const { tasks } = await setup()
+  const tool = taskTools(tasks, messages, undefined, text)[0]!
+  expect(await tool.execute!({ title: 'Managed work', type: 'todo' }, options)).toMatchObject({ status: 'saved' })
+  expect(await tasks.list()).toHaveLength(1)
 })
