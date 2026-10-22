@@ -2,16 +2,15 @@
   "name": "@proj-airi/server-shared",
   "type": "module",
   "version": "0.12.0-beta.5",
-  "description": "Server shared types, utilities for AIRI server components and runtimes",
+  "description": "Shared types and utilities for Angela server components and runtimes",
   "author": {
-    "name": "Moeru AI Project AIRI Team",
-    "email": "airi@moeru.ai",
-    "url": "https://github.com/moeru-ai"
+    "name": "lighthouse2815",
+    "url": "https://github.com/lighthouse2815"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/moeru-ai/airi.git",
+    "url": "https://github.com/lighthouse2815/Angela.git",
     "directory": "packages/server-shared"
   },
   "exports": {
