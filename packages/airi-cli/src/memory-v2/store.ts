@@ -320,16 +320,18 @@ export class MemoryStore {
   }
 
   /** Removes captured copies and blocks old request correlations. A later explicit conversation remains eligible for new memory. */
-  forgetText(text: string, sessionId?: string) {
+  forgetText(text: string, sessionId?: string, activeSessionId?: string) {
     if (!text.trim())
       return
     this.transaction(() => {
       const captures = this.sql('SELECT DISTINCT scope,sessionId FROM memory_observations WHERE instr(lower(text),lower(?))>0').all(text)
       const histories = this.sql('SELECT DISTINCT scope,substr(origin,9) AS sessionId FROM excerpts WHERE kind=\'history\' AND instr(lower(text),lower(?))>0').all(text)
       const sessions = new Set([...captures, ...histories].map(row => String(row.sessionId)))
-      if (sessionId) {
-        sessions.add(sessionId)
-        this.suppress('*', sessionId)
+      for (const id of [sessionId, activeSessionId]) {
+        if (id) {
+          sessions.add(id)
+          this.suppress('*', id)
+        }
       }
       const roots = this.sql('SELECT id FROM memory_pages WHERE sourceSessionId IN (SELECT value FROM json_each(?)) OR instr(lower(body),lower(?))>0 OR instr(lower(abstract),lower(?))>0').all(JSON.stringify([...sessions]), text, text)
       this.erasePages(roots.map(row => String(row.id)), true)

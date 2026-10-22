@@ -228,7 +228,7 @@ export class RecallIndex {
   }
 
   /** Writers purge derived copies without creating an index for users who have not enabled retrieval. */
-  static async invalidate(dataDir: string, origin: string, id?: string, forgotten?: { text?: string, sessionId?: string, previousVersion?: string }) {
+  static async invalidate(dataDir: string, origin: string, id?: string, forgotten?: { text?: string, sessionId?: string, activeSessionId?: string, previousVersion?: string }) {
     try {
       await stat(join(dataDir, 'memory', 'recall.sqlite'))
     }
@@ -242,7 +242,7 @@ export class RecallIndex {
       if (origin.startsWith('history:'))
         index.memory.purgeSession(origin.slice(8))
       if (forgotten?.text)
-        index.memory.forgetText(forgotten.text, forgotten.sessionId)
+        index.memory.forgetText(forgotten.text, forgotten.sessionId, forgotten.activeSessionId)
       index.remove(origin, id, forgotten?.previousVersion)
       index.memory.reclaim()
     }

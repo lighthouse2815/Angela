@@ -127,3 +127,5 @@ Personal corrections purge derived data while the existing personal-file lock is
 A cleanup failure leaves the authoritative old fact available for an explicit retry.
 Identity-only source-version tombstones reject stale personal snapshots from another indexer after the purge completes.
 New explicit facts have new source versions and remain eligible for indexing.
+Model-driven forget also suppresses the active request's captured session, so its assistant confirmation cannot immediately relearn the forgotten fact.
+Personal-memory model tools reject recognized credentials using the same sanitizer. Direct explicit local edits keep their existing storage contract.

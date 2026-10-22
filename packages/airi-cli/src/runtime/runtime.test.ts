@@ -78,6 +78,26 @@ it('stops durable observations when automatic memory is disabled during a reques
   await scope.close()
 })
 
+it('does not relearn a forgotten fact from the same requests assistant confirmation', async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>()
+  const { runtime, options, provider, directory } = await setup(fetch)
+  const scope = runtime.open(options)
+  const id = await (await scope.memory()).remember('My name is Copper')
+  const tool = { id: 'forget-call', type: 'function', function: { name: 'personal_memory', arguments: JSON.stringify({ action: 'forget', id, text: null, source_quote: 'Please forget my saved name' }) } }
+  fetch.mockResolvedValueOnce(new Response(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', tool_calls: [{ index: 0, ...tool }] }, finish_reason: 'tool_calls' }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } }))
+    .mockResolvedValueOnce(completion('I will forget that My name is Copper'))
+  await scope.send(new Chat('model', provider, directory), 'Please forget my saved name', {})
+  expect((await (await scope.memory()).read()).entries).toEqual([])
+  const index = await RecallIndex.open(directory)
+  try {
+    expect(index.memory.observations(directory, options.sessionId)).toEqual([])
+    expect(index.search('Copper', directory)).toEqual([])
+    expect(index.memory.suppressed(directory, options.sessionId)).toBe(true)
+  }
+  finally { index.close() }
+  await scope.close()
+})
+
 async function setup(fetch: typeof globalThis.fetch = async () => completion('Hello')) {
   const directory = await mkdtemp(join(tmpdir(), 'angela-runtime-'))
   directories.push(directory)
