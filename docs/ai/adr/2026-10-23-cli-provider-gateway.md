@@ -30,6 +30,13 @@ OAuth and special account imports use the bundled local dashboard, not an extern
 The existing local configuration package owns atomic provider updates.
 The initial dashboard password and management token stay separate from the shared inference key.
 
+Interactive `angela` starts with GPT, Gemini, Claude, Custom, Continue, and Exit choices.
+The custom menu exposes account controls, model selection, key inspection, and the full bundled dashboard.
+OAuth remains in the browser. The menu never collects provider passwords.
+The menu owns a gateway child only when it starts that child. Chat shutdown releases that owned child.
+An explicit model selection overrides provider environment values for that session and saves the shared local configuration.
+Automation, explicit provider flags, and `--no-menu` retain their existing behavior.
+
 The foreground owner stops only its child. It refuses occupied ports and never kills unrelated listeners.
 Disable the upstream updater and telemetry. Keep the full provider graph rather than copying a login subset.
 

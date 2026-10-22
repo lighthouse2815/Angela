@@ -83,11 +83,42 @@ async function main() {
     await runDiscord(process.argv.slice(3), process.env)
     return
   }
-  const config = await readConfig(process.argv.slice(2), process.env)
+  if (process.stdin.isTTY && process.stderr.isTTY) {
+    const { Startup } = await import('../startup')
+    const startup = new Startup()
+    // Chat installs turn-aware cancellation after runtime initialization. Before that, interruption exits after gateway cleanup.
+    const cancelStartup = () => {
+      void startup.close().finally(() => process.exit(130))
+    }
+    try {
+      const selection = await startup.open(process.argv.slice(2), process.env)
+      if (selection) {
+        process.once('SIGINT', cancelStartup)
+        await runChat(selection.args, selection.env, () => process.off('SIGINT', cancelStartup))
+      }
+    }
+    finally {
+      process.off('SIGINT', cancelStartup)
+      await startup.close()
+    }
+    return
+  }
+  await runChat(process.argv.slice(2), process.env)
+}
+
+/**
+ * Runs chat after interactive provider selection or explicit command-line configuration.
+ *
+ * Call stack:
+ * main -> Startup.open -> runChat -> AngelaRuntime -> Chat.send
+ */
+async function runChat(args: string[], env: NodeJS.ProcessEnv, inputReady?: () => void) {
+  const config = await readConfig(args, env)
   const messages = config.messages
   if (config.help) {
     process.stdout.write(`${messages.description}\n\nangela [--model ID] [--prompt TEXT]\nangela tasks [all]\nangela task show|done|cancel|snooze ID [DURATION]\nangela eval [--help]\nangela setup [--help]\nangela reminders install|start|stop|status|run [--help]\nangela doctor [--json] [--help]\nangela telegram [--help]\nangela discord [--help]\nangela zalo login|logout|status|run [--help]\nangela away on|off|status [--help]\nangela voice start|stop|status [--help]\nangela sessions list|usage|delete ID|cleanup-audio [--help]\n\n${[
       ['angela gateway --help', messages.gateway.description],
+      ['--menu / --no-menu', messages.startup.menu],
       ['--model', messages.model],
       ['--provider', messages.provider],
       ['--config', messages.configFile],
@@ -103,7 +134,7 @@ async function main() {
       ['--resume', messages.resume],
       ['--list-sessions', messages.listSessions],
       ['--data-dir', messages.dataDir],
-    ].map(([flag, text]) => `  ${flag.padEnd(16)}${text}`).join('\n')}\n`)
+    ].map(([flag, text]) => `  ${flag.padEnd(16)} ${text}`).join('\n')}\n`)
     return
   }
 
@@ -128,8 +159,8 @@ async function main() {
     if (!provider)
       throw new Error(`${messages.unsupportedProvider}: ${config.definitionId}`)
     const { AngelaRuntime } = await import('../runtime/runtime')
-    const runtime = new AngelaRuntime(config.model, provider, messages, process.env, config)
-    const chat = await runtime.createChat(workspace, session.restore(), true, Number(process.env.ANGELA_CONTEXT_TOKENS ?? 32_000))
+    const runtime = new AngelaRuntime(config.model, provider, messages, env, config)
+    const chat = await runtime.createChat(workspace, session.restore(), true, Number(env.ANGELA_CONTEXT_TOKENS ?? 32_000))
     const modelTarget = { model: config.model, chatProvider: provider, providerId: definition.id }
     const persona = chat.conversation.turns.filter(turn => turn.type === 'system').flatMap(turn => turn.content).flatMap(part => part.type === 'text' ? [part.text] : []).join('\n')
     await session.saveChat(chat, session.record.interrupted)
@@ -162,7 +193,7 @@ async function main() {
             const approved = (await input.ask(`\n${messages.approve} `, approvalSignal))?.trim().toLowerCase() === 'yes'
             output.decided(approved)
             return approved
-          }, messages, process.env, signal)
+          }, messages, env, signal)
           process.stderr.write(`${messages.mcpConnected}\n`)
           return tools
         }
@@ -192,17 +223,19 @@ async function main() {
       }
     }
     process.on('SIGINT', interrupt)
+    inputReady?.()
     if (process.stdin.isTTY)
       input = new Terminal(interrupt)
-    const stop = () => {
+    const stop = (signal: NodeJS.Signals) => {
       voice = undefined
       interruption?.cancel()
       active?.abort()
       shutdown.abort()
       input?.close()
-      process.exitCode = 143
+      process.exitCode = signal === 'SIGHUP' ? 129 : 143
     }
     process.on('SIGTERM', stop)
+    process.on('SIGHUP', stop)
 
     let pendingUtterance: string | undefined
     let voiceReady = false
@@ -383,7 +416,7 @@ async function main() {
             try {
               const { Voice } = await import('../voice')
               await Voice.cleanupTemporaryAudio().catch(() => {})
-              voice ??= loadedVoice ?? await Voice.load(process.env, messages)
+              voice ??= loadedVoice ?? await Voice.load(env, messages)
               loadedVoice = voice
               notifications.setVoiceEnabled(true)
               active = new AbortController()
@@ -427,7 +460,7 @@ async function main() {
           active = new AbortController()
           try {
             if (/^\/camera(?:\s|$)/u.test(text))
-              camera ??= new (await import('../perception/camera')).Camera(process.env, messages)
+              camera ??= new (await import('../perception/camera')).Camera(env, messages)
             const response = /^\/(?:away|zalo)(?:\s|$)/u.test(text)
               ? await (await import('../zalo-command')).ownerAwayCommand(text, config.dataDir, messages)
               : await camera?.command(text, active.signal) ?? await scope.command(text, active.signal)
@@ -487,6 +520,7 @@ async function main() {
           finally {
             process.off('SIGINT', interrupt)
             process.off('SIGTERM', stop)
+            process.off('SIGHUP', stop)
           }
         }
       }

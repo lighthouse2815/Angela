@@ -22,6 +22,7 @@ export async function readConfig(args: string[], env: NodeJS.ProcessEnv) {
       'cwd': { type: 'string' },
       'locale': { type: 'string' },
       'help': { type: 'boolean', short: 'h' },
+      'menu': { type: 'boolean' },
       'computer-use': { type: 'boolean' },
       'mcp-command': { type: 'string' },
       'mcp-arg': { type: 'string', multiple: true },

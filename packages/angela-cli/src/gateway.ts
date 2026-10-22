@@ -290,6 +290,8 @@ export class Gateway {
       const stop = () => {
         child.kill('SIGTERM')
       }
+      // Startup can end before chat installs its signal handlers. An exiting parent must not leave its gateway child behind.
+      process.once('exit', stop)
       signal.addEventListener('abort', stop, { once: true })
       try {
         const deadline = Date.now() + 60_000
@@ -322,6 +324,7 @@ export class Gateway {
           throw new Error(this.messages.startFailed)
       }
       finally {
+        process.off('exit', stop)
         signal.removeEventListener('abort', stop)
         stop()
         const timeout = new AbortController()

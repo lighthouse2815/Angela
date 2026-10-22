@@ -61,3 +61,31 @@ All inference requests used a local synthetic provider. No paid model or persona
 Real OAuth, provider quotas, and live availability still require account-owner verification.
 The integration does not add native desktop account screens, remote exposure, or a background service installer.
 Existing user deletions of the root and OpenSeeFace licenses remain outside this change.
+
+## Interactive startup menu
+
+The menu provides GPT, Gemini, Claude, Custom, Continue, and Exit choices in English and Vietnamese.
+It reuses the existing terminal reader, gateway client, provider registry, and private configuration writer. No dependency was added.
+Custom exposes account checks, activation controls, filtered model pages, key metadata, explicit secret reveals, and the complete dashboard.
+OAuth remains browser-based. Real account authorization still requires the account owner.
+
+Checks from the repository root:
+
+| Command | Result |
+| --- | --- |
+| `pnpm -F @angela/i18n build` | Passed. |
+| `pnpm -F @angela/cli build` | Passed. |
+| `pnpm -F @angela/cli typecheck` | Passed. |
+| `NODE_OPTIONS=--max-old-space-size=6144 pnpm typecheck --concurrency=1` | Passed, 53 tasks. |
+| `pnpm -F @angela/cli exec vitest run --config vitest.config.ts --maxWorkers=1 --no-file-parallelism` | Passed, 74 files and 881 tests. |
+| `NODE_OPTIONS=--max-old-space-size=6144 pnpm lint` | Passed, zero errors and 603 existing ESLint warnings. |
+| `git diff --cached --check` | Passed. |
+
+The initial unrestricted typecheck reached Node's default heap limit in `stage-ui`.
+The sequential run with a larger heap passed without source changes to that package.
+The 22 new startup tests cover provider choices, override precedence, custom actions, secret visibility, pagination, cancellation, and host ownership.
+Real PTY tests cover startup visibility and SIGINT shutdown. An integration test starts and stops the actual bundled engine.
+Existing gateway tests also cover routing, streaming, persistence, authentication boundaries, and standalone package execution.
+
+No personal AI account or paid inference endpoint was accessed. Portable archive packaging was not repeated.
+Pre-existing license deletions remain unstaged, including the source engine license. They are not part of the menu change.

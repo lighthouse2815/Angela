@@ -3,6 +3,29 @@
 Chat with Angela from a Node.js terminal. The CLI uses Angela's existing provider and generation runtime.
 Angela can manage everyday tasks and deliver reminders while the terminal process remains open.
 
+## Interactive provider menu
+
+Run `angela` in a terminal to choose GPT, Gemini, Claude, or Custom · Angela Gateway.
+Enter the number beside an action. The menu uses English or Vietnamese through `--locale` or `ANGELA_LOCALE`.
+GPT opens the Codex account page. Gemini opens Gemini CLI. Claude opens the Claude account page.
+Account authentication uses the bundled local dashboard in your browser, not a separate gateway installation.
+At the login prompt, enter `p` to show the initial dashboard password. Enter `b` to return.
+After connecting an account, press Enter to select a model and start chat.
+
+Custom includes account connection, account checks, enable/disable controls, model selection, and API-key inspection.
+Separate reveal actions show the shared API key or initial dashboard password only after explicit selection.
+The full dashboard provides the imported provider registry, custom endpoints, combos, routing, and quotas.
+Model choices use the gateway catalog, with a text filter and pages of 15 models.
+
+The menu starts Angela Gateway when necessary. It keeps the owned gateway open during chat and stops it after exit.
+An existing gateway host remains open. Connected accounts and the selected model survive exit.
+Continue uses the current configuration. It also starts a stopped gateway when that configuration points to this local instance.
+A new gateway selection overrides provider environment values for this session without changing the environment file.
+
+`--no-menu` skips the menu. Explicit provider flags also skip it unless `--menu` is present.
+`--help`, `--list-sessions`, `--prompt`, piped input, and subcommands never show this menu.
+These paths keep their existing configuration precedence and do not automatically start the gateway.
+
 ## Angela Gateway
 
 The CLI includes a local multi-account provider engine. Users do not install a separate gateway application.
