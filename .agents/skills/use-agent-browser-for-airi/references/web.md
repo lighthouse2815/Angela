@@ -3,7 +3,7 @@
 Start stage-web on a known origin, then use one fresh agent-browser session per format:
 
 ```bash
-pnpm -F @proj-airi/stage-web dev --host 127.0.0.1 --port 5173
+pnpm -F @angela/web dev --host 127.0.0.1 --port 5173
 agent-browser --session airi-web-live2d open http://127.0.0.1:5173/settings/models
 ```
 

@@ -1,6 +1,6 @@
 ---
 name: analyze-io-traces
-description: Read and analyze AIRI IO traces that Tamagotchi saved to local files. Use when the user asks why a chat, speech, or audio turn was slow, failed, or behaved wrongly, and recording is enabled in Settings > System > Developer.
+description: Read Angela IO traces from local desktop recordings. Use when a chat, speech, or audio turn is slow, fails, or behaves incorrectly. Record traces under Settings, System, Developer.
 ---
 
 # Analyze IO traces
@@ -12,7 +12,7 @@ Tamagotchi saves each ended IO span as one JSON line when **Record IO traces aut
 Files are named `<start time>.jsonl`. A new file starts each time recording starts. Files older than seven days are deleted.
 
 ```sh
-ls -t "$HOME/Library/Application Support/ai.moeru.airi/io-traces"/*.jsonl | head -3
+ls -t "$HOME/Library/Application Support/AIRI/io-traces"/*.jsonl | head -3
 ls -t "$HOME/Library/Application Support/@proj-airi/stage-tamagotchi/io-traces"/*.jsonl | head -3
 ```
 

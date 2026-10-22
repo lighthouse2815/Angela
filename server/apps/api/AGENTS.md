@@ -26,12 +26,12 @@ Hono, Drizzle ORM, PostgreSQL, Redis, Stripe, OpenTelemetry, Valibot, injeca (DI
 Auth is deferred. Activate its workspace through [`../dev-in-future/README.md`](../../../../dev-in-future/README.md) before using Auth commands.
 
 ```sh
-pnpm -F @proj-airi/api-server dev                # dev with dotenvx (.env.local)
-pnpm -F @proj-airi/api-server typecheck
-pnpm -F @proj-airi/api-server exec vitest run    # all server tests
+pnpm -F @angela/api-server dev                # dev with dotenvx (.env.local)
+pnpm -F @angela/api-server typecheck
+pnpm -F @angela/api-server exec vitest run    # all server tests
 pnpm exec vitest run server/apps/api/src/...     # single test file
-pnpm -F @proj-airi/api-server db:generate        # drizzle-kit generate
-pnpm -F @proj-airi/api-server db:push            # drizzle-kit push
+pnpm -F @angela/api-server db:generate        # drizzle-kit generate
+pnpm -F @angela/api-server db:push            # drizzle-kit push
 pnpm -F @proj-airi/auth-server auth:generate # better-auth → server/packages/auth-shared/src/schema.ts
 ```
 

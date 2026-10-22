@@ -9,7 +9,7 @@ All apps use Vue 3, Vite, TypeScript, Pinia, VueUse, UnoCSS, Vitest, and ESLint.
 | Path | Content |
 | --- | --- |
 | `apps/stage-web` | The web app. It uses Vue Router. |
-| `apps/stage-tamagotchi` | The Electron desktop app. |
+| `apps/desktop` | The Electron desktop app. |
 | `../dev-in-future/apps/stage-pocket` | The mobile app. It uses Vue Router, Capacitor, Kotlin, and Swift. |
 | `packages/stage-ui` | Business components, composables, and stores that stage-web and stage-tamagotchi share. |
 | `packages/stage-ui-three` | Three.js bindings and Vue components. |
@@ -27,22 +27,22 @@ All apps use Vue 3, Vite, TypeScript, Pinia, VueUse, UnoCSS, Vitest, and ESLint.
 
 Key files and directories:
 
-- Pages are in `apps/stage-web/src/pages` and `apps/stage-tamagotchi/src/renderer/pages`. Devtools pages are in the `devtools` folder of each.
-- The router configuration is in `apps/stage-web/vite.config.ts` and `apps/stage-tamagotchi/electron.vite.config.ts`.
-- The settings layouts are `packages/stage-layouts/src/layouts/settings.vue` (stage-web) and `apps/stage-tamagotchi/src/renderer/layouts/settings.vue`.
+- Pages are in `apps/stage-web/src/pages` and `apps/desktop/src/renderer/pages`. Devtools pages are in the `devtools` folder of each.
+- The router configuration is in `apps/stage-web/vite.config.ts` and `apps/desktop/electron.vite.config.ts`.
+- The settings layouts are `packages/stage-layouts/src/layouts/settings.vue` (stage-web) and `apps/desktop/src/renderer/layouts/settings.vue`.
 - A settings or devtools page needs `<route lang="yaml"> meta: layout: settings </route>`. Register its route and icon in the settings layout.
 - In `packages/stage-ui/src`, provider definitions are in `stores/providers/` and orchestration modules are in `stores/modules/`.
 - Business composables are in `packages/stage-ui/src/composables/`. Business components are in `packages/stage-ui/src/components/`.
 - Put a component for one page or one use case in `packages/stage-ui/src/components/scenarios/`.
 - Stories are in `packages/stage-ui/stories`, with `packages/stage-ui/histoire.config.ts`. An example is `packages/stage-ui/src/components/misc/Button.story.vue`.
-- Eventa contracts are in `apps/stage-tamagotchi/src/shared`. Main and renderer usage examples are in `apps/stage-tamagotchi/src/main/services/electron`.
-- The dependency injection example is `apps/stage-tamagotchi/src/main/index.ts`.
+- Eventa contracts are in `apps/desktop/src/shared`. Main and renderer usage examples are in `apps/desktop/src/main/services/electron`.
+- The dependency injection example is `apps/desktop/src/main/index.ts`.
 - Style configuration is in `uno.config.ts`. Existing animations are in `apps/stage-web/src/styles`.
 - Lint rules are in `eslint.config.ts`.
 
 ## Current Development Scope
 
-Focus on `apps/stage-tamagotchi`, local AI, voice, memory, computer use, avatars, and Telegram.
+Focus on `apps/desktop`, local AI, voice, memory, computer use, avatars, and Telegram.
 Deferred modules live in `../dev-in-future/` and stay outside the default workspace.
 Read [`../dev-in-future/README.md`](../dev-in-future/README.md) before restoring one.
 The API and shared server packages remain active because desktop imports their contracts.
@@ -79,7 +79,7 @@ Use pnpm workspace filters to limit a command to one workspace. Replace `<packag
 - Omit TypeScript and JavaScript source extensions in relative imports, dynamic imports, and re-exports. Write `./module`, not `./module.ts` or `./module.js`. Keep an extension only when the runtime or asset format requires it.
 - Do not edit `tsconfig.json` to hide an import or type error. Find and fix the cause.
 - Treat a circular import as a design problem. First reconsider ownership and module boundaries. If you cannot resolve the cycle confidently, ask the user.
-- Use `@moeru/eventa` for all IPC, RPC, and cross-process events. Define the contracts in one central place, such as `apps/stage-tamagotchi/src/shared`.
+- Use `@moeru/eventa` for all IPC, RPC, and cross-process events. Define the contracts in one central place, such as `apps/desktop/src/shared`.
 - Use dependency injection only at external boundaries: databases, model runtimes, queues, caches, filesystems, networks, clocks, environments, and feature gates. Use `injeca` for it.
 - Do not add dependency objects for internal functions that only call sibling helpers or forward parameters.
 - Prefer classes for runtime or browser APIs. Also prefer classes for substantial business modules that own state, lifecycle, or a stable domain boundary.

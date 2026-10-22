@@ -1,11 +1,11 @@
 ---
 name: enforce-rules-for-typescript
-description: Enforce AIRI's TypeScript and Vue source rules for imports, naming, comments, JSDoc, fallbacks, stateful and protocol code, and module design. Use when writing, refactoring, or reviewing TypeScript or Vue source code in the AIRI monorepo.
+description: Enforce Angela's TypeScript and Vue source rules for imports, naming, comments, JSDoc, fallbacks, stateful and protocol code, and module design. Use when writing, refactoring, or reviewing TypeScript or Vue source code in the Angela monorepo.
 ---
 
-# Enforce AIRI TypeScript Rules
+# Enforce Angela TypeScript Rules
 
-Apply these rules to every TypeScript and Vue source change in AIRI. The root `AGENTS.md` gives the core code rules. This skill gives the detailed rules.
+Apply these rules to every TypeScript and Vue source change in Angela. The root `AGENTS.md` gives the core code rules. This skill gives the detailed rules.
 
 ## Imports and Types
 

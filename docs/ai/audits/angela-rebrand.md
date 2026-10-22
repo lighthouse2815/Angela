@@ -237,3 +237,15 @@ The targeted API schema and WebSocket contract checks passed: two files, six tes
 The README release-link CLI uses the root repository metadata for download destinations.
 An isolated real-CLI check passed for old AIRI links, new Angela links, and OSS mirror inputs on Windows and macOS.
 Historical issue URLs remained unchanged. ESLint passed for this final release-helper change.
+
+## Agent configuration
+
+A separate commit updates 27 agent configuration files across 14 existing skills.
+Package filters and local app paths match the migrated workspace.
+Skill invocation IDs keep their existing names, including `use-agent-browser-for-airi` and `use-vishot-for-airi`.
+Descriptions and UI labels use Angela.
+The IO-trace guide retains the actual `AIRI` and `@proj-airi/stage-tamagotchi` profile paths.
+
+All 14 changed skills passed the bundled skill validator with the workspace's existing YAML parser.
+Changed `agents/openai.yaml` files parsed successfully and retained their invocation names and metadata length limits.
+`git diff --check` passed. No skill activation policy changed.

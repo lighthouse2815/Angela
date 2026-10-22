@@ -1,9 +1,9 @@
 ---
 name: use-agent-browser-for-airi
-description: Test AIRI display-model imports with agent-browser across stage-tamagotchi Electron, stage-web, and stage-pocket mobile web layouts. Use when uploading and verifying contributor-supplied Live2D ZIP, VRM, or MMD ZIP/PMX/PMD files through AIRI's model selector, including onboarding bypass, format-specific import behavior, renderer verification, and mobile-platform coverage decisions.
+description: Test Angela display-model imports with agent-browser across stage-tamagotchi Electron, stage-web, and stage-pocket mobile web layouts. Use when uploading and verifying contributor-supplied Live2D ZIP, VRM, or MMD ZIP/PMX/PMD files through Angela's model selector, including onboarding bypass, format-specific import behavior, renderer verification, and mobile-platform coverage decisions.
 ---
 
-# Use Agent Browser for AIRI
+# Use Agent Browser for Angela
 
 Invoke `$agent-browser` and `$use-agent-browser-with-input-file`. The input-file skill owns file-input discovery, temporary instrumentation, upload commands, and generic post-upload verification. Run `agent-browser skills get core --full` before browser commands. For Electron, also invoke `$agent-browser-electron` and run `agent-browser skills get electron --full`.
 
@@ -15,7 +15,7 @@ Select the runtime guide:
 
 ## Model import contract
 
-Use an absolute input path. AIRI currently creates each format input with VueUse `useFileDialog` and keeps it detached from the DOM, so all three formats use the [detached-input method](../use-agent-browser-with-input-file/references/detached-input.md). Apply that method before clicking the format menu item, then use the matching selector and format-specific postcondition:
+Use an absolute input path. Angela currently creates each format input with VueUse `useFileDialog` and keeps it detached from the DOM, so all three formats use the [detached-input method](../use-agent-browser-with-input-file/references/detached-input.md). Apply that method before clicking the format menu item, then use the matching selector and format-specific postcondition:
 
 | Format | Menu item | Input selector | Format-specific result |
 | --- | --- | --- | --- |
@@ -25,7 +25,7 @@ Use an absolute input path. AIRI currently creates each format input with VueUse
 
 Resolve local Live2D and VRM fixtures from the paths documented by `$use-vishot-for-airi`. For MMD, use a licensed archive containing the model and its texture directories. Do not encode a contributor's private fixture name in tests or source comments.
 
-## Prepare AIRI state
+## Prepare Angela state
 
 Use a fresh browser session or a dedicated Electron user-data directory. Mark onboarding complete before opening the model settings route:
 
@@ -55,7 +55,7 @@ Require all of these postconditions:
 4. `agent-browser errors` contains no model-load failure.
 5. `agent-browser console` contains no relevant Live2D, VRM, MMD, ZIP, texture, physics, or dynamic-import failure.
 
-Do not infer the selected display model from the AIRI card/profile dropdown in the header; it identifies the active character card and may retain a different label.
+Do not infer the selected display model from the Angela card/profile dropdown in the header; it identifies the active character card and may retain a different label.
 
 Treat upload, persistence, and rendering as separate checkpoints. A visible imported card proves only that storage succeeded.
 

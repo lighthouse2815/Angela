@@ -30,7 +30,7 @@ This validates stage-pocket's shared Vue UI and mobile responsive renderer. It d
 
 Run a native Android test only when `adb devices` lists a booted emulator and an automation bridge can inspect its WebView or drive the native picker. Agent-browser requires a reachable Chromium CDP endpoint; do not claim coverage merely because the app launches.
 
-Use `pnpm dev:pocket:android` for the project runtime. Upload each format through the native document picker, return to AIRI, select the imported card, and verify the final renderer plus Logcat. Record “not runnable” when `adb` or a compatible WebView debugging endpoint is unavailable.
+Use `pnpm dev:pocket:android` for the project runtime. Upload each format through the native document picker, return to Angela, select the imported card, and verify the final renderer plus Logcat. Record “not runnable” when `adb` or a compatible WebView debugging endpoint is unavailable.
 
 ## iOS Simulator
 

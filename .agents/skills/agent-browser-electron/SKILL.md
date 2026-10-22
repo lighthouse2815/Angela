@@ -52,7 +52,7 @@ If `/json/list` does not contain a window that the user says exists, do not assu
 
 The CDP port is project- and run-command-specific. Do not assume `9222`, `9250`, or any other value is universal. If an Electron process is running but no CDP port responds, tell the user to relaunch the app with the project's remote-debug environment variables or launch flags.
 
-For AIRI stage-tamagotchi on POSIX shells:
+For Angela stage-tamagotchi on POSIX shells:
 
 ```bash
 APP_REMOTE_DEBUG=true APP_REMOTE_DEBUG_PORT=9250 pnpm dev:tamagotchi
@@ -151,9 +151,9 @@ Use this order when the Electron app has multiple windows:
 8. `agent-browser --cdp <port> snapshot -i`
 9. If the expected route is missing, trigger the lazy window from the UI and repeat from step 1
 
-## AIRI Example
+## Angela Example
 
-In `apps/stage-tamagotchi`, some windows are lazy-created. The main window loads `/#/`; settings loads `/#/settings`; chat loads `/#/chat`; BeatSync loads `/beat-sync.html`.
+In `apps/desktop`, some windows are lazy-created. The main window loads `/#/`; settings loads `/#/settings`; chat loads `/#/chat`; BeatSync loads `/beat-sync.html`.
 
 The main window hosts the stage and its controls. Settings and chat have separate window owners. For a hearing test, open the settings window first, then navigate that window to `/settings/modules/hearing/transcriber`. Do not set the main window's hash to this route. Stage mouse handling can leave the substituted page unable to accept clicks.
 
@@ -163,15 +163,15 @@ The `9250` examples below assume the app was started by the person running it wi
 APP_REMOTE_DEBUG=true APP_REMOTE_DEBUG_PORT=9250 pnpm dev:tamagotchi
 ```
 
-That port is not intrinsic to AIRI or Electron. It depends on the current command and environment. Most stage-tamagotchi code lives under `apps/stage-tamagotchi`; inspect that app's Electron startup and window code when the port, routes, or remote-debug behavior differ.
+That port is not intrinsic to Angela or Electron. It depends on the current command and environment. Most stage-tamagotchi code lives under `apps/desktop`; inspect that app's Electron startup and window code when the port, routes, or remote-debug behavior differ.
 
 Relevant files:
-- `apps/stage-tamagotchi/src/main/windows/chat/index.ts`
-- `apps/stage-tamagotchi/src/main/windows/main/index.ts`
-- `apps/stage-tamagotchi/src/main/windows/main/rpc/index.electron.ts`
-- `apps/stage-tamagotchi/src/main/windows/settings/index.ts`
-- `apps/stage-tamagotchi/src/main/libs/electron/window-manager/reusable.ts`
-- `apps/stage-tamagotchi/src/renderer/components/stage-islands/controls-island/index.vue`
+- `apps/desktop/src/main/windows/chat/index.ts`
+- `apps/desktop/src/main/windows/main/index.ts`
+- `apps/desktop/src/main/windows/main/rpc/index.electron.ts`
+- `apps/desktop/src/main/windows/settings/index.ts`
+- `apps/desktop/src/main/libs/electron/window-manager/reusable.ts`
+- `apps/desktop/src/renderer/components/stage-islands/controls-island/index.vue`
 
 That means:
 - chat does not exist in CDP until something calls `chatWindow()`
@@ -195,7 +195,7 @@ If settings or chat is missing, start from the main window:
 agent-browser --cdp 9250 tab t2
 agent-browser --cdp 9250 snapshot -i
 # Click the main window control that opens the panel or launcher.
-# In AIRI this is the arrow-up control in the bottom-right controls island.
+# In Angela this is the arrow-up control in the bottom-right controls island.
 # Re-snapshot after every click because refs are stale after UI changes.
 agent-browser --cdp 9250 click '[i-solar\:alt-arrow-up-line-duotone]'
 agent-browser --cdp 9250 snapshot -i
@@ -210,7 +210,7 @@ curl -sS http://127.0.0.1:9250/json/list
 agent-browser --cdp 9250 tab
 ```
 
-If the controls island is visible but the accessibility refs or CSS icon click do not expand it, inspect the Vue component as a diagnostic fallback. AIRI currently nests tooltip trigger buttons around icon buttons, so a CDP click can report success while landing on the wrapper instead of the Vue `ControlButton` listener. This fallback is for automation/debugging only; do not use it as evidence that end-user clicking works.
+If the controls island is visible but the accessibility refs or CSS icon click do not expand it, inspect the Vue component as a diagnostic fallback. Angela currently nests tooltip trigger buttons around icon buttons, so a CDP click can report success while landing on the wrapper instead of the Vue `ControlButton` listener. This fallback is for automation/debugging only; do not use it as evidence that end-user clicking works.
 
 ```bash
 agent-browser --cdp 9250 eval '(() => {

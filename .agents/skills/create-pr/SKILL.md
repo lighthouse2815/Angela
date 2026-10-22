@@ -1,6 +1,6 @@
 ---
 name: create-pr
-description: Prepare and create an AIRI pull request with verifiable change context, architecture evidence, and required visual evidence. Use when Codex must open, create, publish, or prepare a PR from the current branch.
+description: Prepare and create an Angela pull request with verifiable change context, architecture evidence, and required visual evidence. Use when Codex must open, create, publish, or prepare a PR from the current branch.
 ---
 
 # Create Pull Request

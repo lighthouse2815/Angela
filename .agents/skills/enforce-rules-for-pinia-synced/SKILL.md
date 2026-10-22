@@ -1,9 +1,9 @@
 ---
 name: enforce-rules-for-pinia-synced
-description: Enforce AIRI's rules for Pinia stores that use pinia-plugin-synced for cross-window synchronization. Use when adding `synced` to a Pinia store, changing a synced store's state or actions, or writing watchers, persistence, or tests for synchronized state in AIRI renderers.
+description: Enforce Angela's rules for Pinia stores that use pinia-plugin-synced for cross-window synchronization. Use when adding `synced` to a Pinia store, changing a synced store's state or actions, or writing watchers, persistence, or tests for synchronized state in Angela renderers.
 ---
 
-# Enforce AIRI Pinia Synchronization Rules
+# Enforce Angela Pinia Synchronization Rules
 
 Apply these rules to every Pinia store that uses `pinia-plugin-synced`.
 

@@ -1,11 +1,11 @@
 ---
 name: enforce-rules-for-unocss
-description: Enforce AIRI's UnoCSS, Vue styling, shared UI component, animation, icon, and color-mode practices. Use when creating, editing, refactoring, or reviewing Vue templates, component styles, utility classes, UnoCSS configuration, animations, icons, UI primitives, packages/ui components, or VueUse dark-mode behavior in the AIRI monorepo.
+description: Enforce Angela's UnoCSS, Vue styling, shared UI component, animation, icon, and color-mode practices. Use when creating, editing, refactoring, or reviewing Vue templates, component styles, utility classes, UnoCSS configuration, animations, icons, UI primitives, packages/ui components, or VueUse dark-mode behavior in the Angela monorepo.
 ---
 
-# Enforce AIRI UnoCSS Rules
+# Enforce Angela UnoCSS Rules
 
-Apply these rules to every affected UI file in AIRI.
+Apply these rules to every affected UI file in Angela.
 
 ## Compose Utility Classes Readably
 
@@ -33,7 +33,7 @@ Apply these rules to every affected UI file in AIRI.
 
 ## Build on Shared UI Primitives
 
-- Build primitives on `@proj-airi/ui`, which is based on reka-ui, instead of raw DOM controls.
+- Build primitives on `@angela/ui`, which is based on reka-ui, instead of raw DOM controls.
 - Read `docs/ai/context/ui-components.md` for the component API and `packages/ui/src/components/Form` for implementation patterns.
 - When adding or updating a component in `packages/ui`, update `docs/ai/context/ui-components.md` with its description, props, slots, and emits.
 - Use Iconify icon sets instead of bespoke SVGs.
