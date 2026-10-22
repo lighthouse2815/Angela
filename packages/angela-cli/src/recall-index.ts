@@ -190,6 +190,26 @@ export class RecallIndex {
       this.sql('UPDATE excerpts SET vector=?,namespace=? WHERE id=? AND version=?').run(new Uint8Array(item.vector.buffer, item.vector.byteOffset, item.vector.byteLength), namespace, item.id, item.version)
   }
 
+  /** Selects bounded evidence from one latest eligible session, inside the requested workspace and private store. */
+  recentSession(scope: string, excludedSessionId: string) {
+    const rows = this.sql(`WITH eligible AS (
+      SELECT e.*,CASE WHEN e.kind='history' THEN substr(e.origin,9) ELSE p.sourceSessionId END AS sessionId
+      FROM excerpts e LEFT JOIN memory_pages p ON e.id='memory:'||p.id
+      WHERE (?='*' OR e.scope=?)
+        AND (e.kind='history' OR (e.kind='episodic' AND p.kind='session' AND p.status<>'superseded'))
+        AND (p.expiresAt IS NULL OR p.expiresAt>?)
+    ), latest AS (
+      SELECT sessionId FROM eligible e
+      WHERE sessionId IS NOT NULL AND sessionId<>?
+        AND NOT EXISTS(SELECT 1 FROM memory_suppression s WHERE s.sessionId=e.sessionId AND (s.scope=e.scope OR s.scope='*'))
+      GROUP BY sessionId ORDER BY max(updatedAt) DESC,sessionId LIMIT 1
+    )
+    SELECT e.* FROM eligible e JOIN latest l ON l.sessionId=e.sessionId
+    ORDER BY CASE WHEN e.kind='episodic' THEN 0 WHEN e.id LIKE '%:overview' THEN 1 ELSE 2 END,
+      e.updatedAt DESC,e.id LIMIT 12`).all(scope, scope, new Date().toISOString(), excludedSessionId)
+    return rows.map(row => v.parse(hitSchema, row))
+  }
+
   search(query: string, scope: string, namespace?: string, vector?: Float32Array, excludedOrigin = '', automatic = false) {
     const terms = searchTerms(query)
     const lexical = terms.length

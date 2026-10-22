@@ -25,3 +25,19 @@ export function supportsContext(query: string, text: string) {
   const matches = content.filter(term => words.has(term)).length
   return content.length > 0 && matches >= Math.min(content.length, 2)
 }
+
+/**
+ * A recap needs a past-time signal, conversation language and no remaining topic.
+ * Topical questions stay lexical/semantic searches, so a passing reference to the past cannot select an unrelated latest session.
+ */
+export function isConversationRecap(query: string) {
+  const text = normalizeSearch(query)
+  const past = /\b(?:(?:lan|bua|hom|buoi) truoc|(?:cuoc )?(?:noi chuyen|tro chuyen) truoc|truoc do|last (?:time|conversation|session)|previous (?:conversation|session)|earlier)\b/gu
+  const conversation = /\b(?:noi chuyen|tro chuyen|trao doi|thao luan|noi|ke|hoi|discuss(?:ed)?|talk(?:ed)?|say|said|conversation|session)\b/gu
+  if (!past.test(text) || !conversation.test(text))
+    return false
+  past.lastIndex = 0
+  conversation.lastIndex = 0
+  const topic = text.replace(past, ' ').replace(/\b(?:noi dung|chu de)\b/gu, ' ').replace(conversation, ' ').replace(/\b(?:cuoc|chuyen|noi dung|chu de|hai dua|chung ta|voi nhau|our|did|do|about|in|nhac|lai|nho|nhung|dieu|nhung gi|da|o|va|co|gi|khong|nhe|nhi)\b/gu, ' ')
+  return searchTerms(topic).length === 0
+}

@@ -20,6 +20,7 @@ import { MemoryCapture } from './memory-v2/consolidator'
 import { pageTools } from './memory-v2/tools'
 import { ProjectMemory } from './project-memory'
 import { RecallIndex, sourceVersion } from './recall-index'
+import { isConversationRecap } from './recall-query'
 import { Sessions } from './sessions'
 import { Skills } from './skills'
 
@@ -404,7 +405,11 @@ export class Recall {
       day = new Date()
     }
     const date = day ? localDate(day) : undefined
-    const hits = this.database().search(date ? `${searchText} ${date}` : searchText, allWorkspaces ? '*' : this.workspace, this.client?.namespace, vector, `history:${this.sessionId}`, automatic).filter(hit => !date || hit.kind !== 'history' || localDate(new Date(hit.updatedAt)) === date)
+    const workspace = allWorkspaces ? '*' : this.workspace
+    const candidates = isConversationRecap(searchText)
+      ? this.database().recentSession(workspace, this.sessionId)
+      : this.database().search(date ? `${searchText} ${date}` : searchText, workspace, this.client?.namespace, vector, `history:${this.sessionId}`, automatic)
+    const hits = candidates.filter(hit => !date || hit.kind !== 'history' || localDate(new Date(hit.updatedAt)) === date)
     const selected: RecallHit[] = []
     let personal: Awaited<ReturnType<Memory['read']>> | undefined
     try {

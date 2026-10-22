@@ -35,3 +35,18 @@ Context tests check omission, reinforcement and budget behavior through the real
 
 The gate deliberately exposes weak lexical matches that the baseline previously counted as useful.
 Later checkpoints report context hit rate and newly failing cases alongside the requested recall metrics.
+
+## Recent conversation intent
+
+General recaps require three signals: past time, conversation language and no remaining topic.
+Accented and unaccented Vietnamese share normalization. English conversation questions use the same policy.
+Topical questions keep their FTS/vector path. Mentioning “lần trước” alone never selects a session.
+
+The index selects one latest eligible session, excluding the current session, other scopes and suppressed sessions.
+Only history or episodic session pages qualify. Semantic preferences cannot substitute for missing conversations.
+Expiry and supersession remain enforced. Recall still validates archive versions and page authority before returning evidence.
+An archived overview and bounded source excerpts cover the session without injecting every archived message.
+
+Tests cover five recap phrasings, two historical dates, a newer foreign workspace, current-session exclusion and episodic-only stores.
+Negative tests cover topical past references, an empty eligible history, expiry, suppression and supersession.
+This checkpoint recalls all eight general-recap cases. The full lexical recall metric becomes 100/106.

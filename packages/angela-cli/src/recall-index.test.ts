@@ -51,3 +51,17 @@ it('accepts corroborating semantic evidence without lexical overlap and rejects 
   expect(index.search('leisure books', 'workspace', 'fixture', Float32Array.from([0, 1]), '', true)).toEqual([])
   expect(index.search('leisure books', 'another-workspace', 'fixture', Float32Array.from([1, 0]), '', true)).toEqual([])
 })
+
+it('selects only a prior session and excludes expired, suppressed and superseded episodic evidence', async () => {
+  const index = await setup()
+  const input = { tier: 'episodic' as const, kind: 'session', scope: 'workspace', authority: 'episode' as const }
+  const older = index.memory.write({ ...input, key: 'session:older', sourceSessionId: 'older', title: 'Older session', body: 'Eligible previous conversation.' }, '2026-01-01T00:00:00.000Z')
+  index.memory.write({ ...input, key: 'session:current', sourceSessionId: 'current', title: 'Current session', body: 'Current conversation.' }, '2026-03-01T00:00:00.000Z')
+  index.memory.write({ ...input, key: 'session:expired', sourceSessionId: 'expired', title: 'Expired session', body: 'Expired conversation.', expiresAt: '2000-01-01T00:00:00.000Z' }, '2026-03-01T00:00:00.000Z')
+  index.memory.write({ ...input, key: 'session:deleted', sourceSessionId: 'deleted', title: 'Deleted session', body: 'Deleted conversation.' }, '2026-03-01T00:00:00.000Z')
+  index.memory.purgeSession('deleted')
+  expect(index.recentSession('workspace', 'current').map(hit => hit.id)).toEqual([`memory:${older.id}`])
+  const revised = index.memory.write({ ...input, key: 'session:older', sourceSessionId: 'older', title: 'Revised session', body: 'Corrected previous conversation.' }, '2026-02-01T00:00:00.000Z')
+  expect(index.recentSession('workspace', 'current').map(hit => hit.id)).toEqual([`memory:${revised.id}`])
+  expect(index.recentSession('another-workspace', 'current')).toEqual([])
+})
