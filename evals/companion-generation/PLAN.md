@@ -3,7 +3,7 @@
 ## Scope and sequence
 
 1. Audit the behavior spec, ADRs, runtime, memory, tasks, and existing tests.
-2. Add 50 generation cases, a schema, a production-path runner, and runner tests.
+2. Add 57 generation cases, a schema, a production-path runner, and runner tests.
 3. Record an immutable baseline before production edits.
 4. Use baseline evidence to select small fixes, or document unresolved failures.
 5. Run generation and recall evaluations, CLI tests, typechecks, lint, and the CLI build.

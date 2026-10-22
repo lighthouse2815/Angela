@@ -1,0 +1,18 @@
+{
+  "name": "@angela/evals-companion-generation",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "eval": "node --env-file-if-exists=../../.env.cli.local --import tsx run.ts",
+    "check:dataset": "tsx check-dataset.ts",
+    "test": "vitest run --config vitest.config.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@angela/core-agent": "workspace:^",
+    "@angela/i18n": "workspace:^",
+    "@angela/provider-inference": "workspace:^",
+    "@moeru/std": "catalog:",
+    "valibot": "catalog:"
+  }
+}

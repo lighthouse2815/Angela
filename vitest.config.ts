@@ -10,6 +10,7 @@ export default defineConfig({
       'packages/cap-vite',
       'packages/angela-cli',
       'evals/companion',
+      'evals/companion-generation',
       'integrations/discord-bot',
       'packages/local-config',
       'packages/ccc',
