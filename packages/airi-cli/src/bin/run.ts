@@ -101,8 +101,8 @@ async function main() {
     return
   }
   // An explicit workspace wins. Resumed sessions otherwise retain their recorded workspace.
-  const previous = config.resume ? await sessions.read(config.resume) : undefined
-  const workspace = await realpath(config.cwd ?? previous?.workspace ?? process.cwd())
+  const previousWorkspace = config.resume ? (await sessions.read(config.resume)).workspace : undefined
+  const workspace = await realpath(config.cwd ?? previousWorkspace ?? process.cwd())
   if (!(await stat(workspace)).isDirectory())
     throw new Error(messages.invalidWorkspace)
   const session = await sessions.open(workspace, config.resume)
@@ -117,7 +117,7 @@ async function main() {
     const runtime = new AngelaRuntime(config.model, provider, messages, process.env, config)
     const modelTarget = { model: config.model, chatProvider: provider, providerId: definition.id }
     const persona = chat.conversation.turns.filter(turn => turn.type === 'system').flatMap(turn => turn.content).flatMap(part => part.type === 'text' ? [part.text] : []).join('\n')
-    await session.save(chat.conversation, session.record.interrupted)
+    await session.saveChat(chat, session.record.interrupted)
     const interactive = process.stdin.isTTY && config.prompt === undefined
     const output = new Output(messages)
     const permissions = new Permissions(messages)
@@ -237,7 +237,7 @@ async function main() {
       let completed = false
       try {
         output.start()
-        await session.save(chat.conversation, true)
+        await session.saveChat(chat, true)
         await scope.send(chat, text, {
           abortSignal: active.signal,
           resolveStep: async () => ({
@@ -258,7 +258,7 @@ async function main() {
         if (!output.hasText)
           throw new Error(messages.emptyResponse)
         completed = true
-        await session.save(chat.conversation, false)
+        await session.saveChat(chat, false)
         output.stop()
         await speech?.finish()
       }
@@ -274,7 +274,7 @@ async function main() {
         await speech?.cancel()
         output.stop()
         try {
-          await session.save(chat.conversation, !completed)
+          await session.saveChat(chat, !completed)
           const next = await interruption?.finish()
           pendingUtterance = voice ? next : undefined
         }
@@ -450,7 +450,7 @@ async function main() {
         }
         await scheduler.close()
         notifications.resume()
-        await session.save(chat.conversation, session.record.interrupted)
+        await session.saveChat(chat, session.record.interrupted)
       }
       finally {
         input?.close()

@@ -21,24 +21,35 @@ export class Chat {
       authority: 'system',
       content: [{ type: 'text', text: `You are Angela, an AI friend and study companion who helps with everyday tasks. Reply in the user's language. Keep a warm, direct, consistent manner and adapt your wording to the user's stated preferences. Do not invent shared experiences. Report only verified tool outcomes. Ask before destructive changes. Previous requests can stop after tool side effects. Verify the workspace before repeating actions. Workspace: ${JSON.stringify(workspace)}.${toolsAvailable ? '' : ' No tools or filesystem access are available. Do not claim to read, edit, or execute files.'}` }],
     })
-    if (history)
-      this.conversation.turns.push(...history.turns.filter(turn => turn.type !== 'system'))
+    if (history) {
+      for (const turn of history.turns) {
+        if (turn.type !== 'system')
+          this.conversation.turns.push(turn)
+        else if (turn.id === 'cli-context-summary')
+          this.context.restore(turn.content.flatMap(part => part.type === 'text' ? [part.text] : []).join('\n'))
+      }
+    }
   }
 
   /** The caller serializes sends and owns cancellation and event rendering. */
   async send(text: string, options: StreamOptions, memory = '') {
     this.conversation.turns.push({ type: 'user', id: randomUUID(), content: [{ type: 'text', text }] })
+    let conversation = this.conversation
+    if (memory) {
+      const turns: Conversation['turns'] = [this.conversation.turns[0]!, {
+        type: 'system' as const,
+        id: randomUUID(),
+        authority: 'system' as const,
+        content: [{ type: 'text' as const, text: memory }],
+      }]
+      for (let index = 1; index < this.conversation.turns.length; index++)
+        turns.push(this.conversation.turns[index]!)
+      conversation = { turns }
+    }
     await streamFrom({
       model: this.model,
       chatProvider: this.provider,
-      conversation: memory
-        ? { turns: [this.conversation.turns[0]!, {
-            type: 'system',
-            id: randomUUID(),
-            authority: 'system',
-            content: [{ type: 'text', text: memory }],
-          }, ...this.conversation.turns.slice(1)] }
-        : this.conversation,
+      conversation,
       options: {
         ...options,
         prepareConversation: async (conversation, target) => {

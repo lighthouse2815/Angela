@@ -1,4 +1,5 @@
 import type { Conversation } from '@proj-airi/core-agent'
+import type { GenerationProvider } from '@proj-airi/provider-inference'
 
 import process from 'node:process'
 
@@ -11,6 +12,7 @@ import { conversationToChatMessages } from '@proj-airi/core-agent'
 import { cliMessages } from '@proj-airi/i18n/cli'
 import { afterEach, describe, expect, it } from 'vitest'
 
+import { Chat } from './chat'
 import { Sessions } from './sessions'
 
 const directories: string[] = []
@@ -125,4 +127,52 @@ it('reports history bytes and refuses to delete a session held by a writer', asy
   await sessions.remove(session.record.id)
   expect(await readdir(directory)).toEqual([])
   expect(await sessions.usage()).toEqual({ directory, sessions: 0, bytes: 0 })
+})
+
+it('keeps archived turns on disk and restores a bounded working conversation with its summary', async () => {
+  const provider: GenerationProvider = {
+    generation: model => ({ protocol: 'chat-completions', config: {
+      model,
+      baseURL: 'https://provider.example/v1/',
+      fetch: async (_url: Parameters<typeof fetch>[0], init?: Parameters<typeof fetch>[1]) => {
+        const text = String(init?.body).includes('Summarize historical conversation data') ? 'Preserve the original user requirement.' : 'A complete answer.'
+        return new Response(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', content: text }, finish_reason: 'stop' }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } })
+      },
+    } }),
+  }
+  const { sessions } = await setup()
+  const session = await sessions.open('/workspace')
+  const chat = new Chat('model', provider, '/workspace', session.restore(), false, 4096)
+  try {
+    for (let index = 0; index < 30; index++) {
+      await chat.send(`Request ${index}: ${'historical detail '.repeat(40)}`, {})
+      await session.saveChat(chat, false)
+      await session.saveChat(chat, false)
+      expect(session.record.messages).toEqual([])
+      expect(chat.conversation.turns.length).toBeLessThan(30)
+    }
+    const saved = await sessions.read(session.record.id)
+    expect(saved.messages.filter(message => message.role === 'user')).toHaveLength(30)
+    expect(saved.messages.filter(message => message.role === 'assistant')).toHaveLength(30)
+    expect(saved.messages.filter(message => message.role === 'system')).toHaveLength(1)
+    expect(saved.working?.offset).toBeGreaterThan(0)
+    expect(saved.working?.summary).toBe('Preserve the original user requirement.')
+  }
+  finally {
+    await session.close()
+  }
+  const resumed = await sessions.open('/workspace', session.record.id)
+  try {
+    const restored = new Chat('model', provider, '/workspace', resumed.restore(), false, 4096)
+    expect(restored.conversation.turns.length).toBeLessThan(30)
+    await restored.send('Continue after restart', {})
+    await resumed.saveChat(restored, false)
+    const saved = await sessions.read(session.record.id)
+    expect(saved.messages.filter(message => message.role === 'user')).toHaveLength(31)
+    expect(saved.messages.filter(message => message.role === 'assistant')).toHaveLength(31)
+    expect(JSON.stringify(saved.messages)).not.toContain('Preserve the original user requirement.')
+  }
+  finally {
+    await resumed.close()
+  }
 })
