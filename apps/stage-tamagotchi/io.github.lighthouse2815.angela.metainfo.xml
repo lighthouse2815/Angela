@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.lighthouse2815.angela</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Angela</name>
+  <summary>AI companion for conversation, learning, and desktop assistance</summary>
+  <description>
+    <p>
+      Angela is an AI companion for conversation, learning, voice interaction, and desktop assistance.
+    </p>
+  </description>
+  <launchable type="desktop-id">io.github.lighthouse2815.angela.desktop</launchable>
+  <url type="homepage">https://github.com/lighthouse2815/Angela</url>
+  <url type="bugtracker">https://github.com/lighthouse2815/Angela/issues</url>
+  <developer_name>lighthouse2815</developer_name>
+  <content_rating type="oars-1.1" />
+</component>
