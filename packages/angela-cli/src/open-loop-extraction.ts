@@ -1,5 +1,5 @@
 import { classifyCommitmentIntent } from './commitment-intent'
-import { parseReminderTime } from './reminder-time'
+import { localDate, localInstant } from './task-time'
 
 export type OpenLoopKind = 'work_in_progress' | 'problem' | 'waiting' | 'upcoming_event' | 'goal'
 export interface OpenLoopExtraction { subject: string, key: string, kind: OpenLoopKind, confidence: number, salience: number, earliestFollowUpAt?: string, expiresAt: string }
@@ -65,10 +65,9 @@ export function extractOpenLoop(text: string, now: number, timezone: string): Op
       subject = event[1]
       kind = 'upcoming_event'
       // Only a recognized date grants timing. Wait until the event's entire local day has elapsed.
-      const time = parseReminderTime('mai 9h', now, timezone)
-      if (time.status !== 'resolved')
-        return undefined
-      delayHours = (Date.parse(time.remindAt) - now) / 3_600_000 + 24
+      const day = Date.parse(`${localDate(now, timezone)}T00:00:00Z`)
+      const afterEvent = localInstant(day + 2 * 86_400_000 + 9 * 3_600_000, timezone)
+      delayHours = (afterEvent - now) / 3_600_000
       lifetimeHours = delayHours + 48
     }
   }

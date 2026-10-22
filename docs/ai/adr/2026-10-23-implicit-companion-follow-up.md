@@ -47,7 +47,7 @@ The standalone desktop reminder service retains explicit task delivery only.
 Local extraction and model task tools use `classifyCommitmentIntent` before persistence.
 English authorization requires phrases such as `create a task`, `add a todo`, `add a reminder`, or `save this as a task`.
 Generic `create`, `add`, and `save` do not grant authority.
-The classifier checks example and implementation framing across the whole request.
+The classifier checks example and implementation framing across the whole request. Technical objects such as a task parser do not grant authority.
 Quotations, speculation, questions, and uncertain requests cannot authorize task creation.
 Direct reminders about testing a parser remain valid explicit requests.
 
@@ -56,7 +56,7 @@ A group contains task or OpenLoop identities. Multiple identities require clarif
 Inactive, missing, expired, or oversized groups cannot select older pending work.
 A complete task title phrase or verified task ID can establish conversational focus.
 Unrelated assistant replies leave focus unchanged.
-Focus retains at most eight identities for eight requests or six hours.
+Focus retains at most eight identities for eight requests or six hours. Both domains advance focus before resolving the current request.
 The persisted identity includes workspace, session, and channel. Reset clears only that identity.
 Version two uses a separate focus file and discards old reference semantics without modifying task records.
 
@@ -97,7 +97,7 @@ An ambiguous outcome never completes another Task.
 | Concrete goal | 12 hours | 48 hours |
 | Tomorrow's event | 09:00 after the event's entire local date | 48 hours after earliest time |
 
-Undated or unsupported event dates create no proactive opportunity.
+Event timing uses local calendar conversion across daylight saving changes. Undated or unsupported event dates create no proactive opportunity.
 Eligibility also requires confidence of at least 0.95, salience of at least 0.7, open state, and an unconsumed prompt cap.
 Every update adds at least four hours of inactivity before a prompt.
 Implicit prompts wait at least 15 minutes after conversation activity.

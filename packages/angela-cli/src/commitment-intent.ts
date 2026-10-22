@@ -14,6 +14,8 @@ export function classifyCommitmentIntent(text: string): CommitmentIntent {
     return 'meta'
   if (/ví dụ|\b(?:example|implement|explain|regex)\b|(?:là|như)\s+(?:một\s+)?(?:câu|ví dụ)|phải\s+map|parser\s+(?:hiểu|nên|xử lý)/u.test(value))
     return 'meta'
+  if (/\b(?:task|todo|reminder)\s+(?:(?:timestamp|syntax)\s+)?(?:parser|validator|schema|command|function)\b|\b(?:is|as)\s+(?:(?:a|an)\s+)?(?:valid\s+)?(?:syntax|example|test case)\b/u.test(value))
+    return 'meta'
   if (/["“”`\n]|(?:^|\s)'[^']+'(?:$|\s)/u.test(value))
     return 'quoted'
   if (/có lẽ|(?:^|\s)chắc\s|\b(?:maybe|perhaps|probably)\b|\?/u.test(value))

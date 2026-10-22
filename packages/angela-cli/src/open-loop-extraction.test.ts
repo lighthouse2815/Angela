@@ -56,3 +56,8 @@ it('uses longer waiting timing and waits until the event date has ended', () => 
   expect(extractOpenLoop('Tao đang chờ thầy phản hồi.', now, 'UTC')).toMatchObject({ earliestFollowUpAt: '2026-10-23T22:00:00.000Z', expiresAt: '2026-10-30T10:00:00.000Z' })
   expect(extractOpenLoop('Mai tao có buổi bảo vệ.', now, 'UTC')?.earliestFollowUpAt).toBe('2026-10-25T09:00:00.000Z')
 })
+
+it('uses local calendar dates across daylight saving changes', () => {
+  const friday = Date.parse('2026-10-30T10:00:00-04:00')
+  expect(extractOpenLoop('Mai tao có buổi bảo vệ.', friday, 'America/New_York')?.earliestFollowUpAt).toBe('2026-11-01T14:00:00.000Z')
+})

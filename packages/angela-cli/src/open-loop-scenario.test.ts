@@ -11,6 +11,7 @@ import { join } from 'node:path'
 import { cliMessages } from '@angela/i18n/cli'
 import { afterEach, expect, it, vi } from 'vitest'
 
+import { RecallIndex } from './recall-index'
 import { ReminderNotifications } from './reminder-notifications'
 import { AngelaRuntime } from './runtime/runtime'
 
@@ -129,6 +130,11 @@ it('keeps protected requests out of loops, commitment memory, and candidates', a
   await scope.send(await runtime.createChat(directory), 'Tao đang bí auth. Đừng lưu chuyện này.', {})
   expect(await runtime.openLoops(directory).list()).toEqual([])
   expect(await (await scope.tasks()).list()).toEqual([])
+  const index = await RecallIndex.open(directory)
+  try {
+    expect(index.memory.stats()).toEqual({ pages: 0, observations: 0 })
+  }
+  finally { index.close() }
   advance(5)
   await runtime.reminders(directory, notifications(runtime), (error) => {
     throw error
@@ -165,4 +171,48 @@ it('isolates corrupted loop storage from task writes and delivery', async () => 
   expect(presented).toHaveLength(1)
   expect(presented[0]?.text).toContain(task.id)
   expect(errors.length).toBeGreaterThan(0)
+})
+
+it('expires implicit focus before the eighth subsequent request, using the same turn boundary as tasks', async () => {
+  const { directory, options, createRuntime } = await setup()
+  const runtime = createRuntime()
+  const scope = runtime.open(options)
+  const chat = await runtime.createChat(directory)
+  await scope.send(chat, 'Auth vẫn lỗi.', {})
+  for (let index = 0; index < 7; index++)
+    await scope.send(chat, `Trao đổi Java phần ${index}.`, {})
+  await scope.send(chat, 'Xong rồi.', {})
+  expect((await runtime.openLoops(directory).list())[0]?.state).toBe('open')
+})
+
+it('resolves a notification focus across workspaces in the same user store without sharing another session focus', async () => {
+  const { directory, options, createRuntime } = await setup()
+  const runtime = createRuntime()
+  const original = runtime.open(options)
+  await original.send(await runtime.createChat(directory), 'Auth vẫn lỗi.', {})
+  const loop = (await runtime.openLoops(directory).list())[0]!
+  const destination = { ...options, workspace: 'other-workspace', sessionId: randomUUID(), channel: 'telegram' as const }
+  await runtime.mentionOpenLoop(destination, loop)
+  const receiving = runtime.open(destination)
+  await receiving.send(await runtime.createChat(directory), 'Xong rồi.', {})
+  expect((await runtime.openLoops(directory).list())[0]?.state).toBe('resolved')
+})
+
+it('clarifies inactive latest task focus instead of snoozing older pending work', async () => {
+  const { directory, options, createRuntime, generation } = await setup()
+  const runtime = createRuntime()
+  const scope = runtime.open(options)
+  const tasks = await scope.tasks()
+  const older = await tasks.create({ title: 'Task B', type: 'todo' })
+  const latest = await tasks.create({ title: 'Task A', type: 'todo' })
+  await scope.mentionCommitments([older])
+  await scope.mentionCommitments([latest])
+  await tasks.complete(latest.id)
+  generation.mockImplementation(() => {
+    throw new Error('Clarification needs no model')
+  })
+  await scope.send(await runtime.createChat(directory), 'Nhắc lại 2 tiếng nữa.', {})
+  expect(await tasks.find(older.id)).toMatchObject({ status: 'pending', snoozeCount: 0 })
+  expect((await tasks.find(older.id)).snoozedUntil).toBeUndefined()
+  expect(generation).not.toHaveBeenCalled()
 })

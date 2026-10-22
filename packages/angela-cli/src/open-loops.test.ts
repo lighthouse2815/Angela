@@ -108,3 +108,21 @@ it('preserves corrupted storage and leaves tasks usable', async () => {
   const task = await new Tasks(directory, cliMessages.en.tasks, clock).create({ title: 'Independent', type: 'todo' })
   expect(task.status).toBe('pending')
 })
+
+it('retains prompt caps on repeated active mentions and bounds frequent conversation activity', async () => {
+  const { loops, notice, advance, directory } = await setup()
+  const loop = (await notice('Auth vẫn lỗi.'))!
+  advance(4)
+  const claimed = (await loops.claim(loop.id))!
+  expect(await loops.present(loop.id, claimed.claim!.token)).toBe(true)
+  advance(1)
+  await notice('Refresh token vẫn chưa chạy.')
+  expect((await loops.list())[0]).toMatchObject({ id: loop.id, promptCount: 1 })
+  for (let index = 0; index < 12; index++)
+    await loops.noteActivity()
+  const saved = JSON.parse(await readFile(join(directory, 'open-loops', 'state.json'), 'utf8'))
+  expect(saved.activity).toHaveLength(8)
+  expect((await loops.activity()).lastActivityAt).toBe(Date.parse(saved.activity.at(-1)) + 3_600_000)
+  advance(8)
+  expect(await loops.claim(loop.id)).toBeUndefined()
+})

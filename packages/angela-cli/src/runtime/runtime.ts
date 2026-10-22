@@ -28,7 +28,7 @@ import { SystemClock } from '../clock'
 import { OpenLoopConversation } from '../open-loop-conversation'
 import { OpenLoopSource } from '../open-loop-source'
 import { OpenLoops } from '../open-loops'
-import { requestPrivacy } from '../privacy-policy'
+import { durableWriteRejection, requestPrivacy } from '../privacy-policy'
 import { proactiveCandidate } from '../proactive-candidate'
 import { ProactivePolicy } from '../proactive-policy'
 import { buildContext } from './context-builder'
@@ -667,6 +667,8 @@ export class RuntimeSession {
         }
         await emit({ type: this.options.channel === 'zalo' ? 'external.message' : 'user.message' }, text)
         if (sources.tasks && sources.privacy) {
+          if (!durableWriteRejection(sources.privacy, 'task', text))
+            await this.activeCommitments.advance(this.runtime.clock.now())
           let openLoopReply: string | undefined
           try {
             if (sources.privacy.durableMemoryAllowed && await this.runtime.openLoopsEnabled(this.options.dataDir)) {
@@ -676,7 +678,6 @@ export class RuntimeSession {
           }
           catch { sources.warn(this.runtime.messages.tasks.openLoopUnavailable) }
           if (openLoopReply) {
-            await this.activeCommitments.advance(this.runtime.clock.now())
             await chat.respond(text, openLoopReply, options)
             assistant = openLoopReply
             completed = true
@@ -685,7 +686,7 @@ export class RuntimeSession {
           }
           const { CommitmentConversation } = await import('../commitment-conversation')
           const projection = capture ? await sources.recall?.commitmentSource() : undefined
-          const response = await new CommitmentConversation(sources.tasks, this.runtime.messages.tasks, this.options.locale ?? 'en', projection, this.activeCommitments).handle(text, chat.conversation, sources.privacy)
+          const response = await new CommitmentConversation(sources.tasks, this.runtime.messages.tasks, this.options.locale ?? 'en', projection, this.activeCommitments).handle(text, chat.conversation, sources.privacy, false)
           if (response) {
             if (response.task) {
               const { taskEvidence } = await import('../task-commands')

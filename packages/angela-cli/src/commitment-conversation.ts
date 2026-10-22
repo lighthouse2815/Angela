@@ -22,8 +22,8 @@ export interface CommitmentReply {
 export class CommitmentConversation {
   constructor(private readonly tasks: Tasks, private readonly messages: typeof cliMessages.en.tasks, private readonly locale: string, private readonly memoryProjection?: Task['memoryProjection'], private readonly active = new ActiveCommitments()) {}
 
-  async handle(text: string, history: Conversation, privacy: RequestPrivacy): Promise<CommitmentReply | undefined> {
-    if (!durableWriteRejection(privacy, 'task', text))
+  async handle(text: string, history: Conversation, privacy: RequestPrivacy, advanceFocus = true): Promise<CommitmentReply | undefined> {
+    if (advanceFocus && !durableWriteRejection(privacy, 'task', text))
       await this.active.advance(this.tasks.now())
     if (durableWriteRejection(privacy, 'task', text) && /nhắc|hỏi|check\s+xem|gọi\s+(?:tôi|tao|mình)/iu.test(text))
       return { text: this.messages.protected }
