@@ -20,7 +20,6 @@ import { APICallError } from '@xsai/shared'
 import { AbortController as TelegramAbortController } from 'abort-controller'
 import { Bot, InlineKeyboard } from 'grammy'
 
-import { Chat } from './chat'
 import { readConfig } from './config'
 import { formatRequestError } from './errors'
 import { describeTool, Output } from './output'
@@ -46,7 +45,7 @@ export class TelegramChat {
 
   constructor(
     private readonly bot: Bot,
-    private readonly provider: GenerationProvider,
+    provider: GenerationProvider,
     private readonly model: string,
     private readonly sessions: Sessions,
     private readonly workspace: string,
@@ -58,6 +57,7 @@ export class TelegramChat {
   ) {
     this.ownsRuntime = !runtime
     this.runtime = runtime ?? new AngelaRuntime(model, provider, messages, companionConfig.env, companionConfig)
+    this.model = this.runtime.model
     bot.use(async (ctx, next) => {
       // Check the sender before commands, typing indicators, session reads, or provider requests.
       if (!this.closing && ctx.chat?.type === 'private' && ctx.from && this.allowedUsers.has(ctx.from.id))
@@ -338,7 +338,7 @@ export class TelegramChat {
     const session = await this.sessions.open(this.workspace, this.sessionId(chatId), { recoverAbandoned: true })
     const persistence = new AbortController()
     const requestSignal = AbortSignal.any([signal, persistence.signal, AbortSignal.timeout(300_000)])
-    const chat = new Chat(this.model, this.provider, this.workspace, reset ? undefined : session.restore())
+    const chat = await this.runtime.createChat(this.workspace, reset ? undefined : session.restore())
     let request: SavedRequest | undefined
     let saving: Promise<void> = Promise.resolve()
     let timer: ReturnType<typeof setInterval> | undefined
@@ -500,6 +500,7 @@ export class TelegramChat {
       await ctx.reply(failure)
     }
     finally {
+      persistence.abort()
       if (timer)
         clearInterval(timer)
       output.stop()

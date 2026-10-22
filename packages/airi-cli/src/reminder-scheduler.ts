@@ -66,7 +66,9 @@ export class ReminderScheduler {
   async close() {
     this.lifetime.abort()
     this.unsubscribe?.()
+    this.unsubscribe = undefined
     clearTimeout(this.timer)
+    this.timer = undefined
     await this.refreshing
   }
 

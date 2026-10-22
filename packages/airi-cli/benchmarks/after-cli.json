@@ -1,0 +1,46 @@
+{
+  "node": "v26.11.1",
+  "mode": "cli",
+  "samples": [
+    {
+      "label": "cli.idle",
+      "rss": 172736512,
+      "heapUsed": 37428936,
+      "heapTotal": 69910528,
+      "external": 5739109,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "label": "cli.message.1",
+      "rss": 178769920,
+      "heapUsed": 40904464,
+      "heapTotal": 72794112,
+      "external": 6938071,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "label": "cli.message.20",
+      "rss": 179294208,
+      "heapUsed": 41863912,
+      "heapTotal": 74891264,
+      "external": 7003671,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "label": "closed",
+      "rss": 179294208,
+      "heapUsed": 41832288,
+      "heapTotal": 74891264,
+      "external": 7003671,
+      "resources": [
+        "PipeWrap"
+      ]
+    }
+  ]
+}

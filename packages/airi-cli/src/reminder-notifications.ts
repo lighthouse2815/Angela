@@ -42,8 +42,11 @@ export class ReminderNotifications implements ReminderNotifier {
     const heading = overdue ? this.messages.overdue : this.messages.reminder
     const text = `${heading}\n\n${tasks.map(task => formatTask(task, this.locale, this.messages)).join('\n')}`
     await this.present(text, tasks, signal)
-    if (this.voiceEnabled)
-      this.speech.push(`${heading}. ${tasks.map(task => stripVTControlCharacters(task.title)).join('. ')}`)
+    if (this.voiceEnabled) {
+      if (this.speech.length >= 8)
+        this.speech.shift()
+      this.speech.push(`${heading}. ${tasks.map(task => stripVTControlCharacters(task.title)).join('. ')}`.slice(0, 4000))
+    }
   }
 
   pause() {

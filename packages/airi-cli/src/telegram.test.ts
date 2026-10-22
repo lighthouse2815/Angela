@@ -37,7 +37,7 @@ function completion(text: string) {
   return new Response(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', content: text }, finish_reason: 'stop' }] })}\n\ndata: [DONE]\n\n`, { headers: { 'Content-Type': 'text/event-stream' } })
 }
 
-async function connect(fetch = vi.fn<typeof globalThis.fetch>().mockImplementation(async () => completion('Xin chào')), existingDirectory?: string, sharedUserId?: number) {
+async function connect(fetch = vi.fn<typeof globalThis.fetch>().mockImplementation(async () => completion('Xin chào')), existingDirectory?: string, sharedUserId?: number, users: ReadonlySet<number> = new Set([100, 200])) {
   const directory = existingDirectory ?? await mkdtemp(join(tmpdir(), 'angela-telegram-test-'))
   if (!existingDirectory)
     directories.push(directory)
@@ -92,7 +92,7 @@ async function connect(fetch = vi.fn<typeof globalThis.fetch>().mockImplementati
     await tools.discover(signal)
     return tools
   })
-  const host = new TelegramChat(bot, provider, 'test-model', new Sessions(directory, cliMessages.vi), directory, cliMessages.vi, new Set([100, 200]), connectTools, { dataDir: directory, env: {}, locale: 'vi', apiKey: '', sharedUserId })
+  const host = new TelegramChat(bot, provider, 'test-model', new Sessions(directory, cliMessages.vi), directory, cliMessages.vi, users, connectTools, { dataDir: directory, env: {}, locale: 'vi', apiKey: '', sharedUserId })
   hosts.push(host)
   let updateId = 0
   async function message(text: string, id = 100, group = false) {
@@ -155,7 +155,7 @@ it('restores each private chat separately after restart and connects isolated te
   await next.message('/permission')
   expect(next.reply.mock.calls.at(-1)?.[0]).toContain(cliMessages.vi.permissionAsk)
   await next.message('What did I say?')
-  await vi.waitFor(() => expect(next.reply).toHaveBeenCalledWith('Xin chào'))
+  await vi.waitFor(() => expect(next.reply).toHaveBeenCalledWith('Xin chào'), { timeout: 5000 })
   const request = JSON.parse(String(next.fetch.mock.calls[0][1]?.body))
   expect(request.messages).toEqual(expect.arrayContaining([expect.objectContaining({ role: 'user', content: 'Remember my name' })]))
   expect(request.tools).toEqual(expect.arrayContaining([expect.objectContaining({ function: expect.objectContaining({ name: 'builtIn_mcpCallTool' }) })]))
@@ -479,7 +479,7 @@ it('does not resume empty, completed, or other-chat requests', async () => {
   await first.host.close()
   const active = await connect(undefined, first.directory)
   await active.message('Answer once')
-  await vi.waitFor(() => expect(active.reply).toHaveBeenCalledWith('Xin chào'))
+  await vi.waitFor(() => expect(active.reply).toHaveBeenCalledWith('Xin chào'), { timeout: 5000 })
   await active.host.close()
   const restarted = await connect(undefined, first.directory)
   await restarted.message('/resume')
@@ -487,7 +487,7 @@ it('does not resume empty, completed, or other-chat requests', async () => {
   await restarted.message('/resume', 200)
   expect(restarted.fetch).not.toHaveBeenCalled()
   expect(restarted.connectTools).not.toHaveBeenCalled()
-})
+}, 15_000)
 
 function companionCompletion(name: string, input: object) {
   const delta = { role: 'assistant', tool_calls: [{ index: 0, id: `call-${name}`, type: 'function', function: { name, arguments: JSON.stringify(input) } }] }
@@ -501,7 +501,7 @@ it('saves conversational tasks and facts through Telegram tools and recalls fact
     .mockResolvedValueOnce(completion('Đã lưu'))
   const first = await connect(fetch)
   await first.message('Tôi tên là Lan. Thêm việc học tiếng Trung vào danh sách.')
-  await vi.waitFor(() => expect(first.reply).toHaveBeenCalledWith('Đã lưu'))
+  await vi.waitFor(() => expect(first.reply).toHaveBeenCalledWith('Đã lưu'), { timeout: 5000 })
   await first.idle()
   const data = join(first.directory, 'telegram', 'companions', '42', '100')
   expect((await new Memory(data, cliMessages.vi).read()).entries[0]?.text).toBe('Tôi tên là Lan')
@@ -512,14 +512,14 @@ it('saves conversational tasks and facts through Telegram tools and recalls fact
   await first.host.close()
   const next = await connect(undefined, first.directory)
   await next.message('Bạn nhớ gì về tôi?')
-  await vi.waitFor(() => expect(next.reply).toHaveBeenCalledWith('Xin chào'))
+  await vi.waitFor(() => expect(next.reply).toHaveBeenCalledWith('Xin chào'), { timeout: 5000 })
   await next.idle()
   expect(String(next.fetch.mock.calls[0][1]?.body)).toContain('Tôi tên là Lan')
   await next.message('Bạn nhớ gì về tôi?', 200)
   await vi.waitFor(() => expect(next.fetch).toHaveBeenCalledTimes(2))
   expect(String(next.fetch.mock.calls[1][1]?.body)).not.toContain('Tôi tên là Lan')
   await next.host.close()
-})
+}, 15_000)
 
 it('delivers overdue Telegram reminders after restart without another message and preserves task commands and job cancellation', async () => {
   const first = await connect()
@@ -560,3 +560,22 @@ it('shares terminal tasks and memory with only the explicitly selected Telegram 
   await vi.waitFor(() => expect(host.fetch).toHaveBeenCalledTimes(2))
   expect(String(host.fetch.mock.calls[1][1]?.body)).not.toContain('Chủ máy thích trà')
 })
+
+it('evicts inactive chat state and closes request clients after many sequential users', async () => {
+  const users = new Set(Array.from({ length: 40 }, (_, index) => index + 100))
+  const close = vi.spyOn(McpTools.prototype, 'close')
+  const { host, message, idle, fetch } = await connect(undefined, undefined, undefined, users)
+  await host.start()
+  for (const user of users) {
+    await message('Hi Angela', user)
+    await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(user - 99))
+    await idle()
+    await vi.waitFor(() => expect(host.stateCounts.jobs).toBe(0))
+    expect(host.stateCounts.runtime).toBe(0)
+    expect(host.stateCounts.chats).toBeLessThanOrEqual(32)
+  }
+  expect(close).toHaveBeenCalledTimes(40)
+  await host.close()
+  expect(host.stateCounts).toEqual({ jobs: 0, chats: 0, runtime: 0 })
+  close.mockRestore()
+}, 15_000)

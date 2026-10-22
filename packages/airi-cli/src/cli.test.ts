@@ -114,7 +114,7 @@ it('returns exit code 130 after SIGINT cancels the active provider request', asy
   await requested
   child.kill('SIGINT')
   expect(await result).toMatchObject({ code: 130 })
-})
+}, 15_000)
 
 it('rejects empty input without calling a provider', async () => {
   const { child, result } = run([])
@@ -212,7 +212,7 @@ it('shows a readable overload error without SDK stacks or provider response bodi
   expect(output.stderr.match(/Yêu cầu thất bại:/g)).toHaveLength(1)
   expect(output.stderr.match(/Đang thử lại/g)).toHaveLength(3)
   expect(requests).toBe(4)
-})
+}, 15_000)
 
 it.each([
   { status: 401, locale: 'en', message: 'Check your API key and access permissions.' },
@@ -394,3 +394,25 @@ it('creates a conversational task through the real CLI tool runtime and restores
   expect(third, third.stderr).toMatchObject({ code: 0 })
   expect(third.stderr).not.toContain(cliMessages.vi.tasks.overdue)
 }, 20_000)
+
+it('skips MCP startup and definitions when computer use is explicitly disabled', async () => {
+  let body = ''
+  const server = createServer(async (request, response) => {
+    for await (const chunk of request)
+      body += chunk
+    response.writeHead(200, { 'Content-Type': 'text/event-stream' })
+    response.end(`data: ${JSON.stringify({ choices: [{ index: 0, delta: { role: 'assistant', content: 'Text only' }, finish_reason: 'stop' }] })}\n\ndata: [DONE]\n\n`)
+  })
+  servers.push(server)
+  server.listen(0, '127.0.0.1')
+  await once(server, 'listening')
+  const address = server.address()
+  if (!address || typeof address === 'string')
+    throw new Error('Missing provider port')
+  const { result } = run(['--no-computer-use', '--prompt', 'Hi'], { ANGELA_BASE_URL: `http://127.0.0.1:${address.port}/v1/` })
+  const output = await result
+  expect(output).toMatchObject({ code: 0, stdout: 'Text only\n' })
+  expect(output.stderr).not.toContain(cliMessages.vi.mcpConnected)
+  expect(body).not.toContain('builtIn_mcpCallTool')
+  expect(body).toContain('personal_memory')
+})

@@ -16,7 +16,6 @@ import { conversationToChatMessages } from '@proj-airi/core-agent'
 import { DiscordAdapter } from '@proj-airi/discord-bot'
 import { getGenerationProvider, listProviders } from '@proj-airi/provider-inference'
 
-import { Chat } from './chat'
 import { readConfig } from './config'
 import { AngelaRuntime } from './runtime/runtime'
 import { Sessions } from './sessions'
@@ -40,8 +39,8 @@ export class DiscordChat {
   private readonly ownsRuntime: boolean
 
   constructor(
-    private readonly provider: GenerationProvider,
-    private readonly model: string,
+    provider: GenerationProvider,
+    model: string,
     private readonly sessions: Sessions,
     private readonly workspace: string,
     private readonly messages: typeof cliMessages.en,
@@ -75,7 +74,7 @@ export class DiscordChat {
       let scope: RuntimeSession | undefined
       try {
         scope = this.runtime.open({ dataDir: this.sessions.directory, workspace: this.workspace, sessionId: id, channel: 'discord' })
-        const chat = new Chat(this.model, this.provider, this.workspace, session.restore(), false, 32_000, this.messages)
+        const chat = await this.runtime.createChat(this.workspace, session.restore(), false)
         let answer = ''
         await session.saveChat(chat, true)
         try {

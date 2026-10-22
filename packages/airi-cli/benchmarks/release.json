@@ -1,0 +1,192 @@
+{
+  "node": "v26.11.1",
+  "mode": "release",
+  "samples": [
+    {
+      "label": "released.20",
+      "rss": 181727232,
+      "heapUsed": 41267144,
+      "heapTotal": 84852736,
+      "external": 6938031,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "runtime": {
+        "states": 0,
+        "listeners": 0,
+        "reminderRoutes": 0,
+        "reminderTimers": 0
+      },
+      "collected": {
+        "scopes": 12,
+        "recalls": 12
+      }
+    },
+    {
+      "label": "released.40",
+      "rss": 173051904,
+      "heapUsed": 41326376,
+      "heapTotal": 84852736,
+      "external": 6938071,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "runtime": {
+        "states": 0,
+        "listeners": 0,
+        "reminderRoutes": 0,
+        "reminderTimers": 0
+      },
+      "collected": {
+        "scopes": 20,
+        "recalls": 20
+      }
+    },
+    {
+      "label": "released.80",
+      "rss": 173314048,
+      "heapUsed": 41405480,
+      "heapTotal": 84852736,
+      "external": 6938071,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "runtime": {
+        "states": 0,
+        "listeners": 0,
+        "reminderRoutes": 0,
+        "reminderTimers": 0
+      },
+      "collected": {
+        "scopes": 79,
+        "recalls": 79
+      }
+    },
+    {
+      "label": "released.160",
+      "rss": 174493696,
+      "heapUsed": 41560712,
+      "heapTotal": 85377024,
+      "external": 6938071,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "runtime": {
+        "states": 0,
+        "listeners": 0,
+        "reminderRoutes": 0,
+        "reminderTimers": 0
+      },
+      "collected": {
+        "scopes": 80,
+        "recalls": 80
+      }
+    },
+    {
+      "label": "released.320",
+      "rss": 186683392,
+      "heapUsed": 41701680,
+      "heapTotal": 102940672,
+      "external": 6938071,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "runtime": {
+        "states": 0,
+        "listeners": 0,
+        "reminderRoutes": 0,
+        "reminderTimers": 0
+      },
+      "collected": {
+        "scopes": 319,
+        "recalls": 319
+      }
+    },
+    {
+      "label": "released.640",
+      "rss": 187469824,
+      "heapUsed": 41972112,
+      "heapTotal": 103202816,
+      "external": 6938071,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "runtime": {
+        "states": 0,
+        "listeners": 0,
+        "reminderRoutes": 0,
+        "reminderTimers": 0
+      },
+      "collected": {
+        "scopes": 320,
+        "recalls": 320
+      }
+    },
+    {
+      "label": "released.1280",
+      "rss": 198692864,
+      "heapUsed": 42223368,
+      "heapTotal": 103727104,
+      "external": 6938071,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "runtime": {
+        "states": 0,
+        "listeners": 0,
+        "reminderRoutes": 0,
+        "reminderTimers": 0
+      },
+      "collected": {
+        "scopes": 1140,
+        "recalls": 1140
+      }
+    },
+    {
+      "label": "released.2560",
+      "rss": 139460608,
+      "heapUsed": 40127056,
+      "heapTotal": 71745536,
+      "external": 6926886,
+      "resources": [
+        "PipeWrap"
+      ]
+    },
+    {
+      "runtime": {
+        "states": 0,
+        "listeners": 0,
+        "reminderRoutes": 0,
+        "reminderTimers": 0
+      },
+      "collected": {
+        "scopes": 2559,
+        "recalls": 2559
+      }
+    },
+    {
+      "label": "closed",
+      "rss": 139591680,
+      "heapUsed": 40037464,
+      "heapTotal": 71745536,
+      "external": 6926886,
+      "resources": [
+        "PipeWrap"
+      ]
+    }
+  ]
+}

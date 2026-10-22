@@ -105,3 +105,17 @@ it('checks ownership after the pause and propagates presentation failures to the
   expect(present).not.toHaveBeenCalled()
   await expect(notifications.notify([task('New task')], false, new AbortController().signal)).rejects.toThrow('Write failed')
 })
+
+it('bounds pending voice announcements while preserving every text reminder', async () => {
+  const present = vi.fn()
+  const speak = vi.fn().mockResolvedValue(undefined)
+  const notifications = new ReminderNotifications(messages, 'en', present)
+  notifications.setVoiceEnabled(true)
+  for (let index = 0; index < 40; index++)
+    await notifications.notify([task(`Reminder ${index}`)], false, new AbortController().signal)
+  await notifications.speak({ speak }, new AbortController().signal)
+  expect(present).toHaveBeenCalledTimes(40)
+  expect(speak).toHaveBeenCalledTimes(8)
+  expect(speak.mock.calls[0][0]).toContain('Reminder 32')
+  expect(speak.mock.calls.at(-1)?.[0]).toContain('Reminder 39')
+})

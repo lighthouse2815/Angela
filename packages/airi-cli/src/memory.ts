@@ -145,11 +145,12 @@ export class Memory {
     const state = await this.read()
     if (!state.enabled)
       return []
+    const autoEnabled = state.autoEnabled
     return [{
       type: 'function',
       function: {
         name: 'personal_memory',
-        description: state.autoEnabled
+        description: autoEnabled
           ? 'Remember clear durable first-person facts volunteered by the user, or update a clear self-correction. Ask about ambiguous conflicts. Forget only on request. Use exact current-message text.'
           : 'Save, update, or forget a personal fact only when the user explicitly asks. Saved text must be an exact excerpt of the current user message.',
         parameters: {
@@ -173,7 +174,7 @@ export class Memory {
         const current = await this.read()
         if (!userText.includes(source_quote) || (text !== null && !source_quote.includes(text)) || !current.enabled)
           return { status: 'rejected', reason: this.messages.memoryEvidence }
-        if (current.autoEnabled !== state.autoEnabled)
+        if (current.autoEnabled !== autoEnabled)
           return { status: 'rejected', reason: this.messages.memoryChanged }
         if ((action === 'remember' && (!text || id)) || (action === 'update' && (!id || !text)) || (action === 'forget' && (!id || text !== null)))
           return { status: 'rejected', reason: this.messages.memoryUsage }
