@@ -6,6 +6,8 @@ Không chứa hội thoại thật, thông tin cá nhân thật hoặc credentia
 Mục tiêu là đo memory, retrieval và context. Bộ này không chấm trí thông minh hoặc văn phong của model.
 Không dùng API trả phí. Không sửa production code để đạt điểm.
 
+Xem [report baseline](./REPORT.md) và [kết quả JSON](./baseline.json).
+
 ## Dataset và schema
 
 Mỗi dòng trong `cases.jsonl` là một JSON object độc lập. `schema.ts` định nghĩa schema Valibot.
