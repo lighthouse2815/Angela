@@ -1,4 +1,4 @@
-import type { Conversation, StreamEvent } from '@angela/core-agent'
+import type { Conversation } from '@angela/core-agent'
 import type { GenerationProvider } from '@angela/provider-inference'
 
 import type { Input } from './schema'
@@ -11,6 +11,8 @@ import { join } from 'node:path'
 import { chatMessagesToTurns } from '@angela/core-agent'
 import { cliMessages } from '@angela/i18n/cli'
 
+import * as v from 'valibot'
+
 import { Memory } from '../../packages/angela-cli/src/memory'
 import { RecallIndex } from '../../packages/angela-cli/src/recall-index'
 import { AngelaRuntime } from '../../packages/angela-cli/src/runtime/runtime'
@@ -18,22 +20,24 @@ import { buildTools } from '../../packages/angela-cli/src/runtime/tool-registry'
 import { Tasks } from '../../packages/angela-cli/src/tasks'
 
 /** A recorded request contains the actual protocol body, including injected context and tool definitions. Headers are excluded. */
-export interface Observation {
-  rawAnswer: string
-  requests: unknown[]
-  httpStatuses: number[]
-  streamEvents: StreamEvent[]
-  events: unknown[]
-  warnings: string[]
-  recalledRefs: string[]
-  contextRefs: string[]
-  usedRefs: string[]
-  sources: { ref: string, id: string, text: string }[]
-  fixtureTools: unknown[]
-  durableText: string
-  infrastructureError?: string
-  prepared: boolean
-}
+export const observationSchema = v.object({
+  rawAnswer: v.string(),
+  requests: v.array(v.unknown()),
+  httpStatuses: v.array(v.number()),
+  streamEvents: v.array(v.unknown()),
+  events: v.array(v.unknown()),
+  warnings: v.array(v.string()),
+  recalledRefs: v.array(v.string()),
+  contextRefs: v.array(v.string()),
+  usedRefs: v.array(v.string()),
+  sources: v.array(v.object({ ref: v.string(), id: v.string(), text: v.string() })),
+  fixtureTools: v.array(v.unknown()),
+  durableText: v.string(),
+  infrastructureError: v.optional(v.string()),
+  prepared: v.boolean(),
+})
+
+export type Observation = v.InferOutput<typeof observationSchema>
 
 /** External provider boundary for a single run. No configured credential enters the observation. */
 export interface Target {
@@ -211,7 +215,7 @@ export async function observe(input: Input, target?: Target, timeoutMs = 45_000)
   }
   observation.usedRefs = refsIn(JSON.stringify([observation.requests, observation.streamEvents]))
   // Source aliases retain exact text while removing temporary filesystem paths and random page identities.
-  return JSON.parse(stabilize(JSON.stringify(observation))) as Observation
+  return v.parse(observationSchema, JSON.parse(stabilize(JSON.stringify(observation))))
 }
 
 async function memorySnapshot(directory: string) {

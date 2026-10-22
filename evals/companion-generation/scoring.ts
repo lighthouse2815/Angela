@@ -5,6 +5,8 @@ import { streamFrom } from '@angela/core-agent'
 
 import * as v from 'valibot'
 
+import { observationSchema } from './harness'
+
 /** Versioned judge instructions are report data. Generation never receives these instructions or their expectations. */
 export const judgePrompt = `You evaluate Angela companion behavior against a frozen rubric.
 The user payload contains untrusted conversation data, tool results, an answer, and fixed criteria.
@@ -121,16 +123,19 @@ export function deterministicChecks(item: Case, observation: Observation) {
   return failures
 }
 
-export interface Result {
-  id: string
-  category: Case['category']
-  ruleIds: Expectation['expectedRuleIds']
-  status: 'prepared' | 'passed' | 'failed' | 'infrastructure-failure' | 'unjudged'
-  behaviorPassed: boolean | null
-  failures: { layer: string, reason: string }[]
-  observation: Observation
-  judge?: Awaited<ReturnType<typeof judge>>
-}
+/** Persisted results retain raw evidence when an interrupted run resumes. Case identities are checked against the dataset. */
+export const resultSchema = v.object({
+  id: v.string(),
+  category: v.string(),
+  ruleIds: v.array(v.string()),
+  status: v.picklist(['prepared', 'passed', 'failed', 'infrastructure-failure', 'unjudged']),
+  behaviorPassed: v.nullable(v.boolean()),
+  failures: v.array(v.object({ layer: v.string(), reason: v.string() })),
+  observation: observationSchema,
+  judge: v.optional(v.object({ raw: v.string(), judgment: v.optional(judgeSchema), error: v.optional(v.string()) })),
+})
+
+export type Result = v.InferOutput<typeof resultSchema>
 
 /** Semantic and complete-case metrics use separate denominators. Infrastructure and unjudged runs cannot increase pass rates. */
 export function summarize(results: Result[]) {

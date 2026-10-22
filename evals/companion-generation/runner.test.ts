@@ -1,7 +1,7 @@
 import process from 'node:process'
 
 import { execFile } from 'node:child_process'
-import { mkdtemp, readFile, rm } from 'node:fs/promises'
+import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -41,6 +41,34 @@ it('supports subsets, strict preparation, invalid selection, and immutable outpu
     expect((await run(['--id', 'missing_case'], config)).code).toBe(2)
     expect((await run(['--id', 'plan_not_completed_001', '--output', output], config)).code).toBe(2)
     expect(await readFile(output, 'utf8')).toBe(`${JSON.stringify(report, null, 2)}\n`)
+  }
+  finally { await rm(directory, { recursive: true, force: true }) }
+})
+
+it('resumes an exact dataset prefix without rerunning or rewriting completed results', async () => {
+  const directory = await mkdtemp(join(tmpdir(), 'angela-resume-test-'))
+  const config = join(directory, 'unused-config.json')
+  const original = join(directory, 'original.json')
+  const partial = join(directory, 'partial.json')
+  const resumed = join(directory, 'resumed.json')
+  try {
+    expect((await run(['--category', 'vietnamese', '--output', original], config)).code).toBe(0)
+    const full = JSON.parse(await readFile(original, 'utf8'))
+    const checkpoint = { ...full, finishedAt: null, results: full.results.slice(0, 1) }
+    await writeFile(partial, JSON.stringify(checkpoint))
+    expect((await run(['--category', 'vietnamese', '--resume', partial, '--output', resumed, '--concurrency', '2'], config)).code).toBe(0)
+    const report = JSON.parse(await readFile(resumed, 'utf8'))
+    expect(report.results).toHaveLength(2)
+    expect(report.results[0]).toEqual(checkpoint.results[0])
+    expect(report.executionSegments.map((segment: { fromCaseIndex: number }) => segment.fromCaseIndex)).toEqual([0, 1])
+    expect(report.executionSegments[1].concurrency).toBe(2)
+    expect(report.resumedFromSha256).toMatch(/^[\da-f]{64}$/u)
+    expect((await run(['--category', 'vietnamese', '--resume', original, '--output', join(directory, 'completed.json')], config)).code).toBe(2)
+    await writeFile(partial, JSON.stringify({ ...checkpoint, datasetSha256: 'changed' }))
+    expect((await run(['--category', 'vietnamese', '--resume', partial, '--output', join(directory, 'changed.json')], config)).code).toBe(2)
+    await writeFile(partial, JSON.stringify({ ...checkpoint, results: [...full.results].reverse() }))
+    expect((await run(['--category', 'vietnamese', '--resume', partial, '--output', join(directory, 'reordered.json')], config)).code).toBe(2)
+    expect((await run(['--concurrency', '0'], config)).code).toBe(2)
   }
   finally { await rm(directory, { recursive: true, force: true }) }
 })

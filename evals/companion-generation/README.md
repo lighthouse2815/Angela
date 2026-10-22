@@ -35,6 +35,21 @@ By default, generation and judge use the same model. This creates correlated-err
 `--timeout-ms` defaults to 45000. Each case permits at most 12 generation requests and 24000 answer characters.
 Judge output is limited to 32000 characters. Generation and judging each receive their own timeout.
 Reports refuse an existing output path. Every completed case checkpoints the report.
+Checkpoint updates use an atomic file replacement.
+
+If a run stops, resume into a new output file:
+
+```bash
+pnpm -F @angela/evals-companion-generation eval --live --resume /tmp/interrupted.json \
+  --output /tmp/resumed.json --model MODEL --timeout-ms 90000
+```
+
+Keep the original model, provider, selection, timeout, dataset, and judge prompt.
+Resume checks these identities and the production source tree before it runs another case.
+It keeps completed results, including infrastructure failures. It does not retry or replace them.
+The report records each execution segment, its commit, and the original checkpoint hash.
+`--concurrency` accepts one to four independent cases. The default is one.
+Concurrent cases retain dataset order and use separate stores. Checkpoints follow each completed batch.
 
 | Exit | Meaning |
 | --- | --- |
