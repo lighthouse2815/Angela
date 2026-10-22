@@ -4,6 +4,13 @@ This package evaluates generated answers against [the companion behavior spec](.
 The 57 synthetic cases cover 29 Rule IDs and 12 categories.
 The existing [companion evaluation](../companion/README.md) separately measures retrieval and context.
 
+## Saved evaluation evidence
+
+[REPORT.md](./REPORT.md) records the baseline and source audit.
+[REVIEW.md](./REVIEW.md) documents false passes and judge limits.
+[IMPROVEMENTS.md](./IMPROVEMENTS.md) records the minimal production changes, after results, and unresolved behavior.
+The raw reports retain answers and evidence. Their pass percentages require the coverage and judgment caveats in those documents.
+
 ## Run
 
 The default command creates disposable stores and prepares real provider requests. It does not contact a model.

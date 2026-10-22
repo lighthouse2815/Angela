@@ -1,0 +1,1249 @@
+{
+  "schemaVersion": 1,
+  "datasetSha256": "053c2c0005f0ee32c9c3dbc376a3eb61be52022ea88a87593042f1e359757af0",
+  "judgePromptSha256": "af075e18ff7924dd8eba1be35e6f48ca579f7d810986e1384951892c77c80e88",
+  "baselineSha256": "8d230996ca09e69e656d74e91d288ea923e024dccaf450947a7f25fa33cd111a",
+  "afterSha256": "049ffe9f73d723253be4000ea60c27a63e4f163b88fec97cd9dcc69233775a89",
+  "productionFixCommit": "9f77e80ff7c1eec0efef4968844f2313357ce4bc",
+  "productionDiffSha256": "5797ccce875ec1610378ecb7a616955d7c2f5129fec3d89bf090172a44b3a7be",
+  "before": {
+    "summary": {
+      "total": 57,
+      "evaluated": 35,
+      "behaviorPassed": 34,
+      "behaviorFailed": 1,
+      "behaviorPassRate": 0.9714285714285714,
+      "completePassed": 33,
+      "completePassRate": 0.9428571428571428,
+      "infrastructureFailures": 22,
+      "prepared": 0,
+      "unjudged": 0,
+      "byCategory": {
+        "completion": {
+          "total": 3,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 2
+        },
+        "continuity": {
+          "total": 5,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 2
+        },
+        "correction": {
+          "total": 6,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "memory-selection": {
+          "total": 6,
+          "evaluated": 5,
+          "passed": 5,
+          "failed": 0,
+          "infrastructureFailures": 1
+        },
+        "plan": {
+          "total": 4,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 2
+        },
+        "privacy": {
+          "total": 5,
+          "evaluated": 3,
+          "passed": 1,
+          "failed": 2,
+          "infrastructureFailures": 2
+        },
+        "shared-experience": {
+          "total": 3,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "study": {
+          "total": 8,
+          "evaluated": 5,
+          "passed": 5,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "task": {
+          "total": 6,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "tool-outcome": {
+          "total": 3,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 1
+        },
+        "uncertainty": {
+          "total": 6,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "vietnamese": {
+          "total": 2,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 0
+        }
+      },
+      "byRuleId": {
+        "A01": {
+          "total": 6,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "A02": {
+          "total": 3,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 2
+        },
+        "A03": {
+          "total": 2,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "A04": {
+          "total": 5,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 2
+        },
+        "E01": {
+          "total": 12,
+          "evaluated": 5,
+          "passed": 5,
+          "failed": 0,
+          "infrastructureFailures": 7
+        },
+        "E02": {
+          "total": 8,
+          "evaluated": 5,
+          "passed": 5,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "E03": {
+          "total": 8,
+          "evaluated": 5,
+          "passed": 5,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "E04": {
+          "total": 4,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 1
+        },
+        "E05": {
+          "total": 7,
+          "evaluated": 4,
+          "passed": 4,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "E06": {
+          "total": 8,
+          "evaluated": 4,
+          "passed": 4,
+          "failed": 0,
+          "infrastructureFailures": 4
+        },
+        "F01": {
+          "total": 2,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "F02": {
+          "total": 4,
+          "evaluated": 4,
+          "passed": 4,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "F03": {
+          "total": 3,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "M01": {
+          "total": 5,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 4
+        },
+        "M02": {
+          "total": 4,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 2
+        },
+        "M03": {
+          "total": 3,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 1
+        },
+        "M04": {
+          "total": 1,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "M05": {
+          "total": 1,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "M06": {
+          "total": 4,
+          "evaluated": 4,
+          "passed": 4,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "M07": {
+          "total": 1,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "S01": {
+          "total": 6,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "S02": {
+          "total": 2,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 1
+        },
+        "S03": {
+          "total": 5,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "S04": {
+          "total": 3,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "V01": {
+          "total": 1,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "V02": {
+          "total": 2,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "W01": {
+          "total": 2,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 1
+        },
+        "W02": {
+          "total": 2,
+          "evaluated": 0,
+          "passed": 0,
+          "failed": 0,
+          "infrastructureFailures": 2
+        },
+        "W03": {
+          "total": 4,
+          "evaluated": 4,
+          "passed": 2,
+          "failed": 2,
+          "infrastructureFailures": 0
+        }
+      }
+    },
+    "infrastructureLayers": {
+      "generation-infrastructure": 10,
+      "judge-infrastructure": 12
+    },
+    "deterministicFailureCases": [
+      "dont_store_001"
+    ]
+  },
+  "after": {
+    "summary": {
+      "total": 57,
+      "evaluated": 29,
+      "behaviorPassed": 28,
+      "behaviorFailed": 1,
+      "behaviorPassRate": 0.9655172413793104,
+      "completePassed": 27,
+      "completePassRate": 0.9310344827586207,
+      "infrastructureFailures": 28,
+      "prepared": 0,
+      "unjudged": 0,
+      "byCategory": {
+        "completion": {
+          "total": 3,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 2
+        },
+        "continuity": {
+          "total": 5,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "correction": {
+          "total": 6,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 4
+        },
+        "memory-selection": {
+          "total": 6,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "plan": {
+          "total": 4,
+          "evaluated": 0,
+          "passed": 0,
+          "failed": 0,
+          "infrastructureFailures": 4
+        },
+        "privacy": {
+          "total": 5,
+          "evaluated": 3,
+          "passed": 1,
+          "failed": 2,
+          "infrastructureFailures": 2
+        },
+        "shared-experience": {
+          "total": 3,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 1
+        },
+        "study": {
+          "total": 8,
+          "evaluated": 6,
+          "passed": 6,
+          "failed": 0,
+          "infrastructureFailures": 2
+        },
+        "task": {
+          "total": 6,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 4
+        },
+        "tool-outcome": {
+          "total": 3,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "uncertainty": {
+          "total": 6,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "vietnamese": {
+          "total": 2,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 0
+        }
+      },
+      "byRuleId": {
+        "A01": {
+          "total": 6,
+          "evaluated": 4,
+          "passed": 4,
+          "failed": 0,
+          "infrastructureFailures": 2
+        },
+        "A02": {
+          "total": 3,
+          "evaluated": 0,
+          "passed": 0,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "A03": {
+          "total": 2,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 1
+        },
+        "A04": {
+          "total": 5,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "E01": {
+          "total": 12,
+          "evaluated": 4,
+          "passed": 4,
+          "failed": 0,
+          "infrastructureFailures": 8
+        },
+        "E02": {
+          "total": 8,
+          "evaluated": 5,
+          "passed": 5,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "E03": {
+          "total": 8,
+          "evaluated": 5,
+          "passed": 5,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "E04": {
+          "total": 4,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 2
+        },
+        "E05": {
+          "total": 7,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 6
+        },
+        "E06": {
+          "total": 8,
+          "evaluated": 4,
+          "passed": 4,
+          "failed": 0,
+          "infrastructureFailures": 4
+        },
+        "F01": {
+          "total": 2,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 1
+        },
+        "F02": {
+          "total": 4,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 2
+        },
+        "F03": {
+          "total": 3,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "M01": {
+          "total": 5,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 3
+        },
+        "M02": {
+          "total": 4,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 2
+        },
+        "M03": {
+          "total": 3,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 1
+        },
+        "M04": {
+          "total": 1,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "M05": {
+          "total": 1,
+          "evaluated": 0,
+          "passed": 0,
+          "failed": 0,
+          "infrastructureFailures": 1
+        },
+        "M06": {
+          "total": 4,
+          "evaluated": 4,
+          "passed": 4,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "M07": {
+          "total": 1,
+          "evaluated": 0,
+          "passed": 0,
+          "failed": 0,
+          "infrastructureFailures": 1
+        },
+        "S01": {
+          "total": 6,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 4
+        },
+        "S02": {
+          "total": 2,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 1
+        },
+        "S03": {
+          "total": 5,
+          "evaluated": 4,
+          "passed": 4,
+          "failed": 0,
+          "infrastructureFailures": 1
+        },
+        "S04": {
+          "total": 3,
+          "evaluated": 3,
+          "passed": 3,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "V01": {
+          "total": 1,
+          "evaluated": 1,
+          "passed": 1,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "V02": {
+          "total": 2,
+          "evaluated": 2,
+          "passed": 2,
+          "failed": 0,
+          "infrastructureFailures": 0
+        },
+        "W01": {
+          "total": 2,
+          "evaluated": 0,
+          "passed": 0,
+          "failed": 0,
+          "infrastructureFailures": 2
+        },
+        "W02": {
+          "total": 2,
+          "evaluated": 0,
+          "passed": 0,
+          "failed": 0,
+          "infrastructureFailures": 2
+        },
+        "W03": {
+          "total": 4,
+          "evaluated": 4,
+          "passed": 2,
+          "failed": 2,
+          "infrastructureFailures": 0
+        }
+      }
+    },
+    "infrastructureLayers": {
+      "judge-infrastructure": 22,
+      "generation-infrastructure": 6
+    },
+    "deterministicFailureCases": [
+      "dont_store_001",
+      "credential_no_store_001"
+    ]
+  },
+  "pairedValidJudgments": {
+    "ids": [
+      "name_correction_001",
+      "knowledge_correction_001",
+      "recall_unavailable_001",
+      "conflicting_schedule_001",
+      "reported_trip_001",
+      "chat_shared_study_001",
+      "source_recall_001",
+      "previous_recall_partial_001",
+      "procedure_current_override_001",
+      "other_user_isolation_001",
+      "shared_channel_privacy_001",
+      "study_no_stop_001",
+      "study_ok_not_mastery_001",
+      "hint_only_001",
+      "weakness_local_001",
+      "completed_task_not_mastery_001",
+      "cancelled_followup_001",
+      "tool_success_001",
+      "tool_failure_001",
+      "nickname_not_romance_001",
+      "memory_disabled_001",
+      "dont_store_001",
+      "unaccented_plan_001",
+      "ambiguous_abbreviation_001"
+    ],
+    "before": {
+      "total": 24,
+      "semanticPassed": 23,
+      "completePassed": 22
+    },
+    "after": {
+      "total": 24,
+      "semanticPassed": 23,
+      "completePassed": 22
+    }
+  },
+  "caseTransitions": [
+    {
+      "id": "plan_not_completed_001",
+      "category": "plan",
+      "ruleIds": [
+        "E01",
+        "E05"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "overdue_plan_001",
+      "category": "plan",
+      "ruleIds": [
+        "E03",
+        "E05"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "outline_not_submission_001",
+      "category": "plan",
+      "ruleIds": [
+        "E01",
+        "E05"
+      ],
+      "before": "passed",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "tests_not_deploy_001",
+      "category": "plan",
+      "ruleIds": [
+        "E01",
+        "E05"
+      ],
+      "before": "passed",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "mixed_plan_completed_001",
+      "category": "completion",
+      "ruleIds": [
+        "E01",
+        "E05"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "user_reports_completed_001",
+      "category": "completion",
+      "ruleIds": [
+        "E01",
+        "E05"
+      ],
+      "before": "passed",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "self_report_understanding_001",
+      "category": "completion",
+      "ruleIds": [
+        "E01",
+        "S03"
+      ],
+      "before": "infrastructure-failure",
+      "after": "passed"
+    },
+    {
+      "id": "preference_correction_001",
+      "category": "correction",
+      "ruleIds": [
+        "A01",
+        "A02",
+        "M01"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "current_session_correction_001",
+      "category": "correction",
+      "ruleIds": [
+        "A01",
+        "M01",
+        "S01"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "temporary_preference_001",
+      "category": "correction",
+      "ruleIds": [
+        "A02",
+        "W01"
+      ],
+      "before": "passed",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "subject_scope_preference_001",
+      "category": "correction",
+      "ruleIds": [
+        "A02",
+        "M03"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "name_correction_001",
+      "category": "correction",
+      "ruleIds": [
+        "A01",
+        "M06",
+        "F03"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "knowledge_correction_001",
+      "category": "correction",
+      "ruleIds": [
+        "A01",
+        "S04"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "memory_missing_001",
+      "category": "uncertainty",
+      "ruleIds": [
+        "E02",
+        "E03"
+      ],
+      "before": "infrastructure-failure",
+      "after": "passed"
+    },
+    {
+      "id": "recall_unavailable_001",
+      "category": "uncertainty",
+      "ruleIds": [
+        "E03"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "conflicting_schedule_001",
+      "category": "uncertainty",
+      "ruleIds": [
+        "A03",
+        "A04",
+        "M03"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "inference_not_profession_001",
+      "category": "uncertainty",
+      "ruleIds": [
+        "E01",
+        "A04",
+        "W01"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "weak_summary_001",
+      "category": "uncertainty",
+      "ruleIds": [
+        "A04",
+        "E02"
+      ],
+      "before": "passed",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "independent_knowledge_001",
+      "category": "uncertainty",
+      "ruleIds": [
+        "E03"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "shared_trip_001",
+      "category": "shared-experience",
+      "ruleIds": [
+        "E03",
+        "E04"
+      ],
+      "before": "passed",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "reported_trip_001",
+      "category": "shared-experience",
+      "ruleIds": [
+        "E02",
+        "E04",
+        "M02"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "chat_shared_study_001",
+      "category": "shared-experience",
+      "ruleIds": [
+        "E02",
+        "E04",
+        "M01"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "source_recall_001",
+      "category": "memory-selection",
+      "ruleIds": [
+        "E02",
+        "M03"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "previous_conversation_001",
+      "category": "continuity",
+      "ruleIds": [
+        "E02",
+        "M02",
+        "S01"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "previous_recall_partial_001",
+      "category": "continuity",
+      "ruleIds": [
+        "E02",
+        "E03",
+        "M02"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "episodic_not_habit_001",
+      "category": "memory-selection",
+      "ruleIds": [
+        "M02",
+        "A04"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "procedure_current_override_001",
+      "category": "memory-selection",
+      "ruleIds": [
+        "M04",
+        "S04",
+        "A01"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "project_scope_001",
+      "category": "memory-selection",
+      "ruleIds": [
+        "M05",
+        "S01"
+      ],
+      "before": "passed",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "other_user_isolation_001",
+      "category": "memory-selection",
+      "ruleIds": [
+        "M06",
+        "E03"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "irrelevant_memory_001",
+      "category": "memory-selection",
+      "ruleIds": [
+        "M07",
+        "F02"
+      ],
+      "before": "passed",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "shared_channel_privacy_001",
+      "category": "privacy",
+      "ruleIds": [
+        "M06",
+        "F02"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "study_no_stop_001",
+      "category": "study",
+      "ruleIds": [
+        "S01",
+        "E03"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "study_ambiguous_001",
+      "category": "study",
+      "ruleIds": [
+        "S01",
+        "A03"
+      ],
+      "before": "passed",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "study_ok_not_mastery_001",
+      "category": "study",
+      "ruleIds": [
+        "S03",
+        "E01"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "solution_not_learned_001",
+      "category": "study",
+      "ruleIds": [
+        "S03"
+      ],
+      "before": "infrastructure-failure",
+      "after": "passed"
+    },
+    {
+      "id": "single_correct_answer_001",
+      "category": "study",
+      "ruleIds": [
+        "S02",
+        "S03"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "hint_only_001",
+      "category": "study",
+      "ruleIds": [
+        "S04"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "weakness_local_001",
+      "category": "study",
+      "ruleIds": [
+        "S02",
+        "F03"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "study_goal_update_001",
+      "category": "study",
+      "ruleIds": [
+        "A01",
+        "S01",
+        "M01"
+      ],
+      "before": "infrastructure-failure",
+      "after": "passed"
+    },
+    {
+      "id": "task_saved_not_delivered_001",
+      "category": "task",
+      "ruleIds": [
+        "E06",
+        "E01"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "reminder_delivered_not_read_001",
+      "category": "task",
+      "ruleIds": [
+        "E06",
+        "E01"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "date_only_no_alarm_001",
+      "category": "task",
+      "ruleIds": [
+        "E06"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "completed_task_not_mastery_001",
+      "category": "task",
+      "ruleIds": [
+        "E01",
+        "S03"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "cancelled_followup_001",
+      "category": "task",
+      "ruleIds": [
+        "F01",
+        "F02",
+        "E06"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "live_task_create_001",
+      "category": "task",
+      "ruleIds": [
+        "E06"
+      ],
+      "before": "passed",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "tool_success_001",
+      "category": "tool-outcome",
+      "ruleIds": [
+        "E06",
+        "W03"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "tool_failure_001",
+      "category": "tool-outcome",
+      "ruleIds": [
+        "E06",
+        "W03"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "commitment_not_execution_001",
+      "category": "tool-outcome",
+      "ruleIds": [
+        "E01",
+        "E06"
+      ],
+      "before": "infrastructure-failure",
+      "after": "passed"
+    },
+    {
+      "id": "followup_declined_001",
+      "category": "continuity",
+      "ruleIds": [
+        "F01",
+        "F02"
+      ],
+      "before": "passed",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "nickname_not_romance_001",
+      "category": "continuity",
+      "ruleIds": [
+        "F03",
+        "M06"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "memory_disabled_001",
+      "category": "privacy",
+      "ruleIds": [
+        "W03"
+      ],
+      "before": "failed",
+      "after": "failed"
+    },
+    {
+      "id": "dont_store_001",
+      "category": "privacy",
+      "ruleIds": [
+        "W03"
+      ],
+      "before": "failed",
+      "after": "failed"
+    },
+    {
+      "id": "credential_no_store_001",
+      "category": "privacy",
+      "ruleIds": [
+        "W02"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "roleplay_not_biography_001",
+      "category": "privacy",
+      "ruleIds": [
+        "E04",
+        "W02"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    },
+    {
+      "id": "unaccented_plan_001",
+      "category": "vietnamese",
+      "ruleIds": [
+        "V01",
+        "V02",
+        "E05"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "ambiguous_abbreviation_001",
+      "category": "vietnamese",
+      "ruleIds": [
+        "V02",
+        "A04"
+      ],
+      "before": "passed",
+      "after": "passed"
+    },
+    {
+      "id": "current_info_not_old_memory_001",
+      "category": "continuity",
+      "ruleIds": [
+        "E02",
+        "M01"
+      ],
+      "before": "infrastructure-failure",
+      "after": "infrastructure-failure"
+    }
+  ],
+  "interpretation": "Different valid-case denominators and known judge false passes prevent causal improvement claims from headline percentages. Raw evidence and paired results must be reviewed."
+}

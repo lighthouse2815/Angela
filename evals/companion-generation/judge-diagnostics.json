@@ -1,0 +1,210 @@
+{
+  "schemaVersion": 1,
+  "note": "Reparses retained raw outputs with the unchanged production evaluator parser. This diagnoses exclusions; it never changes or replaces a judgment.",
+  "diagnostics": [
+    {
+      "artifact": "baseline.json",
+      "id": "self_report_understanding_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "baseline.json",
+      "id": "subject_scope_preference_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "baseline.json",
+      "id": "independent_knowledge_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "baseline.json",
+      "id": "previous_conversation_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "baseline.json",
+      "id": "episodic_not_habit_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "baseline.json",
+      "id": "solution_not_learned_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "baseline.json",
+      "id": "single_correct_answer_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "baseline.json",
+      "id": "task_saved_not_delivered_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "baseline.json",
+      "id": "reminder_delivered_not_read_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "baseline.json",
+      "id": "date_only_no_alarm_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "baseline.json",
+      "id": "roleplay_not_biography_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "baseline.json",
+      "id": "current_info_not_old_memory_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "plan_not_completed_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "outline_not_submission_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "tests_not_deploy_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "user_reports_completed_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "preference_correction_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "current_session_correction_001",
+      "originalError": "TimeoutError",
+      "parseResult": "Unexpected end of JSON input"
+    },
+    {
+      "artifact": "after.json",
+      "id": "temporary_preference_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "inference_not_profession_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "independent_knowledge_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "shared_trip_001",
+      "originalError": "TimeoutError",
+      "parseResult": "Unexpected end of JSON input"
+    },
+    {
+      "artifact": "after.json",
+      "id": "previous_conversation_001",
+      "originalError": "TimeoutError",
+      "parseResult": "Unexpected end of JSON input"
+    },
+    {
+      "artifact": "after.json",
+      "id": "project_scope_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "irrelevant_memory_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "study_ambiguous_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "single_correct_answer_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "task_saved_not_delivered_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "reminder_delivered_not_read_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "date_only_no_alarm_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "live_task_create_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "followup_declined_001",
+      "originalError": "Error",
+      "parseResult": "Judge quote is not in the answer"
+    },
+    {
+      "artifact": "after.json",
+      "id": "credential_no_store_001",
+      "originalError": "TimeoutError",
+      "parseResult": "Unexpected end of JSON input"
+    },
+    {
+      "artifact": "after.json",
+      "id": "current_info_not_old_memory_001",
+      "originalError": "TimeoutError",
+      "parseResult": "Unexpected end of JSON input"
+    }
+  ]
+}

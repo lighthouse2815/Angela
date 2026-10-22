@@ -1,0 +1,295 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Recall regression evidence, separate from generation quality",
+  "productionFixCommit": "9f77e80",
+  "before": {
+    "sourceCommit": "5a51329b1dc6beb79bf9f6b3f570666f0d966d98",
+    "datasetSha256": "d4209cd00a219970479c971dd564b50ac47fffff827dedbc7278f0acdac28e27",
+    "mode": "offline-lexical-with-explicit-extraction-fixtures",
+    "topK": 5,
+    "summary": {
+      "cases": 128,
+      "categories": 16,
+      "metrics": {
+        "Recall hit rate": {
+          "count": 101,
+          "total": 106,
+          "rate": 0.9528301886792453
+        },
+        "Wrong-memory rate": {
+          "count": 0,
+          "total": 6,
+          "rate": 0
+        },
+        "Superseded-memory error rate": {
+          "count": 0,
+          "total": 16,
+          "rate": 0
+        },
+        "False shared-memory rate": {
+          "count": 0,
+          "total": 8,
+          "rate": 0
+        },
+        "Irrelevant-memory injection rate": {
+          "count": 0,
+          "total": 32,
+          "rate": 0
+        },
+        "Context hit rate": {
+          "count": 98,
+          "total": 106,
+          "rate": 0.9245283018867925
+        },
+        "Forbidden-content rate": {
+          "count": 0,
+          "total": 32,
+          "rate": 0
+        },
+        "Case pass rate": {
+          "count": 120,
+          "total": 128,
+          "rate": 0.9375
+        }
+      },
+      "byCategory": {
+        "preference": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "preference_change": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "conversation_recall": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "last_conversation": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "plan_vs_completed": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "commitment": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "semantic_paraphrase": {
+          "count": 0,
+          "total": 8,
+          "rate": 0
+        },
+        "episodic_recall": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "workflow_recall": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "contradiction": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "no_shared_memory": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "not_yet_happened": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "isolation": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "long_gap": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "irrelevant_memory": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "vietnamese_variants": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        }
+      }
+    },
+    "rawReportSha256": "fcf02ccd657ec8320c6f5f4ce68853c039fc66e4f79eb915d4133ce38cc425b4"
+  },
+  "after": {
+    "sourceCommit": "d83a744d6cf9169a9f3d5ef416d604ebba961e32",
+    "datasetSha256": "d4209cd00a219970479c971dd564b50ac47fffff827dedbc7278f0acdac28e27",
+    "mode": "offline-lexical-with-explicit-extraction-fixtures",
+    "topK": 5,
+    "summary": {
+      "cases": 128,
+      "categories": 16,
+      "metrics": {
+        "Recall hit rate": {
+          "count": 101,
+          "total": 106,
+          "rate": 0.9528301886792453
+        },
+        "Wrong-memory rate": {
+          "count": 0,
+          "total": 6,
+          "rate": 0
+        },
+        "Superseded-memory error rate": {
+          "count": 0,
+          "total": 16,
+          "rate": 0
+        },
+        "False shared-memory rate": {
+          "count": 0,
+          "total": 8,
+          "rate": 0
+        },
+        "Irrelevant-memory injection rate": {
+          "count": 0,
+          "total": 32,
+          "rate": 0
+        },
+        "Context hit rate": {
+          "count": 98,
+          "total": 106,
+          "rate": 0.9245283018867925
+        },
+        "Forbidden-content rate": {
+          "count": 0,
+          "total": 32,
+          "rate": 0
+        },
+        "Case pass rate": {
+          "count": 120,
+          "total": 128,
+          "rate": 0.9375
+        }
+      },
+      "byCategory": {
+        "preference": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "preference_change": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "conversation_recall": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "last_conversation": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "plan_vs_completed": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "commitment": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "semantic_paraphrase": {
+          "count": 0,
+          "total": 8,
+          "rate": 0
+        },
+        "episodic_recall": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "workflow_recall": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "contradiction": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "no_shared_memory": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "not_yet_happened": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "isolation": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "long_gap": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "irrelevant_memory": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        },
+        "vietnamese_variants": {
+          "count": 8,
+          "total": 8,
+          "rate": 1
+        }
+      }
+    },
+    "rawReportSha256": "137abb84908d38f68f388b0e777202fa36ddaf8618126b70a5147b7d9ced408d"
+  },
+  "summaryUnchanged": true,
+  "existingFailures": [
+    "semantic_paraphrase: 0/8 complete passes in both runs"
+  ],
+  "checks": {
+    "cliTests": 415,
+    "generationRunnerTests": 71,
+    "companionRecallTests": 45,
+    "cliTypecheck": "passed",
+    "generationTypecheck": "passed",
+    "companionTypecheck": "passed",
+    "cliBuild": "passed",
+    "scopedLint": "passed",
+    "rootLint": {
+      "errors": 0,
+      "warnings": 603
+    },
+    "diffCheck": "passed"
+  },
+  "note": "Both recall runs used the production evaluator in lexical mode. The after run started before the fix commit and contains that commit’s exact production changes. Generation source identity is independently recorded in after.json."
+}

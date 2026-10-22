@@ -188,3 +188,12 @@ The baseline runner exits 2 because infrastructure failures remain. A strict qua
 
 The repository remains unsuitable for an unconditional 100% behavior-compliance claim.
 The next change must preserve this dataset and baseline and target only failures established above.
+
+## After comparison
+
+The immutable baseline above remains unchanged.
+The two production context fixes in `9f77e80` are assessed in [IMPROVEMENTS.md](./IMPROVEMENTS.md).
+The after run attempted all 57 cases: 27/29 validly judged complete passes, with 28 infrastructure failures.
+Different valid-case coverage and reviewed judge false passes prevent a general compliance claim.
+Raw after evidence is in [after.json](./after.json); paired results and hashes are in [comparison.json](./comparison.json).
+Recall summaries remain identical, including 120/128 complete cases and zero wrong-memory, supersession, and irrelevant-injection errors.
