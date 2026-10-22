@@ -52,7 +52,7 @@ stdenvNoCC.mkDerivation (final: {
     buildPhase = ''
       runHook preBuild
 
-      pnpm -F @proj-airi/stage-web... run build
+      pnpm -F @angela/web... run build
 
       runHook postBuild
     '';
