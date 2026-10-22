@@ -167,8 +167,8 @@ export class OpenLoops {
     return claimed
   }
 
-  /** Commit the one-shot cap immediately before external presentation. Uncertain delivery is never retried after this point. */
-  async present(id: string, token: string) {
+  /** Reserves the at-most-once presentation attempt before calling the adapter. Any subsequent failure can lose the follow-up. */
+  async reservePresentation(id: string, token: string) {
     let valid = false
     await this.edit((state) => {
       const loop = state.loops.find(loop => loop.id === id)

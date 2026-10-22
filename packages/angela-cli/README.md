@@ -1119,7 +1119,9 @@ The store admits 50 active records and retains at most 30 inactive records for s
 Current model context includes at most six workspace-local loop summaries.
 
 CLI and Telegram companion hosts deliver deterministic text without a model.
-Implicit delivery saves its one-shot cap before presentation. A crash at that boundary can lose a question but cannot replay it.
+Implicit delivery reserves an at-most-once presentation attempt before calling the adapter.
+A failure after reservation and before confirmed external presentation can lose the implicit follow-up.
+Process crashes, Telegram API errors, stdout failures, adapter exceptions, and network failures do not retry a reserved attempt.
 Task reminders retain their existing retry and acknowledgment guarantees.
 The standalone desktop reminder service continues to deliver explicit Tasks only.
 

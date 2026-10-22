@@ -141,9 +141,10 @@ Before presentation, the source checks current privacy, fresh task suppression, 
 A pre-presentation failure releases the claim and waits 60 seconds before retry.
 A crashed claim owner becomes recoverable after lease expiry.
 
-Implicit delivery commits `promptCount = 1` and `lastPromptedAt` immediately before the external side effect.
-This provides at-most-once attempts across crashes and repeated restarts.
-A crash or transport failure after this write can lose a question. It cannot cause repeated implicit nagging.
+`reservePresentation` commits `promptCount = 1` and `lastPromptedAt` before the external side effect.
+This provides at-most-once presentation attempts across failures and repeated restarts.
+A failure after reservation and before confirmed external presentation can lose the implicit follow-up.
+This includes process crashes, Telegram API errors, stdout write failures, adapter exceptions, and network failures. These attempts are not retried.
 The `proactive.prompted` event records the committed attempt, not confirmed receipt by the user.
 Task reminders retain their existing at-least-once presentation and acknowledgment behavior.
 

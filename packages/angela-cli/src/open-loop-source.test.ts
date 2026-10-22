@@ -130,3 +130,16 @@ it('applies quiet hours, recent activity, and a durable shared-store burst cap',
   await source.refresh(new AbortController().signal, {}, [])
   expect(presented).toHaveLength(2)
 })
+
+it.each(['Telegram API error', 'stdout write failure', 'adapter exception', 'network failure'])('does not retry a reserved attempt after %s', async (failure) => {
+  const { directory, clock, loops, tasks, advance } = await setup()
+  const present = vi.fn().mockRejectedValue(new Error(failure))
+  const notifications = new ReminderNotifications(cliMessages.en.tasks, 'en', present)
+  const source = new OpenLoopSource(loops, clock, 'UTC', new ProactivePolicy(), notifications, async () => true, () => {}, tasks)
+  await expect(source.refresh(new AbortController().signal, {}, [])).rejects.toThrow(failure)
+  expect((await loops.list())[0]?.promptCount).toBe(1)
+  advance(18)
+  const recovered = new OpenLoopSource(new OpenLoops(directory, cliMessages.en.tasks, clock), clock, 'UTC', new ProactivePolicy(), notifications, async () => true)
+  await recovered.refresh(new AbortController().signal, {}, [])
+  expect(present).toHaveBeenCalledOnce()
+})

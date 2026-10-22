@@ -46,10 +46,10 @@ it('deduplicates aliases, persists the cap across hosts, fences claims, and reop
   expect(claimed?.claim).toBeDefined()
   expect(await other.claim(first.id)).toBeUndefined()
   advance(1)
-  expect(await loops.present(first.id, claimed!.claim!.token)).toBe(false)
+  expect(await loops.reservePresentation(first.id, claimed!.claim!.token)).toBe(false)
   const recovered = await other.claim(first.id)
   expect(recovered?.claim?.token).not.toBe(claimed!.claim!.token)
-  expect(await other.present(first.id, recovered!.claim!.token)).toBe(true)
+  expect(await other.reservePresentation(first.id, recovered!.claim!.token)).toBe(true)
   for (let index = 0; index < 3; index++)
     expect(await new OpenLoops(directory, cliMessages.en.tasks, clock).claim(first.id)).toBeUndefined()
   expect((await loops.list())[0]?.promptCount).toBe(1)
@@ -115,7 +115,7 @@ it('retains prompt caps on repeated active mentions and bounds frequent conversa
   const loop = (await notice('Auth vẫn lỗi.'))!
   advance(4)
   const claimed = (await loops.claim(loop.id))!
-  expect(await loops.present(loop.id, claimed.claim!.token)).toBe(true)
+  expect(await loops.reservePresentation(loop.id, claimed.claim!.token)).toBe(true)
   advance(1)
   await notice('Refresh token vẫn chưa chạy.')
   expect((await loops.list())[0]).toMatchObject({ id: loop.id, promptCount: 1 })

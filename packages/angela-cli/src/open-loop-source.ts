@@ -25,12 +25,12 @@ export class OpenLoopSource implements ProactiveSource {
       if (!claimed?.claim)
         continue
       const token = claimed.claim.token
-      let presented = false
+      let reserved = false
       const deliverySignal = AbortSignal.any([signal, AbortSignal.timeout(30_000)])
       try {
         await this.notifier.notifyOpenLoop(claimed, deliverySignal, async () => {
           deliverySignal.throwIfAborted()
-          if (presented)
+          if (reserved)
             throw new Error('Open loop presentation already consumed')
           if (!await this.allowed())
             throw new Error('Open loop privacy changed')
@@ -41,12 +41,12 @@ export class OpenLoopSource implements ProactiveSource {
             throw new Error('Open loop was removed')
           const current = { ...fresh, claim: undefined }
           const decision = this.policy.evaluateCandidate(this.loops.candidate(current), this.clock.now(), this.timezone, { ...combined, lastActivityAt: Math.max(combined.lastActivityAt, latestActivity.lastActivityAt ?? 0) })
-          if (!decision.notify || !await this.loops.present(loop.id, token))
+          if (!decision.notify || !await this.loops.reservePresentation(loop.id, token))
             throw new Error('Open loop claim expired or changed')
-          presented = true
+          reserved = true
           deliverySignal.throwIfAborted()
         })
-        if (!presented)
+        if (!reserved)
           throw new Error('Open loop notifier did not verify presentation')
       }
       finally {
