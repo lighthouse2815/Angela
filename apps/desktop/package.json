@@ -44,7 +44,7 @@
   "dependencies": {
     "@angela/audio": "workspace:^",
     "@angela/ccc": "workspace:^",
-    "@angela/cli": "workspace:^",
+    "@angela/companion": "workspace:^",
     "@angela/core-agent": "workspace:^",
     "@angela/font-chillroundm": "workspace:^",
     "@angela/font-cjkfonts-allseto": "workspace:^",

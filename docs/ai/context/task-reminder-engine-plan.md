@@ -32,9 +32,9 @@ Không yêu cầu lệnh gạch chéo để sử dụng bình thường. Các l�
 Trước khi mã hóa:
 
 1. Đọc hoàn toàn gốc `AGENTS.md` và làm theo.
-2. Kiểm tra `packages/angela-cli` và sử dụng lại tính bền vững hiện có, chat/tool, cấu hình, ghi nhật ký, prompt, giọng nói, Telegram và các mẫu thử nghiệm nếu có.
+2. Kiểm tra `apps/cli` và sử dụng lại tính bền vững hiện có, chat/tool, cấu hình, ghi nhật ký, prompt, giọng nói, Telegram và các mẫu thử nghiệm nếu có.
 3. Tìm kiếm trước khi tạo tiện ích. Không giới thiệu các mẫu lưu trữ, xác thực, thời gian hoặc xử lý lỗi một lần nếu đã tồn tại các mẫu tương đương.
-4. Giữ tính năng này bên trong `packages/angela-cli` trừ khi kiến ​​trúc hiện tại yêu cầu gói dùng chung một cách rõ ràng.
+4. Giữ tính năng này bên trong `apps/cli` trừ khi kiến ​​trúc hiện tại yêu cầu gói dùng chung một cách rõ ràng.
 5. Không thêm phần phụ thuộc mới mà không kiểm tra trước xem kho lưu trữ đã có phần phụ thuộc hoặc tiện ích phù hợp hay chưa.
 6. Sử dụng tên tệp kebab-case.
 7. Sử dụng Valibot cho các lược đồ persisted-data/tool-input khi cần xác thực, phù hợp với các quy tắc gốc.
@@ -149,7 +149,7 @@ Task store  Scheduler
 Phân chia tên miền được đề xuất, điều chỉnh theo cấu trúc repo thực tế:
 
 ```text
-packages/angela-cli/src/
+apps/cli/src/
   tasks/
     types.ts
     schema.ts
@@ -572,7 +572,7 @@ Hãy tuân theo thứ tự này trừ khi kiến ​​trúc kho lưu trữ cung
 9. Tái phát.
 10. CLI thông báo.
 11. Tích hợp giọng nói nếu nó có thể được thực hiện một cách rõ ràng mà không cần mở rộng phạm vi.
-12. Cập nhật `packages/angela-cli/README.md` với hành vi thực tế của người dùng đã được triển khai.
+12. Cập nhật `apps/cli/README.md` với hành vi thực tế của người dùng đã được triển khai.
 13. Chạy kiểm tra theo yêu cầu của `AGENTS.md`.
 
 Không bắt đầu mốc nền daemon cho đến khi V1 trong quá trình xử lý chính xác và được kiểm tra.
@@ -612,10 +612,10 @@ Cột mốc này được thực hiện khi:
 - Các quy trình daily/weekly hoạt động;
 - logic lập lịch có các bài kiểm tra đồng hồ giả xác định;
 - CLI prompt vẫn có thể sử dụng được khi lời nhắc xuất hiện;
-- vượt qua các bài kiểm tra `packages/angela-cli` có liên quan;
+- vượt qua các bài kiểm tra `apps/cli` có liên quan;
 - thẻ kiểm tra kiểu dữ liệu có liên quan;
 - Các lượt vượt qua `pnpm lint` hoặc mọi lỗi tồn tại trước đó không liên quan đều được báo cáo rõ ràng;
-- `packages/angela-cli/README.md` ghi lại chức năng được triển khai;
+- `apps/cli/README.md` ghi lại chức năng được triển khai;
 - không có tính năng mã hóa-agent không liên quan nào được thêm vào.
 
 ---
@@ -624,7 +624,7 @@ Cột mốc này được thực hiện khi:
 
 ## Hướng dẫn sử dụng Codex
 
-Triển khai hoàn toàn kế hoạch này cho `packages/angela-cli`, tuân theo kiến ​​trúc thực tế hiện tại của kho lưu trữ và tất cả các hướng dẫn `AGENTS.md` hiện hành.
+Triển khai hoàn toàn kế hoạch này cho `apps/cli`, tuân theo kiến ​​trúc thực tế hiện tại của kho lưu trữ và tất cả các hướng dẫn `AGENTS.md` hiện hành.
 
 Không dừng lại chỉ sau tạo khung ban đầu các loại tên miền. Tiếp tục xem qua V1 có thể sử dụng được mô tả ở trên, bao gồm các bài kiểm tra và tài liệu. Nếu kho lưu trữ đã chứa cơ chế tương đương, hãy tích hợp hoặc tái cấu trúc cơ chế đó thay vì sao chép nó.
 

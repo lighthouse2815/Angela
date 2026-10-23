@@ -28,18 +28,18 @@ minimumReleaseAgeExclude:
 
 shellEmulator: true
 packages:
-  - packages/**
-  - plugins/**
-  - integrations/**
-  - services/**
-  - examples/**
-  - evals/*
-  - engines/**
   - apps/**
-  - server/**
+  - core/**
+  - providers/**
+  - capabilities/**
+  - integrations/**
+  - backend/**
+  - shared/**
+  - evals/*
   - '!**/dist/**'
-  # The PostgreSQL/media Telegram prototype stays archived. The supported adapter is packages/angela-cli/src/telegram.ts.
-  - '!integrations/telegram-bot'
+  - '!**/vendor/**'
+  - '!**/addons/**'
+  - '!integrations/telegram/archive'
 
 overrides:
   '@types/hast': 'catalog:'

@@ -33,7 +33,7 @@ jobs:
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
       - name: Shared companion runtime tests
-        run: pnpm -F @angela/cli exec vitest run --config vitest.config.ts src/companion src/runtime --maxWorkers=1 --no-file-parallelism --testTimeout=30000 --hookTimeout=30000
+        run: pnpm -F @angela/companion exec vitest run --config vitest.config.ts src/companion src/runtime --maxWorkers=1 --no-file-parallelism --testTimeout=30000 --hookTimeout=30000
       - name: Desktop Node tests
         run: pnpm exec vitest run --project stage-tamagotchi:node --testTimeout=30000 --hookTimeout=30000
       - name: Desktop companion browser tests

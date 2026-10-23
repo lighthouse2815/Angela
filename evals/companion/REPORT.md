@@ -69,8 +69,8 @@ Lexical candidate dùng OR giữa các token. Có token trùng là đủ vào t�
 `Recall.prepare` đưa nguồn hợp lệ vào context theo budget, chưa loại được các trường hợp khác nghĩa này.
 Nguồn được đọc đúng và vẫn sai chủ đề. Không đổi expectation để che lỗi relevance.
 
-[RecallIndex.search](../../packages/angela-cli/src/recall-index.ts),
-[Recall.search và Recall.prepare](../../packages/angela-cli/src/recall.ts) chứa các đường xử lý liên quan.
+[RecallIndex.search](../../apps/cli/src/recall-index.ts),
+[Recall.search và Recall.prepare](../../apps/cli/src/recall.ts) chứa các đường xử lý liên quan.
 Chưa sửa các điểm yếu này vì task chỉ tạo bộ evaluation.
 
 ## Case không đạt

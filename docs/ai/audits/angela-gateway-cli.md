@@ -8,7 +8,7 @@ Ngày: 23-10-2026 Môi trường: Linux, Node.js 26.11.1, pnpm 11.24.0.
 
 ## Phạm vi phân phối
 
-Angela bao gồm công cụ nhà cung cấp làm nguồn và xây dựng nó thông qua gói `@angela/gateway` workspace. Cả workspace đều không phụ thuộc vào gói cổng upstream được xuất bản riêng. Sổ đăng ký đã nhập chứa 134 định nghĩa nhà cung cấp, bao gồm LLM và các dịch vụ truyền thông. Bản ghi nguồn [](../../../third_party/angela-gateway/README.angela.md) xác định bản sửa đổi được ghim và thông báo MIT.
+Angela bao gồm công cụ nhà cung cấp làm nguồn và xây dựng nó thông qua gói `@angela/gateway` workspace. Cả workspace đều không phụ thuộc vào gói cổng upstream được xuất bản riêng. Sổ đăng ký đã nhập chứa 134 định nghĩa nhà cung cấp, bao gồm LLM và các dịch vụ truyền thông. Bản ghi nguồn [](../../../providers/gateway/vendor/README.angela.md) xác định bản sửa đổi được ghim và thông báo MIT.
 
 CLI kiểm soát việc khởi động, kiểm tra tài khoản, tạo tài khoản dựa trên khóa, kích hoạt tài khoản, khám phá mô hình và lựa chọn nhà cung cấp được chia sẻ. OAuth và các mục nhập đặc biệt sử dụng bảng điều khiển cục bộ đi kèm. Quá trình khởi động liên kết với loopback và bắt đầu làm mới token mà không cần khởi động dịch vụ hệ thống upstream.
 
@@ -41,7 +41,7 @@ pnpm -F @angela/cli exec vitest run --config vitest.config.ts src/gateway.test.t
 
 Kết quả: sáu bài kiểm tra đã được thông qua. Chúng bao gồm cấu hình riêng tư, cổng bị chiếm dụng, ranh giới xác thực, định tuyến mô hình, truyền dữ liệu liên tục, tính bền vững của tài khoản và cấu hình được chia sẻ. Các cuộc kiểm tra cũng đóng gói và khởi động động cơ thực tế bên ngoài quầy thanh toán. Điều này đã phát hiện ra các liên kết tượng trưng của trình quản lý gói bị thiếu trong kho lưu trữ. Bản cài đặt nâng cao và bản sao độc lập đã giải quyết được lỗi đó.
 
-Lệnh đơn vị công cụ, từ `third_party/angela-gateway`, với `DATA_DIR` được đặt thành một thư mục tạm thời mới:
+Lệnh đơn vị công cụ, từ `providers/gateway/vendor`, với `DATA_DIR` được đặt thành một thư mục tạm thời mới:
 
 ```sh
 ../../node_modules/.bin/vitest run --config tests/vitest.config.js tests/unit/dashboard-guard.test.js tests/unit/background-token-refresh.test.js tests/unit/token-refresh-dispatch.test.js tests/unit/token-refresh-generic.test.js tests/unit/codex-refresh-token.test.js tests/unit/key-access.test.js --maxWorkers=1 --no-file-parallelism

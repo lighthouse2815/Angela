@@ -1,4 +1,5 @@
-import type { RecallHit } from '../../packages/angela-cli/src/recall-index'
+import type { RecallHit } from '@angela/companion/recall-index'
+
 import type { CompanionCase } from './schema'
 
 import { createHash } from 'node:crypto'
@@ -6,12 +7,11 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import { MemoryCapture } from '@angela/companion/memory-v2/consolidator'
+import { Recall } from '@angela/companion/recall'
+import { RecallIndex } from '@angela/companion/recall-index'
+import { buildContext } from '@angela/companion/runtime/context-builder'
 import { cliMessages } from '@angela/i18n/cli'
-
-import { MemoryCapture } from '../../packages/angela-cli/src/memory-v2/consolidator'
-import { Recall } from '../../packages/angela-cli/src/recall'
-import { RecallIndex } from '../../packages/angela-cli/src/recall-index'
-import { buildContext } from '../../packages/angela-cli/src/runtime/context-builder'
 
 interface Source {
   ids: string[]

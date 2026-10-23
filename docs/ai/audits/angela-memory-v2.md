@@ -41,7 +41,7 @@ Hai đường cơ sở phục vụ các mục đích khác nhau:
 - `836a68c`: runtime với Recall kế thừa, trước Bộ nhớ V2 thu nhận dữ liệu. Khởi động sử dụng ba mẫu quy trình xen kẽ.
 - `2156d51`: Bộ nhớ V2 trước WAL và phân khối. Đường cơ sở này cho phép so sánh hợp nhất và tranh chấp.
 
-[raw trước data](../../../packages/angela-cli/benchmarks/memory-v2-before-tuning.json) và [raw sau data](../../../packages/angela-cli/benchmarks/memory-v2-after.json) bao gồm các mẫu phân vị và kế hoạch truy vấn.
+[raw trước data](../../../apps/cli/benchmarks/memory-v2-before-tuning.json) và [raw sau data](../../../apps/cli/benchmarks/memory-v2-after.json) bao gồm các mẫu phân vị và kế hoạch truy vấn.
 
 | Hoạt động | Trước khi điều chỉnh, ms | Sau thưa cô |
 | --- | ---: | ---: |
@@ -72,7 +72,7 @@ Legacy Recall đo được 5,00 ms khi lạnh và 3,37/5,93 ms ấm p50/p95. M�
 
 Các yêu cầu nồng nhiệt hiện vẫn tiếp tục quan sát và biên soạn một tập phim. Điều đó làm tăng thêm khoảng 6,5 ms vào yêu cầu mẫu kiểm thử trung bình. Chi phí trung bình của văn bản đầu tiên tăng khoảng 2,9 mili giây. Chi phí này bảo tồn bộ nhớ an toàn khi gặp sự cố. Độ trễ nhà cung cấp sản xuất được loại trừ khỏi mẫu kiểm thử này. Những mẫu khởi động đó giữ lại một phạm vi. Thay vào đó, các phép đo vòng đời của Telegram bên dưới sẽ thực hiện bộ điều hợp thực tế.
 
-Các mẫu khởi động [](../../../packages/angela-cli/benchmarks/runtime-startup-after.json) giữ lại mọi kết quả của quá trình. Các mẫu [ cũ](../../../packages/angela-cli/benchmarks/runtime-startup-before.json) sử dụng cùng một yêu cầu mẫu kiểm thử.
+Các mẫu khởi động [](../../../apps/cli/benchmarks/runtime-startup-after.json) giữ lại mọi kết quả của quá trình. Các mẫu [ cũ](../../../apps/cli/benchmarks/runtime-startup-before.json) sử dụng cùng một yêu cầu mẫu kiểm thử.
 
 Mọi mẫu khởi động đều kết thúc với trạng thái runtime, trình xử lý sự kiện, lời nhắc route và bộ tính giờ nhắc nhở bằng 0. Điểm chuẩn bộ nhớ đã kết thúc với không có chỉ mục Recall, trình theo dõi, bộ hẹn giờ và ứng dụng khách nhúng nào. Các thử nghiệm vòng đời tài nguyên cũng bao gồm việc thu thập, phát hành, hủy lặp lại và kích hoạt tính năng dọn dẹp MCP.
 
@@ -119,8 +119,8 @@ Do đó, bài kiểm tra monorepo hoàn chỉnh cổng kiểm tra vẫn có màu
 Chạy các lệnh từ thư mục gốc của kho lưu trữ, từng lệnh một:
 
 ```sh
-pnpm exec tsx packages/angela-cli/scripts/benchmark-memory-v2.ts WAL memory-v2-result.json
-pnpm exec tsx packages/angela-cli/scripts/benchmark-runtime-startup.ts startup-result.json
+pnpm exec tsx apps/cli/scripts/benchmark-memory-v2.ts WAL memory-v2-result.json
+pnpm exec tsx apps/cli/scripts/benchmark-runtime-startup.ts startup-result.json
 pnpm -F @angela/cli exec vitest run --config vitest.config.ts src/memory-v2 --maxWorkers=1
 ```
 
@@ -155,7 +155,7 @@ Bước tích hợp tiếp theo, sau quá trình xem xét cốt lõi, là bộ �
 | Sản xuất open/send/close | 22,01 / 42,57 mili giây | 13,47 / 28,41 mili giây | 51/51 |
 | Tài liệu tham khảo được giữ lại | 12,79 / 15,94 mili giây | 7,84 / 11,49 mili giây | 4/4 |
 
-Phần trăm sử dụng 30 tin nhắn tiếp theo của một người dùng. Số lượng bao gồm tất cả 51 yêu cầu. Độ trễ yêu cầu bao gồm tính bền bỉ của bộ chuyển đổi Telegram và phân phối HTTP cục bộ. Văn bản đầu tiên dừng ở sự kiện phát trực tiếp runtime. Chuẩn bị bối cảnh bao gồm khởi tạo store, Recall và chuẩn bị công cụ. Thời gian SQLite bao gồm việc tạo thư mục, quyền, mở cơ sở dữ liệu và công việc lược đồ. Nó không cô lập thời gian của tòa nhà SQLite. Chế độ đầu tiên cũng trả tiền khởi động mô-đun quy trình. Phần trăm ấm loại trừ yêu cầu đầu tiên của từng chế độ. Lần chạy này hỗ trợ tái sử dụng ấm có giới hạn. Nó không dự đoán độ trễ mạng thực hoặc mô hình. Số đo thô: `packages/angela-cli/benchmarks/telegram-lifecycle-before.json`.
+Phần trăm sử dụng 30 tin nhắn tiếp theo của một người dùng. Số lượng bao gồm tất cả 51 yêu cầu. Độ trễ yêu cầu bao gồm tính bền bỉ của bộ chuyển đổi Telegram và phân phối HTTP cục bộ. Văn bản đầu tiên dừng ở sự kiện phát trực tiếp runtime. Chuẩn bị bối cảnh bao gồm khởi tạo store, Recall và chuẩn bị công cụ. Thời gian SQLite bao gồm việc tạo thư mục, quyền, mở cơ sở dữ liệu và công việc lược đồ. Nó không cô lập thời gian của tòa nhà SQLite. Chế độ đầu tiên cũng trả tiền khởi động mô-đun quy trình. Phần trăm ấm loại trừ yêu cầu đầu tiên của từng chế độ. Lần chạy này hỗ trợ tái sử dụng ấm có giới hạn. Nó không dự đoán độ trễ mạng thực hoặc mô hình. Số đo thô: `apps/cli/benchmarks/telegram-lifecycle-before.json`.
 
 <a id="telegram-lifecycle-closure"></a>
 
@@ -209,7 +209,7 @@ Lần chạy cuối cùng đã hoàn thành 1.000 chu kỳ trong 8,94 giây và 
 - `pnpm typecheck --concurrency=1`: **Tác vụ 53/53**, 52 tác vụ được lưu vào bộ nhớ đệm, với CLI đã thay đổi được kiểm tra lại.
 - Root kiểm tra kiểu dữ liệu yêu cầu tệp nhị phân pnpm native được cài đặt trên PATH vì trình bao bọc cục bộ thiếu shebang.
 - `pnpm -F @angela/cli build` và `--help` có thể thực thi được đã xây dựng: đã vượt qua sau khi điều chỉnh thời hạn.
-- `pnpm exec eslint packages/angela-cli/src packages/angela-cli/scripts`: đã vượt qua mà không có lỗi gói nào.
+- `pnpm exec eslint apps/cli/src apps/cli/scripts`: đã vượt qua mà không có lỗi gói nào.
 - `pnpm lint`: đã qua. ESLint báo cáo 0 lỗi và 603 cảnh báo. Giai đoạn Oxlint báo cáo 12 cảnh báo.
 - `.github/workflows/cli-core.yml` chạy CLI cổng kiểm tra đầy đủ trên PR #1 với một công việc và một Vitest worker.
 - [ chạy lõi thành công đầu tiên](https://github.com/lighthouse2815/Angela/actions/runs/39723476242) đã xác minh cài đặt mới và các bản dựng tiên quyết.
@@ -222,4 +222,4 @@ Chẩn đoán của người quan sát giữ lại tối đa 16 bản ghi siêu 
 
 Tác vụ không thay đổi việc triển khai lưu trữ, cấp quyền, thanh lọc, nén hoặc làm giàu Bộ nhớ V2. 19 lỗi Vitest gốc hiện có vẫn nằm ngoài nhiệm vụ này. Chúng không được sửa đổi, bỏ qua hoặc chạy lại dưới dạng cổng kiểm tra cốt lõi. desktop IPC, mở rộng bộ nhớ đồng hành Discord, giấc mơ tự động và công việc LLM trong nền vẫn bị trì hoãn. trực tiếp Telegram transport, models/embeddings thực, giọng nói và máy ảnh yêu cầu kiểm tra sản xuất riêng biệt.
 
-Bằng chứng thô: [Vòng đời của Telegram](../../../packages/angela-cli/benchmarks/telegram-lifecycle-after.json), [chu kỳ tài nguyên](../../../packages/angela-cli/benchmarks/session-resources-after.json) và [lệnh sao chép](../../../packages/angela-cli/benchmarks/README.md#telegram-lifecycle-closure).
+Bằng chứng thô: [Vòng đời của Telegram](../../../apps/cli/benchmarks/telegram-lifecycle-after.json), [chu kỳ tài nguyên](../../../apps/cli/benchmarks/session-resources-after.json) và [lệnh sao chép](../../../apps/cli/benchmarks/README.md#telegram-lifecycle-closure).

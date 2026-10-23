@@ -32,12 +32,12 @@ jobs:
       - name: Build CLI prerequisites sequentially
         run: pnpm --filter '@angela/cli^...' --workspace-concurrency=1 run build
       - name: CLI tests
-        run: pnpm -F @angela/cli exec vitest run --config vitest.config.ts --maxWorkers=1 --testTimeout=30000 --hookTimeout=30000
+        run: pnpm -r --workspace-concurrency=1 --filter @angela/cli --filter @angela/companion --filter @angela/telegram --filter @angela/zalo --filter @angela/voice-client --filter @angela/vision --filter @angela/host-sdk --filter @angela/discord-companion exec vitest run --config vitest.config.ts --maxWorkers=1 --testTimeout=30000 --hookTimeout=30000
       - name: CLI typecheck
         run: pnpm -F @angela/cli typecheck
       - name: CLI build
         run: pnpm -F @angela/cli build
       - name: CLI lint
-        run: pnpm exec eslint packages/angela-cli/src packages/angela-cli/scripts
+        run: pnpm exec eslint apps/cli/src apps/cli/scripts core/companion/src shared/sdk/companion-host/src capabilities/voice/client/src capabilities/vision/client/src integrations/telegram/src integrations/zalo/src integrations/discord/runtime/src
       - name: Built CLI smoke check
-        run: node packages/angela-cli/dist/bin/run.mjs --help
+        run: node apps/cli/dist/bin/run.mjs --help

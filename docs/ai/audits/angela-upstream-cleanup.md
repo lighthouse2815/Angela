@@ -11,9 +11,9 @@
 | Tên cục bộ trước đây | Tên cục bộ hiện tại |
 | --- | --- |
 | `apps/desktop/src/main/services/airi` | `apps/desktop/src/main/services/angela` |
-| `packages/plugin-sdk-tamagotchi` | `packages/plugin-sdk-desktop` |
-| `packages/scenarios-stage-tamagotchi-browser` | `packages/scenarios-desktop-browser` |
-| `packages/scenarios-stage-tamagotchi-electron` | `packages/scenarios-desktop-electron` |
+| `packages/plugin-sdk-tamagotchi` | `shared/sdk/plugin-desktop` |
+| `packages/scenarios-stage-tamagotchi-browser` | `shared/tooling/scenarios-desktop-browser` |
+| `packages/scenarios-stage-tamagotchi-electron` | `shared/tooling/scenarios-desktop-electron` |
 | `00-stage-tamagotchi.avif` | `00-desktop.avif` |
 | `05-airi-card.avif` | `05-character-card.avif` |
 
@@ -73,10 +73,10 @@ Tập lệnh xây dựng tài liệu upstream vẫn hoạt động trong cấu h
 
 Quá trình di chuyển 2026-10-23 thay đổi tên cầu nối và bộ điều hợp riêng thành Angela. Nó thay đổi các đường dẫn này và các ký hiệu riêng tư của chúng:
 
-- `integrations/discord-bot/src/adapters/airi-adapter.ts` tới `angela-adapter.ts`
-- `integrations/twitter-services/src/adapters/airi-adapter.ts` tới `angela-adapter.ts`
+- `integrations/discord/src/adapters/airi-adapter.ts` tới `angela-adapter.ts`
+- `integrations/twitter/src/adapters/airi-adapter.ts` tới `angela-adapter.ts`
 - `integrations/minecraft/src/airi` tới `src/angela`
-- `packages/server-runtime/src/server-ws/airi` tới `server-ws/angela`
+- `backend/channel/runtime/src/server-ws/airi` tới `server-ws/angela`
 - `integrations/vscode/airi-plugin-vscode` tới `angela-plugin-vscode`
 - `integrations/vscode/vscode-airi` tới `vscode-angela`
 - bốn thư mục `plugins/airi-plugin-*` cục bộ tới `plugins/angela-plugin-*`

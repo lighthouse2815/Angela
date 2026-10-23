@@ -63,7 +63,7 @@ Camera / Affect Engine
 Trước khi mã hóa:
 
 1. Đọc hoàn toàn gốc `AGENTS.md` và làm theo.
-2. Kiểm tra `packages/angela-cli` và sử dụng lại quy trình, ghi nhật ký, cấu hình, vòng đời, dọn dẹp, sự kiện, prompt/context và các mẫu thử nghiệm hiện có.
+2. Kiểm tra `apps/cli` và sử dụng lại quy trình, ghi nhật ký, cấu hình, vòng đời, dọn dẹp, sự kiện, prompt/context và các mẫu thử nghiệm hiện có.
 3. Tìm kiếm trước khi tạo tiện ích.
 4. Giữ mã tích hợp do Angela sở hữu trong cấu trúc dự án thông thường. Giữ nguồn upstream đã nhập cách ly trong `third_party/`.
 5. Không viết lại kiến ​​trúc CLI không liên quan như một phần của tính năng này.
@@ -103,7 +103,7 @@ Không sao chép tập tin thủ công mà không có nguồn gốc.
 
 Ưu tiên một trong những cách tiếp cận sau, theo thứ tự sau:
 
-1. `git subtree` thuộc `third_party/openseeface/`;
+1. `git subtree` thuộc `capabilities/vision/vendor/openseeface/`;
 2. một cơ chế cung cấp kho lưu trữ-native khác nếu kho lưu trữ Angela hiện tại rõ ràng đã sử dụng một cơ chế đó;
 3. chỉ sử dụng bản sao nguồn đơn giản nếu công cụ subtree/vendor không hoạt động được và lưu giữ siêu dữ liệu nguồn trong tài liệu.
 
@@ -112,7 +112,7 @@ Hình dạng lệnh được đề xuất:
 ```bash
 git remote add openseeface https://github.com/emilianavt/OpenSeeFace.git
 git fetch openseeface
-git subtree add --prefix=third_party/openseeface openseeface master
+git subtree add --prefix=capabilities/vision/vendor/openseeface openseeface master
 ```
 
 Không xóa upstream `LICENSE`, `Licenses/`, thông báo bản quyền hoặc thông báo model/license.
@@ -153,7 +153,7 @@ Angela/
 │       ├── models/
 │       └── upstream source...
 │
-└── packages/angela-cli/src/
+└── apps/cli/src/
     └── perception/
         ├── camera/
         ├── face/
@@ -328,7 +328,7 @@ Trước khi tích hợp với logic hội thoại của Angela, hãy làm cho t
 
 Nhiệm vụ:
 
-1. Nhà cung cấp OpenSeeFace theo `third_party/openseeface/` trong khi vẫn bảo quản giấy phép.
+1. Nhà cung cấp OpenSeeFace theo `capabilities/vision/vendor/openseeface/` trong khi vẫn bảo quản giấy phép.
 2. Tài liệu đã nhập bản sửa đổi upstream chính xác.
 3. Xác định bộ source/model/dependency yêu cầu tối thiểu.
 4. Xác minh webcam thu nhận dữ liệu hoạt động trên nền tảng phát triển chính.
@@ -339,7 +339,7 @@ Nhiệm vụ:
 Đường dẫn worker do Angela sở hữu được đề xuất:
 
 ```text
-packages/angela-cli/python/camera_worker/
+apps/cli/python/camera_worker/
 ```
 
 hoặc một vị trí hiện có tương đương cho runtime phụ trợ.
@@ -998,7 +998,7 @@ Giữ các chỉnh sửa được chia sẻ ở mức tối thiểu.
 Chi nhánh Camera sở hữu chủ yếu:
 
 ```text
-third_party/openseeface/
+capabilities/vision/vendor/openseeface/
 perception/camera
 perception/face
 perception/affect
@@ -1032,8 +1032,8 @@ Khi có thể, hãy tách các phần tích hợp thành các cam kết nhỏ đ
 
 Hãy tuân theo thứ tự này trừ khi kiến ​​trúc hiện tại có đề xuất khác:
 
-1. Đọc `AGENTS.md` và kiểm tra `packages/angela-cli`.
-2. Nhà cung cấp OpenSeeFace theo `third_party/openseeface/` với giấy phép được bảo lưu.
+1. Đọc `AGENTS.md` và kiểm tra `apps/cli`.
+2. Nhà cung cấp OpenSeeFace theo `capabilities/vision/vendor/openseeface/` với giấy phép được bảo lưu.
 3. Ghi upstream revision/provenance.
 4. Tạo máy ảnh Python worker tối thiểu xung quanh nguồn được cung cấp.
 5. Xác minh worker theo cách thủ công bằng webcam.
@@ -1049,7 +1049,7 @@ Hãy tuân theo thứ tự này trừ khi kiến ​​trúc hiện tại có đ
 15. Triển khai `CameraContextProvider`.
 16. Tích hợp các tín hiệu mềm nhỏ gọn vào đường dẫn Angela context/prompt hiện có.
 17. Thêm hiệu chuẩn tùy chọn.
-18. Cập nhật `packages/angela-cli/README.md` với hành vi được triển khai thực tế và các yêu cầu về dependency/setup.
+18. Cập nhật `apps/cli/README.md` với hành vi được triển khai thực tế và các yêu cầu về dependency/setup.
 19. Chạy tất cả các bước kiểm tra theo yêu cầu của `AGENTS.md`.
 
 Không thêm cảm xúc nâng cao mô hình trước khi đường dẫn V1 ổn định.

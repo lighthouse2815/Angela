@@ -7,12 +7,12 @@ import { createHash } from 'node:crypto'
 import { readFile, rename, writeFile } from 'node:fs/promises'
 import { parseArgs } from 'node:util'
 
+import { readConfig } from '@angela/host-sdk/config'
 import { getGenerationProvider, listProviders } from '@angela/provider-inference'
 import { errorMessageFrom } from '@moeru/std'
 
 import * as v from 'valibot'
 
-import { readConfig } from '../../packages/angela-cli/src/config'
 import { observe } from './harness'
 import { loadCases } from './schema'
 import { deterministicChecks, judge, judgePrompt, resultSchema, summarize } from './scoring'
@@ -71,7 +71,7 @@ async function main() {
     startedAt: new Date().toISOString(),
     finishedAt: null as string | null,
     sourceCommit: execFileSync('git', ['rev-parse', 'HEAD'], { cwd: import.meta.dirname, encoding: 'utf8' }).trim(),
-    productionDiffSha256: hash(execFileSync('git', ['diff', 'HEAD', '--', 'packages/angela-cli', 'packages/core-agent', 'packages/provider-inference'], { cwd: new URL('../..', import.meta.url), encoding: 'utf8' })),
+    productionDiffSha256: hash(execFileSync('git', ['diff', 'HEAD', '--', 'apps/cli', 'core/agent', 'providers/inference'], { cwd: new URL('../..', import.meta.url), encoding: 'utf8' })),
     datasetSha256: hash(await readFile(path)),
     node: process.version,
     mode: values.live ? 'live-production-runtime' : 'prepare-only-no-network',
@@ -126,7 +126,7 @@ async function main() {
       throw new Error('Checkpoint identity differs or run already completed')
     if (previous.results.length > cases.length || previous.results.some((result, index) => result.id !== cases[index]?.id || result.category !== cases[index]?.category || JSON.stringify(result.ruleIds) !== JSON.stringify(cases[index]?.expected.expectedRuleIds)))
       throw new Error('Checkpoint results are not a dataset prefix')
-    execFileSync('git', ['diff', '--exit-code', previous.sourceCommit, 'HEAD', '--', 'packages/angela-cli', 'packages/core-agent', 'packages/provider-inference'], { cwd: new URL('../..', import.meta.url), stdio: 'pipe' })
+    execFileSync('git', ['diff', '--exit-code', previous.sourceCommit, 'HEAD', '--', 'apps/cli', 'core/agent', 'providers/inference'], { cwd: new URL('../..', import.meta.url), stdio: 'pipe' })
     results.push(...previous.results)
     report.resumedFromSha256 = hash(raw)
     report.executionSegments.push(...previous.executionSegments ?? [{ sourceCommit: previous.sourceCommit, node: previous.node, startedAt: previous.startedAt, fromCaseIndex: 0, concurrency: 1 }])

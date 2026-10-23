@@ -17,7 +17,7 @@ import { Download } from '@proj-airi/unplugin-fetch'
 import { DownloadLive2DSDK } from '@proj-airi/unplugin-live2d-sdk'
 import { defineKirieConfig } from 'kirie'
 
-const stageUIAssetsRoot = resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src', 'assets'))
+const stageUIAssetsRoot = resolve(join(import.meta.dirname, '..', '..', 'shared/ui/stage/src', 'assets'))
 const sharedCacheDir = resolve(join(import.meta.dirname, '..', '..', '.cache'))
 const rendererRoot = resolve(join(import.meta.dirname, 'src-web', 'src', 'renderer'))
 
@@ -65,16 +65,16 @@ export default defineKirieConfig({
 
       resolve: {
         alias: {
-          '@angela/server-sdk': resolve(join(import.meta.dirname, '..', '..', 'packages', 'server-sdk', 'src')),
-          '@angela/i18n': resolve(join(import.meta.dirname, '..', '..', 'packages', 'i18n', 'src')),
+          '@angela/server-sdk': resolve(join(import.meta.dirname, '..', '..', 'shared/sdk/server/src')),
+          '@angela/i18n': resolve(join(import.meta.dirname, '..', '..', 'shared/i18n/src')),
           // NOTICE: the @angela/stage-ui alias resolves to a directory; rolldown
           // concatenates sub-paths without a file extension, so bare .ts files at the
           // stores/ root (e.g. mcp-tool-bridge.ts) are not found. Add explicit aliases
           // for each such file that the renderer imports from @angela/stage-ui.
-          '@angela/stage-ui/stores/mcp-tool-bridge': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src', 'stores', 'mcp-tool-bridge.ts')),
-          '@angela/stage-ui': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src')),
-          '@angela/stage-pages': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-pages', 'src')),
-          '@angela/stage-shared': resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-shared', 'src')),
+          '@angela/stage-ui/stores/mcp-tool-bridge': resolve(join(import.meta.dirname, '..', '..', 'shared/ui/stage/src', 'stores', 'mcp-tool-bridge.ts')),
+          '@angela/stage-ui': resolve(join(import.meta.dirname, '..', '..', 'shared/ui/stage/src')),
+          '@angela/stage-pages': resolve(join(import.meta.dirname, '..', '..', 'shared/ui/pages/src')),
+          '@angela/stage-shared': resolve(join(import.meta.dirname, '..', '..', 'shared/ui/stage-shared/src')),
           '@angela/stage-host-context': resolve(rendererRoot, 'host-context', 'index.ts'),
         },
       },
@@ -89,8 +89,8 @@ export default defineKirieConfig({
         },
         warmup: {
           clientFiles: [
-            `${resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-ui', 'src'))}/*.vue`,
-            `${resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-pages', 'src'))}/*.vue`,
+            `${resolve(join(import.meta.dirname, '..', '..', 'shared/ui/stage/src'))}/*.vue`,
+            `${resolve(join(import.meta.dirname, '..', '..', 'shared/ui/pages/src'))}/*.vue`,
           ],
         },
       },
@@ -143,7 +143,7 @@ export default defineKirieConfig({
           dts: resolve(rendererRoot, 'typed-router.d.ts'),
           routesFolder: [
             {
-              src: resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-pages', 'src', 'pages')),
+              src: resolve(join(import.meta.dirname, '..', '..', 'shared/ui/pages/src', 'pages')),
               exclude: base => [
                 ...base,
                 '**/settings/account/index.vue',
@@ -167,7 +167,7 @@ export default defineKirieConfig({
         Layouts({
           layoutsDirs: [
             resolve(rendererRoot, 'layouts'),
-            resolve(join(import.meta.dirname, '..', '..', 'packages', 'stage-layouts', 'src', 'layouts')),
+            resolve(join(import.meta.dirname, '..', '..', 'shared/ui/layouts/src', 'layouts')),
           ],
           pagesDirs: [resolve(rendererRoot, 'pages')],
         }),

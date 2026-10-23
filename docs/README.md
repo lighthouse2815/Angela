@@ -166,7 +166,7 @@
 > Bao gồm: RAG, hệ thống bộ nhớ, cơ sở dữ liệu nhúng, icon, tiện ích Live2D, và nhiều hơn nữa.
 
 > [!TIP]
-> Bạn có thể dịch Angela trên [Crowdin](https://crowdin.com/project/proj-airi) hoặc mở một pull request thay đổi `packages/i18n/src/locales/`. Cả hai cách đều cập nhật cùng các bản dịch.
+> Bạn có thể dịch Angela trên [Crowdin](https://crowdin.com/project/proj-airi) hoặc mở một pull request thay đổi `shared/i18n/src/locales/`. Cả hai cách đều cập nhật cùng các bản dịch.
 >
 > Không gửi bản dịch giống hệt văn bản tiếng Anh. Bản dịch đó bị từ chối khi xét duyệt. Chuỗi chưa có bản dịch sẽ hiển thị văn bản tiếng Anh.
 >
@@ -389,7 +389,7 @@ npx bumpp --no-commit --no-tag
 - [`hfup`](https://github.com/moeru-ai/hfup): Các công cụ hỗ trợ triển khai, đóng gói lên HuggingFace Spaces
 - [`xsai-transformers`](https://github.com/moeru-ai/xsai-transformers): Nhà cung cấp thử nghiệm [🤗 Transformers.js](https://github.com/huggingface/transformers.js) cho [xsAI](https://github.com/moeru-ai/xsai).
 - [WebAI: Realtime Voice Chat](https://github.com/proj-airi/webai-realtime-voice-chat): Ví dụ đầy đủ về việc triển khai voice realtime của ChatGPT từ đầu với VAD + STT + LLM + TTS.
-- [`@proj-airi/drizzle-duckdb-wasm`](https://github.com/lighthouse2815/Angela/tree/main/packages/drizzle-duckdb-wasm/README.md): Trình điều khiển Drizzle ORM cho DuckDB WASM
+- [`@proj-airi/drizzle-duckdb-wasm`](https://github.com/lighthouse2815/Angela/tree/main/backend/storage/drizzle-duckdb-wasm/README.md): Trình điều khiển Drizzle ORM cho DuckDB WASM
 - [`@proj-airi/duckdb-wasm`](https://www.npmjs.com/package/@proj-airi/duckdb-wasm): Wrapper dễ sử dụng cho `@duckdb/duckdb-wasm`
 - [AIRI Factorio](https://github.com/moeru-ai/airi-factorio): Cho phép Angela chơi Factorio
 - [Factorio RCON API](https://github.com/nekomeowww/factorio-rcon-api): RESTful API wrapper cho console máy chủ headless Factorio

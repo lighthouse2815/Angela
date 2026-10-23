@@ -1,4 +1,4 @@
-import type { OpenLoop, RuntimeChat, RuntimeSession, Task } from '@angela/cli/runtime'
+import type { OpenLoop, RuntimeChat, RuntimeSession, Task } from '@angela/companion/runtime'
 import type { StreamEvent, StreamOptions } from '@angela/core-agent'
 import type { Tool } from '@xsai/shared-chat'
 
@@ -11,8 +11,8 @@ import { realpathSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 
-import { characterDataDir, CompanionRecords } from '@angela/cli/companion'
-import { AngelaRuntime, ReminderNotifications, requestPrivacy } from '@angela/cli/runtime'
+import { characterDataDir, CompanionRecords } from '@angela/companion/companion'
+import { AngelaRuntime, ReminderNotifications, requestPrivacy } from '@angela/companion/runtime'
 import { chatMessagesToTurns } from '@angela/core-agent'
 import { cliMessages } from '@angela/i18n/cli'
 

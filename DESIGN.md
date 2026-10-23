@@ -14,7 +14,7 @@ Hãy coi stage là không gian cho nhân vật, với các nút điều khiển 
 
 Sử dụng độ mờ để liên kết các điều khiển nổi với stage. Sử dụng các bề mặt trung tính ổn định nơi người dùng đọc mô tả, nhập giá trị hoặc so sánh các tùy chọn.
 
-Hướng dẫn này áp dụng cho các giao diện dùng chung trong `stage-web`, `desktop` và `stage-pocket`. Các mẫu trực quan của nó đến từ `packages/ui` và các bố cục ứng dụng hiện có.
+Hướng dẫn này áp dụng cho các giao diện dùng chung trong `stage-web`, `desktop` và `stage-pocket`. Các mẫu trực quan của nó đến từ `shared/ui/primitives` và các bố cục ứng dụng hiện có.
 
 Đối với các chi tiết không được chỉ định, hãy sử dụng lại bố cục và thành phần được chia sẻ gần nhất. Bảo toàn hành vi, tỷ lệ và trạng thái tương tác của chủ đề.
 
@@ -29,9 +29,9 @@ Chi tiết API thuộc về tham chiếu thành phần [](./docs/ai/context/ui-c
 ## Màu sắc
 
 - Cấu hình [UnoCSS](./uno.config.ts) cung cấp bảng màu, phông chữ, biểu tượng và hình động được chia sẻ.
-- [UI Các biến phương án dự phòng](./packages/ui/src/fallback.css) xác định `--chromatic-hue` và các biến sắc độ cho từng sắc thái.
-- [Cài đặt chủ đề](./packages/stage-ui/src/stores/settings/theme.ts) store màu sắc đã chọn. Mặc định là `220.44`.
-- [Mục nhập biểu định kiểu UI](./packages/ui/src/main.css) bao gồm các biến phương án dự phòng, hoạt ảnh đèn và kiểu thành phần.
+- [UI Các biến phương án dự phòng](./shared/ui/primitives/src/fallback.css) xác định `--chromatic-hue` và các biến sắc độ cho từng sắc thái.
+- [Cài đặt chủ đề](./shared/ui/stage/src/stores/settings/theme.ts) store màu sắc đã chọn. Mặc định là `220.44`.
+- [Mục nhập biểu định kiểu UI](./shared/ui/primitives/src/main.css) bao gồm các biến phương án dự phòng, hoạt ảnh đèn và kiểu thành phần.
 
 `primary` theo tông màu chủ đề. Cấu hình chủ đề cũng cung cấp `complementary`. Sử dụng các bảng màu này thay vì sao chép các màu thương hiệu cố định vào các trang.
 
@@ -74,7 +74,7 @@ Kiểm soát nhóm bằng quyết định mà họ ủng hộ. Giữ mô tả b�
 - Trên màn hình nhỏ, duy trì thứ tự đọc và các hành động có thể truy cập khi nội dung trở thành một cột duy nhất.
 - Giữ các điều khiển cố định tránh xa nội dung có thể cuộn, vùng an toàn và bàn phím phần mềm.
 
-Bố cục cài đặt web [](./packages/stage-layouts/src/layouts/settings.vue) sở hữu phần đệm trang web, vùng an toàn, tiêu đề và vùng chứa cuộn cài đặt.
+Bố cục cài đặt web [](./shared/ui/layouts/src/layouts/settings.vue) sở hữu phần đệm trang web, vùng an toàn, tiêu đề và vùng chứa cuộn cài đặt.
 
 Electron sử dụng bố cục cài đặt [](./apps/desktop/src/renderer/layouts/settings.vue) của riêng nó. Áp dụng các thay đổi cài đặt cho bố cục sở hữu ứng dụng đích.
 
@@ -142,11 +142,11 @@ Giữ kiểu dáng hình bình hành trong hình dạng nút hiện có. Giữ n
 
 | Thành phần | Ngoại hình và hành vi | Sử dụng |
 | --- | --- | --- |
-| [BasicButton](./packages/ui/src/components/misc/basic-button.vue) | Kích thước, biểu tượng, trạng thái tải, trạng thái tắt và phản hồi báo chí. Không có bề mặt hoặc hình dạng. | Xây dựng giao diện nút chia sẻ. |
-| [Button](./packages/ui/src/components/misc/button.vue) | Bề mặt rắn hoặc mềm không có viền. Đường viền di chuột và tiêu điểm được bật theo mặc định. | Hành động chính và phụ. |
-| [GhostButton](./packages/ui/src/components/misc/ghost-button.vue) | Trong suốt khi đứng yên. Tương tác thêm một bề mặt sơ cấp mờ nhạt. Tiêu điểm bàn phím có đường viền. | Thanh công cụ và các hành động ít nhấn mạnh. |
-| [IconButton](./packages/ui/src/components/misc/icon-button.vue) | Loại bỏ phần đệm. Không có bề mặt, hình dạng hoặc kích thước hình vuông cố định. | Yêu thích, sao chép, thử lại và các hành động biểu tượng khác. |
-| [OverlayButton](./packages/ui/src/components/misc/overlay-button.vue) | Bề mặt trung tính trong mờ, làm mờ hậu cảnh và `rounded-xl`. | Các hành động trên stage. |
+| [BasicButton](./shared/ui/primitives/src/components/misc/basic-button.vue) | Kích thước, biểu tượng, trạng thái tải, trạng thái tắt và phản hồi báo chí. Không có bề mặt hoặc hình dạng. | Xây dựng giao diện nút chia sẻ. |
+| [Button](./shared/ui/primitives/src/components/misc/button.vue) | Bề mặt rắn hoặc mềm không có viền. Đường viền di chuột và tiêu điểm được bật theo mặc định. | Hành động chính và phụ. |
+| [GhostButton](./shared/ui/primitives/src/components/misc/ghost-button.vue) | Trong suốt khi đứng yên. Tương tác thêm một bề mặt sơ cấp mờ nhạt. Tiêu điểm bàn phím có đường viền. | Thanh công cụ và các hành động ít nhấn mạnh. |
+| [IconButton](./shared/ui/primitives/src/components/misc/icon-button.vue) | Loại bỏ phần đệm. Không có bề mặt, hình dạng hoặc kích thước hình vuông cố định. | Yêu thích, sao chép, thử lại và các hành động biểu tượng khác. |
+| [OverlayButton](./shared/ui/primitives/src/components/misc/overlay-button.vue) | Bề mặt trung tính trong mờ, làm mờ hậu cảnh và `rounded-xl`. | Các hành động trên stage. |
 
 Các giá trị mặc định của `Button` là `color="neutral"`, `variant="secondary"`, `shape="rect"`, `size="md"` và `outline=true`.
 
@@ -189,11 +189,11 @@ Kích thước đệm và văn bản không đảm bảo kích thước mục ti
 
 | Thành phần | Mẫu hình ảnh hiện tại | Sử dụng |
 | --- | --- | --- |
-| [Input](./packages/ui/src/components/form/input/input.vue) | `rounded-lg`, `px-2 py-1`, `text-sm`, đường viền 2px và `shadow-sm` | Nhập văn bản và số một dòng |
-| [Textarea](./packages/ui/src/components/form/textarea/textarea.vue) | Bề mặt cơ sở, văn bản và đường viền giống như Đầu vào | Đầu vào nhiều dòng |
-| [FieldInput](./packages/ui/src/components/form/field/field-input.vue) | Nhãn và mô tả đặt trước điều khiển. Bố cục bên ngoài sử dụng `gap-4`. | Các trường có mô tả |
-| [Select](./packages/ui/src/components/form/select/select.vue) | Trình kích hoạt `h-9`, `rounded-lg` mặc định và cửa sổ bật lên `rounded-xl` | Một lựa chọn duy nhất từ ​​các lựa chọn đã biết |
-| [Checkbox](./packages/ui/src/components/form/checkbox/checkbox.vue) | Thuốc `h-7 w-12.5` ngón tay cái track và `size-6` | Chuyển đổi Boolean, được triển khai với Reka Switch |
+| [Input](./shared/ui/primitives/src/components/form/input/input.vue) | `rounded-lg`, `px-2 py-1`, `text-sm`, đường viền 2px và `shadow-sm` | Nhập văn bản và số một dòng |
+| [Textarea](./shared/ui/primitives/src/components/form/textarea/textarea.vue) | Bề mặt cơ sở, văn bản và đường viền giống như Đầu vào | Đầu vào nhiều dòng |
+| [FieldInput](./shared/ui/primitives/src/components/form/field/field-input.vue) | Nhãn và mô tả đặt trước điều khiển. Bố cục bên ngoài sử dụng `gap-4`. | Các trường có mô tả |
+| [Select](./shared/ui/primitives/src/components/form/select/select.vue) | Trình kích hoạt `h-9`, `rounded-lg` mặc định và cửa sổ bật lên `rounded-xl` | Một lựa chọn duy nhất từ ​​các lựa chọn đã biết |
+| [Checkbox](./shared/ui/primitives/src/components/form/checkbox/checkbox.vue) | Thuốc `h-7 w-12.5` ngón tay cái track và `size-6` | Chuyển đổi Boolean, được triển khai với Reka Switch |
 
 Đầu vào sử dụng nền `neutral-50` ở chế độ sáng và `neutral-950` ở chế độ tối. Đường viền lấy nét lần lượt sử dụng `primary-300` và `primary-400/50`.
 
@@ -207,7 +207,7 @@ Các biến thể `Input` `primary` và `secondary` hiện trông giống hệt 
 
 ### BottomDrawer
 
-[BottomDrawer](./packages/ui/src/components/layouts/bottom-drawer.vue) sử dụng Vaul Vue để chia sẻ cấu trúc và tương tác bảng điều khiển di động.
+[BottomDrawer](./shared/ui/primitives/src/components/layouts/bottom-drawer.vue) sử dụng Vaul Vue để chia sẻ cấu trúc và tương tác bảng điều khiển di động.
 
 - Các góc trên cùng là 32px. Chiều rộng tối đa là `max-w-lg`. Chiều cao tối đa là `90dvh`.
 - `minimumHeight="half"` đặt chiều cao tối thiểu `50dvh`. Mặc định tuân theo chiều cao nội dung.
@@ -224,9 +224,9 @@ Nội dung bật lên `Select` sử dụng `z-[10010]`. Đây là các giá tr�
 
 ### Chú thích và SwipeActions
 
-[Callout](./packages/ui/src/components/misc/callout.vue) kết hợp bề mặt nhuốm màu, thanh dấu dọc và tiêu đề được nhấn mạnh. Người gọi cung cấp văn bản có ý nghĩa.
+[Callout](./shared/ui/primitives/src/components/misc/callout.vue) kết hợp bề mặt nhuốm màu, thanh dấu dọc và tiêu đề được nhấn mạnh. Người gọi cung cấp văn bản có ý nghĩa.
 
-[SwipeActions](./packages/ui/src/components/swipe-actions/index.ts) sở hữu các vùng vuốt và cử chỉ. [SwipeActionButton](./packages/ui/src/components/misc/swipe-action-button.vue) sở hữu bề mặt viên thuốc, biểu tượng và nhãn.
+[SwipeActions](./shared/ui/primitives/src/components/swipe-actions/index.ts) sở hữu các vùng vuốt và cử chỉ. [SwipeActionButton](./shared/ui/primitives/src/components/misc/swipe-action-button.vue) sở hữu bề mặt viên thuốc, biểu tượng và nhãn.
 
 Sử dụng nền mờ cho nội dung vuốt. Nếu nhãn hiển thị bị ẩn, hãy giữ nguyên tên có thể truy cập được. Logic nghiệp vụ sở hữu trạng thái hoàn tác, xóa và dữ liệu.
 
@@ -238,9 +238,9 @@ Sử dụng nền mờ cho nội dung vuốt. Nếu nhãn hiển thị bị ẩn
 | --- | --- |
 | `BasicButton`, `Input` và `Textarea` | 200ms, `ease-in-out` |
 | Ngón tay cái `Checkbox` | Bản dịch 250ms, `ease-in-out` |
-| [TransitionVertical](./packages/ui/src/components/animations/transition-vertical.vue) | Chuyển đổi độ cao và độ mờ mặc định 250ms |
-| [TransitionHorizontal](./packages/ui/src/components/animations/transition-horizontal.vue) | Chuyển đổi độ rộng và độ mờ 500ms |
-| [AnimatedContent](./packages/ui/src/components/animations/animated-content.vue) | Đầu vào 220 mili giây, đầu ra 160 mili giây và chuyển tiếp làm mờ bên trong 6px |
+| [TransitionVertical](./shared/ui/primitives/src/components/animations/transition-vertical.vue) | Chuyển đổi độ cao và độ mờ mặc định 250ms |
+| [TransitionHorizontal](./shared/ui/primitives/src/components/animations/transition-horizontal.vue) | Chuyển đổi độ rộng và độ mờ 500ms |
+| [AnimatedContent](./shared/ui/primitives/src/components/animations/animated-content.vue) | Đầu vào 220 mili giây, đầu ra 160 mili giây và chuyển tiếp làm mờ bên trong 6px |
 | Ảnh động UnoCSS được chia sẻ | Lớp phủ 300ms, nội dung 150ms, lối vào định hướng 400ms, fade 200ms |
 
 `AnimatedContent` sở hữu chuyển động chứ không phải kiểu dáng bề mặt. Chủ sở hữu vòng đời của nó cung cấp `data-state` và giữ Node được gắn cho đến khi hoạt ảnh thoát kết thúc.

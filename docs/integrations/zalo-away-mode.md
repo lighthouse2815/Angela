@@ -132,17 +132,17 @@ pnpm build:cli
 Các ví dụ này sử dụng tệp thực thi được xây dựng từ thư mục gốc của kho lưu trữ:
 
 ```sh
-node packages/angela-cli/dist/bin/run.mjs zalo login
+node apps/cli/dist/bin/run.mjs zalo login
 ```
 
 Lệnh in đường dẫn hình ảnh QR riêng tư. Mở hình ảnh đó cục bộ. Quét bằng ứng dụng di động Zalo, sau đó xác nhận xác thực trên điện thoại. Luồng QR hết hạn sau ba phút hoặc khi Zalo từ chối hoặc hết mã. Nó không bao giờ thử lại xác thực QR mà không có hành động của chủ sở hữu. Sau khi thành công, lệnh sẽ lưu cookie, IMEI, người dùng agent và tài khoản được xác thực ID. Nó xóa hình ảnh QR trước khi thoát.
 
 ```sh
-node packages/angela-cli/dist/bin/run.mjs zalo status
-node packages/angela-cli/dist/bin/run.mjs zalo allow 123456789
-node packages/angela-cli/dist/bin/run.mjs away mode assistant-reply
-node packages/angela-cli/dist/bin/run.mjs away on
-node packages/angela-cli/dist/bin/run.mjs zalo run
+node apps/cli/dist/bin/run.mjs zalo status
+node apps/cli/dist/bin/run.mjs zalo allow 123456789
+node apps/cli/dist/bin/run.mjs away mode assistant-reply
+node apps/cli/dist/bin/run.mjs away on
+node apps/cli/dist/bin/run.mjs zalo run
 ```
 
 Thay thế `123456789` bằng người gửi Zalo ổn định của liên hệ ID. DM gửi đến bị từ chối xuất hiện trong quá trình kiểm tra liên hệ có giới hạn cùng với ID người gửi của họ mà không có văn bản tin nhắn. Sử dụng `angela zalo recent` hoặc `/zalo recent` để kiểm tra 20 địa chỉ liên hệ gần đây nhất từ ​​quá trình kiểm tra siêu dữ liệu này. Đầu ra bao gồm tên hiển thị ID, có giới hạn của người gửi ổn định, dấu thời gian nhìn thấy lần cuối và số lần gọi lại. Nó loại trừ văn bản tin nhắn. Mã hóa JSON thoát các ký tự điều khiển trong tên liên hệ trước khi hiển thị thiết bị đầu cuối. Số lượng liên hệ được đặt lại sau khi bị trục xuất. Những liên hệ chỉ được quan sát khi Chế độ Đi vắng bị tắt sẽ bị loại trừ. Lệnh chỉ dành cho chủ sở hữu này không phân giải tên, quét thư mục bạn bè hoặc cấp quyền truy cập danh sách trắng. Giữ host tiền cảnh chạy trong khi chủ sở hữu đi vắng. Điều này có thể chạy bên cạnh quy trình đầu cuối Angela thông thường. Chỉ bắt đầu trò chuyện thông thường không bắt đầu nghe Zalo.

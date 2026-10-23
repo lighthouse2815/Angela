@@ -3,7 +3,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-APP_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+APP_DIR="$(cd "${SCRIPT_DIR}/..." && pwd)"
 PORT="${PORT:-8787}"
 CHANNEL="${CHANNEL:-stable}"
 TARGET="${TARGET:-x86_64-pc-windows-msvc}"

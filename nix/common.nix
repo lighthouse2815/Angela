@@ -19,7 +19,7 @@ stdenvNoCC.mkDerivation (final: {
   version = (builtins.fromJSON (builtins.readFile ../package.json)).version;
 
   src = lib.cleanSourceWith {
-    src = ../.;
+    src = ..;
     filter =
       path: type:
       let
@@ -62,7 +62,7 @@ stdenvNoCC.mkDerivation (final: {
 
       mkdir -p "$out"
       cp -r .cache/* "$out"
-      cp -r apps/stage-web/.cache/assets/* "$out"
+      cp -r apps/web/.cache/assets/* "$out"
 
       runHook postInstall
     '';

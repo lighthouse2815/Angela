@@ -12,22 +12,22 @@
     "useDefineForClassFields": true,
     "paths": {
       "@angela/stage-pages/*.vue": [
-        "../../packages/stage-pages/src/*.vue"
+        "../../shared/ui/pages/src/*.vue"
       ],
       "@angela/stage-pages/*": [
-        "../../packages/stage-pages/src/*.ts"
+        "../../shared/ui/pages/src/*.ts"
       ],
       "@angela/stage-ui/*": [
-        "../../packages/stage-ui/src/*"
+        "../../shared/ui/stage/src/*"
       ],
       "@angela/stage-layouts/*": [
-        "../../packages/stage-layouts/src/*"
+        "../../shared/ui/layouts/src/*"
       ],
       "@angela/electron-vueuse": [
-        "../../packages/electron-vueuse/src/index.ts"
+        "../../shared/sdk/electron-vueuse/src/index.ts"
       ],
       "@angela/electron-vueuse/*": [
-        "../../packages/electron-vueuse/src/*"
+        "../../shared/sdk/electron-vueuse/src/*"
       ]
     },
     "resolveJsonModule": true,

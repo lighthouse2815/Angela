@@ -6,7 +6,7 @@ import { join } from 'node:path'
 
 import { afterEach, describe, expect, it } from 'vitest'
 
-import { IOTraceRecordingService } from '.'
+import { IOTraceRecordingService } from './index'
 
 const directories: string[] = []
 

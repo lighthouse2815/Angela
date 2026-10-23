@@ -1,0 +1,32 @@
+{
+  "name": "@angela/zalo",
+  "type": "module",
+  "version": "0.12.0-beta.5",
+  "private": true,
+  "description": "Zalo companion and away-mode adapter",
+  "license": "MIT",
+  "exports": {
+    "./*": {
+      "development": "./src/*.ts",
+      "types": "./dist/*.d.mts",
+      "default": "./dist/*.mjs"
+    }
+  },
+  "files": [
+    "README.md",
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "@angela/companion": "workspace:^",
+    "@angela/host-sdk": "workspace:^",
+    "@angela/i18n": "workspace:^",
+    "@angela/provider-inference": "workspace:^",
+    "valibot": "catalog:",
+    "zca-js": "catalog:"
+  }
+}

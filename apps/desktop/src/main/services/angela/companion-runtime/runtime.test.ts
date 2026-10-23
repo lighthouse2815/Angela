@@ -4,8 +4,8 @@ import { mkdtemp, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { CompanionRecords } from '@angela/cli/companion'
-import { AngelaRuntime } from '@angela/cli/runtime'
+import { CompanionRecords } from '@angela/companion/companion'
+import { AngelaRuntime } from '@angela/companion/runtime'
 import { cliMessages } from '@angela/i18n/cli'
 import { afterEach, expect, it } from 'vitest'
 

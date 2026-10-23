@@ -134,7 +134,7 @@ Kiểm tra được chạy tuần tự với một Vitest worker và tính năng
 | `pnpm -F @angela/evals-companion typecheck` | Đã qua sau lần thay đổi mã cuối cùng |
 | ESLint được nhắm mục tiêu cho các tệp CLI và eval đã thay đổi | Đã vượt qua |
 | `pnpm -F @angela/cli build` | Đã qua sau lần thay đổi mã cuối cùng |
-| `node packages/angela-cli/dist/bin/run.mjs --help` | Đã vượt qua |
+| `node apps/cli/dist/bin/run.mjs --help` | Đã vượt qua |
 | `pnpm lint` | Đã vượt qua, ESLint 0 lỗi và 603 cảnh báo hiện có. Oxlint 12 cảnh báo |
 | `NODE_OPTIONS=--max-old-space-size=4096 pnpm typecheck --concurrency=1` | 53 nhiệm vụ đã được thông qua trước khi sàng lọc tham gia SQL cuối cùng |
 | Người bạn đồng hành hoàn chỉnh cuối cùng runner, hai lần | 120/128 đã vượt qua, báo cáo byte giống hệt nhau |

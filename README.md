@@ -14,7 +14,7 @@ pnpm dev:desktop
 Giai đoạn hiện tại ưu tiên desktop/local AI. Các module tạm hoãn nằm trong
 [`../dev-in-future/`](../dev-in-future/README.md) và không tham gia workspace mặc định.
 Thư mục này nằm ngoài Git repository hiện tại và chỉ được lưu local.
-API và shared contract còn ở `server/` vì desktop vẫn sử dụng kiểu dữ liệu của chúng.
+API và shared contract còn ở `backend/` vì desktop vẫn sử dụng kiểu dữ liệu của chúng.
 
 Bản web:
 
@@ -41,7 +41,7 @@ pnpm cli --resume ID_PHIEN
 ```
 
 CLI hỏi xác nhận trước khi gọi công cụ. Model không được tự phê duyệt thao tác.
-Xem [hướng dẫn CLI](./packages/angela-cli/README.md) để cấu hình provider, MCP và thư mục lưu phiên.
+Xem [hướng dẫn CLI](./apps/cli/README.md) để cấu hình provider, MCP và thư mục lưu phiên.
 
 ## Cấu hình dùng chung trên máy
 
@@ -73,11 +73,28 @@ Bản desktop có công cụ quan sát màn hình và tương tác ứng dụng.
 Khả năng thực tế phụ thuộc vào hệ điều hành, thư viện native và quyền của phiên desktop.
 Xem [thiết lập và kiểm tra](./docs/angela-setup.md) trước khi dùng công cụ.
 
-## Kiến trúc hiện tại
+## Cấu trúc dự án
 
-Runtime chung điều phối CLI, Telegram và các adapter khác. Memory V2 ghi observation, tổng hợp episodic/semantic/procedural memory và đưa dữ liệu trở lại Recall để xây context.
+Repo được chia theo chức năng. Tên package `@angela/...` tiếp tục được dùng để import giữa các nhóm.
 
-Các tài liệu kiến trúc và audit nằm trong [`docs/ai`](./docs/ai/).
+| Thư mục | Trách nhiệm |
+| --- | --- |
+| `apps/` | Desktop Electron, desktop Kirie, web và CLI |
+| `core/` | Agent, nhân vật và runtime đồng hành dùng chung |
+| `providers/` | Inference và gateway kết nối mô hình |
+| `capabilities/` | Audio, voice, vision, avatar, input và computer-use |
+| `integrations/` | Telegram, Discord, Zalo, VS Code và plugin |
+| `backend/` | API máy chủ, channel runtime, contract và storage adapter |
+| `shared/` | UI, i18n, cấu hình local, SDK và công cụ phát triển |
+
+Runtime trong `core/companion` phục vụ CLI, desktop và các adapter kênh.
+Memory, task và reminder giữ nguyên định dạng dữ liệu và thư mục cá nhân.
+Mã nguồn nhập từ bên ngoài nằm trong `vendor/` của chức năng sở hữu nó.
+Gateway giữ workspace Next.js riêng tại `providers/gateway/vendor`.
+OpenSeeFace nằm tại `capabilities/vision/vendor/openseeface`.
+
+Tài liệu, đánh giá, script, triển khai và patch dùng chung nằm tại `docs/`, `evals/`, `scripts/`, `deploy/` và `patches/`.
+Xem [quyết định cấu trúc](docs/ai/adr/2026-10-23-domain-workspace-layout.md) và [ghi nhận nguồn ngoài](docs/ai/vendor-sources.md).
 
 <a id="repository"></a>
 
@@ -85,4 +102,4 @@ Các tài liệu kiến trúc và audit nằm trong [`docs/ai`](./docs/ai/).
 
 https://github.com/lighthouse2815/Angela
 
-Xem [LICENSE](./LICENSE) và [ghi nhận nguồn gốc, giấy phép bên thứ ba](./THIRD_PARTY_NOTICES.md).
+Xem [giấy phép](./docs/licenses/angela.txt) và [ghi nhận nguồn gốc, giấy phép bên thứ ba](./THIRD_PARTY_NOTICES.md).

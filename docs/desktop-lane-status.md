@@ -16,13 +16,13 @@ Ghi chú này là bản ghi nhớ trạng thái thực tế cho desktop luồng 
   - hình ảnh + cây ngữ nghĩa + đầu vào OS
   - lớp phủ là lớp trực quan hóa, không phải con trỏ hệ thống thứ hai
 - Các đường cơ sở sau đây đã tồn tại trong mã:
-  - `/Users/liuziheng/airi/services/computer-use-mcp/src/executors/macos-local.ts`
+  - `/Users/liuziheng/airi/capabilities/computer-use/src/executors/macos-local.ts`
     - lưu vị trí con trỏ thực và khôi phục nó bằng `CGWarpMouseCursorPosition(...)`
   - `/Users/liuziheng/airi/apps/desktop/src/main/windows/shared/window.ts`
     - `makeWindowPassThrough()` sử dụng sự kiện bỏ qua chuột + hành vi lớp phủ không thể lấy tiêu điểm
-  - `/Users/liuziheng/airi/services/computer-use-mcp/src/browser-dom/cdp-bridge.ts`
+  - `/Users/liuziheng/airi/capabilities/computer-use/src/browser-dom/cdp-bridge.ts`
     - Nhịp tim 5 giây rơi lệ sau 3 lần thất bại liên tiếp
-  - `/Users/liuziheng/airi/services/computer-use-mcp/src/bin/smoke-chrome-grounding.ts`
+  - `/Users/liuziheng/airi/capabilities/computer-use/src/bin/smoke-chrome-grounding.ts`
     - desktop v3 kiểm tra nhanh chứng minh chuỗi đảm bảo/quan sát/nhấp chuột/trạng thái
 - Cầu mở rộng Chrome và công việc bù đắp iframe không còn là giả định nữa:
   - nhánh recut đã chứa cầu nối máy khách WebSocket phía mở rộng thực sự

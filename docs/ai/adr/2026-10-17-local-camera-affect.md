@@ -8,13 +8,13 @@ Trạng thái: đã chấp nhận
 
 ## Kiến trúc hiện có
 
-`packages/angela-cli/src/bin/run.ts` sở hữu vòng lặp đầu cuối, lệnh gạch chéo, xử lý SIGINT/SIGTERM và dọn dẹp. `Chat.send` đã chấp nhận bối cảnh hệ thống chỉ yêu cầu cùng với các lượt hội thoại liên tục. `Context.prepare` giữ bối cảnh hệ thống trong quá trình nén và chỉ tóm tắt các lượt lịch sử. Các dịch vụ CLI đọc cài đặt môi trường, sử dụng Valibot ở ranh giới dữ liệu và báo cáo chẩn đoán cục bộ thông qua stderr. Các thay đổi của máy ảnh sử dụng một nhánh riêng biệt từ đường cơ sở CLI rõ ràng.
+`apps/cli/src/bin/run.ts` sở hữu vòng lặp đầu cuối, lệnh gạch chéo, xử lý SIGINT/SIGTERM và dọn dẹp. `Chat.send` đã chấp nhận bối cảnh hệ thống chỉ yêu cầu cùng với các lượt hội thoại liên tục. `Context.prepare` giữ bối cảnh hệ thống trong quá trình nén và chỉ tóm tắt các lượt lịch sử. Các dịch vụ CLI đọc cài đặt môi trường, sử dụng Valibot ở ranh giới dữ liệu và báo cáo chẩn đoán cục bộ thông qua stderr. Các thay đổi của máy ảnh sử dụng một nhánh riêng biệt từ đường cơ sở CLI rõ ràng.
 
 <a id="decision"></a>
 
 ## Phán quyết
 
-Giữ nhận thức của máy ảnh bên trong gói CLI mà không có bộ lập lịch, lời nhắc hoặc khớp nối desktop. Sử dụng nguồn OpenSeeFace làm mặt nhà cung cấp có thể thay thế. Nhà cung cấp cây gốc hoàn chỉnh thông qua cây con Git, bao gồm giấy phép và mô hình. Ghi lại bản sửa đổi upstream trong `third_party/README.md` và siêu dữ liệu cam kết cây con.
+Giữ nhận thức của máy ảnh bên trong gói CLI mà không có bộ lập lịch, lời nhắc hoặc khớp nối desktop. Sử dụng nguồn OpenSeeFace làm mặt nhà cung cấp có thể thay thế. Nhà cung cấp cây gốc hoàn chỉnh thông qua cây con Git, bao gồm giấy phép và mô hình. Ghi lại bản sửa đổi upstream trong `docs/ai/vendor-sources.md` và siêu dữ liệu cam kết cây con.
 
 ```text
 Terminal /camera on
@@ -84,7 +84,7 @@ Các lệnh được thực thi:
 
 | Lệnh | Kết quả |
 | --- | --- |
-| `python3 -m unittest discover -s packages/angela-cli/python/camera-worker -p test.py` | 11 đã qua |
+| `python3 -m unittest discover -s apps/cli/python/camera-worker -p test.py` | 11 đã qua |
 | `pnpm -F @angela/cli exec vitest run src/perception` | 33 đã qua |
 | `pnpm -F @angela/cli test` | 163 đã vượt qua, một lần thất bại cơ bản |
 | `pnpm -F @angela/i18n test` | 20 trôi qua |
@@ -95,8 +95,8 @@ Các lệnh được thực thi:
 | `pnpm lint` | Lỗi kế hoạch cơ bản được mô tả ở trên |
 | `pnpm typecheck` | Vùng heap mặc định đã cạn kiệt trong stage-ui |
 | `NODE_OPTIONS=--max-old-space-size=8192 pnpm typecheck --concurrency=2` | Bị gián đoạn thủ công vì áp lực bộ nhớ |
-| `packages/angela-cli/python/camera-worker/.venv/bin/python packages/angela-cli/python/camera-worker/worker.py --check` | Phụ thuộc và mô hình có sẵn |
-| `packages/angela-cli/python/camera-worker/.venv/bin/python packages/angela-cli/python/camera-worker/worker.py --smoke` | Real mô hình đã xử lý khung đen tổng hợp |
+| `apps/cli/python/camera-worker/.venv/bin/python apps/cli/python/camera-worker/worker.py --check` | Phụ thuộc và mô hình có sẵn |
+| `apps/cli/python/camera-worker/.venv/bin/python apps/cli/python/camera-worker/worker.py --smoke` | Real mô hình đã xử lý khung đen tổng hợp |
 
 Kiểm tra `moeru-lint` được nhắm mục tiêu bao gồm các nguồn CLI đã thay đổi, chuỗi i18n, README, mẫu kiểm thử và ADR này mà không có lỗi hoặc cảnh báo.
 
@@ -108,23 +108,23 @@ Việc chỉnh sửa ngữ cảnh yêu cầu đã vượt qua tất cả 225 bà
 
 | Đường dẫn | Vai trò |
 | --- | --- |
-| `third_party/openseeface/**` | Hoàn thành các thông báo về nguồn upstream, mô hình và giấy phép không thay đổi |
-| `third_party/README.md` | Sửa đổi, xuất xứ cây con, yêu cầu kiểm kê source/model |
+| `capabilities/vision/vendor/openseeface/**` | Hoàn thành các thông báo về nguồn upstream, mô hình và giấy phép không thay đổi |
+| `docs/ai/vendor-sources.md` | Sửa đổi, xuất xứ cây con, yêu cầu kiểm kê source/model |
 | `.gitignore`, `eslint.config.ts` | Bỏ qua Python artifact cục bộ và giữ nguyên định dạng được cung cấp |
-| `packages/angela-cli/package.json`, `pnpm-lock.yaml` | Tái sử dụng phần phụ thuộc danh mục Eventa hiện có và bao gồm các tệp nguồn worker |
-| `packages/angela-cli/python/camera-worker/worker.py` | Bộ chuyển đổi thu nhận dữ liệu, OpenSeeFace, chẩn đoán, nhà sản xuất JSONL |
-| `packages/angela-cli/python/camera-worker/test.py` | Các bài kiểm tra worker không cần phần cứng |
-| `packages/angela-cli/python/camera-worker/pyproject.toml`, `uv.lock` | Khóa độc lập CPU runtime |
-| `packages/angela-cli/python/camera-worker/README.md` | Thiết lập runtime và các lệnh độc lập |
-| `packages/angela-cli/src/perception/observation.ts`, `observation.test.ts` | Giao thức, quan sát trung lập, hợp đồng Eventa và kiểm tra xác nhận |
-| `packages/angela-cli/src/perception/openseeface-provider.ts`, `openseeface-provider.test.ts` | Các bài kiểm tra vòng đời của trẻ em, nhà cung cấp và lệnh camera |
-| `packages/angela-cli/src/perception/affect-engine.ts`, `affect-engine.test.ts` | Làm mịn tạm thời và kiểm tra tín hiệu có thể quan sát được |
-| `packages/angela-cli/src/perception/camera-context.ts`, `camera-context.test.ts` | Chính sách trạng thái nhỏ gọn, mới mẻ và bình luận riêng hiện nay |
-| `packages/angela-cli/src/perception/camera.ts` | Chọn tham gia phiên, lệnh, thông báo tình trạng và thành phần |
-| `packages/angela-cli/src/perception/pipeline.test.ts` | Kiểm tra tính bền vững và tích hợp quy trình với mô hình |
-| `packages/angela-cli/src/perception/fixtures/worker.py`, `smile-screen.json` | Quy trình con thực mẫu kiểm thử không có phụ thuộc suy luận |
-| `packages/angela-cli/src/perception/README.md` | Ngữ nghĩa miền và ngưỡng mặc định chính xác |
-| `packages/angela-cli/src/bin/run.ts` | Các lệnh, chỉ báo, bối cảnh yêu cầu và nối dây vòng đời |
-| `packages/i18n/src/cli.ts` | Tin nhắn và gợi ý lệnh tiếng Anh và tiếng Việt |
-| `packages/angela-cli/README.md` | Thiết lập thực tế, hành vi bảo mật, lệnh, cài đặt và giới hạn |
+| `apps/cli/package.json`, `pnpm-lock.yaml` | Tái sử dụng phần phụ thuộc danh mục Eventa hiện có và bao gồm các tệp nguồn worker |
+| `apps/cli/python/camera-worker/worker.py` | Bộ chuyển đổi thu nhận dữ liệu, OpenSeeFace, chẩn đoán, nhà sản xuất JSONL |
+| `apps/cli/python/camera-worker/test.py` | Các bài kiểm tra worker không cần phần cứng |
+| `apps/cli/python/camera-worker/pyproject.toml`, `uv.lock` | Khóa độc lập CPU runtime |
+| `apps/cli/python/camera-worker/README.md` | Thiết lập runtime và các lệnh độc lập |
+| `apps/cli/src/perception/observation.ts`, `observation.test.ts` | Giao thức, quan sát trung lập, hợp đồng Eventa và kiểm tra xác nhận |
+| `apps/cli/src/perception/openseeface-provider.ts`, `openseeface-provider.test.ts` | Các bài kiểm tra vòng đời của trẻ em, nhà cung cấp và lệnh camera |
+| `apps/cli/src/perception/affect-engine.ts`, `affect-engine.test.ts` | Làm mịn tạm thời và kiểm tra tín hiệu có thể quan sát được |
+| `apps/cli/src/perception/camera-context.ts`, `camera-context.test.ts` | Chính sách trạng thái nhỏ gọn, mới mẻ và bình luận riêng hiện nay |
+| `apps/cli/src/perception/camera.ts` | Chọn tham gia phiên, lệnh, thông báo tình trạng và thành phần |
+| `apps/cli/src/perception/pipeline.test.ts` | Kiểm tra tính bền vững và tích hợp quy trình với mô hình |
+| `apps/cli/src/perception/fixtures/worker.py`, `smile-screen.json` | Quy trình con thực mẫu kiểm thử không có phụ thuộc suy luận |
+| `apps/cli/src/perception/README.md` | Ngữ nghĩa miền và ngưỡng mặc định chính xác |
+| `apps/cli/src/bin/run.ts` | Các lệnh, chỉ báo, bối cảnh yêu cầu và nối dây vòng đời |
+| `shared/i18n/src/cli.ts` | Tin nhắn và gợi ý lệnh tiếng Anh và tiếng Việt |
+| `apps/cli/README.md` | Thiết lập thực tế, hành vi bảo mật, lệnh, cài đặt và giới hạn |
 | ADR này | Bản ghi kiến ​​trúc và xác nhận |

@@ -111,7 +111,7 @@ const godotStagePayloadMessageSchema = object({
  * Expects:
  * - Production: pre-exported binary in `extraResources/godot-stage/`
  * - Dev: `GODOT4` env var points to a local Godot 4.x .NET/Mono executable
- * - The current workspace contains `engines/stage-tamagotchi-godot/project.godot` (dev mode only)
+ * - The current workspace contains `capabilities/avatar/godot/project.godot` (dev mode only)
  *
  * Returns:
  * - Lifecycle helpers, scene-input forwarding, and status subscriptions
@@ -890,7 +890,7 @@ async function resolveGodotProjectPath() {
   let currentDirectory = getElectronMainDirname()
 
   while (true) {
-    const projectPath = resolve(currentDirectory, 'engines', 'stage-tamagotchi-godot')
+    const projectPath = resolve(currentDirectory, 'capabilities', 'avatar', 'godot')
 
     try {
       await access(join(projectPath, 'project.godot'))
@@ -906,7 +906,7 @@ async function resolveGodotProjectPath() {
     currentDirectory = parentDirectory
   }
 
-  throw new Error(`Unable to locate engines/stage-tamagotchi-godot/project.godot from ${getElectronMainDirname()}.`)
+  throw new Error(`Unable to locate capabilities/avatar/godot/project.godot from ${getElectronMainDirname()}.`)
 }
 
 function resolveGodotStageDebugLaunchOptions() {

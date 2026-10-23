@@ -344,14 +344,14 @@ function formatSummary(issues: LocaleIssue[]) {
  *     -> findMovedTranslations (with `--base`)
  *   -> formatSummary (with `--summary`)
  *
- * Usage: `node scripts/i18n/check-locales.ts --root packages/i18n/src/locales [--base <dir>] [--source-changes warning] [--summary <file>]`
+ * Usage: `node scripts/i18n/check-locales.ts --root shared/i18n/src/locales [--base <dir>] [--source-changes warning] [--summary <file>]`
  */
 async function main(): Promise<void> {
   const argument = (name: string) => {
     const index = process.argv.indexOf(name)
     return index === -1 ? undefined : process.argv[index + 1]
   }
-  const root = argument('--root') ?? 'packages/i18n/src/locales'
+  const root = argument('--root') ?? 'shared/i18n/src/locales'
   const issues = await checkLocales({
     root,
     baseRoot: argument('--base'),

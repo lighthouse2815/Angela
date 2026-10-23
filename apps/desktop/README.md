@@ -2,13 +2,13 @@
 
 # stage Tamagotchi
 
-Ứng dụng Electron desktop chạy các công cụ nhân vật, trò chuyện, giọng nói và desktop của Angela. Hành vi ký tự được chia sẻ thuộc về `packages/stage-ui`. Sử dụng `stage-web` cho các tính năng chỉ dành cho trình duyệt.
+Ứng dụng Electron desktop chạy các công cụ nhân vật, trò chuyện, giọng nói và desktop của Angela. Hành vi ký tự được chia sẻ thuộc về `shared/ui/stage`. Sử dụng `stage-web` cho các tính năng chỉ dành cho trình duyệt.
 
 <a id="shared-local-configuration"></a>
 
 ## Cấu hình cục bộ được chia sẻ
 
-desktop chia sẻ cài đặt nhà cung cấp trực tiếp và trò chuyện mô hình với CLI cũng như web được phục vụ cục bộ thông qua `~/.config/angela/config.json`. Đặt `ANGELA_CONFIG` trước khi khởi động ứng dụng để chọn tệp khác. Quá trình chính sở hữu quyền truy cập tệp thông qua Eventa IPC. Chỉ người lãnh đạo Pinia mới tiếp tục thực hiện các hành động cài đặt đã hoàn thành. Nhập nhà cung cấp trực tiếp hiện có một lần cho mỗi hồ sơ. Các chỉnh sửa bên ngoài được làm mới sau mỗi 1,5 giây. Phiên tài khoản và tùy chọn giao diện vẫn giữ nguyên với store hiện tại của họ. Xem [cấu hình cục bộ](../../packages/local-config/README.md) để biết hợp đồng tệp.
+desktop chia sẻ cài đặt nhà cung cấp trực tiếp và trò chuyện mô hình với CLI cũng như web được phục vụ cục bộ thông qua `~/.config/angela/config.json`. Đặt `ANGELA_CONFIG` trước khi khởi động ứng dụng để chọn tệp khác. Quá trình chính sở hữu quyền truy cập tệp thông qua Eventa IPC. Chỉ người lãnh đạo Pinia mới tiếp tục thực hiện các hành động cài đặt đã hoàn thành. Nhập nhà cung cấp trực tiếp hiện có một lần cho mỗi hồ sơ. Các chỉnh sửa bên ngoài được làm mới sau mỗi 1,5 giây. Phiên tài khoản và tùy chọn giao diện vẫn giữ nguyên với store hiện tại của họ. Xem [cấu hình cục bộ](../../shared/config/README.md) để biết hợp đồng tệp.
 
 <a id="development"></a>
 
@@ -32,7 +32,7 @@ Chỉ lựa chọn hiện tại mới cấp quyền truy cập, bao gồm cả c
 
 Electron khởi động AUV SDK và CLI phù hợp theo yêu cầu, qua một đường ống có tên Unix socket hoặc Windows riêng. Nó tuần tự hóa các lệnh trên các cửa sổ, store artifact trong thư mục dữ liệu người dùng của ứng dụng và dừng daemon khi tắt ứng dụng. CLI chạy mà không cần shell. Đối số mô hình không thể thay đổi thiết bị, điểm cuối, chạy hoặc gốc lưu trữ. Các lối thoát khác 0 giữ lại chi tiết lỗi và đầu ra AUV dưới dạng lỗi công cụ. Mã thoát bằng 0 không chứng minh rằng đã xảy ra thay đổi UI dự định.
 
-Trên macOS, cấp quyền Trợ năng và Ghi màn hình cho ứng dụng đang khởi chạy khi OS yêu cầu chúng. Một số hành động của ứng dụng cũng cần có quyền Tự động hóa. Nếu `app.probePermissions` báo cáo thiếu quyền ghi màn hình thì thu nhận dữ liệu chỉ có thể chứa nền desktop mặc dù mã thoát là 0. Các lệnh khả dụng phụ thuộc vào phần phụ trợ OS và AUV. Sử dụng tính năng này cho các ứng dụng native cục bộ. Nó không hiển thị cổng thiết bị từ xa hoặc thay thế dịch vụ `services/computer-use-mcp` riêng biệt.
+Trên macOS, cấp quyền Trợ năng và Ghi màn hình cho ứng dụng đang khởi chạy khi OS yêu cầu chúng. Một số hành động của ứng dụng cũng cần có quyền Tự động hóa. Nếu `app.probePermissions` báo cáo thiếu quyền ghi màn hình thì thu nhận dữ liệu chỉ có thể chứa nền desktop mặc dù mã thoát là 0. Các lệnh khả dụng phụ thuộc vào phần phụ trợ OS và AUV. Sử dụng tính năng này cho các ứng dụng native cục bộ. Nó không hiển thị cổng thiết bị từ xa hoặc thay thế dịch vụ `capabilities/computer-use` riêng biệt.
 
 <a id="angela-browser"></a>
 
@@ -121,7 +121,7 @@ Bật lời nhắc đánh giá desktop trong cài đặt Bộ nhớ dài hạn. 
 Chạy bài đánh giá store, cài đặt, phân phối native và kiểm tra bộ đếm thời gian renderer từ thư mục gốc của kho lưu trữ:
 
 ```sh
-pnpm exec vitest run --config packages/stage-ui/vitest.config.ts --project browser learning-memory
+pnpm exec vitest run --config shared/ui/stage/vitest.config.ts --project browser learning-memory
 pnpm exec vitest run --config apps/desktop/vitest.node.config.ts learning-reviews
 pnpm exec vitest run --config apps/desktop/vitest.config.ts --project browser use-learning-review-reminders
 ```

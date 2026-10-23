@@ -34,7 +34,7 @@ Những phát hiện này đến từ việc kiểm tra nguồn. Hướng dẫn 
 
 Địa chỉ tiêu điểm bàn phím và kích thước trường đầu tiên. Sau đó hợp nhất các tham số hình ảnh lặp lại và kiểm tra các trang kinh doanh. Mỗi thay đổi runtime cần có hành vi và bằng chứng trực quan.
 
-Để chuyển đổi chủ đề, hãy sử dụng lại [useTheme](../../../packages/ui/src/composables/use-theme.ts). Các quy tắc UnoCSS cho phép rõ ràng composable này mặc dù cài đặt `disableTransition: true` của nó.
+Để chuyển đổi chủ đề, hãy sử dụng lại [useTheme](../../../shared/ui/primitives/src/composables/use-theme.ts). Các quy tắc UnoCSS cho phép rõ ràng composable này mặc dù cài đặt `disableTransition: true` của nó.
 
 Đối với các cuộc gọi `useDark` trực tiếp, hãy đặt `disableTransition: false` theo yêu cầu của quy tắc kho lưu trữ.
 
@@ -46,7 +46,7 @@ Kho lưu trữ đã bao gồm các kỹ năng triển khai, đánh giá và ch�
 
 | Nhiệm vụ | Điểm vào | Mục đích |
 | --- | --- | --- |
-| Chọn các mẫu và thành phần trực quan | Hướng dẫn thiết kế và tài liệu tham khảo thành phần [](../../../docs/ai/context/ui-components.md) | Hiểu các quy ước và API thiết kế AIRI |
+| Chọn các mẫu và thành phần trực quan | Hướng dẫn thiết kế và tài liệu tham khảo thành phần [](./ui-components.md) | Hiểu các quy ước và API thiết kế AIRI |
 | Viết kiểu thành phần | [enforce-quy tắc-cho-unocss](../../../.agents/skills/enforce-rules-for-unocss/SKILL.md) | Tái sử dụng các điều khiển, sắp xếp các tiện ích và duy trì hoạt động của chủ đề |
 | Viết các thành phần Vue | Các quy tắc [vue-thực hành tốt nhất](../../../.agents/skills/vue-best-practices/SKILL.md) và [TypeScript](../../../.agents/skills/enforce-rules-for-typescript/SKILL.md) | Xác định ranh giới thành phần, trạng thái và thực tiễn triển khai |
 | Đánh giá tương tác và khả năng tiếp cận | [web-thiết kế-hướng dẫn](../../../.agents/skills/web-design-guidelines/SKILL.md) | Cung cấp kiểm tra đánh giá cùng với các quy ước trực quan AIRI |
@@ -66,8 +66,8 @@ Thiết kế `AGENTS.md` route UI gốc hoạt động theo hướng dẫn thi�
 5. Kiểm tra tiêu điểm bàn phím, mục tiêu cảm ứng, bàn phím phần mềm và vùng an toàn.
 6. Ghi lại kết quả và các mục chưa được xác minh thông qua quy trình làm việc PR.
 
-Chạy `pnpm dev:ui` để xem trước thành phần. Lịch sử sống ở `packages/stage-ui`.
+Chạy `pnpm dev:ui` để xem trước thành phần. Lịch sử sống ở `shared/ui/stage`.
 
-Bắt đầu với các câu chuyện nút [](../../../packages/stage-ui/src/components/misc/button.story.vue), [đầu vào câu chuyện](../../../packages/stage-ui/src/components/form/input/input.story.vue), [chọn câu chuyện](../../../packages/stage-ui/src/components/form/select/select.story.vue) và [swipe câu chuyện hành động](../../../packages/stage-ui/src/components/misc/swipe-actions.story.vue).
+Bắt đầu với các câu chuyện nút [](../../../shared/ui/stage/src/components/misc/button.story.vue), [đầu vào câu chuyện](../../../shared/ui/stage/src/components/form/input/input.story.vue), [chọn câu chuyện](../../../shared/ui/stage/src/components/form/select/select.story.vue) và [swipe câu chuyện hành động](../../../shared/ui/stage/src/components/misc/swipe-actions.story.vue).
 
 Thay đổi tài liệu yêu cầu kiểm tra liên kết và định dạng. Các thay đổi của runtime UI cũng yêu cầu kiểm tra loại, kiểm tra liên quan và chấp nhận trực quan. Kiểm tra nguồn không thay thế kiểm tra runtime.

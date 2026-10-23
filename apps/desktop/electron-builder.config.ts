@@ -114,7 +114,7 @@ export default {
   ],
   extraResources: [
     {
-      from: '../../engines/stage-tamagotchi-godot/out/${os}',
+      from: '../../capabilities/avatar/godot/out/${os}',
       to: 'godot-stage',
       filter: ['**/*'],
     },

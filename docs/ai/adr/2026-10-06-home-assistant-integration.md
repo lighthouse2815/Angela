@@ -22,8 +22,8 @@ Home Assistant là dịch vụ hạng nhất của quy trình chính stage Tamag
 | --- | --- |
 | Địa chỉ, token và mọi yêu cầu gửi đi | `apps/desktop/src/main/services/airi/home-assistant/` |
 | Hợp đồng IPC | `apps/desktop/src/shared/eventa/home-assistant.ts` |
-| Ứng dụng khách API của Home Assistant và xác nhận của nó | `packages/stage-ui/src/libs/home-assistant/client.ts` |
-| Định nghĩa công cụ | `packages/stage-ui/src/tools/home-assistant.ts` |
+| Ứng dụng khách API của Home Assistant và xác nhận của nó | `shared/ui/stage/src/libs/home-assistant/client.ts` |
+| Định nghĩa công cụ | `shared/ui/stage/src/tools/home-assistant.ts` |
 | Trang lắp đặt công cụ và cài đặt | `apps/desktop/src/renderer/` |
 
 Cơ chế này tuân theo `computer-use` và `mcp-servers`, là hai dịch vụ xử lý chính hiện có cung cấp công cụ cho mô hình.
@@ -34,7 +34,7 @@ Cơ chế này tuân theo `computer-use` và `mcp-servers`, là hai dịch vụ 
 
 Plugin kênh trả lời lệnh gọi công cụ trước khi plugin bắt đầu bất kỳ công việc nào. `builtIn_emitSparkCommand` tiếp cận mô-đun thông qua một phong bì đã nhập có hành động là văn bản chưa được nhập và nó trả về `spark:command sent (id) to ...` ngay khi socket chấp nhận sự kiện. Do đó, mô hình không thể đọc kết quả của cuộc gọi Trợ lý gia đình và kết quả của công cụ cho thấy thành công mà không ai xác minh.
 
-Giao thức mang hình dạng ack, `spark:emit` với lệnh `eventId` và `handleSparkEmit` trong `packages/stage-ui/src/stores/character/orchestrator/store.ts` là một hàm trống. Kết quả chỉ có thể đến sau, thông qua `context:update` hoặc `spark:notify`, đây là một ngã rẽ khác.
+Giao thức mang hình dạng ack, `spark:emit` với lệnh `eventId` và `handleSparkEmit` trong `shared/ui/stage/src/stores/character/orchestrator/store.ts` là một hàm trống. Kết quả chỉ có thể đến sau, thông qua `context:update` hoặc `spark:notify`, đây là một ngã rẽ khác.
 
 Plugin kênh cũng yêu cầu người dùng bắt đầu quy trình bằng tay và máy chủ kênh store không có cấu hình, vì vậy plugin phải duy trì cài đặt riêng và trang cài đặt chỉ có thể đẩy bản cập nhật trực tiếp.
 
@@ -46,7 +46,7 @@ Plugin kênh cũng yêu cầu người dùng bắt đầu quy trình bằng tay 
 
 - Không có tiện ích mở rộng nào có thể nhận cấu hình. `ExtensionSetupContext` chỉ mang `extension`, `subscriptions`, `kits` và `modules`, đồng thời trình phân tích cú pháp tệp kê khai từ chối các trường không xác định, do đó URL cơ sở và token không có đường dẫn vào.
 - Mã mở rộng chạy trong quy trình chính của Electron không có hộp cát và không có ranh giới quy trình, đồng thời quy trình chính không có trình xử lý `uncaughtException`. Việc ném sau `setup` có thể kết thúc ứng dụng.
-- `packages/plugin-sdk/src/index.ts` tuyên bố rằng API có thể thay đổi mà không có cảnh báo và không có tiện ích mở rộng ví dụ nào đăng ký một công cụ. Con đường chưa được chứng minh.
+- `shared/sdk/plugin/src/index.ts` tuyên bố rằng API có thể thay đổi mà không có cảnh báo và không có tiện ích mở rộng ví dụ nào đăng ký một công cụ. Con đường chưa được chứng minh.
 
 <a id="why-not-the-mcp-tool-chain"></a>
 

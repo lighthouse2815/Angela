@@ -1,4 +1,4 @@
-import type { RecordsCommand, RecordsResponse } from '@angela/cli/companion-contracts'
+import type { RecordsCommand, RecordsResponse } from '@angela/companion/companion-contracts'
 import type { StreamEvent } from '@angela/core-agent'
 import type { Tool } from '@xsai/shared-chat'
 

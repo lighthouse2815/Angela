@@ -1,0 +1,55 @@
+{
+  "name": "@angela/companion",
+  "type": "module",
+  "version": "0.12.0-beta.5",
+  "private": true,
+  "description": "Shared companion runtime, memory, tasks, and records",
+  "license": "MIT",
+  "exports": {
+    "./*": {
+      "development": "./src/*.ts",
+      "types": "./dist/*.d.mts",
+      "default": "./dist/*.mjs"
+    },
+    "./runtime": {
+      "development": "./src/runtime/runtime.ts",
+      "types": "./dist/runtime/runtime.d.mts",
+      "default": "./dist/runtime/runtime.mjs"
+    },
+    "./companion": {
+      "development": "./src/companion/records.ts",
+      "types": "./dist/companion/records.d.mts",
+      "default": "./dist/companion/records.mjs"
+    },
+    "./companion-contracts": {
+      "development": "./src/companion/contracts.ts",
+      "types": "./dist/companion/contracts.d.mts",
+      "default": "./dist/companion/contracts.mjs"
+    }
+  },
+  "files": [
+    "README.md",
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "@angela/computer-use-mcp": "workspace:^",
+    "@angela/core-agent": "workspace:^",
+    "@angela/i18n": "workspace:^",
+    "@angela/provider-inference": "workspace:^",
+    "@angela/voice-client": "workspace:^",
+    "@modelcontextprotocol/sdk": "catalog:",
+    "@moeru/std": "catalog:",
+    "@xsai/shared-chat": "catalog:",
+    "@xsai/tool": "catalog:",
+    "valibot": "catalog:",
+    "yaml": "catalog:"
+  },
+  "devDependencies": {
+    "@angela/host-sdk": "workspace:^"
+  }
+}

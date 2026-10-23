@@ -49,9 +49,9 @@ const mcpSessionRoot = resolve(reportDir, 'computer-use-session')
 const stageLogPath = resolve(reportDir, 'stage-tamagotchi.log')
 const mcpConfigPath = resolve(userDataDir, 'mcp.json')
 const requiredWorkspaceBuildOutputs = [
-  'packages/electron-screen-capture/dist/main.mjs',
-  'packages/electron-vueuse/dist/main/index.mjs',
-  'packages/server-runtime/dist/server.mjs',
+  'capabilities/vision/electron-screen-capture/dist/main.mjs',
+  'shared/sdk/electron-vueuse/dist/main/index.mjs',
+  'backend/channel/runtime/dist/server.mjs',
 ]
 
 const smokeHtml = `<!doctype html>

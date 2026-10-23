@@ -37,9 +37,9 @@ export default defineConfig({
         ...unoConfig.content,
         filesystem: [
           `${import.meta.dirname}/src/**/*.vue`,
-          `${import.meta.dirname}/../../packages/stage-layouts/src/**/*.vue`,
-          `${import.meta.dirname}/../../packages/stage-ui/src/**/*.vue`,
-          `${import.meta.dirname}/../../packages/ui/src/**/*.vue`,
+          `${import.meta.dirname}/../../shared/ui/layouts/src/**/*.vue`,
+          `${import.meta.dirname}/../../shared/ui/stage/src/**/*.vue`,
+          `${import.meta.dirname}/../../shared/ui/primitives/src/**/*.vue`,
         ],
       },
     }),

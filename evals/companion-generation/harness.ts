@@ -8,19 +8,18 @@ import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import { Memory } from '@angela/companion/memory'
+import { ProjectMemory } from '@angela/companion/project-memory'
+import { RecallIndex } from '@angela/companion/recall-index'
+import { AngelaRuntime } from '@angela/companion/runtime/runtime'
+import { buildTools } from '@angela/companion/runtime/tool-registry'
+import { Sessions } from '@angela/companion/sessions'
+import { Skills } from '@angela/companion/skills'
+import { Tasks } from '@angela/companion/tasks'
 import { chatMessagesToTurns } from '@angela/core-agent'
 import { cliMessages } from '@angela/i18n/cli'
 
 import * as v from 'valibot'
-
-import { Memory } from '../../packages/angela-cli/src/memory'
-import { ProjectMemory } from '../../packages/angela-cli/src/project-memory'
-import { RecallIndex } from '../../packages/angela-cli/src/recall-index'
-import { AngelaRuntime } from '../../packages/angela-cli/src/runtime/runtime'
-import { buildTools } from '../../packages/angela-cli/src/runtime/tool-registry'
-import { Sessions } from '../../packages/angela-cli/src/sessions'
-import { Skills } from '../../packages/angela-cli/src/skills'
-import { Tasks } from '../../packages/angela-cli/src/tasks'
 
 /** A recorded request contains the actual protocol body, including injected context and tool definitions. Headers are excluded. */
 export const observationSchema = v.object({

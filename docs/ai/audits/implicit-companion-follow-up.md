@@ -118,32 +118,32 @@ Yêu cầu xuất xứ và các điều khiển cá nhân, tự động hiện c
 docs/ai/adr/2026-10-22-commitment-follow-up.md
 docs/ai/adr/2026-10-23-implicit-companion-follow-up.md
 docs/ai/audits/implicit-companion-follow-up.md
-packages/angela-cli/README.md
-packages/angela-cli/src/active-commitments.test.ts
-packages/angela-cli/src/active-commitments.ts
-packages/angela-cli/src/bin/run.ts
-packages/angela-cli/src/commitment-conversation.test.ts
-packages/angela-cli/src/commitment-conversation.ts
-packages/angela-cli/src/commitment-extraction.test.ts
-packages/angela-cli/src/commitment-intent.ts
-packages/angela-cli/src/open-loop-conversation.ts
-packages/angela-cli/src/open-loop-extraction.test.ts
-packages/angela-cli/src/open-loop-extraction.ts
-packages/angela-cli/src/open-loop-scenario.test.ts
-packages/angela-cli/src/open-loop-source.test.ts
-packages/angela-cli/src/open-loop-source.ts
-packages/angela-cli/src/open-loops.test.ts
-packages/angela-cli/src/open-loops.ts
-packages/angela-cli/src/proactive-candidate.ts
-packages/angela-cli/src/proactive-policy.ts
-packages/angela-cli/src/reminder-notifications.ts
-packages/angela-cli/src/reminder-scheduler.ts
-packages/angela-cli/src/runtime/context-builder.ts
-packages/angela-cli/src/runtime/events.ts
-packages/angela-cli/src/runtime/runtime.ts
-packages/angela-cli/src/task-tools.test.ts
-packages/angela-cli/src/telegram.ts
-packages/i18n/src/cli.ts
+apps/cli/README.md
+apps/cli/src/active-commitments.test.ts
+apps/cli/src/active-commitments.ts
+apps/cli/src/bin/run.ts
+apps/cli/src/commitment-conversation.test.ts
+apps/cli/src/commitment-conversation.ts
+apps/cli/src/commitment-extraction.test.ts
+apps/cli/src/commitment-intent.ts
+apps/cli/src/open-loop-conversation.ts
+apps/cli/src/open-loop-extraction.test.ts
+apps/cli/src/open-loop-extraction.ts
+apps/cli/src/open-loop-scenario.test.ts
+apps/cli/src/open-loop-source.test.ts
+apps/cli/src/open-loop-source.ts
+apps/cli/src/open-loops.test.ts
+apps/cli/src/open-loops.ts
+apps/cli/src/proactive-candidate.ts
+apps/cli/src/proactive-policy.ts
+apps/cli/src/reminder-notifications.ts
+apps/cli/src/reminder-scheduler.ts
+apps/cli/src/runtime/context-builder.ts
+apps/cli/src/runtime/events.ts
+apps/cli/src/runtime/runtime.ts
+apps/cli/src/task-tools.test.ts
+apps/cli/src/telegram.ts
+shared/i18n/src/cli.ts
 ```
 
 <a id="14-tests"></a>
@@ -305,7 +305,7 @@ Các bài kiểm tra được thêm hoặc mở rộng bao gồm:
 ### Xác nhận cuối cùng
 
 - `pnpm --config.verify-deps-before-run=false -F @angela/cli test --maxWorkers=2`: **PASS**, 72 tệp, 812 bài kiểm tra trước khi sàng lọc ủy quyền hai dòng cuối cùng.
-- `../../node_modules/.bin/vitest run --config vitest.config.ts --maxWorkers=2` từ `packages/angela-cli`: **PASS**, 72 tệp, 814 bài kiểm tra sau lần sàng lọc cuối cùng.
+- `../../node_modules/.bin/vitest run --config vitest.config.ts --maxWorkers=2` từ `apps/cli`: **PASS**, 72 tệp, 814 bài kiểm tra sau lần sàng lọc cuối cùng.
 - `pnpm --config.verify-deps-before-run=false -F @angela/cli typecheck`: **PASS** khi chạy sau khi quá trình xây dựng i18n hoàn tất.
 - `pnpm --config.verify-deps-before-run=false -F @angela/cli build`: **PASS**.
 - `pnpm --config.verify-deps-before-run=false -F @angela/i18n typecheck`: **PASS**.
@@ -327,7 +327,7 @@ Các bài kiểm tra được thêm hoặc mở rộng bao gồm:
 - `774a626`: tài liệu cuối cùng và kiểm tra ngữ cảnh có giới hạn.
 - `d0e0e59`: chấp nhận các hoạt động cá nhân rõ ràng sau `for` mà không mở lại mã hóa dương tính giả.
 
-Các cam kết này được đẩy lên `origin/main`. Các đường dẫn không được cam kết duy nhất là các đường dẫn đã xóa trước đó của `LICENSE` và `third_party/openseeface/LICENSE`, chưa được tác phẩm này chạm tới.
+Các cam kết này được đẩy lên `origin/main`. Các đường dẫn không được cam kết duy nhất là các đường dẫn đã xóa trước đó của `LICENSE` và `capabilities/vision/vendor/openseeface/LICENSE`, chưa được tác phẩm này chạm tới.
 
 <a id="closure-decision"></a>
 

@@ -127,8 +127,9 @@ const testDataRoot = resolve(
   '..',
   '..',
   '..',
-  'packages',
-  'plugin-sdk',
+  'shared',
+  'sdk',
+  'plugin',
   'src',
   'plugin-host',
   'testdata',
@@ -249,7 +250,7 @@ async function installExampleExtension(pluginsRoot: string, extensionId: string,
     (await readFile(join(sourceDir, entrypointFileName), 'utf-8'))
       .replace(
         '\'@angela/plugin-sdk\'',
-        JSON.stringify(pathToFileURL(resolve(repoRoot, 'packages/plugin-sdk/src/index.ts')).href),
+        JSON.stringify(pathToFileURL(resolve(repoRoot, 'shared/sdk/plugin/src/index.ts')).href),
       ),
   )
 }
@@ -258,7 +259,7 @@ async function linkWorkspacePackageForPlugin(pluginDir: string, packageName: '@a
   const packageDirName = packageName.replace('@angela/', '')
   const packageDir = join(pluginDir, 'node_modules', '@angela', packageDirName)
   await mkdir(packageDir, { recursive: true })
-  await symlink(resolve(repoRoot, 'packages', packageDirName, 'src'), join(packageDir, 'src'), 'dir')
+  await symlink(resolve(repoRoot, 'shared', 'sdk', packageName === '@angela/plugin-sdk' ? 'plugin' : 'plugin-desktop', 'src'), join(packageDir, 'src'), 'dir')
 
   const exports = packageName === '@angela/plugin-sdk'
     ? {
@@ -282,7 +283,7 @@ async function linkWorkspacePackageForPlugin(pluginDir: string, packageName: '@a
 }
 
 function createEmptyExtensionEntrypoint(id: string) {
-  const pluginSdkUrl = pathToFileURL(resolve(repoRoot, 'packages/plugin-sdk/src/index.ts')).href
+  const pluginSdkUrl = pathToFileURL(resolve(repoRoot, 'shared/sdk/plugin/src/index.ts')).href
   return [
     `import { defineExtension } from ${JSON.stringify(pluginSdkUrl)}`,
     '',
@@ -2019,7 +2020,7 @@ describe('setupExtensionHost', () => {
     const beforeSession = before.sessions.find(session => session.extensionId === 'test-auto-reload-reload')
     expect(beforeSession).toBeDefined()
 
-    const pluginSdkUrl = pathToFileURL(resolve(repoRoot, 'packages/plugin-sdk/src/index.ts')).href
+    const pluginSdkUrl = pathToFileURL(resolve(repoRoot, 'shared/sdk/plugin/src/index.ts')).href
     await writeFile(entrypointPath, [
       `import { defineExtension } from ${JSON.stringify(pluginSdkUrl)}`,
       '',
@@ -2353,8 +2354,8 @@ describe('setupExtensionHost', () => {
       }, null, 2),
     )
     await writeFile(join(pluginDir, 'airi-plugin-game-chess.mjs'), [
-      `import { defineExtension } from ${JSON.stringify(pathToFileURL(resolve(repoRoot, 'packages/plugin-sdk/src/index.ts')).href)}`,
-      `import { gameletKit } from ${JSON.stringify(pathToFileURL(resolve(repoRoot, 'packages/plugin-sdk-desktop/src/index.ts')).href)}`,
+      `import { defineExtension } from ${JSON.stringify(pathToFileURL(resolve(repoRoot, 'shared/sdk/plugin/src/index.ts')).href)}`,
+      `import { gameletKit } from ${JSON.stringify(pathToFileURL(resolve(repoRoot, 'shared/sdk/plugin-desktop/src/index.ts')).href)}`,
       '',
       'export default defineExtension({',
       '  id: "airi-plugin-game-chess",',
@@ -2714,8 +2715,8 @@ describe('setupExtensionHost', () => {
     const { service } = await setupExtensionHostForTest()
     const pluginDir = join(pluginsDir, 'test-extension-gamelet-kit')
     await mkdir(pluginDir, { recursive: true })
-    const pluginSdkUrl = pathToFileURL(resolve(repoRoot, 'packages/plugin-sdk/src/index.ts')).href
-    const tamagotchiSdkUrl = pathToFileURL(resolve(repoRoot, 'packages/plugin-sdk-desktop/src/index.ts')).href
+    const pluginSdkUrl = pathToFileURL(resolve(repoRoot, 'shared/sdk/plugin/src/index.ts')).href
+    const tamagotchiSdkUrl = pathToFileURL(resolve(repoRoot, 'shared/sdk/plugin-desktop/src/index.ts')).href
     const entrypointPath = await writeEntrypoint({
       dir: pluginDir,
       name: 'test-extension-gamelet-kit.ts',

@@ -130,7 +130,7 @@ result*
 outputs/
 
 # MediaPipe task assets
-packages/model-driver-mediapipe/tasks/assets/*
+capabilities/vision/mediapipe/tasks/assets/*
 
 # Plugins
 plugins/local
@@ -156,9 +156,9 @@ __screenshots__
 .alint/
 .alintcache
 
-# Generated from packages/i18n/glossary/terms.yaml at upload time. Never committed, so it
+# Generated from shared/i18n/glossary/terms.yaml at upload time. Never committed, so it
 # cannot drift from its source.
-packages/i18n/glossary/glossary.tbx
+shared/i18n/glossary/glossary.tbx
 
 /airi-docs/
 .worktrees/
@@ -168,9 +168,9 @@ apps/*/public/sherpaw/
 apps/*/src/renderer/public/sherpaw/
 
 # Private state and generated build files for the vendored gateway.
-third_party/angela-gateway/.next/
-third_party/angela-gateway/node_modules/
-third_party/angela-gateway/.data/
+providers/gateway/vendor/.next/
+providers/gateway/vendor/node_modules/
+providers/gateway/vendor/.data/
 # Zalo personal session material and account-scoped external message logs
 **/zalo-credentials.json
 **/zalo-login-qr.png
@@ -204,86 +204,86 @@ third_party/angela-gateway/.data/
 !/deploy/pitch/public/assets/fonts/
 !/deploy/pitch/public/assets/doki-doki-main-theme.mp3
 
-# engines/stage-tamagotchi-godot
+# capabilities/avatar/godot
 # Godot 4+ specific ignores
-/engines/stage-tamagotchi-godot/**/.godot/
-/engines/stage-tamagotchi-godot/android/
-/engines/stage-tamagotchi-godot/artifacts/
+/capabilities/avatar/godot/**/.godot/
+/capabilities/avatar/godot/android/
+/capabilities/avatar/godot/artifacts/
 
 # .NET build artifacts
-/engines/stage-tamagotchi-godot/**/bin/
-/engines/stage-tamagotchi-godot/**/obj/
+/capabilities/avatar/godot/**/bin/
+/capabilities/avatar/godot/**/obj/
 
 # Godot can scan verification test sources during project imports; these are not stage resources.
-/engines/stage-tamagotchi-godot/tests/**/*.uid
+/capabilities/avatar/godot/tests/**/*.uid
 
 # Developer-provided local VRM fixtures for editor preview scenes.
-/engines/stage-tamagotchi-godot/assets/fixtures/vrm/*
-!/engines/stage-tamagotchi-godot/assets/fixtures/vrm/.gitkeep
+/capabilities/avatar/godot/assets/fixtures/vrm/*
+!/capabilities/avatar/godot/assets/fixtures/vrm/.gitkeep
 
 # integrations/minecraft
 /integrations/minecraft/**/logs/
 
-# integrations/satori-bot
+# integrations/satori
 # Database persistence (generated locally; do not commit)
-/integrations/satori-bot/data/*
-!/integrations/satori-bot/data/.gitkeep
+/integrations/satori/data/*
+!/integrations/satori/data/.gitkeep
 
 # Environment Secrets
-/integrations/satori-bot/**/.env
-/integrations/satori-bot/**/.env.local
+/integrations/satori/**/.env
+/integrations/satori/**/.env.local
 
 # Node.js
-/integrations/satori-bot/**/node_modules/
-/integrations/satori-bot/**/dist/
-/integrations/satori-bot/**/*.log
+/integrations/satori/**/node_modules/
+/integrations/satori/**/dist/
+/integrations/satori/**/*.log
 
 # OS Files
-/integrations/satori-bot/**/.DS_Store
+/integrations/satori/**/.DS_Store
 
-# packages/testing-audio
-/packages/testing-audio/**/test-results/
+# shared/tooling/testing-audio
+/shared/tooling/testing-audio/**/test-results/
 
-# services/voice-local
-/services/voice-local/**/__pycache__/
-/services/voice-local/**/*.pyc
+# capabilities/voice/local
+/capabilities/voice/local/**/__pycache__/
+/capabilities/voice/local/**/*.pyc
 
-# third_party/openseeface
-/third_party/openseeface/**/*.mp4
-/third_party/openseeface/__pycache__/*
-/third_party/openseeface/Binary/*
-/third_party/openseeface/Samples/*
-/third_party/openseeface/**/*.zip
-/third_party/openseeface/**/*.7z
-/third_party/openseeface/CSharp/*
-/third_party/openseeface/VSeeFace/*
-/third_party/openseeface/.venv/*
+# capabilities/vision/vendor/openseeface
+/capabilities/vision/vendor/openseeface/**/*.mp4
+/capabilities/vision/vendor/openseeface/__pycache__/*
+/capabilities/vision/vendor/openseeface/Binary/*
+/capabilities/vision/vendor/openseeface/Samples/*
+/capabilities/vision/vendor/openseeface/**/*.zip
+/capabilities/vision/vendor/openseeface/**/*.7z
+/capabilities/vision/vendor/openseeface/CSharp/*
+/capabilities/vision/vendor/openseeface/VSeeFace/*
+/capabilities/vision/vendor/openseeface/.venv/*
 
-# server/apps/api
-/server/apps/api/docs/ai-context
+# backend/api
+/backend/api/docs/ai-context
 
-# third_party/angela-gateway/tests
-/third_party/angela-gateway/tests/**/node_modules/
-/third_party/angela-gateway/tests/**/package-lock.json
-/third_party/angela-gateway/tests/**/.vite/
-/third_party/angela-gateway/tests/**/coverage/
+# providers/gateway/vendor/tests
+/providers/gateway/vendor/tests/**/node_modules/
+/providers/gateway/vendor/tests/**/package-lock.json
+/providers/gateway/vendor/tests/**/.vite/
+/providers/gateway/vendor/tests/**/coverage/
 
-# engines/stage-tamagotchi-godot/addons/Godot-MToon-Shader
-/engines/stage-tamagotchi-godot/addons/Godot-MToon-Shader/**/*.vrm.res
+# capabilities/avatar/godot/addons/Godot-MToon-Shader
+/capabilities/avatar/godot/addons/Godot-MToon-Shader/**/*.vrm.res
 
 # Godot-specific ignores
-/engines/stage-tamagotchi-godot/addons/Godot-MToon-Shader/**/.import/
-/engines/stage-tamagotchi-godot/addons/Godot-MToon-Shader/**/.godot/
-/engines/stage-tamagotchi-godot/addons/Godot-MToon-Shader/**/export.cfg
-/engines/stage-tamagotchi-godot/addons/Godot-MToon-Shader/**/export_presets.cfg
+/capabilities/avatar/godot/addons/Godot-MToon-Shader/**/.import/
+/capabilities/avatar/godot/addons/Godot-MToon-Shader/**/.godot/
+/capabilities/avatar/godot/addons/Godot-MToon-Shader/**/export.cfg
+/capabilities/avatar/godot/addons/Godot-MToon-Shader/**/export_presets.cfg
 
 # Imported translations (automatically generated from CSV files)
-/engines/stage-tamagotchi-godot/addons/Godot-MToon-Shader/**/*.translation
+/capabilities/avatar/godot/addons/Godot-MToon-Shader/**/*.translation
 
 # Mono-specific ignores
-/engines/stage-tamagotchi-godot/addons/Godot-MToon-Shader/**/.mono/
-/engines/stage-tamagotchi-godot/addons/Godot-MToon-Shader/**/data_*/
+/capabilities/avatar/godot/addons/Godot-MToon-Shader/**/.mono/
+/capabilities/avatar/godot/addons/Godot-MToon-Shader/**/data_*/
 
 # System/tool-specific ignores
-/engines/stage-tamagotchi-godot/addons/Godot-MToon-Shader/**/.DS_Store
-/engines/stage-tamagotchi-godot/addons/Godot-MToon-Shader/**/*~
+/capabilities/avatar/godot/addons/Godot-MToon-Shader/**/.DS_Store
+/capabilities/avatar/godot/addons/Godot-MToon-Shader/**/*~

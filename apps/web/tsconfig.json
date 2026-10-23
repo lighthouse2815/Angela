@@ -1,0 +1,41 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "jsx": "preserve",
+    "lib": [
+      "DOM",
+      "ESNext",
+      "DOM.Iterable",
+      "DOM.AsyncIterable"
+    ],
+    "useDefineForClassFields": true,
+    "paths": {
+      "@angela/stage-ui/*": [
+        "../../shared/ui/stage/src/*"
+      ],
+      "@angela/stage-layouts/*": [
+        "../../shared/ui/layouts/src/*"
+      ]
+    },
+    "resolveJsonModule": true,
+    "types": [
+      "vitest",
+      "vite/client",
+      "vite-plugin-vue-layouts/client",
+      "vite-plugin-pwa/client",
+      "vue-macros/macros-global",
+      "@types/audioworklet",
+      "unplugin-info/client"
+    ],
+    "allowJs": true,
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "vueCompilerOptions": {
+    "plugins": [
+      "@vue-macros/volar/define-models",
+      "@vue-macros/volar/define-slots"
+    ]
+  }
+}

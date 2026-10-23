@@ -1,6 +1,6 @@
 import type { InvocableEventContext } from '@moeru/eventa'
 
-import type { IOTraceRecordingService } from '.'
+import type { IOTraceRecordingService } from './index'
 
 import { defineInvokeHandler } from '@moeru/eventa'
 

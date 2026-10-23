@@ -1,4 +1,4 @@
-import type { RecordsResponse } from '@angela/cli/companion-contracts'
+import type { RecordsResponse } from '@angela/companion/companion-contracts'
 import type { GenerationProvider } from '@angela/provider-inference'
 
 import type { CompanionBegin, CompanionReady } from '../../shared/eventa/companion-runtime'

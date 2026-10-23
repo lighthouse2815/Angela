@@ -1,0 +1,33 @@
+{
+  "name": "@angela/host-sdk",
+  "type": "module",
+  "version": "0.12.0-beta.5",
+  "private": true,
+  "description": "Host configuration, output, and approval helpers",
+  "license": "MIT",
+  "exports": {
+    "./*": {
+      "development": "./src/*.ts",
+      "types": "./dist/*.d.mts",
+      "default": "./dist/*.mjs"
+    }
+  },
+  "files": [
+    "README.md",
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --config vitest.config.ts"
+  },
+  "dependencies": {
+    "@angela/core-agent": "workspace:^",
+    "@angela/i18n": "workspace:^",
+    "@angela/local-config": "workspace:^",
+    "@modelcontextprotocol/sdk": "catalog:",
+    "@moeru/std": "catalog:",
+    "@xsai/shared": "catalog:",
+    "valibot": "catalog:"
+  }
+}

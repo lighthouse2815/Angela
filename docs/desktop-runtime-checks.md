@@ -18,7 +18,7 @@ pnpm exec playwright install chromium
 Chạy các nhóm test tương ứng:
 
 ```sh
-pnpm -F @angela/cli exec vitest run --config vitest.config.ts src/companion src/runtime --maxWorkers=1 --no-file-parallelism --testTimeout=30000 --hookTimeout=30000
+pnpm -F @angela/companion exec vitest run --config vitest.config.ts src/companion src/runtime --maxWorkers=1 --no-file-parallelism --testTimeout=30000 --hookTimeout=30000
 pnpm exec vitest run --project stage-tamagotchi:node --testTimeout=30000 --hookTimeout=30000
 pnpm -F @angela/desktop exec vitest run --config vitest.config.ts --project browser src/renderer/composables/use-companion-runtime.browser.test.ts src/renderer/composables/use-companion-follow-ups.browser.test.ts --maxWorkers=1 --no-file-parallelism --testTimeout=30000 --hookTimeout=30000
 ```

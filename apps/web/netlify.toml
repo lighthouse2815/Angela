@@ -1,0 +1,20 @@
+[build]
+base = "/"
+command = "pnpm -F @angela/web run build && ./scripts/build-airi-docs.sh ./apps/web/dist/docs && cp ./apps/web/dist/docs/sitemap.xml ./apps/web/dist/sitemap.xml  && pnpm -F @angela/stage-ui run story:build && mv ./shared/ui/stage/.histoire/dist ./apps/web/dist/ui"
+publish = "/apps/web/dist"
+
+[build.environment]
+NODE_VERSION = "24"
+NODE_OPTIONS = "--max-old-space-size=4096"
+
+[[redirects]]
+from = "/assets/*"
+to = "/assets/:splat"
+status = 200
+force = true
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200
+force = false

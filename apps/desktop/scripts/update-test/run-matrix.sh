@@ -3,8 +3,8 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-APP_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/../../../.." && pwd)"
+APP_DIR="$(cd "${SCRIPT_DIR}/..." && pwd)"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.../../.." && pwd)"
 APP_BIN="${APP_DIR}/dist/mac-arm64/airi.app/Contents/MacOS/airi"
 
 PORT="${PORT:-8787}"

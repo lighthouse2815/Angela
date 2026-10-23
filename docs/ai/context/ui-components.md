@@ -2,11 +2,11 @@
 
 # Tham khảo thành phần `@angela/ui`
 
-> **Tự động duy trì**: Khi thêm hoặc cập nhật các thành phần trong `packages/ui`, hãy cập nhật tài liệu này cho phù hợp.
+> **Tự động duy trì**: Khi thêm hoặc cập nhật các thành phần trong `shared/ui/primitives`, hãy cập nhật tài liệu này cho phù hợp.
 
 Nguyên thủy được tiêu chuẩn hóa được xây dựng trên [reka-ui](https://reka-ui.com/). Logic nghiệp vụ tối thiểu - sử dụng những logic này thay vì các phần tử DOM thô.
 
-Nguồn: `packages/ui/src/components/`
+Nguồn: `shared/ui/primitives/src/components/`
 
 ---
 
@@ -741,7 +741,7 @@ Danh sách chuỗi động với add/remove.
 
 ## Composables
 
-Đã xuất từ ​​`packages/ui/src/composables/`:
+Đã xuất từ ​​`shared/ui/primitives/src/composables/`:
 
 - **`useDeferredMount()`** — Trì hoãn việc gắn linh kiện (hữu ích cho các linh kiện nặng).
 - **`useTheme()`** — Quản lý chủ đề composable.

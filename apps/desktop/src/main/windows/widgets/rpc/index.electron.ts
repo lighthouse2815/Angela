@@ -1,8 +1,8 @@
 import type { BrowserWindow } from 'electron'
 
+import type { WidgetsWindowManager } from '..'
 import type { I18n } from '../../../libs/i18n'
 import type { ServerChannel } from '../../../services/angela/channel-server'
-import type { WidgetsWindowManager } from '../../widgets'
 
 import { createContext } from '@moeru/eventa/adapters/electron/main'
 import { ipcMain } from 'electron'

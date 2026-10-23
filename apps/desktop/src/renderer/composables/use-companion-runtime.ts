@@ -1,7 +1,7 @@
 import type { Conversation, StreamOptions } from '@angela/core-agent'
 import type { Tool } from '@xsai/shared-chat'
 
-import { requestPrivacy } from '@angela/cli/companion-contracts'
+import { requestPrivacy } from '@angela/companion/companion-contracts'
 import { useElectronEventaInvoke } from '@angela/electron-vueuse'
 import { extractMessageText } from '@angela/stage-ui/libs/chat-sync/index'
 import { usePiniaSynced } from '@angela/stage-ui/libs/pinia'

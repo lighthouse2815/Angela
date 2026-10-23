@@ -13,7 +13,7 @@ export default defineConfig({
   vue: true,
 }, {
   ignores: [
-    'third_party/**', // Preserve imported upstream sources.
+    '**/vendor/**', // Preserve imported upstream sources.
     'apps/desktop-kirie/addons/**', // Kirie installs third-party Godot dependencies here.
     'cspell.config.yaml',
     'cspell.config.yml',
@@ -94,7 +94,7 @@ export default defineConfig({
     'yaml/plain-scalar': 'off',
   },
 }, {
-  files: ['server/apps/api/**/*.ts'],
+  files: ['backend/api/**/*.ts'],
   rules: {
     'no-restricted-syntax': [
       'error',

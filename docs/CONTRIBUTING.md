@@ -200,15 +200,15 @@ pnpm telegram
 
 Đặt token và danh sách người dùng được phép trong file môi trường Telegram riêng. Không commit thông tin xác thực.
 Để nối với desktop, dùng cùng `ANGELA_DATA_DIR`, `ANGELA_WORKSPACE` và đặt `ANGELA_TELEGRAM_SHARED_USER_ID`.
-Xem [hướng dẫn runtime chung](../packages/angela-cli/src/companion/README.md) để cấu hình nhân vật và bộ nhớ.
+Xem [hướng dẫn runtime chung](../apps/cli/src/companion/README.md) để cấu hình nhân vật và bộ nhớ.
 
-Bản thử nghiệm Postgres/media trong `integrations/telegram-bot` đã được đưa ra khỏi workspace mặc định.
-Mã nguồn và dữ liệu cũ được giữ lại. Xem [ghi chú lưu trữ](../integrations/telegram-bot/ARCHIVED.md) trước khi dùng bản đó.
+Bản thử nghiệm Postgres/media trong `integrations/telegram/archive` đã được đưa ra khỏi workspace mặc định.
+Mã nguồn và dữ liệu cũ được giữ lại. Xem [ghi chú lưu trữ](../integrations/telegram/archive/ARCHIVED.md) trước khi dùng bản đó.
 
 ### Tích hợp bot Discord
 
 ```shell
-cd integrations/discord-bot
+cd integrations/discord
 ```
 
 Cấu hình `.env`

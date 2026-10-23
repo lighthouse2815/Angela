@@ -19,10 +19,10 @@ import ts from 'typescript'
  *   -> stdout.write
  */
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const require = createRequire(join(root, 'packages/stage-ui/package.json'))
+const require = createRequire(join(root, 'shared/ui/stage/package.json'))
 const { parse } = require('vue/compiler-sfc')
 
-const files = execFileSync('rg', ['--files', 'apps', 'packages'], { cwd: root, encoding: 'utf8' }).trim().split('\n').sort()
+const files = execFileSync('rg', ['--files', 'apps', 'shared', 'capabilities'], { cwd: root, encoding: 'utf8' }).trim().split('\n').sort()
 const packages = new Map(files.filter(file => file.endsWith('/package.json')).map((file) => {
   const manifest = JSON.parse(readFileSync(join(root, file), 'utf8'))
   return [manifest.name, { directory: dirname(file), exports: manifest.exports }]
@@ -139,7 +139,7 @@ function renderedImports(file) {
 }
 
 const vueFiles = files.filter(file => file.endsWith('.vue') && !file.includes('/public/') && !file.includes('/dist/'))
-const stories = vueFiles.filter(file => file.startsWith('packages/stage-ui/') && file.endsWith('.story.vue'))
+const stories = vueFiles.filter(file => file.startsWith('shared/ui/stage/') && file.endsWith('.story.vue'))
 const coverage = new Map()
 for (const story of stories) {
   for (const item of renderedImports(story)) {

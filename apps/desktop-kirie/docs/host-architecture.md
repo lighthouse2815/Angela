@@ -22,7 +22,7 @@ Vue renderer -> Angela Eventa contracts
 | Ứng dụng điện tử | Tham khảo hành vi và ứng dụng được hỗ trợ |
 | Dịch vụ Angela Node | Kênh máy chủ trì hoãn, plugin, Artistry và MCP |
 
-Kirie renderer sử dụng một bộ chuyển đổi Kirie host. Chủ sở hữu của nó cung cấp ứng dụng khách Nền tảng được yêu cầu và một ngữ cảnh Eventa cho mỗi renderer. Bộ điều hợp cục bộ Kirie không chọn Electron transport tại runtime. Ứng dụng Electron ban đầu và `engines/stage-tamagotchi-godot/` vẫn có các đường dẫn được hỗ trợ riêng biệt.
+Kirie renderer sử dụng một bộ chuyển đổi Kirie host. Chủ sở hữu của nó cung cấp ứng dụng khách Nền tảng được yêu cầu và một ngữ cảnh Eventa cho mỗi renderer. Bộ điều hợp cục bộ Kirie không chọn Electron transport tại runtime. Ứng dụng Electron ban đầu và `capabilities/avatar/godot/` vẫn có các đường dẫn được hỗ trợ riêng biệt.
 
 Các dịch vụ Node bị trì hoãn không khởi động trong bootstrap Kirie renderer. Các trang hiển thị của họ vẫn nằm ngoài khả năng được hỗ trợ cho đến khi Angela cung cấp runtime và vòng đời. Một hoạt động bị từ chối không thiết lập một triển khai.
 
@@ -40,7 +40,7 @@ Các dịch vụ Node bị trì hoãn không khởi động trong bootstrap Kiri
 | [tests/StageTamagotchiKirie.Tests](../tests/StageTamagotchiKirie.Tests) | Kiểm tra hợp đồng C# |
 | [kirie.config.ts](../kirie.config.ts) | Xây dựng web, bí danh và lựa chọn route |
 
-Mục Web sản xuất là `res://src-web/dist/index.html`. Phương pháp phát triển [C#](../../../engines/stage-tamagotchi-godot/docs/csharp-development-method.md) và hướng dẫn kiểu [](../../../engines/stage-tamagotchi-godot/docs/csharp-style.md) vẫn chuẩn.
+Mục Web sản xuất là `res://src-web/dist/index.html`. Phương pháp phát triển [C#](../../../capabilities/avatar/godot/docs/csharp-development-method.md) và hướng dẫn kiểu [](../../../capabilities/avatar/godot/docs/csharp-style.md) vẫn chuẩn.
 
 <a id="required-behavior"></a>
 
@@ -78,4 +78,4 @@ Các yêu cầu HTTP(S) bên ngoài sử dụng Nền tảng `openExternalUrl()`
 
 Việc lựa chọn thanh tra yêu cầu mục tiêu dẫn đầu và `devtoolsFrontendUrl` có thể sử dụng được, bất kể thứ tự mục tiêu. Quá trình sản xuất vô hiệu hóa việc gỡ lỗi từ xa. Xem đường cơ sở bảo mật [CEF](https://github.com/dsh0416/godot-cef/blob/v1.16.1/docs/api/security-baseline.md). Ranh giới có khóa route sẽ cách ly các lỗi renderer. Ngữ cảnh CEF được chia sẻ sẽ bảo tồn cookie, bộ lưu trữ, BroadcastChannel và Khóa Web trên các cửa sổ.
 
-Công cụ chạy lại chuyển tiếp `invocationId` được chia sẻ để chọn một lệnh gọi trong số các giá trị `toolCallId` lặp lại. Triển khai chạy lại [ được chia sẻ](../../../packages/stage-ui/src/stores/tool-call-rerun.ts) sở hữu tính năng từ chối mục tiêu, thay thế kết quả và vô hiệu hóa tính năng tiếp tục phụ thuộc.
+Công cụ chạy lại chuyển tiếp `invocationId` được chia sẻ để chọn một lệnh gọi trong số các giá trị `toolCallId` lặp lại. Triển khai chạy lại [ được chia sẻ](../../../shared/ui/stage/src/stores/tool-call-rerun.ts) sở hữu tính năng từ chối mục tiêu, thay thế kết quả và vô hiệu hóa tính năng tiếp tục phụ thuộc.

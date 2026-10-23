@@ -100,8 +100,8 @@ function getServerChannelQrHosts(config: ElectronServerChannelConfig, serverChan
 
 function createServerChannelUrl(protocol: 'ws' | 'wss', host: string) {
   const urlHost = isIP(host) === 6 ? `[${host}]` : host
-  // TODO: Deduplicate the server channel websocket path with `packages/server-runtime/src/index.ts`
-  // and `packages/server-sdk/src/client.ts` so this does not rely on three separate `/ws` literals.
+  // TODO: Deduplicate the server channel websocket path with `backend/channel/runtime/src/index.ts`
+  // and `shared/sdk/server/src/client.ts` so this does not rely on three separate `/ws` literals.
   return `${protocol}://${urlHost}:${getServerChannelPort()}/ws`
 }
 

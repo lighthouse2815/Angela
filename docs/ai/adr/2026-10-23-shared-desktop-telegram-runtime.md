@@ -9,11 +9,11 @@ Implemented. Desktop and the supported Telegram adapter use AngelaRuntime and th
 Desktop stores learning and companion records in renderer localStorage.
 CLI and its Telegram adapter use AngelaRuntime, Memory V2, Tasks, and OpenLoops.
 The separate stores prevent consistent recall and follow-up across channels.
-The older integrations/telegram-bot also owns an independent Telegram implementation.
+The older integrations/telegram/archive also owns an independent Telegram implementation.
 
 ## Target
 
-- Keep AngelaRuntime in packages/angela-cli as the authoritative companion orchestration domain.
+- Keep AngelaRuntime in core/companion as the authoritative companion orchestration domain.
 - Keep Electron presentation, avatars, provider selection, voice interruption, attachments, and authorized desktop tools.
 - Run Node-only memory and runtime operations in Electron main, never inside the browser renderer.
 - Use central Eventa contracts for desktop requests, results, cancellation, and lifecycle events.
@@ -24,7 +24,7 @@ The older integrations/telegram-bot also owns an independent Telegram implementa
 - Keep character, workspace, channel, and session provenance explicit. A renderer cannot choose arbitrary filesystem paths or user identities.
 - Use Memory V2 for durable facts, Tasks for explicit reminders, and OpenLoops for unfinished conversation subjects.
 - Preserve learning review intervals and activity state through shared domain operations without a parallel desktop authority.
-- Use the packages/angela-cli Telegram adapter as the supported Telegram entry point.
+- Use the apps/cli Telegram adapter as the supported Telegram entry point.
 
 ## Data transition
 
@@ -92,11 +92,11 @@ They do not gain a second Telegram notification path.
 
 ## Telegram retirement boundary
 
-The root `pnpm telegram` command starts the packages/angela-cli adapter.
-The upstream integrations/telegram-bot prototype is excluded from the default workspace.
+The root `pnpm telegram` command starts the apps/cli adapter.
+The upstream integrations/telegram/archive prototype is excluded from the default workspace.
 Its PostgreSQL and media source remain archived, without deleting existing data.
 Those database records and media workflows need a separate migration before their source can be removed.
-Read [the shared runtime guide](../../../packages/angela-cli/src/companion/README.md) for configuration and supported boundaries.
+Read [the shared runtime guide](../../../core/companion/src/companion/README.md) for configuration and supported boundaries.
 
 ## Validation
 

@@ -14,7 +14,7 @@ Người dùng đã yêu cầu mọi nhà cung cấp và luồng tài khoản t�
 
 ## Phán quyết
 
-Nhà cung cấp công cụ nhà cung cấp hoàn chỉnh theo `third_party/angela-gateway` với giấy phép MIT và xuất xứ được ghim. Sử dụng tên sản phẩm Angela Gateway. Bảo toàn các mã định danh giao thức bên ngoài và bản ghi bản quyền. Giữ động cơ đã nhập ở phần phụ thuộc riêng biệt workspace. Xây dựng nó thành `@angela/gateway`, mà Angela CLI bao gồm dưới dạng phần phụ thuộc workspace.
+Nhà cung cấp công cụ nhà cung cấp hoàn chỉnh theo `providers/gateway/vendor` với giấy phép MIT và xuất xứ được ghim. Sử dụng tên sản phẩm Angela Gateway. Bảo toàn các mã định danh giao thức bên ngoài và bản ghi bản quyền. Giữ động cơ đã nhập ở phần phụ thuộc riêng biệt workspace. Xây dựng nó thành `@angela/gateway`, mà Angela CLI bao gồm dưới dạng phần phụ thuộc workspace.
 
 ```text
 Angela CLI gateway commands
