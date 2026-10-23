@@ -16,7 +16,7 @@
   "scripts": {
     "package:cli": "node scripts/package-cli.mjs",
     "cli": "node --env-file-if-exists=.env.cli.local --import tsx apps/cli/src/bin/run.ts",
-    "build:cli": "pnpm -F @angela/cli... build",
+    "build:cli": "turbo run build --filter=@angela/cli --concurrency=1",
     "postinstall": "pnpm exec simple-git-hooks && pnpm run build:packages",
     "dev": "pnpm run dev:desktop",
     "dev:ui": "pnpm -rF @angela/stage-ui run story:dev",

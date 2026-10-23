@@ -2,7 +2,7 @@
   "$schema": "https://turborepo.com/schema.json",
   "tasks": {
     "@angela/gateway#build": {
-      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/providers/gateway/vendor/**", "!$TURBO_ROOT$/providers/gateway/vendor/node_modules/**", "!$TURBO_ROOT$/providers/gateway/vendor/.next/**"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/providers/gateway/vendor/**", "!$TURBO_ROOT$/providers/gateway/vendor/node_modules/**", "!$TURBO_ROOT$/providers/gateway/vendor/.next/**", "!README.md", "!UPSTREAM.md", "!$TURBO_ROOT$/providers/gateway/vendor/README.angela.md", "!$TURBO_ROOT$/providers/gateway/vendor/tests/**"],
       "outputs": ["dist/**"]
     },
     "build": {

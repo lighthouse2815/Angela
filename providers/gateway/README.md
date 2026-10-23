@@ -15,6 +15,8 @@ Tại thư mục gốc repo, chạy `pnpm build:cli`. Gói này được build t
 Để build riêng gateway và dùng lại cache Turbo, chạy `pnpm exec turbo run build --filter=@angela/gateway`.
 Turbo chỉ build lại khi đầu vào thay đổi. Đầu vào gồm mã nguồn vendor, lockfile và script build.
 `pnpm -F @angela/gateway build` luôn chạy Next.js trực tiếp.
+`pnpm build:cli` dùng Turbo để tái sử dụng các package đã build.
+Thay đổi tài liệu và test vendor không làm mất cache production của gateway.
 
 <a id="use"></a>
 
