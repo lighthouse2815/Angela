@@ -120,6 +120,9 @@ Không coi kiểm tra Node, browser hoặc RPC là bằng chứng cho click nati
 
 Smoke cửa sổ dùng `electron-vite preview --skipBuild` để tránh build lại trong thời gian chờ khởi động.
 CI dùng Xvfb do bước cài dependency Playwright cung cấp.
+Trước smoke, CI cài Electron và đặt sandbox helper thành `root:root`, quyền `4755`.
+Runner Ubuntu yêu cầu quyền này để Electron khởi động với sandbox.
+Cấu hình theo [hướng dẫn Chromium](https://chromium.googlesource.com/chromium/src/+/main/docs/linux/suid_sandbox_development.md).
 Kiểm tra đầu vào Turbo xác nhận test không đổi mã hash cache. Thay đổi nguồn production đổi mã hash.
 
 CI desktop dùng trực tiếp `apps/desktop/vitest.node.config.ts`.

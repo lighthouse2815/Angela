@@ -83,6 +83,13 @@ jobs:
         run: pnpm -F @angela/desktop lint
       - name: Desktop build
         run: pnpm -F @angela/desktop build
+      - name: Configure Electron sandbox helper
+        working-directory: apps/desktop
+        run: |
+          pnpm exec install-electron
+          sandbox_path="$(node -p "require('node:path').join(require('node:path').dirname(require('electron')), 'chrome-sandbox')")"
+          sudo chown root:root "$sandbox_path"
+          sudo chmod 4755 "$sandbox_path"
       - name: Linux window render smoke
         timeout-minutes: 5
         env:
