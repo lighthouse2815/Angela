@@ -6,6 +6,7 @@ import { defineStore } from 'pinia'
 
 import { computerUseTools } from './builtin/computer-use'
 import { imageJournalTools } from './builtin/image-journal'
+import { internetTools } from './builtin/internet'
 import { studyWorkspaceTools } from './builtin/study-workspace'
 import { weatherTools } from './builtin/weather'
 import { widgetsTools } from './builtin/widgets'
@@ -21,6 +22,8 @@ export const computerUseToolReferences = [
   { name: 'study_workspace_read' },
   { name: 'study_workspace_search' },
   { name: 'study_workspace_save_note' },
+  { name: 'study_along' },
+  { name: 'internet_diagnostics' },
 ] satisfies ChatToolReference[]
 
 export const widgetToolReferences = [
@@ -50,6 +53,7 @@ export const useTamagotchiBuiltinToolsStore = defineStore('tamagotchi-builtin-to
       weatherTools(),
       computerUseTools(),
       studyWorkspaceTools(),
+      internetTools(),
     ])).flat()
 
     llmToolsStore.removeToolsByIds(...registeredToolIds())

@@ -114,6 +114,10 @@ export default {
   ],
   extraResources: [
     {
+      from: '../../third_party/agent-reach/LICENSE',
+      to: 'licenses/agent-reach-LICENSE.txt',
+    },
+    {
       from: '../../capabilities/avatar/godot/out/${os}',
       to: 'godot-stage',
       filter: ['**/*'],

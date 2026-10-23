@@ -40,6 +40,7 @@ import { setupComputerUse } from './services/angela/computer-use'
 import { setupGodotStageManager } from './services/angela/godot-stage'
 import { setupHomeAssistant } from './services/angela/home-assistant'
 import { setupBuiltInServer } from './services/angela/http-server'
+import { createInternetRuntime, setupInternet } from './services/angela/internet'
 import { IOTraceRecordingService } from './services/angela/io-trace-recording'
 import { setupLearningReviewNotifications } from './services/angela/learning-reviews'
 import { setupLocalProviderConfig } from './services/angela/local-config'
@@ -241,6 +242,11 @@ app.whenReady().then(async () => {
     build: async () => setupMcpManager(),
   })
 
+  const internetRuntime = injeca.provide('modules:internet', {
+    dependsOn: { mcpManager },
+    build: ({ dependsOn }) => createInternetRuntime(dependsOn.mcpManager),
+  })
+
   const ioTraceRecording = injeca.provide('services:io-trace-recording', {
     dependsOn: { config: ioTraceRecordingConfig, lifecycle },
     build: ({ dependsOn }) => {
@@ -392,13 +398,14 @@ app.whenReady().then(async () => {
   }
 
   injeca.invoke({
-    dependsOn: { mainWindow, tray, serverChannel, airiHttpServer, godotStageManager, pluginHost, mcpManager, onboardingWindow: onboardingWindowManager, widgetsWindow: widgetsManager, spotlightWindow, artistryConfig },
+    dependsOn: { mainWindow, tray, serverChannel, airiHttpServer, godotStageManager, pluginHost, mcpManager, internetRuntime, onboardingWindow: onboardingWindowManager, widgetsWindow: widgetsManager, spotlightWindow, artistryConfig },
     callback: async (deps) => {
       const { context } = createContext(ipcMain)
       setupComputerUse(context)
       setupLocalProviderConfig(context)
       setupCompanionRuntime(context)
       setupStudyWorkspace(context)
+      setupInternet(context, deps.internetRuntime)
       setupHomeAssistant(context)
       await setupArtistryBridge({
         widgetsManager: deps.widgetsWindow,

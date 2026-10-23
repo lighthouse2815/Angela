@@ -173,3 +173,10 @@ Cuộc chạy Niri 2026-10-16 đã diễn ra với Gemini 3.1 Flash Lite và Mã
 Mở Cài đặt > Mô-đun > Bộ nhớ dài hạn và bật Đồng hành. Bộ nhớ học tập cũng phải được kích hoạt. Thêm một chủ đề chưa hoàn thành hoặc bắt đầu một hoạt động được chia sẻ. stage chính trình bày nội dung theo dõi sau một phút mà không cần nhập dữ liệu khi đến hạn ghi. Nó chờ trong khi tạo cuộc trò chuyện hoặc phát lời nói và trong khi stage bị ẩn. Quá trình theo dõi diễn ra trong khoảng thời gian từ 08:00 đến 22:00 theo múi giờ của máy, nhiều nhất là một lần mỗi giờ. Mỗi bản ghi có một lần trình bày. Việc đóng Angela dừng kiểm tra cho đến lần khởi chạy tiếp theo. Nỗ lực dành riêng có thể bị mất nếu renderer đóng trước khi bánh mì nướng xuất hiện.
 
 Sử dụng Dừng yêu cầu để loại bỏ một chủ đề. Sử dụng Xóa bản ghi để xóa bộ nhớ đồng hành của nó. Một hoạt động đã hoàn thành sẽ ghi lại báo cáo của người dùng. Bộ đếm thời gian đã trôi qua không bao giờ đánh dấu một hoạt động đã hoàn thành. Các bản ghi cục bộ này vẫn tách biệt với Bộ nhớ CLI V2 và Telegram OpenLoops. Bảng điều khiển Đồng hành và trò chuyện sử dụng cùng các bản ghi có phạm vi ký tự trên các cửa sổ desktop.
+
+## Study Along
+
+Desktop có công cụ native `study_along` để đọc bài học YouTube trong tab Angela Browser đang kết nối.
+Công cụ giữ timestamp, cache transcript và lấy đoạn quanh vị trí đang xem hoặc 5 phút trước đó.
+`internet_diagnostics` kiểm tra cấu hình và công cụ media cục bộ mà không upload audio.
+Xem [hướng dẫn Study Along](../../docs/study-along.md) để cấu hình extraction, transcription và đọc giới hạn hỗ trợ.

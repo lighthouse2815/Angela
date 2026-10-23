@@ -55,6 +55,8 @@ describe('useTamagotchiBuiltinToolsStore', async () => {
       { id: 'tamagotchi:study_workspace_read', defaultActive: false },
       { id: 'tamagotchi:study_workspace_search', defaultActive: false },
       { id: 'tamagotchi:study_workspace_save_note', defaultActive: false },
+      { id: 'tamagotchi:study_along', defaultActive: false },
+      { id: 'tamagotchi:internet_diagnostics', defaultActive: false },
     ])
     expect(toolsStore.tools.filter(tool => tool.requiresExplicitSelection).map(tool => tool.function.name)).toEqual([
       'computer_use',
@@ -67,6 +69,8 @@ describe('useTamagotchiBuiltinToolsStore', async () => {
       'study_workspace_read',
       'study_workspace_search',
       'study_workspace_save_note',
+      'study_along',
+      'internet_diagnostics',
     ])
     expect(toolsStore.getToolsByNames('get_weather')[0]?.function.name).toBe('get_weather')
   })

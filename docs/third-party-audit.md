@@ -30,7 +30,7 @@ The inspected source has no `core/`, `doctor.py`, or `integrations/` directories
 | YouTube metadata/subtitles | `channels/youtube.py`, yt-dlp, VTT repeat removal | yt-dlp | Derive extraction policy. Preserve timestamps instead of plain text. | `core/companion/src/internet/youtube.ts` |
 | Transcription | `transcribe.py`, audio download, mono 16 kHz/32 kbps chunks, explicit API routing | yt-dlp, FFmpeg, Groq/OpenAI HTTP | Derive bounded extraction/chunk policy. Request verbose timestamped JSON. | `core/companion/src/internet/transcription.ts` |
 | Webpage | `channels/web.py`, Jina Reader then Exa HTTP MCP | Hosted APIs | Keep existing browser reading and Tavily search. Do not duplicate them. | Existing browser MCP and shared web-search tools |
-| GitHub | `channels/github.py`, gh API then public REST | gh or GitHub HTTP API | Native public REST reader is suitable. No CLI installation needed. | Native research tool |
+| GitHub | `channels/github.py`, gh API then public REST | gh or GitHub HTTP API | Keep the existing browser reader. Defer a separate REST provider. | Existing browser MCP |
 | Reddit | `channels/reddit.py`, OpenCLI and public web hints | OpenCLI/browser session | Keep public reading through the existing browser. Defer authenticated scraper. | Existing MCP |
 | Twitter/X | `channels/twitter.py`, experimental OpenCLI | OpenCLI/browser session | Defer authenticated integration. Never import browser cookies. | Existing MCP |
 | Bilibili | `channels/bilibili.py`, bili-cli, OpenCLI, public search API | bili-cli/OpenCLI | Defer native subtitles. Upstream removed yt-dlp support after 412 failures. | Existing browser reading only |
@@ -54,14 +54,14 @@ Angela does not download or bundle new executables in this change.
 | OpenCLI | [Apache-2.0](https://github.com/jackwener/opencli/blob/main/LICENSE) | Evaluated, not ported | No | No | None added |
 | bili-cli (`bilibili-cli`) | [Apache-2.0 metadata](https://pypi.org/pypi/bilibili-cli/json) | Evaluated, not ported | No | No | None added |
 | twitter-cli | [Apache-2.0](https://github.com/jackwener/twitter-cli/blob/main/LICENSE) | Retired upstream. Browser-cookie behavior rejected. | No | No | None added |
-| rdt-cli | Removed upstream. Exact historical package/license not verified. | Excluded. Do not copy or install. | No | No | Requires audit before future use |
+| rdt-cli | [Apache-2.0 metadata](https://pypi.org/pypi/rdt-cli/json), [source](https://github.com/jackwener/rdt-cli). Removed upstream. | Excluded. Do not copy or install. | No | No | None added |
 | mcporter | [MIT](https://github.com/steipete/mcporter/blob/main/LICENSE) | Retired upstream integration | No | No | None added |
 | imageio-ffmpeg | [BSD-2-Clause wrapper](https://github.com/imageio/imageio-ffmpeg/blob/main/LICENSE). Bundled FFmpeg has separate terms. | Upstream installer only, excluded | No | No | None added |
 | CloakBrowser | [MIT metadata](https://pypi.org/pypi/cloakbrowser/json). Browser binaries have separate terms. | Upstream browser owner, excluded | No | No | None added |
 | requests / loguru / PyYAML | Apache-2.0 / MIT / MIT, respective PyPI metadata | Python dependencies, excluded | No | No | None added |
 | Playwright MCP | [Apache-2.0](https://github.com/microsoft/playwright-mcp/blob/main/LICENSE) | Reuse Angela's existing MCP configuration | No | Existing | Existing package notices |
 | Groq/OpenAI-compatible transcription | Hosted API, service terms rather than a source license | Explicit selected provider receives audio | No | Optional | No SDK/code copied. Provider account terms apply. |
-| GitHub REST | Hosted API, service terms | Public repository and issue data | No | For public GitHub research | No implementation copied |
+| GitHub REST | Hosted API, service terms | Evaluated public REST alternative, deferred | No | No new | No implementation copied |
 
 ## Security boundaries
 
