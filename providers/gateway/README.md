@@ -31,7 +31,7 @@ angela gateway use --model PROVIDER_ALIAS/MODEL_ID
 angela
 ```
 
-`login` in địa chỉ bảng điều khiển cục bộ. Khi nhà cung cấp yêu cầu, việc xác thực tài khoản diễn ra trong trình duyệt. Giữ tiến trình gateway đang chạy. Nhấn Ctrl+C để dừng máy chủ. Điểm cuối API mặc định là `http://127.0.0.1:20129/v1/`.
+`login` in địa chỉ bảng điều khiển cục bộ. Khi nhà cung cấp yêu cầu, việc xác thực tài khoản diễn ra trong trình duyệt. Giữ tiến trình gateway đang chạy. Nhấn Ctrl+C để dừng máy chủ. Điểm cuối API mặc định là `http://127.0.0.1:1107/angela1/`.
 
 <a id="boundaries"></a>
 

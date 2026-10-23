@@ -708,12 +708,12 @@ export default function APIPageClient({ machineId }) {
     });
   };
 
-  const [baseUrl, setBaseUrl] = useState("/v1");
+  const [baseUrl, setBaseUrl] = useState("/angela1");
 
   // Hydration fix: Only access window on client side
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setBaseUrl(`${window.location.origin}/v1`);
+      setBaseUrl(`${window.location.origin}/angela1`);
     }
   }, []);
 
@@ -754,9 +754,9 @@ export default function APIPageClient({ machineId }) {
             }`}>Tunnel</span>
             {tunnelEnabled && !tunnelLoading && tunnelReachable ? (
               <>
-                <Input value={`${tunnelPublicUrl || tunnelUrl}/v1`} readOnly className="flex-1 font-mono text-sm" />
+                <Input value={`${tunnelPublicUrl || tunnelUrl}/angela1`} readOnly className="flex-1 font-mono text-sm" />
                 <button
-                  onClick={() => copy(`${tunnelPublicUrl || tunnelUrl}/v1`, "tunnel_url")}
+                  onClick={() => copy(`${tunnelPublicUrl || tunnelUrl}/angela1`, "tunnel_url")}
                   className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded text-text-muted hover:text-primary transition-colors shrink-0"
                 >
                   <span className="material-symbols-outlined text-[18px]">{copied === "tunnel_url" ? "check" : "content_copy"}</span>
@@ -846,9 +846,9 @@ export default function APIPageClient({ machineId }) {
             }`}>Tailscale</span>
             {tsEnabled && !tsLoading && tsReachable ? (
               <>
-                <Input value={`${tsUrl}/v1`} readOnly className="flex-1 font-mono text-sm" />
+                <Input value={`${tsUrl}/angela1`} readOnly className="flex-1 font-mono text-sm" />
                 <button
-                  onClick={() => copy(`${tsUrl}/v1`, "ts_url")}
+                  onClick={() => copy(`${tsUrl}/angela1`, "ts_url")}
                   className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded text-text-muted hover:text-primary transition-colors shrink-0"
                 >
                   <span className="material-symbols-outlined text-[18px]">{copied === "ts_url" ? "check" : "content_copy"}</span>

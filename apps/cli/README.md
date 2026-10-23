@@ -41,7 +41,7 @@ Tài khoản dựa trên khóa có thể sử dụng `angela gateway add --provi
 
 `enable ACCOUNT_ID`, `disable ACCOUNT_ID` và `test ACCOUNT_ID` quản lý các tài khoản hiện có. `test` có thể liên hệ với nhà cung cấp. `keys` liệt kê siêu dữ liệu không có giá trị thông tin xác thực. `key --show` in rõ ràng khóa suy luận chung. `password --show` in mật khẩu bảng điều khiển ban đầu. Nếu bạn đã thay đổi mật khẩu trang tổng quan, hãy sử dụng mật khẩu mới thay thế.
 
-Điểm cuối mặc định là `http://127.0.0.1:20129/v1/`. `--port` chọn một cổng khác. Áp dụng tùy chọn tương tự cho các lệnh truy cập vào phiên bản đó. `--data-dir` hoặc `ANGELA_GATEWAY_DATA_DIR` chọn thư mục tài khoản riêng tư khác. Thư mục mặc định là `$XDG_CONFIG_HOME/angela/gateway` hoặc `~/.config/angela/gateway` không có cấu hình XDG. Thư mục này tách biệt với bộ nhớ CLI và dữ liệu phiên. Không chia sẻ nó hoặc cam kết nó.
+Điểm cuối mặc định là `http://127.0.0.1:1107/angela1/`. `--port` chọn một cổng khác. Áp dụng tùy chọn tương tự cho các lệnh truy cập vào phiên bản đó. `--data-dir` hoặc `ANGELA_GATEWAY_DATA_DIR` chọn thư mục tài khoản riêng tư khác. Thư mục mặc định là `$XDG_CONFIG_HOME/angela/gateway` hoặc `~/.config/angela/gateway` không có cấu hình XDG. Thư mục này tách biệt với bộ nhớ CLI và dữ liệu phiên. Không chia sẻ nó hoặc cam kết nó.
 
 `use --model` lưu khóa chia sẻ thông qua tệp cấu hình riêng hiện có. Nó bảo tồn các mục nhà cung cấp khác và hỗ trợ `--config PATH` hoặc `ANGELA_CONFIG`. Cờ trò chuyện rõ ràng và ghi đè môi trường vẫn được ưu tiên hơn cấu hình đã lưu. Khóa suy luận không thể quản lý tài khoản nhà cung cấp. Việc cài đặt dịch vụ nền và hiển thị từ xa không nằm trong quá trình tích hợp này.
 

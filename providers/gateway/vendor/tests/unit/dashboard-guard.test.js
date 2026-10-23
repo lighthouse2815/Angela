@@ -63,15 +63,15 @@ describe("dashboard guard public LLM API access", () => {
     mocks.verifyDashboardAuthToken.mockResolvedValue(false);
   });
 
-  it("allows loopback public LLM API without API key", async () => {
-    const response = await proxy(localRequest("/v1/chat/completions", { host: "localhost:20128" }));
+  it.each(["/v1", "/angela1"])("allows loopback public LLM API at %s without API key", async (prefix) => {
+    const response = await proxy(localRequest(`${prefix}/chat/completions`, { host: "localhost:20128" }));
 
     expect(response).toBe(mocks.nextResponse);
     expect(mocks.validateApiKey).not.toHaveBeenCalled();
   });
 
-  it("rejects remote Host-spoof when real peer IP is non-loopback", async () => {
-    const response = await proxy(localRequest("/v1/chat/completions", {
+  it.each(["/v1", "/angela1"])("rejects remote Host-spoof at %s when real peer IP is non-loopback", async (prefix) => {
+    const response = await proxy(localRequest(`${prefix}/chat/completions`, {
       host: "localhost",
       "x-9r-real-ip": "10.204.111.34",
     }));

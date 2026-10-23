@@ -41,6 +41,14 @@ The navigation drawer retains access to all management pages. Light, dark, and m
 The landing and login pages share the Angela orbit illustration and app icon.
 Stored protocol identifiers remain unchanged so existing integrations continue to work.
 
+## API address
+
+The default address is `http://127.0.0.1:1107/angela1/`.
+The dashboard and Angela CLI use `/angela1` for inference requests.
+`/angela1/v1` supports clients that append the OpenAI version path automatically.
+`/v1` remains a supported API alias. All inference paths enforce the same API-key policy.
+Upstream provider URLs and the internal `/api/v1` handlers keep their protocol paths.
+
 ## Build and tests
 
 Run `pnpm build:cli` from the repository root.

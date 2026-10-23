@@ -20,7 +20,7 @@ export const UPDATER_CONFIG = {
   installCmdLatest: "Install an Angela release",
   shutdownCountdownSec: 3,
   exitDelayMs: 500,
-  statusPort: 20129,
+  statusPort: 1107,
   statusPollIntervalMs: 1000,
   statusLogTailLines: 8,
   installRetries: 3,

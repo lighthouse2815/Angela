@@ -87,7 +87,7 @@ export class Gateway {
         headers: {
           'Content-Type': 'application/json',
           'x-9r-cli-token': await this.token(),
-          ...(path.startsWith('/v1/') ? { Authorization: `Bearer ${await this.sharedKey()}` } : {}),
+          ...(path.startsWith('/angela1/') ? { Authorization: `Bearer ${await this.sharedKey()}` } : {}),
         },
         ...(body === undefined ? undefined : { body: JSON.stringify(body) }),
         redirect: 'error',
@@ -117,10 +117,10 @@ export class Gateway {
     const endpoint = await this.endpoint()
     try {
       await this.request('/api/settings')
-      return { configured: true, running: true, endpoint: `${endpoint}/v1`, engine: 'Angela Gateway' }
+      return { configured: true, running: true, endpoint: `${endpoint}/angela1`, engine: 'Angela Gateway' }
     }
     catch {
-      return { configured: true, running: false, endpoint: `${endpoint}/v1`, engine: 'Angela Gateway' }
+      return { configured: true, running: false, endpoint: `${endpoint}/angela1`, engine: 'Angela Gateway' }
     }
   }
 
@@ -159,7 +159,7 @@ export class Gateway {
   }
 
   async models() {
-    return v.parse(modelsSchema, await this.request('/v1/models')).data
+    return v.parse(modelsSchema, await this.request('/angela1/models')).data
   }
 
   /** Updates only Angela's gateway provider and chat selection. Other applications and providers remain unchanged. */
@@ -175,7 +175,7 @@ export class Gateway {
       providers: { 'angela-gateway': {
         definitionId: 'openai-compatible',
         status: 'configured',
-        config: { apiKey: await this.sharedKey(), baseUrl: `${await this.endpoint()}/v1/`, api: 'chat-completions' },
+        config: { apiKey: await this.sharedKey(), baseUrl: `${await this.endpoint()}/angela1/`, api: 'chat-completions' },
       } },
       chat: { provider: 'angela-gateway', model },
     })
@@ -215,7 +215,7 @@ export class Gateway {
     catch (error) {
       if (!hasCode(error, 'ENOENT'))
         throw error
-      settings = { version: 1, port: 20129, password: randomBytes(32).toString('hex'), jwtSecret: randomBytes(32).toString('hex') }
+      settings = { version: 1, port: 1107, password: randomBytes(32).toString('hex'), jwtSecret: randomBytes(32).toString('hex') }
     }
     settings.port = this.port ?? settings.port
     await this.writeSettings(settings)

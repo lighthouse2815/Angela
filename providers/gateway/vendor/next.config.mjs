@@ -64,6 +64,22 @@ const nextConfig = {
   async rewrites() {
     return [
       {
+        source: "/angela1/v1/:path*",
+        destination: "/api/v1/:path*"
+      },
+      {
+        source: "/angela1/v1",
+        destination: "/api/v1"
+      },
+      {
+        source: "/angela1/:path*",
+        destination: "/api/v1/:path*"
+      },
+      {
+        source: "/angela1",
+        destination: "/api/v1"
+      },
+      {
         source: "/v1/v1/:path*",
         destination: "/api/v1/:path*"
       },

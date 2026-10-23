@@ -163,7 +163,7 @@ it('runs the actual bundled engine, isolates management auth, shares one key and
   await ready.promise
 
   const endpoint = await gateway.endpoint()
-  expect(await gateway.status()).toMatchObject({ configured: true, running: true, endpoint: `${endpoint}/v1` })
+  expect(await gateway.status()).toMatchObject({ configured: true, running: true, endpoint: `${endpoint}/angela1` })
   expect(await gateway.accounts()).toEqual([])
   const key = await gateway.showKey()
   expect(await gateway.showKey()).toBe(key)
@@ -180,7 +180,7 @@ it('runs the actual bundled engine, isolates management auth, shares one key and
   expect(loginHtml).not.toContain('9Router')
   expect(loginHtml).not.toContain('googletagmanager.com')
   expect(await (await fetch(`${endpoint}/api/version`)).json()).toMatchObject({ hasUpdate: false })
-  expect((await fetch(`${endpoint}/v1/chat/completions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'unknown', messages: [{ role: 'user', content: 'test' }] }) })).status).toBe(401)
+  expect((await fetch(`${endpoint}/angela1/chat/completions`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'unknown', messages: [{ role: 'user', content: 'test' }] }) })).status).toBe(401)
   expect(await gateway.login('codex')).toBe(`${endpoint}/dashboard/providers/codex`)
   expect(await gateway.login('gemini-cli')).toBe(`${endpoint}/dashboard/providers/gemini-cli`)
   expect(await gateway.login()).toBe(`${endpoint}/dashboard/providers`)
@@ -233,19 +233,25 @@ it('runs the actual bundled engine, isolates management auth, shares one key and
   const configPath = join(directory, 'shared-config.json')
   const config = new LocalConfigFile(configPath)
   await config.update({ providers: { existing: { definitionId: 'openai-compatible', status: 'configured', config: { apiKey: 'other-secret' } } }, chat: { provider: 'existing', model: 'original' } })
+  const publicModels = await fetch(`${endpoint}/angela1/models`)
+  expect(publicModels.status).toBe(200)
+  expect(await publicModels.json()).toMatchObject({ data: expect.arrayContaining([expect.objectContaining({ id: 'fixture/fixture-model' })]) })
+  const sdkModels = await fetch(`${endpoint}/angela1/v1/models`, { headers: { Authorization: `Bearer ${key}` } })
+  expect(sdkModels.status).toBe(200)
+  expect(await sdkModels.json()).toMatchObject({ data: expect.arrayContaining([expect.objectContaining({ id: 'fixture/fixture-model' })]) })
   const models = await gateway.models()
   expect(models).toContainEqual({ id: 'fixture/fixture-model' })
   await gateway.use('fixture/fixture-model', configPath)
   expect((await config.read()).config).toMatchObject({
     providers: {
       'existing': { config: { apiKey: 'other-secret' } },
-      'angela-gateway': { definitionId: 'openai-compatible', config: { apiKey: key, baseUrl: `${endpoint}/v1/` } },
+      'angela-gateway': { definitionId: 'openai-compatible', config: { apiKey: key, baseUrl: `${endpoint}/angela1/` } },
     },
     chat: { provider: 'angela-gateway', model: 'fixture/fixture-model' },
   })
   await expect(gateway.use('not-a-model', configPath)).rejects.toThrow(messages.modelMissing)
   for (const stream of [false, true]) {
-    const response = await fetch(`${endpoint}/v1/chat/completions`, {
+    const response = await fetch(`${endpoint}/angela1/chat/completions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
       body: JSON.stringify({ model: 'fixture/fixture-model', messages: [{ role: 'user', content: 'test' }], stream }),

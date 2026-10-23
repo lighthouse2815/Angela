@@ -27,7 +27,7 @@ export default function Overview() {
   const [statsError, setStatsError] = useState(false);
   const [statsLoading, setStatsLoading] = useState(true);
   const [refresh, setRefresh] = useState(0);
-  const endpoint = useSyncExternalStore(subscribeToOrigin, () => `${window.location.origin}/v1`, () => "");
+  const endpoint = useSyncExternalStore(subscribeToOrigin, () => `${window.location.origin}/angela1`, () => "");
   const { copied, copy } = useCopyToClipboard();
 
   useEffect(() => {
