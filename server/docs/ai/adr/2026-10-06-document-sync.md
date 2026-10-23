@@ -101,7 +101,9 @@ Trường đã xóa không bao giờ tham gia kiểm tra xung đột. Bản sử
 - Ảnh chụp nhanh cho bản sửa đổi bên dưới khoảng thời gian lưu giữ 100 bản sửa đổi không được đảm bảo để tái tạo lại mọi khóa một cách chính xác, chỉ có khóa có lịch sử của chính nó tình cờ thu gọn về đường cơ sở tại hoặc gần điểm đó. Xem [History](#history).
 - Không có hộp thoại xem xét xung đột. Quy tắc hiện có trong [Quy tắc xung đột](#conflict-rules) vẫn quyết định người chiến thắng và bản chỉnh sửa thua chỉ tồn tại dưới dạng bản sao cục bộ của khách hàng vì nó chưa bao giờ đến được máy chủ.
 
-## Non-goals
+<a id="non-goals"></a>
+
+## Ngoài phạm vi
 
 - Cấu hình nhà cung cấp và tin nhắn trò chuyện. Đồng bộ hóa hiện tại của họ không thay đổi.
 - Lưu trữ được mã hóa. Một tính năng có bí mật cần có nó trước tiên.

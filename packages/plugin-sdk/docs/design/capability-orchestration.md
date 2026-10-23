@@ -58,7 +58,9 @@ Thiết kế phải tránh thứ tự mã hóa cứng đặc quyền chẳng h�
 - Hỗ trợ nhiều phiên bản stage và API dành riêng cho nền tảng trong một mô hình.
 - Ngăn chặn các tín hiệu sẵn sàng bị bỏ lỡ bằng cách dựa vào các ảnh chụp nhanh đăng ký có trạng thái chứ không phải các sự kiện diễn ra một lần.
 
-## Non-goals
+<a id="non-goals"></a>
+
+## Ngoài phạm vi
 
 - Xác định công cụ chính sách sản xuất cuối cùng (ưu tiên, hạn ngạch, công bằng) trong lần lặp này.
 - Thiết kế chi tiết UI/UX các trang cấu hình.

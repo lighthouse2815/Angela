@@ -89,7 +89,9 @@ Kích hoạt nhà cung cấp yêu cầu ít nhất một mô hình tiếp xúc v
 
 Việc chuyển đổi mô hình sẽ từ chối hoặc hoàn tất quá trình nhận dạng trong chuyến bay trước khi loại bỏ runtime cũ. Tải xuống một phần chưa được cài đặt. Các thay đổi về bản sửa đổi sẽ tạo ra một bản nhận dạng nội dung mới và không ghi đè lên bản sửa đổi cũ hơn trước khi xác thực thành công. Sau khi bản sửa đổi mới được cam kết, bộ lưu trữ sẽ xóa các bản sửa đổi cũ hơn của mô hình đó. Xóa mô hình sẽ xóa tất cả các bản sửa đổi của nó.
 
-## Non-goals
+<a id="non-goals"></a>
+
+## Ngoài phạm vi
 
 Quyết định này không khẳng định rằng Sherpaw transport hiện tại vẫn duy trì bộ nhận dạng giữa các bản ghi. Các bản sửa đổi được ghim xác định nội dung nhưng danh mục hiện tại không có bản tóm tắt tệp để kiểm tra tính toàn vẹn của mật mã.
 

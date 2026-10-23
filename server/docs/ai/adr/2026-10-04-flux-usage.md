@@ -33,7 +33,9 @@ Nhật ký yêu cầu giữ giá nhà cung cấp và không bao giờ chuyển �
 
 Thêm `flux_usage` và `user_flux.unsettled_micro_flux`. Dừng viết `llm_request_settlement`. Loại bỏ bộ đếm ký tự lời nói của Redis. Loại bỏ `FluxMeter`. LLM và bài phát biểu thanh toán thông qua cùng một lệnh. credit giải quyết các khoản phí còn tồn đọng phải chăng. Các điều chỉnh của quản trị viên sẽ bảo toàn các khoản phí chưa thanh toán.
 
-## Non-goals
+<a id="non-goals"></a>
+
+## Ngoài phạm vi
 
 Đặt trước vé vào cửa, tự động đối chiếu các yêu cầu chưa được lập hóa đơn, hoàn tiền và định giá lại lịch sử.
 

@@ -55,7 +55,9 @@ Việc phối hợp phụ thuộc runtime được cố tình chia thành một 
 - Cho phép nhiều người xem và cầu nối phối hợp thông qua mặt phẳng điều khiển chung.
 - Duy trì việc triển khai linh hoạt: Plugin host được nhúng, bên ngoài hoặc từ xa.
 
-## Non-goals
+<a id="non-goals"></a>
+
+## Ngoài phạm vi
 
 - Xác định máy trạng thái vòng đời plugin đầy đủ trong tài liệu này.
 - Chỉ định bố cục UI chi tiết hoặc triển khai trình xem.

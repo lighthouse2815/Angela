@@ -24,7 +24,9 @@ Các hàm không trạng thái trong `libs/redis/cache.ts` sở hữu các lần
 
 Khởi tạo số dư, điền vào bộ đệm cơ sở dữ liệu, ghi nợ, credit và đồng bộ hóa bộ đệm thanh toán chia sẻ TTL. Việc ghi đè của quản trị viên và việc xóa tài khoản sẽ giữ lại tình trạng vô hiệu hóa bộ đệm hiện có của họ. Các phím liên tục chưa được chạm tới vẫn còn cho đến khi đọc số dư hoặc thay đổi trạng thái thay thế chúng. Không có quá trình quét khóa sản xuất nào được thực hiện trong thay đổi này.
 
-## Non-goals
+<a id="non-goals"></a>
+
+## Ngoài phạm vi
 
 Không có thay đổi sổ cái, thay đổi thời hạn sử dụng đồng hồ nợ, khóa phân phối hoặc hoạt động dữ liệu sản xuất.
 

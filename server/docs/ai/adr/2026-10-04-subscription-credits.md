@@ -109,7 +109,9 @@ Việc dọn dẹp tài nguyên không có quy tắc đăng ký. Việc từ ch�
 
 Xóa bản sao trạng thái đăng ký cục bộ và nhật ký sự kiện webhook. Đọc trạng thái quyền được hưởng từ RevenueCat trên máy khách và trên máy chủ. Giữ Capacitor Flux trong ví Flux.
 
-## Non-goals
+<a id="non-goals"></a>
+
+## Ngoài phạm vi
 
 Capacitor Flux Recall trong khoảng thời gian vẫn hoạt động. Một công việc hòa giải không có webhook. Hiển thị số tiền Capacitor Flux trên thẻ Capacitor. Tụ điện hàng năm. Flux đóng gói thông qua RevenueCat. Một quản trị viên route trong API này để đặt lại. Kiểm tra thay thế sản phẩm trong ứng dụng. Các lô hết hạn dành cho Flux đã mua.
 

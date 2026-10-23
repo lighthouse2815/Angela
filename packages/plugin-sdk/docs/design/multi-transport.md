@@ -48,7 +48,9 @@ Eventa hướng theo ngữ cảnh: các ngữ cảnh được tạo trên mỗi 
 - Hỗ trợ nhiều plugin trong một host mà không bị xung đột kênh.
 - Giữ công thái học API dành cho tác giả plugin đơn giản và rõ ràng.
 
-## Non-goals
+<a id="non-goals"></a>
+
+## Ngoài phạm vi
 
 - Thiết kế điều phối vòng đời plugin đầy đủ (chuyển pha, cấu hình khả năng, v.v.).
 - Triển khai ngăn xếp transport mới ngoài bộ điều hợp Eventa (trừ khi được yêu cầu bởi các khoảng trống runtime).

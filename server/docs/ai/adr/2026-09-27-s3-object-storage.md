@@ -16,7 +16,9 @@ Thêm bộ điều hợp S3 tùy chọn, trong phạm vi bucket vào API. Sử d
 
 Hỗ trợ tải lên máy chủ, tải xuống trực tuyến, HEAD, xóa và URL PUT/GET được chỉ định. Hỗ trợ các điểm cuối tùy chỉnh và các yêu cầu kiểu đường dẫn tùy chọn cho các dịch vụ như MinIO. Sử dụng chuỗi thông tin xác thực mặc định AWS, bao gồm các biến môi trường AWS tiêu chuẩn và vai trò IAM. Không xác định các biến thông tin xác thực S3 riêng biệt. Sử dụng cấu hình vùng rõ ràng khi bật bộ nhớ. Các URL đã ký có thời gian tồn tại cố định là 900 giây.
 
-## Non-goals
+<a id="non-goals"></a>
+
+## Ngoài phạm vi
 
 PR này không thêm điểm cuối HTTP công khai, bảng đính kèm, thay đổi giao thức đồng bộ hóa đám mây hoặc cung cấp bucket. Nó độc lập với #2636. PR đó có thể sử dụng bộ chuyển đổi này trong lần thay đổi sau. Người gọi tên miền phải ủy quyền các yêu cầu trước khi ký URL. URL đã ký là thông tin xác thực mang tính tạm thời và không được nhập các hồ sơ hoặc nhật ký lâu dài.
 

@@ -38,7 +38,9 @@ Máy khách đã gửi phiên ID và làm tròn ID. API không cần sự kiện
 - Chỉ hiển thị nội dung yêu cầu đầy đủ trong chi tiết theo dõi.
 - Thêm điều hướng giữa các phiên, dấu vết và yêu cầu.
 
-## Non-goals
+<a id="non-goals"></a>
+
+## Ngoài phạm vi
 
 - Không thêm ứng dụng khách tải lên IOTrace.
 - Không suy ra chính xác thời gian sử dụng dao hoặc mức độ thành công của dao.

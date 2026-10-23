@@ -41,7 +41,9 @@ OAuth nhà cung cấp bao gồm `sid` trong quyền truy cập token được t�
 - Hành vi phiên nhạy cảm Better Auth
 - Kiểm tra lệnh cấm tài khoản đối với người gọi JWT
 
-## Non-goals
+<a id="non-goals"></a>
+
+## Ngoài phạm vi
 
 - Xóa các hàng Phiên đã hết hạn trong lịch sử
 - Thay đổi thời gian truy cập-token hoặc làm mới-token

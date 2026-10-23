@@ -182,7 +182,9 @@ Máy khách đã sử dụng transport, vì vậy một nền tảng khác sẽ 
 - Một tiện ích mở rộng, sau khi plugin SDK mang cấu hình và có một ví dụ hoạt động.
 - MCP route, không cần mã nào cả.
 
-## Non-goals
+<a id="non-goals"></a>
+
+## Ngoài phạm vi
 
 - Không có chính sách cho mỗi tên miền. Đơn vị là thiết bị, vì vậy người dùng muốn tiếp cận mọi ánh sáng sẽ chọn từng ánh sáng hoặc không chọn gì và để trống danh sách từ chối.
 - Không có trang web stage nào hoạt động.
