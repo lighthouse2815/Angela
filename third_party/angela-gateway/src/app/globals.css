@@ -8,33 +8,34 @@
 .fonts-loaded .material-symbols-outlined { opacity: 1; transition: opacity .12s ease-out; }
 
 /* ============================================================
-   Angela Gateway palette — adopted from 9remote_private/web
-   Brand orange (dark) / soft coral (light), neutral warm bases
+   Angela Gateway palette
+   Jade accents and slate surfaces
    ============================================================ */
 :root {
-  /* Brand scale (light) - centered on #E56A4A */
-  --color-brand-50: #fdf1ed;
-  --color-brand-100: #fadccf;
-  --color-brand-200: #f4b59c;
-  --color-brand-300: #ee8d6a;
-  --color-brand-400: #ea7855;
-  --color-brand-500: #E56A4A;
-  --color-brand-600: #cc5236;
-  --color-brand-700: #a64027;
-  --color-brand-800: #7a2f1d;
-  --color-brand-900: #4d1e12;
+  /* Brand scale (light) - centered on jade */
+  --color-brand-50: #effcf9;
+  --color-brand-100: #ccf4e9;
+  --color-brand-200: #99e8d4;
+  --color-brand-300: #5cd5bc;
+  --color-brand-400: #2ebda2;
+  --color-brand-500: #118574;
+  --color-brand-600: #0d6d60;
+  --color-brand-700: #11574f;
+  --color-brand-800: #15463f;
+  --color-brand-900: #123a35;
 
   /* Primary (legacy alias for backward compat with existing components) */
   --color-primary: var(--color-brand-500);
   --color-primary-hover: var(--color-brand-600);
 
   /* Surfaces & backgrounds (light) */
-  --color-bg: #FDFAF6;
-  --color-bg-alt: #F7F3EE;
+  --color-bg: #f3f7f8;
+  --color-bg-alt: #eaf0f2;
   --color-surface: #ffffff;
-  --color-surface-2: #f4f4f5;
-  --color-surface-3: #e7e7e9;
-  --color-sidebar: rgba(244, 241, 236, 0.85);
+  --color-surface-2: #eef3f5;
+  --color-surface-3: #e0e9ed;
+  --color-sidebar: #e6eff1;
+  --color-navigation: #102d34;
 
   /* Borders */
   --color-border: #e5e7eb;
@@ -58,43 +59,44 @@
 
   /* Shadows */
   --shadow-soft: 0 1px 2px 0 rgba(0,0,0,0.04);
-  --shadow-warm: 0 2px 12px -2px rgba(229, 106, 74, 0.18);
+  --shadow-warm: 0 2px 12px -2px rgba(17, 133, 116, 0.18);
   --shadow-elevated: 0 12px 28px -4px rgba(60, 50, 45, 0.06);
   --shadow-elev:
     inset 0 1px 0 0 rgba(255,255,255,0.8),
     0 1px 2px rgba(15,23,42,0.04),
     0 12px 36px -8px rgba(15,23,42,0.10);
-  --shadow-focus: 0 0 0 3px rgba(229,106,74,0.18);
+  --shadow-focus: 0 0 0 3px rgba(17,133,116,0.18);
 
   color-scheme: light;
 }
 
 .dark {
-  /* Brand scale (dark) - centered on #E56A4A, same as light for consistency */
-  --color-brand-50: #fdf1ed;
-  --color-brand-100: #fadccf;
-  --color-brand-200: #f4b59c;
-  --color-brand-300: #ee8d6a;
-  --color-brand-400: #ea7855;
-  --color-brand-500: #E56A4A;
-  --color-brand-600: #cc5236;
-  --color-brand-700: #a64027;
-  --color-brand-800: #7a2f1d;
-  --color-brand-900: #4d1e12;
+  /* Brand scale (dark) - centered on jade, same as light for consistency */
+  --color-brand-50: #effcf9;
+  --color-brand-100: #ccf4e9;
+  --color-brand-200: #99e8d4;
+  --color-brand-300: #5cd5bc;
+  --color-brand-400: #2ebda2;
+  --color-brand-500: #118574;
+  --color-brand-600: #0d6d60;
+  --color-brand-700: #11574f;
+  --color-brand-800: #15463f;
+  --color-brand-900: #123a35;
 
-  --color-primary: #E56A4A;
-  --color-primary-hover: #cc5236;
+  --color-primary: #118574;
+  --color-primary-hover: #0d6d60;
 
-  /* Surfaces (dark - Claude-like neutral warm) */
-  --color-bg: #1a1a1a;
-  --color-bg-alt: #1F1F1E;
-  --color-surface: #262626;
-  --color-surface-2: #303030;
-  --color-surface-3: #3a3a3a;
-  --color-sidebar: rgba(30, 30, 30, 0.85);
+  /* Surfaces (dark - slate) */
+  --color-bg: #0b171e;
+  --color-bg-alt: #10212a;
+  --color-surface: #132831;
+  --color-surface-2: #1b3540;
+  --color-surface-3: #25444e;
+  --color-sidebar: #10212a;
+  --color-navigation: #0c2028;
 
-  --color-border: #333333;
-  --color-border-subtle: #2a2a2a;
+  --color-border: #29434d;
+  --color-border-subtle: #203943;
 
   --color-text: #ededed;
   --color-text-main: #ededed;
@@ -107,13 +109,13 @@
   --color-info: #60a5fa;
 
   --shadow-soft: 0 1px 2px 0 rgba(0,0,0,0.3);
-  --shadow-warm: 0 2px 12px -2px rgba(229, 106, 74, 0.25);
+  --shadow-warm: 0 2px 12px -2px rgba(17, 133, 116, 0.25);
   --shadow-elevated: 0 12px 28px -4px rgba(0, 0, 0, 0.45);
   --shadow-elev:
     inset 0 1px 0 0 rgba(255,255,255,0.06),
     0 1px 2px rgba(0,0,0,0.4),
     0 16px 48px -8px rgba(0,0,0,0.55);
-  --shadow-focus: 0 0 0 3px rgba(229, 106, 74, 0.18);
+  --shadow-focus: 0 0 0 3px rgba(17, 133, 116, 0.18);
 
   color-scheme: dark;
 }
@@ -172,13 +174,13 @@ select {
 
   /* Static fallbacks (explicit per-mode usage if needed) */
   --color-bg-light: #FCFBF9;
-  --color-bg-dark: #1a1a1a;
+  --color-bg-dark: #0b171e;
   --color-surface-light: #ffffff;
-  --color-surface-dark: #262626;
+  --color-surface-dark: #132831;
   --color-sidebar-light: #F4F1EC;
-  --color-sidebar-dark: #1F1F1E;
+  --color-sidebar-dark: #10212a;
   --color-border-light: #e5e7eb;
-  --color-border-dark: #333333;
+  --color-border-dark: #29434d;
   --color-text-main-light: #0a0a0a;
   --color-text-main-dark: #ededed;
   --color-text-muted-light: #6B7280;
@@ -210,11 +212,11 @@ body {
 
 /* Selection - brand-tinted */
 ::selection {
-  background-color: rgba(229, 106, 74, 0.25);
+  background-color: rgba(17, 133, 116, 0.25);
   color: var(--color-primary);
 }
 .dark ::selection {
-  background-color: rgba(229, 106, 74, 0.3);
+  background-color: rgba(17, 133, 116, 0.3);
   color: var(--color-brand-300);
 }
 
@@ -241,19 +243,19 @@ input, textarea {
 /* Thin horizontal scrollbar - brand colored */
 .scroll-thin-x {
   scrollbar-width: thin;
-  scrollbar-color: rgba(229, 106, 74, 0.55) transparent;
+  scrollbar-color: rgba(17, 133, 116, 0.55) transparent;
 }
 .dark .scroll-thin-x {
-  scrollbar-color: rgba(229, 106, 74, 0.55) transparent;
+  scrollbar-color: rgba(17, 133, 116, 0.55) transparent;
 }
 .scroll-thin-x::-webkit-scrollbar { height: 3px; }
 .scroll-thin-x::-webkit-scrollbar-track { background: transparent; }
 .scroll-thin-x::-webkit-scrollbar-thumb {
-  background: rgba(229, 106, 74, 0.55);
+  background: rgba(17, 133, 116, 0.55);
   border-radius: 3px;
 }
 .dark .scroll-thin-x::-webkit-scrollbar-thumb {
-  background: rgba(229, 106, 74, 0.55);
+  background: rgba(17, 133, 116, 0.55);
 }
 
 /* Global thin mac-like scrollbars (overrides clunky Windows/Linux default) */
@@ -387,12 +389,12 @@ button:disabled,
 
 @keyframes border-glow {
   0%, 100% {
-    box-shadow: 0 0 5px rgba(229, 106, 74, 0.3), 0 0 10px rgba(229, 106, 74, 0.2);
-    border-color: rgba(229, 106, 74, 0.5);
+    box-shadow: 0 0 5px rgba(17, 133, 116, 0.3), 0 0 10px rgba(17, 133, 116, 0.2);
+    border-color: rgba(17, 133, 116, 0.5);
   }
   50% {
-    box-shadow: 0 0 10px rgba(229, 106, 74, 0.5), 0 0 20px rgba(229, 106, 74, 0.3);
-    border-color: rgba(229, 106, 74, 0.8);
+    box-shadow: 0 0 10px rgba(17, 133, 116, 0.5), 0 0 20px rgba(17, 133, 116, 0.3);
+    border-color: rgba(17, 133, 116, 0.8);
   }
 }
 .animate-border-glow { animation: border-glow 2s ease-in-out infinite; }
@@ -425,8 +427,8 @@ button:disabled,
   100% { transform: translateX(220%) skewX(-20deg); }
 }
 @keyframes ctaGlowPulse {
-  0%, 100% { box-shadow: 0 8px 24px -8px rgba(229, 106, 74, 0.45), 0 0 0 0 rgba(229, 106, 74, 0.5); }
-  50% { box-shadow: 0 12px 32px -8px rgba(229, 106, 74, 0.6), 0 0 0 8px rgba(229, 106, 74, 0); }
+  0%, 100% { box-shadow: 0 8px 24px -8px rgba(17, 133, 116, 0.45), 0 0 0 0 rgba(17, 133, 116, 0.5); }
+  50% { box-shadow: 0 12px 32px -8px rgba(17, 133, 116, 0.6), 0 0 0 8px rgba(17, 133, 116, 0); }
 }
 .btn-cta {
   position: relative;
@@ -452,13 +454,13 @@ button:disabled,
 .dot-grid-bg {
   background-color: var(--color-bg);
   background-image:
-    radial-gradient(circle at 15% 20%, rgba(229, 106, 74, 0.10) 0%, transparent 40%),
-    radial-gradient(circle at 85% 80%, rgba(229, 106, 74, 0.06) 0%, transparent 40%);
+    radial-gradient(circle at 15% 20%, rgba(17, 133, 116, 0.10) 0%, transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(17, 133, 116, 0.06) 0%, transparent 40%);
 }
 .dark .dot-grid-bg {
   background-image:
-    radial-gradient(circle at 15% 20%, rgba(229, 106, 74, 0.18) 0%, transparent 40%),
-    radial-gradient(circle at 85% 80%, rgba(229, 106, 74, 0.10) 0%, transparent 40%);
+    radial-gradient(circle at 15% 20%, rgba(17, 133, 116, 0.18) 0%, transparent 40%),
+    radial-gradient(circle at 85% 80%, rgba(17, 133, 116, 0.10) 0%, transparent 40%);
 }
 
 /* Landing-style faint grid overlay (use absolute pos inside relative parent) */
@@ -602,3 +604,37 @@ button:disabled,
   border-top: 1px solid var(--color-border);
   margin: 1.5rem 0;
 }
+
+/* Angela workspace shell */
+.angela-workspace { padding: 16px; gap: 16px; }
+.angela-sidebar {
+  width: 256px;
+  min-height: 0;
+  height: 100%;
+  background: var(--color-navigation);
+  color: #d8e9ed;
+  border: 1px solid #ffffff12;
+  border-radius: 24px;
+  box-shadow: 0 16px 44px #03192112;
+}
+.angela-sidebar .text-text-main { color: #f0fafb; }
+.angela-sidebar .text-text-muted { color: #a7c0c7; }
+.angela-sidebar nav a, .angela-sidebar nav button { min-height: 40px; }
+.angela-sidebar nav a:hover, .angela-sidebar nav button:hover { background: #ffffff0c; color: #fff; }
+.angela-sidebar nav .text-primary { color: #8be2cb; background: #8be2cb14; }
+.angela-sidebar nav a[aria-current="page"] { box-shadow: inset 3px 0 #8be2cb; }
+.angela-main { border: 1px solid var(--color-border-subtle); border-radius: 24px; background: var(--color-bg); overflow: hidden; }
+.angela-header { min-height: 100px; padding: 20px 32px; background: var(--color-surface); }
+.angela-eyebrow { color: var(--color-primary); font-size: 10px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; }
+@media (max-width: 1023px) {
+  .angela-workspace { padding: 0; gap: 0; }
+  .angela-main { border: 0; border-radius: 0; }
+  .angela-sidebar { border-radius: 0 24px 24px 0; }
+  .angela-header { min-height: 80px; padding: 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+.angela-navigation-surface { background: var(--color-navigation); }

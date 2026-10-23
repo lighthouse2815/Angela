@@ -394,7 +394,7 @@ amp --model "{{model}}"
       },
       {
         type: "info",
-        text: "Configure 9router as an OpenAI-compatible provider to route all jcode requests through 9router's optimization layer."
+        text: "Configure Angela Gateway as an OpenAI-compatible provider to route all jcode requests through Angela Gateway."
       },
       {
         type: "warning",

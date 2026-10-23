@@ -227,11 +227,12 @@ export default function Header({ onMenuClick, showMenuButton = true }) {
   };
 
   return (
-    <header className="shrink-0 flex items-center justify-between gap-3 px-4 lg:px-8 pt-3 pb-2 border-b border-border-subtle bg-surface/60 backdrop-blur-xl lg:bg-transparent lg:backdrop-blur-none z-20">
+    <header className="angela-header shrink-0 flex items-center justify-between gap-3 px-4 lg:px-8 pt-3 pb-2 border-b border-border-subtle bg-surface/60 backdrop-blur-xl lg:bg-transparent lg:backdrop-blur-none z-20">
       {/* Mobile menu button */}
       <div className="flex items-center gap-3 lg:hidden shrink-0">
         {showMenuButton && (
           <button
+            aria-label="Open navigation"
             onClick={onMenuClick}
             className="text-text-main hover:text-primary transition-colors"
           >
@@ -242,6 +243,7 @@ export default function Header({ onMenuClick, showMenuButton = true }) {
 
       {/* Page title with breadcrumbs */}
       <div className="flex flex-col min-w-0 flex-1">
+        <p className="angela-eyebrow mb-1">Angela / Gateway</p>
         {breadcrumbs.length > 0 ? (
           <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
             {breadcrumbs.map((crumb, index) => (
