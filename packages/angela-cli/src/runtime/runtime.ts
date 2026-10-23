@@ -2,12 +2,12 @@ import type { Conversation, StreamOptions } from '@angela/core-agent'
 import type { cliMessages } from '@angela/i18n/cli'
 import type { GenerationProvider } from '@angela/provider-inference'
 
-import type { Chat } from '../chat'
 import type { Clock } from '../clock'
 import type { McpTools } from '../mcp'
 import type { Memory } from '../memory'
 import type { MemoryCapture } from '../memory-v2/consolidator'
 import type { OpenLoop } from '../open-loops'
+import type { RequestPrivacy } from '../privacy-policy'
 import type { ProactiveOptions } from '../proactive-policy'
 import type { ProjectMemory } from '../project-memory'
 import type { Recall } from '../recall'
@@ -35,6 +35,15 @@ import { ProactivePolicy } from '../proactive-policy'
 import { buildContext } from './context-builder'
 import { EventBus } from './event-bus'
 import { buildTools } from './tool-registry'
+
+/** External hosts retain presentation, provider selection, attachments, and tool execution through the core generation contract. */
+export interface RuntimeChat {
+  readonly conversation: Conversation
+  readonly privacy?: RequestPrivacy
+  applyPrivacy: (privacy: RequestPrivacy) => void
+  respond: (text: string, reply: string, options: StreamOptions) => Promise<void>
+  send: (text: string, options: StreamOptions, context?: string) => Promise<void>
+}
 
 /** Telegram retention is independent of the existing eight active-context limit. */
 export interface RuntimeOptions {
@@ -604,7 +613,7 @@ export class RuntimeSession {
    * Call stack:
    * adapter -> RuntimeSession.send -> buildContext / buildTools -> Chat.send -> core-agent.streamFrom
    */
-  send(chat: Chat, text: string, options: StreamOptions, extra = '') {
+  send(chat: RuntimeChat, text: string, options: StreamOptions, extra = '') {
     this.lifetime.signal.throwIfAborted()
     if (this.request)
       return Promise.reject(new Error('Context already has an active request'))
