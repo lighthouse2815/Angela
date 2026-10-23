@@ -125,3 +125,7 @@ Kiểm tra đầu vào Turbo xác nhận test không đổi mã hash cache. Thay
 CI desktop dùng trực tiếp `apps/desktop/vitest.node.config.ts`.
 Cấu hình gốc nạp cả các workspace nằm ngoài tập dependency được cài trên runner.
 Thay đổi gateway riêng không khởi chạy lại workflow desktop. Desktop theo dõi provider inference mà nó sử dụng.
+
+Workflow desktop giữ bước typecheck CLI và cài dependency của cả hai ứng dụng.
+Nó build các package cần cho desktop và khai báo kiểu CLI theo thứ tự dependency.
+Gateway engine không cần build cho typecheck. Workflow CLI vẫn kiểm tra build và runtime gateway đầy đủ.

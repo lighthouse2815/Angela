@@ -60,10 +60,11 @@ jobs:
         with:
           node-version: 26.11.1
           cache: pnpm
-      - name: Install locked desktop dependencies
-        run: pnpm --filter @angela/desktop... install --frozen-lockfile --ignore-scripts
-      - name: Build desktop prerequisites sequentially
-        run: pnpm --filter '@angela/desktop^...' --workspace-concurrency=1 run build
+      - name: Install locked desktop and CLI dependencies
+        run: pnpm --filter @angela/desktop... --filter @angela/cli... install --frozen-lockfile --ignore-scripts
+      # CLI typecheck needs its dependency declarations. The gateway engine has no TypeScript build output.
+      - name: Build desktop and CLI typecheck prerequisites
+        run: pnpm --filter '@angela/desktop^...' --filter '@angela/cli^...' --filter '!@angela/gateway' --workspace-concurrency=1 run build
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
       - name: Shared companion runtime tests
