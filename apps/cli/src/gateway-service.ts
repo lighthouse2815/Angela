@@ -73,7 +73,7 @@ export class GatewayService {
       const deadline = Date.now() + 60_000
       while (Date.now() < deadline) {
         if (await this.ownsHost() && (await gateway.status()).running) {
-          process.stdout.write(`${this.messages.backgroundReady}\n`)
+          process.stdout.write(`${action === 'start' ? this.messages.backgroundReady : this.messages.serviceChanged}\n`)
           return
         }
         await setTimeout(200)
