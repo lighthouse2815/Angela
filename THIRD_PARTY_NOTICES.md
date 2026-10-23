@@ -18,3 +18,17 @@ Giấy phép [MIT gốc](./docs/licenses/angela.txt) giữ lại `Copyright (c) 
 | Các gói npm `@proj-airi/*` đã xuất bản | Các phần phụ thuộc bên ngoài giữ lại tên đăng ký, phiên bản, bản ghi toàn vẹn và giấy phép gói. |
 
 Các liên kết GitHub lịch sử xác định kho lưu trữ, cam kết và đường dẫn ban đầu. Các đường dẫn URL đó giữ lại tên lịch sử của chúng khi các thư mục cục bộ di chuyển. Bản ghi Kirie cũng tham chiếu [BeanDz/airi](https://github.com/BeanDz/airi).
+
+## Agent-Reach
+
+Project: [Agent-Reach](https://github.com/Panniantong/Agent-Reach).
+Source revision: `beabda7486e9a666360b18cdb5c0e759c2c4d20f` (inspected 2026-10-24).
+Original copyright: `Copyright (c) 2025 Agent Eyes`.
+The complete MIT license is preserved in [third_party/agent-reach/LICENSE](./third_party/agent-reach/LICENSE).
+
+Angela's `core/companion/src/internet/youtube.ts` and `transcription.ts` derive extraction arguments,
+subtitle preference, bounded audio chunking, and explicit transcription routing from
+`agent_reach/channels/youtube.py` and `agent_reach/transcribe.py`.
+These modules are rewritten in TypeScript. No Python package or upstream repository is required at runtime.
+Diagnostics reuse the status-reporting concept, without copying the upstream runtime.
+See [the dependency audit](./docs/third-party-audit.md).
