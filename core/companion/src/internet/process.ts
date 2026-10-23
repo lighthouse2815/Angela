@@ -7,16 +7,17 @@ const execute = promisify(execFile)
 
 /** Runs fixed media commands without a shell. Raw process errors can contain signed URLs and stay private. */
 export class MediaProcess {
-  async run(executable: string, args: string[], options: { cwd?: string, timeout?: number, signal?: AbortSignal } = {}) {
+  async run(executable: string, args: string[], options: { cwd?: string, timeout?: number, signal?: AbortSignal, includeStderr?: boolean } = {}) {
+    const { includeStderr, ...processOptions } = options
     try {
-      const { stdout } = await execute(executable, args, {
-        ...options,
+      const { stdout, stderr } = await execute(executable, args, {
+        ...processOptions,
         timeout: options.timeout ?? 90000,
         maxBuffer: 8 * 1024 * 1024,
         encoding: 'utf8',
         windowsHide: true,
       })
-      return stdout
+      return includeStderr ? `${stdout}\n${stderr}` : stdout
     }
     catch (error) {
       if (options.signal?.aborted)

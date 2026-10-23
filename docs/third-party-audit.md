@@ -70,3 +70,11 @@ yt-dlp ignores user configuration and never receives browser cookies or account 
 Audio uploads use one explicitly selected provider. Provider failure never switches recipients.
 Transcripts are untrusted reference data. They never become instructions or automatic personal memories.
 The browser adapter observes only the connected browser's current tab. It does not inspect other browser profiles.
+
+## Managed desktop executable artifacts
+
+The desktop now resolves explicit overrides, bundled artifacts, and development-only PATH tools through one media resolver.
+Release packaging verifies SHA-256 digests and required license files before copying tools outside ASAR.
+No binaries or new Python packages are included in this source change.
+See [the release artifact contract](./study-along-media-artifacts.md).
+Bundled yt-dlp, FFmpeg, and optional whisper.cpp remain separate runtime dependencies, with their actual binary notices staged by the release pipeline.

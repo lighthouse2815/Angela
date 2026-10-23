@@ -3,8 +3,13 @@
 import type { Configuration } from 'electron-builder'
 
 import { execSync } from 'node:child_process'
+import { join } from 'node:path'
 
+import { Arch } from 'electron-builder'
 import { isMacOS } from 'std-env'
+
+import { checkMediaArtifacts } from './scripts/media-artifacts'
+import { mediaTarget } from './src/main/services/angela/internet/media/resolver'
 
 function hasXcode26OrAbove() {
   if (!isMacOS)
@@ -74,6 +79,7 @@ export default {
   files: [
     'out/**',
     'resources/**',
+    '!resources/media{,/**}',
     'package.json',
     // NOTICE: Exclude npm `electron` package from app payload.
     // Electron runtime is already provided by the outer app bundle; bundling a nested
@@ -112,7 +118,9 @@ export default {
     '**/*.node',
     '**/node_modules/@auv-js/cli-*/bin/**',
   ],
+  beforePack: async context => checkMediaArtifacts(join(import.meta.dirname, 'resources', 'media', mediaTarget(context.electronPlatformName, Arch[context.arch])), context.electronPlatformName === 'win32'),
   extraResources: [
+    { from: 'resources/media/${os}-${arch}', to: 'media/${os}-${arch}', filter: ['**/*'] },
     {
       from: '../../third_party/agent-reach/LICENSE',
       to: 'licenses/agent-reach-LICENSE.txt',

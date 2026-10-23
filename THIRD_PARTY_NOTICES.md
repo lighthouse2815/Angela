@@ -32,3 +32,11 @@ subtitle preference, bounded audio chunking, and explicit transcription routing 
 These modules are rewritten in TypeScript. No Python package or upstream repository is required at runtime.
 Diagnostics reuse the status-reporting concept, without copying the upstream runtime.
 See [the dependency audit](./docs/third-party-audit.md).
+
+## Managed desktop media executables
+
+Release media executables are independent runtime tools, not Agent-Reach source.
+No executable bytes are committed by this change.
+Electron-builder requires a checksum manifest and actual per-artifact license files before packaging.
+Those files are distributed beside the executable artifacts under `resources/media/<target>/licenses`.
+See [the release artifact contract](./docs/study-along-media-artifacts.md) for source-license and binary-license boundaries.

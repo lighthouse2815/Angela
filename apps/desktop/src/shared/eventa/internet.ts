@@ -18,6 +18,7 @@ export interface InternetDiagnostic {
   capability: string
   status: 'READY' | 'NEED_SETUP' | 'UNVERIFIED' | 'UNAVAILABLE' | 'NOT_INTEGRATED'
   detail: string
+  toolSource?: 'BUNDLED' | 'SYSTEM' | 'OVERRIDE' | 'MISSING'
 }
 
 export const videoResearch = defineInvokeEventa<LessonContext | object, VideoResearchRequest>('eventa:invoke:internet:video')

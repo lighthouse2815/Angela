@@ -7,7 +7,6 @@ import process from 'node:process'
 import { join } from 'node:path'
 
 import { InternetError } from '@angela/companion/internet'
-import { extractorArgs, MediaProcess } from '@angela/companion/internet/process'
 import { CompatibleTranscriptionProvider } from '@angela/companion/internet/transcription'
 import { YouTubeTranscriptProvider } from '@angela/companion/internet/youtube'
 import { chatMessagesToTurns, streamFrom } from '@angela/core-agent'
@@ -21,17 +20,17 @@ import { internetDiagnostics, videoResearch } from '../../../../shared/eventa/in
 import { onAppBeforeQuit } from '../../../libs/bootkit/lifecycle'
 import { isLocalAppURL } from '../../../libs/electron/url'
 import { McpBrowserContextProvider } from './browser'
+import { ManagedMediaProcess, MediaToolResolver } from './media/resolver'
 import { diagnoseInternet, StudyAlongRuntime } from './runtime'
 
 /** Assembles the existing configuration, MCP, generation, and private storage boundaries for the desktop host. */
 export function createInternetRuntime(mcp: McpManager) {
   const log = useLogg('main/internet').useGlobalConfig()
   const config = new LocalConfigFile()
-  const media = new MediaProcess()
+  const resolver = new MediaToolResolver({ packaged: app.isPackaged, resourcesPath: process.resourcesPath, developmentResources: join(app.getAppPath(), 'resources'), platform: process.platform, arch: process.arch, env: process.env })
+  const media = new ManagedMediaProcess(resolver)
   const abort = new AbortController()
   const browser = new McpBrowserContextProvider(mcp)
-  const extractor = process.env.ANGELA_YTDLP_PATH ?? 'yt-dlp'
-  const ffmpeg = process.env.ANGELA_FFMPEG_PATH ?? 'ffmpeg'
 
   async function transcriptionConfig() {
     const id = process.env.ANGELA_VIDEO_TRANSCRIPTION_PROVIDER
@@ -58,7 +57,7 @@ export function createInternetRuntime(mcp: McpManager) {
   const transcription = process.env.ANGELA_VIDEO_TRANSCRIPTION_PROVIDER
     ? new CompatibleTranscriptionProvider(transcriptionConfig)
     : undefined
-  const provider = new YouTubeTranscriptProvider(media, transcription, { executable: extractor, ffmpeg })
+  const provider = new YouTubeTranscriptProvider(media, transcription)
 
   async function summarizer() {
     const snapshot = (await config.read()).config
@@ -128,19 +127,17 @@ export function createInternetRuntime(mcp: McpManager) {
   })
   return {
     execute,
-    diagnostics: () => diagnoseInternet(mcp, async (name) => {
-      try {
-        await media.run(name === 'extractor' ? extractor : ffmpeg, name === 'extractor' ? [...extractorArgs, '--version'] : ['-version'], { timeout: 5000, signal: abort.signal })
-        return true
-      }
-      catch { return false }
-    }, async () => {
-      try {
-        await transcriptionConfig()
-        return true
-      }
-      catch { return false }
-    }),
+    diagnostics: async () => {
+      const tools = await Promise.all([resolver.inspect('yt-dlp'), resolver.inspect('ffmpeg')])
+      const rows = await diagnoseInternet(mcp, async name => Boolean(tools[name === 'extractor' ? 0 : 1]!.path), async () => {
+        try {
+          await transcriptionConfig()
+          return true
+        }
+        catch { return false }
+      })
+      return [...rows, ...tools.map(tool => ({ capability: tool.tool, status: tool.path ? 'READY' as const : 'NEED_SETUP' as const, detail: tool.detail, toolSource: tool.source }))]
+    },
   }
 }
 
