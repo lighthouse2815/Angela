@@ -1,4 +1,5 @@
 import type { Buffer } from 'node:buffer'
+import type { ChildProcess } from 'node:child_process'
 
 import type { cliMessages } from '@angela/i18n/cli'
 
@@ -13,6 +14,18 @@ import { parseEnv } from 'node:util'
 import WebSocket from 'ws'
 
 import { EchoCancellation } from './echo-cancellation'
+
+/** Waits for an owned audio process before releasing its device or temporary files. */
+async function stopAudio(child: ChildProcess, closed: Promise<void>, signal: NodeJS.Signals) {
+  child.kill(signal)
+  const timeout = setTimeout(() => child.kill('SIGKILL'), 2000)
+  try {
+    await closed
+  }
+  finally {
+    clearTimeout(timeout)
+  }
+}
 
 /** Owns private audio files, PipeWire children, and one serial audio request at a time. */
 export class Voice {
@@ -178,7 +191,8 @@ export class Voice {
             clearTimeout(timer)
             state('ready')
             const source = this.echo?.active ? this.echo.source : this.env.ANGELA_VOICE_SOURCE
-            recorder = spawn('pw-record', [...(source ? ['--target', source] : []), '--raw', '--rate', '16000', '--channels', '1', '--format', 's16', '-'], { stdio: ['ignore', 'pipe', 'ignore'] })
+            combined.throwIfAborted()
+            recorder = spawn('pw-record', [...(source ? ['--target', source] : []), '--raw', '--rate', '16000', '--channels', '1', '--format', 's16', '-'], { stdio: ['ignore', 'pipe', 'ignore'], env: this.env })
             recorder.once('error', () => reject(new Error(this.messages.voicePlatform)))
             stopped = new Promise<void>((done) => {
               recorder!.once('close', () => {
@@ -231,9 +245,9 @@ export class Voice {
     finally {
       lifetime.abort()
       clearTimeout(timer)
-      recorder?.kill('SIGINT')
       socket.terminate()
-      await stopped
+      if (recorder && stopped)
+        await stopAudio(recorder, stopped, 'SIGINT')
     }
   }
 
@@ -259,12 +273,25 @@ export class Voice {
       const path = join(directory, 'answer.wav')
       await writeFile(path, new Uint8Array(await response.arrayBuffer()), { mode: 0o600 })
       signal.throwIfAborted()
-      await new Promise<void>((resolve, reject) => {
-        const sink = this.echo?.active ? this.echo.sink : this.env.ANGELA_VOICE_SINK
-        const child = spawn('pw-play', [...(sink ? ['--target', sink] : []), path], { stdio: 'ignore', signal })
-        child.once('error', () => reject(new Error(this.messages.voicePlatform)))
-        child.once('close', code => code === 0 ? resolve() : reject(new Error(this.messages.voiceFailed)))
-      })
+      const sink = this.echo?.active ? this.echo.sink : this.env.ANGELA_VOICE_SINK
+      const child = spawn('pw-play', [...(sink ? ['--target', sink] : []), path], { stdio: 'ignore', env: this.env })
+      const closed = new Promise<void>(resolve => child.once('close', () => resolve()))
+      let abort: (() => void) | undefined
+      try {
+        await new Promise<void>((resolve, reject) => {
+          abort = () => reject(signal.reason)
+          signal.addEventListener('abort', abort, { once: true })
+          child.once('error', () => reject(new Error(this.messages.voicePlatform)))
+          child.once('close', code => code === 0 ? resolve() : reject(new Error(this.messages.voiceFailed)))
+          if (signal.aborted)
+            abort()
+        })
+      }
+      finally {
+        if (abort)
+          signal.removeEventListener('abort', abort)
+        await stopAudio(child, closed, 'SIGTERM')
+      }
     }
     finally {
       await rm(directory, { recursive: true, force: true })

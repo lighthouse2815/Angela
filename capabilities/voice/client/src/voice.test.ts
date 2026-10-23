@@ -39,7 +39,7 @@ it('sends the configured TTS model, voice and isolated audio credential before p
   const fetch = vi.fn(async (_url: URL, _init: RequestInit) => new Response(new Uint8Array([82, 73, 70, 70])))
   vi.stubGlobal('fetch', fetch)
   spawn.mockImplementation(() => {
-    const child = new EventEmitter()
+    const child = Object.assign(new EventEmitter(), { kill: vi.fn() })
     queueMicrotask(() => child.emit('close', 0))
     return child
   })
@@ -81,7 +81,7 @@ it('splits long replies without losing text and stops future chunks on cancellat
   const fetch = vi.fn(async (_url: URL, _init: RequestInit) => new Response(new Uint8Array([82, 73, 70, 70])))
   vi.stubGlobal('fetch', fetch)
   spawn.mockImplementation(() => {
-    const child = new EventEmitter()
+    const child = Object.assign(new EventEmitter(), { kill: vi.fn() })
     queueMicrotask(() => child.emit('close', 0))
     return child
   })
@@ -94,7 +94,7 @@ it('splits long replies without losing text and stops future chunks on cancellat
   expect(chunks.every(chunk => chunk.length <= 1801)).toBe(true)
   fetch.mockClear()
   spawn.mockImplementation(() => {
-    const child = new EventEmitter()
+    const child = Object.assign(new EventEmitter(), { kill: vi.fn() })
     queueMicrotask(() => {
       controller.abort()
       child.emit('close', 0)
@@ -184,7 +184,8 @@ it('cancels listening without leaving a terminal question or microphone running'
     return pendingCommand(signal)
   }, controller.signal, () => controller.abort())).rejects.toThrow()
   expect(question?.aborted).toBe(true)
-  expect(mic.kill).toHaveBeenCalledWith('SIGINT')
+  expect(spawn).not.toHaveBeenCalled()
+  expect(mic.kill).not.toHaveBeenCalled()
 })
 
 it('rejects service disconnects and cancels the pending terminal question', async () => {
@@ -272,7 +273,7 @@ it('routes recording and playback to the configured devices without shell expans
 
   vi.stubGlobal('fetch', vi.fn(async () => new Response(new Uint8Array([82, 73, 70, 70]))))
   spawn.mockImplementation(() => {
-    const child = new EventEmitter()
+    const child = Object.assign(new EventEmitter(), { kill: vi.fn() })
     queueMicrotask(() => child.emit('close', 0))
     return child
   })
