@@ -1,7 +1,7 @@
 import process from 'node:process'
 
 import { execFile } from 'node:child_process'
-import { mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises'
+import { mkdtemp, readFile, rm, stat, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { delimiter, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -16,6 +16,7 @@ let env: NodeJS.ProcessEnv
 
 beforeEach(async () => {
   directory = await mkdtemp(join(tmpdir(), 'angela-gateway-service-'))
+  await symlink(entry, join(directory, 'angela'))
   await writeFile(join(directory, 'systemctl'), `#!${process.execPath}
 import { appendFileSync } from 'node:fs'
 appendFileSync(process.env.TEST_SYSTEMCTL_LOG, JSON.stringify(process.argv.slice(2)) + '\\n')
@@ -31,7 +32,7 @@ afterEach(async () => {
 
 it('installs a private user unit without shell expansion, credentials, or overwriting another unit', async () => {
   const data = join(directory, 'data $HOME %n "quoted"')
-  const args = [entry, 'gateway', 'service', 'install', '--data-dir', data, '--port', '1107', '--locale', 'en']
+  const args = [join(directory, 'angela'), 'gateway', 'service', 'install', '--data-dir', data, '--port', '1107', '--locale', 'en']
   await execute(process.execPath, args, { env })
   const path = join(directory, 'systemd', 'user', 'angela-gateway.service')
   const unit = await readFile(path, 'utf8')

@@ -3,7 +3,7 @@ import type { cliMessages } from '@angela/i18n/cli'
 import process from 'node:process'
 
 import { execFile } from 'node:child_process'
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, realpath, writeFile } from 'node:fs/promises'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
 import { setTimeout } from 'node:timers/promises'
@@ -37,9 +37,10 @@ export class GatewayService {
     if (process.platform !== 'linux')
       throw new Error(this.messages.serviceLinux)
     if (action === 'install') {
-      if (!/\.m?js$/u.test(process.argv[1] ?? ''))
+      const entry = await realpath(resolve(process.argv[1] ?? '')).catch(() => '')
+      if (!/\.m?js$/u.test(entry))
         throw new Error(this.messages.serviceBuild)
-      const command = [process.execPath, resolve(process.argv[1]!), 'gateway', 'start', '--data-dir', this.directory, '--locale', this.locale]
+      const command = [process.execPath, entry, 'gateway', 'start', '--data-dir', this.directory, '--locale', this.locale]
       if (this.port !== undefined)
         command.push('--port', String(this.port))
       const unit = `[Unit]\nDescription=Angela Gateway\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nType=exec\nExecStart=${command.map(unitArgument).join(' ')}\nRestart=on-failure\nRestartSec=5\nTimeoutStopSec=15\nUMask=0077\n\n[Install]\nWantedBy=default.target\n`
