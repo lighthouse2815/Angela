@@ -1,10 +1,11 @@
 # Kiểm tra desktop và runtime
 
-Workflow `.github/workflows/desktop-runtime.yml` chỉ chạy thủ công qua `workflow_dispatch`.
-Push và pull request không kích hoạt workflow này. Giữ chế độ thủ công để tiết kiệm quota GitHub Actions.
+Workflow `.github/workflows/desktop-runtime.yml` chạy khi push hoặc pull request vào `main` thay đổi các đường dẫn desktop và dependency liên quan.
+Workflow vẫn hỗ trợ chạy thủ công qua `workflow_dispatch`.
 
 Workflow kiểm tra runtime chung, desktop Node, trình duyệt, typecheck và build desktop trên Ubuntu.
-Các test dùng IO giả lập. Chúng không chứng nhận microphone, cửa sổ Electron hoặc Telegram thật.
+Các test runtime dùng IO giả lập. Smoke cửa sổ chạy Electron thật trong Xvfb.
+Workflow không chứng nhận microphone, thao tác desktop native hoặc Telegram thật.
 
 ## Chạy local
 
@@ -88,3 +89,35 @@ Kết quả Linux Wayland ngày 24-10-2026:
 - ESLint các script đã sửa đạt, không có cảnh báo.
 
 Chưa chứng nhận heartbeat với snapshot, click native hoặc cách ly chuột thực tế trên macOS.
+
+## Kết quả local ngày 24-10-2026
+
+- `pnpm install --lockfile-only --ignore-scripts --frozen-lockfile`: đạt, không thay đổi lockfile.
+- `NODE_OPTIONS=--max-old-space-size=4096 pnpm typecheck --concurrency=1`: 60 tác vụ đạt.
+- `pnpm build:cli`: 22 tác vụ đạt. Lần chạy lại dùng đủ cache, thời gian Turbo khoảng 0,3 giây.
+- `pnpm -F @angela/desktop build`: đạt.
+- CLI: 112 test đạt trong 16 file.
+- Desktop Node: 684 test đạt, 2 test bỏ qua theo cấu hình hiện có.
+- Browser companion: 6 test đạt trong 2 file.
+- Smoke cửa sổ Electron: đạt trên Linux Wayland, có renderer và cửa sổ hiển thị.
+- Gateway: 75 test hồi quy đạt trong 7 file.
+- WebSocket: 94 test đạt trong 5 file.
+- Voice client: 33 test đạt. Test dịch vụ thật chạy riêng và đạt.
+- Audio pipeline: 33 test đạt trong 3 file.
+- `pnpm lint`: không có lỗi, còn 603 cảnh báo hiện có.
+
+Kiểm tra voice thật dùng PipeWire, VAD, STT và TTS với nguồn và đích âm thanh ảo.
+Lần chạy có tín hiệu nói sau 2.743 ms và bản chép lời sau 20.226 ms.
+Các số này gồm thời gian tổng hợp tiếng nói và xử lý dịch vụ trên máy đang build.
+Chúng không đo độ trễ mic hoặc loa vật lý.
+
+Gateway chạy bằng systemd user service và bật tự khởi động khi đăng nhập.
+Kiểm tra stop/restart giữ nguyên cấu hình, tài khoản và khóa suy luận.
+Playwright xác nhận lựa chọn endpoint Codex là `http://127.0.0.1:1107/angela1`.
+
+Smoke desktop native còn cần macOS có quyền điều khiển hoặc một host Linux X11 qua SSH.
+Không coi kiểm tra Node, browser hoặc RPC là bằng chứng cho click native trên host đó.
+
+Smoke cửa sổ dùng `electron-vite preview --skipBuild` để tránh build lại trong thời gian chờ khởi động.
+CI dùng Xvfb do bước cài dependency Playwright cung cấp.
+Kiểm tra đầu vào Turbo xác nhận test không đổi mã hash cache. Thay đổi nguồn production đổi mã hash.
