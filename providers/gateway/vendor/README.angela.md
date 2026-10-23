@@ -64,6 +64,8 @@ Upstream unit tests remain in `tests/unit/` and use `tests/vitest.config.js`.
 Kimchi and Cline authentication tests use the same Vitest runner.
 Registry checks retain Windsurf's hidden state and its current Codeium endpoint.
 CommandCode image checks require both `mimeType` and `mediaType`.
+The certificate utilities in `src/mitm/cert/` are source code and ship with the vendor workspace.
+Git tracks only the three JavaScript utilities there. Generated certificates and private keys stay ignored.
 
 OAuth application identifiers in the imported source are upstream protocol configuration, not user account credentials.
 Never add personal access tokens, refresh tokens, account databases, or private build state to this directory.

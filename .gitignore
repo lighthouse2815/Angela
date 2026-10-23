@@ -44,6 +44,12 @@ lerna-debug.log*
 
 # Credentials
 cert*/
+# Include only imported JavaScript utilities. Generated certificates and keys stay ignored.
+!/providers/gateway/vendor/src/mitm/cert/
+/providers/gateway/vendor/src/mitm/cert/*
+!/providers/gateway/vendor/src/mitm/cert/generate.js
+!/providers/gateway/vendor/src/mitm/cert/install.js
+!/providers/gateway/vendor/src/mitm/cert/rootCA.js
 *.pem
 *.crt
 *.cer

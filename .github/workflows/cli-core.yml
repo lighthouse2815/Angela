@@ -76,7 +76,7 @@ jobs:
         run: pnpm -F @angela/cli build
       - name: Gateway regression tests
         working-directory: providers/gateway/vendor
-        run: node ../../../node_modules/vitest/vitest.mjs run --config tests/vitest.config.js tests/unit/gateway-endpoint.test.js tests/unit/codex-settings-refresh.test.js tests/unit/openai-to-commandcode.test.js tests/unit/windsurf-executor.test.js tests/unit/kimchi.test.js tests/unit/kimchi-strip-reasoning.test.js tests/unit/cline-auth.test.js --maxWorkers=1
+        run: node ../../../node_modules/vitest/vitest.mjs run --config tests/vitest.config.js tests/unit/gateway-endpoint.test.js tests/unit/codex-settings-refresh.test.js tests/unit/openai-to-commandcode.test.js tests/unit/windsurf-executor.test.js tests/unit/kimchi.test.js tests/unit/kimchi-strip-reasoning.test.js tests/unit/cline-auth.test.js tests/unit/mitm-root-ca.test.js tests/unit/antigravity-mitm.test.js --maxWorkers=1
       - name: CLI tests
         run: pnpm -r --workspace-concurrency=1 --filter @angela/cli --filter @angela/companion --filter @angela/telegram --filter @angela/zalo --filter @angela/voice-client --filter @angela/vision --filter @angela/host-sdk --filter @angela/discord-companion exec vitest run --config vitest.config.ts --maxWorkers=1 --testTimeout=30000 --hookTimeout=30000
       - name: CLI typecheck
