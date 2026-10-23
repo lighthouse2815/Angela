@@ -1,84 +1,88 @@
-### **JSON Field Documentation**
+<a id="json-field-documentation"></a>
 
-JSON Field Documentation of `SatoriEvent`
+### **Tài liệu hiện trường JSON**
 
-* **Root Level**
+JSON Tài liệu hiện trường của `SatoriEvent`
 
-| Path | Type | Description |
+* **Cấp độ gốc**
+
+| Đường dẫn | Loại | Mô tả |
 | --- | --- | --- |
-| `self_id` | String | The unique ID (QQ number) of the bot receiving the event. |
-| `platform` | String | The platform name (e.g., `onebot`). |
-| `timestamp` | Number | Unix timestamp (ms) when the event was created. |
-| `type` | String | The general event category (e.g., `message-created`). |
-| `subtype` | String | The sub-category of the event (e.g., `group`). |
-| `subsubtype` | String | Further classification (e.g., `group`). |
-| `id` | Integer | Internal sequence ID for the event processing. |
-| `sn` | Integer | Serial number for the event. |
+| `self_id` | Chuỗi | ID (số QQ) duy nhất của bot nhận sự kiện. |
+| `platform` | Chuỗi | Tên nền tảng (ví dụ: `onebot`). |
+| `timestamp` | Số | Dấu thời gian Unix (ms) khi sự kiện được tạo. |
+| `type` | Chuỗi | Danh mục sự kiện chung (ví dụ: `message-created`). |
+| `subtype` | Chuỗi | Danh mục phụ của sự kiện (ví dụ: `group`). |
+| `subsubtype` | Chuỗi | Phân loại sâu hơn (ví dụ: `group`). |
+| `id` | Số nguyên | Trình tự nội bộ ID để xử lý sự kiện. |
+| `sn` | Số nguyên | Số sê-ri cho sự kiện. |
 
-* **Message Object**
+* **Đối tượng tin nhắn**
 
-| Path | Type | Description |
+| Đường dẫn | Loại | Mô tả |
 | --- | --- | --- |
-| `message` | Object | Container for standardized message details. |
-| `message.message_id` | String | Unique identifier for this specific message. |
-| `message.content` | String | The plain text content of the message. |
+| `message` | Đối tượng | Vùng chứa chi tiết tin nhắn được tiêu chuẩn hóa. |
+| `message.message_id` | Chuỗi | Mã định danh duy nhất cho tin nhắn cụ thể này. |
+| `message.content` | Chuỗi | Nội dung văn bản đơn giản của tin nhắn. |
 
-* **User & Member**
+* **Người dùng & Thành viên**
 
-| Path | Type | Description |
+| Đường dẫn | Loại | Mô tả |
 | --- | --- | --- |
-| `user` | Object | Standardized information about the message sender. |
-| `user.id` | String | Unique ID of the sender. |
-| `user.name` | String | Display name of the sender. |
-| `user.avatar` | String | URL to the sender's avatar image. |
-| `member` | Object | Context-specific member info (e.g., group membership). |
-| `member.nick` | String | The user's nickname/card in this specific group . |
-| `member.roles` | Array | List of roles assigned to the user (e.g., `member`). |
+| `user` | Đối tượng | Thông tin tiêu chuẩn về người gửi tin nhắn. |
+| `user.id` | Chuỗi | ID duy nhất của người gửi. |
+| `user.name` | Chuỗi | Hiển thị tên người gửi. |
+| `user.avatar` | Chuỗi | URL thành ảnh đại diện của người gửi. |
+| `member` | Đối tượng | Thông tin thành viên theo ngữ cảnh cụ thể (ví dụ: thành viên nhóm). |
+| `member.nick` | Chuỗi | nickname/card của người dùng trong nhóm cụ thể này. |
+| `member.roles` | Mảng | Danh sách các vai trò được gán cho người dùng (ví dụ: `member`). |
 
-* **Context (Guild/Group)**
+* **Bối cảnh (Guild/Group)**
 
-| Path | Type | Description |
+| Đường dẫn | Loại | Mô tả |
 | --- | --- | --- |
-| `guild` | Object | Information about the guild/group. |
-| `guild.id` | String | Unique ID of the group/guild. |
-| `channel` | Object | Information about the channel (often same as guild in QQ groups). |
-| `channel.type` | Integer | Channel type classification. |
+| `guild` | Đối tượng | Thông tin về guild/group. |
+| `guild.id` | Chuỗi | ID độc đáo của group/guild. |
+| `channel` | Đối tượng | Thông tin về kênh (thường giống với bang hội trong các nhóm QQ). |
+| `channel.type` | Số nguyên | Phân loại loại kênh. |
 
-* **Bot Instance (`login`)**
+* **Phiên bản Bot (`login`)**
 
-| Path | Type | Description |
+| Đường dẫn | Loại | Mô tả |
 | --- | --- | --- |
-| `login` | Object | Information about the bot instance processing this event. |
-| `login.user` | Object | The bot's own user details (Name, Avatar, ID). |
-| `login.status` | Integer | Connection status (1 = Online). |
-| `login.features` | Array | List of supported API features (e.g., `message.create`). |
-| `login.adapter` | String | The adapter protocol being used (`onebot`). |
+| `login` | Đối tượng | Thông tin về phiên bản bot đang xử lý sự kiện này. |
+| `login.user` | Đối tượng | Thông tin chi tiết về người dùng của bot (Tên, Hình đại diện, ID). |
+| `login.status` | Số nguyên | Trạng thái kết nối (1 = Trực tuyến). |
+| `login.features` | Mảng | Danh sách các tính năng API được hỗ trợ (ví dụ: `message.create`). |
+| `login.adapter` | Chuỗi | Giao thức bộ điều hợp đang được sử dụng (`onebot`). |
 
-### [Optional] raw data from adapter
+<a id="optional-raw-data-from-adapter"></a>
 
-e.g. onebot
+### [Tùy chọn] dữ liệu thô từ bộ chuyển đổi
 
-* **OneBot Data (`_data`)** *Raw payload from the OneBot adapter*
+ví dụ. onebot
 
-| Path | Type | Description |
+* **Dữ liệu OneBot (`_data`)** *Tải trọng thô từ bộ chuyển đổi OneBot*
+
+| Đường dẫn | Loại | Mô tả |
 | --- | --- | --- |
-| `_data.message_type` | String | Type of message (e.g., `group`, `private`). |
-| `_data.sub_type` | String | Subtype (e.g., `normal`, `anonymous`). |
-| `_data.message_id` | Integer | Message ID as an integer (OneBot standard). |
-| `_data.real_id` | Integer | The real message ID from the protocol. |
-| `_data.sender` | Object | Sender details specific to OneBot format. |
-| `_data.sender.card` | String | The sender's group card/nickname. |
-| `_data.raw_message` | String | The unformatted raw string of the message. |
-| `_data.message` | Array | Array of message segments (Text, Image, Face, etc.). |
-| `_data.group_id` | Integer | The numeric ID of the group. |
-| `_data.group_name` | String | The name of the group. |
+| `_data.message_type` | Chuỗi | Loại thông báo (ví dụ: `group`, `private`). |
+| `_data.sub_type` | Chuỗi | Loại phụ (ví dụ: `normal`, `anonymous`). |
+| `_data.message_id` | Số nguyên | Thông báo ID dưới dạng số nguyên (tiêu chuẩn OneBot). |
+| `_data.real_id` | Số nguyên | Thông điệp thực ID từ giao thức. |
+| `_data.sender` | Đối tượng | Chi tiết người gửi cụ thể theo định dạng OneBot. |
+| `_data.sender.card` | Chuỗi | Nhóm người gửi card/nickname. |
+| `_data.raw_message` | Chuỗi | Chuỗi thô chưa được định dạng của tin nhắn. |
+| `_data.message` | Mảng | Mảng phân đoạn tin nhắn (Văn bản, Hình ảnh, Khuôn mặt, v.v.). |
+| `_data.group_id` | Số nguyên | Số ID của nhóm. |
+| `_data.group_name` | Chuỗi | Tên của nhóm. |
 
-* **Protocol Raw Data (`_data.raw`)** *Internal low-level protocol data (NTQQ/Lagrange)*
+* **Dữ liệu thô giao thức (`_data.raw`)** *Dữ liệu giao thức cấp thấp nội bộ (NTQQ/Lagrange)*
 
-| Path | Type | Description |
+| Đường dẫn | Loại | Mô tả |
 | --- | --- | --- |
-| `_data.raw.msgId` | String | Protocol-level message ID. |
-| `_data.raw.msgSeq` | String | Message sequence number. |
-| `_data.raw.elements` | Array | Detailed rich media elements (text, faces, images). |
-| `_data.raw.senderUin` | String | Sender's User Internal Number (QQ). |
-| `_data.raw.peerUin` | String | Receiver/Group User Internal Number. |
+| `_data.raw.msgId` | Chuỗi | Thông báo cấp độ giao thức ID. |
+| `_data.raw.msgSeq` | Chuỗi | Số thứ tự tin nhắn. |
+| `_data.raw.elements` | Mảng | Các yếu tố đa phương tiện chi tiết (văn bản, khuôn mặt, hình ảnh). |
+| `_data.raw.senderUin` | Chuỗi | Số nội bộ người dùng của người gửi (QQ). |
+| `_data.raw.peerUin` | Chuỗi | Số nội bộ của người dùng Receiver/Group. |

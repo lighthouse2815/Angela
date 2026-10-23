@@ -1,107 +1,86 @@
-# Vendored Add-on Local Patches
+<a id="vendored-add-on-local-patches"></a>
 
-This project vendors Godot add-ons under `addons/` because Godot plugins are
-installed as project-local source and asset folders. Keep this file in sync
-whenever vendored add-on files differ from their upstream source.
+# Các bản vá cục bộ bổ trợ được nhà cung cấp
 
-## Upstream Baselines
+Dự án này cung cấp các tiện ích bổ sung Godot trong `addons/` vì các plugin Godot được cài đặt dưới dạng thư mục tài sản và nguồn cục bộ của dự án. Giữ tệp này được đồng bộ hóa bất cứ khi nào các tệp tiện ích bổ sung được cung cấp khác với nguồn upstream của chúng.
+
+<a id="upstream-baselines"></a>
+
+## Đường cơ sở upstream
 
 - `addons/vrm`
-  - Repository: `https://github.com/V-Sekai/godot-vrm`
-  - Branch: `only-addon`
-  - Commit: `651205484c35f5cd7ba56475ff636e10db8ad674`
+  - Kho lưu trữ: `https://github.com/V-Sekai/godot-vrm`
+  - Chi nhánh: `only-addon`
+  - Cam kết: `651205484c35f5cd7ba56475ff636e10db8ad674`
 - `addons/Godot-MToon-Shader`
-  - Repository: `https://github.com/V-Sekai/Godot-MToon-Shader`
-  - Branch: `main`
-  - Commit: `268c0d3b19c0885698b7bd39e21a16c9c2af448f`
+  - Kho lưu trữ: `https://github.com/V-Sekai/Godot-MToon-Shader`
+  - Chi nhánh: `main`
+  - Cam kết: `268c0d3b19c0885698b7bd39e21a16c9c2af448f`
 
-## Source Patches
+<a id="source-patches"></a>
+
+## Bản vá nguồn
 
 ### `addons/vrm/vrm_extension.gd`
 
-- Local change: use `root_node.get_node_or_null("secondary")` instead of
-  `root_node.get_node("secondary")`.
-- Reason: some VRM 0.0 exporters include `secondaryAnimation` data without a
-  scene node named `secondary`. The upstream `get_node()` call throws before
-  the existing null fallback can create the node.
-- Validation: comparing vendored source files against upstream commit
-  `651205484c35f5cd7ba56475ff636e10db8ad674` shows this as the only changed
-  `.gd`/`.shader`/`.cfg`/`.cs` file under `addons/`. Runtime import then
-  completes without the `Node not found: "secondary"` importer error.
-- Removal condition: remove this patch after the upstream add-on ships the same
-  lookup fix or otherwise handles missing `secondary` nodes before parsing
-  spring bones.
+- Thay đổi cục bộ: sử dụng `root_node.get_node_or_null("secondary")` thay vì `root_node.get_node("secondary")`.
+- Lý do: một số nhà xuất khẩu VRM 0.0 bao gồm dữ liệu `secondaryAnimation` không có cảnh Node có tên `secondary`. Lệnh gọi upstream `get_node()` được thực hiện trước khi phương án dự phòng null hiện có có thể tạo Node.
+- Xác thực: so sánh các tệp nguồn được cung cấp với cam kết upstream `651205484c35f5cd7ba56475ff636e10db8ad674` cho thấy đây là tệp `.gd`/`.shader`/`.cfg`/`.cs` được thay đổi duy nhất trong `addons/`. Quá trình nhập runtime sau đó hoàn tất mà không có lỗi nhập `Node not found: "secondary"`.
+- Điều kiện loại bỏ: xóa bản vá này sau khi tiện ích bổ sung upstream cung cấp bản sửa lỗi tra cứu tương tự hoặc xử lý các nút `secondary` bị thiếu trước khi phân tích cú pháp xương lò xo.
 
-### MToon ambient and cutout shader patch
+<a id="mtoon-ambient-and-cutout-shader-patch"></a>
 
-Files:
+### Bản vá đổ bóng xung quanh và cắt bỏ MToon
+
+Tập tin:
 
 - `addons/Godot-MToon-Shader/mtoon_common.gdshaderinc`
 - `addons/Godot-MToon-Shader/mtoon_cutout.gdshader`
 - `addons/Godot-MToon-Shader/mtoon_cutout_cull_off.gdshader`
 - `addons/Godot-MToon-Shader/mtoon_outline_cutout.gdshader`
 
-- Local change: enable `render_mode ambient_light_disabled` for the shared MToon
-  shader include.
-- Local change: route MToon cutout materials through Godot's alpha scissor
-  antialiasing path by writing `ALPHA`, setting `ALPHA_SCISSOR_THRESHOLD`,
-  `ALPHA_ANTIALIASING_EDGE`, and `ALPHA_TEXTURE_COORDINATE`, and enabling
-  `render_mode alpha_to_coverage`.
-- Reason: Angela's stage preset owns sky, ground, and environment presentation, but
-  avatar toon materials need stable character color. Godot's default ambient
-  light and radiance contribution can wash out MToon avatars as the stage
-  environment changes, so Angela isolates avatar MToon materials from implicit
-  WorldEnvironment ambient while keeping direct light handling in the shader.
-- Reason: VRM hair, lashes, accessories, and outline cutout passes use hard alpha
-  edges. At distance, those edges collapse into visible stair-step or dashed
-  pixels. Godot's alpha-to-coverage path works with 3D MSAA, and Godot's shader
-  alpha scissor path requires `ALPHA` to receive the sampled texture alpha.
-  Writing `ALPHA` may route these shaders through Godot's transparent pipeline,
-  which can introduce sorting or shadow-casting regressions. Angela accepts that
-  tradeoff for the current visual baseline and should revisit it if those
-  regressions appear or upstream exposes a cutout antialiasing path that
-  preserves opaque shadow semantics.
-- Validation: `tests/material-rendering-check/materialRenderingCheck.tscn`
-  imports AvatarSample A/B and still detects MToon, cutout, transparent,
-  outline, and shadow-caster materials after the patch.
-- Removal condition: remove this patch if Angela moves to an owned MToon shader
-  variant, or if upstream exposes a supported way to opt MToon materials out of
-  Godot environment ambient/radiance while preserving VRM import compatibility.
+- Thay đổi cục bộ: bật `render_mode ambient_light_disabled` cho trình đổ bóng MToon được chia sẻ.
+- Thay đổi cục bộ: Vật liệu cắt bỏ route MToon thông qua đường dẫn khử răng cưa alpha cắt kéo của Godot bằng cách viết `ALPHA`, thiết lập `ALPHA_SCISSOR_THRESHOLD`, `ALPHA_ANTIALIASING_EDGE` và `ALPHA_TEXTURE_COORDINATE`, đồng thời bật `render_mode alpha_to_coverage`.
+- Lý do: Preset stage của Angela sở hữu cách trình bày bầu trời, mặt đất và môi trường, nhưng chất liệu hoạt hình avatar cần màu sắc nhân vật ổn định. Sự đóng góp ánh sáng và ánh sáng xung quanh mặc định của Godot có thể loại bỏ các hình đại diện MToon khi môi trường stage thay đổi, do đó, Angela cách ly các vật liệu MToon của hình đại diện khỏi môi trường xung quanh WorldEnvironment tiềm ẩn trong khi vẫn duy trì khả năng xử lý ánh sáng trực tiếp trong bóng đổ.
+- Lý do: Tóc, lông mi, phụ kiện và đường cắt đường viền của VRM sử dụng các cạnh alpha cứng. Ở khoảng cách xa, các cạnh đó thu gọn thành các pixel bậc thang hoặc nét đứt có thể nhìn thấy được. Đường dẫn từ alpha đến vùng phủ sóng của Godot hoạt động với 3D MSAA và đường dẫn cắt kéo alpha đổ bóng của Godot yêu cầu `ALPHA` nhận được kết cấu alpha được lấy mẫu. Việc viết `ALPHA` có thể route các trình đổ bóng này thông qua đường dẫn trong suốt của Godot, điều này có thể đưa ra các hồi quy phân loại hoặc đổ bóng. Angela chấp nhận sự đánh đổi đó cho đường cơ sở hình ảnh hiện tại và nên xem lại nó nếu những hồi quy đó xuất hiện hoặc upstream hiển thị một đường dẫn khử răng cưa bị cắt bỏ để duy trì ngữ nghĩa bóng mờ.
+- Xác thực: `tests/material-rendering-check/materialRenderingCheck.tscn` nhập AvatarSample A/B và vẫn phát hiện các vật liệu MToon, cutout, trong suốt, phác thảo và tạo bóng sau bản vá.
+- Điều kiện xóa: xóa bản vá này nếu Angela chuyển sang biến thể trình đổ bóng MToon thuộc sở hữu của mình hoặc nếu upstream đưa ra cách được hỗ trợ để chọn vật liệu MToon ra khỏi môi trường Godot ambient/radiance trong khi vẫn duy trì khả năng tương thích nhập VRM.
 
-## Generated Metadata Differences
+<a id="generated-metadata-differences"></a>
 
-These files differ from the upstream commit after opening/importing the add-on
-with Godot `4.6.2`. They are not Angela behavior patches, but they are recorded so
-future add-on upgrades can distinguish generated metadata churn from intentional
-source changes.
+## Sự khác biệt về siêu dữ liệu được tạo
 
-### SVG Import Metadata
+Các tệp này khác với cam kết upstream sau opening/importing, tiện ích bổ sung với Godot `4.6.2`. Chúng không phải là các bản vá hành vi của Angela nhưng chúng được ghi lại để các bản nâng cấp tiện ích bổ sung trong tương lai có thể phân biệt sự thay đổi siêu dữ liệu được tạo ra với những thay đổi nguồn có chủ ý.
+
+<a id="svg-import-metadata"></a>
+
+### Siêu dữ liệu nhập SVG
 
 - `addons/vrm/node_constraint/icons/bone_node_constraint.svg.import`
 - `addons/vrm/node_constraint/icons/bone_node_constraint_applier.svg.import`
 
-Observed difference:
+Sự khác biệt quan sát được:
 
-- Godot `4.6.2` adds current texture import fields such as
-  `compress/uastc_level`, `compress/rdo_quality_loss`, and
-  `process/channel_remap/*`.
+- Godot `4.6.2` bổ sung các trường nhập kết cấu hiện tại như `compress/uastc_level`, `compress/rdo_quality_loss` và `process/channel_remap/*`.
 
-### Godot UID Sidecars
+<a id="godot-uid-sidecars"></a>
 
-Godot generated `.uid` sidecar files under:
+### Xe sidecar Godot UID
+
+Godot đã tạo các tệp `.uid` sidecar trong:
 
 - `addons/vrm/**/*.uid`
 - `addons/Godot-MToon-Shader/**/*.uid`
 
-These preserve Godot resource UIDs for imported scripts and shader resources.
-They are local generated metadata, not source patches.
+Những điều này bảo tồn UID tài nguyên Godot cho các tập lệnh và tài nguyên đổ bóng đã nhập. Chúng là siêu dữ liệu được tạo cục bộ, không phải bản vá nguồn.
 
-## Upgrade Checklist
+<a id="upgrade-checklist"></a>
 
-When updating the vendored add-ons:
+## Danh sách kiểm tra nâng cấp
 
-1. Compare the new upstream add-on against the current vendored tree.
-2. Re-apply source patches listed above only if the upstream fix is still absent.
-3. Let Godot regenerate import metadata and `.uid` sidecars if needed.
-4. Update this file with the new upstream commit and the remaining local patch
-   list.
+Khi cập nhật các tiện ích bổ sung được cung cấp:
+
+1. So sánh tiện ích bổ sung upstream mới với cây được cung cấp hiện tại.
+2. Chỉ áp dụng lại các bản vá nguồn được liệt kê ở trên nếu bản sửa lỗi upstream vẫn không có.
+3. Hãy để Godot tạo lại siêu dữ liệu nhập và sidecar `.uid` nếu cần.
+4. Cập nhật tệp này với cam kết upstream mới và danh sách bản vá cục bộ còn lại.

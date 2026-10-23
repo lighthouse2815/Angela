@@ -1,64 +1,54 @@
-# Runtime Verification Scenes
+<a id="runtime-verification-scenes"></a>
 
-Use a verification scene when a renderer change needs isolated visual evidence
-that unit tests cannot provide. Keep the main stage WebSocket flow as the final
-acceptance path for avatar presentation work.
+# Cảnh xác minh runtime
 
-## When To Use
+Sử dụng cảnh xác minh khi thay đổi renderer cần bằng chứng trực quan riêng biệt mà các bài kiểm tra đơn vị không thể cung cấp. Giữ luồng stage WebSocket chính làm đường dẫn chấp nhận cuối cùng cho công việc trình bày hình đại diện.
 
-- Use a temporary verification scene to isolate one renderer question, such as
-  alpha cutout behavior, outline geometry, stencil masks, or glow source
-  extraction.
-- Use the main stage plus a temporary WebSocket host before accepting any change
-  that affects the shipped stage view.
-- Do not rely on a verification scene as CI evidence when it depends on local
-  fixtures that are not tracked by git.
+<a id="when-to-use"></a>
 
-## Scene Shape
+## Khi nào nên sử dụng
 
-For visual renderer checks, create a minimal scene under
-`tests/<check-name>/<checkName>.tscn` with one `Node3D` root and a script that
-uses the same runtime entry points as the feature under test. C# is preferred
-when the check needs stage C# runtime objects. A GDScript scene is acceptable
-for non-visual importer/material checks, such as
-`tests/material-rendering-check/materialRenderingCheck.tscn`.
+- Sử dụng cảnh xác minh tạm thời để tách biệt một câu hỏi renderer, chẳng hạn như hành vi cắt bỏ alpha, hình học phác thảo, mặt nạ stencil hoặc trích xuất nguồn sáng.
+- Sử dụng stage chính cộng với WebSocket host tạm thời trước khi chấp nhận bất kỳ thay đổi nào ảnh hưởng đến chế độ xem stage được vận chuyển.
+- Đừng dựa vào cảnh xác minh làm bằng chứng CI khi nó phụ thuộc vào mẫu kiểm thử cục bộ không được git theo dõi.
 
-A visual renderer script should:
+<a id="scene-shape"></a>
 
-1. Set a deterministic viewport size with `DisplayServer.WindowSetSize`.
-2. Apply the normal stage baseline with `StageVisualPreset.Apply(this)`.
-3. Load the target avatar or fixture through the same runtime path being tested.
-4. Create one active `Camera3D` and use fixed poses.
-5. Install the renderer feature runtime being tested. For avatar glow, create
-   `StageRenderEffectsRuntime(camera)` and call `UseAvatar(avatar)` after
-   loading the avatar; `StageVisualPreset.Apply(this)` alone does not install
-   the glow compositor.
-6. Wait several frames before each capture so imports, materials, and compositor
-   resources settle.
-7. Save PNG captures to `Path.Combine(Path.GetTempPath(), "<check-name>")` only
-   for intermediate pass diagnostics.
-8. Print compact diagnostics that can be compared across runs.
-9. Quit with `GetTree().Quit(0)` after the final capture.
+## Hình dạng cảnh
 
-## Fixture Rules
+Để kiểm tra renderer trực quan, hãy tạo một cảnh tối thiểu trong `tests/<check-name>/<checkName>.tscn` bằng một gốc `Node3D` và một tập lệnh sử dụng cùng các điểm nhập runtime như tính năng đang được thử nghiệm. C# được ưu tiên khi kiểm tra cần các đối tượng stage C# runtime. Cảnh GDScript có thể được chấp nhận để kiểm tra importer/material không trực quan, chẳng hạn như `tests/material-rendering-check/materialRenderingCheck.tscn`.
 
-- Prefer tracked fixtures when the check is meant to remain in the repository.
-- If a check needs a private or large local VRM, keep the scene temporary and
-  document the required local path in the experiment notes.
-- Do not commit a verification scene that cannot run from a clean checkout
-  unless the limitation is intentional and documented next to the scene.
+Tập lệnh renderer trực quan nên:
 
-## Renderer Caveats
+1. Đặt kích thước khung nhìn xác định bằng `DisplayServer.WindowSetSize`.
+2. Áp dụng đường cơ sở stage bình thường với `StageVisualPreset.Apply(this)`.
+3. Tải hình đại diện mục tiêu hoặc mẫu kiểm thử thông qua cùng một đường dẫn runtime đang được thử nghiệm.
+4. Tạo một `Camera3D` hoạt động và sử dụng các tư thế cố định.
+5. Cài đặt tính năng renderer runtime đang được thử nghiệm. Để hình đại diện phát sáng, hãy tạo `StageRenderEffectsRuntime(camera)` và gọi `UseAvatar(avatar)` sau khi tải hình đại diện; Riêng `StageVisualPreset.Apply(this)` không cài đặt bộ tổng hợp phát sáng.
+6. Đợi một vài khung trước mỗi thu nhận dữ liệu để các tài nguyên nhập, vật liệu và bộ tổng hợp được giải quyết.
+7. Chỉ lưu các bản chụp PNG vào `Path.Combine(Path.GetTempPath(), "<check-name>")` để chẩn đoán vượt qua trung gian.
+8. In chẩn đoán nhỏ gọn có thể so sánh qua các lần chạy.
+9. Thoát khỏi `GetTree().Quit(0)` sau thu nhận dữ liệu cuối cùng.
 
-- Avatar glow uses a depth-tested stencil overlay so opaque objects between the
-  camera and avatar occlude the glow source. Transparent occluders may not block
-  the mask if their materials do not write depth. This is a normal transparent
-  rendering limitation; verify those cases with a dedicated scene before relying
-  on them for shipped visuals.
+<a id="fixture-rules"></a>
 
-## Capture Pattern
+## Quy tắc mẫu kiểm thử
 
-Use frame-number gates instead of timers so the script stays deterministic:
+- Ưu tiên mẫu kiểm thử được theo dõi khi séc được dự định vẫn còn trong kho lưu trữ.
+- Nếu quá trình kiểm tra cần một VRM cục bộ lớn hoặc riêng tư, hãy giữ cảnh tạm thời và ghi lại đường dẫn cục bộ cần thiết trong ghi chú thử nghiệm.
+- Không thực hiện cảnh xác minh không thể chạy từ quá trình kiểm tra sạch trừ khi giới hạn đó là có chủ ý và được ghi lại bên cạnh cảnh đó.
+
+<a id="renderer-caveats"></a>
+
+## renderer Hãy cẩn thận
+
+- Ánh sáng của hình đại diện sử dụng lớp phủ stencil đã được kiểm tra độ sâu để các vật thể mờ đục giữa máy ảnh và hình đại diện sẽ chặn nguồn phát sáng. Các vật liệu che phủ trong suốt có thể không chặn được mặt nạ nếu vật liệu của chúng không ghi độ sâu. Đây là giới hạn hiển thị minh bạch thông thường; xác minh những trường hợp đó bằng một cảnh chuyên dụng trước khi dựa vào chúng để có hình ảnh được chuyển tải.
+
+<a id="capture-pattern"></a>
+
+## Mẫu thu nhận dữ liệu
+
+Sử dụng số khung cổng kiểm tra thay vì bộ hẹn giờ để tập lệnh vẫn mang tính xác định:
 
 ```csharp
 public override void _Process(double delta)
@@ -80,14 +70,13 @@ public override void _Process(double delta)
 }
 ```
 
-The in-scene capture helper may call `GetViewport().GetTexture().GetImage()` for
-intermediate data, but this is not final display output. Do not use viewport
-readback PNGs as acceptance evidence for color mapping, contrast, glow, rim
-light, or other final-frame judgments.
+Trình trợ giúp thu nhận dữ liệu trong cảnh có thể gọi `GetViewport().GetTexture().GetImage()` để lấy dữ liệu trung gian nhưng đây không phải là đầu ra hiển thị cuối cùng. Không sử dụng PNG đọc lại khung nhìn làm bằng chứng chấp nhận cho ánh xạ màu, độ tương phản, độ sáng, ánh sáng viền hoặc các đánh giá khung hình cuối cùng khác.
 
-## Run Command
+<a id="run-command"></a>
 
-Launch the scene with the Godot mono binary:
+## Chạy lệnh
+
+Khởi chạy cảnh với tệp nhị phân đơn sắc Godot:
 
 ```powershell
 C:\Godot_v4.7.1-stable_mono_win64\Godot_v4.7.1-stable_mono_win64.exe `
@@ -95,33 +84,31 @@ C:\Godot_v4.7.1-stable_mono_win64\Godot_v4.7.1-stable_mono_win64.exe `
   --scene "res://tests/<check-name>/<checkName>.tscn"
 ```
 
-For shipped stage visuals, export render-stage artifacts instead of relying on a
-temporary manual screenshot:
+Đối với hình ảnh stage đã gửi, hãy xuất render-stage artifact thay vì dựa vào ảnh chụp màn hình thủ công tạm thời:
 
 ```powershell
 pnpm -F @angela/stage-tamagotchi-godot dump:render-stages
 ```
 
-For rim or edge-light shape checks, prefer the upper-body camera preset:
+Để kiểm tra hình dạng vành hoặc ánh sáng cạnh, hãy ưu tiên cài đặt trước của máy ảnh thân trên:
 
 ```powershell
 pnpm -F @angela/stage-tamagotchi-godot dump:render-stages:upper-body
 ```
 
-The dump command runs this flow:
+Lệnh kết xuất chạy luồng này:
 
-1. Start a local WebSocket host.
-2. Launch the main Godot stage with a fixed `--resolution`.
-3. Wait for `stage.ready`.
-4. Send `host.scene.apply` with the tracked AvatarSample A VRM.
-5. Wait for `scene.applied`.
-6. Capture the visible Godot window client area for each requested render-stage
-   view.
-7. Write diagnostic PNGs under `artifacts/`.
-8. Send `host.shutdown`.
+1. Bắt đầu WebSocket host cục bộ.
+2. Khởi chạy Godot stage chính với `--resolution` cố định.
+3. Đợi `stage.ready`.
+4. Gửi `host.scene.apply` cùng với AvatarSample A VRM được theo dõi.
+5. Đợi `scene.applied`.
+6. thu nhận dữ liệu khu vực máy khách cửa sổ Godot hiển thị cho mỗi chế độ xem kết xuất-stage được yêu cầu.
+7. Viết PNG chẩn đoán trong `artifacts/`.
+8. Gửi `host.shutdown`.
 
-## Cleanup
+<a id="cleanup"></a>
 
-After the visual question is answered, either promote the scene into a stable
-tracked check with tracked fixtures, or delete the temporary scene and keep only
-the experiment result in the relevant design notes.
+## Dọn dẹp
+
+Sau khi câu hỏi trực quan được trả lời, hãy chuyển cảnh thành bản kiểm tra được theo dõi ổn định với mẫu kiểm thử được theo dõi hoặc xóa cảnh tạm thời và chỉ giữ lại kết quả thử nghiệm trong ghi chú thiết kế có liên quan.

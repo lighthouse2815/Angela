@@ -1,56 +1,46 @@
-# Technical Art Visual Workflow
+<a id="technical-art-visual-workflow"></a>
 
-This workflow exists for renderer and Technical Art work where visual judgment
-is part of correctness. It is specifically written for the Godot stage runtime.
+# Nghệ thuật kỹ thuật Quy trình làm việc trực quan
 
-## Required Evidence
+Quy trình công việc này tồn tại cho renderer và tác phẩm Nghệ thuật kỹ thuật trong đó phán đoán trực quan là một phần của tính chính xác. Nó được viết riêng cho Godot stage runtime.
 
-Every renderer-facing change needs comparable evidence before it can be
-accepted:
+<a id="required-evidence"></a>
 
-1. Reference evidence.
-   Use screenshots, Blender captures, shader references, or shipped-game
-   examples. Record the camera, model, active feature state, and what visual
-   property the reference is meant to prove.
-2. Before/after Angela evidence.
-   Capture the current Angela output before and after changing the renderer when
-   the question depends on a visual difference.
-3. Pipeline evidence.
-   Capture the relevant intermediate render stages when debugging compositor or
-   material pipeline behavior. Do not rely on memory or a manually inspected
-   live viewport alone.
+## Bằng chứng bắt buộc
 
-The current render-stage dump command is:
+Mọi thay đổi đối với renderer đều cần bằng chứng có thể so sánh được trước khi có thể được chấp nhận:
+
+1. Bằng chứng tham khảo. Sử dụng ảnh chụp màn hình, ảnh chụp Blender, tài liệu tham khảo về trình đổ bóng hoặc ví dụ về trò chơi được vận chuyển. Ghi lại máy ảnh, mô hình, trạng thái tính năng hoạt động và thuộc tính trực quan mà tham chiếu nhằm chứng minh.
+2. Before/after Angela bằng chứng. thu nhận dữ liệu đầu ra hiện tại của Angela trước và sau khi thay đổi renderer khi câu hỏi phụ thuộc vào sự khác biệt về hình ảnh.
+3. Bằng chứng đường ống. thu nhận dữ liệu các giai đoạn kết xuất trung gian có liên quan khi gỡ lỗi hoạt động của bộ tổng hợp hoặc đường dẫn vật liệu. Không chỉ dựa vào bộ nhớ hoặc khung nhìn trực tiếp được kiểm tra thủ công.
+
+Lệnh kết xuất render-stage hiện tại là:
 
 ```powershell
 pnpm -F @angela/stage-tamagotchi-godot dump:render-stages
 ```
 
-For rim or edge-light shape checks, prefer the upper-body camera preset:
+Để kiểm tra hình dạng vành hoặc ánh sáng cạnh, hãy ưu tiên cài đặt trước của máy ảnh thân trên:
 
 ```powershell
 pnpm -F @angela/stage-tamagotchi-godot dump:render-stages:upper-body
 ```
 
-The dump is end-to-end: it launches the real main stage, loads the tracked
-avatar through the WebSocket host path, and captures the visible Godot window
-client area. Internal viewport texture readback is not acceptable as final
-renderer evidence because it can bypass the final display conversion and
-produce darker, higher-contrast PNGs than the actual window.
+Kết xuất là từ đầu đến cuối: nó khởi chạy stage chính thực sự, tải hình đại diện được theo dõi thông qua đường dẫn WebSocket host và chụp khu vực máy khách cửa sổ Godot hiển thị. Việc đọc lại kết cấu khung nhìn bên trong không được chấp nhận làm bằng chứng renderer cuối cùng vì nó có thể bỏ qua chuyển đổi hiển thị cuối cùng và tạo ra PNG tối hơn, độ tương phản cao hơn cửa sổ thực tế.
 
-The command writes:
+Lệnh viết:
 
 ```text
 engines/stage-tamagotchi-godot/artifacts/render-stages/
 ```
 
-The upper-body variant writes:
+Biến thể phần thân trên viết:
 
 ```text
 engines/stage-tamagotchi-godot/artifacts/render-stages-upper-body/
 ```
 
-Default outputs are:
+Đầu ra mặc định là:
 
 - `scene-copy.png`
 - `avatar-mask.png`
@@ -60,85 +50,56 @@ Default outputs are:
 - `final.png`
 - `final-edge-off.png`
 
-These are diagnostic outputs, not accepted baselines. Use them to locate the
-first divergent stage before changing the next stage.
+Đây là kết quả chẩn đoán, không phải là đường cơ sở được chấp nhận. Sử dụng chúng để xác định vị trí stage phân kỳ đầu tiên trước khi thay đổi stage tiếp theo.
 
-This workflow intentionally does not define a project-wide visual baseline yet.
-If visual baselines are added later, they need a separate design for scope,
-fixture ownership, feature-specific acceptance, and update policy.
+Quy trình làm việc này cố ý chưa xác định đường cơ sở trực quan cho toàn dự án. Nếu đường cơ sở trực quan được thêm vào sau, chúng cần có thiết kế riêng cho phạm vi, quyền sở hữu mẫu kiểm thử, chấp nhận tính năng cụ thể và chính sách cập nhật.
 
-## Work Order
+<a id="work-order"></a>
 
-1. Define the visual question.
-   Write the narrow question first: color mapping parity, avatar-only glow,
-   rim-light shape, outline width, alpha sorting, or another specific property.
-   Do not start from an implementation idea.
+## Lệnh làm việc
 
-2. Choose the reference and fixture.
-   Use a tracked fixture when the result should stay reproducible from the
-   repository. Use a private fixture only for temporary research, and record the
-   path and limitation in the working notes.
+1. Xác định câu hỏi trực quan. Trước tiên, hãy viết câu hỏi hẹp: tính chẵn lẻ của ánh xạ màu, ánh sáng chỉ dành cho hình đại diện, hình dạng ánh sáng viền, chiều rộng đường viền, sắp xếp alpha hoặc thuộc tính cụ thể khác. Đừng bắt đầu từ một ý tưởng thực hiện.
 
-3. Capture the current output.
-   Dump the relevant render stages and keep the artifact path in the working
-   notes or PR context. For refactors, this is the behavior that must remain
-   visually stable.
+2. Chọn tham chiếu và mẫu kiểm thử. Sử dụng mẫu kiểm thử được theo dõi khi kết quả vẫn có thể được lặp lại từ kho lưu trữ. Chỉ sử dụng mẫu kiểm thử riêng cho nghiên cứu tạm thời và ghi lại đường dẫn cũng như giới hạn trong ghi chú làm việc.
 
-4. Make one renderer change.
-   Keep the change aligned to one pipeline stage or one material/source owner
-   decision. A refactor and a new visual effect should not be accepted in the
-   same comparison unless there is an explicit reason.
+3. thu nhận dữ liệu đầu ra hiện tại. Kết xuất các giai đoạn kết xuất có liên quan và giữ đường dẫn artifact trong ghi chú làm việc hoặc ngữ cảnh PR. Đối với các nhà tái cấu trúc, đây là hành vi phải duy trì ổn định về mặt trực quan.
 
-5. Compare before judging.
-   Dump the same scene after the change and compare the relevant artifacts
-   before changing code again.
+4. Thực hiện một thay đổi renderer. Giữ thay đổi phù hợp với một quy trình stage hoặc một quyết định của chủ sở hữu material/source. Không nên chấp nhận một bộ tái cấu trúc và một hiệu ứng hình ảnh mới trong cùng một so sánh trừ khi có lý do rõ ràng.
 
-6. Classify the difference.
-   Put the difference into one bucket before fixing:
-   - expected visual change
-   - expected drift caused by the intended change
-   - regression in an unrelated visual property
-   - capture instability
-   - fixture or camera mismatch
+5. Hãy so sánh trước khi phán xét. Kết xuất cảnh tương tự sau khi thay đổi và so sánh artifact có liên quan trước khi thay đổi lại mã.
 
-7. Record the acceptance.
-   If the image changes intentionally, record why and keep the artifact path. If
-   the code change is supposed to preserve behavior, compare the before/after
-   artifacts and document the result.
+6. Phân loại sự khác biệt. Đặt phần chênh lệch thành một bucket trước khi sửa:
+   - thay đổi trực quan dự kiến
+   - sự trôi dạt dự kiến ​​gây ra bởi sự thay đổi dự định
+   - hồi quy trong một thuộc tính hình ảnh không liên quan
+   - thu nhận dữ liệu mất ổn định
+   - mẫu kiểm thử hoặc máy ảnh không khớp
 
-## Debug Rules
+7. Ghi lại sự chấp nhận Nếu hình ảnh thay đổi có chủ ý, hãy ghi lại lý do và giữ nguyên đường dẫn artifact. Nếu việc thay đổi mã được cho là để duy trì hành vi, hãy so sánh before/after artifact và ghi lại kết quả.
 
-- Start from the rendered artifact, not from a shader guess.
-- Use final window output for visual acceptance. `GetViewport().GetTexture()`
-  readback is only an intermediate diagnostic and must not become the accepted
-  final evidence for color, contrast, glow, rim light, or tone-mapping
-  judgments.
-- Compare the same model, camera, viewport size, and frame timing.
-- For pipeline work, identify the stage that first diverges before modifying the
-  next stage.
-- For reference-driven compositor work, compare the reference stage output and
-  Godot stage output side by side. Do not accept the final image until the
-  intermediate mask and after-stage image explain the final difference.
-- For material work, inspect imported material parameters before changing the
-  post-process shader.
-- For color issues, separate scene color, source mask, glow composite, and final
-  color mapping. Do not merge these explanations into one cause.
-- If three local fixes do not explain the visual difference, stop and re-check
-  the pipeline ownership model before adding another patch.
+<a id="debug-rules"></a>
 
-## Gate For Edge Light Work
+## Quy tắc gỡ lỗi
 
-Edge light work can start only after these are true:
+- Bắt đầu từ artifact được kết xuất, không phải từ dự đoán của trình đổ bóng.
+- Sử dụng đầu ra cửa sổ cuối cùng để chấp nhận trực quan. Việc đọc lại `GetViewport().GetTexture()` chỉ là chẩn đoán trung gian và không được trở thành bằng chứng cuối cùng được chấp nhận cho các đánh giá về màu sắc, độ tương phản, độ sáng, ánh sáng viền hoặc ánh xạ tông màu.
+- So sánh cùng một mô hình, máy ảnh, kích thước khung nhìn và thời gian khung hình.
+- Đối với công việc đường ống, hãy xác định stage phân kỳ đầu tiên trước khi sửa đổi stage tiếp theo.
+- Đối với công việc của bộ tổng hợp dựa trên tham chiếu, hãy so sánh đầu ra stage tham chiếu và đầu ra Godot stage cạnh nhau. Không chấp nhận hình ảnh cuối cùng cho đến khi mặt nạ trung gian và hình ảnh sau stage giải thích được sự khác biệt cuối cùng.
+- Đối với công việc vật liệu, hãy kiểm tra các thông số vật liệu đã nhập trước khi thay đổi trình đổ bóng sau xử lý.
+- Đối với các vấn đề về màu sắc, tách màu cảnh, mặt nạ nguồn, tổng hợp ánh sáng và ánh xạ màu cuối cùng. Đừng hợp nhất những lời giải thích này thành một nguyên nhân.
+- Nếu ba bản sửa lỗi cục bộ không giải thích được sự khác biệt về hình ảnh, hãy dừng và kiểm tra lại quyền sở hữu đường dẫn mô hình trước khi thêm một bản vá khác.
 
-1. Current render-stage artifacts exist and have been manually inspected.
-2. Refactor-only changes have matching before/after output for the relevant
-   views.
-3. The reference case has a documented camera and enabled/disabled comparison.
-4. The planned edge-light implementation is behind a toggle or stage boundary so
-   feature-off output can still be captured and compared.
-5. Xiaoer reference stages and Godot render stages have been dumped for the same
-   visual question: edge mask, after-edge image, and final enabled/disabled
-   comparison.
+<a id="gate-for-edge-light-work"></a>
 
-This avoids repeating the previous failure mode: changing rendering architecture
-and a new visual effect at the same time without proving same-scene parity.
+## cổng kiểm tra dành cho công việc nhẹ nhàng ở cạnh
+
+Công việc ánh sáng ở cạnh chỉ có thể bắt đầu sau khi những điều này là đúng:
+
+1. Render-stage artifact hiện tại tồn tại và đã được kiểm tra thủ công.
+2. Các thay đổi chỉ dành cho bộ tái cấu trúc có đầu ra before/after phù hợp cho các chế độ xem có liên quan.
+3. Trường hợp tham chiếu có camera được ghi lại và so sánh enabled/disabled.
+4. Việc triển khai ánh sáng cạnh theo kế hoạch nằm sau ranh giới chuyển đổi hoặc stage nên vẫn có thể ghi lại và so sánh đầu ra không có tính năng.
+5. Các giai đoạn tham chiếu của Xiaoer và các giai đoạn kết xuất của Godot đã bị loại bỏ vì cùng một câu hỏi trực quan: mặt nạ cạnh, hình ảnh sau cạnh và so sánh enabled/disabled cuối cùng.
+
+Điều này tránh lặp lại chế độ thất bại trước đó: thay đổi kiến ​​trúc kết xuất và hiệu ứng hình ảnh mới cùng lúc mà không chứng minh được tính tương đương của cùng một cảnh.

@@ -1,80 +1,96 @@
-# Core Message Flow Architecture
+<a id="core-message-flow-architecture"></a>
 
-This document outlines the complete lifecycle of a message within the Satori Bot, from the initial WebSocket event to the LLM's decision-making process.
+# Kiến trúc luồng thông điệp cốt lõi
 
-## 1. Architectural Overview
+Tài liệu này phác thảo toàn bộ vòng đời của tin nhắn trong Satori Bot, từ sự kiện WebSocket ban đầu đến quá trình ra quyết định của LLM.
 
-The bot operates on a **Event-Driven + Autonomous Loop** hybrid model:
-* **Event Layer**: Handles raw WebSocket signals, deduplication, and queuing.
-* **Scheduler Layer**: Consumes the queue, updates the internal "Unread Pool" state, and triggers channel-specific processing loops.
-* **Planner Layer**: The LLM acts as an Agent that observes the "Unread Pool" and "History Actions" state to decide whether to `read_unread_messages` (observe) or `send_message` (act).
+<a id="1-architectural-overview"></a>
+
+## 1. Tổng quan về kiến ​​trúc
+
+Bot hoạt động trên **Vòng lặp tự động + hướng sự kiện** kết hợp mô hình:
+* **Lớp sự kiện**: Xử lý tín hiệu WebSocket thô, chống trùng lặp và xếp hàng.
+* **Lớp lập lịch**: Sử dụng hàng đợi, cập nhật trạng thái "Nhóm chưa đọc" nội bộ và kích hoạt các vòng xử lý theo kênh cụ thể.
+* **Lớp lập kế hoạch**: LLM hoạt động như một agent quan sát trạng thái "Nhóm chưa đọc" và "Hành động lịch sử" để quyết định xem nên sử dụng `read_unread_messages` (quan sát) hay `send_message` (hành động).
 
 ---
 
-## 2. Detailed Data Flow
+<a id="2-detailed-data-flow"></a>
 
-### Phase 1: Ingress
-**Location:** `src/adapter/satori/client.ts` → `src/core/loop/queue.ts`
+## 2. Luồng dữ liệu chi tiết
 
-1.  **WebSocket Reception**: The `SatoriClient` receives a raw JSON signal and parses it into a `SatoriEvent`.
-2.  **Event Listener**: The `setupMessageEventHandler` (in `queue.ts`) listens for `message-created` events.
-3.  **Deduplication**: The system checks the `processedIds` set (key: `channelId-messageId`) to prevent double-processing.
-4.  **Enqueuing**:
-    * The raw `event` is wrapped into a `{ event, status: 'ready' }` object.
-    * It is pushed into `botContext.eventQueue` and persisted to the database via `pushToEventQueue`.
-    * **Key Data**: `event.message.content`, `event.user.id`, `event.channel.id`.
+<a id="phase-1-ingress"></a>
 
-### Phase 2: Consumption & Anchoring
-**Location:** `src/core/loop/scheduler.ts` (Function: `onMessageArrival`)
+### Giai đoạn 1: Xâm nhập
+**Vị trí:** `src/adapter/satori/client.ts` → `src/core/loop/queue.ts`
 
-When the system processing lock is free, it consumes events from the `eventQueue`:
+1.  **Tiếp nhận WebSocket**: `SatoriClient` nhận tín hiệu JSON thô và phân tích nó thành `SatoriEvent`.
+2.  **Trình xử lý sự kiện**: `setupMessageEventHandler` (trong `queue.ts`) lắng nghe các sự kiện `message-created`.
+3.  **Loại bỏ trùng lặp**: Hệ thống kiểm tra bộ `processedIds` (khóa: `channelId-messageId`) để ngăn chặn việc xử lý kép.
+4.  **Đang xếp hàng**:
+    * `event` thô được gói vào một đối tượng `{ event, status: 'ready' }`.
+    * Nó được đẩy vào `botContext.eventQueue` và lưu vào cơ sở dữ liệu thông qua `pushToEventQueue`.
+    * **Dữ liệu chính**: `event.message.content`, `event.user.id`, `event.channel.id`.
 
-1.  **Context Initialization**:
-    * Extracts `channelId`.
-    * Calls `ensureChatContext` (in `src/core/session/context.ts`) to load or create the in-memory `ChatContext` for that channel.
-    * **Anchor**: The `event.channel.id` is the primary key for all context.
-2.  **Filtering**:
-    * Checks `selfId`. If the sender is the bot itself, the event is removed from the queue and discarded (not counted as unread).
-3.  **State Update (The "Unread Pool")**:
-    * The event is pushed into `botContext.unreadEvents[channelId]` and persisted to the database via `pushToUnreadEvents`.
-    * The event is then removed from the database queue via `removeFromEventQueue`.
-4.  **Loop Trigger**:
-    * Immediately calls `loopIterationForChannel`, waking up the Agent Loop for this specific channel.
+<a id="phase-2-consumption--anchoring"></a>
 
-### Phase 3: Reasoning (LLM)
-**Location:** `src/core/loop/scheduler.ts` → `src/core/planner/llm-client.ts`
+### Giai đoạn 2: Tiêu thụ & Neo
+**Vị trí:** `src/core/loop/scheduler.ts` (Chức năng: `onMessageArrival`)
 
-The LLM is prompted not to "reply to this text," but to "decide the next action based on state."
+Khi khóa xử lý hệ thống rảnh, nó sẽ tiêu thụ các sự kiện từ `eventQueue`:
 
-1.  **Context Construction (`imagineAnAction`)**:
-    * **System**: Injects `system-action-gen-v1` (Tool Definitions) and `personality-v1` (Persona).
-    * **Short-term Memory**: Injects `chatContext.messages` (Recent conversation turns).
-    * **Global State (Crucial)**: The prompt explicitly states: *"You have X unread events."* and lists the contents of `botContext.unreadEvents`.
-    * **Incoming Injection**: If there is an incoming message stream, it is injected as an `Incoming events` block at the end of the prompt.
-    * **Action History**: Injects `chatContext.actions` to show the results of previous attempts (e.g., "Last action: read_messages, Result: Success").
+1.  **Khởi tạo bối cảnh**:
+    * Trích xuất `channelId`.
+    * Gọi `ensureChatContext` (trong `src/core/session/context.ts`) để tải hoặc tạo `ChatContext` trong bộ nhớ cho kênh đó.
+    * **Anchor**: `event.channel.id` là khóa chính cho tất cả ngữ cảnh.
+2.  **Lọc**:
+    * Kiểm tra `selfId`. Nếu người gửi chính là bot thì sự kiện sẽ bị xóa khỏi hàng đợi và bị loại bỏ (không được tính là chưa đọc).
+3.  **Cập nhật trạng thái ("Nhóm chưa đọc")**:
+    * Sự kiện được đẩy vào `botContext.unreadEvents[channelId]` và được lưu vào cơ sở dữ liệu thông qua `pushToUnreadEvents`.
+    * Sự kiện này sau đó sẽ bị xóa khỏi hàng đợi cơ sở dữ liệu thông qua `removeFromEventQueue`.
+4.  **Kích hoạt vòng lặp**:
+    * Gọi ngay `loopIterationForChannel`, đánh thức Vòng lặp agent cho kênh cụ thể này.
+
+<a id="phase-3-reasoning-llm"></a>
+
+### Giai đoạn 3: suy luận (LLM)
+**Vị trí:** `src/core/loop/scheduler.ts` → `src/core/planner/llm-client.ts`
+
+LLM được nhắc không "trả lời văn bản này" mà "quyết định hành động tiếp theo dựa trên trạng thái".
+
+1.  **Xây dựng bối cảnh (`imagineAnAction`)**:
+    * **Hệ thống**: Đưa `system-action-gen-v1` (Định nghĩa công cụ) và `personality-v1` (Persona).
+    * **Bộ nhớ ngắn hạn**: Tiêm `chatContext.messages` (chuyển hướng cuộc trò chuyện gần đây).
+    * **Trạng thái toàn cầu (Quan trọng)**: prompt tuyên bố rõ ràng: *"Bạn có X sự kiện chưa đọc."* và liệt kê nội dung của `botContext.unreadEvents`.
+    * **Incoming Incoming**: Nếu có một luồng tin nhắn đến, nó sẽ được đưa vào dưới dạng khối `Incoming events` ở cuối prompt.
+    * **Lịch sử hành động**: Đưa `chatContext.actions` vào để hiển thị kết quả của những lần thử trước đó (ví dụ: "Hành động cuối cùng: read_messages, Kết quả: Thành công").
 2.  **Generation**:
-    * The LLM outputs a strictly formatted JSON Action, e.g., `{"action": "read_unread_messages", "channelId": "..."}`.
+    * LLM xuất ra Hành động JSON được định dạng nghiêm ngặt, ví dụ: `{"action": "read_unread_messages", "channelId": "..."}`.
 
-### Phase 4: Dispatch & Execution
-**Location:** `src/core/dispatcher.ts` → `src/capabilities/registry.ts`
+<a id="phase-4-dispatch--execution"></a>
 
-The system looks up the corresponding Handler in `globalRegistry` based on the JSON Action:
+### Giai đoạn 4: Điều phối & Thi công
+**Vị trí:** `src/core/dispatcher.ts` → `src/capabilities/registry.ts`
 
-* **Case: `read_unread_messages`** (`src/capabilities/actions/read-messages.ts`)
-    * **Logic**: Retrieves all backlog events from `botContext.unreadEvents` for the specified channel.
-    * **Formatting**: Converts them into a single text block (e.g., `[User]: Content`).
-    * **Result**: Stores this text in the `Action Result`.
-    * **State Change**: Clears the `unreadEvents` for that channel. In the **next Tick**, the LLM will see this text in its History Actions and generate a reply.
+Hệ thống tra cứu Handler tương ứng trong `globalRegistry` dựa trên Hành động JSON:
 
-* **Case: `send_message`** (`src/capabilities/actions/send-message.ts`)
-    * **Safety Check**: Checks `unreadEvents` again. If new messages arrived during generation, it might abort the send to prioritize reading.
-    * **Execution**: Calls `satoriClient.sendMessage`.
-    * **Recording**: Persists the response to the DB and the in-memory `messages` array.
+* **Vỏ: `read_unread_messages`** (`src/capabilities/actions/read-messages.ts`)
+    * **Logic**: Truy xuất tất cả các sự kiện tồn đọng từ `botContext.unreadEvents` cho kênh được chỉ định.
+    * **Định dạng**: Chuyển đổi chúng thành một khối văn bản duy nhất (ví dụ: `[User]: Content`).
+    * **Kết quả**: store văn bản này trong `Action Result`.
+    * **Thay đổi trạng thái**: Xóa `unreadEvents` cho kênh đó. Trong **Tick tiếp theo**, LLM sẽ thấy văn bản này trong Hành động lịch sử của nó và tạo ra câu trả lời.
 
-### Phase 5: Loop Continuation
-**Location:** `src/core/loop/scheduler.ts` (`handleLoopStep`)
+* **Vỏ: `send_message`** (`src/capabilities/actions/send-message.ts`)
+    * **Kiểm tra an toàn**: Kiểm tra lại `unreadEvents`. Nếu tin nhắn mới đến trong sinh nội dung, nó có thể hủy quá trình gửi để ưu tiên đọc.
+    * **Thực thi**: Gọi `satoriClient.sendMessage`.
+    * **Ghi âm**: Duy trì phản hồi cho DB và mảng `messages` trong bộ nhớ.
 
-* `dispatchAction` returns an `ActionResult` containing a `shouldContinue` flag.
-* If `shouldContinue` is true (e.g., usually true after reading messages, as a reply is expected), the scheduler waits for `LOOP_CONTINUE_DELAY_MS` (default 2.5s) and then recursively calls `handleLoopStep`.
-* **Hard Limit**: To prevent infinite loops caused by LLM hallucinations or API abuse, each loop is capped at `MAX_LOOP_ITERATIONS = 5`. Reaching this limit will force the loop to break.
-* **Termination**: The loop stops when the LLM selects a terminal action, the iteration limit is reached, or the `shouldContinue` flag becomes false.
+<a id="phase-5-loop-continuation"></a>
+
+### Giai đoạn 5: Tiếp tục vòng lặp
+**Vị trí:** `src/core/loop/scheduler.ts` (`handleLoopStep`)
+
+* `dispatchAction` trả về `ActionResult` chứa cờ `shouldContinue`.
+* Nếu `shouldContinue` là đúng (ví dụ: thường đúng sau khi đọc tin nhắn, vì dự kiến ​​sẽ có phản hồi), bộ lập lịch sẽ đợi `LOOP_CONTINUE_DELAY_MS` (mặc định là 2,5 giây) và sau đó gọi đệ quy `handleLoopStep`.
+* **Giới hạn cứng**: Để ngăn chặn các vòng lặp vô hạn do ảo giác LLM hoặc lạm dụng API gây ra, mỗi vòng lặp được giới hạn ở `MAX_LOOP_ITERATIONS = 5`. Đạt đến giới hạn này sẽ buộc vòng lặp bị đứt.
+* **Chấm dứt**: Vòng lặp dừng khi LLM chọn hành động đầu cuối, đạt đến giới hạn lặp lại hoặc cờ `shouldContinue` trở thành sai.

@@ -1,13 +1,14 @@
-# Angela Discord bot
+<a id="angela-discord-bot"></a>
 
-Angela can chat through mentions and direct messages, and join a server voice channel for spoken conversation.
-Run `angela discord` to use the CLI's saved chat provider without a desktop or web client.
-The standalone adapter also supports the existing Angela server channel with a connected desktop or web client.
-Use this package for voice conversation. The CLI Telegram task, permission, status, and recovery commands are separate features.
+# Angela Bất hòa bot
 
-## CLI setup
+Angela có thể trò chuyện thông qua các đề cập và tin nhắn trực tiếp, đồng thời tham gia kênh thoại của máy chủ để trò chuyện bằng giọng nói. Chạy `angela discord` để sử dụng trò chuyện đã lưu nhà cung cấp của CLI mà không cần desktop hoặc ứng dụng khách web. Bộ điều hợp độc lập cũng hỗ trợ kênh máy chủ Angela hiện có với desktop hoặc máy khách web được kết nối. Sử dụng gói này để trò chuyện bằng giọng nói. Các lệnh tác vụ, quyền, trạng thái và khôi phục Telegram của CLI là các tính năng riêng biệt.
 
-From the repository root, build the CLI and its workspace dependencies:
+<a id="cli-setup"></a>
+
+## Thiết lập CLI
+
+Từ thư mục gốc của kho lưu trữ, hãy xây dựng CLI và các phần phụ thuộc workspace của nó:
 
 ```sh
 pnpm build:cli
@@ -16,112 +17,76 @@ cp integrations/discord-bot/.env.example ~/.config/angela/discord.env
 chmod 600 ~/.config/angela/discord.env
 ```
 
-Set `DISCORD_TOKEN` in `discord.env`. Keep the speech defaults for the local voice service, or configure another compatible speech provider.
-The CLI reads the chat provider and model from `~/.config/angela/config.json`.
-`AIRI_URL` and `AIRI_TOKEN` are unused in CLI mode.
-`ANGELA_DISCORD_ENV` selects another Discord configuration file. Environment variables override file values.
+Đặt `DISCORD_TOKEN` trong `discord.env`. Giữ mặc định giọng nói cho dịch vụ thoại cục bộ hoặc định cấu hình lời nói tương thích khác nhà cung cấp. CLI đọc cuộc trò chuyện nhà cung cấp và mô hình từ `~/.config/angela/config.json`. `AIRI_URL` và `AIRI_TOKEN` không được sử dụng ở chế độ CLI. `ANGELA_DISCORD_ENV` chọn một tệp cấu hình Discord khác. Biến môi trường ghi đè giá trị tệp.
 
-Start the voice service, then start Discord:
+Bắt đầu dịch vụ thoại, sau đó khởi động Discord:
 
 ```sh
 angela voice start
 angela discord
 ```
 
-Without the installed executable, run `pnpm cli discord` from the repository root.
-Use `angela discord --help` for configuration help. Use Ctrl+C to stop the bot and cancel pending replies.
-Mention Angela in a text channel, or send the bot a direct message.
-For voice, join a server voice channel and use `/summon`.
+Nếu không có tệp thực thi đã cài đặt, hãy chạy `pnpm cli discord` từ thư mục gốc của kho lưu trữ. Sử dụng `angela discord --help` để được trợ giúp về cấu hình. Sử dụng Ctrl+C để dừng bot và hủy các câu trả lời đang chờ xử lý. Đề cập đến Angela trong kênh văn bản hoặc gửi tin nhắn trực tiếp cho bot. Đối với giọng nói, hãy tham gia kênh thoại của máy chủ và sử dụng `/summon`.
 
-CLI mode stores history under the CLI data directory's `discord` folder.
-Each channel has separate text and voice conversations. Requests in one conversation run in order.
-CLI mode supports conversation only. It does not expose terminal tools, Telegram task commands, or the local microphone.
-Interrupting speech, pausing, leaving, and shutdown cancel local AI generation.
-Text chat does not import speech, Opus, or the voice transport. Voice commands load these modules once per process.
-A host permits four simultaneous calls and four active speaker captures per call. Leaving or shutdown releases their resources.
-Voice replies use call context and brief, spoken sentences. Unclear transcripts prompt a clarification instead of a guessed microphone diagnosis.
-The CLI rejects the observed Google gateway diagnostic and reports a localized call failure instead of reading the diagnostic aloud.
-Previously saved diagnostics remain in history files but stay outside model requests.
+Chế độ CLI Lịch sử store trong thư mục `discord` của thư mục dữ liệu CLI. Mỗi kênh có các cuộc hội thoại bằng văn bản và giọng nói riêng biệt. Các yêu cầu trong một cuộc trò chuyện diễn ra theo thứ tự. Chế độ CLI chỉ hỗ trợ hội thoại. Nó không hiển thị các công cụ đầu cuối, lệnh tác vụ Telegram hoặc micrô cục bộ. Ngắt lời nói, tạm dừng, rời khỏi và tắt máy sẽ hủy AI sinh nội dung cục bộ. Trò chuyện văn bản không nhập lời nói, Opus hoặc giọng nói transport. Lệnh thoại tải các mô-đun này một lần cho mỗi quy trình. host cho phép bốn cuộc gọi đồng thời và bốn lần thu âm loa hoạt động cho mỗi cuộc gọi. Việc rời đi hoặc tắt máy sẽ giải phóng tài nguyên của họ. Trả lời bằng giọng nói sử dụng ngữ cảnh cuộc gọi và các câu nói ngắn gọn. Bản ghi không rõ ràng prompt làm rõ thay vì chẩn đoán micrô được đoán. CLI từ chối chẩn đoán cổng Google được quan sát và báo cáo lỗi cuộc gọi cục bộ thay vì đọc to chẩn đoán. Chẩn đoán đã lưu trước đó vẫn còn trong tệp lịch sử nhưng nằm ngoài các yêu cầu mô hình.
 
-## Standalone adapter setup
+<a id="standalone-adapter-setup"></a>
 
-Use the workspace Node.js and pnpm versions. Install dependencies from the repository root.
-Install FFmpeg and put it on PATH. The existing Discord voice and Opus packages handle transport and audio decoding.
+## Thiết lập bộ chuyển đổi độc lập
 
-Create a bot in the [Discord Developer Portal](https://discord.com/developers/applications).
-Enable Message Content Intent for mention-based text chat.
-Invite the bot with the `bot` and `applications.commands` scopes.
-Grant View Channel, Connect, Speak, and Send Messages in the call channel and its text chat.
+Sử dụng phiên bản workspace Node.js và pnpm. Cài đặt phụ thuộc từ kho lưu trữ gốc. Cài đặt FFmpeg và đặt nó trên PATH. Các gói Opus và giọng nói Discord hiện có xử lý transport và giải mã âm thanh.
 
-From the repository root, copy the configuration template:
+Tạo bot trong Cổng thông tin dành cho nhà phát triển [Discord](https://discord.com/developers/applications). Bật Ý định nội dung tin nhắn cho trò chuyện văn bản dựa trên đề cập. Mời bot có phạm vi `bot` và `applications.commands`. Cấp quyền Xem kênh, Kết nối, Nói và Gửi tin nhắn trong kênh cuộc gọi và trò chuyện văn bản của kênh đó.
+
+Từ thư mục gốc của kho lưu trữ, sao chép mẫu cấu hình:
 
 ```sh
 cp integrations/discord-bot/.env.example integrations/discord-bot/.env.local
 ```
 
-Set `DISCORD_TOKEN` in the local file. Set `AIRI_URL` and `AIRI_TOKEN` to match Angela's server-channel settings.
-Keep credentials in the ignored local file or environment. Never commit them.
-The authenticated Discord bot ID registers commands automatically. `DISCORD_BOT_CLIENT_ID` is not required.
+Đặt `DISCORD_TOKEN` trong tệp cục bộ. Đặt `AIRI_URL` và `AIRI_TOKEN` để khớp với cài đặt kênh máy chủ của Angela. Giữ thông tin xác thực trong tệp hoặc môi trường cục bộ bị bỏ qua. Không bao giờ cam kết chúng. Bot Discord ID đã được xác thực sẽ tự động đăng ký các lệnh. `DISCORD_BOT_CLIENT_ID` là không cần thiết.
 
-The template uses the existing [voice service](../../services/voice-local/README.md) on port 8000.
-Start that service separately. Its default models are `small` for transcription and `edge-tts` for speech.
-The default voice is `vi-VN-HoaiMyNeural`. Edge speech uses an external service.
-For another compatible provider, set both endpoint URLs, model names, API keys, and the speech voice.
-Use HTTP or HTTPS endpoint URLs with a trailing slash. The speech endpoint must support WAV responses.
-STT and TTS keys remain separate. Local endpoints can use empty keys.
+Mẫu sử dụng dịch vụ thoại [](../../services/voice-local/README.md) hiện có trên cổng 8000. Bắt đầu dịch vụ đó một cách riêng biệt. mô hình mặc định của nó là `small` để phiên âm và `edge-tts` cho lời nói. Giọng nói mặc định là `vi-VN-HoaiMyNeural`. Edge speech sử dụng dịch vụ bên ngoài. Đối với một nhà cung cấp tương thích khác, hãy đặt cả URL điểm cuối, tên mô hình, khóa API và giọng nói. Sử dụng URL điểm cuối HTTP hoặc HTTPS có dấu gạch chéo ở cuối. Điểm cuối giọng nói phải hỗ trợ WAV Responses. Các phím STT và TTS vẫn tách biệt. Điểm cuối cục bộ có thể sử dụng các khóa trống.
 
-Start Angela's desktop or local web client, then start the adapter:
+Khởi động desktop hoặc ứng dụng khách web cục bộ của Angela, sau đó khởi động bộ điều hợp:
 
 ```sh
 pnpm -F @angela/discord-bot start
 ```
 
-Use `ANGELA_LOCALE=en` for English command descriptions and notices. Vietnamese is the default.
+Sử dụng `ANGELA_LOCALE=en` để mô tả và thông báo lệnh bằng tiếng Anh. Tiếng Việt là mặc định.
 
-## Call controls
+<a id="call-controls"></a>
 
-Join a normal server voice channel, then use `/summon`.
-Angela starts listening after the connection reaches Ready and the join notice succeeds.
-The notice states that speech goes to the configured transcription service.
+## Điều khiển cuộc gọi
 
-| Command | Behavior |
+Tham gia kênh thoại của máy chủ bình thường, sau đó sử dụng `/summon`. Angela bắt đầu lắng nghe sau khi kết nối đạt trạng thái Sẵn sàng và thông báo tham gia thành công. Thông báo cho biết rằng lời nói sẽ được chuyển đến dịch vụ phiên âm đã định cấu hình.
+
+| Lệnh | Hành vi |
 | --- | --- |
-| `/summon` | Join your voice channel and start listening. |
-| `/listen enabled:false` | Stop capture, queued speech, pending voice requests, and playback. Remain in the channel. |
-| `/listen enabled:true` | Resume listening explicitly. |
-| `/leave` | Stop the call and disconnect. |
-| `/ping` | Check whether the bot responds. |
+| `/summon` | Tham gia kênh thoại của bạn và bắt đầu nghe. |
+| `/listen enabled:false` | Dừng thu nhận dữ liệu, lời nói xếp hàng, yêu cầu giọng nói đang chờ xử lý và phát lại. Ở lại trong kênh. |
+| `/listen enabled:true` | Tiếp tục nghe một cách rõ ràng. |
+| `/leave` | Dừng cuộc gọi và ngắt kết nối. |
+| `/ping` | Kiểm tra xem bot có phản hồi không. |
 
-Call controls require membership in the same voice channel as Angela.
-One bot can own one voice connection per server. A summon from another channel does not move an active call.
-Direct calls, group DMs, and Stage channels are outside this implementation.
+Điều khiển cuộc gọi yêu cầu tư cách thành viên trong cùng kênh thoại với Angela. Một bot có thể sở hữu một kết nối thoại trên mỗi máy chủ. Lệnh triệu tập từ kênh khác sẽ không chuyển cuộc gọi đang hoạt động. Các cuộc gọi trực tiếp, DM nhóm và các kênh stage nằm ngoài phạm vi triển khai này.
 
-## Conversation behavior
+<a id="conversation-behavior"></a>
 
-Each room owns its capture streams, speaker buffers, request queue, playback, and cancellation state.
-Discord user IDs identify speakers. This is not voiceprint recognition.
-The shared conversation session belongs to that server and voice channel. The speaker prefix identifies each person's input.
-Text chat retains its existing routing and sessions.
+## Hành vi hội thoại
 
-The receiver ends a speech capture after 800 ms of silence through Discord's AfterSilence policy.
-Quiet captures remain local and do not trigger transcription. Confirmed speech can interrupt Angela's pending or audible reply.
-A room keeps at most four queued utterances. Overlapping speakers retain separate buffers.
-A capture can last at most 30 seconds. Longer captures are discarded with a notice instead of a partial transcript.
-Each reply has a 90-second deadline covering transcription, the AI response, speech generation, and playback.
+Mỗi phòng sở hữu các luồng thu nhận dữ liệu, bộ đệm loa, hàng đợi yêu cầu, trạng thái phát lại và hủy. ID người dùng Discord xác định người nói. Đây không phải là nhận dạng giọng nói. Phiên hội thoại được chia sẻ thuộc về máy chủ và kênh thoại đó. Tiền tố người nói xác định đầu vào của mỗi người. Trò chuyện bằng văn bản vẫn giữ nguyên định tuyến và phiên hiện có.
 
-Only `output:gen-ai:chat:complete` triggers speech. Intermediate assistant messages never play in the call.
-The room, speaker, and random request ID must match the active turn before playback.
-Interrupted, duplicate, disconnected, or previous-call responses are ignored.
-Interruption stops playback and cancels pending speech synthesis. An active transcription can finish to preserve the speaker's words.
-An interrupted turn's reply remains silent. Pausing or leaving also cancels pending transcription requests.
-These controls do not cancel remote AI generation in the desktop client.
-Voice pauses and disconnects discard pending audio. They do not automatically reactivate after restart.
+Người nhận kết thúc bài phát biểu thu nhận dữ liệu sau 800 ms im lặng thông qua chính sách AfterSilence của Discord. Việc chụp yên tĩnh vẫn cục bộ và không kích hoạt phiên mã. Lời nói đã được xác nhận có thể làm gián đoạn câu trả lời đang chờ xử lý hoặc có thể nghe được của Angela. Một phòng chỉ giữ tối đa bốn câu phát biểu xếp hàng. Các loa chồng lên nhau giữ lại bộ đệm riêng biệt. thu nhận dữ liệu có thể tồn tại tối đa 30 giây. Các ảnh chụp dài hơn sẽ bị loại bỏ kèm theo thông báo thay vì bản ghi một phần. Mỗi câu trả lời có thời hạn 90 giây bao gồm phiên âm, phản hồi AI, lời nói sinh nội dung và phát lại.
 
-Audio stays in bounded memory inside the adapter. The adapter writes no recordings to disk.
-The configured STT provider receives captured audio. The AI receives transcripts, and the TTS provider receives reply text.
-Angela's existing chat history and the providers' own retention settings remain in effect.
+Chỉ `output:gen-ai:chat:complete` kích hoạt lời nói. Tin nhắn trợ lý trung gian không bao giờ phát trong cuộc gọi. Phòng, loa và yêu cầu ngẫu nhiên ID phải khớp với lượt hoạt động trước khi phát lại. Responses bị gián đoạn, trùng lặp, ngắt kết nối hoặc cuộc gọi trước đó đều bị bỏ qua. Sự gián đoạn sẽ dừng phát lại và hủy bỏ việc tổng hợp giọng nói đang chờ xử lý. Quá trình phiên âm đang hoạt động có thể kết thúc để bảo toàn lời nói của người nói. Câu trả lời của một lượt bị gián đoạn vẫn im lặng. Việc tạm dừng hoặc thoát cũng sẽ hủy các yêu cầu phiên âm đang chờ xử lý. Các điều khiển này không hủy AI sinh nội dung từ xa trong máy khách desktop. Giọng nói tạm dừng và ngắt kết nối sẽ loại bỏ âm thanh đang chờ xử lý. Chúng không tự động kích hoạt lại sau khi khởi động lại.
 
-## Checks
+Âm thanh vẫn nằm trong bộ nhớ có giới hạn bên trong bộ chuyển đổi. Bộ điều hợp không ghi bản ghi vào đĩa. STT nhà cung cấp được định cấu hình sẽ nhận âm thanh đã ghi. AI nhận bản ghi và TTS nhà cung cấp nhận văn bản trả lời. Lịch sử trò chuyện hiện có của Angela và cài đặt lưu giữ của nhà cung cấp vẫn có hiệu lực.
+
+<a id="checks"></a>
+
+## Kiểm tra
 
 ```sh
 pnpm -F @angela/discord-bot typecheck
@@ -133,18 +98,18 @@ pnpm -F @angela/i18n build
 pnpm lint
 ```
 
-Tests use local speech HTTP fixtures, real Discord-format Opus encoding/decoding, and mocked Discord transport boundaries.
-`ANGELA_DISCORD_AUDIO_TEST=1` also runs the real WAV-to-Opus playback pipeline through FFmpeg. This optional check requires FFmpeg on PATH.
-They cover response routing, speaker separation, interruption, pause/resume, timeout, connection failure, and cleanup.
-A live acceptance check still needs a bot token, a Discord server, two participants, and working speech providers.
-Check audible playback, interruption, concurrent speakers, `/listen`, `/leave`, and reconnect behavior in that server.
+Các thử nghiệm sử dụng lời nói cục bộ HTTP mẫu kiểm thử, Opus encoding/decoding định dạng Discord thực và ranh giới Discord transport mô phỏng. `ANGELA_DISCORD_AUDIO_TEST=1` cũng chạy đường dẫn phát lại WAV-to-Opus thực thông qua FFmpeg. Kiểm tra tùy chọn này yêu cầu FFmpeg trên PATH. Chúng bao gồm định tuyến phản hồi, tách loa, gián đoạn, pause/resume, thời gian chờ, lỗi kết nối và dọn dẹp. Quá trình kiểm tra chấp nhận trực tiếp vẫn cần có bot token, máy chủ Discord, hai người tham gia và bài phát biểu làm việc nhà cung cấp. Kiểm tra phát lại âm thanh, gián đoạn, loa đồng thời, `/listen`, `/leave` và hoạt động kết nối lại trong máy chủ đó.
 
-## Other similar projects
+<a id="other-similar-projects"></a>
+
+## Các dự án tương tự khác
 
 - [pladisdev/Discord-AI-With-STT](https://github.com/pladisdev/Discord-AI-With-STT)
 
-## Acknowledgements
+<a id="acknowledgements"></a>
 
-- Implementation of Audio handling and processing https://github.com/TheTrueSCP/CharacterAIVoice/blob/54d6a41b4e0eba9ad996c5f9ddcc6230277af2f8/src/VoiceHandler.js
-- Example of usage https://github.com/discordjs/voice-examples/blob/da0c3b419107d41053501a4dddf3826ad53c03f7/radio-bot/src/bot.ts
-- Excellent library https://github.com/discordjs/discord.js
+## Lời cảm ơn
+
+- Triển khai xử lý và xử lý âm thanh https://github.com/TheTrueSCP/CharacterAIVoice/blob/54d6a41b4e0eba9ad996c5f9ddcc6230277af2f8/src/VoiceHandler.js
+- Ví dụ về cách sử dụng https://github.com/discordjs/voice-examples/blob/da0c3b419107d41053501a4dddf3826ad53c03f7/radio-bot/src/bot.ts
+- Thư viện tuyệt vời https://github.com/discordjs/discord.js

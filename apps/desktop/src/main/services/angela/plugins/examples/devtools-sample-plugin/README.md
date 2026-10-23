@@ -1,28 +1,36 @@
-# Devtools Sample Extension
+<a id="devtools-sample-extension"></a>
 
-This sample extension is for validating extension host behavior in the **Extension Host Inspector** page.
+# Tiện ích mở rộng mẫu Devtools
 
-## Files
+Tiện ích mở rộng mẫu này dùng để xác thực hành vi của tiện ích mở rộng host trong trang **Trình kiểm tra tiện ích mở rộng host**.
 
-- `extension.airi.json`: extension manifest (`ExtensionManifestV2`)
-- `devtools-sample-plugin.mjs`: self-contained bundled Extension output
+<a id="files"></a>
 
-The manifest declares the extension entrypoint used by the host inspector sample.
+## Tập tin
 
-## How to use
+- `extension.airi.json`: bảng kê khai tiện ích mở rộng (`ExtensionManifestV2`)
+- `devtools-sample-plugin.mjs`: Đầu ra mở rộng đi kèm khép kín
 
-1. Open `/devtools/plugin-host` in Stage Tamagotchi.
-2. Click `Import Folder` and select this sample directory.
-3. Review the package facts and click `Import Extension`.
-4. Find `devtools-sample-plugin` and click `Enable and Load`.
-5. Confirm:
-   - the import starts in the disabled and unloaded state
-   - extension appears as `loaded`
-   - session phase becomes `ready`
-   - capability list is visible
+Tệp kê khai khai báo điểm nhập mở rộng được mẫu thanh tra host sử dụng.
 
-## What this extension does
+<a id="how-to-use"></a>
 
-- `setup`: logs startup in renderer/main console.
+## Cách sử dụng
 
-It does not mutate app state; it is safe for lifecycle verification.
+1. Mở `/devtools/plugin-host` trong stage Tamagotchi.
+2. Nhấp vào `Import Folder` và chọn thư mục mẫu này.
+3. Xem lại thông tin chi tiết về gói và nhấp vào `Import Extension`.
+4. Tìm `devtools-sample-plugin` và nhấp vào `Enable and Load`.
+5. Xác nhận:
+   - quá trình nhập bắt đầu ở trạng thái bị vô hiệu hóa và không tải
+   - tiện ích mở rộng xuất hiện dưới dạng `loaded`
+   - giai đoạn phiên trở thành `ready`
+   - danh sách khả năng có thể nhìn thấy
+
+<a id="what-this-extension-does"></a>
+
+## Tiện ích mở rộng này làm gì
+
+- `setup`: ghi nhật ký khởi động trong bảng điều khiển renderer/main.
+
+Nó không làm thay đổi trạng thái ứng dụng; nó an toàn để xác minh vòng đời.

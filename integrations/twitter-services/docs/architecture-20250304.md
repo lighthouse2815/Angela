@@ -1,17 +1,25 @@
-# Twitter Service Architecture Documentation
+<a id="twitter-service-architecture-documentation"></a>
 
-## 1. Project Overview
+# Tài liệu kiến ​​trúc dịch vụ Twitter
 
-Twitter Service is a web automation service based on BrowserBase, providing structured access and interaction capabilities with Twitter data. It employs a layered architecture design that supports multiple adapters for integration with different applications.
+<a id="1-project-overview"></a>
 
-## 2. Design Goals
+## 1. Tổng quan dự án
 
-- **Reliability**: Stable handling of Twitter page changes and limitations
-- **Scalability**: Easy to add new features and support different integration methods
-- **Performance Optimization**: Intelligent management of request frequency and browser sessions
-- **Data Structuring**: Provides standardized, typed data models
+Dịch vụ Twitter là một dịch vụ tự động hóa web dựa trên BrowserBase, cung cấp khả năng tương tác và truy cập có cấu trúc với dữ liệu Twitter. Nó sử dụng thiết kế kiến ​​trúc phân lớp hỗ trợ nhiều bộ điều hợp để tích hợp với các ứng dụng khác nhau.
 
-## 3. Architecture Overview
+<a id="2-design-goals"></a>
+
+## 2. Mục tiêu thiết kế
+
+- **Độ tin cậy**: Xử lý ổn định các thay đổi và hạn chế của trang Twitter
+- **Khả năng mở rộng**: Dễ dàng thêm các tính năng mới và hỗ trợ các phương pháp tích hợp khác nhau
+- **Tối ưu hóa hiệu suất**: Quản lý thông minh tần suất yêu cầu và phiên trình duyệt
+- **Cấu trúc dữ liệu**: Cung cấp dữ liệu được đánh máy, chuẩn hóa mô hình
+
+<a id="3-architecture-overview"></a>
+
+## 3. Tổng quan về kiến ​​trúc
 
 ```txt
 ┌─────────────────────────────────────────────┐
@@ -62,119 +70,153 @@ Twitter Service is a web automation service based on BrowserBase, providing stru
           └────────────────────────┘
 ```
 
-## 4. Technology Stack and Dependencies
+<a id="4-technology-stack-and-dependencies"></a>
 
-- **Core Library**: TypeScript, Node.js
-- **Browser Automation**: BrowserBase Stagehand, Playwright
-- **HTML Parsing**: unified, rehype-parse, unist-util-visit
-- **API Server**: H3.js, listhen
-- **Adapters**: AIRI Server SDK, MCP SDK
-- **Logging System**: @guiiai/logg
-- **Configuration**: defu (deep merging configurations)
-- **Utility Library**: zod (type validation)
+## 4. Công nghệ và sự phụ thuộc
 
-## 5. Key Components
+- **Thư viện lõi**: TypeScript, Node.js
+- **Tự động hóa trình duyệt**: BrowserBase Stagehand, Playwright
+- **Phân tích cú pháp HTML**: hợp nhất, phân tích lại, không sử dụng-truy cập
+- **Máy chủ API**: H3.js, nghe này
+- **Bộ điều hợp**: Máy chủ AIRI SDK, MCP SDK
+- **Hệ thống ghi nhật ký**: @guiiai/logg
+- **Cấu hình**: defu (cấu hình hợp nhất sâu)
+- **Thư viện tiện ích**: zod (xác thực loại)
 
-### 5.1 Adapter Layer
+<a id="5-key-components"></a>
 
-#### 5.1.1 AIRI Adapter
+## 5. Thành phần chính
 
-Provides integration with the AIRI LLM platform, handling event-driven communication.
+<a id="51-adapter-layer"></a>
 
-#### 5.1.2 MCP Adapter
+### 5.1 Lớp bộ điều hợp
 
-Implements the Model Context Protocol interface, providing communication based on HTTP. Currently using the official MCP SDK implementation, providing high-performance HTTP server and SSE communication through H3.js.
+<a id="511-airi-adapter"></a>
 
-The MCP adapter exposes several tools and resources:
+#### 5.1.1 Bộ chuyển đổi AIRI
 
-- **Timeline Resource**: Access tweets from the user's timeline
-- **Tweet Details Resource**: Get detailed information about a specific tweet
-- **User Profile Resource**: Retrieve user profile information
+Cung cấp khả năng tích hợp với nền tảng AIRI LLM, xử lý giao tiếp theo hướng sự kiện.
 
-Additionally, it provides tools for interaction:
+<a id="512-mcp-adapter"></a>
 
-- **Login Tool**: Simplified authentication tool that provides clear feedback on session status. It attempts to load existing sessions, and clearly communicates whether a session was loaded successfully or if manual login is required. The tool no longer requires username/password parameters, as it relies on the enhanced session management system.
-- **Post Tweet Tool**: Create and publish new tweets
-- **Like Tweet Tool**: Like a tweet by its ID
-- **Retweet Tool**: Retweet a tweet by its ID
-- **Refresh Timeline Tool**: Refresh the timeline with the latest tweets, with options to control the count and whether to include replies and retweets.
-- **Get My Profile Tool**: Get information about a user's profile. It can extract the username from the current URL or accept a specific username as a parameter.
+#### 5.1.2 Bộ chuyển đổi MCP
 
-The adapter uses internationalized messages (Chinese/English) to provide clear feedback to users about login status and session management.
+Triển khai giao diện Giao thức ngữ cảnh mô hình, cung cấp giao tiếp dựa trên HTTP. Hiện đang sử dụng triển khai MCP SDK chính thức, cung cấp máy chủ HTTP hiệu suất cao và giao tiếp SSE thông qua H3.js.
 
-#### 5.1.3 Development Server
+Bộ điều hợp MCP hiển thị một số công cụ và tài nguyên:
 
-Using listhen for optimized development experience, including automatic browser opening, real-time logging, and debugging tools.
+- **Tài nguyên dòng thời gian**: Truy cập các tweet từ dòng thời gian của người dùng
+- **Tài nguyên chi tiết Tweet**: Nhận thông tin chi tiết về một tweet cụ thể
+- **Tài nguyên hồ sơ người dùng**: Truy xuất thông tin hồ sơ người dùng
 
-### 5.2 Core Service Layer
+Ngoài ra, nó còn cung cấp các công cụ để tương tác:
 
-#### 5.2.1 Authentication Service (Auth Service)
+- **Công cụ đăng nhập**: Công cụ xác thực đơn giản cung cấp phản hồi rõ ràng về trạng thái phiên. Nó cố gắng tải các phiên hiện có và thông báo rõ ràng liệu phiên đã được tải thành công hay cần đăng nhập thủ công. Công cụ này không còn yêu cầu các tham số username/password nữa vì nó dựa vào hệ thống quản lý phiên nâng cao.
+- **Công cụ đăng Tweet**: Tạo và xuất bản các tweet mới
+- **Công cụ Thích Tweet**: Thích một tweet của ID
+- **Công cụ Retweet**: Retweet một tweet bằng ID của nó
+- **Công cụ làm mới dòng thời gian**: Làm mới dòng thời gian bằng các tweet mới nhất, với các tùy chọn để kiểm soát số lượng và có bao gồm các câu trả lời và tin nhắn lại hay không.
+- **Tải Công cụ Hồ sơ của Tôi**: Nhận thông tin về hồ sơ của người dùng. Nó có thể trích xuất tên người dùng từ URL hiện tại hoặc chấp nhận một tên người dùng cụ thể làm tham số.
 
-The Authentication Service has been significantly enhanced to improve reliability and error handling:
+Bộ điều hợp sử dụng các thông báo được quốc tế hóa (Chinese/English) để cung cấp phản hồi rõ ràng cho người dùng về trạng thái đăng nhập và quản lý phiên.
 
-1. **Improved Session Detection**: Enhanced logic for detecting existing browser sessions
-2. **Robust Error Handling**: Implemented granular error handling to distinguish between different authentication failure types
-3. **Timeout Optimization**: Adjusted timeouts for various operations to enhance stability during network fluctuations
-4. **Enhanced Cookie Management**: Improved cookie storage and loading mechanisms to reduce the need for manual login
-5. **Session Validation**: Added comprehensive session validation to verify the integrity of saved sessions
-6. **Simplified API**: Removed the need for explicit username/password in the login method, relying instead on session files and browser session detection
+<a id="513-development-server"></a>
 
-The service follows a multi-stage authentication approach:
+#### 5.1.3 Máy chủ phát triển
 
-1. **Session File Loading**: First attempts to load saved sessions from disk
-2. **Existing Session Detection**: Checks if the browser already has a valid Twitter session
-3. **Manual Login Process**: If necessary, guides through the Twitter login page
+Sử dụng listen để có trải nghiệm phát triển được tối ưu hóa, bao gồm mở trình duyệt tự động, ghi nhật ký thời gian thực và các công cụ gỡ lỗi.
 
-After successful authentication through any method, sessions are automatically persisted for future use. The system provides clear feedback to users about the current login state and automatically monitors and saves sessions when changes are detected.
+<a id="52-core-service-layer"></a>
 
-#### 5.2.2 Timeline Service (Timeline Service)
+### 5.2 Lớp dịch vụ cốt lõi
 
-Gets and processes Twitter timeline content.
+<a id="521-authentication-service-auth-service"></a>
 
-#### 5.2.3 Other Services
+#### 5.2.1 Dịch vụ xác thực (Auth Service)
 
-Includes search service, interaction service, user profile service, etc. (not implemented in MVP)
+Dịch vụ xác thực đã được tăng cường đáng kể để cải thiện độ tin cậy và xử lý lỗi:
 
-### 5.3 Parsers and Tools
+1. **Cải thiện khả năng phát hiện phiên**: Logic nâng cao để phát hiện các phiên trình duyệt hiện có
+2. **Xử lý lỗi mạnh mẽ**: Triển khai xử lý lỗi chi tiết để phân biệt giữa các loại lỗi xác thực khác nhau
+3. **Tối ưu hóa thời gian chờ**: Thời gian chờ được điều chỉnh cho các hoạt động khác nhau để tăng cường độ ổn định khi mạng biến động
+4. **Quản lý cookie nâng cao**: Cơ chế tải và lưu trữ cookie được cải thiện để giảm nhu cầu đăng nhập thủ công
+5. **Xác thực phiên**: Đã thêm xác thực phiên toàn diện để xác minh tính toàn vẹn của các phiên đã lưu
+6. **API được đơn giản hóa**: Đã loại bỏ nhu cầu về username/password rõ ràng trong phương thức đăng nhập, thay vào đó dựa vào tệp phiên và phát hiện phiên trình duyệt
 
-#### 5.3.1 Tweet Parser
+Dịch vụ tuân theo phương pháp xác thực đa stage:
 
-Extracts structured data from HTML.
+1. **Đang tải tệp phiên**: Lần thử đầu tiên tải các phiên đã lưu từ đĩa
+2. **Phát hiện phiên hiện tại**: Kiểm tra xem trình duyệt đã có phiên Twitter hợp lệ chưa
+3. **Quy trình đăng nhập thủ công**: Nếu cần, hãy hướng dẫn qua trang đăng nhập Twitter
 
-#### 5.3.2 Rate Limiter
+Sau khi xác thực thành công thông qua bất kỳ phương thức nào, các phiên sẽ tự động được duy trì để sử dụng trong tương lai. Hệ thống cung cấp phản hồi rõ ràng cho người dùng về trạng thái đăng nhập hiện tại và tự động theo dõi và lưu phiên khi phát hiện có thay đổi.
 
-Controls request frequency to avoid triggering Twitter limits.
+<a id="522-timeline-service-timeline-service"></a>
 
-#### 5.3.3 Session Manager
+#### 5.2.2 Dịch vụ dòng thời gian (Dịch vụ dòng thời gian)
 
-Manages authentication session data, providing methods to:
+Nhận và xử lý nội dung dòng thời gian Twitter.
 
-- Save session cookies to local files
-- Load previous sessions during startup
-- Delete invalid or expired sessions
-- Validate session age and integrity
+<a id="523-other-services"></a>
 
-### 5.3.4 Browser Adapter Layer
+#### 5.2.3 Các dịch vụ khác
 
-The service has migrated from direct BrowserBase API usage to Stagehand, an AI-powered web browsing framework built on top of Playwright. Stagehand offers three core APIs that simplify browser automation:
+Bao gồm dịch vụ tìm kiếm, dịch vụ tương tác, dịch vụ hồ sơ người dùng, v.v. (không được triển khai trong MVP)
 
-- **act**: Execute actions on the page through natural language instructions
-- **extract**: Retrieve structured data from the page using natural language queries
-- **observe**: Analyze the page and suggest possible actions before execution
+<a id="53-parsers-and-tools"></a>
 
-Stagehand processes the DOM in chunks to optimize LLM performance and provides fallback vision capabilities for complex page structures. This migration significantly improves code maintainability and automation reliability when interacting with Twitter's interface.
+### 5.3 Trình phân tích cú pháp và công cụ
 
-## 6. Data Flow
+<a id="531-tweet-parser"></a>
 
-1. **Request Flow**: Application Layer → Adapter → Core Service → Browser Adapter Layer → BrowserBase API → Twitter
-2. **Response Flow**: Twitter → BrowserBase API → Browser Adapter Layer → Core Service → Data Parsing → Adapter → Application Layer
-3. **Authentication Flow**:
-   - Load Session → Check Existing Session → Manual Login → Session Validation → Session Storage
-   - Clear feedback is provided at each step of the authentication process
+#### 5.3.1 Trình phân tích cú pháp Tweet
 
-## 7. Configuration System
+Trích xuất dữ liệu có cấu trúc từ HTML.
 
-The configuration system has been optimized using the `defu` library for deep merging configurations, eliminating redundant initialization. The updated configuration structure includes Stagehand-specific settings:
+<a id="532-rate-limiter"></a>
+
+#### 5.3.2 Giới hạn tốc độ
+
+Kiểm soát tần suất yêu cầu để tránh kích hoạt giới hạn Twitter.
+
+<a id="533-session-manager"></a>
+
+#### 5.3.3 Trình quản lý phiên
+
+Quản lý dữ liệu phiên xác thực, cung cấp các phương thức để:
+
+- Lưu cookie phiên vào tệp cục bộ
+- Tải các phiên trước đó trong khi khởi động
+- Xóa các phiên không hợp lệ hoặc hết hạn
+- Xác thực tuổi phiên và tính toàn vẹn
+
+<a id="534-browser-adapter-layer"></a>
+
+### 5.3.4 Lớp bộ điều hợp trình duyệt
+
+Dịch vụ này đã chuyển từ việc sử dụng trực tiếp BrowserBase API sang Stagehand, một khung duyệt web dựa trên AI được xây dựng dựa trên Playwright. Stagehand cung cấp ba API cốt lõi giúp đơn giản hóa quá trình tự động hóa trình duyệt:
+
+- **hành động**: Thực hiện các hành động trên trang thông qua hướng dẫn bằng ngôn ngữ tự nhiên
+- **trích xuất**: Truy xuất dữ liệu có cấu trúc từ trang bằng truy vấn ngôn ngữ tự nhiên
+- **quan sát**: Phân tích trang và đề xuất các hành động có thể thực hiện trước khi thực hiện
+
+Stagehand xử lý DOM theo từng khối để tối ưu hóa hiệu suất LLM và cung cấp khả năng hiển thị phương án dự phòng cho các cấu trúc trang phức tạp. Việc di chuyển này cải thiện đáng kể khả năng bảo trì mã và độ tin cậy tự động hóa khi tương tác với giao diện của Twitter.
+
+<a id="6-data-flow"></a>
+
+## 6. Luồng dữ liệu
+
+1. **Luồng yêu cầu**: Lớp ứng dụng → Bộ điều hợp → Dịch vụ cốt lõi → Lớp bộ điều hợp trình duyệt → BrowserBase API → Twitter
+2. **Luồng phản hồi**: Twitter → BrowserBase API → Lớp bộ điều hợp trình duyệt → Dịch vụ cốt lõi → Phân tích dữ liệu → Bộ điều hợp → Lớp ứng dụng
+3. **Luồng xác thực**:
+   - Tải phiên → Kiểm tra phiên hiện có → Đăng nhập thủ công → Xác thực phiên → Lưu trữ phiên
+   - Phản hồi rõ ràng được cung cấp ở mỗi bước của quá trình xác thực
+
+<a id="7-configuration-system"></a>
+
+## 7. Hệ thống cấu hình
+
+Hệ thống cấu hình đã được tối ưu hóa bằng thư viện `defu` cho các cấu hình hợp nhất sâu, loại bỏ việc khởi tạo dư thừa. Cấu trúc cấu hình được cập nhật bao gồm các cài đặt dành riêng cho Stagehand:
 
 ```typescript
 interface Config {
@@ -224,11 +266,15 @@ interface Config {
 }
 ```
 
-The system no longer relies on the `TWITTER_COOKIES` environment variable, as cookies are now managed through the session management system.
+Hệ thống không còn dựa vào biến môi trường `TWITTER_COOKIES` nữa vì cookie hiện được quản lý thông qua hệ thống quản lý phiên.
 
-## 8. Development and Testing
+<a id="8-development-and-testing"></a>
 
-### 8.1 Development Environment Setup
+## 8. Phát triển và thử nghiệm
+
+<a id="81-development-environment-setup"></a>
+
+### 8.1 Thiết lập môi trường phát triển
 
 ```bash
 # Install dependencies
@@ -243,15 +289,21 @@ npm run dev        # Standard mode
 npm run dev:mcp    # MCP development server mode
 ```
 
-### 8.2 Testing Strategy
+<a id="82-testing-strategy"></a>
 
-- **Unit Tests**: Test parsers, utility classes, and business logic
-- **Integration Tests**: Test service and adapter interaction
-- **End-to-End Tests**: Simulate complete usage scenarios
+### 8.2 Chiến lược thử nghiệm
 
-## 9. Integration Example
+- **Thử nghiệm đơn vị**: Kiểm tra trình phân tích cú pháp, lớp tiện ích và logic nghiệp vụ
+- **Thử nghiệm tích hợp**: Dịch vụ thử nghiệm và tương tác bộ chuyển đổi
+- **Thử nghiệm toàn diện**: Mô phỏng các kịch bản sử dụng hoàn chỉnh
 
-### 9.1 Integration Example with Stagehand
+<a id="9-integration-example"></a>
+
+## 9. Ví dụ tích hợp
+
+<a id="91-integration-example-with-stagehand"></a>
+
+### 9.1 Ví dụ tích hợp với Stagehand
 
 ```typescript
 import { StagehandAdapter, TwitterService } from 'twitter-services'
@@ -291,7 +343,9 @@ async function main() {
 }
 ```
 
-### 9.2 Integrating as AIRI Module
+<a id="92-integrating-as-airi-module"></a>
+
+### 9.2 Tích hợp dưới dạng Mô-đun AIRI
 
 ```typescript
 import { AIRIAdapter, BrowserBaseMCPAdapter, TwitterService } from 'twitter-services'
@@ -315,7 +369,9 @@ async function startAIRIModule() {
 }
 ```
 
-### 9.3 Using MCP for Integration
+<a id="93-using-mcp-for-integration"></a>
+
+### 9.3 Sử dụng MCP để tích hợp
 
 ```typescript
 // Use MCP SDK to interact with Twitter service
@@ -355,42 +411,54 @@ async function connectToTwitterService() {
 }
 ```
 
-## 10. Extension Guide
+<a id="10-extension-guide"></a>
 
-### 10.1 Adding New Features
+## 10. Hướng dẫn mở rộng
 
-For example, adding "Get Tweets from a Specific User" functionality:
+<a id="101-adding-new-features"></a>
 
-1. Extend the interface in `src/types/twitter.ts`
-2. Implement the method in `src/core/twitter-service.ts`
-3. Add corresponding handling logic in the adapter
-4. If it's an MCP adapter, add appropriate resources or tools in `configureServer()`
+### 10.1 Thêm tính năng mới
 
-### 10.2 Supporting New Adapters
+Ví dụ: thêm chức năng "Nhận Tweet từ một người dùng cụ thể":
 
-1. Create a new adapter class
-2. Implement communication logic with the target system
-3. Add configuration support in the entry file
+1. Mở rộng giao diện trong `src/types/twitter.ts`
+2. Triển khai phương thức trong `src/core/twitter-service.ts`
+3. Thêm logic xử lý tương ứng trong bộ chuyển đổi
+4. Nếu đó là bộ điều hợp MCP, hãy thêm tài nguyên hoặc công cụ thích hợp trong `configureServer()`
 
-## 11. Maintenance Recommendations
+<a id="102-supporting-new-adapters"></a>
 
-- **Automated Testing**: Write unit tests and integration tests
-- **Monitoring & Alerts**: Monitor service status and Twitter access limitations
-- **Selector Updates**: Regularly validate and update selector configurations
-- **Session Management**: Use the built-in session management system to improve stability and reduce manual login requirements. Consider implementing session rotation and validation.
-- **Cookie Management**: The system now automatically manages cookie storage via the SessionManager, but consider adding encrypted storage for production environments.
-- **User Feedback**: Maintain clear, internationalized feedback messages for authentication status to improve user experience.
+### 10.2 Hỗ trợ bộ điều hợp mới
 
-### 11.4 Stagehand Maintenance
+1. Tạo một lớp bộ điều hợp mới
+2. Triển khai logic giao tiếp với hệ thống đích
+3. Thêm hỗ trợ cấu hình trong tệp nhập
 
-- **Model Selection**: Regularly evaluate the performance of different LLM models (GPT-4o, Claude 3.5 Sonnet) for your specific use cases
-- **Prompt Engineering**: Refine natural language instructions to improve reliability and performance
-- **Vision Capabilities**: Consider enabling vision capabilities for complex DOM structures by setting `useVision: true` in appropriate operations
-- **DOM Chunking**: Monitor and optimize chunk sizes based on the complexity of the Twitter interface
+<a id="11-maintenance-recommendations"></a>
 
-## 12. Project Roadmap
+## 11. Khuyến nghị bảo trì
 
-- MVP Stage: Core functionality with Stagehand integration (authentication, browsing timeline)
-- Stage Two: Enhanced interaction features utilizing Stagehand's natural language capabilities
-- Stage Three: Advanced search and filtering features with optimized LLM prompts
-- Stage Four: Performance optimization and multi-model support
+- **Kiểm tra tự động**: Viết bài kiểm tra đơn vị và bài kiểm tra tích hợp
+- **Giám sát & Cảnh báo**: Theo dõi trạng thái dịch vụ và giới hạn truy cập Twitter
+- **Cập nhật bộ chọn**: Thường xuyên xác thực và cập nhật cấu hình bộ chọn
+- **Quản lý phiên**: Sử dụng hệ thống quản lý phiên tích hợp để cải thiện tính ổn định và giảm yêu cầu đăng nhập thủ công. Hãy cân nhắc triển khai việc xoay vòng và xác thực phiên.
+- **Quản lý cookie**: Hệ thống hiện tự động quản lý việc lưu trữ cookie thông qua SessionManager, nhưng hãy xem xét thêm bộ lưu trữ được mã hóa cho môi trường sản xuất.
+- **Phản hồi của người dùng**: Duy trì các thông báo phản hồi rõ ràng, được quốc tế hóa về trạng thái xác thực nhằm cải thiện trải nghiệm người dùng.
+
+<a id="114-stagehand-maintenance"></a>
+
+### 11.4 Bảo trì sân khấu
+
+- **Lựa chọn mô hình**: Thường xuyên đánh giá hiệu suất của các LLM mô hình (GPT-4o, Claude 3.5 Sonnet) khác nhau cho các trường hợp sử dụng cụ thể của bạn
+- **prompt Engineering**: Tinh chỉnh hướng dẫn ngôn ngữ tự nhiên để cải thiện độ tin cậy và hiệu suất
+- **Khả năng thị giác**: Cân nhắc việc kích hoạt khả năng thị giác cho các cấu trúc DOM phức tạp bằng cách đặt `useVision: true` trong các hoạt động thích hợp
+- **DOM Chunking**: Theo dõi và tối ưu hóa kích thước chunk dựa trên độ phức tạp của giao diện Twitter
+
+<a id="12-project-roadmap"></a>
+
+## 12. Lộ trình dự án
+
+- MVP stage: Chức năng cốt lõi tích hợp Stagehand (xác thực, dòng thời gian duyệt web)
+- stage Hai: Các tính năng tương tác nâng cao sử dụng khả năng ngôn ngữ tự nhiên của Stagehand
+- stage Ba: Tính năng tìm kiếm và lọc nâng cao với LLM prompt được tối ưu hóa
+- stage Bốn: Tối ưu hóa hiệu suất và hỗ trợ đa mô hình

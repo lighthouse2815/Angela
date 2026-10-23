@@ -1,172 +1,183 @@
-# Stage Tamagotchi Godot C# Development Method
+<a id="stage-tamagotchi-godot-c-development-method"></a>
 
-This guide applies only to `engines/stage-tamagotchi-godot`.
+# stage Tamagotchi Godot Phương pháp phát triển C#
 
-It defines how C# code in this Godot engine should be structured and how modern
-C# features should be used. Formatting and naming rules are secondary and live
-in the local `.editorconfig` plus `docs/csharp-style.md`.
+Hướng dẫn này chỉ áp dụng cho `engines/stage-tamagotchi-godot`.
 
-## 1. Scope
+Nó xác định cách cấu trúc mã C# trong công cụ Godot này và cách sử dụng các tính năng C# hiện đại. Các quy tắc định dạng và đặt tên là phụ và trực tiếp trong `.editorconfig` cục bộ cộng với `docs/csharp-style.md`.
 
-Use this guide for:
+<a id="1-scope"></a>
 
-- Godot scene scripts
-- runtime coordinators and controllers
-- host-stage transport contracts
-- registry and discovery code
-- tooling and editor-support code inside this engine
+## 1. Phạm vi
 
-Do not treat this guide as a repo-wide C# standard.
+Sử dụng hướng dẫn này cho:
 
-## 2. Layer Model
+- Kịch bản cảnh Godot
+- Điều phối viên và bộ điều khiển runtime
+- Hợp đồng host-stage transport
+- mã đăng ký và khám phá
+- mã hỗ trợ công cụ và trình soạn thảo bên trong công cụ này
 
-Split engine C# code into these layers before writing implementation:
+Đừng coi hướng dẫn này là tiêu chuẩn C# cho toàn bộ repo.
 
-1. Scene Script
-   - Godot-owned `Node` or `Node3D` partial classes
-   - lifecycle entrypoints and scene binding
-2. Runtime Core
-   - plain C# runtime logic
-   - controllers, coordinators, state holders, services
-3. Contract and Transport
-   - message types
-   - settings snapshots
-   - ready, fatal, shutdown, and state-update payloads
-4. Registry and Discovery
-   - descriptors
-   - startup-time discovery
-   - catalogues and lookup tables
-5. Tooling and Editor Support
-   - inspector-facing helpers
-   - import/export helpers
-   - debug or editor-only data assembly
+<a id="2-layer-model"></a>
 
-Do not collapse these responsibilities into a single Godot script by default.
+## 2. Lớp mô hình
 
-## 3. Scene Script Rules
+Chia mã C# của công cụ thành các lớp này trước khi viết triển khai:
 
-Scene scripts should stay thin.
+1. Kịch bản cảnh
+   - Các lớp một phần `Node` hoặc `Node3D` thuộc sở hữu của Godot
+   - điểm vào vòng đời và ràng buộc cảnh
+2. Lõi runtime
+   - logic C# runtime đơn giản
+   - người kiểm soát, người điều phối, chủ sở hữu trạng thái, dịch vụ
+3. Hợp đồng và transport
+   - các loại tin nhắn
+   - ảnh chụp nhanh cài đặt
+   - tải trọng sẵn sàng, nghiêm trọng, tắt máy và cập nhật trạng thái
+4. Đăng ký và khám phá
+   - sự mô tả
+   - khám phá thời gian khởi động
+   - danh mục và bảng tra cứu
+5. Hỗ trợ công cụ và biên tập
+   - người trợ giúp đối mặt với thanh tra
+   - Người trợ giúp import/export
+   - gỡ lỗi hoặc tập hợp dữ liệu chỉ dành cho người soạn thảo
 
-Use scene scripts for:
+Theo mặc định, không thu gọn những trách nhiệm này thành một tập lệnh Godot duy nhất.
 
-- Godot lifecycle entrypoints such as `_Ready`
-- node lookup and scene wiring
-- handing control to runtime objects
-- bridging Godot callbacks into explicit runtime code
+<a id="3-scene-script-rules"></a>
 
-Avoid putting these directly into scene scripts unless the code is trivial:
+## 3. Quy tắc kịch bản cảnh
 
-- transport protocol handling
-- registry construction
-- complex state transitions
-- business or gameplay rules
-- large data transformation pipelines
+Kịch bản cảnh nên mỏng.
 
-If a scene script starts owning lifecycle, runtime state, protocol handling, and
-tool configuration at once, split the code.
+Sử dụng kịch bản cảnh cho:
 
-## 4. Runtime Core Rules
+- Các điểm vào vòng đời của Godot như `_Ready`
+- Tra cứu và nối dây cảnh Node
+- trao quyền điều khiển cho các đối tượng runtime
+- kết nối các lệnh gọi lại Godot thành mã runtime rõ ràng
 
-Put durable runtime logic into plain C# objects first.
+Tránh đặt những thứ này trực tiếp vào tập lệnh cảnh trừ khi mã đó không quan trọng:
 
-Prefer:
+- Xử lý giao thức transport
+- xây dựng đăng ký
+- chuyển đổi trạng thái phức tạp
+- quy tắc kinh doanh hoặc trò chơi
+- đường ống chuyển đổi dữ liệu lớn
 
-- small coordinators over large all-knowing classes
-- explicit state objects over hidden mutable flags
-- constructor or method injection of dependencies
-- clear call flow over implicit control transfer
+Nếu tập lệnh cảnh bắt đầu sở hữu vòng đời, trạng thái runtime, xử lý giao thức và cấu hình công cụ cùng một lúc, hãy tách mã.
 
-Runtime core code should be easy to trace in a debugger. Favor explicit maps,
-state, and control flow over clever abstraction.
+<a id="4-runtime-core-rules"></a>
 
-## 5. Contract and Transport Rules
+## 4. Quy tắc cốt lõi của runtime
 
-Make cross-boundary communication type-driven.
+Trước tiên hãy đặt logic runtime bền bỉ vào các đối tượng C# đơn giản.
 
-Prefer explicit types for:
+Thích hơn:
 
-- transport messages
-- payloads
-- settings snapshots
-- descriptors
-- registry entries
-- runtime state snapshots
+- điều phối viên nhỏ trên các lớp học lớn biết tất cả
+- đối tượng trạng thái rõ ràng trên các cờ có thể thay đổi ẩn
+- hàm tạo hoặc phương thức chèn phụ thuộc
+- luồng cuộc gọi rõ ràng qua chuyển điều khiển ngầm
 
-Avoid:
+Mã lõi runtime phải dễ dàng theo dõi trong trình gỡ lỗi. Ưu tiên các bản đồ, trạng thái và luồng điều khiển rõ ràng hơn là sự trừu tượng hóa thông minh.
 
-- `Dictionary<string, object?>` as a default contract shape
-- magic-string protocols spread across files
-- anonymous objects crossing subsystem boundaries
-- comments standing in for real type definitions
+<a id="5-contract-and-transport-rules"></a>
 
-The rule is simple: define the boundary as types first, then implement the
-transport around those types.
+## 5. Hợp đồng và Quy tắc transport
 
-## 6. Reflection and LINQ Policy
+Làm cho giao tiếp xuyên biên giới theo kiểu định hướng.
 
-Reflection is for discovery, not execution.
+Thích các loại rõ ràng cho:
 
-Good uses of reflection:
+- Tin nhắn transport
+- tải trọng
+- ảnh chụp nhanh cài đặt
+- sự mô tả
+- mục đăng ký
+- Ảnh chụp nhanh trạng thái runtime
 
-- startup-time module discovery
-- attribute metadata reading
-- descriptor generation
-- editor or tooling support
+Tránh xa:
 
-Do not use reflection for:
+- `Dictionary<string, object?>` làm hình dạng hợp đồng mặc định
+- giao thức chuỗi ma thuật trải rộng trên các tập tin
+- các đối tượng ẩn danh vượt qua ranh giới hệ thống con
+- nhận xét thay thế cho định nghĩa kiểu thực
 
-- per-frame logic
-- runtime hot-path dispatch
-- core state-machine execution
-- repeated dynamic invocation in steady-state runtime
+Quy tắc rất đơn giản: trước tiên hãy xác định ranh giới theo các loại, sau đó triển khai transport xung quanh các loại đó.
 
-LINQ is for cold-path querying and data shaping.
+<a id="6-reflection-and-linq-policy"></a>
 
-Good uses of LINQ:
+## 6. Chính sách phản ánh và LINQ
 
-- building registries
-- filtering descriptors
-- configuration projection
-- debug or tooling views
+Suy ngẫm là để khám phá chứ không phải để thực thi.
 
-Avoid heavy LINQ in hot paths, per-frame loops, or repeatedly executed runtime
-queries when an explicit index or dictionary would be clearer and cheaper.
+Công dụng tốt của sự phản ánh:
 
-Use this mental model:
+- khám phá mô-đun thời gian khởi động
+- đọc siêu dữ liệu thuộc tính
+- bộ mô tả sinh nội dung
+- hỗ trợ biên tập hoặc công cụ
 
-- reflection builds the catalogue
-- LINQ shapes and queries the catalogue
-- runtime executes through explicit structures
+Không sử dụng sự phản ánh cho:
 
-## 7. Async Boundary Policy
+- logic trên mỗi khung hình
+- Công văn đường dẫn nóng runtime
+- thực thi máy trạng thái cốt lõi
+- lệnh gọi động lặp đi lặp lại ở trạng thái ổn định runtime
 
-Use async at I/O and process boundaries.
+LINQ dành cho truy vấn đường dẫn nguội và định hình dữ liệu.
 
-Good async boundaries:
+Công dụng tốt của LINQ:
 
-- socket and transport setup
-- file I/O
-- host-side process interaction
-- startup loading that is naturally asynchronous
+- đăng ký xây dựng
+- lọc mô tả
+- phép chiếu cấu hình
+- chế độ xem gỡ lỗi hoặc công cụ
 
-Avoid pushing async into:
+Tránh LINQ nặng trong các đường dẫn nóng, vòng lặp trên mỗi khung hình hoặc các truy vấn runtime được thực hiện lặp đi lặp lại khi chỉ mục hoặc từ điển rõ ràng sẽ rõ ràng hơn và rẻ hơn.
 
-- per-frame updates
-- core runtime loops
-- timing-sensitive behavior that should stay explicit
+Hãy sử dụng mô hình tinh thần này:
 
-Do not use async to hide lifecycle or ordering problems.
+- sự phản ánh xây dựng danh mục
+- LINQ định hình và truy vấn danh mục
+- runtime thực thi thông qua các cấu trúc rõ ràng
 
-## 8. Deferred Decisions
+<a id="7-async-boundary-policy"></a>
 
-These items are intentionally deferred and should not be guessed:
+## 7. Chính sách ranh giới không đồng bộ
 
-- nullable reference type rollout policy
-- namespace strategy
-- `record` usage boundaries
-- `required` member usage boundaries
-- primary constructor usage boundaries
-- helper-layer versus scene-script feature allowances
+Sử dụng async tại I/O và xử lý các ranh giới.
 
-When one of these becomes relevant, decide it explicitly and add it to the
-engine-local guidance instead of inferring it from style tools.
+Ranh giới không đồng bộ tốt:
+
+- Thiết lập socket và transport
+- tập tin I/O
+- Tương tác quá trình phía host
+- tải khởi động vốn không đồng bộ
+
+Tránh đẩy async vào:
+
+- cập nhật trên mỗi khung hình
+- vòng lặp runtime lõi
+- hành vi nhạy cảm với thời gian nên luôn rõ ràng
+
+Không sử dụng async để ẩn các vấn đề về vòng đời hoặc đặt hàng.
+
+<a id="8-deferred-decisions"></a>
+
+## 8. Quyết định hoãn lại
+
+Những mục này được cố ý trì hoãn và không nên đoán:
+
+- chính sách triển khai loại tham chiếu có thể vô hiệu
+- chiến lược không gian tên
+- Ranh giới sử dụng `record`
+- Ranh giới sử dụng của thành viên `required`
+- ranh giới sử dụng hàm tạo chính
+- phụ cấp tính năng của lớp trợ giúp so với kịch bản cảnh
+
+Khi một trong những điều này trở nên phù hợp, hãy quyết định nó một cách rõ ràng và thêm nó vào hướng dẫn cục bộ của công cụ thay vì suy luận nó từ các công cụ định kiểu.

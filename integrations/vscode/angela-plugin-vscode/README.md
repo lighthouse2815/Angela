@@ -1,3 +1,3 @@
 # @angela/plugin-vscode
 
-Host-side plugin that bridges VS Code context and exposes UI contributions in Angela.
+Plugin phía host kết nối ngữ cảnh Mã VS và thể hiện những đóng góp của UI trong Angela.

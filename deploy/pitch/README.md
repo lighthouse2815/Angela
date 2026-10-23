@@ -1,4 +1,6 @@
-# Angela Hackathon Pitch
+<a id="angela-hackathon-pitch"></a>
+
+# Angela Hackathon Sân
 
 Bản thuyết trình ý tưởng gồm 20 slide, phát triển từ `Angela_Hackathon_Pitch_20_Slides.html`.
 Nội dung đi từ lý do chọn đề tài đến giải pháp, thách thức, lộ trình và tương lai phát triển.
@@ -136,7 +138,9 @@ Sửa nội dung trong `deploy/pitch/public/index.html` hoặc giao diện trong
 Sau đó tạo commit rồi push lên GitHub.
 Trang tĩnh này không cần cài dependency hoặc build ứng dụng Angela.
 
-## Cloudflare Pages
+<a id="cloudflare-pages"></a>
+
+## Trang đám mây
 
 Địa chỉ: <https://angela-pitch.pages.dev>.
 
@@ -146,12 +150,12 @@ Các nhánh khác tạo bản preview riêng.
 
 | Cấu hình | Giá trị |
 | --- | --- |
-| Production branch | `main` |
-| Root directory | `deploy/pitch` |
+| Chi nhánh sản xuất | `main` |
+| Thư mục gốc | `deploy/pitch` |
 | Build command | Để trống |
-| Build output directory | `public` |
+| Xây dựng thư mục đầu ra | `public` |
 | Biến môi trường production và preview | `SKIP_DEPENDENCY_INSTALL=true` |
-| Build watch paths | `*` |
+| Xây dựng đường dẫn theo dõi | `*` |
 
 Cấu hình nằm trong Cloudflare Pages → `angela-pitch` → Settings.
 Xem trạng thái và log của mỗi lần deploy trong tab Deployments.

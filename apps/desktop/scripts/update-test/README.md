@@ -1,24 +1,30 @@
-# Angela Electron Updater Local Test Harness
+<a id="angela-electron-updater-local-test-harness"></a>
 
-This directory provides a local mocked update-server workflow for Stage Tamagotchi.
+# Angela Electron Cập nhật thử nghiệm cục bộ bộ kiểm thử
 
-It is intended to verify Angela's updater path:
+Thư mục này cung cấp quy trình làm việc của máy chủ cập nhật mô phỏng cục bộ cho stage Tamagotchi.
 
-- explicit `UPDATE_SERVER_URL` override mode
-- lane switching (`stable`, `beta`, `alpha`, `nightly`) via `AIRI_UPDATE_CHANNEL`
-- developer-only updater diagnostics inspection
+Nó nhằm mục đích xác minh đường dẫn cập nhật của Angela:
 
-## Files
+- chế độ ghi đè `UPDATE_SERVER_URL` rõ ràng
+- Chuyển đổi luồng (`stable`, `beta`, `alpha`, `nightly`) qua `AIRI_UPDATE_CHANNEL`
+- kiểm tra chẩn đoán trình cập nhật chỉ dành cho nhà phát triển
 
-- `generate-manifest.ts`: generate local `latest-*.yml` metadata and placeholder artifacts
-- `start-server.ts`: serve generated fixtures over HTTP
-- `setup.sh`: prepare the local fixture directories
-- `run-test.sh`: thin orchestration wrapper
-- `dev-app-update.local.yml`: optional generic-provider template for development-only experiments
+<a id="files"></a>
 
-## Quick Start
+## Tập tin
 
-From the repo root:
+- `generate-manifest.ts`: tạo siêu dữ liệu `latest-*.yml` cục bộ và trình giữ chỗ artifact
+- `start-server.ts`: phục vụ mẫu kiểm thử được tạo qua HTTP
+- `setup.sh`: chuẩn bị các thư mục mẫu kiểm thử cục bộ
+- `run-test.sh`: trình bao bọc dàn nhạc mỏng
+- `dev-app-update.local.yml`: mẫu nhà cung cấp chung tùy chọn dành cho các thử nghiệm chỉ dành cho phát triển
+
+<a id="quick-start"></a>
+
+## Bắt đầu nhanh
+
+Từ gốc repo:
 
 ```bash
 bash apps/desktop/scripts/update-test/setup.sh
@@ -32,7 +38,7 @@ pnpm -F @angela/desktop update-test:server \
   --root scripts/update-test/fixtures/server
 ```
 
-Then, in another terminal:
+Sau đó, trong một thiết bị đầu cuối khác:
 
 ```bash
 cd apps/desktop
@@ -41,65 +47,71 @@ UPDATE_SERVER_URL=http://127.0.0.1:8787/stable pnpm run dev
 # AIRI_UPDATE_CHANNEL=beta UPDATE_SERVER_URL=http://127.0.0.1:8787/beta pnpm run dev
 ```
 
-## Verification Flow
+<a id="verification-flow"></a>
 
-1. Open the About page.
-2. Click `Check for updates`.
-3. Confirm the update becomes available.
-4. Click `Download update`.
-5. Confirm the updater reaches the `downloaded` state.
-6. Open `Settings > System > Developer`.
-7. Enable `Inspect updater diagnostics`.
-8. Open `Devtools > Updater`.
-9. Confirm:
+## Luồng xác minh
+
+1. Mở trang Giới thiệu.
+2. Nhấp vào `Check for updates`.
+3. Xác nhận bản cập nhật có sẵn.
+4. Nhấp vào `Download update`.
+5. Xác nhận trình cập nhật đạt trạng thái `downloaded`.
+6. Mở `Settings > System > Developer`.
+7. Kích hoạt `Inspect updater diagnostics`.
+8. Mở `Devtools > Updater`.
+9. Xác nhận:
    - `overrideActive=true`
-   - `feedUrl` points to `http://127.0.0.1:8787/stable`
-   - `platform`, `arch`, and `channel` match the current runtime
+   - `feedUrl` trỏ tới `http://127.0.0.1:8787/stable`
+   - `platform`, `arch` và `channel` khớp với runtime hiện tại
 
-## Helper Wrapper
+<a id="helper-wrapper"></a>
 
-You can also print the workflow commands with:
+## Trình bao bọc trợ giúp
+
+Bạn cũng có thể in các lệnh quy trình công việc bằng:
 
 ```bash
 bash apps/desktop/scripts/update-test/run-test.sh
 ```
 
-For automated matrix checks (lane x runtime feed mode + bundle-version test matrix), run:
+Để kiểm tra ma trận tự động (chế độ cấp dữ liệu luồng x runtime + ma trận kiểm tra phiên bản gói), hãy chạy:
 
 ```bash
 pnpm -F @angela/desktop update-test:matrix
 ```
 
-This script:
+Kịch bản này:
 
-- runs Vitest updater matrix tests (including bundled version: stable/beta/alpha)
-- generates local fixtures for `stable`, `beta`, `alpha`, `nightly`
-- runs packaged app checks for two runtime modes:
-  - `UPDATE_SERVER_URL` override mode
-  - no override (GitHub lane resolution mode)
-- captures logs and summaries under `scripts/update-test/artifacts/`
-- writes a green/red matrix report at `scripts/update-test/artifacts/<run-id>/summary.md`
+- chạy thử nghiệm ma trận cập nhật Vitest (bao gồm phiên bản đi kèm: stable/beta/alpha)
+- tạo mẫu kiểm thử cục bộ cho `stable`, `beta`, `alpha`, `nightly`
+- chạy kiểm tra ứng dụng đóng gói cho hai chế độ runtime:
+  - Chế độ ghi đè `UPDATE_SERVER_URL`
+  - không ghi đè (chế độ phân giải GitHub luồng)
+- ghi lại nhật ký và tóm tắt trong `scripts/update-test/artifacts/`
+- viết báo cáo ma trận green/red tại `scripts/update-test/artifacts/<run-id>/summary.md`
 
-Environment variables supported by the wrapper:
+Các biến môi trường được trình bao bọc hỗ trợ:
 
 - `PORT`
 - `CHANNEL`
 - `TARGET`
 - `VERSION`
-- `AIRI_UPDATE_CHANNEL` (at app launch time; independent from `CHANNEL`)
-- `RUN_SECONDS` (matrix app runtime per case; default `18`)
-- `LOG_DIR` (matrix artifact directory override)
+- `AIRI_UPDATE_CHANNEL` (tại thời điểm khởi chạy ứng dụng; độc lập với `CHANNEL`)
+- `RUN_SECONDS` (ứng dụng ma trận runtime cho mỗi trường hợp; `18` mặc định)
+- `LOG_DIR` (ghi đè thư mục ma trận artifact)
 
-Common targets:
+Mục tiêu chung:
 
 - Apple Silicon macOS: `aarch64-apple-darwin`
 - Intel macOS: `x86_64-apple-darwin`
 - Windows x64: `x86_64-pc-windows-msvc`
 - Linux x64: `x86_64-unknown-linux-gnu`
 
-## Notes
+<a id="notes"></a>
 
-- The generated artifact is a placeholder file meant for update discovery and early download flow verification.
-- Real signed installer execution remains a separate manual verification step.
-- The first pass is manual-first by design. A Playwright `_electron` smoke layer can be added on top later.
-- When invoking the package scripts through `pnpm -F @angela/desktop`, treat `--root` as relative to `apps/desktop`, not the workspace root.
+## Ghi chú
+
+- artifact được tạo là một tệp giữ chỗ dùng để khám phá bản cập nhật và xác minh luồng tải xuống sớm.
+- Việc thực thi trình cài đặt có chữ ký thực vẫn là một bước xác minh thủ công riêng biệt.
+- Lần đầu tiên được thực hiện thủ công theo thiết kế. Lớp Playwright `_electron` kiểm tra nhanh có thể được thêm lên trên sau.
+- Khi gọi các tập lệnh gói thông qua `pnpm -F @angela/desktop`, hãy coi `--root` có liên quan đến `apps/desktop` chứ không phải gốc workspace.

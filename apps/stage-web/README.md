@@ -1,32 +1,25 @@
-<h1 align="center">アイリ VTuber</h1>
+<h1 align="center"> Airi VTuber</h1>
 
 <p align="center">
-  [<a href="https://airi.ayaka.io">Try it</a>]
+  [<a href="https://airi.ayaka.io">Hãy thử</a>]
 </p>
 
-> Heavily inspired by [Neuro-sama](https://www.youtube.com/@Neurosama)
+> Lấy cảm hứng mạnh mẽ từ [Neuro-sama](https://www.youtube.com/@Neurosama)
 
-## Shared local configuration
+<a id="shared-local-configuration"></a>
 
-When served on localhost through Vite development or preview, this app shares `~/.config/angela/config.json` with desktop and CLI.
-Set `ANGELA_CONFIG` before starting Vite to select another file. Provider settings save automatically and external edits refresh every 1.5 seconds.
-Each browser profile imports its existing direct providers once. Shared values take priority when instance IDs match.
-The Vite endpoint only accepts local, same-origin requests. Hosted builds keep their current configuration behavior.
-See [local configuration](../../packages/local-config/README.md) for the file contract.
+## Cấu hình cục bộ được chia sẻ
 
-## Performance diagnostics
+Khi được phân phát trên localhost thông qua bản xem trước hoặc phát triển Vite, ứng dụng này chia sẻ `~/.config/angela/config.json` với desktop và CLI. Đặt `ANGELA_CONFIG` trước khi khởi động Vite để chọn tệp khác. Cài đặt nhà cung cấp tự động lưu và các chỉnh sửa bên ngoài làm mới sau mỗi 1,5 giây. Mỗi cấu hình trình duyệt nhập nhà cung cấp trực tiếp hiện có của nó một lần. Các giá trị được chia sẻ được ưu tiên khi ID phiên bản khớp nhau. Điểm cuối Vite chỉ chấp nhận các yêu cầu cục bộ, có cùng nguồn gốc. Các bản dựng hosted giữ nguyên trạng thái cấu hình hiện tại của chúng. Xem [cấu hình cục bộ](../../packages/local-config/README.md) để biết hợp đồng tệp.
 
-Run `pnpm dev:web:https` from the repository root. Open `/devtools/performance-visualizer` and enable FPS.
-The floating overlay shows the last 10 seconds of FPS history, with time and FPS axes.
-The minimum, maximum, and latest values describe the visible samples. Other metrics retain their distribution charts.
+<a id="performance-diagnostics"></a>
 
-Start a recording, then navigate within the app to the scene you want to measure.
-Stop the recording within 60 seconds, or let it stop automatically.
-Return to the visualizer to inspect the recorded FPS history. Export the recording as CSV for individual timestamps and values.
+## Chẩn đoán hiệu suất
 
-Each FPS sample is `1000 / frameIntervalMs`, from `requestAnimationFrame` callbacks.
-Use these samples to locate changes in animation frame timing. They do not measure GPU presentation or native application FPS.
-Keep the page in the foreground. Reloading the page clears the recording.
+Chạy `pnpm dev:web:https` từ kho lưu trữ gốc. Mở `/devtools/performance-visualizer` và kích hoạt FPS. Lớp phủ nổi hiển thị 10 giây cuối cùng của lịch sử FPS, cùng với các trục thời gian và FPS. Các giá trị tối thiểu, tối đa và mới nhất mô tả các mẫu có thể nhìn thấy. Các số liệu khác giữ lại biểu đồ phân phối của chúng.
 
-For device comparisons, use the same scene, model, warm-up period, and recording duration.
-The development server and the visible overlay affect performance, so record these conditions with the results.
+Bắt đầu ghi, sau đó điều hướng trong ứng dụng đến cảnh bạn muốn đo. Dừng ghi trong vòng 60 giây hoặc để ghi tự động dừng. Quay lại trình hiển thị để kiểm tra lịch sử FPS đã ghi. Xuất bản ghi dưới dạng CSV cho các dấu thời gian và giá trị riêng lẻ.
+
+Mỗi mẫu FPS là `1000 / frameIntervalMs`, từ các lệnh gọi lại `requestAnimationFrame`. Sử dụng các mẫu này để xác định các thay đổi về thời gian của khung hình hoạt ảnh. Họ không đo lường bản trình bày GPU hoặc ứng dụng native FPS. Giữ trang ở phía trước. Tải lại trang sẽ xóa bản ghi.
+
+Để so sánh thiết bị, hãy sử dụng cùng một cảnh, mô hình, thời gian khởi động và thời lượng ghi. Máy chủ phát triển và lớp phủ hiển thị ảnh hưởng đến hiệu suất, vì vậy hãy ghi lại các điều kiện này cùng với kết quả.

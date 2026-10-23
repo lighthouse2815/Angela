@@ -1,34 +1,50 @@
-# Satori Bot 待办事项 (优化版)
+<a id="satori-bot-待办事项-优化版"></a>
 
-## 🟡 P1: 架构完善与逻辑优化 (性能与体验)
+# Danh sách việc cần làm của Satori Bot (phiên bản tối ưu hóa)
 
-### 1. 重构 Action 截断逻辑，防止上下文失忆
-**目标**: 确保 LLM 的历史记录截断不会破坏逻辑链（如 `send_message` + `continue`）。
-- [ ] **策略层 (进阶)**:
-    - [ ] 尝试将较旧的 `actions` 压缩为文本 Summary 存入 LLM Context，而非直接丢弃。
+<a id="-p1-架构完善与逻辑优化-性能与体验"></a>
 
-## 🟢 P2: 增强功能与类型安全
+## 🟡 P1: Cải tiến kiến ​​trúc và tối ưu hóa logic (hiệu năng và trải nghiệm)
 
-- [ ] **监控增强**:
-    - [ ] 为所有 Action 执行增加更详细的 Trace 日志。
-- [ ] **类型收紧**:
-    - [ ] 持续检查并消除残留的 `as any` 类型断言。
+<a id="1-重构-action-截断逻辑防止上下文失忆"></a>
+
+### 1. Xây dựng lại logic cắt ngắn hành động để ngăn ngừa chứng mất trí nhớ ngữ cảnh
+**Mục tiêu**: Đảm bảo rằng việc cắt bớt lịch sử của LLM không phá vỡ chuỗi logic (chẳng hạn như `send_message` + `continue`).
+- [ ] **Cấp độ chiến lược (Nâng cao)**:
+    - [ ] Cố gắng nén `actions` cũ hơn thành một bản tóm tắt văn bản và lưu trữ nó trong Ngữ cảnh LLM thay vì loại bỏ trực tiếp.
+
+<a id="-p2-增强功能与类型安全"></a>
+
+## 🟢 P2: Chức năng nâng cao và an toàn loại
+
+- [ ] **Tăng cường giám sát**:
+    - [ ] Thêm nhật ký Theo dõi chi tiết hơn cho tất cả các lần thực thi Hành động.
+- [ ] **Thắt chặt kiểu**:
+    - [ ] Liên tục kiểm tra và loại bỏ các xác nhận loại `as any` còn sót lại.
 
 ---
 
-## ✅ 已完成事项 (归档)
+<a id="-已完成事项-归档"></a>
 
-### 🛡️ 1. 核心稳定性与并发架构 (P0)
-- [x] **修复短时记忆清理的竞态条件**: 实现基于 ID 的精准删除，防止异步消息丢失。
-- [x] **消除全局锁死锁**: 将锁粒度下放到 Channel 级别，并引入 `try...finally` 强制释放机制。
-- [x] **实现非阻塞调度**: `onMessageArrival` 与周期性任务改为并发执行，提升吞吐量。
+## ✅ Các mục đã hoàn thành (Đã lưu trữ)
 
-### ⚙️ 2. 逻辑链完整性与体验优化 (P1)
-- [x] **智能 Action 截断**: 实现 `trimActions` 自动回溯，防止截断破坏 `continue` 等成对逻辑链。
-- [x] **阻断 API 滥用**: 在 `handleLoopStep` 中增加 `MAX_LOOP_ITERATIONS = 5` 的硬性上限。
+<a id="️-1-核心稳定性与并发架构-p0"></a>
 
-### 💎 3. 类型安全与基础设施 (P2)
-- [x] **修复 Satori API 类型不匹配**: 使 `SatoriMessageCreateResponse` 的接口定义与运行时 Schema 保持一致。
-- [x] **移除全局暴力退出**: 在 `process.on('unhandledRejection')` 中移除 `process.exit(1)`。
-- [x] **消除 Any 类型滥用**: 修复了 LLM 解析、数据库 Schema 等多处的类型退化。
-- [x] **重写队列持久化 I/O**: 实现 Drizzle ORM 的增量更新模式。
+### 🛡️ 1. Kiến trúc đồng thời và ổn định cốt lõi (P0)
+- [x] **Khắc phục tình trạng chạy đua để dọn dẹp bộ nhớ ngắn hạn**: Thực hiện xóa chính xác dựa trên ID để tránh mất tin nhắn không đồng bộ.
+- [x] **Loại bỏ bế tắc khóa toàn cầu**: Giảm độ chi tiết của khóa xuống cấp Kênh và giới thiệu cơ chế giải phóng cưỡng bức `try...finally`.
+- [x] **Triển khai lập lịch không chặn**: `onMessageArrival` và các tác vụ định kỳ được thực thi đồng thời để cải thiện thông lượng.
+
+<a id="️-2-逻辑链完整性与体验优化-p1"></a>
+
+### ⚙️ 2. Tính toàn vẹn chuỗi logic và tối ưu hóa trải nghiệm (P1)
+- [x] **Cắt ngắn hành động thông minh**: Triển khai tính năng quay lui tự động của `trimActions` để ngăn việc cắt ngắn phá hủy các chuỗi logic được ghép nối như `continue`.
+- [x] **Chặn lạm dụng API**: Thêm hardcap vào `MAX_LOOP_ITERATIONS = 5` trong `handleLoopStep`.
+
+<a id="-3-类型安全与基础设施-p2"></a>
+
+### 💎 3. Loại An toàn và Cơ sở hạ tầng (P2)
+- [x] **Sửa lỗi loại Satori API không khớp**: Làm cho định nghĩa giao diện của `SatoriMessageCreateResponse` nhất quán với Lược đồ thời gian chạy.
+- [x] **Xóa lối thoát vũ phu toàn cầu**: Xóa `process.exit(1)` trong `process.on('unhandledRejection')`.
+- [x] **Loại bỏ mọi lạm dụng loại**: Đã sửa lỗi thoái hóa loại trong phân tích cú pháp LLM, lược đồ cơ sở dữ liệu, v.v.
+- [x] **Viết lại tính bền vững của hàng đợi I/O**: để triển khai chế độ cập nhật gia tăng của Drizzle ORM.

@@ -1,36 +1,46 @@
-### **Prompt Architecture: Context-Injected Action Loop**
+<a id="prompt-architecture-context-injected-action-loop"></a>
 
-The bot implements a **"State-Aware Agentic Loop"** rather than a simple Chat-QA structure. The prompt is constructed dynamically at every tick of the loop.
+### **Kiến trúc prompt: Vòng lặp hành động được đưa vào ngữ cảnh**
 
-#### **1. Static Layer (System Definitions)**
+Bot triển khai **"Vòng lặp tác nhân nhận biết trạng thái"** thay vì cấu trúc Chat-QA đơn giản. prompt được xây dựng linh hoạt ở mỗi tích tắc của vòng lặp.
 
-* **Source:** `src/core/planner/prompts/*.velin.md`
-* **Loader:** `src/core/planner/prompts/index.ts`
-* **Role:** Defines the "Soul" and "Rules".
-* **Components:**
-    * **Protocol Definition (`system-action-gen-v1`):** Hardcodes the JSON schema for available tools (`send_message`, `read_unread_messages`, `sleep`) and logic flow (e.g., "Must check unread messages after sending").
-    * **Persona (`personality-v1`):** Defines the character "Angela" (tone, brevity, naturalness).
+<a id="1-static-layer-system-definitions"></a>
 
-#### **2. History Layer (Short-term Memory)**
+#### **1. Lớp tĩnh (Định nghĩa hệ thống)**
 
-* **Source:** In-memory `messages` array (`ChatContext`).
-* **Role:** Provides conversational continuity.
-* **Mechanism:** A sliding window of the last ~20 messages (User/Assistant turns) is injected directly after the system prompt.
+* **Nguồn:** `src/core/planner/prompts/*.velin.md`
+* **Trình tải:** `src/core/planner/prompts/index.ts`
+* **Vai trò:** Xác định "Linh hồn" và "Quy tắc".
+* **Thành phần:**
+    * **Định nghĩa giao thức (`system-action-gen-v1`):** Mã hóa cứng lược đồ JSON cho các công cụ có sẵn (`send_message`, `read_unread_messages`, `sleep`) và luồng logic (ví dụ: "Phải kiểm tra tin nhắn chưa đọc sau khi gửi").
+    * **Persona (`personality-v1`):** Xác định nhân vật "Angela" (giọng điệu, ngắn gọn, tự nhiên).
 
-#### **3. Dynamic State Layer (Sensory Injection)**
+<a id="2-history-layer-short-term-memory"></a>
 
-* **Source:** `src/core/planner/llm-client.ts` (Runtime generated)
-* **Role:** Provides "Situational Awareness" and "Grounding".
-* **Mechanism:** A synthesized **User Message** is appended at the very end of the context window, forcing the LLM to focus on the immediate reality. It contains:
-    * **Incoming Stream**: Raw content of new messages arriving *now* (passed from `scheduler`).
-    * **Action History**: Results of the *immediately preceding* tool executions (e.g., "Action: send_message, Result: Success").
-    * **Environment**: Current server time.
-    * **Global State**: A summary of unread message counts across all channels (`unreadEvents`).
-    * **Trigger**: The final instruction: *"Based on the context... Respond with the action... in JSON only."*
+#### **2. Lớp lịch sử (Bộ nhớ ngắn hạn)**
+
+* **Nguồn:** Mảng `messages` trong bộ nhớ (`ChatContext`).
+* **Vai trò:** Cung cấp tính liên tục trong cuộc trò chuyện.
+* **Cơ chế:** Một cửa sổ trượt gồm ~20 tin nhắn cuối cùng (lần quay User/Assistant) được đưa trực tiếp vào sau hệ thống prompt.
+
+<a id="3-dynamic-state-layer-sensory-injection"></a>
+
+#### **3. Lớp trạng thái động (Tiêm cảm giác)**
+
+* **Nguồn:** `src/core/planner/llm-client.ts` (được tạo bởi runtime)
+* **Vai trò:** Cung cấp "Nhận thức tình huống" và "đối chiếu ngữ cảnh".
+* **Cơ chế:** **Thông báo người dùng** tổng hợp được thêm vào cuối cửa sổ ngữ cảnh, buộc LLM phải tập trung vào thực tế trước mắt. Nó chứa:
+    * **Luồng đến**: Nội dung thô của tin nhắn mới đến *bây giờ* (được truyền từ `scheduler`).
+    * **Lịch sử hành động**: Kết quả của việc thực thi công cụ *ngay trước đó* (ví dụ: "Hành động: send_message, Kết quả: Thành công").
+    * **Môi trường**: Giờ máy chủ hiện tại.
+    * **Trạng thái chung**: Bản tóm tắt số lượng tin nhắn chưa đọc trên tất cả các kênh (`unreadEvents`).
+    * **Kích hoạt**: Hướng dẫn cuối cùng: *"Dựa trên ngữ cảnh... Phản hồi bằng hành động... chỉ trong JSON."*
 
 ---
 
-### **Data Flow Summary**
+<a id="data-flow-summary"></a>
+
+### **Tóm tắt luồng dữ liệu**
 
 ```mermaid
 graph TD
@@ -47,8 +57,10 @@ graph TD
 
 ```
 
-### **Key Characteristics**
+<a id="key-characteristics"></a>
 
-1. **JSON Enforcement**: The bot does not use native "Function Calling" APIs (like OpenAI Tools). It relies on **Prompt Engineering** to force the model to output raw JSON, which is then parsed by `best-effort-json-parser`.
-2. **Stateless Logic**: The prompt explicitly tells the LLM "You have X unread messages" in every turn, making the LLM the sole decision-maker for flow control (Reading vs. Replying vs. Sleeping).
-3. **Observation-Reflection**: The prompt includes `History actions`, allowing the LLM to "see" the result of its previous attempt (e.g., if a read action returned empty, it knows to stop).
+### **Đặc điểm chính**
+
+1. **Thực thi JSON**: Bot không sử dụng API "Gọi hàm" native (như Công cụ OpenAI). Nó dựa vào **prompt Engineering** để buộc mô hình xuất ra JSON thô, sau đó được `best-effort-json-parser` phân tích cú pháp.
+2. **Logic không trạng thái**: prompt thông báo rõ ràng cho LLM "Bạn có X tin nhắn chưa đọc" trong mỗi lượt, khiến LLM trở thành người đưa ra quyết định duy nhất về kiểm soát luồng (Đọc, Trả lời và Ngủ).
+3. **Quan sát-Phản ánh**: prompt bao gồm `History actions`, cho phép LLM "nhìn thấy" kết quả của lần thử trước đó (ví dụ: nếu một hành động đọc trả về trống, nó sẽ biết dừng lại).

@@ -1,26 +1,28 @@
-# Dependency patches
+<a id="dependency-patches"></a>
+
+# Các bản vá phụ thuộc
 
 ## @xsai/stream-text 0.5.1
 
-Gemini's OpenAI-compatible stream can omit `index` on complete function calls. The SDK stored these calls on an undefined array key and silently skipped execution. This patch uses each call's position when the index is absent, while keeping explicit indices and Google replay metadata unchanged.
+Luồng tương thích OpenAI của Gemini có thể bỏ qua `index` trong các lệnh gọi chức năng hoàn chỉnh. SDK đã lưu trữ các lệnh gọi này trên một khóa mảng không xác định và âm thầm bỏ qua quá trình thực thi. Bản vá này sử dụng vị trí của từng cuộc gọi khi không có chỉ mục, trong khi vẫn giữ nguyên các chỉ mục rõ ràng và siêu dữ liệu phát lại của Google.
 
-The regression in `packages/core-agent/src/runtime/chat-completions.test.ts` uses the real SDK with two unindexed calls and a `stop` finish reason. It checks that both tools execute once and their metadata reaches the next request. Remove this patch when an upstream release passes that regression.
+Hồi quy trong `packages/core-agent/src/runtime/chat-completions.test.ts` sử dụng SDK thực với hai lệnh gọi không được lập chỉ mục và lý do kết thúc `stop`. Nó kiểm tra xem cả hai công cụ có thực thi một lần không và siêu dữ liệu của chúng có đáp ứng được yêu cầu tiếp theo hay không. Xóa bản vá này khi bản phát hành upstream vượt qua hồi quy đó.
 
 ## @xsai-ext/responses 0.5.1
 
-This patch fixes behavior in the published SDK. Angela's protocol and billing code remain in workspace packages.
+Bản vá này khắc phục hành vi trong SDK đã xuất bản. Giao thức và mã thanh toán của Angela vẫn còn trong các gói workspace.
 
-- Reject `response.incomplete` and stream error events so Angela does not store failed turns.
-- Type native `web_search` tools and their output Items for replay across steps.
-- Await `onNativeEvent` before transcript commit so consumers can retain sources and search activity.
+- Từ chối `response.incomplete` và phát trực tuyến các sự kiện lỗi để Angela không quay lỗi store.
+- Nhập các công cụ native `web_search` và các Mục đầu ra của chúng để phát lại qua các bước.
+- Chờ `onNativeEvent` trước khi xác nhận bản ghi để bên sử dụng có thể giữ lại nguồn và hoạt động tìm kiếm.
 
-Browser regressions are in `packages/provider-inference/src/responses.browser.test.ts`. Core integration tests use the real patched SDK with synthetic HTTP responses in `packages/core-agent/src/runtime/responses.test.ts`.
+Hồi quy trình duyệt nằm trong `packages/provider-inference/src/responses.browser.test.ts`. Các thử nghiệm tích hợp cốt lõi sử dụng SDK được vá thực sự với HTTP Responses tổng hợp trong `packages/core-agent/src/runtime/responses.test.ts`.
 
-The patch changes `dist` because the npm artifact ships compiled code. To contribute upstream, port these changes to the corresponding sources in [xsAI](https://github.com/moeru-ai/xsai), then run the same regressions.
+Bản vá thay đổi `dist` vì npm artifact gửi mã đã biên dịch. Để đóng góp upstream, hãy chuyển những thay đổi này sang các nguồn tương ứng trong [xsAI](https://github.com/moeru-ai/xsai), sau đó chạy các hồi quy tương tự.
 
-Remove the patch when an upstream release passes these tests and provides native event callbacks and web search types. Recheck incomplete-response behavior before removal: Angela treats an incomplete turn as a failure.
+Xóa bản vá khi bản phát hành upstream vượt qua các thử nghiệm này và cung cấp các lệnh gọi lại sự kiện native và các loại tìm kiếm trên web. Kiểm tra lại hành vi phản hồi chưa hoàn chỉnh trước khi xóa: Angela coi lượt chưa hoàn thành là một thất bại.
 
-To update the patch:
+Để cập nhật bản vá:
 
 ```sh
 pnpm patch @xsai-ext/responses@0.5.1

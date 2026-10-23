@@ -1,16 +1,18 @@
-# Activation Planner Provider
+<a id="activation-planner-provider"></a>
 
-This example declares `dev.airi.example-activation` version `1.0.0` in its manifest.
+# Công cụ lập kế hoạch kích hoạt nhà cung cấp
 
-Use it with the `activation-planner-consumer` example:
+Ví dụ này khai báo phiên bản `dev.airi.example-activation` `1.0.0` trong tệp kê khai của nó.
 
-1. Open `/devtools/plugin-host` in Stage Tamagotchi.
-2. Import this folder.
-3. Import the Consumer folder next to this folder.
-4. Enable this Provider.
-5. Enable the Consumer.
-6. Load the enabled Extensions.
+Sử dụng nó với ví dụ `activation-planner-consumer`:
 
-The Host loads this Provider before the Consumer. It also rejects disabling or unloading this Provider while the Consumer still requires it.
+1. Mở `/devtools/plugin-host` trong stage Tamagotchi.
+2. Nhập thư mục này.
+3. Nhập thư mục bên sử dụng bên cạnh thư mục này.
+4. Kích hoạt nhà cung cấp này.
+5. Kích hoạt bên sử dụng.
+6. Tải các tiện ích mở rộng đã bật.
 
-This example has no runtime Kit implementation. Its `kits.provides` entry is a static Phase 2 declaration. Runtime Kit registration belongs to Phase 3.
+host tải nhà cung cấp này trước bên sử dụng. Nó cũng từ chối việc vô hiệu hóa hoặc dỡ bỏ nhà cung cấp này trong khi bên sử dụng vẫn yêu cầu nó.
+
+Ví dụ này không có triển khai Bộ công cụ runtime. Mục nhập `kits.provides` của nó là khai báo Giai đoạn 2 tĩnh. Việc đăng ký Kit runtime thuộc Giai đoạn 3.

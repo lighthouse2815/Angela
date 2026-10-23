@@ -1,19 +1,25 @@
-# Angela Plugin - Web Extension
+<a id="angela-plugin---web-extension"></a>
 
-> Read what you are reading!
+# Plugin Angela - Tiện ích mở rộng web
 
-This is a plugin for the Angela to understand what you are reading, looking at, or listening to on the web.
+> Đọc những gì bạn đang đọc!
 
-## What it does now
+Đây là plugin giúp Angela hiểu được bạn đang đọc gì, đang xem gì hoặc đang nghe gì trên web.
 
-- Captures page + video context from YouTube and Bilibili.
-- Extracts subtitles from text tracks or DOM overlays.
-- Sends context updates and optional `spark:notify` events to the character.
-- Exposes a popup to configure WebSocket, toggles, and quick status.
+<a id="what-it-does-now"></a>
 
-## Quick start
+## Bây giờ nó làm gì
+
+- Ghi lại bối cảnh trang + video từ YouTube và Bilibili.
+- Trích xuất phụ đề từ lớp phủ văn bản track hoặc DOM.
+- Gửi thông tin cập nhật ngữ cảnh và các sự kiện `spark:notify` tùy chọn cho nhân vật.
+- Hiển thị cửa sổ bật lên để định cấu hình WebSocket, chuyển đổi và trạng thái nhanh.
+
+<a id="quick-start"></a>
+
+## Bắt đầu nhanh
 
 1. `pnpm -F @angela/plugin-web-extension dev`
-2. Load the unpacked extension from `.wxt/dev` in your browser.
-3. Open the popup to set the WebSocket URL (default: `ws://localhost:6121/ws`).
-4. Watch a YouTube/Bilibili video and confirm the popup shows the detected title/subtitle.
+2. Tải tiện ích mở rộng đã giải nén từ `.wxt/dev` trong trình duyệt của bạn.
+3. Mở cửa sổ bật lên để đặt WebSocket URL (mặc định: `ws://localhost:6121/ws`).
+4. Xem video YouTube/Bilibili và xác nhận cửa sổ bật lên hiển thị title/subtitle. được phát hiện

@@ -1,214 +1,185 @@
-# Stage Tamagotchi Kirie migration
+<a id="stage-tamagotchi-kirie-migration"></a>
 
-Status: In progress. Updated: 2026-09-30.
+# Di chuyển stage Tamagotchi Kirie
 
-This document owns capability decisions, blockers, deferred work, and dependencies.
-[README](README.md) owns commands. [Architecture](docs/host-architecture.md) owns runtime requirements.
-[Ablation review](docs/ablation-review.md) analyzes the whole migrated framework.
+Tình trạng: Đang tiến hành. Cập nhật: 2026-09-30.
 
-## Current acceptance
+Tài liệu này sở hữu các quyết định về năng lực, trở ngại, công việc bị trì hoãn và các phần phụ thuộc. [README](README.md) sở hữu các lệnh. [Architecture](docs/host-architecture.md) sở hữu các yêu cầu về runtime. [Ablation review](docs/ablation-review.md) phân tích toàn bộ khung được di chuyển.
 
-Windows records **23 passing items, one failing item, and five deferred items**.
-The original macOS review accepted 24 items and deferred five.
-No matrix item remains partially tested or untested. Each pass covers only its recorded flow.
+<a id="current-acceptance"></a>
 
-The original macOS runtime review used Kirie 0.4.2 on 2026-09-21.
-Windows used Kirie 0.6.5 on 2026-09-29.
-Different baselines do not establish that every Windows failure is platform-specific.
-Later simplifications do not extend either platform decision.
-The single-host adapter and deferred-bootstrap changes require their own checks after implementation.
+## Chấp nhận hiện tại
 
-## Capability matrix
+Windows ghi lại **23 mục đạt, một mục không đạt và năm mục bị trì hoãn**. Bài đánh giá macOS ban đầu đã chấp nhận 24 mục và trì hoãn 5 mục. Không có mục ma trận nào vẫn được kiểm tra một phần hoặc chưa được kiểm tra. Mỗi lượt chỉ bao gồm luồng được ghi lại của nó.
 
-`Accepted` records the original macOS decision.
-`Pass` records successful Windows checks.
-`Pass (user review)` identifies the user's Windows acceptance.
-`Fail` records a required behavior that failed.
-`Deferred` identifies work outside the current milestone.
+Bài đánh giá macOS runtime ban đầu sử dụng Kirie 0.4.2 vào ngày 21-09-2026. Windows đã sử dụng Kirie 0.6.5 vào ngày 29-09-2026. Các đường cơ sở khác nhau không chứng minh được rằng mọi lỗi của Windows đều liên quan đến nền tảng cụ thể. Sự đơn giản hóa sau này không mở rộng quyết định của nền tảng. Các thay đổi của bộ chuyển đổi host đơn và các thay đổi về khởi động chậm yêu cầu phải có sự kiểm tra riêng sau khi triển khai.
 
-Six Windows passes include user acceptance decisions.
-The user accepted native resize despite the unchanged cursor during the Windows review.
-On 2026-09-30, the user requested resize cursor indicators. See [resize cursor indicators](docs/ablation-review.md#resize-cursor-indicators-2026-09-30).
-The review does not imply unreported coverage of multiple displays or every onboarding and login branch.
+<a id="capability-matrix"></a>
 
-| ID | Capability | Original macOS decision | Windows | Windows evidence |
+## Ma trận năng lực
+
+`Accepted` ghi lại quyết định ban đầu của macOS. `Pass` ghi lại các lần kiểm tra Windows thành công. `Pass (user review)` xác định sự chấp nhận Windows của người dùng. `Fail` ghi lại hành vi bắt buộc nhưng không thành công. `Deferred` xác định công việc nằm ngoài mốc hiện tại.
+
+Sáu thẻ Windows bao gồm các quyết định chấp nhận của người dùng. Người dùng đã chấp nhận thay đổi kích thước native mặc dù con trỏ không thay đổi trong quá trình xem xét Windows. Vào ngày 30-09-2026, người dùng đã yêu cầu thay đổi kích thước các chỉ báo con trỏ. Xem [thay đổi kích thước chỉ báo con trỏ](docs/ablation-review.md#resize-cursor-indicators-2026-09-30). Việc đánh giá không ngụ ý mức độ bao phủ chưa được báo cáo của nhiều màn hình hoặc mọi nhánh đăng nhập và đăng nhập.
+
+| ID | Năng lực | Quyết định macOS gốc | Windows | Bằng chứng về Windows |
 | --- | --- | --- | --- | --- |
-| GAP-001 | Window leadership | Accepted | Pass | Main used explicit leader state. Settings and Chat used follower state. |
-| GAP-002 | Native edge resize | Accepted | Pass (user review) | The user confirmed that native edge resize works. The later cursor indicator change has separate [macOS evidence](docs/ablation-review.md#resize-cursor-indicators-2026-09-30). |
-| GAP-003 | Pointer state | Accepted | Pass | Native AUV movement changed the host pointer coordinates and inside state. |
-| GAP-004 | Display snapshot | Accepted | Pass (user review) | Display and bounds RPCs worked at 200% scaling. The user confirmed normal Windows behavior. No separate multi-display evidence exists. |
-| GAP-005 | Window movement and pinning | Accepted | Pass (user review) | Pin and unpin changed native z-order relative to Explorer. The user confirmed normal Windows behavior. |
-| GAP-006 | Window centering | Accepted | Pass | Center changed native coordinates to `(1150, 400)` for a 900 × 1200 window. |
-| GAP-007 | Spotlight | Accepted | Pass | After the window flag fix, direct open and native scan-code Ctrl+Shift+A displayed Spotlight. Repeated open and hide/reopen passed. Desktop capture showed the input and transparency. Earlier notification display and click-to-Chat passed. Physical keyboard and macOS regression checks remain pending. |
-| GAP-008 | Global shortcuts | Accepted | Pass | Register, list, duplicate rejection, and unregister passed. Physical Ctrl+Shift+K produced one down/up pair in the foreground and another in the background. |
-| GAP-009 | Window lifecycle | Accepted | Pass | Native actions produced minimize, restore, blur, and focus events. |
-| GAP-010 | Server channel | Deferred | Deferred | Angela server configuration and lifecycle require the deferred sidecar work. |
-| GAP-011 | Locale | Accepted | Pass | Locale changes reached another window and survived process restart. The Chinese locale normalized to `zh-Hans`. English also survived the next restart. |
-| GAP-012 | Onboarding | Accepted | Pass (user review) | Window creation and reuse passed. The user reported that onboarding looked normal on Windows. |
-| GAP-013 | Settings window | Accepted | Pass | Settings opened, routed, closed through its native title bar, and reopened. |
-| GAP-014 | Chat window | Accepted | Pass | Chat closed through its native title bar and reopened. Two further open requests reused one minimal follower window. |
-| GAP-015 | Application exit | Accepted | Fail | Both native close and application quit ended with a CEF access violation. |
-| GAP-016 | Microphone permission state | Accepted | Pass (user review) | Permission state and reset worked. The user accepted the result and excluded the renderer exception from migration failures. See [Windows microphone permission evidence](docs/verification.md#windows-microphone-permission-evidence). |
-| GAP-017 | Microphone access policy | Accepted | Pass | Allow, deny, repeated requests, follower denial, grant persistence, and application-owned stream revocation passed. One capture after restart failed transiently. See [Windows microphone permission evidence](docs/verification.md#windows-microphone-permission-evidence) and [additional observations](#additional-observations). |
-| GAP-018 | Notice window | Accepted | Pass | Confirmation returned `true`. Native title-bar close and the cancel contract each returned `false`. Each operation closed the window. |
-| GAP-019 | Account sign-in | Accepted | Pass (user review) | The user confirmed Windows sign-in behavior. The automated session also displayed existing account state. Individual cancellation branches lack separate evidence. |
-| GAP-020 | Window transparency | Accepted | Pass | AUV desktop captures showed desktop and Explorer pixels around the character and controls, without an opaque window rectangle. |
-| GAP-021 | External links | Accepted | Pass | External URL RPC resolved. A later AUV desktop capture showed the requested GitHub page in Chrome. |
-| GAP-022 | Application data directory | Accepted | Pass | Data directory RPC returned the expected Godot user directory. A later AUV capture showed that directory in Explorer. |
-| GAP-023 | Plugin host | Deferred | Deferred | The Node.js plugin host and extension lifecycle require the deferred sidecar work. |
-| GAP-024 | Artistry | Deferred | Deferred | Artistry configuration and generation require the deferred sidecar work. |
-| GAP-025 | MCP | Deferred | Deferred | MCP configuration and stdio process management require the deferred sidecar work. |
-| GAP-026 | Packaging and updates | Deferred | Deferred | Production packaging, installation, and updates remain outside this migration scope. |
-| GAP-027 | Inspector and Devtools | Accepted | Pass | Native devtools requests reused one page. A desktop capture showed the connected Inspector, the main renderer DOM, and its live preview. |
-| GAP-028 | Shared browser context | Accepted | Pass | Cookies, localStorage, BroadcastChannel, and Web Locks crossed windows. Persistent cookie and localStorage probes survived process restart. |
-| GAP-029 | Chat initialization and send | Accepted | Pass | Initialization, two requests, and saved replies passed. The original missing-permission-handler failure did not recur. A session selection observation lacks a confirmed reproduction through normal user actions. See [Windows Chat evidence](docs/verification.md#windows-chat-evidence). |
+| GAP-001 | Lãnh đạo cửa sổ | Đã chấp nhận | Vượt qua | Trạng thái lãnh đạo rõ ràng được sử dụng chính. Cài đặt và trạng thái người theo dõi được sử dụng trong Trò chuyện. |
+| GAP-002 | Thay đổi kích thước cạnh native | Đã chấp nhận | Vượt qua (đánh giá của người dùng) | Người dùng xác nhận rằng việc thay đổi kích thước cạnh native hoạt động. Thay đổi chỉ báo con trỏ sau này có bằng chứng [macOS riêng biệt](docs/ablation-review.md#resize-cursor-indicators-2026-09-30). |
+| GAP-003 | Trạng thái con trỏ | Đã chấp nhận | Vượt qua | Chuyển động native AUV đã thay đổi tọa độ con trỏ host và trạng thái bên trong. |
+| GAP-004 | Hiển thị ảnh chụp nhanh | Đã chấp nhận | Vượt qua (đánh giá của người dùng) | RPC hiển thị và giới hạn hoạt động ở tỷ lệ 200%. Người dùng đã xác nhận hoạt động bình thường của Windows. Không có bằng chứng đa màn hình riêng biệt tồn tại. |
+| GAP-005 | Chuyển động và ghim cửa sổ | Đã chấp nhận | Vượt qua (đánh giá của người dùng) | Ghim và bỏ ghim đã thay đổi thứ tự z native so với Explorer. Người dùng đã xác nhận hoạt động bình thường của Windows. |
+| GAP-006 | Định tâm cửa sổ | Đã chấp nhận | Vượt qua | Trung tâm đã thay đổi tọa độ native thành `(1150, 400)` cho cửa sổ 900 × 1200. |
+| GAP-007 | Tiêu điểm | Đã chấp nhận | Vượt qua | Sau khi sửa cờ cửa sổ, hãy mở trực tiếp và mã quét native Ctrl+Shift+A hiển thị Spotlight. Mở liên tục và hide/reopen đã vượt qua. desktop thu nhận dữ liệu hiển thị đầu vào và độ trong suốt. Hiển thị thông báo trước đó và nhấp để trò chuyện đã được thông qua. Kiểm tra hồi quy bàn phím vật lý và macOS vẫn đang chờ xử lý. |
+| GAP-008 | Phím tắt toàn cầu | Đã chấp nhận | Vượt qua | Đăng ký, liệt kê, từ chối trùng lặp và hủy đăng ký đã được thông qua. Ctrl+Shift+K vật lý tạo ra một cặp down/up ở nền trước và một cặp khác ở nền sau. |
+| GAP-009 | Vòng đời cửa sổ | Đã chấp nhận | Vượt qua | Các hành động native tạo ra các sự kiện thu nhỏ, khôi phục, làm mờ và lấy nét. |
+| GAP-010 | Kênh máy chủ | Trì hoãn | Trì hoãn | Cấu hình và vòng đời của máy chủ Angela yêu cầu hoạt động sidecar bị trì hoãn. |
+| GAP-011 | Ngôn ngữ | Đã chấp nhận | Vượt qua | Các thay đổi về ngôn ngữ đã đến một cửa sổ khác và vẫn tiếp tục khởi động lại quá trình. Ngôn ngữ Trung Quốc được chuẩn hóa thành `zh-Hans`. Tiếng Anh cũng sống sót sau lần khởi động lại tiếp theo. |
+| GAP-012 | Giới thiệu | Đã chấp nhận | Vượt qua (đánh giá của người dùng) | Việc tạo và tái sử dụng cửa sổ đã được thông qua. Người dùng báo cáo rằng việc giới thiệu có vẻ bình thường trên Windows. |
+| GAP-013 | Cửa sổ cài đặt | Đã chấp nhận | Vượt qua | Các cài đặt đã mở, định tuyến, đóng thông qua thanh tiêu đề native và mở lại. |
+| GAP-014 | Cửa sổ trò chuyện | Đã chấp nhận | Vượt qua | Trò chuyện đã đóng thông qua thanh tiêu đề native và mở lại. Hai yêu cầu mở tiếp theo đã sử dụng lại một cửa sổ theo dõi tối thiểu. |
+| GAP-015 | Thoát ứng dụng | Đã chấp nhận | Thất bại | Cả việc đóng và thoát ứng dụng của native đều dẫn đến vi phạm quyền truy cập CEF. |
+| GAP-016 | Trạng thái cho phép micrô | Đã chấp nhận | Vượt qua (đánh giá của người dùng) | Trạng thái cấp phép và thiết lập lại đã hoạt động. Người dùng đã chấp nhận kết quả và loại trừ ngoại lệ renderer khỏi lỗi di chuyển. Xem [Bằng chứng cho phép micrô của Windows](docs/verification.md#windows-microphone-permission-evidence). |
+| GAP-017 | Chính sách truy cập micrô | Đã chấp nhận | Vượt qua | Cho phép, từ chối, yêu cầu lặp lại, từ chối người theo dõi, cấp quyền duy trì và thu hồi luồng thuộc sở hữu ứng dụng đã được thông qua. Một thu nhận dữ liệu sau khi khởi động lại tạm thời không thành công. Xem [Bằng chứng cho phép micrô của Windows](docs/verification.md#windows-microphone-permission-evidence) và [quan sát bổ sung](#additional-observations). |
+| GAP-018 | Cửa sổ thông báo | Đã chấp nhận | Vượt qua | Xác nhận trả về `true`. Thanh tiêu đề native đóng và mỗi hợp đồng hủy đều trả về `false`. Mỗi thao tác đều đóng cửa sổ. |
+| GAP-019 | Đăng nhập tài khoản | Đã chấp nhận | Vượt qua (đánh giá của người dùng) | Người dùng đã xác nhận hành vi đăng nhập Windows. Phiên tự động cũng hiển thị trạng thái tài khoản hiện có. Các chi nhánh hủy đơn lẻ thiếu bằng chứng riêng biệt. |
+| GAP-020 | Cửa sổ trong suốt | Đã chấp nhận | Vượt qua | Các ảnh chụp AUV desktop hiển thị các pixel desktop và Explorer xung quanh nhân vật và điều khiển mà không có hình chữ nhật cửa sổ mờ. |
+| GAP-021 | Liên kết ngoài | Đã chấp nhận | Vượt qua | URL RPC bên ngoài đã được giải quyết. AUV desktop thu nhận dữ liệu sau này đã hiển thị trang GitHub được yêu cầu trong Chrome. |
+| GAP-022 | Thư mục dữ liệu ứng dụng | Đã chấp nhận | Vượt qua | Thư mục dữ liệu RPC trả về thư mục người dùng Godot dự kiến. AUV thu nhận dữ liệu sau này hiển thị thư mục đó trong Explorer. |
+| GAP-023 | Plugin host | Trì hoãn | Trì hoãn | Plugin Node.js host và vòng đời tiện ích mở rộng yêu cầu hoạt động sidecar bị trì hoãn. |
+| GAP-024 | Artistry | Trì hoãn | Trì hoãn | Cấu hình Artistry và sinh nội dung yêu cầu công việc sidecar bị trì hoãn. |
+| GAP-025 | MCP | Trì hoãn | Trì hoãn | Cấu hình MCP và quản lý quy trình stdio yêu cầu công việc sidecar bị trì hoãn. |
+| GAP-026 | Đóng gói và cập nhật | Trì hoãn | Trì hoãn | Việc đóng gói, cài đặt và cập nhật sản xuất vẫn nằm ngoài phạm vi di chuyển này. |
+| GAP-027 | Thanh tra và Devtools | Đã chấp nhận | Vượt qua | Các yêu cầu của công cụ phát triển native được sử dụng lại một trang. desktop thu nhận dữ liệu hiển thị Thanh tra được kết nối, renderer DOM chính và bản xem trước trực tiếp của nó. |
+| GAP-028 | Bối cảnh trình duyệt được chia sẻ | Đã chấp nhận | Vượt qua | Cookie, localStorage, BroadcastChannel và Khóa Web vượt qua các cửa sổ. Các thăm dò cookie liên tục và localStorage vẫn tồn tại trong quá trình khởi động lại. |
+| GAP-029 | Khởi tạo trò chuyện và gửi | Đã chấp nhận | Vượt qua | Quá trình khởi tạo, hai yêu cầu và các câu trả lời đã lưu đã được thông qua. Lỗi xử lý thiếu quyền ban đầu không tái diễn. Quan sát lựa chọn phiên thiếu bản sao được xác nhận thông qua các hành động thông thường của người dùng. Xem [Bằng chứng trò chuyện trên Windows](docs/verification.md#windows-chat-evidence). |
 
-## Open Windows failures
+<a id="open-windows-failures"></a>
 
-### GAP-015: Application exit can crash
+## Mở Windows bị lỗi
 
-Native close reproduced a crash at 17:41:53.
-Application quit reproduced it at 18:10:52 with four WebViews, and again at 19:11:48.
-The host logged `destroy_webview`. Windows Application event 1000 reported:
+<a id="gap-015-application-exit-can-crash"></a>
 
-| Field | Value |
+### GAP-015: Thoát ứng dụng có thể bị lỗi
+
+native đóng đã tái tạo sự cố lúc 17:41:53. Ứng dụng thoát đã sao chép nó vào lúc 18:10:52 với bốn WebViews và một lần nữa vào lúc 19:11:48. host đã ghi lại `destroy_webview`. Sự kiện ứng dụng Windows 1000 đã được báo cáo:
+
+| Lĩnh vực | Giá trị |
 | --- | --- |
-| Application | `Godot_v4.7.2-stable_mono_win64.exe` |
-| Module | `libcef.dll_unloaded`, version `152.0.6.0` |
-| Exception | `0xc0000005` |
-| Offset | `0x000000000452217a` |
+| Ứng dụng | `Godot_v4.7.2-stable_mono_win64.exe` |
+| Mô-đun | `libcef.dll_unloaded`, phiên bản `152.0.6.0` |
+| Ngoại lệ | `0xc0000005` |
+| Bù đắp | `0x000000000452217a` |
 
-The failure occurs near shutdown. The evidence does not identify the owner of the invalid memory access.
-See Microsoft's [access violation reference](https://learn.microsoft.com/en-us/shows/inside/c0000005).
-A later exit returned code 0 with two ObjectDB leaks. This intermittent success does not close GAP-015.
+Sự cố xảy ra gần tắt máy. Bằng chứng không xác định được chủ sở hữu của quyền truy cập bộ nhớ không hợp lệ. Xem tham chiếu vi phạm quyền truy cập [](https://learn.microsoft.com/en-us/shows/inside/c0000005) của Microsoft. Lần thoát sau đó trả về mã 0 với hai lần rò rỉ ObjectDB. Thành công không liên tục này không đóng được GAP-015.
 
-### Additional observations
+<a id="additional-observations"></a>
 
-- Child close logged `Angela host context disposed.` at 18:34:04 through `disposeHostContext` and `disposeRendererHost`.
-  Close and reopen succeeded. Promise cleanup remains unresolved.
-- One microphone request after restart returned `AbortError: Failed due to shutdown`. An immediate repeat returned a live track.
-- Root lint failures differed by checkout artifacts: Windows recorded 41 errors. The later macOS review recorded 1,715 errors and 701 warnings.
+### quan sát bổ sung
 
-## Remaining acceptance work
+- Trẻ em đóng `Angela host context disposed.` đã ghi nhật ký lúc 18:34:04 thông qua `disposeHostContext` và `disposeRendererHost`. Đóng và mở lại thành công. Lời hứa dọn dẹp vẫn chưa được giải quyết.
+- Một yêu cầu micrô sau khi khởi động lại đã trả về `AbortError: Failed due to shutdown`. Việc lặp lại ngay lập tức sẽ trả về trực tiếp track.
+- Lỗi lint gốc khác nhau khi thanh toán artifact: Windows ghi lại 41 lỗi. Bài đánh giá macOS sau này ghi nhận 1.715 lỗi và 701 cảnh báo.
 
-| Item | Required follow-up |
+<a id="remaining-acceptance-work"></a>
+
+## Công tác nghiệm thu còn lại
+
+| Mục | Yêu cầu theo dõi |
 | --- | --- |
-| GAP-015 | Resolve CEF shutdown, then repeat native close and application quit on Windows. |
-| GAP-002 | Review the new resize cursor indicators on Windows. Original resize acceptance remains separate. |
-| GAP-007 | Repeat the physical Windows shortcut and macOS regression checks for the visibility correction. |
-| Lifecycle | Investigate disposed-context rejections and ObjectDB leaks. Exit code 0 does not resolve them. |
-| Later source changes | Repeat relevant native flows. Historical passes do not cover the current simplifications. |
-| Coverage | Preserve the [limits](docs/ablation-review.md#coverage-and-blockers) for physical input, multiple displays, mixed DPI, and authentication. |
+| GAP-015 | Giải quyết việc tắt CEF, sau đó lặp lại thao tác đóng native và thoát ứng dụng trên Windows. |
+| GAP-002 | Xem lại các chỉ báo thay đổi kích thước con trỏ trên Windows. Việc chấp nhận thay đổi kích thước ban đầu vẫn riêng biệt. |
+| GAP-007 | Lặp lại phím tắt vật lý của Windows và kiểm tra hồi quy macOS để điều chỉnh khả năng hiển thị. |
+| Vòng đời | Điều tra việc từ chối bối cảnh đã xử lý và rò rỉ ObjectDB. Mã thoát 0 không giải quyết được chúng. |
+| Sau này thay đổi nguồn | Lặp lại các luồng native có liên quan. Những bước đi lịch sử không bao gồm những sự đơn giản hóa hiện tại. |
+| Bảo hiểm | Bảo toàn [limits](docs/ablation-review.md#coverage-and-blockers) cho đầu vào vật lý, nhiều màn hình, DPI hỗn hợp và xác thực. |
 
-## Scope and change rules
+<a id="scope-and-change-rules"></a>
 
-The objective is to preserve Stage Tamagotchi behavior in a Kirie desktop host.
-Electron remains supported and supplies the behavior reference.
-The original setup, renderer adaptation, gap discovery, context ownership, and Platform integration phases are complete.
-Platform acceptance remains open.
+## Phạm vi và quy tắc thay đổi
 
-The milestone excludes model rendering, assets, packaging, and model-specific media for Live2D, VRM, and MMD.
-Linux notifications remain outside the review.
-[Kirie Platform](https://github.com/moeru-ai/godot-kirie/blob/v0.10.0/packages/platform/README.md#desktop-notifications) lists macOS and Windows notification backends.
+Mục tiêu là duy trì hoạt động của stage Tamagotchi trong Kirie desktop host. Electron vẫn được hỗ trợ và cung cấp tham chiếu hành vi. Quá trình thiết lập ban đầu, điều chỉnh renderer, phát hiện lỗ hổng, quyền sở hữu bối cảnh và các giai đoạn tích hợp Nền tảng đã hoàn tất. Sự chấp nhận nền tảng vẫn mở.
 
-1. Reproduce an in-scope failure before adding a capability.
-2. Use the Godot API or lifecycle that owns the behavior.
-3. Keep general desktop capabilities in Platform and Angela services in Angela.
-4. Keep one Eventa context per renderer and Godot window operations on the main thread.
-5. Record a proven Godot limit before native integration or sidecar work.
-6. Get explicit approval for native dependencies, sidecars, and dependency workarounds.
-7. Preserve the original Electron application and separate Godot runtime.
-8. Do not add a `BrowserWindow` facade or mock a missing capability.
-9. Keep model errors outside this milestone.
-10. Do not create commits unless the user requests them.
+Cột mốc này không bao gồm kết xuất mô hình, nội dung, gói và phương tiện dành riêng cho mô hình cho Live2D, VRM và MMD. Thông báo Linux vẫn nằm ngoài phạm vi xem xét. [Kirie Platform](https://github.com/moeru-ai/godot-kirie/blob/v0.10.0/packages/platform/README.md#desktop-notifications) liệt kê các chương trình phụ trợ thông báo của macOS và Windows.
 
-## Deferred work
+1. Tái tạo lỗi trong phạm vi trước khi thêm khả năng.
+2. Sử dụng Godot API hoặc vòng đời sở hữu hành vi.
+3. Giữ các khả năng chung của desktop trong các dịch vụ Nền tảng và Angela trong Angela.
+4. Giữ một bối cảnh Eventa cho mỗi hoạt động của cửa sổ renderer và Godot trên luồng chính.
+5. Ghi lại giới hạn Godot đã được chứng minh trước khi tích hợp native hoặc sidecar hoạt động.
+6. Nhận được sự phê duyệt rõ ràng đối với các phần phụ thuộc native, các sidecar và các giải pháp phụ thuộc.
+7. Giữ nguyên ứng dụng Electron gốc và tách riêng Godot runtime.
+8. Không thêm mặt tiền `BrowserWindow` hoặc mock một khả năng còn thiếu.
+9. Giữ các lỗi mô hình nằm ngoài mốc này.
+10. Không tạo các cam kết trừ khi người dùng yêu cầu chúng.
 
-| Gap | Missing behavior | Reopen condition |
+<a id="deferred-work"></a>
+
+## Công việc bị trì hoãn
+
+| Khoảng cách | Thiếu hành vi | Điều kiện mở lại |
 | --- | --- | --- |
-| GAP-010 | Server configuration, QR payload, listener, and WebSocket lifecycle | The user reopens sidecar work. Angela defines an artifact and lifecycle, or accepts an external server. |
-| GAP-023 | Plugin discovery, workers, directory import, and extension lifecycle | The user reopens sidecar work. Angela owns files, runtime modules, shutdown, and packaging. |
-| GAP-024 | Artistry configuration and generation | The user reopens sidecar work. Angela owns credentials, persistence, providers, jobs, downloads, and Widget updates. |
-| GAP-025 | MCP configuration and stdio processes | The user reopens sidecar work. Angela owns configuration, process shutdown, and packaging. |
-| GAP-026 | Production installation and updates | The user reopens releases. Angela defines versions, exports, signatures, manifests, installation, and relaunch. |
+| GAP-010 | Cấu hình máy chủ, tải trọng QR, trình nghe và vòng đời WebSocket | Người dùng mở lại công việc sidecar. Angela xác định artifact và vòng đời hoặc chấp nhận máy chủ bên ngoài. |
+| GAP-023 | Khám phá plugin, worker, nhập thư mục và vòng đời tiện ích mở rộng | Người dùng mở lại tác phẩm sidecar. Angela sở hữu các tập tin, mô-đun runtime, tắt máy và đóng gói. |
+| GAP-024 | Cấu hình Artistry và sinh nội dung | Người dùng mở lại công việc sidecar. Angela sở hữu thông tin xác thực, tính bền bỉ, nhà cung cấp, công việc, nội dung tải xuống và cập nhật Widget. |
+| GAP-025 | Cấu hình MCP và quy trình stdio | Người dùng mở lại tác phẩm sidecar. Angela sở hữu cấu hình, tắt quy trình và đóng gói. |
+| GAP-026 | Cài đặt và cập nhật sản xuất | Người dùng mở lại bản phát hành. Angela xác định phiên bản, xuất, chữ ký, bảng kê khai, cài đặt và khởi chạy lại. |
 
-The workspace Node.js command is not a production sidecar.
-Do not port the server protocol to C# as a workaround.
-Do not expose Artistry credentials in the renderer or depend on browser CORS for desktop provider access.
+Lệnh workspace Node.js không phải là sidecar sản xuất. Không chuyển giao thức máy chủ sang C# như một giải pháp thay thế. Không để lộ thông tin xác thực Artistry trong renderer hoặc phụ thuộc vào trình duyệt CORS để truy cập desktop nhà cung cấp.
 
-### Deferred startup reference
+<a id="deferred-startup-reference"></a>
 
-The Kirie bootstrap no longer connects these deferred services. Their stores, contracts, and Electron implementations remain as migration references.
-Removing startup calls does not remove indirect store creation or every page entry.
-The [original Kirie App.vue](https://github.com/BeanDz/airi/blob/ef7eb50e5a76265f2675e9072a7430d2dc46f09c/apps/stage-tamagotchi-kirie/src-web/src/renderer/App.vue#L136-L361) preserves the removed startup order and subscriptions.
+### Tham chiếu khởi động bị trì hoãn
 
-| Gap | Retained implementation | Removed startup connection |
+Khởi động Kirie không còn kết nối các dịch vụ bị trì hoãn này nữa. store, hợp đồng và triển khai Electron của họ vẫn là tài liệu tham khảo di chuyển. Việc xóa lệnh gọi khởi động không xóa việc tạo store gián tiếp hoặc mọi mục nhập trang. [orie App.vue](https://github.com/BeanDz/airi/blob/ef7eb50e5a76265f2675e9072a7430d2dc46f09c/apps/stage-tamagotchi-kirie/src-web/src/renderer/App.vue#L136-L361) gốc giữ nguyên thứ tự khởi động và đăng ký đã bị xóa.
+
+| Khoảng cách | Việc thực hiện được giữ lại | Đã xóa kết nối khởi động |
 | --- | --- | --- |
-| GAP-010 | [Channel settings](src-web/src/renderer/stores/settings/server-channel.ts), [channel store](../../packages/stage-ui/src/stores/mods/api/channel-server.ts), and [Electron service](../desktop/src/main/services/angela/channel-server/index.ts) | Fetch host configuration, apply it, and initialize the channel. |
-| GAP-010 | [Context bridge](../../packages/stage-ui/src/stores/mods/api/context-bridge.ts) and [character orchestrator](../../packages/stage-ui/src/stores/character/orchestrator/store.ts) | Set the Spark host role, initialize both stores, and dispose the context bridge. These depend on the channel. |
-| GAP-023 | [Plugin tools](src-web/src/renderer/stores/tools/plugins.ts), [inspector](../../packages/stage-ui/src/stores/devtools/plugin-host-debug.ts), and [Electron host](../desktop/src/main/services/angela/plugins/host/index.ts) | Install the inspector bridge, discover tools, subscribe to changes, register provider queries, and publish capabilities. |
-| GAP-024 | [Artistry store](../../packages/stage-ui/src/stores/modules/artistry.ts) and [Electron bridge](../desktop/src/main/services/angela/widgets/artistry-bridge.ts) | Observe configuration, deduplicate snapshots, and send configuration to the host. |
-| GAP-025 | [MCP tools](src-web/src/renderer/stores/tools/mcp.ts) and [Electron service](../desktop/src/main/services/angela/mcp-servers/index.ts) | Discover MCP tools when the main renderer becomes leader. |
-| Model rendering scope | [Electron Godot sidecar](../desktop/src/main/services/angela/godot-stage/index.ts) | Query sidecar status, subscribe to changes, and select the Godot renderer. |
+| GAP-010 | [Cài đặt kênh](src-web/src/renderer/stores/settings/server-channel.ts), [cửa hàng kênh](../../packages/stage-ui/src/stores/mods/api/channel-server.ts) và [Edịch vụ điện tử](../desktop/src/main/services/angela/channel-server/index.ts) | Tìm nạp cấu hình host, áp dụng nó và khởi tạo kênh. |
+| GAP-010 | [Cầu ngữ cảnh](../../packages/stage-ui/src/stores/mods/api/context-bridge.ts) và [bộ điều phối nhân vật](../../packages/stage-ui/src/stores/character/orchestrator/store.ts) | Đặt vai trò Spark host, khởi tạo cả store và loại bỏ cầu ngữ cảnh. Những điều này phụ thuộc vào kênh. |
+| GAP-023 | [Công cụ plugin](src-web/src/renderer/stores/tools/plugins.ts), [inspector](../../packages/stage-ui/src/stores/devtools/plugin-host-debug.ts) và [Emáy chủ điện tử](../desktop/src/main/services/angela/plugins/host/index.ts) | Cài đặt cầu kiểm tra, khám phá các công cụ, đăng ký thay đổi, đăng ký truy vấn nhà cung cấp và xuất bản các khả năng. |
+| GAP-024 | [Cửa hàng nghệ thuật](../../packages/stage-ui/src/stores/modules/artistry.ts) và [Ecầu điện tử](../desktop/src/main/services/angela/widgets/artistry-bridge.ts) | Quan sát cấu hình, loại bỏ ảnh chụp nhanh trùng lặp và gửi cấu hình tới host. |
+| GAP-025 | [MCP công cụ](src-web/src/renderer/stores/tools/mcp.ts) và [Edịch vụ điện tử](../desktop/src/main/services/angela/mcp-servers/index.ts) | Khám phá các công cụ MCP khi renderer chính trở thành người dẫn đầu. |
+| Phạm vi hiển thị mô hình | [Exe điện tử Godot](../desktop/src/main/services/angela/godot-stage/index.ts) | Truy vấn trạng thái sidecar, đăng ký các thay đổi và chọn Godot renderer. |
 
-When a gap reopens, implement its host handlers and runtime ownership before restoring its startup connection.
-For GAP-010, initialize the channel before the context bridge and character orchestrator. Keep their setup and cleanup responsibilities explicit.
-Tool discovery and capability publication belong to the main renderer. Restore inspector availability only with working host operations.
-Deferred startup must not block local inference preload. The old Electron cursor request remains replaced by the [Kirie pointer implementation](src-web/src/renderer/host-context/pointer.ts).
+Khi một khoảng trống mở lại, hãy triển khai trình xử lý host và quyền sở hữu runtime trước khi khôi phục kết nối khởi động của nó. Đối với GAP-010, hãy khởi tạo kênh trước cầu ngữ cảnh và bộ điều phối ký tự. Giữ trách nhiệm thiết lập và dọn dẹp của họ rõ ràng. Khám phá công cụ và công bố khả năng thuộc về renderer chính. Chỉ khôi phục tính khả dụng của thanh tra khi hoạt động host. Khởi động chậm không được chặn tải trước suy luận cục bộ. Yêu cầu con trỏ Electron cũ vẫn được thay thế bằng triển khai con trỏ [Kirie](src-web/src/renderer/host-context/pointer.ts).
 
-### Plugin directory import
+<a id="plugin-directory-import"></a>
 
-The shared [plugin inspector](../../packages/stage-ui/src/stores/devtools/plugin-host-debug.ts) requires prepare, commit, and cancel methods.
-Kirie supplies no inspector bridge, so shared `isAvailable` is false.
-The shared store retains explicit unsupported-operation errors. It creates no plan and writes no files.
-The shared [page](../../packages/stage-pages/src/pages/devtools/plugin-host.vue) retains its unavailable state.
-The interface remains unsupported until GAP-023 reopens.
+### Nhập thư mục plugin
 
-The packaging audit found no export presets, release workflow, version source, or update manifest. The package version was `0.0.0`.
-A resource pack cannot update C# assemblies or native CEF libraries.
-See Godot's [export guide](https://docs.godotengine.org/en/4.7/tutorials/export/exporting_projects.html#exporting-from-the-command-line)
-and [resource-pack guide](https://docs.godotengine.org/en/4.7/tutorials/export/exporting_pcks.html#opening-pck-or-zip-files-at-runtime).
-Do not substitute an Electron installer or mark a download as installed.
-Update acceptance requires download, integrity checks, installation, relaunch, and channel selection with versioned Kirie artifacts.
+Trình kiểm tra plugin [ được chia sẻ](../../packages/stage-ui/src/stores/devtools/plugin-host-debug.ts) yêu cầu các phương thức chuẩn bị, cam kết và hủy. Kirie không cung cấp cầu nối thanh tra nên `isAvailable` được chia sẻ là sai. store được chia sẻ vẫn giữ lại các lỗi hoạt động không được hỗ trợ rõ ràng. Nó không tạo ra kế hoạch và không ghi tập tin. [page](../../packages/stage-pages/src/pages/devtools/plugin-host.vue) được chia sẻ vẫn giữ trạng thái không khả dụng. Giao diện vẫn không được hỗ trợ cho đến khi GAP-023 mở lại.
 
-## Dependency baseline
+Quá trình kiểm tra đóng gói không tìm thấy giá trị đặt trước xuất, quy trình phát hành, nguồn phiên bản hoặc bảng kê khai cập nhật. Phiên bản gói là `0.0.0`. Gói tài nguyên không thể cập nhật các tập hợp C# hoặc thư viện native CEF. Xem hướng dẫn xuất khẩu [](https://docs.godotengine.org/en/4.7/tutorials/export/exporting_projects.html#exporting-from-the-command-line) và hướng dẫn gói tài nguyên [](https://docs.godotengine.org/en/4.7/tutorials/export/exporting_pcks.html#opening-pck-or-zip-files-at-runtime) của Godot. Không thay thế trình cài đặt Electron hoặc đánh dấu bản tải xuống là đã cài đặt. Việc chấp nhận cập nhật yêu cầu tải xuống, kiểm tra tính toàn vẹn, cài đặt, khởi chạy lại và chọn kênh với Kirie artifact đã được phiên bản.
 
-Kirie npm, NuGet, and the Godot addon use 0.10.0.
-Godot and Godot.NET.Sdk use 4.7.2. Godot CEF uses 2.0.0.
-The [0.10.0 release](https://github.com/moeru-ai/godot-kirie/releases/tag/v0.10.0) supplies official artifacts.
+<a id="dependency-baseline"></a>
 
-The core plugin bundles the Kirie addon and pins the CEF archive SHA-256.
-The installed plugin state records the CEF digest.
-The macOS artifact passed strict signatures. Windows used D3D12 Forward+ with accelerated OSR.
+## Đường cơ sở phụ thuộc
 
-On 2026-09-29, the NuGet v3 feed omitted both 0.6.5 packages and restore failed with `NU1102`.
-That session used the official v2 feed successfully:
+Kirie npm, NuGet và addon Godot sử dụng 0.10.0. Godot và Godot.NET.Sdk sử dụng 4.7.2. Godot CEF sử dụng 2.0.0. Bản phát hành [0.10.0](https://github.com/moeru-ai/godot-kirie/releases/tag/v0.10.0) cung cấp artifact chính thức.
+
+Plugin cốt lõi gói phần bổ trợ Kirie và ghim kho lưu trữ CEF SHA-256. Trạng thái plugin đã cài đặt ghi lại thông báo CEF. macOS artifact đã vượt qua các chữ ký nghiêm ngặt. Windows đã sử dụng D3D12 Forward+ với OSR được tăng tốc.
+
+Vào ngày 29-09-2026, nguồn cấp dữ liệu NuGet v3 đã bỏ qua cả hai gói 0.6.5 và khôi phục không thành công với `NU1102`. Phiên đó đã sử dụng thành công nguồn cấp dữ liệu v2 chính thức:
 
 ```sh
 mise x -- dotnet restore tests/StageTamagotchiKirie.Tests/StageTamagotchiKirie.Tests.csproj --source https://www.nuget.org/api/v2/ --no-http-cache
 ```
 
-The repository retained its default NuGet source.
-The [0.10.0 addon](https://github.com/moeru-ai/godot-kirie/blob/v0.10.0/packages/kirie/addon/addons/kirie/csharp/KirieClient.cs) supplies the C# client wrapper.
-Exact Kirie entries bypass `minimumReleaseAge`. Later releases obey the normal [pnpm policy](https://pnpm.io/settings/dependency-resolution).
+Kho lưu trữ vẫn giữ lại nguồn NuGet mặc định của nó. Addon[0.10.0 addon](https://github.com/moeru-ai/godot-kirie/blob/v0.10.0/packages/kirie/addon/addons/kirie/csharp/KirieClient.cs) cung cấp trình bao bọc ứng dụng khách C#. Các mục Kirie chính xác bỏ qua `minimumReleaseAge`. Các bản phát hành sau tuân theo chính sách [pnpm thông thường](https://pnpm.io/settings/dependency-resolution).
 
-Acceptance requires coordinated published packages.
-Do not commit `link:` dependencies, sibling `ProjectReference` entries, or copied Kirie implementations.
-Temporary sibling-source work requires dependency-boundary approval and a reproduced API gap.
+Việc chấp nhận yêu cầu các gói được xuất bản phối hợp. Không cam kết các phần phụ thuộc `link:`, các mục nhập `ProjectReference` anh chị em hoặc các triển khai Kirie được sao chép. Công việc nguồn anh chị em tạm thời yêu cầu phê duyệt ranh giới phụ thuộc và khoảng cách API được tái tạo.
 
-## Completion requirements
+<a id="completion-requirements"></a>
 
-- Every in-scope capability passes its platform flow, or has an explicit blocked or deferred decision.
-- Published packages, CEF artifacts, and signatures match the selected baseline.
-- TypeScript and C# contracts agree, errors propagate, and Godot operations stay on the main thread.
-- The complete desktop flow passes on each acceptance platform.
-- Deferred items retain explicit ownership and reopen conditions.
+## Yêu cầu hoàn thành
 
-For a new failure, record its input, actual result, expected result, and owner.
-Use a focused reproduction and the [README checks](README.md#checks-and-build).
-For an IPC change, include a real request and response.
-Complete an independent review before acceptance.
+- Mọi khả năng trong phạm vi đều vượt qua luồng nền tảng của nó hoặc có quyết định bị chặn hoặc trì hoãn rõ ràng.
+- Các gói đã xuất bản, CEF artifact và chữ ký khớp với đường cơ sở đã chọn.
+- Hợp đồng TypeScript và C# đồng ý, lỗi lan truyền và các hoạt động Godot vẫn nằm trên luồng chính.
+- Luồng desktop hoàn chỉnh đi qua mỗi nền tảng chấp nhận.
+- Các mục bị trì hoãn vẫn giữ quyền sở hữu rõ ràng và các điều kiện mở lại.
 
-[Platform verification](docs/verification.md) and [ablation review](docs/ablation-review.md) retain dated evidence.
-The [full previous migration record](https://github.com/BeanDz/airi/blob/ef7eb50e5a76265f2675e9072a7430d2dc46f09c/apps/stage-tamagotchi-kirie/MIGRATION.md) retains longer narratives.
-This document reorganization adds no runtime acceptance.
+Đối với một lỗi mới, hãy ghi lại thông tin đầu vào, kết quả thực tế, kết quả mong đợi và chủ sở hữu của nó. Sử dụng bản sao tập trung và [README sẽ kiểm tra](README.md#checks-and-build). Đối với thay đổi IPC, hãy bao gồm yêu cầu và phản hồi thực. Hoàn thành đánh giá độc lập trước khi chấp nhận.
+
+[Kiểm tra nền tảng](docs/verification.md) và [đánh giá loại bỏ thành phần](docs/ablation-review.md) lưu bằng chứng kèm ngày tháng. [Bản ghi di chuyển đầy đủ trước đây](https://github.com/BeanDz/airi/blob/ef7eb50e5a76265f2675e9072a7430d2dc46f09c/apps/stage-tamagotchi-kirie/MIGRATION.md) giữ các mô tả dài hơn. Việc sắp xếp lại tài liệu này không bổ sung kết quả nghiệm thu runtime.

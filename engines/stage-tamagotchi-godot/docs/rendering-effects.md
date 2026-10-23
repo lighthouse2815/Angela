@@ -1,12 +1,14 @@
-# Rendering Effect Placement
+<a id="rendering-effect-placement"></a>
 
-This note records the current design direction for custom stage rendering
-effects. The goal is to keep vendored MToon shaders stable unless an effect
-truly needs to participate in base material shading.
+# Vị trí hiệu ứng kết xuất
 
-## Current Direction
+Ghi chú này ghi lại hướng thiết kế hiện tại cho các hiệu ứng hiển thị stage tùy chỉnh. Mục tiêu là giữ cho các shader MToon được bán ổn định trừ khi một hiệu ứng thực sự cần tham gia vào việc tạo bóng vật liệu cơ bản.
 
-Prefer this split for avatar and stage visual effects:
+<a id="current-direction"></a>
+
+## Hướng hiện tại
+
+Thích sự phân chia này cho hình đại diện và hiệu ứng hình ảnh stage:
 
 ```text
 MToon / base material
@@ -21,110 +23,74 @@ CompositorEffect
   final custom color mapping before display output.
 ```
 
-For avatar glow, this means:
+Đối với hình đại diện phát sáng, điều này có nghĩa là:
 
-- `StageRenderEffectsRuntime` wires the stage-level overlay and compositor
-  owners for the active camera and loaded avatar.
-- `StageMaterialOverlayOwner` records render-effect source claims and assigns
-  the shared avatar mask overlay material. The overlay depth-tests against the
-  scene and writes stencil reference `1` without writing scene depth.
-- `StagePostProcessCompositorEffect` always owns the final NAES/toon color
-  mapping stage. Its internal pipeline currently runs scene copy, avatar glow,
-  and final color mapping in that order.
-- When avatar glow is active, it extracts bright source from the stencil-marked
-  scene color, diffuses it, and composites avatar glare into the HDR input
-  consumed by final color mapping.
-- The vendored V-Sekai MToon shader remains responsible for the avatar's base
-  material look.
+- `StageRenderEffectsRuntime` kết nối chủ sở hữu lớp phủ và bộ tổng hợp stage-level cho máy ảnh đang hoạt động và hình đại diện đã tải.
+- `StageMaterialOverlayOwner` ghi lại các xác nhận quyền sở hữu nguồn hiệu ứng kết xuất và chỉ định vật liệu lớp phủ mặt nạ hình đại diện được chia sẻ. Kiểm tra độ sâu lớp phủ đối với cảnh và ghi tham chiếu stencil `1` mà không ghi độ sâu cảnh.
+- `StagePostProcessCompositorEffect` luôn sở hữu bản đồ màu NAES/toon cuối cùng stage. Đường dẫn nội bộ của nó hiện đang chạy bản sao cảnh, ánh sáng hình đại diện và ánh xạ màu cuối cùng theo thứ tự đó.
+- Khi ánh sáng hình đại diện được kích hoạt, nó sẽ trích xuất nguồn sáng từ màu cảnh được đánh dấu bằng stencil, khuếch tán nó và ánh sáng hình đại diện tổng hợp vào đầu vào HDR được sử dụng bởi ánh xạ màu cuối cùng.
+- Trình tạo bóng V-Sekai MToon được cung cấp vẫn chịu trách nhiệm về giao diện vật liệu cơ bản của hình đại diện.
 
-Current implementation details:
+Chi tiết triển khai hiện tại:
 
-- `StageCompositorOwner` owns the active `Camera3D` compositor slot and registers
-  the stage post-process compositor effect without feature runtimes replacing
-  the camera compositor independently.
-- `StageMaterialOverlayOwner` owns `GeometryInstance3D.MaterialOverlay` writes
-  for stage render-effect source passes.
-- The compositor effect owns its transient post-process textures. It uses Godot's
-  `FramebufferCacheRD` and `UniformSetCacheRD` for derived framebuffer and
-  uniform-set RIDs, while texture ownership stays local to the stage
-  post-process pass graph.
-- The final NAES/toon color mapping is a separate compositor stage and no
-  longer depends on avatar glow being enabled. Later source effects can feed the
-  same final color stage before display output after same-scene visual
-  comparison.
-- Godot Environment Glow is disabled in `StageVisualPreset`; avatar-style glow
-  source selection comes from the shared stencil overlay, not from material
-  emission.
+- `StageCompositorOwner` sở hữu khe cắm bộ tổng hợp `Camera3D` đang hoạt động và đăng ký hiệu ứng bộ tổng hợp hậu xử lý stage mà không có tính năng runtime thay thế bộ tổng hợp máy ảnh một cách độc lập.
+- `StageMaterialOverlayOwner` sở hữu ghi `GeometryInstance3D.MaterialOverlay` cho các đường truyền nguồn hiệu ứng kết xuất stage.
+- Hiệu ứng tổng hợp sở hữu kết cấu hậu xử lý tạm thời. Nó sử dụng `FramebufferCacheRD` và `UniformSetCacheRD` của Godot cho bộ đệm khung dẫn xuất và RID được thiết lập đồng nhất, trong khi quyền sở hữu kết cấu vẫn cục bộ đối với biểu đồ vượt qua quá trình hậu xử lý stage.
+- Ánh xạ màu NAES/toon cuối cùng là một bộ tổng hợp stage riêng biệt và không còn phụ thuộc vào việc bật ánh sáng hình đại diện nữa. Các hiệu ứng nguồn sau này có thể cung cấp cùng màu cuối cùng stage trước khi xuất ra màn hình sau khi so sánh hình ảnh trong cùng một cảnh.
+- Godot Môi trường Glow bị vô hiệu hóa trong `StageVisualPreset`; Lựa chọn nguồn phát sáng kiểu avatar đến từ lớp phủ stencil được chia sẻ, không phải từ sự phát xạ vật liệu.
 
-## Why Overlay First
+<a id="why-overlay-first"></a>
 
-`MaterialOverlay` is instance-local and renders an additional material over the
-same geometry. It can add semantic render data without replacing the imported
-MToon material.
+## Tại sao nên phủ lớp đầu tiên
 
-Use overlay first when an effect can be represented as an extra whole-geometry
-pass:
+`MaterialOverlay` là phiên bản cục bộ và hiển thị vật liệu bổ sung trên cùng một hình dạng. Nó có thể thêm dữ liệu kết xuất ngữ nghĩa mà không thay thế tài liệu MToon đã nhập.
 
-- stencil or object-mask tagging;
-- avatar mask selection for glow and future avatar-only effects;
-- silhouette, outline, selection, or interaction masks;
-- depth-tested x-ray or rim/shell source passes;
-- temporary verification passes that should not mutate imported materials.
+Trước tiên hãy sử dụng lớp phủ khi một hiệu ứng có thể được biểu diễn dưới dạng toàn bộ hình học bổ sung:
 
-This avoids patching every vendored MToon shader variant for effects that do
-not belong to the material's base shading model.
+- gắn thẻ stencil hoặc mặt nạ đối tượng;
+- lựa chọn mặt nạ hình đại diện để phát sáng và các hiệu ứng chỉ dành cho hình đại diện trong tương lai;
+- mặt nạ hình bóng, đường viền, lựa chọn hoặc tương tác;
+- nguồn tia X hoặc rim/shell đã được kiểm tra độ sâu;
+- giấy phép xác minh tạm thời không làm thay đổi nguyên liệu nhập khẩu.
 
-## Where Overlay Stops
+Điều này tránh việc vá mọi biến thể trình đổ bóng MToon được cung cấp cho các hiệu ứng không thuộc về lớp tạo bóng cơ bản mô hình của vật liệu.
 
-Overlay is not a general replacement for shader ownership.
+<a id="where-overlay-stops"></a>
 
-Do not rely on overlay alone when the effect needs to change the base material
-result before post-processing:
+## Nơi lớp phủ dừng lại
 
-- MToon ramp, shade color, or lighting response;
-- shadow attenuation or direct-light behavior;
-- normal-dependent toon bands inside the material;
-- texture-driven or UV-driven per-surface masks unavailable to the overlay
-  pass;
-- skin, hair, cloth, or accessory behavior that must differ inside one imported
-  mesh.
+Lớp phủ không phải là sự thay thế chung cho quyền sở hữu trình đổ bóng.
 
-Those cases need an owned shader contract, an importer/material patch, or extra
-authoring data that the overlay pass can read.
+Không chỉ dựa vào lớp phủ khi hiệu ứng cần thay đổi kết quả vật liệu cơ bản trước khi xử lý hậu kỳ:
 
-## Known Constraints
+- Đường dốc MToon, màu bóng hoặc phản ứng ánh sáng;
+- sự suy giảm bóng hoặc hành vi ánh sáng trực tiếp;
+- các dải hoạt hình phụ thuộc bình thường bên trong vật liệu;
+- mặt nạ trên mỗi bề mặt được điều khiển bằng kết cấu hoặc được điều khiển bằng UV không có sẵn cho thẻ lớp phủ;
+- hành vi của da, tóc, vải hoặc phụ kiện phải khác nhau bên trong một lưới nhập khẩu.
 
-- `MaterialOverlay` is a single slot on each `GeometryInstance3D`. Multiple
-  effects must go through `StageMaterialOverlayOwner` instead of assigning it
-  independently.
-- `Camera3D.Compositor` is also a single owner slot. Additional post effects
-  must be registered through the stage compositor owner instead of independently
-  replacing the camera compositor.
-- The overlay material applies to the whole geometry and all surfaces unless
-  the mesh is split or the overlay shader has reliable mask data.
-- Overlay adds draw work for every marked geometry. This is acceptable for the
-  current avatar path, but it should be measured before expanding it to many
-  scene objects.
-- Transparent occluders may not block overlay-derived masks when they do not
-  write depth. Opaque depth-tested occluders should block the current avatar
-  glow stencil source.
-- Screen-space diffusion, blur pyramids, and color mapping still belong in a
-  same-frame compositor. Overlay should produce source information, not replace
-  the compositor pass graph.
-- The current final color mapping still lives inside the stage post-process
-  compositor, but it is an independently enabled stage, not a glow sub-pass.
+Những trường hợp đó cần có hợp đồng đổ bóng thuộc sở hữu, bản vá importer/material hoặc dữ liệu tác giả bổ sung mà thẻ lớp phủ có thể đọc.
 
-## Decision Rule
+<a id="known-constraints"></a>
 
-Use the least invasive layer that has the data and timing required by the
-effect:
+## Những hạn chế đã biết
 
-1. Use MToon or an owned material shader when the effect changes base material
-   shading.
-2. Use `MaterialOverlay` when the effect only needs an extra per-mesh pass or
-   semantic mask.
-3. Use `CompositorEffect` when the effect needs same-frame screen-space image
-   processing.
+- `MaterialOverlay` là một khe cắm duy nhất trên mỗi `GeometryInstance3D`. Nhiều hiệu ứng phải thông qua `StageMaterialOverlayOwner` thay vì gán độc lập.
+- `Camera3D.Compositor` cũng là một vị trí chủ sở hữu duy nhất. Các hiệu ứng bài đăng bổ sung phải được đăng ký thông qua chủ sở hữu bộ tổng hợp stage thay vì thay thế độc lập bộ tổng hợp máy ảnh.
+- Vật liệu lớp phủ áp dụng cho toàn bộ hình học và tất cả các bề mặt trừ khi lưới bị chia tách hoặc trình đổ bóng lớp phủ có dữ liệu mặt nạ đáng tin cậy.
+- Lớp phủ thêm công việc vẽ cho mọi hình học được đánh dấu. Điều này có thể chấp nhận được đối với đường dẫn hình đại diện hiện tại, nhưng cần đo lường trước khi mở rộng nó sang nhiều đối tượng trong cảnh.
+- Các bộ che trong suốt có thể không chặn các mặt nạ có nguồn gốc từ lớp phủ khi chúng không ghi độ sâu. Các bộ che phủ được kiểm tra độ sâu mờ sẽ chặn nguồn stencil phát sáng hình đại diện hiện tại.
+- Khuếch tán không gian màn hình, kim tự tháp mờ và ánh xạ màu vẫn thuộc về một bộ tổng hợp cùng khung. Lớp phủ sẽ tạo ra thông tin nguồn, không thay thế biểu đồ thông qua bộ tổng hợp.
+- Ánh xạ màu cuối cùng hiện tại vẫn tồn tại bên trong bộ tổng hợp xử lý hậu kỳ stage, nhưng nó là một stage được kích hoạt độc lập, không phải là một đường dẫn phụ phát sáng.
 
-Patch vendored MToon only when the required behavior cannot be expressed as an
-overlay source plus compositor work.
+<a id="decision-rule"></a>
+
+## Quy tắc quyết định
+
+Sử dụng lớp ít xâm lấn nhất có dữ liệu và thời gian theo yêu cầu của hiệu ứng:
+
+1. Sử dụng MToon hoặc trình đổ bóng vật liệu thuộc sở hữu của bạn khi hiệu ứng thay đổi độ bóng của vật liệu cơ bản.
+2. Sử dụng `MaterialOverlay` khi hiệu ứng chỉ cần thêm một đường chuyền trên mỗi lưới hoặc mặt nạ ngữ nghĩa.
+3. Sử dụng `CompositorEffect` khi hiệu ứng cần xử lý hình ảnh trong không gian màn hình cùng khung.
+
+Chỉ vá lỗi MToon được cung cấp khi hành vi được yêu cầu không thể được thể hiện dưới dạng nguồn lớp phủ cộng với công việc của bộ tổng hợp.

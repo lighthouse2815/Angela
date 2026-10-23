@@ -1,10 +1,12 @@
-# Extension Host Examples
+<a id="extension-host-examples"></a>
 
-Use these folders with the **Extension Host Inspector** at `/devtools/plugin-host`.
+# Ví dụ về phần mở rộng host
 
-- `devtools-sample-plugin` verifies the basic Extension lifecycle and permissions.
-- `activation-planner-provider` and `activation-planner-consumer` verify dependency planning.
+Sử dụng các thư mục này với **Extension host Inspector** tại `/devtools/plugin-host`.
 
-Import both Activation Planner examples. Enable the Provider first. Then enable the Consumer. The Host loads the Provider before the Consumer and stops the Consumer before the Provider.
+- `devtools-sample-plugin` xác minh vòng đời và quyền của Tiện ích mở rộng cơ bản.
+- `activation-planner-provider` và `activation-planner-consumer` xác minh việc lập kế hoạch phụ thuộc.
 
-The Provider only declares a Kit in its manifest. It does not register a runtime Kit implementation. Runtime Kit registration is outside the Phase 2 boundary.
+Nhập cả hai ví dụ về Công cụ lập kế hoạch kích hoạt. Trước tiên hãy kích hoạt nhà cung cấp. Sau đó kích hoạt bên sử dụng. host tải nhà cung cấp trước bên sử dụng và dừng bên sử dụng trước nhà cung cấp.
+
+nhà cung cấp chỉ khai báo một Kit trong bảng kê khai của nó. Nó không đăng ký triển khai Bộ công cụ runtime. Việc đăng ký Bộ runtime nằm ngoài ranh giới Giai đoạn 2.

@@ -1,9 +1,12 @@
-# Kirie host architecture
+<a id="kirie-host-architecture"></a>
 
-[Migration status](../MIGRATION.md) owns acceptance and deferred work.
-[README](../README.md) owns setup. [Ablation review](ablation-review.md) owns framework simplification decisions.
+# Kiến trúc Kirie host
 
-## Runtime and ownership
+[Trạng thái di chuyển](../MIGRATION.md) sở hữu công việc được chấp nhận và trì hoãn. [README](../README.md) sở hữu thiết lập. [Ablation review](ablation-review.md) sở hữu các quyết định đơn giản hóa khuôn khổ.
+
+<a id="runtime-and-ownership"></a>
+
+## runtime và quyền sở hữu
 
 ```text
 Vue renderer -> Angela Eventa contracts
@@ -11,96 +14,68 @@ Vue renderer -> Angela Eventa contracts
              -> Angela Godot handlers -> application windows and services
 ```
 
-| Owner | Responsibility |
+| Chủ sở hữu | Trách nhiệm |
 | --- | --- |
-| Angela Kirie application | Renderer integration, native application windows, authentication, and permissions |
-| Kirie Core | WebView lifecycle and IPC transport |
-| Kirie Platform | General desktop capabilities |
-| Electron application | Supported application and behavior reference |
-| Angela Node services | Deferred server channel, plugins, Artistry, and MCP |
+| Ứng dụng Angela Kirie | Tích hợp renderer, cửa sổ ứng dụng native, xác thực và quyền |
+| Cốt lõi Kirie | Vòng đời WebView và IPC transport |
+| Nền tảng Kirie | Khả năng chung của desktop |
+| Ứng dụng điện tử | Tham khảo hành vi và ứng dụng được hỗ trợ |
+| Dịch vụ Angela Node | Kênh máy chủ trì hoãn, plugin, Artistry và MCP |
 
-The Kirie renderer uses one Kirie host adapter.
-Its owner supplies the required Platform client and one Eventa context per renderer.
-Kirie-local adapters do not select an Electron transport at runtime.
-The original Electron application and `engines/stage-tamagotchi-godot/` remain separate supported paths.
+Kirie renderer sử dụng một bộ chuyển đổi Kirie host. Chủ sở hữu của nó cung cấp ứng dụng khách Nền tảng được yêu cầu và một ngữ cảnh Eventa cho mỗi renderer. Bộ điều hợp cục bộ Kirie không chọn Electron transport tại runtime. Ứng dụng Electron ban đầu và `engines/stage-tamagotchi-godot/` vẫn có các đường dẫn được hỗ trợ riêng biệt.
 
-Deferred Node services do not start in the Kirie renderer bootstrap.
-Their visible pages remain outside supported capability until Angela supplies the runtime and lifecycle.
-A rejected operation does not establish an implementation.
+Các dịch vụ Node bị trì hoãn không khởi động trong bootstrap Kirie renderer. Các trang hiển thị của họ vẫn nằm ngoài khả năng được hỗ trợ cho đến khi Angela cung cấp runtime và vòng đời. Một hoạt động bị từ chối không thiết lập một triển khai.
 
-## Source map
+<a id="source-map"></a>
 
-| Path | Responsibility |
+## Bản đồ nguồn
+
+| Đường dẫn | Trách nhiệm |
 | --- | --- |
-| [src-web/src/renderer](../src-web/src/renderer) | Renderer, host adapters, routes, and entry points |
-| [src-web/src/shared](../src-web/src/shared) | Angela Eventa contracts |
-| [src-godot/scripts](../src-godot/scripts) | C# services, managers, permissions, and authentication |
-| [src-godot](../src-godot) | Native scenes |
-| `addons/kirie/` | Installed addon and CEF metadata from the [official release](https://github.com/moeru-ai/godot-kirie/releases/tag/v0.10.0) |
-| [tests/StageTamagotchiKirie.Tests](../tests/StageTamagotchiKirie.Tests) | C# contract checks |
-| [kirie.config.ts](../kirie.config.ts) | Web build, aliases, and route selection |
+| [src-web/src/renderer](../src-web/src/renderer) | Bộ điều hợp renderer, host, route và các điểm vào |
+| [src-web/src/shared](../src-web/src/shared) | Hợp đồng Angela Eventa |
+| [src-godot/scripts](../src-godot/scripts) | Dịch vụ, người quản lý, quyền và xác thực C# |
+| [src-godot](../src-godot) | Cảnh native |
+| `addons/kirie/` | Đã cài đặt addon và siêu dữ liệu CEF từ bản phát hành chính thức [](https://github.com/moeru-ai/godot-kirie/releases/tag/v0.10.0) |
+| [tests/StageTamagotchiKirie.Tests](../tests/StageTamagotchiKirie.Tests) | Kiểm tra hợp đồng C# |
+| [kirie.config.ts](../kirie.config.ts) | Xây dựng web, bí danh và lựa chọn route |
 
-The production Web entry is `res://src-web/dist/index.html`.
-The [C# development method](../../../engines/stage-tamagotchi-godot/docs/csharp-development-method.md) and [style guide](../../../engines/stage-tamagotchi-godot/docs/csharp-style.md) remain canonical.
+Mục Web sản xuất là `res://src-web/dist/index.html`. Phương pháp phát triển [C#](../../../engines/stage-tamagotchi-godot/docs/csharp-development-method.md) và hướng dẫn kiểu [](../../../engines/stage-tamagotchi-godot/docs/csharp-style.md) vẫn chuẩn.
 
-## Required behavior
+<a id="required-behavior"></a>
 
-### Window and context lifecycle
+## Hành vi bắt buộc
 
-Main receives `synced-leader=true` before Pinia initialization. Followers receive `synced-leader=false`.
-Chat and Spotlight use `stage-runtime=minimal`.
-Pointer, display, window-action, and lifecycle adapters borrow the same host context.
-Display placement uses one atomic snapshot. Kirie's pointer-inside result overrides stale renderer bounds.
+<a id="window-and-context-lifecycle"></a>
 
-Godot owns resize, movement, close requests, and child cleanup.
-Managers own window reuse, keyed Devtools lookup, route requests, and service attachments.
-Settings retains its latest route before readiness.
-Notice resolves once, with `true` for confirmation and `false` for cancellation or close.
-These requirements do not justify a generic manager for all window types.
+### Vòng đời của cửa sổ và ngữ cảnh
 
-Godot exits children before parents. Manager `TreeExiting` callbacks clear child references before Main disposes services.
-Caller-owned Eventa registrations end before their context or service.
-Readiness, focus grace periods, cancellation, and completion guards retain distinct meanings.
-See [Godot lifecycle](https://github.com/godotengine/godot/blob/4.7.2-stable/scene/main/node.cpp) and [Window](https://docs.godotengine.org/en/4.7/classes/class_window.html).
+Main nhận `synced-leader=true` trước khi khởi tạo Pinia. Người theo dõi nhận được `synced-leader=false`. Trò chuyện và Tiêu điểm sử dụng `stage-runtime=minimal`. Bộ điều hợp con trỏ, màn hình, hành động cửa sổ và vòng đời đều mượn cùng một bối cảnh host. Vị trí hiển thị sử dụng một ảnh chụp nhanh nguyên tử. Kết quả bên trong con trỏ của Kirie ghi đè giới hạn renderer cũ.
 
-Transparency requires alpha in the CEF background, root viewport, and each native window.
-The quit adapter retains its no-argument caller API and sends an explicit empty host payload.
+Godot sở hữu khả năng thay đổi kích thước, di chuyển, đóng yêu cầu và dọn dẹp trẻ em. Người quản lý sử dụng lại cửa sổ, tra cứu Devtools có khóa, yêu cầu route và tệp đính kèm dịch vụ. Cài đặt giữ lại route mới nhất của nó trước khi sẵn sàng. Thông báo được giải quyết một lần, với `true` để xác nhận và `false` để hủy hoặc đóng. Những yêu cầu này không chứng minh được một trình quản lý chung cho tất cả các loại cửa sổ.
 
-### Spotlight and permissions
+Godot thoát khỏi trẻ em trước cha mẹ. Trình quản lý `TreeExiting` gọi lại xóa các tham chiếu con trước khi Main loại bỏ các dịch vụ. Đăng ký Eventa do người gọi sở hữu kết thúc trước ngữ cảnh hoặc dịch vụ của họ. Các biện pháp bảo đảm về tính sẵn sàng, thời gian ân hạn tập trung, việc hủy bỏ và hoàn thành đều có ý nghĩa riêng biệt. Xem vòng đời [Godot](https://github.com/godotengine/godot/blob/4.7.2-stable/scene/main/node.cpp) và [Window](https://docs.godotengine.org/en/4.7/classes/class_window.html).
 
-Angela owns Spotlight's reusable native window, contracts, and `user://spotlight.cfg`.
-Its shortcut registration is separate from renderer-owned registrations. Renderer `unregisterAll` must not release Spotlight.
-Close and blur hide Spotlight. Notifications open Chat.
-`beforeunload` releases the shortcut registration during CEF reload.
-CEF `FocusMode` and `GrabFocus()` remain necessary.
+Độ trong suốt yêu cầu alpha trong nền CEF, khung nhìn gốc và mỗi cửa sổ native. Bộ điều hợp thoát vẫn giữ lại trình gọi không có đối số API và gửi tải trọng host trống rõ ràng.
 
-Angela owns microphone state in `user://permissions.cfg`.
-Only the exact main-renderer origin can capture audio. Other origins, windows, and permission types receive denial.
-The CEF `Signal` policy groups native request IDs behind one opaque prompt ID.
-Denial, modal close, the two-minute timeout, and shutdown deny pending requests.
-See the [CEF permission API](https://github.com/dsh0416/godot-cef/blob/v1.16.1/docs/api/methods.md#permission-handling).
+<a id="spotlight-and-permissions"></a>
 
-Every window that awaits permission state requires Angela handlers.
-`MicrophonePermissionService.Attach` supplies them, while only Main owns prompts.
-An explicit enable-button click resets stored denial. Automatic requests retain denial.
-The original Chat stall resulted from a missing handler before `chatStore.initialize()`.
-The upstream default-rejection proposal [kirie#87](https://github.com/moeru-ai/godot-kirie/pull/87) closed without merge.
+### Tiêu điểm và quyền
 
-### Authentication and desktop services
+Angela quản lý cửa sổ native dùng lại của Spotlight, các hợp đồng và `user://spotlight.cfg`. Việc đăng ký phím tắt này độc lập với đăng ký do renderer quản lý. `unregisterAll` của renderer không được hủy Spotlight. Đóng cửa sổ hoặc mất tiêu điểm sẽ ẩn Spotlight. Thông báo mở Chat. `beforeunload` hủy đăng ký phím tắt khi tải lại CEF. CEF `FocusMode` và `GrabFocus()` vẫn cần thiết.
 
-Angela owns system-browser OIDC with PKCE, state validation, and a temporary loopback listener.
-The renderer supplies the server URL and client ID before login. Logout cancels unfinished login.
-See [RFC 8252](https://www.rfc-editor.org/rfc/rfc8252.html).
+Angela sở hữu trạng thái micrô trong `user://permissions.cfg`. Chỉ có nguồn gốc renderer chính xác mới có thể phát ra âm thanh thu nhận dữ liệu. Các nguồn gốc, cửa sổ và loại quyền khác sẽ bị từ chối. Chính sách CEF `Signal` nhóm các ID yêu cầu native phía sau một prompt ID mờ. Từ chối, đóng phương thức, thời gian chờ hai phút và tắt máy từ chối các yêu cầu đang chờ xử lý. Xem quyền [CEF API](https://github.com/dsh0416/godot-cef/blob/v1.16.1/docs/api/methods.md#permission-handling).
 
-External HTTP(S) requests use Platform `openExternalUrl()`.
-Angela rejects other schemes. Platform validates the absolute URL before `OS.shell_open()`.
-Disposal restores `window.open` and removes the click handler.
-The data-directory API accepts no caller path. Godot selects `OS.get_user_data_dir()` and propagates OS errors.
+Mọi cửa sổ đang chờ trạng thái cấp phép đều yêu cầu trình xử lý Angela. `MicrophonePermissionService.Attach` cung cấp cho họ, trong khi chỉ có Main sở hữu prompt. Một lần nhấp vào nút bật rõ ràng sẽ đặt lại từ chối đã lưu trữ. Yêu cầu tự động giữ lại sự từ chối. Gian hàng Trò chuyện ban đầu là do trình xử lý bị thiếu trước `chatStore.initialize()`. Đề xuất từ chối mặc định upstream [kirie#87](https://github.com/moeru-ai/godot-kirie/pull/87) đã đóng mà không hợp nhất.
 
-Inspector selection requires the leader target and a usable `devtoolsFrontendUrl`, irrespective of target order.
-Production disables remote debugging. See the [CEF security baseline](https://github.com/dsh0416/godot-cef/blob/v1.16.1/docs/api/security-baseline.md).
-A route-keyed boundary isolates renderer errors.
-The shared CEF context preserves cookies, storage, BroadcastChannel, and Web Locks across windows.
+<a id="authentication-and-desktop-services"></a>
 
-Tool reruns forward the shared `invocationId` to select one invocation among repeated `toolCallId` values.
-The [shared rerun implementation](../../../packages/stage-ui/src/stores/tool-call-rerun.ts) owns target rejection, result replacement, and dependent continuation invalidation.
+### Dịch vụ xác thực và desktop
+
+Angela sở hữu trình duyệt hệ thống OIDC với PKCE, xác thực trạng thái và trình nghe vòng lặp tạm thời. renderer cung cấp cho máy chủ URL và máy khách ID trước khi đăng nhập. Đăng xuất hủy đăng nhập chưa hoàn thành. Xem [RFC 8252](https://www.rfc-editor.org/rfc/rfc8252.html).
+
+Các yêu cầu HTTP(S) bên ngoài sử dụng Nền tảng `openExternalUrl()`. Angela từ chối những âm mưu khác. Nền tảng xác thực URL tuyệt đối trước `OS.shell_open()`. Việc xử lý sẽ khôi phục `window.open` và xóa trình xử lý nhấp chuột. Thư mục dữ liệu API không chấp nhận đường dẫn người gọi. Godot chọn `OS.get_user_data_dir()` và truyền bá các lỗi OS.
+
+Việc lựa chọn thanh tra yêu cầu mục tiêu dẫn đầu và `devtoolsFrontendUrl` có thể sử dụng được, bất kể thứ tự mục tiêu. Quá trình sản xuất vô hiệu hóa việc gỡ lỗi từ xa. Xem đường cơ sở bảo mật [CEF](https://github.com/dsh0416/godot-cef/blob/v1.16.1/docs/api/security-baseline.md). Ranh giới có khóa route sẽ cách ly các lỗi renderer. Ngữ cảnh CEF được chia sẻ sẽ bảo tồn cookie, bộ lưu trữ, BroadcastChannel và Khóa Web trên các cửa sổ.
+
+Công cụ chạy lại chuyển tiếp `invocationId` được chia sẻ để chọn một lệnh gọi trong số các giá trị `toolCallId` lặp lại. Triển khai chạy lại [ được chia sẻ](../../../packages/stage-ui/src/stores/tool-call-rerun.ts) sở hữu tính năng từ chối mục tiêu, thay thế kết quả và vô hiệu hóa tính năng tiếp tục phụ thuộc.

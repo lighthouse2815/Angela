@@ -1,201 +1,124 @@
-# Stage Tamagotchi
+<a id="stage-tamagotchi"></a>
 
-The Electron desktop app runs Angela characters, chat, voice, and desktop tools.
-Shared character behavior belongs in `packages/stage-ui`. Use `stage-web` for browser-only features.
+# stage Tamagotchi
 
-## Shared local configuration
+Ứng dụng Electron desktop chạy các công cụ nhân vật, trò chuyện, giọng nói và desktop của Angela. Hành vi ký tự được chia sẻ thuộc về `packages/stage-ui`. Sử dụng `stage-web` cho các tính năng chỉ dành cho trình duyệt.
 
-Desktop shares direct provider settings and the chat model with CLI and locally served web through `~/.config/angela/config.json`.
-Set `ANGELA_CONFIG` before starting the application to select another file.
-The main process owns file access through Eventa IPC. Only the Pinia leader persists completed settings actions.
-Existing direct providers import once per profile. External edits refresh every 1.5 seconds.
-Account sessions and interface preferences remain with their current stores.
-See [local configuration](../../packages/local-config/README.md) for the file contract.
+<a id="shared-local-configuration"></a>
 
-## Development
+## Cấu hình cục bộ được chia sẻ
 
-From the repository root, run `pnpm install`, then `pnpm dev:desktop`.
-Run `pnpm -F @angela/desktop build` to build the app.
+desktop chia sẻ cài đặt nhà cung cấp trực tiếp và trò chuyện mô hình với CLI cũng như web được phục vụ cục bộ thông qua `~/.config/angela/config.json`. Đặt `ANGELA_CONFIG` trước khi khởi động ứng dụng để chọn tệp khác. Quá trình chính sở hữu quyền truy cập tệp thông qua Eventa IPC. Chỉ người lãnh đạo Pinia mới tiếp tục thực hiện các hành động cài đặt đã hoàn thành. Nhập nhà cung cấp trực tiếp hiện có một lần cho mỗi hồ sơ. Các chỉnh sửa bên ngoài được làm mới sau mỗi 1,5 giây. Phiên tài khoản và tùy chọn giao diện vẫn giữ nguyên với store hiện tại của họ. Xem [cấu hình cục bộ](../../packages/local-config/README.md) để biết hợp đồng tệp.
 
-## Local model files
+<a id="development"></a>
 
-Sherpaw downloads remote model files into the app user data directory. The main
-process serves installed files to the renderer through `airi-model`. The desktop
-release bundles X-ASR through `airi-sherpaw`. Sherpaw settings control
-remote downloads. The Resource Status Island shows transfer progress and errors.
+## Phát triển
 
-## Computer use
+Từ thư mục gốc của kho lưu trữ, hãy chạy `pnpm install`, sau đó là `pnpm dev:desktop`. Chạy `pnpm -F @angela/desktop build` để xây dựng ứng dụng.
 
-The desktop chat composer starts with **Use computer** on. Turn it off to send a request without desktop access.
-The selection is local to the composer. A new composer starts with it on. While a request runs, its selection is locked.
-Turn it off before sending messages that must not receive computer-use tools.
+<a id="local-model-files"></a>
 
-Only the current selection grants access, including retries and tool reruns. Historical messages do not grant access.
-The selected request receives `computer_use`, `computer_use_press_key`, `computer_use_paste_text`, `computer_use_windows`, `computer_use_read_image`, and the learning directory tools described below.
-The first tool accepts AUV arguments, such as `["invoke", "window.list"]`.
-Use `["invoke", "--help"]` and command-specific help to discover supported operations.
-The image tool returns a screenshot as model image content. It accepts only PNG and JPEG artifacts inside the app's computer-use store.
-Use a model and provider that support tool calls for visual tasks.
-With **Use the vision model for tool images** on, the vision model reads the screenshot first for a chat model whose provider does not report image input.
-The chat model then gets a text description. It has the visible text and layout, but no pixel positions.
-Use AUV commands such as `screen.findText` to get coordinates.
+## Các tệp mô hình cục bộ
 
-Electron starts the matching AUV SDK and CLI on demand, over a private Unix socket or Windows named pipe.
-It serializes commands across windows, stores artifacts under the app's user-data directory, and stops the daemon during app shutdown.
-The CLI runs without a shell. Model arguments cannot change the device, endpoint, run, or storage root.
-Nonzero exits retain AUV output and failure details as tool errors. A zero exit code does not prove that the intended UI change occurred.
+Sherpaw tải các tệp mô hình từ xa vào thư mục dữ liệu người dùng ứng dụng. Quá trình chính cung cấp các tệp đã cài đặt cho renderer thông qua `airi-model`. Bản phát hành desktop bao gồm X-ASR đến `airi-sherpaw`. Cài đặt Sherpaw kiểm soát tải xuống từ xa. Đảo trạng thái tài nguyên hiển thị tiến trình truyền và lỗi.
 
-On macOS, grant Accessibility and Screen Recording permissions to the launching app when the OS requests them.
-Some application actions also need Automation permission. If `app.probePermissions` reports missing screen-recording permission, a capture can contain only the desktop background despite exit code zero. Available commands depend on the OS and AUV backend.
-Use this feature for local native applications. It does not expose a remote-device gateway or replace the separate `services/computer-use-mcp` service.
+<a id="computer-use"></a>
 
-### Angela Browser
+## Sử dụng máy tính
 
-New desktop MCP configurations include `angela-browser`. Existing configurations stay unchanged.
-The server supplies navigation, accessibility snapshots, forms, tabs, uploads, screenshots, PDF output, and browser debugging.
-The existing MCP bridge discovers these tools and registers them with the chat model.
-Use a model that supports tool calls.
+Trình soạn thảo trò chuyện desktop bắt đầu bằng cách bật **Sử dụng máy tính**. Tắt nó để gửi yêu cầu mà không có quyền truy cập desktop. Việc lựa chọn mang tính cục bộ đối với nhà soạn nhạc. Một nhà soạn nhạc mới bắt đầu với nó. Trong khi yêu cầu chạy, lựa chọn của nó bị khóa. Tắt nó đi trước khi gửi tin nhắn không được nhận các công cụ sử dụng máy tính.
 
-Install Node.js with npm and `npx` on the desktop host. The first server start downloads the pinned runtime.
-The default browser is Chrome. Install Chrome before the first browser action.
+Chỉ lựa chọn hiện tại mới cấp quyền truy cập, bao gồm cả các lần thử lại và chạy lại công cụ. Tin nhắn lịch sử không cấp quyền truy cập. Yêu cầu đã chọn sẽ nhận được `computer_use`, `computer_use_press_key`, `computer_use_paste_text`, `computer_use_windows`, `computer_use_read_image` và các công cụ thư mục học tập được mô tả bên dưới. Công cụ đầu tiên chấp nhận các đối số AUV, chẳng hạn như `["invoke", "window.list"]`. Sử dụng `["invoke", "--help"]` và trợ giúp dành riêng cho lệnh để khám phá các hoạt động được hỗ trợ. Công cụ hình ảnh trả về ảnh chụp màn hình dưới dạng nội dung hình ảnh mô hình. Nó chỉ chấp nhận PNG và JPEG artifact bên trong store sử dụng máy tính của ứng dụng. Sử dụng mô hình và nhà cung cấp hỗ trợ các lệnh gọi công cụ cho các tác vụ trực quan. Khi **Sử dụng tầm nhìn mô hình cho hình ảnh công cụ** bật, tầm nhìn mô hình sẽ đọc ảnh chụp màn hình trước tiên cho cuộc trò chuyện mô hình có nhà cung cấp không báo cáo đầu vào hình ảnh. Cuộc trò chuyện mô hình sau đó sẽ nhận được mô tả bằng văn bản. Nó có văn bản và bố cục hiển thị nhưng không có vị trí pixel. Sử dụng các lệnh AUV như `screen.findText` để lấy tọa độ.
 
-For an existing configuration:
+Electron khởi động AUV SDK và CLI phù hợp theo yêu cầu, qua một đường ống có tên Unix socket hoặc Windows riêng. Nó tuần tự hóa các lệnh trên các cửa sổ, store artifact trong thư mục dữ liệu người dùng của ứng dụng và dừng daemon khi tắt ứng dụng. CLI chạy mà không cần shell. Đối số mô hình không thể thay đổi thiết bị, điểm cuối, chạy hoặc gốc lưu trữ. Các lối thoát khác 0 giữ lại chi tiết lỗi và đầu ra AUV dưới dạng lỗi công cụ. Mã thoát bằng 0 không chứng minh rằng đã xảy ra thay đổi UI dự định.
 
-1. Open **Settings → Modules → MCP** and open the configuration file.
-2. Run `pnpm -F @angela/desktop setup:browser /absolute/path/to/mcp.json` from the repository root.
-3. In MCP settings, apply and restart the servers.
-4. Check that `angela-browser` runs and its connection test lists browser tools.
-5. Ask Angela to open a website, read its content, and complete a form.
+Trên macOS, cấp quyền Trợ năng và Ghi màn hình cho ứng dụng đang khởi chạy khi OS yêu cầu chúng. Một số hành động của ứng dụng cũng cần có quyền Tự động hóa. Nếu `app.probePermissions` báo cáo thiếu quyền ghi màn hình thì thu nhận dữ liệu chỉ có thể chứa nền desktop mặc dù mã thoát là 0. Các lệnh khả dụng phụ thuộc vào phần phụ trợ OS và AUV. Sử dụng tính năng này cho các ứng dụng native cục bộ. Nó không hiển thị cổng thiết bị từ xa hoặc thay thế dịch vụ `services/computer-use-mcp` riêng biệt.
 
-The setup command preserves other servers and any existing `angela-browser` entry, including disabled entries.
-Browser tools use the existing MCP registration path. The **Use computer** switch controls native AUV tools separately.
-Disable `angela-browser` in MCP settings to remove browser access.
+<a id="angela-browser"></a>
 
-The browser uses a persistent automation profile. Sign in inside that browser to retain sessions.
-To connect an existing Chrome instance, append `--cdp-endpoint` and its local endpoint to the server arguments.
-For a browser without a visible window, append `--headless`.
-Keep profile data and downloaded private files outside Git.
+### Trình duyệt Angela
 
-The runtime uses the published `@playwright/mcp` package at version `0.0.83` under Apache-2.0.
-Its package retains the required third-party license notices. Angela Browser is the integration name.
+Cấu hình desktop MCP mới bao gồm `angela-browser`. Cấu hình hiện tại không thay đổi. Máy chủ cung cấp điều hướng, ảnh chụp nhanh khả năng truy cập, biểu mẫu, tab, tải lên, ảnh chụp màn hình, đầu ra PDF và gỡ lỗi trình duyệt. Cầu MCP hiện có phát hiện ra các công cụ này và đăng ký chúng với trò chuyện mô hình. Sử dụng mô hình hỗ trợ lệnh gọi công cụ.
 
-### Literal text and Vietnamese
+Cài đặt Node.js với npm và `npx` trên desktop host. Máy chủ đầu tiên bắt đầu tải xuống runtime đã được ghim. Trình duyệt mặc định là Chrome. Cài đặt Chrome trước hành động đầu tiên của trình duyệt.
 
-Use `computer_use_paste_text` for literal text, including Vietnamese, after focusing the intended input.
-On Niri with `AUV_LINUX_INPUT_BACKEND=uinput`, wl-clipboard supplies the system selection and AUV sends Ctrl+V.
-Install `wl-copy` and `wl-paste` from [wl-clipboard](https://github.com/bugaevc/wl-clipboard). Text travels through stdin, outside process arguments.
-Other Linux uinput desktops retain the Electron clipboard adapter.
-This path does not need the RemoteDesktop clipboard portal. Other backends use native AUV paste.
-Desktop operations share one queue, so another tool call cannot interrupt the paste sequence.
-Host clipboard adapters accept only plain text formats. It refuses images, HTML, and custom formats before input.
-It restores the previous text unless the clipboard changes during delivery. A new user copy takes precedence.
-The tool reports delivery without claiming that the application received the text. Inspect the resulting UI.
+Đối với cấu hình hiện có:
 
-### Native window selection on Niri
+1. Mở **Cài đặt → Mô-đun → MCP** và mở tệp cấu hình.
+2. Chạy `pnpm -F @angela/desktop setup:browser /absolute/path/to/mcp.json` từ kho lưu trữ gốc.
+3. Trong cài đặt MCP, áp dụng và khởi động lại máy chủ.
+4. Kiểm tra xem `angela-browser` có chạy không và kiểm tra kết nối của nó có liệt kê các công cụ trình duyệt hay không.
+5. Yêu cầu Angela mở một trang web, đọc nội dung và điền vào biểu mẫu.
 
-On Linux Niri, `computer_use_windows` lists native compositor windows and focuses an exact returned ID.
-Use a title substring to limit the results to the intended application. Results contain at most 200 matches.
-The host enables this backend only when the Niri socket is present. Other desktops use their existing AUV commands.
-Niri IDs differ from AUV accessibility IDs. Never pass a Niri ID as an AUV `--target`.
-After focus, pass `windowId` to `computer_use_press_key`, `computer_use` input commands, and `computer_use_paste_text`.
-The key tool accepts a key or shortcut such as `ctrl+1`, `ctrl+a`, or `ctrl+s`, without CLI arguments.
-The host checks compositor focus immediately before native input, after daemon startup. A changed focus rejects input.
-Guarded paste also checks focus before touching the clipboard. Calls share the same desktop queue.
-Focus confirms the selected window, without verifying its document contents. Inspect the resulting application state.
-Existing calls without `windowId` retain their current foreground behavior.
+Lệnh thiết lập sẽ bảo vệ các máy chủ khác và mọi mục nhập `angela-browser` hiện có, bao gồm cả các mục nhập bị vô hiệu hóa. Các công cụ trình duyệt sử dụng đường dẫn đăng ký MCP hiện có. Công tắc **Sử dụng máy tính** điều khiển riêng các công cụ native AUV. Tắt `angela-browser` trong cài đặt MCP để xóa quyền truy cập trình duyệt.
 
-### Native development build
+Trình duyệt sử dụng cấu hình tự động hóa liên tục. Đăng nhập vào bên trong trình duyệt đó để giữ lại phiên. Để kết nối phiên bản Chrome hiện có, hãy thêm `--cdp-endpoint` và điểm cuối cục bộ của nó vào đối số máy chủ. Đối với trình duyệt không có cửa sổ hiển thị, hãy thêm `--headless`. Giữ dữ liệu hồ sơ và các tệp riêng tư đã tải xuống bên ngoài Git.
 
-If the bundled Linux CLI reports a missing shared library, build against the system libraries:
+runtime sử dụng gói `@playwright/mcp` đã xuất bản ở phiên bản `0.0.83` trong Apache-2.0. Gói của nó giữ lại các thông báo giấy phép của bên thứ ba cần thiết. Angela Browser là tên tích hợp.
+
+<a id="literal-text-and-vietnamese"></a>
+
+### Văn bản chữ và tiếng Việt
+
+Sử dụng `computer_use_paste_text` cho văn bản chữ, bao gồm cả tiếng Việt, sau khi tập trung vào mục nhập dự kiến. Trên Niri với `AUV_LINUX_INPUT_BACKEND=uinput`, wl-clipboard cung cấp lựa chọn hệ thống và AUV gửi Ctrl+V. Cài đặt `wl-copy` và `wl-paste` từ [wl-clipboard](https://github.com/bugaevc/wl-clipboard). Văn bản di chuyển qua stdin, các đối số quy trình bên ngoài. Các máy tính để bàn uinput Linux khác vẫn giữ lại bộ chuyển đổi clipboard Electron. Đường dẫn này không cần cổng clipboard RemoteDesktop. Các chương trình phụ trợ khác sử dụng dán native AUV. Các hoạt động desktop chia sẻ một hàng đợi, do đó một lệnh gọi công cụ khác không thể làm gián đoạn trình tự dán. Bộ điều hợp clipboard host chỉ chấp nhận các định dạng văn bản thuần túy. Nó từ chối hình ảnh, HTML và các định dạng tùy chỉnh trước khi nhập. Nó khôi phục văn bản trước đó trừ khi bảng nhớ tạm thay đổi trong quá trình phân phối. Một bản sao người dùng mới được ưu tiên. Công cụ báo cáo việc gửi mà không tuyên bố rằng ứng dụng đã nhận được văn bản. Kiểm tra UI thu được.
+
+<a id="native-window-selection-on-niri"></a>
+
+### Lựa chọn cửa sổ native trên Niri
+
+Trên Linux Niri, `computer_use_windows` liệt kê các cửa sổ bộ tổng hợp native và tập trung vào ID được trả về chính xác. Sử dụng chuỗi con tiêu đề để giới hạn kết quả cho ứng dụng dự định. Kết quả chứa tối đa 200 kết quả phù hợp. host chỉ kích hoạt chương trình phụ trợ này khi có Niri socket. Các máy tính để bàn khác sử dụng các lệnh AUV hiện có của chúng. ID Niri khác với ID trợ năng AUV. Không bao giờ chuyển Niri ID thành AUV `--target`. Sau khi lấy nét, chuyển `windowId` sang `computer_use_press_key`, lệnh nhập `computer_use` và `computer_use_paste_text`. Công cụ chính chấp nhận một phím hoặc phím tắt như `ctrl+1`, `ctrl+a` hoặc `ctrl+s` mà không có đối số CLI. host kiểm tra tiêu điểm của bộ tổng hợp ngay trước đầu vào native, sau khi khởi động daemon. Tiêu điểm đã thay đổi sẽ từ chối đầu vào. Dán bảo vệ cũng kiểm tra tiêu điểm trước khi chạm vào khay nhớ tạm. Các cuộc gọi chia sẻ cùng một hàng đợi desktop. Tiêu điểm xác nhận cửa sổ đã chọn mà không xác minh nội dung tài liệu của cửa sổ đó. Kiểm tra trạng thái ứng dụng kết quả. Các cuộc gọi hiện tại không có `windowId` vẫn giữ nguyên hành vi ở nền trước hiện tại của chúng.
+
+<a id="native-development-build"></a>
+
+### Xây dựng phát triển native
+
+Nếu Linux CLI đi kèm báo cáo thư viện dùng chung bị thiếu, hãy xây dựng dựa trên các thư viện hệ thống:
 
 ```sh
 pnpm -F @angela/desktop setup:computer-use
 pnpm dev:desktop
 ```
 
-Run these commands from the repository root. Install Rust and the [native build dependencies](https://github.com/moeru-ai/auv/tree/v0.0.28#install-with-cargo) first.
-The setup script builds the installed CLI version from its matching Git tag with the upstream lockfile.
-It uses debug mode and one compiler process to limit memory use.
+Chạy các lệnh này từ kho lưu trữ gốc. Trước tiên hãy cài đặt Rust và [bản dựng phụ thuộc ](https://github.com/moeru-ai/auv/tree/v0.0.28#install-with-cargo).
+Tập lệnh thiết lập xây dựng phiên bản CLI đã cài đặt từ thẻ Git phù hợp với tệp khóa upstream.
+Nó sử dụng chế độ gỡ lỗi và một quy trình biên dịch để hạn chế sử dụng bộ nhớ.
 With LLVM 22 or later, follow the [isolated libclang setup](../../docs/angela-setup.md#tương-tác-laptop) for the upstream Bindgen incompatibility.
 
-Executable selection follows this order:
+Lựa chọn có thể thực thi theo thứ tự sau:
 
-1. `AUV_BINARY_PATH`, when set to an absolute path.
-2. `.cache/auv/<installed-cli-version>/bin/auv` for development, when the file exists. Windows uses `auv.exe`.
-3. The bundled CLI. Packaged applications use its executable outside ASAR.
+1. `AUV_BINARY_PATH`, khi được đặt thành đường dẫn tuyệt đối.
+2. `.cache/auv/<installed-cli-version>/bin/auv` để phát triển khi tệp tồn tại. Windows sử dụng `auv.exe`.
+3. CLI đi kèm. Các ứng dụng đóng gói sử dụng khả năng thực thi của nó bên ngoài ASAR.
 
-The cache stays outside Git. A CLI upgrade selects a new cache directory and requires another native build.
+Bộ đệm nằm ngoài Git. Bản nâng cấp CLI chọn thư mục bộ đệm mới và yêu cầu bản dựng native khác.
 
-The desktop package includes the platform CLI as an optional dependency and unpacks its executable from ASAR.
-Do not omit optional dependencies when building an installer. Windows ARM64 and Linux musl do not have a matching CLI in this version.
+Gói desktop bao gồm nền tảng CLI dưới dạng phần phụ thuộc tùy chọn và giải nén tệp thực thi của nó khỏi ASAR. Đừng bỏ qua các phần phụ thuộc tùy chọn khi xây dựng trình cài đặt. Windows ARM64 và Linux không có CLI phù hợp trong phiên bản này.
 
-## Learning directory
+<a id="learning-directory"></a>
 
-With **Use computer** on, ask Angela to read a learning document and save a Markdown summary.
-`study_workspace_directory` opens the native folder picker. Only that picker grants directory access.
-Its `status` action inspects the selection. Its `clear` action revokes access and invalidates a pending picker.
-The selection is shared across desktop windows and expires when the app exits.
+## Thư mục học tập
 
-`study_workspace_list` lists subdirectories and supported documents. Listings contain at most 200 entries and scan at most 1,000 entries.
-`study_workspace_read` reads UTF-8 `.md`, `.markdown`, and `.txt` files up to 256 KiB.
-It also extracts text from `.pdf` files up to 10 MiB and 1,000 pages through [unpdf](https://github.com/unjs/unpdf).
-PDF results contain the relative path, total page count, numbered page text, and a `truncated` flag.
-PDF page numbers start at 1 and refer to physical pages, independent of printed labels.
-Optional `startPage` and `endPage` select an inclusive range of at most 20 pages.
-The default range contains 10 pages from `startPage`, or page 1 when absent, capped at the document end.
-Each PDF read returns at most 256 KiB of extracted text. Request fewer pages if this limit prevents a read.
-Read further ranges before a complete document summary. Partial ranges set `truncated` to true.
-Both tools accept relative paths within the selected directory. Hidden paths and symbolic links are refused.
-Document text goes to the selected chat provider as reference material. It is not a source of tool instructions or personal memories.
-Scanned pages require OCR, which is unsupported. Pages without extractable text produce an explicit error when the whole requested range is empty.
-Password-protected documents, legacy `.doc` files, and image documents are unsupported.
+Khi **Sử dụng máy tính** bật, hãy yêu cầu Angela đọc tài liệu học tập và lưu bản tóm tắt Markdown. `study_workspace_directory` mở bộ chọn thư mục native. Chỉ bộ chọn đó mới cấp quyền truy cập thư mục. Hành động `status` của nó sẽ kiểm tra việc lựa chọn. Hành động `clear` của nó sẽ thu hồi quyền truy cập và vô hiệu hóa bộ chọn đang chờ xử lý. Lựa chọn được chia sẻ trên các cửa sổ desktop và hết hạn khi ứng dụng thoát.
 
-DOCX extraction uses [Mammoth](https://github.com/mwilliamson/mammoth.js) with a pinned document-transform API and disabled external file access.
-DOCX files support up to 10 MiB compressed, 20 MiB expanded, and 1,000 ZIP entries.
-The result has `format: "docx"`, numbered `paragraphs`, and extraction `warnings`.
-Paragraphs contain body text, including standard headings and table-cell paragraphs. Empty paragraphs are excluded from the numbering.
-Each paragraph includes the nearest standard Heading 1–9 or Title text when available. Numbered Heading styles also include their level.
-Paragraph data fits within 256 KiB and 10,000 paragraphs. Oversized output produces an error rather than a partial read.
-Headers, footers, footnotes, endnotes, comments, and image text are outside the extracted body.
-DOCX paragraph numbers refer to the extraction order. They are not Word page numbers or numbered-list labels.
+`study_workspace_list` liệt kê các thư mục con và tài liệu được hỗ trợ. Danh sách chứa tối đa 200 mục và quét tối đa 1.000 mục. `study_workspace_read` đọc các tệp UTF-8 `.md`, `.markdown` và `.txt` lên tới 256 tệp KiB. Nó cũng trích xuất văn bản từ các tệp `.pdf` lên tới 10 MiB và 1.000 trang thông qua [unpdf](https://github.com/unjs/unpdf). Kết quả PDF chứa đường dẫn tương đối, tổng số trang, văn bản trang được đánh số và cờ `truncated`. Số trang PDF bắt đầu từ 1 và đề cập đến các trang vật lý, không phụ thuộc vào nhãn in. `startPage` và `endPage` tùy chọn chọn phạm vi bao gồm tối đa 20 trang. Phạm vi mặc định chứa 10 trang từ `startPage` hoặc trang 1 khi vắng mặt, được giới hạn ở cuối tài liệu. Mỗi lần đọc PDF trả về tối đa 256 KiB văn bản được trích xuất. Yêu cầu ít trang hơn nếu giới hạn này cản trở việc đọc. Đọc thêm các phạm vi trước khi tóm tắt tài liệu đầy đủ. Phạm vi một phần được đặt `truncated` thành true. Cả hai công cụ đều chấp nhận đường dẫn tương đối trong thư mục đã chọn. Đường dẫn ẩn và liên kết tượng trưng bị từ chối. Văn bản tài liệu chuyển đến cuộc trò chuyện nhà cung cấp đã chọn làm tài liệu tham khảo. Nó không phải là nguồn hướng dẫn công cụ hoặc ký ức cá nhân. Các trang được quét yêu cầu OCR, không được hỗ trợ. Các trang không có văn bản có thể trích xuất sẽ tạo ra lỗi rõ ràng khi toàn bộ phạm vi được yêu cầu trống. Các tài liệu được bảo vệ bằng mật khẩu, tệp `.doc` cũ và tài liệu hình ảnh không được hỗ trợ.
 
-`study_workspace_search` finds a literal phrase in a document or recursively within a directory. Use `path: "."` for the selected directory.
-Matches ignore letter case, preserve accents, and accept whitespace across line breaks. Regular expression characters remain literal.
-Each text file, PDF page, or DOCX paragraph contributes at most one excerpt, with its relative path and position.
-DOCX results include a paragraph number and the nearest heading when available. Phrases do not span separate DOCX paragraphs.
-Excerpts contain at most 600 characters. Search reads current local files and sends paths, excerpts, and scan status to the chat provider.
-One call inspects at most 200 queued paths, 50 directories, 50 documents, 100 PDF pages, and 500 DOCX paragraphs.
-Search text has a 2 MiB budget. Each directory retains the existing listing limits.
-Limits and unreadable files set `truncated`. Inspect `skipped` before a claim that content is absent.
-The `pending` array contains scopes to search next with the same query.
-Its `startPage` resumes a single PDF. Its `startParagraph` resumes a single DOCX.
-The `pending` and `skipped` arrays contain at most 20 entries each, so these lists can also be incomplete.
-Search excerpts do not grant note citations. Read the matched document or page before a full explanation or a saved source citation.
+Trích xuất DOCX sử dụng [Mammoth](https://github.com/mwilliamson/mammoth.js) với API chuyển đổi tài liệu được ghim và vô hiệu hóa quyền truy cập tệp bên ngoài. Các tệp DOCX hỗ trợ tối đa 10 MiB được nén, 20 MiB được mở rộng và 1.000 mục ZIP. Kết quả có `format: "docx"`, được đánh số `paragraphs` và trích xuất `warnings`. Đoạn văn chứa văn bản nội dung, bao gồm các tiêu đề tiêu chuẩn và các đoạn văn trong ô bảng. Các đoạn văn trống được loại trừ khỏi việc đánh số. Mỗi đoạn bao gồm văn bản Tiêu đề 1–9 hoặc Tiêu đề tiêu chuẩn gần nhất nếu có. Các kiểu Tiêu đề được đánh số cũng bao gồm cấp độ của chúng. Dữ liệu đoạn văn phù hợp với 256 KiB và 10.000 đoạn văn. Đầu ra quá khổ tạo ra lỗi thay vì đọc một phần. Đầu trang, chân trang, chú thích cuối trang, chú thích cuối, nhận xét và văn bản hình ảnh nằm ngoài nội dung được trích xuất. Số đoạn DOCX đề cập đến thứ tự trích xuất. Chúng không phải là số trang Word hoặc nhãn danh sách đánh số.
 
-`study_workspace_save_note` creates new Markdown files under `Angela Notes` within that directory.
-Notes contain at most 128 KiB. Existing files are never overwritten.
-The optional `sources` array accepts up to 20 references with a relative `path` and a PDF `page` or DOCX `paragraph`.
-Omit both position fields for text files. Only documents and positions read during the current folder selection can become source citations.
-The tool appends relative Markdown links with PDF page anchors.
-DOCX citation labels contain paragraph numbers and recorded headings. Their links open the source file without a paragraph jump.
-Citations count toward the note size limit.
-Successful results include the saved relative path and UTF-8 byte count.
-Folder changes wait for active file operations. Clearing access preserves saved notes.
-These tools use Electron IPC and Node filesystem APIs. They do not require AUV or desktop input permissions.
+`study_workspace_search` tìm thấy một cụm từ theo nghĩa đen trong tài liệu hoặc đệ quy trong một thư mục. Sử dụng `path: "."` cho thư mục đã chọn. Khớp bỏ qua trường hợp chữ cái, giữ nguyên dấu và chấp nhận khoảng trắng trên các ngắt dòng. Các ký tự biểu thức chính quy vẫn giữ nguyên theo nghĩa đen. Mỗi tệp văn bản, trang PDF hoặc đoạn DOCX đóng góp tối đa một đoạn trích, kèm theo đường dẫn và vị trí tương đối của nó. Kết quả DOCX bao gồm số đoạn văn và tiêu đề gần nhất nếu có. Các cụm từ không kéo dài các đoạn DOCX riêng biệt. Đoạn trích chứa tối đa 600 ký tự. Tìm kiếm đọc các tệp cục bộ hiện tại và gửi đường dẫn, đoạn trích và trạng thái quét tới cuộc trò chuyện nhà cung cấp. Một cuộc gọi kiểm tra tối đa 200 đường dẫn được xếp hàng đợi, 50 thư mục, 50 tài liệu, 100 trang PDF và 500 đoạn DOCX. Văn bản tìm kiếm có ngân sách 2 MiB. Mỗi thư mục giữ lại các giới hạn danh sách hiện có. Giới hạn và các tệp không thể đọc được đặt `truncated`. Kiểm tra `skipped` trước khi xác nhận rằng nội dung bị thiếu. Mảng `pending` chứa các phạm vi để tìm kiếm tiếp theo với cùng một truy vấn. `startPage` của nó tiếp tục một PDF duy nhất. `startParagraph` của nó tiếp tục một DOCX duy nhất. Mảng `pending` và `skipped` chứa tối đa 20 mục mỗi mảng, vì vậy các danh sách này cũng có thể không đầy đủ. Các trích đoạn tìm kiếm không cấp ghi chú trích dẫn. Đọc tài liệu hoặc trang phù hợp trước khi giải thích đầy đủ hoặc trích dẫn nguồn đã lưu.
 
-## Learning review reminders
+`study_workspace_save_note` tạo các tệp Markdown mới trong `Angela Notes` trong thư mục đó. Ghi chú chứa tối đa 128 KiB. Các tập tin hiện có không bao giờ bị ghi đè. Mảng `sources` tùy chọn chấp nhận tối đa 20 tham chiếu với `path` tương đối và PDF `page` hoặc DOCX `paragraph`. Bỏ qua cả hai trường vị trí cho tệp văn bản. Chỉ những tài liệu và vị trí được đọc trong quá trình lựa chọn thư mục hiện tại mới có thể trở thành trích dẫn nguồn. Công cụ này nối thêm các liên kết Markdown tương đối với các neo trang PDF. Nhãn trích dẫn DOCX chứa số đoạn văn và tiêu đề được ghi. Các liên kết của họ mở tệp nguồn mà không cần nhảy đoạn văn. Các trích dẫn được tính vào giới hạn kích thước ghi chú. Kết quả thành công bao gồm đường dẫn tương đối đã lưu và số byte UTF-8. Thay đổi thư mục chờ hoạt động tập tin hoạt động. Xóa quyền truy cập sẽ bảo tồn các ghi chú đã lưu. Các công cụ này sử dụng API hệ thống tệp Electron IPC và Node. Chúng không yêu cầu quyền đầu vào AUV hoặc desktop.
 
-Enable desktop review reminders in Long-Term Memory settings. The option defaults to off.
-The main renderer checks the selected character every minute while the app runs.
-Electron main accepts delivery requests only from that renderer and groups due records into one native notification.
-The notification contains a count, without learning content. Clicking opens Chat.
-Main groups duplicate requests and retains successful receipts across renderer leadership changes.
-The learning store persists successful receipts for each due date. Reloads do not repeat a recorded reminder.
-Failed and unconfirmed deliveries remain retryable. Notifications do not complete reviews or run after the app exits.
+<a id="learning-review-reminders"></a>
 
-## Verification
+## Nhắc nhở đánh giá học tập
 
-Run the review store, settings, native delivery, and renderer timer tests from the repository root:
+Bật lời nhắc đánh giá desktop trong cài đặt Bộ nhớ dài hạn. Tùy chọn mặc định là tắt. renderer chính kiểm tra ký tự đã chọn mỗi phút trong khi ứng dụng chạy. Electron main chỉ chấp nhận các yêu cầu phân phối từ renderer đó và nhóm các bản ghi đến hạn vào một thông báo native. Thông báo chứa số lượng, không có nội dung học tập. Nhấp vào sẽ mở Trò chuyện. Các nhóm chính sao chép các yêu cầu và giữ lại các biên nhận thành công trong các lần thay đổi lãnh đạo renderer. Việc học store vẫn duy trì các biên nhận thành công cho mỗi ngày đến hạn. Tải lại không lặp lại lời nhắc đã ghi. Việc giao hàng thất bại và chưa được xác nhận vẫn có thể thử lại. Thông báo không hoàn thành việc đánh giá hoặc chạy sau khi thoát ứng dụng.
+
+<a id="verification"></a>
+
+## Xác minh
+
+Chạy bài đánh giá store, cài đặt, phân phối native và kiểm tra bộ đếm thời gian renderer từ thư mục gốc của kho lưu trữ:
 
 ```sh
 pnpm exec vitest run --config packages/stage-ui/vitest.config.ts --project browser learning-memory
@@ -203,75 +126,50 @@ pnpm exec vitest run --config apps/desktop/vitest.node.config.ts learning-review
 pnpm exec vitest run --config apps/desktop/vitest.config.ts --project browser use-learning-review-reminders
 ```
 
-Run the focused runtime tests:
+Chạy các bài kiểm tra runtime tập trung:
 
 ```sh
 pnpm -F @angela/desktop exec vitest run src/main/services/angela/computer-use/runtime.test.ts
 ```
 
-For learning directory access, IPC, and request selection, run from the repository root:
+Để truy cập thư mục học tập, IPC và yêu cầu lựa chọn, hãy chạy từ thư mục gốc của kho lưu trữ:
 
 ```sh
 pnpm exec vitest run --config apps/desktop/vitest.node.config.ts apps/desktop/src/main/services/angela/study-workspace apps/desktop/src/renderer/stores/tools/built-in.test.ts
 ```
 
-Set `AIRI_COMPUTER_USE_LIVE=1` to include the CLI/private-daemon test. Set `AUV_BINARY_PATH` to test a native development build.
-It invokes help and an invalid argument, without injecting desktop input.
-For renderer verification, launch with `APP_REMOTE_DEBUG=true` and an unused `APP_REMOTE_DEBUG_PORT`, then attach `agent-browser` to the chat CDP target.
+Đặt `AIRI_COMPUTER_USE_LIVE=1` để bao gồm kiểm tra CLI/private-daemon. Đặt `AUV_BINARY_PATH` để kiểm tra bản dựng phát triển native. Nó gọi trợ giúp và đối số không hợp lệ mà không đưa vào đầu vào desktop. Để xác minh renderer, hãy khởi chạy với `APP_REMOTE_DEBUG=true` và `APP_REMOTE_DEBUG_PORT` chưa sử dụng, sau đó đính kèm `agent-browser` vào mục tiêu trò chuyện CDP.
 
-### Live Linux input verification
+<a id="live-linux-input-verification"></a>
 
-Run the smoke on an unlocked Wayland session with one output and temporary uinput access:
+### trực tiếp Xác minh đầu vào Linux
+
+Chạy kiểm tra nhanh trên phiên Wayland đã mở khóa với một đầu ra và quyền truy cập đầu vào tạm thời:
 
 ```sh
 AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AUV_LINUX_INPUT_BACKEND=uinput pnpm -F @angela/desktop smoke:computer-use-input
 ```
 
-If the shell sets `ELECTRON_RUN_AS_NODE`, unset it before launch. The script never grants device permissions.
-It opens a separate fullscreen fixture with an isolated temporary profile. It needs no API key or application build.
-Native AUV input must click a button, focus the control, type ASCII, and paste an exact Vietnamese sentence.
-The fixture counts trusted events and reads the resulting value. DOM code never supplies clicks or input text.
-The smoke preserves text and HTML clipboard content around its plain text test. It refuses other initial formats.
-A new user copy during delivery takes precedence. Avoid changing focus while this input test runs.
-The report and fixture-only screenshot go into `.cache`. Set `SMOKE_REPORT_DIR` to choose the output directory.
-The test stops its private daemon and removes its temporary profile. Revoke temporary uinput access after the run.
-This proves native execution against the fixture. It does not prove model planning or arbitrary application control.
+Nếu shell đặt `ELECTRON_RUN_AS_NODE`, hãy bỏ đặt nó trước khi khởi chạy. Tập lệnh không bao giờ cấp quyền cho thiết bị. Nó mở một mẫu kiểm thử toàn màn hình riêng biệt với một cấu hình tạm thời bị cô lập. Nó không cần xây dựng ứng dụng hoặc khóa API. Đầu vào native AUV phải bấm một nút, tập trung điều khiển, gõ ASCII và dán một câu tiếng Việt chính xác. mẫu kiểm thử đếm các sự kiện đáng tin cậy và đọc giá trị kết quả. Mã DOM không bao giờ cung cấp các nhấp chuột hoặc văn bản đầu vào. kiểm tra nhanh bảo tồn văn bản và nội dung bảng nhớ tạm HTML xung quanh quá trình kiểm tra văn bản thuần túy của nó. Nó từ chối các định dạng ban đầu khác. Một bản sao người dùng mới trong quá trình phân phối sẽ được ưu tiên. Tránh thay đổi tiêu điểm trong khi chạy thử nghiệm đầu vào này. Báo cáo và ảnh chụp màn hình chỉ dành cho mẫu kiểm thử được đưa vào `.cache`. Đặt `SMOKE_REPORT_DIR` để chọn thư mục đầu ra. Quá trình kiểm tra dừng daemon riêng tư của nó và xóa hồ sơ tạm thời của nó. Thu hồi quyền truy cập đầu vào tạm thời sau khi chạy. Điều này chứng tỏ khả năng thực thi native so với mẫu kiểm thử. Nó không chứng minh việc lập kế hoạch mô hình hoặc kiểm soát ứng dụng tùy ý.
 
-### Model-driven VS Code verification
+<a id="model-driven-vs-code-verification"></a>
 
-Configure a chat model with tool calling in the local development profile. Build desktop before this smoke.
-Run on Linux Niri with temporary uinput access:
+### Xác minh mã VS dựa trên mô hình
+
+Định cấu hình trò chuyện mô hình bằng cách gọi công cụ trong hồ sơ phát triển cục bộ. Xây dựng desktop trước kiểm tra nhanh này. Chạy trên Linux Niri với quyền truy cập đầu vào tạm thời:
 
 ```sh
 AUV_BINARY_PATH="$PWD/.cache/auv/0.0.28/bin/auv" AUV_LINUX_INPUT_BACKEND=uinput pnpm exec tsx apps/desktop/scripts/computer-use-model-smoke.ts
 ```
 
-The smoke copies only Local Storage into a private temporary profile. It requires a local-only account state.
-Set `SMOKE_SOURCE_PROFILE` to choose a different source profile. Set `SMOKE_CODE_BINARY` for a different native VS Code binary.
-The default editor binary is `/usr/share/code/code`. The smoke launches separate editor data and extension directories.
-Two temporary documents appear in separate windows. The model must select the target, paste Vietnamese, and save it.
-The harness permits native input only to its two editor windows. It forwards allowed calls to the registered production executors.
-The test reads the saved target, checks that the other file stayed intact, and verifies every input target ID.
-This proves a keyboard workflow with native window selection. It does not prove visual grounding or arbitrary application support.
-The test requires an empty or plain text clipboard. Rich formats remain untouched.
-It checks the real Wayland selection, stops its process groups, and removes temporary profiles and provider logs.
-Set `SMOKE_DIAGNOSTICS=1` to record fixture tool calls and editor state for failure diagnosis.
-The report contains verification flags and tool names, without credentials or document contents. Revoke uinput access after the run.
+kiểm tra nhanh chỉ sao chép Bộ nhớ cục bộ vào một hồ sơ tạm thời riêng tư. Nó yêu cầu trạng thái tài khoản chỉ cục bộ. Đặt `SMOKE_SOURCE_PROFILE` để chọn cấu hình nguồn khác. Đặt `SMOKE_CODE_BINARY` cho mã nhị phân native VS khác. Tệp nhị phân của trình soạn thảo mặc định là `/usr/share/code/code`. kiểm tra nhanh khởi chạy các thư mục mở rộng và dữ liệu soạn thảo riêng biệt. Hai tài liệu tạm thời xuất hiện trong các cửa sổ riêng biệt. mô hình phải chọn mục tiêu, dán tiếng Việt và lưu lại. bộ kiểm thử chỉ cho phép đầu vào native vào hai cửa sổ soạn thảo của nó. Nó chuyển tiếp các cuộc gọi được phép đến người thực thi sản xuất đã đăng ký. Kiểm tra sẽ đọc mục tiêu đã lưu, kiểm tra xem tệp còn lại có còn nguyên vẹn không và xác minh mọi mục tiêu đầu vào ID. Điều này chứng tỏ quy trình làm việc của bàn phím với lựa chọn cửa sổ native. Nó không chứng minh đối chiếu ngữ cảnh trực quan hoặc hỗ trợ ứng dụng tùy ý. Bài kiểm tra yêu cầu một bảng tạm văn bản trống hoặc thuần túy. Các định dạng phong phú vẫn còn nguyên. Nó kiểm tra lựa chọn Wayland thực, dừng các nhóm quy trình của nó và xóa các cấu hình tạm thời và nhật ký nhà cung cấp. Đặt `SMOKE_DIAGNOSTICS=1` để ghi lại các lệnh gọi công cụ mẫu kiểm thử và trạng thái soạn thảo để chẩn đoán lỗi. Báo cáo chứa cờ xác minh và tên công cụ, không có thông tin xác thực hoặc nội dung tài liệu. Thu hồi quyền truy cập uinput sau khi chạy.
 
-The 2026-10-16 Niri run passed with Gemini 3.1 Flash Lite and real VS Code.
-The saved document matched the requested Vietnamese text. The other file stayed intact and the native clipboard returned to its initial state.
+Cuộc chạy Niri 2026-10-16 đã diễn ra với Gemini 3.1 Flash Lite và Mã VS thực. Tài liệu đã lưu khớp với văn bản tiếng Việt được yêu cầu. Tệp còn lại vẫn nguyên vẹn và bảng tạm native trở lại trạng thái ban đầu.
 
-## Companion follow-ups
+<a id="companion-follow-ups"></a>
 
-Open Settings > Modules > Long-Term Memory and enable Companion.
-Learning memory must also remain enabled. Add an unfinished subject or start a shared activity.
-The main Stage presents a follow-up after one minute without input, when the record is due.
-It waits while chat generates or speech plays, and while the Stage is hidden.
-Follow-ups run between 08:00 and 22:00 in the machine timezone, at most once per hour.
-Each record gets one presentation attempt. Closing Angela stops checks until the next launch.
-A reserved attempt can be lost if the renderer closes before the toast appears.
+## Theo dõi đồng hành
 
-Use Stop asking to dismiss a subject. Use Delete record to remove its companion memory.
-A completed activity records the user report. An elapsed timer never marks an activity complete.
-These local records remain separate from CLI Memory V2 and Telegram OpenLoops.
-The Companion panel and chat use the same character-scoped records across desktop windows.
+Mở Cài đặt > Mô-đun > Bộ nhớ dài hạn và bật Đồng hành. Bộ nhớ học tập cũng phải được kích hoạt. Thêm một chủ đề chưa hoàn thành hoặc bắt đầu một hoạt động được chia sẻ. stage chính trình bày nội dung theo dõi sau một phút mà không cần nhập dữ liệu khi đến hạn ghi. Nó chờ trong khi tạo cuộc trò chuyện hoặc phát lời nói và trong khi stage bị ẩn. Quá trình theo dõi diễn ra trong khoảng thời gian từ 08:00 đến 22:00 theo múi giờ của máy, nhiều nhất là một lần mỗi giờ. Mỗi bản ghi có một lần trình bày. Việc đóng Angela dừng kiểm tra cho đến lần khởi chạy tiếp theo. Nỗ lực dành riêng có thể bị mất nếu renderer đóng trước khi bánh mì nướng xuất hiện.
+
+Sử dụng Dừng yêu cầu để loại bỏ một chủ đề. Sử dụng Xóa bản ghi để xóa bộ nhớ đồng hành của nó. Một hoạt động đã hoàn thành sẽ ghi lại báo cáo của người dùng. Bộ đếm thời gian đã trôi qua không bao giờ đánh dấu một hoạt động đã hoàn thành. Các bản ghi cục bộ này vẫn tách biệt với Bộ nhớ CLI V2 và Telegram OpenLoops. Bảng điều khiển Đồng hành và trò chuyện sử dụng cùng các bản ghi có phạm vi ký tự trên các cửa sổ desktop.

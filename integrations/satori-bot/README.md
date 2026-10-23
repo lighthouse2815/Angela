@@ -1,49 +1,54 @@
 # Angela Satori Bot
 
-> **⚠️ Disclaimer**: This is a submodule of **Angela**. The `core` part of this satori bot is merely a **temporary solution**. We will eventually delete it and integrate with **Angela's Core** once the main framework is stable.
+> **⚠️ Tuyên bố miễn trừ trách nhiệm**: Đây là mô-đun con của **Angela**. Phần `core` của bot satori này chỉ là **giải pháp tạm thời**. Cuối cùng, chúng tôi sẽ xóa nó và tích hợp với **Angela's Core** sau khi khung chính ổn định.
 
-A **STANDALONE**, event-driven AI agent built on the [Satori Protocol](https://satori.chat/). It connects to multiple chat platforms (QQ, Telegram, Discord, Lark) via a Koishi bridge, featuring an autonomous thought loop.
+**STANDALONE**, AI agent theo sự kiện được xây dựng trên [Satori Protocol](https://satori.chat/). Nó kết nối với nhiều nền tảng trò chuyện (QQ, Telegram, Discord, Lark) thông qua cầu Koishi, có vòng suy nghĩ tự động.
 
-## 🏗 Architecture & Internals (Provisional)
+<a id="-architecture--internals-provisional"></a>
 
-**Important**: This module currently implements a self-contained "Mini-Core" (`src/core/`) to operate independently. This is **NOT** the final architecture of Angela.
+## 🏗 Kiến trúc & Nội thất (Tạm thời)
 
-* **Temporary Logic**: The Event Loop, Scheduler, and Planner logic located in `src/core/` are placeholders. They simulate the behavior of the future Angela Core.
-* **Retained Components**: The **Dispatcher** and **Database** will be retained. They will be exposed as **tool-like modules** to the Angela Core for action execution and state persistence.
-* **Future Migration**: Once the main Angela Core is ready, the `src/core/` directory (specifically the loop/planning logic) will be removed. This module will then be refactored to strictly function as an **Adapter** (Satori Protocol handling) and **Capability Provider** (Actions), delegating the cognitive loop to the main Angela process.
+**Quan trọng**: Mô-đun này hiện triển khai một "Mini-Core" (`src/core/`) độc lập để tự vận hành. Đây **KHÔNG** phải kiến trúc cuối cùng của Angela.
 
-For the current standalone version, please refer to these documents:
+* **Logic tạm thời**: Logic Vòng lặp sự kiện, Trình lập lịch biểu và Trình lập kế hoạch nằm trong `src/core/` là các phần giữ chỗ. Chúng mô phỏng hành vi của Angela Core trong tương lai.
+* **Thành phần được giữ lại**: **Bộ điều phối** và **Cơ sở dữ liệu** sẽ được giữ lại. Chúng sẽ được hiển thị dưới dạng **mô-đun giống công cụ** trong Angela Core để thực thi hành động và duy trì trạng thái.
+* **Di chuyển trong tương lai**: Khi Angela Core chính đã sẵn sàng, thư mục `src/core/` (cụ thể là logic loop/planning) sẽ bị xóa. Sau đó, mô-đun này sẽ được tái cấu trúc để hoạt động nghiêm ngặt như một **Bộ chuyển đổi** (Xử lý giao thức Satori) và **Khả năng nhà cung cấp** (Hành động), ủy quyền vòng lặp nhận thức cho quy trình Angela chính.
 
-* **[HANDLER.md](./docs/HANDLER.md)**: Explains the **current** Event-to-Action Flow (Queue -> Scheduler -> LLM).
-* **[PERSISTENCE.md](./docs/PERSISTENCE.md)**: Details the **current** Memory-First state management strategy specific to this temporary core.
+Đối với phiên bản độc lập hiện tại, vui lòng tham khảo các tài liệu sau:
 
-**Key Code Paths:**
-* **Loop & Logic (Temporary)**: `src/core/`
-* **Adapter (Permanent)**: `src/adapter/satori/`
-* **Capabilities (Permanent)**: `src/capabilities/`
+* **[HANDLER.md](./docs/HANDLER.md)**: Giải thích luồng **hiện tại** từ sự kiện đến hành động (Hàng đợi -> Bộ lập lịch -> LLM).
+* **[PERSISTENCE.md](./docs/PERSISTENCE.md)**: Chi tiết chiến lược quản lý trạng thái **hiện tại** Bộ nhớ đầu tiên dành riêng cho lõi tạm thời này.
 
-## Prerequisites
+**Đường dẫn mã khóa:**
+* **Vòng lặp & Logic (Tạm thời)**: `src/core/`
+* **Bộ chuyển đổi (Vĩnh viễn)**: `src/adapter/satori/`
+* **Khả năng (Vĩnh viễn)**: `src/capabilities/`
+
+<a id="prerequisites"></a>
+
+## Điều kiện tiên quyết
 
 * **Node.js** >= 18.0.0
 * **pnpm** >= 8.0.0
-* **Koishi Instance**: Running the `server-satori` plugin.
-* **LLM Provider**: OpenAI compatible API (Ollama, vLLM, DeepSeek, etc.).
+* **Phiên bản Koishi**: Chạy plugin `server-satori`.
+* **LLM nhà cung cấp**: OpenAI tương thích API (Ollama, vLLM, DeepSeek, v.v.).
 
-## Quick Start
+<a id="quick-start"></a>
 
-1. **Install Dependencies**
+## Bắt đầu nhanh
+
+1. **Cài đặt phụ thuộc**
 ```bash
 pnpm install
 ```
 
-2. **Configure Environment**
-Copy the example config and edit it:
+2. **Cấu hình môi trường** Sao chép cấu hình ví dụ và chỉnh sửa nó:
 
 ```bash
 cp .env .env.local
 ```
 
-**Key Variables:**
+**Các biến chính:**
 
 ```env
 # Satori Configuration
@@ -59,7 +64,7 @@ LLM_RESPONSE_LANGUAGE=English
 LLM_OLLAMA_DISABLE_THINK=false
 ```
 
-3. **Run**
+3. **Chạy**
 
 ```bash
 # Development (Hot-reload)
@@ -69,8 +74,10 @@ pnpm --filter @angela/satori-bot dev
 pnpm --filter @angela/satori-bot start
 ```
 
-## Key Locations
+<a id="key-locations"></a>
 
-* **Persona & System Prompts**: `src/core/planner/prompts/*.velin.md`
-* **Database (PGlite)**: `data/pglite-db` (See *PERSISTENCE.md* for architecture)
-* **Action Logic**: `src/capabilities/actions/`
+## Vị trí chính
+
+* **Nhân vật & Hệ thống prompt**: `src/core/planner/prompts/*.velin.md`
+* **Cơ sở dữ liệu (PGlite)**: `data/pglite-db` (Xem *PERSISTENCE.md* để biết kiến ​​trúc)
+* **Logic hành động**: `src/capabilities/actions/`

@@ -1,10 +1,12 @@
 # `telegram-bot`
 
-Allow アイリ to talk to you and many other users in Telegram.
+Cho phép Airi nói chuyện với bạn và nhiều người dùng khác trong Telegram.
 
-## Getting started
+<a id="getting-started"></a>
 
-Clone & install dependencies:
+## Bắt đầu
+
+Sao chép và cài đặt phụ thuộc:
 
 ```shell
 git clone git@github.com:moeru-ai/airi.git
@@ -12,21 +14,21 @@ pnpm i
 pnpm run build:packages
 ```
 
-Start Ollama instance for embedding models
+Khởi động phiên bản Ollama để nhúng mô hình
 
 ```shell
 ollama start
 ollama pull nomic-embed-text
 ```
 
-Create a `.env.local` file:
+Tạo tệp `.env.local`:
 
 ```shell
 cd integrations/telegram-bot
 cp .env .env.local
 ```
 
-Fill-in the following credentials as configurations:
+Điền thông tin xác thực sau làm cấu hình:
 
 ```shell
 DATABASE_URL=postgres://postgres:123456@localhost:5432/postgres
@@ -47,7 +49,7 @@ EMBEDDING_MODEL=''
 EMBEDDING_DIMENSION=''
 ```
 
-For example:
+Ví dụ:
 
 ```shell
 DATABASE_URL=postgres://postgres:123456@localhost:5433/postgres
@@ -68,7 +70,7 @@ EMBEDDING_MODEL='nomic-embed-text' # embedding model
 EMBEDDING_DIMENSION='768' # must set
 ```
 
-Start both DB and the bot:
+Khởi động cả DB và bot:
 
 ```shell
 docker compose up -d

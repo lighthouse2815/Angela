@@ -1,16 +1,18 @@
-# Activation Planner Consumer
+<a id="activation-planner-consumer"></a>
 
-This example requires `dev.airi.example-activation` with the version range `^1.0.0`.
+# Công cụ lập kế hoạch kích hoạt bên sử dụng
 
-Use it with the `activation-planner-provider` example:
+Ví dụ này yêu cầu `dev.airi.example-activation` với phạm vi phiên bản `^1.0.0`.
 
-1. Open `/devtools/plugin-host` in Stage Tamagotchi.
-2. Import the Provider folder next to this folder.
-3. Import this folder.
-4. Enable the Provider.
-5. Enable this Consumer.
-6. Load the enabled Extensions.
+Sử dụng nó với ví dụ `activation-planner-provider`:
 
-The Host loads the Provider before this Consumer. When the system stops, the Host stops this Consumer before the Provider.
+1. Mở `/devtools/plugin-host` trong stage Tamagotchi.
+2. Nhập thư mục nhà cung cấp bên cạnh thư mục này.
+3. Nhập thư mục này.
+4. Kích hoạt nhà cung cấp.
+5. Kích hoạt bên sử dụng này.
+6. Tải các tiện ích mở rộng đã bật.
 
-This example does not call a runtime Kit. Its `kits.uses` entry only creates a static Phase 2 dependency. Runtime Kit lookup belongs to Phase 3.
+host tải nhà cung cấp trước bên sử dụng này. Khi hệ thống dừng, host dừng bên sử dụng này trước nhà cung cấp.
+
+Ví dụ này không gọi Bộ công cụ runtime. Mục nhập `kits.uses` của nó chỉ tạo ra sự phụ thuộc tĩnh vào Giai đoạn 2. Tra cứu Kit runtime thuộc Giai đoạn 3.

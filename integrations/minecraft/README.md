@@ -1,65 +1,76 @@
-# Angela Minecraft Service
+<a id="angela-minecraft-service"></a>
 
-This workspace runs Angela's dedicated Minecraft bot. It connects a Mineflayer runtime to a Minecraft server, loads the cognitive stack in `src/cognitive`, and bridges status, context, and command traffic back to Angela so the Stage settings shell can observe the service.
+# Dịch vụ Minecraft của Angela
 
-## Deprecation Notice
+workspace này chạy bot Minecraft chuyên dụng của Angela. Nó kết nối Mineflayer runtime với máy chủ Minecraft, tải ngăn xếp nhận thức trong `src/cognitive`, đồng thời kết nối trạng thái, bối cảnh và lưu lượng lệnh trở lại Angela để cài đặt stage shell có thể quan sát dịch vụ.
 
-This service is on a deprecation path. The current Mineflayer-based bot is expected to be replaced by a Fabric mod based runtime, which will become the primary Minecraft integration surface going forward.
+<a id="deprecation-notice"></a>
 
-Use this service for current local development and maintenance, but avoid building new long-term features around the Mineflayer runtime unless they are also part of the migration plan.
+## Thông báo ngừng hỗ trợ
 
-## Safety Notice
+Dịch vụ này sắp ngừng hoạt động. Bot dựa trên Mineflayer hiện tại dự kiến ​​sẽ được thay thế bằng runtime dựa trên mod Fabric, sẽ trở thành bề mặt tích hợp Minecraft chính trong tương lai.
 
-Do not connect this bot to public servers you do not trust.
+Sử dụng dịch vụ này để phát triển và bảo trì cục bộ hiện tại nhưng tránh xây dựng các tính năng dài hạn mới xung quanh Mineflayer runtime trừ khi chúng cũng là một phần của kế hoạch di chuyển.
 
-The runtime can execute JavaScript-generated action plans to control the bot. Those scripts run in an isolated environment, but they still drive a real local process with access to your Minecraft session, local network reachability, and other machine-side resources. A malicious or hostile server can still cause unwanted actions, or damage to your system.
+<a id="safety-notice"></a>
 
-Treat this service as a local-development and trusted-server tool only.
+## Thông báo an toàn
 
-## Setup
+Không kết nối bot này với các máy chủ công cộng mà bạn không tin tưởng.
 
-1. Install workspace dependencies from the repo root:
+runtime có thể thực thi các kế hoạch hành động do JavaScript tạo để điều khiển bot. Các tập lệnh đó chạy trong môi trường biệt lập nhưng chúng vẫn điều khiển một quy trình cục bộ thực sự với quyền truy cập vào phiên Minecraft của bạn, khả năng truy cập mạng cục bộ và các tài nguyên phía máy khác. Máy chủ độc hại hoặc thù địch vẫn có thể gây ra các hành động không mong muốn hoặc làm hỏng hệ thống của bạn.
+
+Chỉ coi dịch vụ này là một công cụ máy chủ đáng tin cậy và phát triển cục bộ.
+
+<a id="setup"></a>
+
+## Cài đặt
+
+1. Cài đặt các phụ thuộc workspace từ gốc repo:
 
    ```bash
    pnpm i
    ```
 
-2. Copy the template:
+2. Sao chép mẫu:
 
    ```bash
    cp integrations/minecraft/.env integrations/minecraft/.env.local
    ```
 
-3. Edit `integrations/minecraft/.env.local`.
+3. Chỉnh sửa `integrations/minecraft/.env.local`.
 
-   In Angela, open **Settings -> Connection** and copy the WebSocket authentication token.
-   Set `AIRI_WS_TOKEN` to that token in `.env.local`:
+   Trong Angela, mở **Cài đặt -> Kết nối** và sao chép xác thực WebSocket token. Đặt `AIRI_WS_TOKEN` thành token đó trong `.env.local`:
 
    ```dotenv
    AIRI_WS_TOKEN='paste-your-token-here'
    ```
 
-   If the token changes, update `.env.local` and restart the bot.
+   Nếu token thay đổi, hãy cập nhật `.env.local` và khởi động lại bot.
 
-4. Start the service:
+4. Bắt đầu dịch vụ:
 
    ```bash
    pnpm -F @angela/minecraft-bot dev
    ```
 
-   Or, from `integrations/minecraft/`:
+   Hoặc, từ `integrations/minecraft/`:
 
    ```bash
    pnpm dev
    ```
 
-5. The bot should automatically connect to both Angela and the Minecraft server.
+5. Bot sẽ tự động kết nối với cả Angela và máy chủ Minecraft.
 
-## Cognitive Architecture
+<a id="cognitive-architecture"></a>
 
-Angela's Minecraft agent is built on a **four-layered cognitive architecture** inspired by cognitive science, enabling reactive, conscious, and physically grounded behaviors.
+## Kiến trúc nhận thức
 
-### Architecture Overview
+Minecraft agent của Angela được xây dựng trên **kiến trúc nhận thức bốn lớp** lấy cảm hứng từ khoa học nhận thức, cho phép các hành vi phản ứng, có ý thức và dựa trên cơ sở thể chất.
+
+<a id="architecture-overview"></a>
+
+### Tổng quan về kiến ​​trúc
 
 ```mermaid
 graph TB
@@ -101,60 +112,70 @@ graph TB
     style TE fill:#dcedc8
 ```
 
-### Layer A: Perception
+<a id="layer-a-perception"></a>
 
-**Location**: `src/cognitive/perception/`
+### Lớp A: Nhận thức
 
-The perception layer acts as the sensory input hub, collecting raw Mineflayer signals and translating them into typed events/signals through an event registry + rule engine pipeline.
+**Vị trí**: `src/cognitive/perception/`
 
-**Pipeline**:
-- Event definitions in `events/definitions/*` bind Mineflayer events to normalized raw events.
-- `EventRegistry` emits `raw:<modality>:<kind>` events to the cognitive event bus.
-- `RuleEngine` evaluates YAML rules and emits derived `signal:*` events consumed by Reflex/Conscious layers.
+Lớp nhận thức đóng vai trò là trung tâm đầu vào cảm giác, thu thập các tín hiệu Mineflayer thô và chuyển chúng thành events/signals đã nhập thông qua hệ thống đăng ký sự kiện + công cụ quy tắc.
 
-**Key files**:
+**Đường ống**:
+- Các định nghĩa sự kiện trong `events/definitions/*` liên kết các sự kiện Mineflayer với các sự kiện thô được chuẩn hóa.
+- `EventRegistry` phát ra các sự kiện `raw:<modality>:<kind>` tới bus sự kiện nhận thức.
+- `RuleEngine` đánh giá các quy tắc YAML và phát ra các sự kiện `signal:*` dẫn xuất được các lớp Reflex/Conscious tiêu thụ.
+
+**Tệp chính**:
 - `events/index.ts`
 - `events/definitions/*`
 - `rules/engine.ts`
 - `rules/*.yaml`
 - `pipeline.ts`
 
-### Layer B: Reflex
+<a id="layer-b-reflex"></a>
 
-**Location**: `src/cognitive/reflex/`
+### Lớp B: Phản xạ
 
-The reflex layer handles immediate, instinctive reactions. It operates on a finite state machine (FSM) pattern for predictable, fast responses.
+**Vị trí**: `src/cognitive/reflex/`
 
-**Components**:
-- **Reflex Manager** (`reflex-manager.ts`): Coordinates reflex behaviors
-- **Inhibition**: Reflexes can inhibit Conscious layer processing to prevent redundant responses.
+Lớp phản xạ xử lý các phản ứng tức thời, theo bản năng. Nó hoạt động trên mẫu máy trạng thái hữu hạn (FSM) để có Responses nhanh, có thể dự đoán được.
 
-### Layer C: Conscious
+**Thành phần**:
+- **Trình quản lý phản xạ** (`reflex-manager.ts`): Điều phối các hành vi phản xạ
+- **Ức chế**: Phản xạ có thể ức chế quá trình xử lý lớp Ý thức để ngăn chặn Responses dư thừa.
 
-**Location**: `src/cognitive/conscious/`
+<a id="layer-c-conscious"></a>
 
-The conscious layer handles complex reasoning, planning, and high-level decision-making. No physical execution happens here anymore.
+### Lớp C: Ý thức
 
-**Components**:
-- **Brain** (`brain.ts`): Event queue orchestration, LLM turn lifecycle, safety/budget guards, debug REPL integration.
-- **JavaScript Planner** (`js-planner.ts`): Sandboxed planning/runtime execution against exposed tools/globals.
-- **Query Runtime** (`query-dsl.ts`): Read-only world/inventory/entity query helpers for planner scripts.
-- **Task State** (`task-state.ts`): Cancellation token and task lifecycle primitives used by action execution.
+**Vị trí**: `src/cognitive/conscious/`
 
-### Layer D: Action
+Lớp ý thức xử lý suy luận phức tạp, lập kế hoạch và ra quyết định cấp cao. Không có sự thực thi vật lý nào xảy ra ở đây nữa.
 
-**Location**: `src/cognitive/action/`
+**Thành phần**:
+- **Não** (`brain.ts`): Sắp xếp hàng đợi sự kiện, vòng đời rẽ LLM, bộ bảo vệ safety/budget, gỡ lỗi tích hợp REPL.
+- **Công cụ lập kế hoạch JavaScript** (`js-planner.ts`): Thực thi planning/runtime được đóng hộp cát đối với tools/globals. bị lộ
+- **Truy vấn runtime** (`query-dsl.ts`): Trình trợ giúp truy vấn chỉ đọc world/inventory/entity cho các tập lệnh lập kế hoạch.
+- **Trạng thái nhiệm vụ** (`task-state.ts`): Hủy token và các nguyên tắc gốc của vòng đời nhiệm vụ được sử dụng khi thực thi hành động.
 
-The action layer is responsible for the actual execution of tasks in the world. It isolates "Doing" from "Thinking".
+<a id="layer-d-action"></a>
 
-**Components**:
-- **Task Executor** (`task-executor.ts`): Runs normalized action instructions and emits action lifecycle events.
-- **Action Registry** (`action-registry.ts`): Validates params and dispatches tool calls.
-- **Tool Catalog** (`llm-actions.ts`): Action/tool definitions and schemas bound to mineflayer skills.
+### Lớp D: Hành động
 
-### Event Flow Example
+**Vị trí**: `src/cognitive/action/`
 
-**Scenario: "Build a house"**
+Lớp hành động chịu trách nhiệm thực hiện các nhiệm vụ thực tế trên thế giới. Nó tách biệt “Làm” khỏi “Suy nghĩ”.
+
+**Thành phần**:
+- **Trình thực thi tác vụ** (`task-executor.ts`): Chạy các hướng dẫn hành động được chuẩn hóa và phát ra các sự kiện trong vòng đời hành động.
+- **Đăng ký hành động** (`action-registry.ts`): Xác thực các thông số và gửi lệnh gọi công cụ.
+- **Danh mục công cụ** (`llm-actions.ts`): Các định nghĩa và lược đồ Action/tool gắn liền với các kỹ năng của thợ đào mìn.
+
+<a id="event-flow-example"></a>
+
+### Ví dụ về luồng sự kiện
+
+**Kịch bản: "Xây nhà"**
 ```txt
 Player: "build a house"
   ↓
@@ -170,7 +191,9 @@ Player: "build a house"
 [Conscious] Brain confirms completion: "House is ready!"
 ```
 
-### Project Structure
+<a id="project-structure"></a>
+
+### Cấu trúc dự án
 
 ```txt
 src/
@@ -221,42 +244,54 @@ src/
 └── main.ts                   # Bot entrypoint
 ```
 
-### Design Principles
+<a id="design-principles"></a>
 
-1. **Separation of Concerns**: Each layer has a distinct responsibility
-2. **Event-Driven**: Loose coupling via centralized event system
-3. **Inhibition Control**: Reflexes prevent unnecessary LLM calls
-4. **Extensibility**: Easy to add new reflexes or conscious behaviors
-5. **Cognitive Realism**: Mimics human-like perception → reaction → deliberation
+### Nguyên tắc thiết kế
 
-### Future Enhancements
+1. **Tách biệt mối quan tâm**: Mỗi lớp có một trách nhiệm riêng biệt
+2. **Theo hướng sự kiện**: Khớp nối lỏng lẻo thông qua hệ thống sự kiện tập trung
+3. **Kiểm soát ức chế**: Phản xạ ngăn chặn các cuộc gọi LLM không cần thiết
+4. **Khả năng mở rộng**: Dễ dàng thêm các phản xạ hoặc hành vi có ý thức mới
+5. **Chủ nghĩa hiện thực nhận thức**: Bắt chước nhận thức giống con người → phản ứng → cân nhắc
 
-- **Perception Layer**:
-  - ⏱️ Temporal context window (remember recent events)
-  - 🎯 Salience detection (filter noise, prioritize important events)
+<a id="future-enhancements"></a>
 
-- **Reflex Layer**:
-  - 🏃 Dodge hostile mobs
-  - 🛡️ Emergency combat responses
+### Những cải tiến trong tương lai
 
-- **Conscious Layer**:
-  - 💭 Emotional state management
-  - 🧠 Long-term memory integration
-  - 🎭 Personality-driven responses
+- **Lớp nhận thức**:
+  - ⏱️ Cửa sổ ngữ cảnh tạm thời (ghi nhớ các sự kiện gần đây)
+  - 🎯 Phát hiện sự nổi bật (lọc tiếng ồn, ưu tiên các sự kiện quan trọng)
 
-## 🛠️ Development
+- **Lớp phản xạ**:
+  - 🏃 Né tránh đám đông thù địch
+  - 🛡️ Chiến đấu khẩn cấp Responses
 
-### Commands
+- **Lớp ý thức**:
+  - 💭 Quản lý trạng thái cảm xúc
+  - 🧠 Tích hợp trí nhớ dài hạn
+  - 🎭 Responses hướng đến cá tính
 
-- `pnpm dev` - Start the bot in development mode
-- `pnpm lint` - Run ESLint
-- `pnpm typecheck` - Run TypeScript type checking
-- `pnpm test` - Run tests
+<a id="️-development"></a>
 
-## 🙏 Acknowledgements
+## 🛠️ Phát triển
+
+<a id="commands"></a>
+
+### Lệnh
+
+- `pnpm dev` - Khởi động bot ở chế độ phát triển
+- `pnpm lint` - Chạy ESLint
+- `pnpm typecheck` - Chạy kiểm tra loại TypeScript
+- `pnpm test` - Chạy thử nghiệm
+
+<a id="-acknowledgements"></a>
+
+## 🙏 Lời cảm ơn
 
 - https://github.com/kolbytn/mindcraft
 
-## 🤝 Contributing
+<a id="-contributing"></a>
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+## 🤝 Đóng góp
+
+Đóng góp được chào đón! Vui lòng gửi Yêu cầu kéo.

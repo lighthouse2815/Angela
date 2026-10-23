@@ -1,30 +1,30 @@
-# Stage Tamagotchi Kirie
+<a id="stage-tamagotchi-kirie"></a>
 
-This application runs the Stage Tamagotchi Vue renderer in a Godot desktop host.
-Kirie supplies the WebView and IPC transport. Angela owns application services and native windows.
+# stage Tamagotchi Kirie
 
-Use this application for Kirie desktop development.
-The Electron application remains supported and supplies the behavior reference.
-Production packaging remains deferred. Windows CEF shutdown still fails.
+Ứng dụng này chạy stage Tamagotchi Vue renderer trong Godot desktop host. Kirie cung cấp WebView và IPC transport. Angela sở hữu các dịch vụ ứng dụng và cửa sổ native.
 
-## Documentation
+Sử dụng ứng dụng này để phát triển Kirie desktop. Ứng dụng Electron vẫn được hỗ trợ và cung cấp tham chiếu hành vi. Bao bì sản xuất vẫn bị trì hoãn. Tắt máy Windows CEF vẫn không thành công.
 
-| Document | Owns |
+<a id="documentation"></a>
+
+## Tài liệu
+
+| Tài liệu | Sở hữu |
 | --- | --- |
-| This README | Setup, commands, and environment failures |
-| [Migration status](MIGRATION.md) | The 29 capabilities, platform decisions, blockers, dependencies, and deferred work |
-| [Host architecture](docs/host-architecture.md) | Runtime boundaries, ownership, and implementation requirements |
-| [Platform verification](docs/verification.md) | Dated acceptance evidence and automation limits |
-| [Ablation review](docs/ablation-review.md) | Whole-framework decisions, compact experiment evidence, and review limits |
+| README này | Lỗi thiết lập, lệnh và môi trường |
+| [Trạng thái di chuyển](MIGRATION.md) | 29 khả năng, quyết định nền tảng, trở ngại, phần phụ thuộc và công việc bị trì hoãn |
+| [Kiến trúc máy chủ](docs/host-architecture.md) | Các yêu cầu về ranh giới, quyền sở hữu và triển khai runtime |
+| [Xác minh nền tảng](docs/verification.md) | Bằng chứng chấp nhận ngày và giới hạn tự động hóa |
+| [Ablation đánh giá](docs/ablation-review.md) | Các quyết định toàn bộ khuôn khổ, bằng chứng thử nghiệm nhỏ gọn và giới hạn đánh giá |
 
-## Setup and development
+<a id="setup-and-development"></a>
 
-Install [mise](https://mise.jdx.dev/getting-started.html).
-The root [.tool-versions](../../.tool-versions) selects Node.js, pnpm, and .NET.
-The local [mise.toml](mise.toml) selects Godot Mono.
-[StageTamagotchiKirie.csproj](StageTamagotchiKirie.csproj) requires .NET 10 and Godot.NET.Sdk 4.7.2.
+## Thiết lập và phát triển
 
-From the repository root, install the workspace tools and dependencies:
+Cài đặt [mise](https://mise.jdx.dev/getting-started.html). [.tool-versions](../../.tool-versions) gốc chọn Node.js, pnpm và .NET. [mise.toml](mise.toml) cục bộ chọn Godot Mono. [StageTamagotchiKirie.csproj](StageTamagotchiKirie.csproj) yêu cầu .NET 10 và Godot.NET.Sdk 4.7.2.
+
+Từ kho lưu trữ gốc, cài đặt các công cụ và phụ thuộc workspace:
 
 ```sh
 mise install
@@ -33,59 +33,48 @@ cd apps/desktop-kirie
 mise install
 ```
 
-Run all remaining application commands from this directory.
-Dependency installation creates `node_modules/.gdignore` so Godot skips the dependency directory. Git ignores the entire directory.
+Chạy tất cả các lệnh ứng dụng còn lại từ thư mục này. Cài đặt phụ thuộc tạo ra `node_modules/.gdignore` nên Godot bỏ qua thư mục phụ thuộc. Git bỏ qua toàn bộ thư mục.
 
-Install the dependencies from the Kirie core plugin:
+Cài đặt các phần phụ thuộc từ plugin lõi Kirie:
 
 ```sh
 mise x -- pnpm kirie doctor --fix plugin:core
 ```
 
-The command installs the `0.10.0` addon, Godot CEF backend, and NuGet packages.
-The addon supplies `addons/kirie/`, including `KirieClient.cs`. Git ignores this installed dependency.
-After a Kirie version change, run the command again.
+Lệnh cài đặt gói bổ trợ `0.10.0`, chương trình phụ trợ Godot CEF và NuGet. Tiện ích bổ sung cung cấp `addons/kirie/`, bao gồm `KirieClient.cs`. Git bỏ qua phần phụ thuộc đã cài đặt này. Sau khi thay đổi phiên bản Kirie, hãy chạy lại lệnh.
 
-Inspect the installed environment:
+Kiểm tra môi trường đã cài đặt:
 
 ```sh
 mise x -- pnpm kirie doctor
 ```
 
-The doctor checks the configured core plugin and its .NET packages.
-Missing Android SDK or export templates alone do not block desktop development.
-Exports require matching Godot export templates. Android work also requires the Android SDK.
+Bác sĩ kiểm tra plugin lõi đã được định cấu hình và các gói .NET của nó. Việc thiếu Android SDK hoặc chỉ xuất các mẫu không cản trở sự phát triển của desktop. Việc xuất yêu cầu các mẫu xuất Godot phù hợp. Android hoạt động cũng yêu cầu Android SDK.
 
-If CEF is absent or stale, install the configured backend:
+Nếu CEF không có hoặc cũ, hãy cài đặt phần phụ trợ đã định cấu hình:
 
 ```sh
 mise x -- pnpm kirie doctor --fix plugin:core
 ```
 
-The [installer](https://github.com/moeru-ai/godot-kirie/blob/v0.10.0/packages/cli/src/commands/doctor/addons.ts) verifies the Godot CEF archive and records its checksum under `.godot/kirie/`.
-The [doctor](https://github.com/moeru-ai/godot-kirie/blob/v0.10.0/packages/cli/src/commands/doctor/index.ts) checks the configured plugin dependencies and their versions.
-It does not hash installed native files or inspect macOS signatures.
+[installer](https://github.com/moeru-ai/godot-kirie/blob/v0.10.0/packages/cli/src/commands/doctor/addons.ts) xác minh kho lưu trữ Godot CEF và ghi lại tổng kiểm tra của nó trong `.godot/kirie/`. [doctor](https://github.com/moeru-ai/godot-kirie/blob/v0.10.0/packages/cli/src/commands/doctor/index.ts) kiểm tra các phần phụ thuộc của plugin đã định cấu hình và các phiên bản của chúng. Nó không băm các tệp native đã cài đặt hoặc kiểm tra chữ ký macOS.
 
-After a CEF version change, repeat installation.
-Before acceptance, make sure that the installed artifact matches the release.
-On macOS, also make sure that the framework passes strict signature verification.
-If installation or signatures fail, record the exact upstream failure before a dependency workaround.
+Sau khi thay đổi phiên bản CEF, hãy lặp lại cài đặt. Trước khi chấp nhận, hãy đảm bảo rằng artifact đã cài đặt phù hợp với bản phát hành. Trên macOS, cũng đảm bảo rằng khung vượt qua xác minh chữ ký nghiêm ngặt. Nếu quá trình cài đặt hoặc chữ ký không thành công, hãy ghi lại lỗi upstream chính xác trước khi giải quyết vấn đề phụ thuộc.
 
-Build C# before the first development session:
+Xây dựng C# trước phiên phát triển đầu tiên:
 
 ```sh
 mise x -- dotnet build
 mise x -- pnpm kirie dev
 ```
 
-`kirie dev` starts Vite, Godot, and CEF renderers.
-The [dev command](https://github.com/moeru-ai/godot-kirie/blob/v0.10.0/packages/cli/src/commands/dev.ts) reuses the last C# build.
-After a C# change, repeat both commands.
-Spotlight opens through its global shortcut and has no in-app entry point.
+`kirie dev` khởi động Vite, Godot và CEF các renderer. Lệnh [dev](https://github.com/moeru-ai/godot-kirie/blob/v0.10.0/packages/cli/src/commands/dev.ts) sử dụng lại bản dựng C# cuối cùng. Sau khi thay đổi C#, hãy lặp lại cả hai lệnh. Spotlight mở thông qua phím tắt chung và không có điểm vào trong ứng dụng.
 
-## Checks and build
+<a id="checks-and-build"></a>
 
-From this application directory, run:
+## Kiểm tra và xây dựng
+
+Từ thư mục ứng dụng này, hãy chạy:
 
 ```sh
 mise x -- pnpm typecheck
@@ -94,26 +83,26 @@ mise x -- dotnet run --project tests/StageTamagotchiKirie.Tests
 mise x -- pnpm build
 ```
 
-`pnpm build` runs `kirie build` for Web assets and C#.
-It does not export or package the application.
+`pnpm build` chạy `kirie build` cho nội dung Web và C#. Nó không xuất hoặc đóng gói ứng dụng.
 
-From the repository root, run:
+Từ thư mục gốc của kho lưu trữ, hãy chạy:
 
 ```sh
 mise x -- pnpm typecheck
 mise x -- pnpm lint
 ```
 
-Build success does not establish native acceptance.
-[Verification](docs/verification.md) and [ablation evidence](docs/ablation-review.md) record historical command results.
+Xây dựng thành công không thiết lập sự chấp nhận native. [Verification](docs/verification.md) và [ablation bằng chứng](docs/ablation-review.md) ghi lại kết quả lệnh lịch sử.
 
-## Environment failures
+<a id="environment-failures"></a>
 
-| Symptom | Action |
+## Thất bại về môi trường
+
+| Triệu chứng | Hành động |
 | --- | --- |
-| Godot is absent or a C# change has no effect | Use the application directory and rebuild C# before development. |
-| CEF is absent or its marker is stale | Run the CEF installation command. |
-| CEF signature verification fails | Record the exact failure. A matching marker can cause the installer to skip an invalid framework. |
-| `Accelerated OSR unavailable` | Make sure that desktop uses Forward+ with Metal, Direct3D 12, or Vulkan. |
-| NuGet reports a missing pinned release | Compare feed metadata with the [dependency evidence](MIGRATION.md#dependency-baseline). |
-| Native or IPC behavior fails | Find its capability and accepted scope in [MIGRATION.md](MIGRATION.md). |
+| Godot vắng mặt hoặc thay đổi C# không có hiệu lực | Sử dụng thư mục ứng dụng và xây dựng lại C# trước khi phát triển. |
+| CEF không có hoặc điểm đánh dấu của nó đã cũ | Chạy lệnh cài đặt CEF. |
+| Xác minh chữ ký CEF không thành công | Ghi lại sự thất bại chính xác. Điểm đánh dấu phù hợp có thể khiến trình cài đặt bỏ qua khung không hợp lệ. |
+| `Accelerated OSR unavailable` | Đảm bảo rằng desktop sử dụng Forward+ với Metal, Direct3D 12 hoặc Vulkan. |
+| NuGet báo cáo bản phát hành được ghim bị thiếu | So sánh siêu dữ liệu của nguồn cấp dữ liệu với bằng chứng phụ thuộc [](MIGRATION.md#dependency-baseline). |
+| Hành vi native hoặc IPC không thành công | Tìm khả năng và phạm vi được chấp nhận của nó trong [MIGRATION.md](MIGRATION.md). |
