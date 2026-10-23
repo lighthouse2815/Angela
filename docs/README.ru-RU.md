@@ -290,7 +290,7 @@ pnpm dev
 ### Stage Tamagotchi (Десктопная версия)
 
 ```shell
-pnpm dev:tamagotchi
+pnpm dev:desktop
 ```
 
 Включён пакет Nix для Tamagotchi. Чтобы запустить airi с Nix, сначала убедитесь, что включены flakes, затем выполните:
@@ -330,7 +330,7 @@ CAPACITOR_DEV_SERVER_URL=https://<your-ip-address>:5273 pnpm open:ios
 Если нужно подключить серверный канал Pocket в беспроводном режиме, запустите Tamagotchi с правами root:
 
 ```shell
-sudo pnpm dev:tamagotchi
+sudo pnpm dev:desktop
 ```
 
 Затем включите secure websocket в `settings/connections` Tamagotchi.

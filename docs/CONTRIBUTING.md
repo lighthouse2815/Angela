@@ -141,7 +141,7 @@ mise exec -- npm install --global @antfu/ni
 ### Stage Tamagotchi (Desktop version)
 
 ```shell
-pnpm dev:tamagotchi
+pnpm dev:desktop
 ```
 
 > [!NOTE]
@@ -149,7 +149,7 @@ pnpm dev:tamagotchi
 > For [@antfu/ni](https://github.com/antfu-collective/ni) users, you can
 >
 > ```shell
-> nr dev:tamagotchi
+> nr dev:desktop
 > ```
 
 > [!NOTE]

@@ -290,7 +290,7 @@ pnpm dev
 ### ステージたまごっち（デスクトップアプリ）
 
 ```shell
-pnpm dev:tamagotchi
+pnpm dev:desktop
 ```
 
 たまごっち用の Nix パッケージも用意しています。flakes を有効化した上で、次のように実行できます：
@@ -330,7 +330,7 @@ Xcode が開いたら、"Run" ボタンをクリックして iPhone 上でアプ
 ワイヤレスモードで Pocket のサーバーチャンネルへ接続する必要がある場合は、Tamagotchi を root 権限で起動してください：
 
 ```shell
-sudo pnpm dev:tamagotchi
+sudo pnpm dev:desktop
 ```
 
 その後、Tamagotchi の `settings/connections` で secure websocket を有効にしてください。

@@ -2,14 +2,14 @@
 
 ## Chạy ứng dụng
 
-Nếu dùng mise, chạy `mise exec -- pnpm dev:tamagotchi` từ thư mục dự án.
+Nếu dùng mise, chạy `mise exec -- pnpm dev:desktop` từ thư mục dự án.
 Lệnh này dùng pnpm được ghim trong `.tool-versions`.
 Bản web chạy bằng `mise exec -- pnpm dev:web`.
 
 Nếu muốn dùng API trước và tải mô hình nhận diện từ gọi sau, chạy:
 
 ```bash
-SHERPAW_BUNDLE_KWS=false mise exec -- pnpm dev:tamagotchi
+SHERPAW_BUNDLE_KWS=false mise exec -- pnpm dev:desktop
 ```
 
 Build cùng cấu hình bằng:
@@ -238,7 +238,7 @@ Nếu gặp lỗi này, build AUV với thư viện của máy:
 
 ```bash
 mise exec -- pnpm -F @angela/desktop setup:computer-use
-mise exec -- pnpm dev:tamagotchi
+mise exec -- pnpm dev:desktop
 ```
 
 Chạy từ thư mục gốc repository. Cần Rust và [thư viện phát triển của AUV](https://github.com/moeru-ai/auv/tree/v0.0.28#install-with-cargo).

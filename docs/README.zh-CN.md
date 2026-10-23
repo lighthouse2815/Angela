@@ -289,7 +289,7 @@ pnpm dev
 ### 桌面版（也叫拓麻歌子，aka 电子宠物）
 
 ```shell
-pnpm dev:tamagotchi
+pnpm dev:desktop
 ```
 
 我们提供了拓麻歌子的 Nix 包。先启用 flakes，然后可以直接运行：
@@ -304,7 +304,7 @@ nix run github:lighthouse2815/Angela
 
 ```shell
 nix develop .#fhs
-pnpm dev:tamagotchi
+pnpm dev:desktop
 ```
 
 ### Stage Pocket（移动版）
@@ -338,7 +338,7 @@ CAPACITOR_DEV_SERVER_URL=https://<your-ip-address>:5273 pnpm open:ios
 如果需要在无线模式下连接 Pocket 的 server channel，需要以 root 权限启动 Tamagotchi：
 
 ```shell
-sudo pnpm dev:tamagotchi
+sudo pnpm dev:desktop
 ```
 
 然后在 Tamagotchi 的 `settings/connections` 中启用 secure websocket。

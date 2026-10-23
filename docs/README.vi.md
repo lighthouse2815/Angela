@@ -290,7 +290,7 @@ pnpm dev
 ### Stage Tamagotchi (phiên bản máy tính)
 
 ```shell
-pnpm dev:tamagotchi
+pnpm dev:desktop
 ```
 
 Gói Nix dành cho Tamagotchi được bao gồm. Để chạy airi với Nix, trước tiên hãy đảm bảo bạn đã bật flakes, sau đó chạy:
@@ -330,7 +330,7 @@ Sau đó Xcode sẽ mở, và bạn có thể bấm nút "Run" để chạy app 
 Nếu cần kết nối server channel trên Pocket ở chế độ không dây, bạn cần khởi chạy Tamagotchi với quyền root:
 
 ```shell
-sudo pnpm dev:tamagotchi
+sudo pnpm dev:desktop
 ```
 
 Sau đó bật secure websocket trong `settings/connections` của Tamagotchi.

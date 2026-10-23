@@ -14,7 +14,7 @@ See [local configuration](../../packages/local-config/README.md) for the file co
 
 ## Development
 
-From the repository root, run `pnpm install`, then `pnpm dev:tamagotchi`.
+From the repository root, run `pnpm install`, then `pnpm dev:desktop`.
 Run `pnpm -F @angela/desktop build` to build the app.
 
 ## Local model files
@@ -110,7 +110,7 @@ If the bundled Linux CLI reports a missing shared library, build against the sys
 
 ```sh
 pnpm -F @angela/desktop setup:computer-use
-pnpm dev:tamagotchi
+pnpm dev:desktop
 ```
 
 Run these commands from the repository root. Install Rust and the [native build dependencies](https://github.com/moeru-ai/auv/tree/v0.0.28#install-with-cargo) first.

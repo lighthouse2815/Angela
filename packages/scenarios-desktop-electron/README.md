@@ -115,9 +115,9 @@ Important:
 
 ## Electron Profile Note (Plugin Discovery)
 
-When running scenarios through Vishot's generic Electron source capture, the built Electron app can use a different `userData` profile than `dev:tamagotchi`.
+When running scenarios through Vishot's generic Electron source capture, the built Electron app can use a different `userData` profile than `dev:desktop`.
 
-- `dev:tamagotchi` plugin root commonly resolves to:
+- `dev:desktop` plugin root commonly resolves to:
   - `~/Library/Application Support/@angela/desktop/plugins/v1`
 - Vishot/Electron capture runs can resolve plugin root to:
   - `~/Library/Application Support/Electron/plugins/v1`

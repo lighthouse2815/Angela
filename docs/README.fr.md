@@ -290,7 +290,7 @@ pnpm dev
 ### Stage Tamagotchi (Version Bureau)
 
 ```shell
-pnpm dev:tamagotchi
+pnpm dev:desktop
 ```
 
 Un package Nix pour Tamagotchi est inclus. Pour lancer Angela avec Nix, assurez-vous d'abord d'activer les flakes, puis exécutez :
@@ -330,7 +330,7 @@ Xcode s'ouvrira ensuite, et vous pourrez cliquer sur le bouton "Run" pour lancer
 Si vous devez connecter le canal serveur de Pocket en mode sans fil, vous devez lancer Tamagotchi avec les droits root :
 
 ```shell
-sudo pnpm dev:tamagotchi
+sudo pnpm dev:desktop
 ```
 
 Activez ensuite le websocket sécurisé dans `settings/connections` de Tamagotchi.

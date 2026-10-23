@@ -47,7 +47,7 @@ Sherpaw({
 Model artifacts come from `https://huggingface.co` by default. A host that cannot reach the Hub sets `HF_ENDPOINT`, the same variable `huggingface_hub` reads, and every application picks it up without a change:
 
 ```shell
-HF_ENDPOINT=https://hf-mirror.com pnpm dev:tamagotchi
+HF_ENDPOINT=https://hf-mirror.com pnpm dev:desktop
 ```
 
 Pass `endpoint` to set the base URL in one Vite config instead:

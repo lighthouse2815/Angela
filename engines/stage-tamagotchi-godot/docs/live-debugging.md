@@ -24,7 +24,7 @@ inspected in the Godot editor.
    ```powershell
    $env:GODOT_STAGE_REMOTE_DEBUG = "1"
    $env:GODOT_STAGE_REMOTE_DEBUG_URI = "tcp://127.0.0.1:6007"
-   nr dev:tamagotchi
+   nr dev:desktop
    ```
 
 4. In the Tamagotchi settings window, start the experimental Godot stage and
@@ -58,7 +58,7 @@ If the Godot editor only shows the local scene tree:
 
 - Confirm the Godot editor was started before the sidecar.
 - Confirm `Debug -> Keep Debug Server Open` is enabled.
-- Confirm `nr dev:tamagotchi` was started after setting
+- Confirm `nr dev:desktop` was started after setting
   `GODOT_STAGE_REMOTE_DEBUG=1`.
 - Close the Godot stage sidecar window and start it again from the Tamagotchi
   settings window.

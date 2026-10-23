@@ -292,7 +292,7 @@ pnpm dev
 ### Stage Tamagotchi (데스크톱 버전)
 
 ```shell
-pnpm dev:tamagotchi
+pnpm dev:desktop
 ```
 
 Tamagotchi용 Nix 패키지도 포함되어 있습니다. flakes를 활성화한 후 다음과 같이 실행할 수 있습니다:
@@ -307,7 +307,7 @@ Electron에 필요한 공유 라이브러리가 NixOS에서는 표준 경로에 
 
 ```shell
 nix develop .#fhs
-pnpm dev:tamagotchi
+pnpm dev:desktop
 ```
 
 ### Stage Pocket (모바일 버전)
@@ -327,7 +327,7 @@ CAPACITOR_DEVICE_ID_IOS="<DEVICE_ID_OR_SIMULATOR_NAME>" pnpm dev:pocket:ios
 무선 모드에서 Pocket의 서버 채널에 연결해야 하는 경우, Tamagotchi를 루트 권한으로 시작해야 합니다:
 
 ```shell
-sudo pnpm dev:tamagotchi
+sudo pnpm dev:desktop
 ```
 
 그런 다음 Tamagotchi의 `settings/connections`에서 보안 웹소켓을 활성화하세요.

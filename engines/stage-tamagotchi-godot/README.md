@@ -77,24 +77,24 @@ PowerShell:
 
 ```powershell
 $env:GODOT4 = "C:\Path\To\Godot_v4.x-stable_mono_win64.exe"
-pnpm dev:tamagotchi
+pnpm dev:desktop
 ```
 
 macOS / Linux:
 
 ```bash
-GODOT4="/path/to/godot" pnpm dev:tamagotchi
+GODOT4="/path/to/godot" pnpm dev:desktop
 ```
 
 With GodotEnv:
 
 ```bash
-GODOT4="$(godotenv godot env path)" pnpm dev:tamagotchi
+GODOT4="$(godotenv godot env path)" pnpm dev:desktop
 ```
 
 Keep machine-specific Godot paths outside the repository. The current Electron
 main service reads `process.env.GODOT4`, so the shell or local development
-environment must provide it before starting `pnpm dev:tamagotchi`.
+environment must provide it before starting `pnpm dev:desktop`.
 
 ## Editor Static Preview
 
@@ -256,7 +256,7 @@ Then start the Electron development app with Godot remote debugging enabled:
 ```powershell
 $env:GODOT_STAGE_REMOTE_DEBUG = "1"
 $env:GODOT_STAGE_REMOTE_DEBUG_URI = "tcp://127.0.0.1:6007"
-nr dev:tamagotchi
+nr dev:desktop
 ```
 
 `GODOT_STAGE_REMOTE_DEBUG_URI` is optional and defaults to
