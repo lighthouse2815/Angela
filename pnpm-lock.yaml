@@ -1358,6 +1358,12 @@ importers:
 
   apps/desktop:
     dependencies:
+      "@angela/core-agent":
+        specifier: workspace:^
+        version: link:../../packages/core-agent
+      "@angela/cli":
+        specifier: workspace:^
+        version: link:../../packages/angela-cli
       '@auv-js/cli':
         specifier: 'catalog:'
         version: 0.0.28
@@ -4245,6 +4251,9 @@ importers:
 
   packages/stage-ui:
     dependencies:
+      "@angela/cli":
+        specifier: workspace:^
+        version: link:../angela-cli
       '@better-fetch/fetch':
         specifier: 'catalog:'
         version: 1.3.1

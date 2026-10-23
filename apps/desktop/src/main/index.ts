@@ -35,6 +35,7 @@ import { createI18n } from './libs/i18n'
 import { setupAppleSpeechTranscriptionService } from './services/angela/apple-speech-transcription'
 import { setupAppleVisionService } from './services/angela/apple-vision'
 import { setupServerChannel } from './services/angela/channel-server'
+import { setupCompanionRuntime } from './services/angela/companion-runtime'
 import { setupComputerUse } from './services/angela/computer-use'
 import { setupGodotStageManager } from './services/angela/godot-stage'
 import { setupHomeAssistant } from './services/angela/home-assistant'
@@ -396,6 +397,7 @@ app.whenReady().then(async () => {
       const { context } = createContext(ipcMain)
       setupComputerUse(context)
       setupLocalProviderConfig(context)
+      setupCompanionRuntime(context)
       setupStudyWorkspace(context)
       setupHomeAssistant(context)
       await setupArtistryBridge({

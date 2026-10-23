@@ -64,6 +64,7 @@ toaster:
       notNow: Not now
       ok: OK
 companion:
+  import-error: Shared memory is unavailable. Existing local records are intact. Angela will retry the import. Check storage and restart if this persists.
   title: Companion
   description: Save support preferences, shared activities, and subjects to revisit. Desktop follow-ups appear while the app is open and idle, between 08:00 and 22:00. At most one appears per hour. Each record prompts once.
   enabled: Enable companion memory and follow-ups

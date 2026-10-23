@@ -18,7 +18,7 @@ export function useCompanionFollowUps() {
   const speaking = useSpeakingStore()
   const runtime = usePiniaSynced()
   const visibility = useDocumentVisibility()
-  const { idle } = useIdle(60000)
+  const { idle, stop: stopIdle } = useIdle(60000)
   const { t } = useI18n()
   let disposed = false
   let checking = false
@@ -78,6 +78,7 @@ export function useCompanionFollowUps() {
   onScopeDispose(() => {
     disposed = true
     interval.pause()
+    stopIdle()
     stopWatch()
     if (toastId !== undefined)
       toast.dismiss(toastId)

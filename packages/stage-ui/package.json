@@ -81,6 +81,7 @@
   "dependencies": {
     "@angela/audio": "workspace:^",
     "@angela/ccc": "workspace:^",
+    "@angela/cli": "workspace:^",
     "@angela/core-agent": "workspace:^",
     "@angela/core-character": "workspace:^",
     "@angela/font-chillroundm": "workspace:^",

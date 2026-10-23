@@ -2,8 +2,7 @@
 
 ## Status
 
-Implementation in progress. This document defines the target and migration requirements.
-It does not certify that the current applications share a runtime.
+Implemented. Desktop and the supported Telegram adapter use AngelaRuntime and the same explicitly linked companion records.
 
 ## Problem
 
@@ -64,24 +63,45 @@ That session implements this document and follows the repository checks and comm
 Commit each independently complete change in Vietnamese and push to the existing GitHub remote.
 Keep caches and pre-existing LICENSE deletions unchanged.
 
-## Implemented foundation
+## Implementation
 
-RuntimeSession accepts a structural RuntimeChat host instead of requiring the CLI Chat class.
-The CLI Chat still satisfies this contract without behavior changes.
-An external host can retain generation and presentation while the runtime owns privacy, context, tools, and lifecycle.
-This contract alone does not connect Electron or migrate memory.
+RuntimeSession accepts a structural RuntimeChat host. CLI Chat and the Electron main adapter implement that boundary.
+Electron main owns runtime context, durable tools, privacy, tasks, and OpenLoops.
+The renderer retains generation, media projection, provider selection, streaming, avatars, and authorized device tools.
+Eventa binds requests and tool calls to the local application frame and its WebContents identity.
+Cancellation, window destruction, expiry, and shutdown release the main request.
 
-## Outstanding work
+CompanionRecords stores typed learning and companion pages in Memory V2 with atomic import receipts.
+The imported identities, review progress, due dates, presentation markers, and dismissal states remain intact.
+Import failure preserves the original source and permits retry without a receipt.
+Successful import leaves localStorage as an inert recovery source. Desktop edits never write back to that source.
+Browser-only stage-web remains a supported local-storage client of the same record schemas.
 
-Electron main and renderer adapters, import receipts, learning review transfer, and Telegram integration retirement remain unimplemented.
-The separate shell refactor session stopped because its workspace exhausted credits.
-The parent session completed validation of the host boundary. No personal data was migrated.
+Desktop supplies original stored user messages rather than model prompt decorations.
+An inherited protected-history flag preserves the no-store policy beyond the bounded history sent over IPC.
+Runtime tool writes also recheck the shared opt-out when another channel changes it during generation.
 
-## Foundation validation
+The linked Telegram owner shares the character root with desktop.
+Other Telegram users remain isolated. Typed record scopes also include the exact workspace and character.
+Desktop polls shared views every five seconds, so Telegram corrections become visible without duplicate persistence.
 
-- CLI test suite: 75 files and 893 tests passed with two workers, without concurrent heavyweight checks.
-- CLI typecheck and build passed.
-- Root typecheck passed all 53 tasks with one-task concurrency and a 4 GB heap.
-- Root lint passed with zero errors and 603 existing warnings.
-- An earlier concurrent test run timed out in a CLI subprocess hook. The sequential rerun passed without timeout changes.
-- No live Telegram message or paid generation request ran during these checks.
+Desktop runtime reminders require a renderer presentation receipt before task delivery completes.
+OpenLoops retain their existing at-most-once reservation policy.
+Learning reviews and companion activities retain desktop presentation with shared durable progress.
+They do not gain a second Telegram notification path.
+
+## Telegram retirement boundary
+
+The root `pnpm telegram` command starts the packages/angela-cli adapter.
+The upstream integrations/telegram-bot prototype is excluded from the default workspace.
+Its PostgreSQL and media source remain archived, without deleting existing data.
+Those database records and media workflows need a separate migration before their source can be removed.
+Read [the shared runtime guide](../../../packages/angela-cli/src/companion/README.md) for configuration and supported boundaries.
+
+## Validation
+
+Checks use temporary stores, local fake Telegram servers, and mocked provider and Electron IPC boundaries.
+No live Telegram messages or paid generation requests run during these checks.
+The companion tests cover shared corrections, scope isolation, import rollback, retained progress, opt-outs, and nested transaction rollback.
+Desktop tests cover provider streaming, direct replies, original message identities, long-history privacy, cancellation, and reminder receipts.
+Browser store tests cover import retry, multi-character sources, and single persistence through synced leader and follower windows.

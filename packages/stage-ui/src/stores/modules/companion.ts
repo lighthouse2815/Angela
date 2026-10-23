@@ -1,29 +1,20 @@
+import type { CompanionEntry, RecordsCommand } from '@angela/cli/companion-contracts'
 import type {} from 'pinia-plugin-synced'
 import type { InferOutput } from 'valibot'
 
+import { companionEntrySchema as entrySchema, companionStateSchema as stateSchema } from '@angela/cli/companion-contracts'
 import { nanoid } from 'nanoid'
 import { defineStore } from 'pinia'
-import { array, boolean, finite, maxLength, minLength, nullable, number, object, optional, parse, picklist, pipe, safeParse, string, trim } from 'valibot'
+import { parse, picklist, safeParse } from 'valibot'
 import { shallowRef } from 'vue'
 
-export const companionKindSchema = picklist(['preference', 'thread', 'activity'])
-const textSchema = pipe(string(), trim(), minLength(1), maxLength(500))
-const entrySchema = object({
-  id: string(),
-  characterId: pipe(string(), minLength(1)),
-  kind: companionKindSchema,
-  text: textSchema,
-  status: picklist(['open', 'completed', 'dismissed']),
-  createdAt: number(),
-  updatedAt: number(),
-  dueAt: nullable(pipe(number(), finite())),
-  promptedAt: optional(number()),
-})
-const stateSchema = object({ enabled: boolean(), entries: array(entrySchema), lastPromptAt: number() })
-const storageKey = 'angela/companion/v1'
+import { companionTransport, importCompanionRecords } from '../../services/companion-runtime'
+import { useAngelaCardStore } from './angela-card'
 
-/** A user-supplied preference, unfinished subject, or shared activity. Completion requires an explicit user report. */
-export type CompanionEntry = InferOutput<typeof entrySchema>
+export { companionKindSchema } from '@angela/cli/companion-contracts'
+export type { CompanionEntry } from '@angela/cli/companion-contracts'
+
+const storageKey = 'angela/companion/v1'
 
 function load() {
   try {
@@ -41,6 +32,21 @@ function load() {
 export const useCompanionStore = defineStore('companion', () => {
   const state = shallowRef(load())
 
+  async function shared(characterId: string, command: RecordsCommand) {
+    const host = companionTransport()
+    if (!host)
+      throw new Error('The shared companion host is unavailable')
+    await importCompanionRecords(characterId)
+    const result = await host.records(characterId, command)
+    state.value = { ...result.snapshot.companion, entries: [...state.value.entries.filter(entry => entry.characterId !== characterId), ...result.snapshot.companion.entries] }
+    return result
+  }
+
+  async function refresh(characterId: string) {
+    if (companionTransport())
+      await shared(characterId, { type: 'read' })
+  }
+
   function persist(next: InferOutput<typeof stateSchema>) {
     localStorage.setItem(storageKey, JSON.stringify(next))
     state.value = next
@@ -51,10 +57,18 @@ export const useCompanionStore = defineStore('companion', () => {
   }
 
   async function setEnabled(enabled: boolean) {
+    if (companionTransport()) {
+      await shared(useAngelaCardStore().activeCardId, { type: 'companion.enabled', value: enabled })
+      return
+    }
     persist({ ...state.value, enabled })
   }
 
   async function save(characterId: string, kind: CompanionEntry['kind'], text: string, dueAt: number | null = null, id?: string) {
+    if (companionTransport()) {
+      const result = await shared(characterId, { type: 'companion.save', kind, text, dueAt, id })
+      return result.snapshot.companion.entries.find(entry => entry.id === result.entryId)!
+    }
     if (!state.value.enabled)
       throw new Error('disabled')
     const now = Date.now()
@@ -84,6 +98,10 @@ export const useCompanionStore = defineStore('companion', () => {
   }
 
   async function resolve(characterId: string, id: string, status: 'completed' | 'dismissed') {
+    if (companionTransport()) {
+      const result = await shared(characterId, { type: 'companion.resolve', id, status })
+      return result.snapshot.companion.entries.find(entry => entry.id === id)!
+    }
     const current = forCharacter(characterId).find(entry => entry.id === id)
     if (!current)
       throw new Error('missing')
@@ -94,11 +112,17 @@ export const useCompanionStore = defineStore('companion', () => {
   }
 
   async function forget(characterId: string, id: string) {
+    if (companionTransport()) {
+      await shared(characterId, { type: 'companion.forget', id })
+      return
+    }
     persist({ ...state.value, entries: state.value.entries.filter(entry => entry.characterId !== characterId || entry.id !== id) })
   }
 
   /** Reserves at most one attempt per record, and at most one per hour across characters, before any UI side effect. */
   async function reservePrompt(characterId: string) {
+    if (companionTransport())
+      return (await shared(characterId, { type: 'companion.reserve' })).prompt ?? null
     const now = Date.now()
     const hour = new Date(now).getHours()
     if (!state.value.enabled || hour < 8 || hour >= 22 || now - state.value.lastPromptAt < 3600000)
@@ -112,7 +136,7 @@ export const useCompanionStore = defineStore('companion', () => {
     return structuredClone(entry)
   }
 
-  return { state, forCharacter, setEnabled, save, resolve, forget, reservePrompt }
+  return { refresh, state, forCharacter, setEnabled, save, resolve, forget, reservePrompt }
 }, {
-  synced: { state: true, actions: ['setEnabled', 'save', 'resolve', 'forget', 'reservePrompt'] },
+  synced: { state: true, actions: ['refresh', 'setEnabled', 'save', 'resolve', 'forget', 'reservePrompt'] },
 })

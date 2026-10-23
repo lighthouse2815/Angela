@@ -75,6 +75,7 @@ toaster:
     action:
       notNow: Để sau
 companion:
+  import-error: Chưa truy cập được bộ nhớ dùng chung. Dữ liệu local cũ vẫn còn. Angela sẽ thử nhập lại. Kiểm tra bộ nhớ máy và khởi động lại nếu lỗi tiếp diễn.
   title: Đồng hành
   description: Lưu cách hỗ trợ bạn thích, hoạt động chung và chuyện muốn hỏi lại. Desktop hỏi khi ứng dụng đang mở và rảnh, từ 08:00 đến 22:00. Tối đa một lần mỗi giờ. Mỗi bản ghi chỉ hỏi một lần.
   enabled: Bật ghi nhớ đồng hành và hỏi thăm

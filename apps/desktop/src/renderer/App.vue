@@ -71,6 +71,7 @@ import { initializeElectronAuthCallbackBridge } from './bridges/electron-auth-ca
 import { initializeIOTraceRecordingBridge } from './bridges/io-trace-recording'
 import { initializeStageThreeRuntimeTraceBridge } from './bridges/stage-three-runtime-trace'
 import { useCompanionFollowUps } from './composables/use-companion-follow-ups'
+import { useCompanionRuntime } from './composables/use-companion-runtime'
 import { useLanguage } from './composables/use-language'
 import { useLearningReviewReminders } from './composables/use-learning-review-reminders'
 import { useServerChannelSettingsStore } from './stores/settings/server-channel'
@@ -122,6 +123,7 @@ const homeAssistantStore = useTamagotchiHomeAssistantStore()
 const mcpToolsStore = useTamagotchiMcpToolsStore()
 const pluginToolsStore = useTamagotchiPluginToolsStore()
 const syncedPinia = usePiniaSynced()
+useCompanionRuntime()
 useLearningReviewReminders()
 if (initialRoutePath === '/')
   useCompanionFollowUps()
