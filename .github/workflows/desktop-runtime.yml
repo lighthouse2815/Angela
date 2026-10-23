@@ -6,7 +6,7 @@ on:
     paths:
       - 'apps/desktop/**'
       - 'core/**'
-      - 'providers/**'
+      - 'providers/inference/**'
       - 'capabilities/**'
       - 'shared/**'
       - 'backend/contracts/**'
@@ -24,7 +24,7 @@ on:
     paths:
       - 'apps/desktop/**'
       - 'core/**'
-      - 'providers/**'
+      - 'providers/inference/**'
       - 'capabilities/**'
       - 'shared/**'
       - 'backend/contracts/**'
@@ -69,7 +69,7 @@ jobs:
       - name: Shared companion runtime tests
         run: pnpm -F @angela/companion exec vitest run --config vitest.config.ts src/companion src/runtime --maxWorkers=1 --no-file-parallelism --testTimeout=30000 --hookTimeout=30000
       - name: Desktop Node tests
-        run: pnpm exec vitest run --project stage-tamagotchi:node --testTimeout=30000 --hookTimeout=30000
+        run: pnpm exec vitest run --config apps/desktop/vitest.node.config.ts --testTimeout=30000 --hookTimeout=30000
       - name: Desktop companion browser tests
         run: pnpm -F @angela/desktop exec vitest run --config vitest.config.ts --project browser src/renderer/composables/use-companion-runtime.browser.test.ts src/renderer/composables/use-companion-follow-ups.browser.test.ts --maxWorkers=1 --no-file-parallelism --testTimeout=30000 --hookTimeout=30000
       - name: CLI typecheck

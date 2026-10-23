@@ -20,7 +20,7 @@ Chạy các nhóm test tương ứng:
 
 ```sh
 pnpm -F @angela/companion exec vitest run --config vitest.config.ts src/companion src/runtime --maxWorkers=1 --no-file-parallelism --testTimeout=30000 --hookTimeout=30000
-pnpm exec vitest run --project stage-tamagotchi:node --testTimeout=30000 --hookTimeout=30000
+pnpm exec vitest run --config apps/desktop/vitest.node.config.ts --testTimeout=30000 --hookTimeout=30000
 pnpm -F @angela/desktop exec vitest run --config vitest.config.ts --project browser src/renderer/composables/use-companion-runtime.browser.test.ts src/renderer/composables/use-companion-follow-ups.browser.test.ts --maxWorkers=1 --no-file-parallelism --testTimeout=30000 --hookTimeout=30000
 ```
 
@@ -100,7 +100,7 @@ Chưa chứng nhận heartbeat với snapshot, click native hoặc cách ly chu�
 - Desktop Node: 684 test đạt, 2 test bỏ qua theo cấu hình hiện có.
 - Browser companion: 6 test đạt trong 2 file.
 - Smoke cửa sổ Electron: đạt trên Linux Wayland, có renderer và cửa sổ hiển thị.
-- Gateway: 75 test hồi quy đạt trong 7 file.
+- Gateway: 81 test hồi quy đạt trong 9 file.
 - WebSocket: 94 test đạt trong 5 file.
 - Voice client: 33 test đạt. Test dịch vụ thật chạy riêng và đạt.
 - Audio pipeline: 33 test đạt trong 3 file.
@@ -121,3 +121,7 @@ Không coi kiểm tra Node, browser hoặc RPC là bằng chứng cho click nati
 Smoke cửa sổ dùng `electron-vite preview --skipBuild` để tránh build lại trong thời gian chờ khởi động.
 CI dùng Xvfb do bước cài dependency Playwright cung cấp.
 Kiểm tra đầu vào Turbo xác nhận test không đổi mã hash cache. Thay đổi nguồn production đổi mã hash.
+
+CI desktop dùng trực tiếp `apps/desktop/vitest.node.config.ts`.
+Cấu hình gốc nạp cả các workspace nằm ngoài tập dependency được cài trên runner.
+Thay đổi gateway riêng không khởi chạy lại workflow desktop. Desktop theo dõi provider inference mà nó sử dụng.
