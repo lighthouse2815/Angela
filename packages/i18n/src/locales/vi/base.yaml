@@ -74,3 +74,28 @@ toaster:
     message: Có phiên bản mới, tải lại ngay?
     action:
       notNow: Để sau
+companion:
+  title: Đồng hành
+  description: Lưu cách hỗ trợ bạn thích, hoạt động chung và chuyện muốn hỏi lại. Desktop hỏi khi ứng dụng đang mở và rảnh, từ 08:00 đến 22:00. Tối đa một lần mỗi giờ. Mỗi bản ghi chỉ hỏi một lần.
+  enabled: Bật ghi nhớ đồng hành và hỏi thăm
+  memory-disabled: Bật Bộ nhớ dài hạn để dùng ngữ cảnh đồng hành và hỏi thăm.
+  kind: Loại bản ghi
+  subject: Sở thích, chuyện còn dang dở hoặc mục tiêu hoạt động
+  follow-up: Hỏi lại sau
+  no-timer: Không hỏi lại
+  minutes: '{count} phút'
+  save: Lưu / bắt đầu hoạt động
+  complete: Mình đã làm xong
+  dismiss: Đừng hỏi nữa
+  forget: Xóa bản ghi
+  error: Không lưu được thay đổi. Kiểm tra bộ nhớ máy và giới hạn 50 bản ghi mỗi nhân vật.
+  kinds:
+    preference: Cách hỗ trợ bạn thích
+    thread: Chuyện còn dang dở
+    activity: Hoạt động chung
+  status:
+    open: Đang mở
+    completed: Đã xong (bạn xác nhận)
+    dismissed: Đã dừng hỏi
+  prompt: 'Bạn muốn kể tiếp chuyện này không? {subject}'
+  elapsed: 'Đã hết thời gian hoạt động chung: {subject}. Bạn làm tới đâu rồi?'

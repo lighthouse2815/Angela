@@ -339,3 +339,20 @@ The default pack contains twelve generated chibi reactions of AIRI's official bl
 See [artwork provenance](src/assets/stickers/README.md) for references, exact prompts, and inspection notes.
 These are static assets. No runtime image-generation dependency is included.
 The four development-only Fluent Emoji images are removed. No old-ID migration is included.
+
+## Companion interactions
+
+Long-Term Memory settings include a Companion panel. Companion storage starts disabled.
+Enable both learning memory and companion memory to use saved companion context.
+The panel stores support preferences, unfinished subjects, and shared activity goals per character.
+Each character has a limit of 50 records. Delete old records to free space.
+
+Choose an activity and a duration to start a shared study or work session.
+The elapsed duration does not prove completion. The user confirms completion or dismisses the subject.
+The panel can delete records even when companion memory is disabled.
+Chat tools save verbatim user text and update existing records by ID.
+Protected turns expose no companion write tools. This control does not replace chat-history retention settings.
+
+The conversation policy supports listening, practical help, user corrections, and consistent forms of address.
+Voice replies favor short sentences and the latest correction after an interruption.
+These behaviors depend on the selected model. Existing voice controllers own capture, interruption, and playback.
