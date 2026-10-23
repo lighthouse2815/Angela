@@ -1,5 +1,6 @@
 "use client";
 
+import { gatewayApiBase, normalizeApiBase } from "@/shared/utils/gateway-endpoint";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Card, Button, ModelSelectModal, ManualConfigModal } from "@/shared/components";
 import { useModelCaps } from "@/shared/hooks/useModelCaps";
@@ -155,9 +156,9 @@ export default function GrokBuildToolCard({
 
   const getEffectiveBaseUrl = () => {
     const url = customBaseUrl || (typeof window !== "undefined"
-      ? window.location.origin.replace("://localhost", "://127.0.0.1")
-      : "http://127.0.0.1:20128");
-    return url.endsWith("/v1") ? url : `${url}/v1`;
+      ? gatewayApiBase(window.location.origin.replace("://localhost", "://127.0.0.1"))
+      : gatewayApiBase());
+    return normalizeApiBase(url);
   };
 
   const handleApply = async () => {

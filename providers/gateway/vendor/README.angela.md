@@ -48,6 +48,9 @@ The dashboard and Angela CLI use `/angela1` for inference requests.
 `/angela1/v1` supports clients that append the OpenAI version path automatically.
 `/v1` remains a supported API alias. All inference paths enforce the same API-key policy.
 Upstream provider URLs and the internal `/api/v1` handlers keep their protocol paths.
+CLI tool presets use the current dashboard origin and `/angela1`, including custom ports and tunnels.
+Settings writers preserve explicit `/angela1` and `/v1` paths. Custom OpenAI origins still receive `/v1`.
+Existing tool configurations with port 20128 remain recognized. New presets use port 1107 by default.
 
 ## Build and tests
 

@@ -1,5 +1,7 @@
 "use server";
 
+import { normalizeApiBase } from "@/shared/utils/gateway-endpoint";
+
 import { NextResponse } from "next/server";
 import { resolveCliApiKey } from "../resolveApiKey.js";
 import fs from "fs/promises";
@@ -33,7 +35,7 @@ const has9RouterConfig = (settings) => {
   if (!settings) return false;
   return (
     settings._managedBy === "9router" ||
-    (typeof settings.baseUrl === "string" && settings.baseUrl.length > 0 && settings.baseUrl.includes("20128"))
+    (typeof settings.baseUrl === "string" && settings.baseUrl.length > 0 && (settings.baseUrl.includes("/angela1") || settings.baseUrl.includes("20128")))
   );
 };
 
@@ -93,7 +95,7 @@ export async function POST(request) {
       existing = JSON.parse(raw);
     } catch {}
 
-    const normalizedBaseUrl = baseUrl.endsWith("/v1") ? baseUrl : `${baseUrl}/v1`;
+    const normalizedBaseUrl = normalizeApiBase(baseUrl);
     const updated = {
       ...existing,
       baseUrl: normalizedBaseUrl,

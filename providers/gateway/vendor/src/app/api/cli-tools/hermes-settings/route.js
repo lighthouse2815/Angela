@@ -1,5 +1,7 @@
 "use server";
 
+import { normalizeApiBase } from "@/shared/utils/gateway-endpoint";
+
 import { NextResponse } from "next/server";
 import { exec } from "child_process";
 import { promisify } from "util";
@@ -214,7 +216,7 @@ export async function POST(request) {
       return NextResponse.json({ error: "audio.model is required when enabling audio transcription" }, { status: 400 });
     }
 
-    const normalizedBaseUrl = baseUrl.endsWith("/v1") ? baseUrl : `${baseUrl}/v1`;
+    const normalizedBaseUrl = normalizeApiBase(baseUrl);
 
     // applyToAll refreshes endpoint + API key only (and the model blocks those belong to);
     // the stt wiring is per-profile and follows the single-profile path below.

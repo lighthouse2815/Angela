@@ -1,5 +1,7 @@
 "use server";
 
+import { normalizeApiBase } from "@/shared/utils/gateway-endpoint";
+
 import { NextResponse } from "next/server";
 import { exec } from "child_process";
 import { promisify } from "util";
@@ -114,8 +116,7 @@ export async function POST(request) {
     // Remove all existing 9Router configs
     settings.customModels = settings.customModels.filter(m => !m.id?.startsWith("custom:9Router"));
 
-    // Normalize baseUrl to ensure /v1 suffix
-    const normalizedBaseUrl = baseUrl.endsWith("/v1") ? baseUrl : `${baseUrl}/v1`;
+    const normalizedBaseUrl = normalizeApiBase(baseUrl);
     const keyToUse = apiKey || "your_api_key";
 
     // Determine active model: prefer explicit activeModel, else first of modelsArray

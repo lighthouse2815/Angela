@@ -1,5 +1,6 @@
 "use client";
 
+import { gatewayApiBase, normalizeApiBase } from "@/shared/utils/gateway-endpoint";
 import { useState, useEffect, useRef } from "react";
 import { Card, Button, ModelSelectModal, ManualConfigModal } from "@/shared/components";
 import Image from "next/image";
@@ -109,19 +110,19 @@ export default function JcodeToolCard({
 
   const getLocalBaseUrl = () => {
     if (typeof window !== "undefined") {
-      return normalizeLocalhost(window.location.origin);
+      return gatewayApiBase(normalizeLocalhost(window.location.origin));
     }
-    return "http://127.0.0.1:20128";
+    return gatewayApiBase();
   };
 
   const getEffectiveBaseUrl = () => {
     const url = customBaseUrl || getLocalBaseUrl();
-    return url.endsWith("/v1") ? url : `${url}/v1`;
+    return normalizeApiBase(url);
   };
 
   const getDisplayUrl = () => {
     const url = customBaseUrl || getLocalBaseUrl();
-    return url.endsWith("/v1") ? url : `${url}/v1`;
+    return normalizeApiBase(url);
   };
 
   const handleApplySettings = async () => {

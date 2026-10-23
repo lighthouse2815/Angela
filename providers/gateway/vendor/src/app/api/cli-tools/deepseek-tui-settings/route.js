@@ -1,5 +1,7 @@
 "use server";
 
+import { normalizeApiBase } from "@/shared/utils/gateway-endpoint";
+
 import { NextResponse } from "next/server";
 import { resolveCliApiKey } from "../resolveApiKey.js";
 import { exec } from "child_process";
@@ -54,7 +56,7 @@ const parseToml = (content) => {
 
 // Build TOML config for 9Router (openai provider mode)
 const build9RouterConfig = (baseUrl, apiKey, model) => {
-    const normalizedBaseUrl = baseUrl.endsWith("/v1") ? baseUrl : `${baseUrl}/v1`;
+    const normalizedBaseUrl = normalizeApiBase(baseUrl);
     return `provider = "openai"
 
 [providers.openai]

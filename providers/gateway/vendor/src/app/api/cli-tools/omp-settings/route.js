@@ -1,5 +1,7 @@
 "use server";
 
+import { normalizeApiBase } from "@/shared/utils/gateway-endpoint";
+
 import { NextResponse } from "next/server";
 import { resolveCliApiKey } from "../resolveApiKey.js";
 import fs from "fs/promises";
@@ -46,12 +48,12 @@ const readModelsYml = async () => {
 
 const has9RouterInYml = (content) => {
   if (!content) return false;
-  return content.includes("9router:") || content.includes("localhost:20128");
+  return content.includes("9router:") || (content.includes("127.0.0.1:1107") || content.includes("localhost:20128"));
 };
 
 // Build standard 9Router provider block for models.yml
 const buildOmpProviderYaml = (baseUrl, apiKey) => {
-  const normalizedBaseUrl = baseUrl.endsWith("/v1") ? baseUrl : `${baseUrl}/v1`;
+  const normalizedBaseUrl = normalizeApiBase(baseUrl);
   const key = apiKey || "";
   return `  ${PROVIDER_ID}:
     baseUrl: ${normalizedBaseUrl}

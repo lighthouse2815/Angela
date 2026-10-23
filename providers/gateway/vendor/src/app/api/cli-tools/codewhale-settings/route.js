@@ -1,5 +1,7 @@
 "use server";
 
+import { normalizeApiBase } from "@/shared/utils/gateway-endpoint";
+
 import { NextResponse } from "next/server";
 import { resolveCliApiKey } from "../resolveApiKey.js";
 import fs from "fs/promises";
@@ -32,7 +34,7 @@ const checkCodewhaleInstalled = async () => {
 
 const has9RouterConfig = (content) => {
   if (!content) return false;
-  return content.includes("managed by Angela Gateway") || content.includes("localhost:20128");
+  return content.includes("managed by Angela Gateway") || (content.includes("127.0.0.1:1107") || content.includes("localhost:20128"));
 };
 
 const readConfig = async () => {
@@ -94,7 +96,7 @@ export async function POST(request) {
       existing = parseTOML(raw);
     } catch {}
 
-    const normalizedBaseUrl = baseUrl.endsWith("/v1") ? baseUrl : `${baseUrl}/v1`;
+    const normalizedBaseUrl = normalizeApiBase(baseUrl);
 
     existing.openai = {
       base_url: normalizedBaseUrl,

@@ -1,5 +1,7 @@
 "use server";
 
+import { normalizeApiBase } from "@/shared/utils/gateway-endpoint";
+
 import { NextResponse } from "next/server";
 import { resolveCliApiKey } from "../resolveApiKey.js";
 import { exec } from "child_process";
@@ -112,7 +114,7 @@ export async function POST(request) {
       config = JSON.parse(existing);
     } catch { /* No existing config */ }
 
-    const normalizedBaseUrl = baseUrl.endsWith("/v1") ? baseUrl : `${baseUrl}/v1`;
+    const normalizedBaseUrl = normalizeApiBase(baseUrl);
     const keyToUse = await resolveCliApiKey(apiKey);
     const effectiveSubagentModel = subagentModel || modelsArray[0];
 

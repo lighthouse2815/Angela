@@ -1,5 +1,7 @@
 "use server";
 
+import { normalizeApiBase } from "@/shared/utils/gateway-endpoint";
+
 import { NextResponse } from "next/server";
 import { resolveCliApiKey } from "../resolveApiKey.js";
 import fs from "fs/promises";
@@ -38,7 +40,7 @@ const has9RouterConfig = (settings) => {
   const p = settings.providers["9router"];
   if (p && p.base_url) return true;
   for (const prov of Object.values(settings.providers)) {
-    if (prov.base_url && prov.base_url.includes("20128")) return true;
+    if (prov.base_url && (prov.base_url.includes("/angela1") || prov.base_url.includes("20128"))) return true;
   }
   return false;
 };
@@ -103,7 +105,7 @@ export async function POST(request) {
 
     if (!existing.providers) existing.providers = {};
 
-    const normalizedBaseUrl = baseUrl.endsWith("/v1") ? baseUrl : `${baseUrl}/v1`;
+    const normalizedBaseUrl = normalizeApiBase(baseUrl);
     const modelId = model || "provider/model-id";
 
     existing.providers["9router"] = {

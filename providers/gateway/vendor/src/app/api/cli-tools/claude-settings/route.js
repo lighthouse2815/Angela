@@ -1,5 +1,7 @@
 "use server";
 
+import { normalizeApiBase } from "@/shared/utils/gateway-endpoint";
+
 import { NextResponse } from "next/server";
 import { exec } from "child_process";
 import { promisify } from "util";
@@ -149,11 +151,8 @@ export async function POST(request) {
       }
     }
 
-    // Normalize ANTHROPIC_BASE_URL to ensure /v1 suffix
     if (env.ANTHROPIC_BASE_URL) {
-      env.ANTHROPIC_BASE_URL = env.ANTHROPIC_BASE_URL.endsWith("/v1")
-        ? env.ANTHROPIC_BASE_URL
-        : `${env.ANTHROPIC_BASE_URL}/v1`;
+      env.ANTHROPIC_BASE_URL = normalizeApiBase(env.ANTHROPIC_BASE_URL);
     }
 
     // Keep an existing token (real key or earlier config); only add when absent — Reset clears it.

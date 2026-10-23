@@ -1,5 +1,6 @@
 "use client";
 
+import { gatewayApiBase, normalizeApiBase } from "@/shared/utils/gateway-endpoint";
 import { useState, useEffect, useRef } from "react";
 import { Card, Button, ModelSelectModal, ManualConfigModal } from "@/shared/components";
 import Image from "next/image";
@@ -109,10 +110,10 @@ export default function OpenCodeToolCard({ tool, isExpanded, onToggle, baseUrl, 
 
   const getEffectiveBaseUrl = () => {
     const url = customBaseUrl || baseUrl;
-    return url.endsWith("/v1") ? url : `${url}/v1`;
+    return normalizeApiBase(url);
   };
 
-  const getDisplayUrl = () => customBaseUrl || `${baseUrl}/v1`;
+  const getDisplayUrl = () => customBaseUrl || gatewayApiBase(baseUrl);
 
   const checkStatus = async () => {
     setChecking(true);

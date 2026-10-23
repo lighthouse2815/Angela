@@ -1,5 +1,7 @@
 "use server";
 
+import { normalizeApiBase } from "@/shared/utils/gateway-endpoint";
+
 import { NextResponse } from "next/server";
 import { exec } from "child_process";
 import { promisify } from "util";
@@ -162,7 +164,7 @@ export async function POST(request) {
     if (!settings.models) settings.models = {};
     if (!settings.models.providers) settings.models.providers = {};
 
-    const normalizedBaseUrl = baseUrl.endsWith("/v1") ? baseUrl : `${baseUrl}/v1`;
+    const normalizedBaseUrl = normalizeApiBase(baseUrl);
     const fullModelId = `9router/${model}`;
 
     // Remove all old 9router/* entries from agents.defaults.models

@@ -1,5 +1,6 @@
 "use client";
 
+import { gatewayApiBase } from "@/shared/utils/gateway-endpoint";
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { CardSkeleton } from "@/shared/components";
@@ -120,10 +121,10 @@ export default function ToolDetailClient({ toolId, machineId }) {
   }, []);
 
   const getBaseUrl = () => {
-    if (tunnelEnabled && tunnelPublicUrl) return tunnelPublicUrl;
-    if (cloudEnabled && CLOUD_URL) return CLOUD_URL;
-    if (typeof window !== "undefined") return window.location.origin;
-    return "http://localhost:20128";
+    if (tunnelEnabled && tunnelPublicUrl) return gatewayApiBase(tunnelPublicUrl);
+    if (cloudEnabled && CLOUD_URL) return gatewayApiBase(CLOUD_URL);
+    if (typeof window !== "undefined") return gatewayApiBase(window.location.origin);
+    return gatewayApiBase();
   };
 
   const renderToolCard = () => {

@@ -1,5 +1,7 @@
 "use server";
 
+import { normalizeApiBase } from "@/shared/utils/gateway-endpoint";
+
 import { NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
@@ -52,7 +54,7 @@ const has9RouterConfig = (config) => {
   if (providers["9router"]) return true;
 
   for (const [name, provider] of Object.entries(providers)) {
-    if (provider.base_url && provider.base_url.includes("localhost:20128")) {
+    if (provider.base_url && (provider.base_url.includes("127.0.0.1:1107") || provider.base_url.includes("localhost:20128"))) {
       return true;
     }
   }
@@ -139,9 +141,7 @@ export async function POST(request) {
       );
     }
 
-    const normalizedBaseUrl = baseUrl.endsWith("/v1")
-      ? baseUrl
-      : `${baseUrl}/v1`;
+    const normalizedBaseUrl = normalizeApiBase(baseUrl);
 
     let config = await readConfig();
 

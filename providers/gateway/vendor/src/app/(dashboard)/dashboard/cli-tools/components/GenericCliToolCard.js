@@ -1,5 +1,6 @@
 "use client";
 
+import { gatewayApiBase, normalizeApiBase } from "@/shared/utils/gateway-endpoint";
 import { useState, useEffect } from "react";
 import { Card, Button, ModelSelectModal, ManualConfigModal } from "@/shared/components";
 import Image from "next/image";
@@ -103,8 +104,8 @@ export default function GenericCliToolCard({
   };
 
   const getEffectiveBaseUrl = () => {
-    const url = customBaseUrl || `${baseUrl}/v1`;
-    return url.endsWith("/v1") ? url : `${url}/v1`;
+    const url = customBaseUrl || gatewayApiBase(baseUrl);
+    return normalizeApiBase(url);
   };
 
   const getCurrentBaseUrl = () => {

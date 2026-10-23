@@ -1,7 +1,7 @@
 "use client";
 
+import { gatewayOrigin, gatewayApiBase, normalizeApiBase } from "@/shared/utils/gateway-endpoint";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { UPDATER_CONFIG } from "@/shared/constants/config";
 import { readPresets, upsertPreset, deletePreset, subscribePresets, stripSlash } from "./cliEndpointPresets";
 
 const CUSTOM_VALUE = "__custom__";
@@ -10,14 +10,14 @@ const SAVE_VALUE = "__save__";
 const ensureV1 = (url) => {
   const trimmed = (url || "").replace(/\/+$/, "");
   if (!trimmed) return "";
-  return /\/v1$/.test(trimmed) ? trimmed : `${trimmed}/v1`;
+  return normalizeApiBase(trimmed);
 };
 
 const buildOptions = ({ requiresExternalUrl, tunnelEnabled, tunnelPublicUrl, tailscaleEnabled, tailscaleUrl, cloudEnabled, cloudUrl, savedPresets, withV1 }) => {
   const opts = [];
-  const wrap = (url) => (withV1 ? ensureV1(url) : (url || "").replace(/\/+$/, ""));
+  const wrap = (url) => (withV1 ? gatewayApiBase(url) : (url || "").replace(/\/+$/, ""));
   if (!requiresExternalUrl) {
-    const localUrl = wrap(`http://127.0.0.1:${UPDATER_CONFIG.appPort}`);
+    const localUrl = wrap(gatewayOrigin());
     opts.push({ value: "local", label: localUrl, url: localUrl });
   }
   if (tunnelEnabled && tunnelPublicUrl) {
@@ -89,7 +89,7 @@ export default function BaseUrlSelect({
   // Sync the active config URL without replacing edits unless the config itself changes.
   useEffect(() => {
     if (!presetsLoaded || options.length === 0) return;
-    const normalizeUrl = (url) => (withV1 ? ensureV1(url) : stripSlash(url));
+    const normalizeUrl = (url) => (withV1 ? normalizeApiBase(url) : stripSlash(url));
     const current = normalizeUrl(currentUrl);
     if (initializedRef.current && currentUrlRef.current === current) return;
     initializedRef.current = true;

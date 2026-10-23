@@ -1,5 +1,6 @@
 "use client";
 
+import { gatewayApiBase, normalizeApiBase } from "@/shared/utils/gateway-endpoint";
 import { useState } from "react";
 import { Card, ModelSelectModal } from "@/shared/components";
 import { getProviderIconSrc, markProviderIconMissing } from "@/shared/utils/providerIcon";
@@ -22,11 +23,8 @@ export default function DefaultToolCard({ toolId, tool, isExpanded, onToggle, ba
       ? selectedApiKey 
       : (!cloudEnabled ? "sk_9router" : "your-api-key");
     
-    // Add /v1 suffix only if not already present (DRY - avoid duplicate)
-    const normalizedBaseUrl = baseUrl || "http://localhost:20128";
-    const baseUrlWithV1 = normalizedBaseUrl.endsWith("/v1") 
-      ? normalizedBaseUrl 
-      : `${normalizedBaseUrl}/v1`;
+    const normalizedBaseUrl = baseUrl || gatewayApiBase();
+    const baseUrlWithV1 = normalizeApiBase(normalizedBaseUrl);
     
     return text
       .replace(/\{\{baseUrl\}\}/g, baseUrlWithV1)

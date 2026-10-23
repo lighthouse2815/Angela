@@ -1,5 +1,7 @@
 "use server";
 
+import { normalizeApiBase } from "@/shared/utils/gateway-endpoint";
+
 import { NextResponse } from "next/server";
 import { exec } from "child_process";
 import { promisify } from "util";
@@ -80,7 +82,7 @@ export async function POST(request) {
 
     await fs.mkdir(getDataDir(), { recursive: true });
 
-    const normalizedBaseUrl = baseUrl.endsWith("/v1") ? baseUrl : `${baseUrl}/v1`;
+    const normalizedBaseUrl = normalizeApiBase(baseUrl);
 
     const auth = (await readJson(getAuthPath())) || {};
     auth["openai-compatible"] = {

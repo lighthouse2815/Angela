@@ -1,5 +1,6 @@
 "use client";
 
+import { normalizeApiBase } from "@/shared/utils/gateway-endpoint";
 import { useState, useEffect } from "react";
 import { Card, Button, ManualConfigModal, ComboFormModal, McpMarketplaceModal, ModelSelectModal } from "@/shared/components";
 import Image from "next/image";
@@ -13,7 +14,7 @@ const stripV1 = (url) => (url || "").replace(/\/v1\/?$/, "");
 const ensureV1 = (url) => {
   const trimmed = (url || "").replace(/\/+$/, "");
   if (!trimmed) return "";
-  return /\/v1$/.test(trimmed) ? trimmed : `${trimmed}/v1`;
+  return normalizeApiBase(trimmed);
 };
 
 export default function CoworkToolCard({

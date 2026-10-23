@@ -1,3 +1,4 @@
+import { normalizeApiBase } from "@/shared/utils/gateway-endpoint";
 import { NextResponse } from "next/server";
 import { exec } from "child_process";
 import { promisify } from "util";
@@ -133,8 +134,7 @@ export async function POST(request) {
     parsed.model_provider = "9router";
 
     // Update or create 9router provider section (no api_key - Codex reads from auth.json)
-    // Ensure /v1 suffix is added only once
-    const normalizedBaseUrl = baseUrl.endsWith("/v1") ? baseUrl : `${baseUrl}/v1`;
+    const normalizedBaseUrl = normalizeApiBase(baseUrl);
     // Custom providers ignore auth.json - the key must travel as a static header
     setNestedSection(parsed, "model_providers.9router", {
       name: "Angela Gateway",
