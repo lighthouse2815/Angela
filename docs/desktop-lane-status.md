@@ -1,107 +1,124 @@
-# Desktop Lane Status
+<a id="desktop-lane-status"></a>
 
-Updated: 2026-05-08
+# Trạng thái desktop luồng
 
-This note is a factual status memo for the current desktop lane work in this recut branch. It is intentionally narrow: only current state, actual blockers, and what should happen now vs later.
+Cập nhật: 2026-05-08
 
-## What is already true
+Ghi chú này là bản ghi nhớ trạng thái thực tế cho desktop luồng hiện tại hoạt động trong nhánh cắt lại này. Nó được thu hẹp một cách có chủ ý: chỉ trạng thái hiện tại, trở ngại thực tế và những gì sẽ xảy ra bây giờ so với sau này.
 
-- The desktop lane direction is stable:
-  - macOS only
-  - Chrome-first
-  - visual + semantic tree + OS input
-  - overlay is a visualization layer, not a second system cursor
-- The following baselines already exist in code:
+<a id="what-is-already-true"></a>
+
+## Điều gì đã là sự thật
+
+- Hướng desktop luồng ổn định:
+  - chỉ macOS
+  - Ưu tiên Chrome
+  - hình ảnh + cây ngữ nghĩa + đầu vào OS
+  - lớp phủ là lớp trực quan hóa, không phải con trỏ hệ thống thứ hai
+- Các đường cơ sở sau đây đã tồn tại trong mã:
   - `/Users/liuziheng/airi/services/computer-use-mcp/src/executors/macos-local.ts`
-    - saves the real cursor position and restores it with `CGWarpMouseCursorPosition(...)`
+    - lưu vị trí con trỏ thực và khôi phục nó bằng `CGWarpMouseCursorPosition(...)`
   - `/Users/liuziheng/airi/apps/desktop/src/main/windows/shared/window.ts`
-    - `makeWindowPassThrough()` uses ignore-mouse-events + non-focusable overlay behavior
+    - `makeWindowPassThrough()` sử dụng sự kiện bỏ qua chuột + hành vi lớp phủ không thể lấy tiêu điểm
   - `/Users/liuziheng/airi/services/computer-use-mcp/src/browser-dom/cdp-bridge.ts`
-    - 5-second heartbeat with teardown after 3 consecutive failures
+    - Nhịp tim 5 giây rơi lệ sau 3 lần thất bại liên tiếp
   - `/Users/liuziheng/airi/services/computer-use-mcp/src/bin/smoke-chrome-grounding.ts`
-    - desktop v3 smoke that proves the ensure / observe / click / state chain
-- The Chrome extension bridge and iframe offset work are no longer hypothetical:
-  - the recut branch already contains a real extension-side WebSocket client bridge
-  - the recut branch already contains frame offset propagation for iframe DOM candidates
-- The browser-dom route contract is now fail-closed:
-  - non-left clicks and multi-clicks stay on OS input
-  - `BrowserDomExtensionBridge` rejects `ok: false` responses instead of treating them as success
+    - desktop v3 kiểm tra nhanh chứng minh chuỗi đảm bảo/quan sát/nhấp chuột/trạng thái
+- Cầu mở rộng Chrome và công việc bù đắp iframe không còn là giả định nữa:
+  - nhánh recut đã chứa cầu nối máy khách WebSocket phía mở rộng thực sự
+  - nhánh recut đã chứa sự lan truyền bù khung cho các ứng viên iframe DOM
+- Hợp đồng route của trình duyệt hiện là từ chối khi có lỗi:
+  - nhấp chuột không trái và nhấp chuột nhiều lần vẫn ở trên đầu vào OS
+  - `BrowserDomExtensionBridge` từ chối `ok: false` Responses thay vì coi chúng là thành công
 
-## What is actually still blocking
+<a id="what-is-actually-still-blocking"></a>
 
-These are the remaining real issues, ordered by severity.
+## Những gì thực sự vẫn đang chặn
 
-### 1. Live desktop v3 smoke exists, but it is baseline coverage, not product support.
+Đây là những vấn đề thực tế còn lại, được sắp xếp theo mức độ nghiêm trọng.
 
-- Current smoke proves:
-  `desktop_ensure_chrome -> desktop_observe -> desktop_click_target -> desktop_get_state`
-- It does not prove Chrome semantic DOM routing, live overlay-window rendering,
-  or user-input isolation.
+<a id="1-live-desktop-v3-smoke-exists-but-it-is-baseline-coverage-not-product-support"></a>
 
-### 2. Overlay lifecycle / RPC readiness still needs a live-window pass on this recut branch.
+### 1. trực tiếp desktop v3 kiểm tra nhanh tồn tại, nhưng đó là phạm vi bảo hiểm cơ bản chứ không phải hỗ trợ sản phẩm.
 
-- Files currently being worked on:
+- kiểm tra nhanh hiện tại chứng minh: `desktop_ensure_chrome -> desktop_observe -> desktop_click_target -> desktop_get_state`
+- Nó không chứng minh được việc định tuyến DOM ngữ nghĩa của Chrome, kết xuất cửa sổ lớp phủ trực tiếp hoặc cách ly đầu vào của người dùng.
+
+<a id="2-overlay-lifecycle--rpc-readiness-still-needs-a-live-window-pass-on-this-recut-branch"></a>
+
+### 2. Vòng đời lớp phủ / mức độ sẵn sàng của RPC vẫn cần có thẻ cửa sổ trực tiếp trên nhánh cắt lại này.
+
+- Các tập tin hiện đang được xử lý:
   - `/Users/liuziheng/airi-desktop-recut/apps/desktop/src/main/windows/desktop-overlay/rpc/contracts.ts`
   - `/Users/liuziheng/airi-desktop-recut/apps/desktop/src/main/windows/desktop-overlay/rpc/index.electron.ts`
   - `/Users/liuziheng/airi-desktop-recut/apps/desktop/src/renderer/pages/desktop-overlay-polling.ts`
   - `/Users/liuziheng/airi-desktop-recut/apps/desktop/src/renderer/pages/desktop-overlay-polling.test.ts`
-- Current state:
-  - the readiness contract is already wired in `desktop-overlay/rpc/index.electron.ts`
-  - the renderer poll controller already waits on readiness and handles degraded state
-  - the live window still needs one fresh pass on this recut branch to confirm the runtime proof is current
-- This is the remaining runtime risk on the overlay path.
+- Tình trạng hiện tại:
+  - hợp đồng sẵn sàng đã được nối vào `desktop-overlay/rpc/index.electron.ts`
+  - bộ điều khiển thăm dò renderer đã sẵn sàng và xử lý trạng thái xuống cấp
+  - cửa sổ trực tiếp vẫn cần một thẻ mới trên nhánh recut này để xác nhận bằng chứng runtime hiện tại
+- Đây là rủi ro runtime còn lại trên đường dẫn lớp phủ.
 
-### 3. Local overlay live-window smoke exists in the recut branch, but it still needs a live run on this branch.
+<a id="3-local-overlay-live-window-smoke-exists-in-the-recut-branch-but-it-still-needs-a-live-run-on-this-branch"></a>
 
-- The smoke is now wired in `apps/desktop/package.json` as
-  `smoke:desktop-overlay-live-window`.
-- The shared candidate-selection helper is unit-tested.
-- What is still missing here is a fresh pass on this recut branch with the real
-  Electron overlay window, to confirm the heartbeat marker and MCP polling still
-  behave the same as the older line.
+### 3. Lớp phủ cục bộ trực tiếp-window kiểm tra nhanh tồn tại trong nhánh recut, nhưng nó vẫn cần trực tiếp chạy trên nhánh này.
 
-## What is not a current blocker
+- kiểm tra nhanh hiện được kết nối với `apps/desktop/package.json` dưới dạng `smoke:desktop-overlay-live-window`.
+- Trình trợ giúp lựa chọn ứng viên được chia sẻ đã được thử nghiệm đơn vị.
+- Điều vẫn còn thiếu ở đây là một đường chuyền mới trên nhánh recut này với cửa sổ lớp phủ Electron thực, để xác nhận điểm đánh dấu nhịp tim và việc bỏ phiếu MCP vẫn hoạt động giống như dòng cũ hơn.
 
-These items are real ideas or cleanup work, but they are not the thing that should block the line right now.
+<a id="what-is-not-a-current-blocker"></a>
 
-- Eager overlay init cleanliness in `apps/desktop/src/main/index.ts`
-- Refactoring nested browser-dom routing logic for readability
-- Turning `macos-local.ts` into instant-warp-only fallback with zero motion trace
-- Rewriting overlay visuals, ghost pointer polish, or extra renderer debug UI
+## trở ngại hiện tại không phải là gì
 
-## How to interpret m13v's comments
+Những mục này là những ý tưởng thực sự hoặc công việc dọn dẹp, nhưng chúng không phải là những thứ nên chặn đường ngay bây giờ.
 
-m13v's comments were useful because they matched the real platform constraints, but they should be split correctly:
+- Mong muốn lớp phủ sạch sẽ ban đầu trong `apps/desktop/src/main/index.ts`
+- Tái cấu trúc logic định tuyến của trình duyệt lồng nhau để dễ đọc
+- Biến `macos-local.ts` thành phương án dự phòng chỉ cong vênh tức thời mà không có dấu vết chuyển động
+- Viết lại hình ảnh lớp phủ, đánh bóng con trỏ ma hoặc gỡ lỗi renderer bổ sung UI
 
-- Already aligned with current code:
-  - save → act → restore cursor pattern
-  - overlay should not intercept user input
-  - heartbeat teardown for crashed CDP sessions
-- Still useful as future refinement:
-  - reducing native motion trace so UI owns more of the visible pointer animation
-  - deeper runtime discipline around session lifecycle
+<a id="how-to-interpret-m13vs-comments"></a>
 
-In short: m13v gave good runtime advice. That does not mean every suggestion is a current blocker.
+## Cách diễn giải nhận xét của m13v
 
-## What should happen now
+Nhận xét của m13v rất hữu ích vì chúng phù hợp với các ràng buộc nền tảng thực, nhưng chúng phải được phân chia chính xác:
 
-1. No action needed for the extension unknown-action contract; it is already fail-closed.
-2. Keep browser-dom routing fail-closed for non-left clicks and bridge errors; this stays covered, not product-supported.
-3. Rerun the local overlay live-window smoke on this recut branch before calling it current proof.
+- Đã liên kết với mã hiện tại:
+  - lưu → hành động → khôi phục mẫu con trỏ
+  - lớp phủ không được chặn đầu vào của người dùng
+  - sự cố nhịp tim cho các phiên CDP bị lỗi
+- Vẫn hữu ích khi sàng lọc trong tương lai:
+  - giảm dấu vết chuyển động của native để UI sở hữu nhiều hoạt ảnh con trỏ hiển thị hơn
+  - kỷ luật runtime sâu sắc hơn xung quanh vòng đời phiên
 
-## What should happen later
+Tóm lại: m13v đã đưa ra lời khuyên tốt về runtime. Điều đó không có nghĩa là mọi đề xuất đều là trở ngại hiện tại.
 
-Only after the above is clean:
+<a id="what-should-happen-now"></a>
 
-1. Optional follow-up:
+## Điều gì sẽ xảy ra bây giờ
+
+1. Không cần thực hiện hành động nào đối với hợp đồng gia hạn hành động chưa xác định; nó đã là từ chối khi có lỗi rồi.
+2. Giữ định tuyến từ chối khi có lỗi trong trình duyệt cho các lỗi nhấp chuột không trái và cầu nối; điều này vẫn được đề cập, không được hỗ trợ bởi sản phẩm.
+3. Chạy lại lớp phủ cục bộ trực tiếp-window kiểm tra nhanh trên nhánh recut này trước khi gọi nó là bằng chứng hiện tại.
+
+<a id="what-should-happen-later"></a>
+
+## Điều gì sẽ xảy ra sau này
+
+Chỉ sau khi ở trên sạch:
+
+1. Theo dõi tùy chọn:
    - `fix(stage-tamagotchi): validate desktop overlay lifecycle and RPC readiness in live window context`
-2. Optional follow-up:
+2. Theo dõi tùy chọn:
    - `refactor(computer-use-mcp): evaluate instant-warp-only macOS fallback against ghost-pointer UX`
-3. Optional follow-up:
-   - strengthen iframe anchor matching when sibling iframes are highly similar
+3. Theo dõi tùy chọn:
+   - tăng cường kết hợp neo iframe khi iframe anh chị em rất giống nhau
 
-## Bottom line
+<a id="bottom-line"></a>
 
-The desktop lane is not blocked by direction. It is blocked by a small number of correctness issues and one still-open overlay lifecycle validation step.
+## Điểm mấu chốt
 
-Do not reopen architecture. Do not mix in polish. Do not keep piling unrelated changes onto the same PR.
+desktop luồng không bị chặn theo hướng. Nó bị chặn bởi một số ít vấn đề về tính chính xác và một bước xác thực vòng đời lớp phủ vẫn đang mở.
+
+Không mở lại kiến ​​trúc. Không trộn trong nước đánh bóng. Đừng tiếp tục chồng chất những thay đổi không liên quan lên cùng một PR.

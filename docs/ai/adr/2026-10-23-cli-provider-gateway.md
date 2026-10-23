@@ -1,19 +1,20 @@
-# Include Angela Gateway in the CLI
+<a id="include-angela-gateway-in-the-cli"></a>
 
-Status: Accepted
+# Bao gồm Angela Gateway trong CLI
 
-## Context
+Trạng thái: Đã chấp nhận
 
-The user requested every provider and account flow from the selected upstream engine, behind one API key.
-They require an in-repository implementation, an Angela identity, and a CLI-first delivery.
-A separately installed gateway application does not meet that requirement.
+<a id="context"></a>
 
-## Decision
+## Bối cảnh
 
-Vendor the complete provider engine under `third_party/angela-gateway` with its MIT license and pinned provenance.
-Use the product name Angela Gateway. Preserve external protocol identifiers and copyright records.
-Keep the imported engine in an isolated dependency workspace.
-Build it into `@angela/gateway`, which Angela CLI includes as a workspace dependency.
+Người dùng đã yêu cầu mọi nhà cung cấp và luồng tài khoản từ công cụ upstream đã chọn, đằng sau một khóa API. Chúng yêu cầu triển khai trong kho lưu trữ, danh tính Angela và phân phối CLI đầu tiên. Ứng dụng cổng được cài đặt riêng không đáp ứng được yêu cầu đó.
+
+<a id="decision"></a>
+
+## Phán quyết
+
+Nhà cung cấp công cụ nhà cung cấp hoàn chỉnh theo `third_party/angela-gateway` với giấy phép MIT và xuất xứ được ghim. Sử dụng tên sản phẩm Angela Gateway. Bảo toàn các mã định danh giao thức bên ngoài và bản ghi bản quyền. Giữ động cơ đã nhập ở phần phụ thuộc riêng biệt workspace. Xây dựng nó thành `@angela/gateway`, mà Angela CLI bao gồm dưới dạng phần phụ thuộc workspace.
 
 ```text
 Angela CLI gateway commands
@@ -25,27 +26,16 @@ Angela CLI gateway commands
 Angela chat -> shared local configuration -> gateway /v1 -> the same accounts
 ```
 
-The CLI starts the server, lists accounts and models, adds key-based accounts, and selects a shared provider.
-OAuth and special account imports use the bundled local dashboard, not an external gateway application.
-The existing local configuration package owns atomic provider updates.
-The initial dashboard password and management token stay separate from the shared inference key.
+CLI khởi động máy chủ, liệt kê các tài khoản và mô hình, thêm tài khoản dựa trên khóa và chọn nhà cung cấp được chia sẻ. OAuth và nhập tài khoản đặc biệt sử dụng bảng điều khiển cục bộ đi kèm chứ không phải ứng dụng cổng bên ngoài. Gói cấu hình cục bộ hiện có sở hữu các bản cập nhật nhà cung cấp nguyên tử. Mật khẩu bảng điều khiển ban đầu và quản lý token tách biệt với khóa suy luận chung.
 
-Interactive `angela` starts with GPT, Gemini, Claude, Custom, Continue, and Exit choices.
-The custom menu exposes account controls, model selection, key inspection, and the full bundled dashboard.
-OAuth remains in the browser. The menu never collects provider passwords.
-The menu owns a gateway child only when it starts that child. Chat shutdown releases that owned child.
-An explicit model selection overrides provider environment values for that session and saves the shared local configuration.
-Automation, explicit provider flags, and `--no-menu` retain their existing behavior.
+`angela` tương tác bắt đầu với các lựa chọn GPT, Gemini, Claude, Tùy chỉnh, Tiếp tục và Thoát. Menu tùy chỉnh hiển thị các điều khiển tài khoản, lựa chọn mô hình, kiểm tra khóa và bảng điều khiển đi kèm đầy đủ. OAuth vẫn còn trong trình duyệt. Menu không bao giờ thu thập mật khẩu nhà cung cấp. Menu chỉ sở hữu một cổng con khi nó khởi động cổng con đó. Việc tắt trò chuyện sẽ giải phóng đứa trẻ sở hữu đó. Lựa chọn mô hình rõ ràng sẽ ghi đè các giá trị môi trường nhà cung cấp cho phiên đó và lưu cấu hình cục bộ được chia sẻ. Tự động hóa, cờ nhà cung cấp rõ ràng và `--no-menu` giữ nguyên hành vi hiện có của chúng.
 
-The foreground owner stops only its child. It refuses occupied ports and never kills unrelated listeners.
-Disable the upstream updater and telemetry. Keep the full provider graph rather than copying a login subset.
+Chủ sở hữu tiền cảnh chỉ dừng con của nó. Nó từ chối các cổng bị chiếm đóng và không bao giờ giết chết những người nghe không liên quan. Vô hiệu hóa trình cập nhật và đo từ xa upstream. Giữ biểu đồ nhà cung cấp đầy đủ thay vì sao chép tập hợp con đăng nhập.
 
-## Consequences
+<a id="consequences"></a>
 
-Portable Angela releases contain the built engine. Users do not download or install another gateway product.
-Source builds require pnpm and download ordinary locked framework dependencies.
-The imported dashboard retains its separate React/Next.js implementation. Angela's main Vue applications do not change frameworks.
+## Hậu quả
 
-The initial delivery does not add a desktop account screen, system service, or remotely exposed gateway.
-Real OAuth, quotas, and model availability require provider accounts and manual verification.
-Automated integration checks cover the real engine with a local synthetic provider.
+Bản phát hành Angela di động có chứa công cụ được xây dựng. Người dùng không tải xuống hoặc cài đặt một sản phẩm cổng khác. Bản dựng nguồn yêu cầu pnpm và tải xuống các phần phụ thuộc khung bị khóa thông thường. Bảng thông tin đã nhập vẫn giữ nguyên cách triển khai React/Next.js riêng biệt. Các ứng dụng Vue chính của Angela không thay đổi framework.
+
+Lần phân phối đầu tiên không thêm màn hình tài khoản desktop, dịch vụ hệ thống hoặc cổng tiếp xúc từ xa. OAuth thực, hạn ngạch và tính khả dụng của mô hình yêu cầu tài khoản nhà cung cấp và xác minh thủ công. Kiểm tra tích hợp tự động bao gồm động cơ thực bằng nhà cung cấp tổng hợp cục bộ.

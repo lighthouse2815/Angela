@@ -1,26 +1,26 @@
-# Implicit companion follow-up
+<a id="implicit-companion-follow-up"></a>
 
-Date: 2026-10-23
+# Theo dõi đồng hành ngầm
 
-Status: Accepted
+Ngày: 23-10-2026
 
-## Baseline and problems
+Trạng thái: Đã chấp nhận
 
-Inspected GitHub main: `46212a2a54d5951a30a2893f5402589bac9e4c27`.
+<a id="baseline-and-problems"></a>
 
-Before this change, explicit requests created tasks through local extraction or guarded model tools.
-Task persistence owned status, schedules, leases, recovery, and explicit follow-up occurrences.
-The scheduler derived task candidates and applied deterministic policy before notification adapters presented text.
-Commitment memory projected verified task events. Bounded context distinguished current task state from historical evidence.
+## Cơ sở và các vấn đề
 
-The intent classifier treated generic English creation verbs as task authority.
-It inspected meta framing only before the action. A suffix example could become a reminder.
-Active references merged recent events and selected pending tasks. This could select older work after the latest task completed.
-No independent domain represented unresolved conversational work.
+Đã kiểm tra GitHub chính: `46212a2a54d5951a30a2893f5402589bac9e4c27`.
 
-## Architecture
+Trước thay đổi này, các yêu cầu rõ ràng đã tạo các tác vụ thông qua các công cụ trích xuất cục bộ hoặc mô hình được bảo vệ. Trạng thái sở hữu liên tục của nhiệm vụ, lịch trình, lease, quá trình khôi phục và các lần xuất hiện tiếp theo rõ ràng. Bộ lập lịch bắt nguồn từ các ứng viên nhiệm vụ và áp dụng chính sách xác định trước khi bộ điều hợp thông báo trình bày văn bản. Bộ nhớ cam kết dự kiến ​​các sự kiện nhiệm vụ đã được xác minh. Bối cảnh có giới hạn phân biệt trạng thái nhiệm vụ hiện tại với bằng chứng lịch sử.
 
-After this change:
+Trình phân loại mục đích coi các động từ sáng tạo tiếng Anh chung chung là quyền hạn thực hiện nhiệm vụ. Nó chỉ kiểm tra khung meta trước khi hành động. Một ví dụ về hậu tố có thể trở thành một lời nhắc nhở. Các tham chiếu đang hoạt động đã hợp nhất các sự kiện gần đây và các nhiệm vụ đang chờ xử lý được chọn. Điều này có thể chọn công việc cũ hơn sau khi hoàn thành nhiệm vụ mới nhất. Không có miền độc lập nào đại diện cho công việc đàm thoại chưa được giải quyết.
+
+<a id="architecture"></a>
+
+## Ngành kiến ​​​​trúc
+
+Sau sự thay đổi này:
 
 ```text
 Explicit user request -> Task store -> task candidate -----------+
@@ -36,145 +36,93 @@ OpenLoops -> metadata events only
 Historical memory never decides whether an OpenLoop is open.
 ```
 
-The scheduler retains its task delivery code and accepts optional proactive sources.
-Task delivery runs first. Auxiliary source failures cannot reject a task mutation or corrupt task storage.
-The runtime registers one OpenLoop source per task store. It adds no second scheduler or backend.
-CLI and private Telegram companion notifications support implicit text delivery.
-The standalone desktop reminder service retains explicit task delivery only.
+Bộ lập lịch giữ lại mã phân phối nhiệm vụ của nó và chấp nhận các nguồn chủ động tùy chọn. Phân phối nhiệm vụ chạy đầu tiên. Lỗi nguồn phụ trợ không thể từ chối tác vụ thay đổi trạng thái hoặc bộ lưu trữ tác vụ bị hỏng. runtime đăng ký một nguồn OpenLoop cho mỗi tác vụ store. Nó không thêm lịch trình hoặc chương trình phụ trợ thứ hai. CLI và thông báo đồng hành Telegram riêng tư hỗ trợ gửi văn bản ngầm. Dịch vụ nhắc nhở desktop độc lập chỉ giữ lại việc phân phối nhiệm vụ rõ ràng.
 
-## Intent and focus
+<a id="intent-and-focus"></a>
 
-Local extraction and model task tools use `classifyCommitmentIntent` before persistence.
-English authorization requires an explicit purpose, title, personal activity, or time clause after a creation object.
-Examples include `create a task to study`, `add a todo: submit my report`, and `add a reminder for tomorrow`.
-`save this as a task` also authorizes an explicit conversion of current context. Bare task nouns do not grant authority.
-Generic `create`, `add`, and `save` do not grant authority.
-The classifier checks example and implementation framing across the whole request. Technical objects such as a task parser do not grant authority. Coding subjects inside valid management requests remain supported.
-Quotations, speculation, questions, and uncertain requests cannot authorize task creation.
-Direct reminders about testing a parser remain valid explicit requests.
+## Ý định và sự tập trung
 
-One event creates one focus group. The latest group replaces the previous group.
-A group contains task or OpenLoop identities. Multiple identities require clarification.
-Inactive, missing, expired, or oversized groups cannot select older pending work.
-A complete task title phrase or verified task ID can establish conversational focus.
-Unrelated assistant replies leave focus unchanged.
-Focus retains at most eight identities for eight requests or six hours. Both domains advance focus before resolving the current request.
-The persisted identity includes workspace, session, and channel. Reset clears only that identity.
-Version two uses a separate focus file and discards old reference semantics without modifying task records.
+Các công cụ tác vụ mô hình và trích xuất cục bộ sử dụng `classifyCommitmentIntent` trước khi lưu giữ. Ủy quyền bằng tiếng Anh yêu cầu mục đích, tiêu đề, hoạt động cá nhân hoặc điều khoản thời gian rõ ràng sau đối tượng tạo. Ví dụ bao gồm `create a task to study`, `add a todo: submit my report` và `add a reminder for tomorrow`. `save this as a task` cũng cho phép chuyển đổi rõ ràng bối cảnh hiện tại. Danh từ nhiệm vụ đơn giản không cấp quyền. `create`, `add` và `save` chung không cấp quyền. Trình phân loại kiểm tra ví dụ và khung triển khai trên toàn bộ yêu cầu. Các đối tượng kỹ thuật như trình phân tích cú pháp tác vụ không cấp quyền. Các chủ đề mã hóa bên trong các yêu cầu quản lý hợp lệ vẫn được hỗ trợ. Các trích dẫn, suy đoán, câu hỏi và yêu cầu không chắc chắn không thể cho phép tạo nhiệm vụ. Lời nhắc trực tiếp về việc kiểm tra trình phân tích cú pháp vẫn là các yêu cầu rõ ràng hợp lệ.
 
-## Domain and extraction
+Một sự kiện tạo ra một nhóm tập trung. Nhóm mới nhất thay thế nhóm trước đó. Một nhóm chứa các đặc tính nhiệm vụ hoặc OpenLoop. Nhiều danh tính yêu cầu làm rõ. Các nhóm không hoạt động, bị thiếu, hết hạn hoặc quá lớn không thể chọn tác phẩm cũ hơn đang chờ xử lý. Một cụm từ tiêu đề nhiệm vụ hoàn chỉnh hoặc nhiệm vụ đã được xác minh ID có thể thiết lập trọng tâm cuộc trò chuyện. Các câu trả lời của trợ lý không liên quan sẽ giữ nguyên tiêu điểm. Focus giữ lại tối đa tám danh tính cho tám yêu cầu hoặc sáu giờ. Cả hai miền đều nâng cao tiêu điểm trước khi giải quyết yêu cầu hiện tại. Danh tính bền vững bao gồm workspace, phiên và kênh. Đặt lại chỉ xóa danh tính đó. Phiên bản hai sử dụng một tệp tiêu điểm riêng biệt và loại bỏ ngữ nghĩa tham chiếu cũ mà không sửa đổi bản ghi tác vụ.
 
-`OpenLoops` owns subject, normalized identity, kind, workspace, source session, lifecycle, confidence, salience, timing, prompt count, and delivery claim.
-States are `open`, `resolved`, `expired`, and `dismissed`.
-An OpenLoop never becomes a synthetic Task.
+<a id="domain-and-extraction"></a>
 
-| Statement | Domain |
+## Tên miền và trích xuất
+
+`OpenLoops` sở hữu chủ đề, danh tính chuẩn hóa, loại, workspace, phiên nguồn, vòng đời, độ tin cậy, mức độ nổi bật, thời gian, số lượng prompt và yêu cầu giao hàng. Các trạng thái là `open`, `resolved`, `expired` và `dismissed`. OpenLoop không bao giờ trở thành Nhiệm vụ tổng hợp.
+
+| Tuyên bố | Tên miền |
 | --- | --- |
 | `Mai 9h nhắc tao làm auth.` | Explicit reminder Task |
 | `Mai hỏi tao xem auth xong chưa.` | Explicit follow-up Task |
 | `Tao đang bí phần refresh token.` | Implicit problem OpenLoop |
 
-Deterministic Vietnamese rules accept current problems, unfinished work, waiting, dated events, and concrete goals.
-Examples, quoted text, hypotheticals, old incidents, preferences, feelings alone, casual remarks, and reading topics are rejected.
-Unknown subjects and unsupported wording produce no implicit state. No model extracts or authorizes implicit persistence.
+Các quy tắc xác định của Việt Nam chấp nhận các vấn đề hiện tại, công việc còn dang dở, sự chờ đợi, các sự kiện đã cũ và các mục tiêu cụ thể. Ví dụ, văn bản được trích dẫn, giả thuyết, sự việc cũ, sở thích, cảm xúc đơn thuần, nhận xét thông thường và chủ đề đọc đều bị từ chối. Chủ đề không xác định và từ ngữ không được hỗ trợ không tạo ra trạng thái ngầm định. Không có trích xuất mô hình hoặc cho phép tồn tại ngầm định.
 
-Normalized equal subjects merge within a workspace while open.
-The initial alias rule groups `auth`, `login`, and `refresh token`. This conservative rule can merge distinct authentication problems.
-A more specific refresh-token mention updates the displayed subject.
-Updates postpone prompting after recent work. They never reset the cap or extend the original expiry.
-A fresh unresolved statement after dismissal or expiry creates a new identity.
+Các chủ thể bằng nhau được chuẩn hóa hợp nhất trong workspace khi mở. Nhóm quy tắc bí danh ban đầu `auth`, `login` và `refresh token`. Quy tắc bảo thủ này có thể hợp nhất các vấn đề xác thực riêng biệt. Đề cập đến làm mới-token cụ thể hơn sẽ cập nhật chủ đề được hiển thị. Cập nhật trì hoãn nhắc nhở sau công việc gần đây. Họ không bao giờ đặt lại giới hạn hoặc gia hạn thời hạn ban đầu. Một tuyên bố mới chưa được giải quyết sau khi bị sa thải hoặc hết hạn sẽ tạo ra một danh tính mới.
 
 Named resolution recognizes outcomes such as `Fix được auth rồi`, `Xong phần slide rồi`, and `Thầy trả lời rồi`.
-Subject aliases and prefix removal avoid exact-title-only matching.
+Bí danh chủ đề và loại bỏ tiền tố tránh việc chỉ khớp chính xác với tiêu đề.
 `Xong rồi` and `Đừng hỏi vụ này nữa` require one exact focused OpenLoop.
-Named outcomes use the current workspace. A notification focus can resolve its exact loop across workspaces in the same user store.
-An ambiguous outcome never completes another Task.
+Các kết quả được đặt tên sử dụng workspace hiện tại. Tiêu điểm thông báo có thể giải quyết vòng lặp chính xác của nó trên workspace trong cùng một người dùng store.
+Một kết quả mơ hồ không bao giờ hoàn thành được một Nhiệm vụ khác.
 Named opt-outs include `Quên vụ auth đi`, `Đừng nhớ chuyện auth nữa`, and `Đừng hỏi tôi về auth nữa`.
-They dismiss only a matching current-workspace thread. Generic opt-outs require one exact current focus and otherwise request clarification.
-A do-not-ask request changes proactive tracking only.
-An explicit forget also uses existing `Memory.forget` for one matching personal record, including its existing cleanup and stale-write checks.
-Multiple matching records, disabled personal memory, or removal failure leave personal memory unchanged and direct the user to `/memory`.
-Tracking stays dismissed even when personal-memory removal fails. No broad historical deletion is introduced.
-Explicit opt-out remains available when automatic capture is disabled or the current request prohibits new durable content.
+Họ chỉ loại bỏ một chuỗi workspace hiện tại phù hợp. Việc chọn không tham gia chung yêu cầu một trọng tâm hiện tại chính xác và nếu không thì yêu cầu làm rõ.
+Yêu cầu không hỏi chỉ thay đổi theo dõi chủ động.
+Việc quên rõ ràng cũng sử dụng `Memory.forget` hiện có cho một hồ sơ cá nhân phù hợp, bao gồm cả các bước kiểm tra dọn dẹp và ghi cũ hiện có.
+Nhiều bản ghi trùng khớp, bộ nhớ cá nhân bị vô hiệu hóa hoặc lỗi xóa sẽ khiến bộ nhớ cá nhân không thay đổi và hướng người dùng đến `/memory`.
+Việc theo dõi vẫn bị loại bỏ ngay cả khi việc xóa bộ nhớ cá nhân không thành công. Không có sự xóa bỏ lịch sử rộng rãi nào được giới thiệu.
+Tính năng chọn không tham gia rõ ràng vẫn khả dụng khi thu nhận dữ liệu tự động bị tắt hoặc yêu cầu hiện tại cấm nội dung lâu bền mới.
 
-## Timing and eligibility
+<a id="timing-and-eligibility"></a>
 
-| Kind | Initial earliest time | Expiry |
+## Thời gian và tính đủ điều kiện
+
+| Loại | Thời gian sớm nhất ban đầu | Hết hạn |
 | --- | --- | --- |
-| Problem or unfinished work | 4 hours | 48 hours |
-| Waiting | 12 hours | 7 days |
-| Concrete goal | 12 hours | 48 hours |
-| Tomorrow's event | 09:00 after the event's entire local date | 48 hours after earliest time |
+| Vấn đề hoặc công việc chưa hoàn thành | 4 giờ | 48 giờ |
+| Chờ đợi | 12 giờ | 7 ngày |
+| Mục tiêu cụ thể | 12 giờ | 48 giờ |
+| Sự kiện ngày mai | 09:00 sau toàn bộ sự kiện tại cục bộ | 48 giờ sau thời điểm sớm nhất |
 
-Event timing uses local calendar conversion across daylight saving changes. Undated or unsupported event dates create no proactive opportunity.
-Eligibility also requires confidence of at least 0.95, salience of at least 0.7, open state, and an unconsumed prompt cap.
-Every update adds at least four hours of inactivity before a prompt.
-Implicit prompts wait at least 15 minutes after conversation activity.
-Six or more recent requests add a one-hour activity deferral. The activity window retains at most eight timestamps.
-Default implicit quiet hours are 22:00–08:00 in the configured timezone.
-Configured quiet hours replace that default. Active runtime requests also block implicit presentation.
+Thời gian sự kiện sử dụng chuyển đổi lịch cục bộ qua các thay đổi về tiết kiệm ánh sáng ban ngày. Ngày diễn ra sự kiện không ghi ngày tháng hoặc không được hỗ trợ sẽ không tạo ra cơ hội chủ động. Tính đủ điều kiện cũng yêu cầu độ tin cậy ít nhất là 0,95, độ mặn ít nhất là 0,7, trạng thái mở và giới hạn prompt chưa sử dụng. Mỗi bản cập nhật sẽ thêm ít nhất bốn giờ không hoạt động trước prompt. prompt tiềm ẩn đợi ít nhất 15 phút sau hoạt động hội thoại. Sáu yêu cầu gần đây trở lên sẽ thêm thời gian trì hoãn hoạt động là một giờ. Cửa sổ hoạt động giữ lại tối đa tám dấu thời gian. Giờ yên tĩnh ngầm định mặc định là 22:00–08:00 trong múi giờ đã định cấu hình. Giờ yên tĩnh được cấu hình sẽ thay thế mặc định đó. Các yêu cầu runtime đang hoạt động cũng chặn việc trình bày ngầm.
 
-One loop permits one presentation attempt. Each user store permits at most one implicit attempt per eight hours.
-Explicit follow-ups also defer implicit candidates through existing scheduler activity.
-The scheduler reconciles implicit work within one minute. It reads no semantic-memory corpus or conversation history.
+Một vòng lặp cho phép một lần trình bày. Mỗi người dùng store cho phép tối đa một lần thử ngầm trong tám giờ. Việc theo dõi rõ ràng cũng trì hoãn các ứng viên tiềm ẩn thông qua hoạt động lập lịch trình hiện có. Bộ lập lịch điều chỉnh công việc tiềm ẩn trong vòng một phút. Nó không đọc kho ngữ liệu bộ nhớ ngữ nghĩa hoặc lịch sử hội thoại.
 
-## Task suppression
+<a id="task-suppression"></a>
 
-A pending Task with an equivalent normalized subject and matching host-owned `memoryProjection.scope` dismisses the implicit loop and records `supersededByTaskId`.
-The runtime observes task creation and updates. The source also repairs suppression on each reconciliation and before presentation.
-Task observers cannot roll back a successful Task write.
-If a pending equivalent Task exists, later implicit statements do not create another loop.
-Cancelling the Task does not silently resurrect a dismissed loop. A fresh user statement can open another loop.
-Tasks remain global per user store. Suppression requires an exact compatible workspace scope.
-Existing projection provenance supplies that evidence without changing the Task schema or using historical memory.
-Unknown provenance and free-form Task context do not authorize suppression.
-New runtime OpenLoops use the existing canonical project scope, including nested Git directories.
+## Ngăn chặn nhiệm vụ
 
-## Persistence and delivery
+Nhiệm vụ đang chờ xử lý có chủ đề được chuẩn hóa tương đương và `memoryProjection.scope` thuộc sở hữu của host phù hợp sẽ loại bỏ vòng lặp ngầm và ghi lại `supersededByTaskId`. runtime quan sát việc tạo và cập nhật tác vụ. Nguồn cũng sửa chữa sự đàn áp trong mỗi lần hòa giải và trước khi trình bày. Người quan sát tác vụ không thể quay lại quá trình ghi Tác vụ thành công. Nếu một Nhiệm vụ tương đương đang chờ xử lý tồn tại, các câu lệnh ẩn sau này sẽ không tạo ra một vòng lặp khác. Việc hủy tác vụ không âm thầm phục hồi vòng lặp bị loại bỏ. Một câu lệnh người dùng mới có thể mở ra một vòng lặp khác. Nhiệm vụ vẫn mang tính toàn cầu cho mỗi người dùng store. Việc ngăn chặn yêu cầu phạm vi workspace tương thích chính xác. Nguồn gốc dự báo hiện tại cung cấp bằng chứng đó mà không thay đổi lược đồ Nhiệm vụ hoặc sử dụng bộ nhớ lịch sử. Nguồn gốc không xác định và bối cảnh Nhiệm vụ dạng tự do không cho phép loại bỏ. runtime OpenLoops mới sử dụng phạm vi dự án chuẩn hiện có, bao gồm các thư mục Git lồng nhau.
 
-The store uses existing `MemoryFile` validation, private file permissions, atomic rename, and cross-process locking.
-Its file is `open-loops/state.json` under the user data directory.
-Task schema, delivery state, recurrence, restart recovery, and memory projection keep their existing contracts.
+<a id="persistence-and-delivery"></a>
 
-A claim lasts 30 seconds and carries a fencing token.
-Before presentation, the source checks current privacy, fresh task suppression, latest activity, current loop state, and lease ownership.
-A pre-presentation failure releases the claim and waits 60 seconds before retry.
-A crashed claim owner becomes recoverable after lease expiry.
+## Sự kiên trì và giao hàng
 
-`reservePresentation` commits `promptCount = 1` and `lastPromptedAt` before the external side effect.
-This provides at-most-once presentation attempts across failures and repeated restarts.
-A failure after reservation and before confirmed external presentation can lose the implicit follow-up.
-This includes process crashes, Telegram API errors, stdout write failures, adapter exceptions, and network failures. These attempts are not retried.
-The `proactive.prompted` event records the committed attempt, not confirmed receipt by the user.
-Task reminders retain their existing at-least-once presentation and acknowledgment behavior.
+store sử dụng xác thực `MemoryFile` hiện có, quyền truy cập tệp riêng tư, đổi tên nguyên tử và khóa đa quy trình. Tệp của nó là `open-loops/state.json` trong thư mục dữ liệu người dùng. Lược đồ tác vụ, trạng thái phân phối, lặp lại, khởi động lại khôi phục và chiếu bộ nhớ giữ nguyên các hợp đồng hiện có của chúng.
 
-No generation provider is called for delivery. English and Vietnamese templates provide kind-specific problem, work, waiting, goal, and event questions.
-Presentation strips redundant leading subject prefixes without changing identity keys.
+Yêu cầu kéo dài 30 giây và mang theo hàng rào token. Trước khi trình bày, nguồn sẽ kiểm tra quyền riêng tư hiện tại, ngăn chặn tác vụ mới, hoạt động mới nhất, trạng thái vòng lặp hiện tại và quyền sở hữu lease. Lỗi trình bày trước sẽ hủy bỏ xác nhận quyền sở hữu và đợi 60 giây trước khi thử lại. Chủ sở hữu yêu cầu bồi thường bị lỗi sẽ có thể phục hồi được sau khi lease hết hạn.
+
+`reservePresentation` cam kết `promptCount = 1` và `lastPromptedAt` trước tác dụng phụ bên ngoài. Điều này cung cấp các nỗ lực trình bày tối đa một lần đối với các lỗi và khởi động lại nhiều lần. Một thất bại sau khi đặt trước và trước khi trình bày bên ngoài được xác nhận có thể làm mất đi sự theo dõi ngầm. Điều này bao gồm sự cố quy trình, lỗi Telegram API, lỗi ghi thiết bị xuất chuẩn, ngoại lệ bộ điều hợp và lỗi mạng. Những nỗ lực này không được thử lại. Sự kiện `proactive.prompted` ghi lại nỗ lực đã cam kết nhưng không được người dùng xác nhận. Lời nhắc nhiệm vụ giữ lại hành vi xác nhận và trình bày ít nhất một lần hiện có của chúng.
+
+Không có sinh nội dung nhà cung cấp nào được gọi để giao hàng. Các mẫu tiếng Anh và tiếng Việt cung cấp các câu hỏi về vấn đề, công việc, sự chờ đợi, mục tiêu và sự kiện theo từng loại cụ thể.
+Bản trình bày loại bỏ các tiền tố chủ đề thừa ở đầu mà không thay đổi khóa nhận dạng.
 For example, waiting for `thầy` produces `Thầy đã phản hồi chưa?`.
-A provider failure during ordinary chat does not erase a valid user-grounded loop already persisted by the host.
+Lỗi nhà cung cấp trong quá trình trò chuyện thông thường không xóa vòng lặp hợp lệ do người dùng căn cứ đã được host duy trì.
 
-## Privacy, bounds, and failures
+<a id="privacy-bounds-and-failures"></a>
 
-Creation and resolution require existing durable personal-memory consent.
-The source checks current personal-memory, automatic-memory, and recall switches without opening a semantic index.
-Disabled, unavailable, or invalid memory controls block implicit delivery. Explicit Tasks retain independent privacy controls.
-Protected requests create no loop, task projection, or implicit candidate.
-Subjects never enter global events. Events contain IDs, reasons, and lifecycle metadata only.
+## Quyền riêng tư, giới hạn và thất bại
 
-The store admits at most 50 open loops. It rejects excess admissions without evicting active work.
-Inactive history retains at most 30 records for seven days. Expiry runs under the store lock.
-The storage file remains bounded by the existing 128,000-character storage contract.
-Model context includes at most six workspace-local loop summaries, each with a subject of at most 120 characters.
-Open threads sort before inactive history, then by update time.
-Metadata observers run after persistence and cannot change authoritative results.
-Corrupted files remain untouched. Source errors are reported without stopping Task reminders.
+Việc tạo và giải quyết yêu cầu phải có sự đồng ý lâu dài về bộ nhớ cá nhân. Nguồn kiểm tra các bộ chuyển mạch bộ nhớ cá nhân, bộ nhớ tự động và Recall hiện tại mà không cần mở chỉ mục ngữ nghĩa. Các điều khiển bộ nhớ bị vô hiệu hóa, không khả dụng hoặc không hợp lệ sẽ chặn việc phân phối ngầm định. Nhiệm vụ rõ ràng giữ lại các biện pháp kiểm soát quyền riêng tư độc lập. Các yêu cầu được bảo vệ không tạo ra vòng lặp, nhiệm vụ chiếu hoặc ứng viên tiềm ẩn. Đối tượng không bao giờ tham gia các sự kiện toàn cầu. Sự kiện chỉ chứa ID, lý do và siêu dữ liệu vòng đời.
 
-## Limits and next milestone
+store thừa nhận tối đa 50 vòng lặp mở. Nó từ chối việc nhập học quá mức mà không loại bỏ công việc đang hoạt động. Lịch sử không hoạt động giữ lại tối đa 30 bản ghi trong bảy ngày. Hết hạn chạy theo khóa store. Tệp lưu trữ vẫn là có giới hạn theo hợp đồng lưu trữ 128.000 ký tự hiện có. Ngữ cảnh mô hình bao gồm tối đa sáu bản tóm tắt vòng lặp cục bộ workspace, mỗi bản tóm tắt có chủ đề tối đa 120 ký tự. Sắp xếp các chủ đề mở trước lịch sử không hoạt động, sau đó theo thời gian cập nhật. Người quan sát siêu dữ liệu chạy theo sự kiên trì và không thể thay đổi kết quả có thẩm quyền. Các tập tin bị hỏng vẫn còn nguyên. Lỗi nguồn được báo cáo mà không dừng nhắc nhở Tác vụ.
 
-This foundation recognizes a bounded Vietnamese grammar. It does not understand arbitrary unresolved topics or arbitrary event calendars.
-Authentication alias matching can over-merge related problems. Other topics require normalized equality.
-Implicit delivery needs a running CLI or Telegram companion host. Voice and standalone background implicit prompts are not implemented.
-At-most-once delivery deliberately accepts possible loss after reservation. It does not promise exactly-once network receipt.
-OpenLoop history remains separate from semantic-memory purge commands. Natural-language forget requests dismiss tracking and use existing personal-memory forgetting when unambiguous.
+<a id="limits-and-next-milestone"></a>
 
-Next milestone: evaluate extraction and dedupe against a consented Vietnamese conversation corpus before expanding the grammar.
+## Giới hạn và cột mốc tiếp theo
+
+Nền tảng này công nhận ngữ pháp tiếng Việt có giới hạn. Nó không hiểu các chủ đề tùy tiện chưa được giải quyết hoặc các lịch sự kiện tùy ý. Việc kết hợp bí danh xác thực có thể kết hợp quá mức các vấn đề liên quan. Các chủ đề khác yêu cầu sự bình đẳng được chuẩn hóa. Phân phối ngầm cần có CLI đang chạy hoặc host đồng hành của Telegram. Giọng nói và nền độc lập tiềm ẩn prompt không được triển khai. Giao hàng tối đa một lần cố tình chấp nhận mất mát có thể xảy ra sau khi đặt trước. Nó không hứa hẹn nhận mạng chính xác một lần. Lịch sử OpenLoop vẫn tách biệt với các lệnh thanh lọc bộ nhớ ngữ nghĩa. Các yêu cầu quên ngôn ngữ tự nhiên loại bỏ việc theo dõi và sử dụng việc quên bộ nhớ cá nhân hiện có khi rõ ràng.
+
+Cột mốc tiếp theo: đánh giá việc trích xuất và loại trừ đối với kho ngữ liệu hội thoại tiếng Việt đã được đồng ý trước khi mở rộng ngữ pháp.

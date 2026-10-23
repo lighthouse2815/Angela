@@ -1,68 +1,43 @@
-# The presence bubble is drawn inside the model canvas
+<a id="the-presence-bubble-is-drawn-inside-the-model-canvas"></a>
 
-Status: Accepted
+# Bong bóng hiện diện được vẽ bên trong khung vẽ mô hình
 
-## Context
+Trạng thái: Đã chấp nhận
 
-The desktop main view reports nothing about what AIRI is doing. A model turn
-looks the same as an idle window, and messages that arrive while the chat window
-is hidden leave no trace on the stage. A user who leaves speech-to-text enabled
-can spend provider quota for a long time before anything on screen suggests it.
+<a id="context"></a>
 
-A first pass drew the bubble as a DOM overlay above the stage canvas. It reads
-correctly while the stage runs uncapped, and it desynchronizes as soon as it does
-not. `settings/live2d/max-fps` caps the Pixi ticker, so the canvas repaints at the
-capped rate while a DOM overlay follows `requestAnimationFrame`. The head and the
-bubble then advance on different clocks, and the bubble slides off the head during
-motion and window drags.
+## Bối cảnh
 
-The stage has three renderers, selected by `stageModelRenderer`: `live2d` on Pixi,
-`vrm` on Three, and `tachie` on a static image. There is no shared scene graph
-between them.
+Chế độ xem chính của desktop không báo cáo gì về những gì AIRI đang làm. Một lượt mô hình trông giống như một cửa sổ nhàn rỗi và các tin nhắn đến trong khi cửa sổ trò chuyện bị ẩn sẽ không để lại dấu vết trên stage. Người dùng bật tính năng chuyển lời nói thành văn bản có thể sử dụng hạn ngạch nhà cung cấp trong một thời gian dài trước khi bất kỳ nội dung nào trên màn hình đề xuất điều đó.
 
-## Decision
+Lần vượt qua đầu tiên đã vẽ bong bóng dưới dạng lớp phủ DOM phía trên khung vẽ stage. Nó đọc chính xác trong khi stage chạy không được khai thác và nó sẽ không đồng bộ hóa ngay khi không hoạt động. `settings/live2d/max-fps` giới hạn mã đánh dấu Pixi, do đó khung vẽ sẽ sơn lại ở tốc độ giới hạn trong khi lớp phủ DOM tuân theo `requestAnimationFrame`. Sau đó, đầu và bong bóng di chuyển theo các đồng hồ khác nhau và bong bóng trượt khỏi đầu trong quá trình chuyển động và kéo cửa sổ.
 
-- The bubble is a child of the model's own scene, not a DOM layer over it. The
-  head anchor and the bubble are read and written inside the same frame, so a
-  frame cap moves both or neither.
-- `live2d` and `vrm` each carry their own adapter. `tachie` has no head to follow
-  and shows no bubble; it is not a fallback path and reports no error.
-- One painter draws the bubble into a 2D canvas, and each adapter uploads that
-  canvas as a texture. Appearance, layout and text shaping live in one place, and
-  the system font stack keeps CJK digits and future CJK text working without a
-  bundled font.
-- The bubble is opaque and is not carved out of the alpha hit test. Pixels it
-  paints stop the window passing the mouse through, the same as the character.
-- The bubble shows one thing at a time, by precedence: thinking, then unread.
-  A spoken line will take precedence over both when it lands.
-- Unread is a mark and a count, drawn in the same panel the dots use, in the
-  accent colour. One shape for both states reads as the character's own bubble
-  rather than as a badge stuck to its head. It is not a sentence, and the
-  character does not narrate it.
+stage có ba các renderer, được `stageModelRenderer` chọn: `live2d` trên Pixi, `vrm` trên Three và `tachie` trên ảnh tĩnh. Không có biểu đồ cảnh được chia sẻ giữa chúng.
 
-## Anchor resolution
+<a id="decision"></a>
 
-VRM states where the head is: `humanoid.getNormalizedBoneNode('head')` turns and
-nods with it. Nothing states how large it is, so the reach is a share of the
-model's height, which a humanoid format makes a safe thing to assume. The offset
-from the bone to the drawn head follows the bone's own up axis, so a tilted head
-stays right.
+## Phán quyết
 
-Live2D has no such bone. A `Head` or `Face` hit area names it when the author
-declared one, which three of the seven models shipped with the Cubism SDK do.
-Otherwise the rig answers: the standard head-angle parameters are turned to the
-end of their range furthest from rest, physics is run, and the drawables that
-moved are the head. The body is not turned as a control: a body carries the head
-with it, so a head drawable answers to both, and comparing the two would reject
-the head itself. A drawable that merely follows the head barely moves, and a
-share of the largest movement drops it. Six of the seven define at least one
-head-angle parameter; the seventh is a dog, whose head does not turn on its own.
+- Bong bóng là con của cảnh riêng của mô hình, không phải là lớp DOM phía trên nó. Điểm neo đầu và bong bóng được đọc và ghi bên trong cùng một khung, do đó, nắp khung sẽ di chuyển cả hai hoặc không di chuyển.
+- Mỗi `live2d` và `vrm` đều có bộ chuyển đổi riêng. `tachie` không có đầu để theo dõi và không có bong bóng; nó không phải là đường dẫn phương án dự phòng và không báo cáo lỗi.
+- Một họa sĩ vẽ bong bóng thành khung vẽ 2D và mỗi bộ chuyển đổi sẽ tải khung vẽ đó lên dưới dạng họa tiết. Giao diện, bố cục và định hình văn bản trực tiếp ở một nơi và ngăn xếp phông chữ hệ thống giữ cho các chữ số CJK và văn bản CJK trong tương lai hoạt động mà không cần phông chữ đi kèm.
+- Bong bóng mờ đục và không được khắc ra khỏi bài kiểm tra lần truy cập alpha. Các pixel mà nó vẽ sẽ ngăn cửa sổ di chuyển chuột qua, giống như ký tự.
+- Bong bóng hiển thị một điều tại một thời điểm, theo thứ tự ưu tiên: đang suy nghĩ, sau đó chưa đọc. Một dòng nói sẽ được ưu tiên hơn cả khi nó hạ cánh.
+- Chưa đọc là một dấu và một số đếm, được vẽ trong cùng một bảng mà các dấu chấm sử dụng, có màu nhấn. Một hình dạng cho cả hai trạng thái được coi là bong bóng của chính nhân vật chứ không phải là huy hiệu dán trên đầu nhân vật. Đó không phải là một câu văn và nhân vật cũng không kể lại câu chuyện đó.
 
-A model that states neither shows no bubble. Placing it from where drawables sit
-assumes the model was drawn upright with nothing above the head, and a hat, tall
-hair or a raised arm breaks that.
+<a id="anchor-resolution"></a>
 
-## State model
+## Độ phân giải neo
+
+VRM cho biết đầu ở đâu: `humanoid.getNormalizedBoneNode('head')` quay lại và gật đầu với nó. Không có gì cho biết nó lớn đến mức nào, vì vậy phạm vi tiếp cận là một phần chiều cao của mô hình, định dạng hình người là điều an toàn để giả định. Khoảng lệch từ xương đến đầu được vẽ theo trục hướng lên của xương, do đó đầu nghiêng vẫn ở bên phải.
+
+Live2D không có xương như vậy. Khu vực truy cập `Head` hoặc `Face` đặt tên cho nó khi tác giả tuyên bố một khu vực, điều mà ba trong số bảy mô hình được vận chuyển cùng với Chủ nghĩa lập thể SDK làm được. Mặt khác, giàn khoan sẽ trả lời: các tham số góc đầu tiêu chuẩn được chuyển về cuối phạm vi xa nhất so với phần còn lại của chúng, vật lý được chạy và các đối tượng có thể vẽ được di chuyển là phần đầu. Cơ thể không được quay như một vật kiểm soát: một cơ thể mang theo đầu, do đó, một cái đầu có thể kéo được sẽ trả lời cho cả hai và việc so sánh cả hai sẽ loại bỏ chính cái đầu đó. Một vật có thể vẽ được chỉ đi theo phần đầu hầu như không di chuyển và một phần chuyển động lớn nhất sẽ làm rơi nó. Sáu trong số bảy tham số xác định ít nhất một tham số góc đầu; thứ bảy là con chó, đầu nó không tự quay được.
+
+mô hình có trạng thái không hiển thị bong bóng. Đặt nó từ vị trí có thể kéo được giả định rằng mô hình được vẽ thẳng đứng mà không có gì phía trên đầu và một chiếc mũ, mái tóc cao hoặc một cánh tay giơ lên ​​sẽ phá vỡ điều đó.
+
+<a id="state-model"></a>
+
+## Trạng thái mô hình
 
 ```mermaid
 stateDiagram-v2
@@ -74,22 +49,12 @@ stateDiagram-v2
   Unread --> Hidden: chat window opens
 ```
 
-## Consequences
+<a id="consequences"></a>
 
-- The panel and its tail are one outline, traced in a single walk. Drawing them
-  as two shapes and relying on the fill to join them leaves a seam that reopens
-  at some angles whatever the overlap.
-- A translucent, blurred treatment is not available. `backdrop-filter` blurs what
-  the DOM composites behind an element, and the canvas has nothing behind it: the
-  window is transparent and the desktop is not in the scene. Pixi and Three can
-  only blur what the scene already contains. The bubble is therefore drawn as an
-  opaque panel.
-- The bubble is covered by the resize fix in `Live2DCanvas`, because it is drawn
-  in the same frame as the model.
-- The bubble needs no `data-ambient-light-opaque` marker. That marker exists for
-  overlays outside the canvas; the ambient-light mask reads canvas alpha and
-  already counts anything drawn in the scene as AIRI's own pixels.
-- Unread requires a read cursor, which this repository does not have. The chat
-  window is a separate Electron window and `electronOpenChat` toggles it without
-  reporting the result, so the main window cannot currently tell whether the chat
-  is visible. That signal has to be added before unread can be correct.
+## Hậu quả
+
+- Bảng điều khiển và phần đuôi của nó là một đường viền, được vẽ trong một lần đi bộ. Vẽ chúng thành hai hình dạng và dựa vào phần tô để nối chúng sẽ để lại một đường nối mở lại ở một số góc bất kể phần chồng lên nhau.
+- Không có phương pháp điều trị mờ, mờ. `backdrop-filter` làm mờ những gì DOM tổng hợp đằng sau một phần tử và khung vẽ không có gì đằng sau nó: cửa sổ trong suốt và desktop không có trong cảnh. Tỳ Hưu và Ba chỉ có thể làm mờ những gì cảnh đã có. Do đó, bong bóng được vẽ dưới dạng một bảng mờ đục.
+- Bong bóng được bao phủ bởi bản sửa đổi kích thước trong `Live2DCanvas`, vì nó được vẽ trong cùng khung với mô hình.
+- Bong bóng không cần điểm đánh dấu `data-ambient-light-opaque`. Điểm đánh dấu đó tồn tại cho các lớp phủ bên ngoài khung vẽ; mặt nạ ánh sáng xung quanh đọc canvas alpha và đã tính bất kỳ thứ gì được vẽ trong cảnh là pixel của chính AIRI.
+- Chưa đọc yêu cầu một con trỏ đọc, kho lưu trữ này không có. Cửa sổ trò chuyện là một cửa sổ Electron riêng biệt và `electronOpenChat` chuyển đổi nó mà không báo cáo kết quả, vì vậy cửa sổ chính hiện không thể biết liệu cuộc trò chuyện có hiển thị hay không. Tín hiệu đó phải được thêm vào trước khi dữ liệu chưa đọc có thể chính xác.

@@ -1,164 +1,146 @@
-# Recall quality improvements
+<a id="recall-quality-improvements"></a>
 
-## Initial investigation
+# Cải tiến chất lượng Recall
 
-Read all 21 failed cases before implementation. Dataset and expected labels remain unchanged.
+<a id="initial-investigation"></a>
 
-| Initial failures | Count | Root cause |
+## Điều tra ban đầu
+
+Đọc tất cả 21 trường hợp thất bại trước khi thực hiện. Tập dữ liệu và nhãn dự kiến ​​không thay đổi.
+
+| Thất bại ban đầu | Đếm | Nguyên nhân gốc rễ |
 | --- | ---: | --- |
-| `no_shared_memory_004`, `no_shared_memory_005` | 2 | One folded syllable matched unrelated study text |
-| `irrelevant_memory_001`, `002`, `003`, `004`, `006`, `007` | 6 | OR matching admitted weak or ambiguous words |
-| `last_conversation_001`, `002`, `003`, `004`, `006`, `007`, `008` | 7 | General recap had no topic tokens and no temporal source selection |
-| `semantic_paraphrase_001`, `004`, `006`, `007`, `008` | 5 | No lexical overlap and no configured embedding provider |
-| `vietnamese_variants_005` | 1 | Name and nickname use different words, beyond accent folding |
+| `no_shared_memory_004`, `no_shared_memory_005` | 2 | Một âm tiết gấp phù hợp với văn bản nghiên cứu không liên quan |
+| `irrelevant_memory_001`, `002`, `003`, `004`, `006`, `007` | 6 | OR khớp các từ yếu hoặc mơ hồ được thừa nhận |
+| `last_conversation_001`, `002`, `003`, `004`, `006`, `007`, `008` | 7 | Tóm tắt chung không có chủ đề token và không có lựa chọn nguồn tạm thời |
+| `semantic_paraphrase_001`, `004`, `006`, `007`, `008` | 5 | Không chồng chéo từ vựng và không nhúng cấu hình nhà cung cấp |
+| `vietnamese_variants_005` | 1 | Tên và biệt hiệu sử dụng các từ khác nhau, ngoài dấu gấp |
 
 Accent folding already removes Vietnamese combining marks and maps `đ` to `d`.
-RRF uses candidate position, not an absolute relevance score. A sole weak result still ranked first.
-Authority weights made explicit facts rank well but did not establish topic relevance.
-Automatic context accepted every validated result that fit its character budget.
-Increasing top K or budget cannot resolve these causes.
+RRF sử dụng vị trí ứng viên chứ không phải điểm phù hợp tuyệt đối. Một kết quả yếu duy nhất vẫn xếp thứ nhất.
+Trọng số của cơ quan làm cho các sự kiện rõ ràng được xếp hạng tốt nhưng không thiết lập được mức độ liên quan của chủ đề.
+Ngữ cảnh tự động chấp nhận mọi kết quả được xác thực phù hợp với ngân sách ký tự của nó.
+Việc tăng K hoặc ngân sách hàng đầu không thể giải quyết được những nguyên nhân này.
 
-## Relevance gate
+<a id="relevance-gate"></a>
 
-Automatic context now requires two distinct query content tokens, or the full query when only one content token remains.
-Two tokens provide corroboration beyond a single ambiguous word. This is a conservative lexical rule, not a probability estimate.
-Query scaffolding is removed before the gate. Document matching reads the full bounded excerpt, not its last 32 tokens.
-The existing vector similarity floor remains an independent route to semantic relevance.
-Rank fusion and authority cannot override the gate. Explicit memory search retains broad results for further inspection.
+## Mức độ liên quan cổng kiểm tra
 
-Candidate limits remain 80 per retrieval channel. Recall still returns at most 12 validated results and two per ordinary origin.
-Context budget remains unchanged. Sources are validated after retrieval and reinforced only after selection.
-Core personal facts retain their existing explicit profile policy.
+Ngữ cảnh tự động hiện yêu cầu hai nội dung truy vấn riêng biệt token hoặc truy vấn đầy đủ khi chỉ còn lại một nội dung token. Hai token cung cấp sự chứng thực ngoài một từ mơ hồ. Đây là một quy tắc từ vựng thận trọng, không phải là ước tính xác suất. Truy vấn tạo khung ban đầu bị xóa trước cổng kiểm tra. Đối sánh tài liệu đọc toàn bộ đoạn trích có giới hạn chứ không phải 32 token cuối cùng của nó. Tầng tương tự vectơ hiện có vẫn là route độc lập với mức độ liên quan về mặt ngữ nghĩa. Hợp nhất cấp bậc và quyền hạn không thể ghi đè cổng kiểm tra. Tìm kiếm bộ nhớ rõ ràng giữ lại kết quả rộng rãi để kiểm tra thêm.
 
-Positive and negative tests cover a sole weak result, twenty weak results, exact diagnostics, strong phrases and vector evidence.
-Context tests check omission, reinforcement and budget behavior through the real Recall API.
+Giới hạn ứng viên vẫn là 80 cho mỗi kênh truy xuất. Recall vẫn trả về tối đa 12 kết quả được xác thực và hai kết quả cho nguồn gốc thông thường. Ngân sách bối cảnh không thay đổi. Các nguồn được xác thực sau khi truy xuất và chỉ được củng cố sau khi lựa chọn. Thông tin cá nhân cốt lõi vẫn giữ nguyên chính sách hồ sơ rõ ràng hiện có của họ.
 
-The gate deliberately exposes weak lexical matches that the baseline previously counted as useful.
-Later checkpoints report context hit rate and newly failing cases alongside the requested recall metrics.
+Các xét nghiệm dương tính và âm tính bao gồm một kết quả yếu duy nhất, hai mươi kết quả yếu, chẩn đoán chính xác, cụm từ mạnh và bằng chứng vectơ. Kiểm tra bối cảnh kiểm tra hành vi thiếu sót, gia cố và ngân sách thông qua Recall API thực.
 
-## Recent conversation intent
+cổng kiểm tra cố tình hiển thị các kết quả từ vựng yếu mà đường cơ sở trước đó được coi là hữu ích. Các điểm kiểm tra sau này báo cáo tỷ lệ trúng ngữ cảnh và các trường hợp lỗi mới cùng với chỉ số Recall được yêu cầu.
 
-General recaps require three signals: past time, conversation language and no remaining topic.
-Accented and unaccented Vietnamese share normalization. English conversation questions use the same policy.
+<a id="recent-conversation-intent"></a>
+
+## Mục đích cuộc trò chuyện gần đây
+
+Tóm tắt chung yêu cầu ba tín hiệu: thời gian đã qua, ngôn ngữ hội thoại và không còn chủ đề nào.
+Chuẩn hóa chia sẻ tiếng Việt có dấu và không có dấu. Các câu hỏi đàm thoại bằng tiếng Anh cũng sử dụng chính sách tương tự.
 Topical questions keep their FTS/vector path. Mentioning “lần trước” alone never selects a session.
 
-The index selects one latest eligible session, excluding the current session, other scopes and suppressed sessions.
-Only history or episodic session pages qualify. Semantic preferences cannot substitute for missing conversations.
-Expiry and supersession remain enforced. Recall still validates archive versions and page authority before returning evidence.
-An archived overview and bounded source excerpts cover the session without injecting every archived message.
+Chỉ mục chọn một phiên đủ điều kiện mới nhất, ngoại trừ phiên hiện tại, các phạm vi khác và các phiên bị chặn. Chỉ các trang lịch sử hoặc phiên nhiều tập mới đủ điều kiện. Tùy chọn ngữ nghĩa không thể thay thế cho các cuộc hội thoại bị thiếu. Hết hạn và thay thế vẫn được thực thi. Recall vẫn xác thực các phiên bản lưu trữ và quyền hạn của trang trước khi trả lại bằng chứng. Tổng quan đã lưu trữ và các trích đoạn nguồn có giới hạn bao gồm phiên mà không đưa vào mọi thư đã lưu trữ.
 
-Tests cover five recap phrasings, two historical dates, a newer foreign workspace, current-session exclusion and episodic-only stores.
-Negative tests cover topical past references, an empty eligible history, expiry, suppression and supersession.
-This checkpoint recalls all eight general-recap cases. The full lexical recall metric becomes 100/106.
+Các thử nghiệm bao gồm năm cụm từ tóm tắt, hai ngày lịch sử, một workspace nước ngoài mới hơn, loại trừ phiên hiện tại và store chỉ theo từng tập. Các thử nghiệm tiêu cực bao gồm các tài liệu tham khảo mang tính thời sự trong quá khứ, lịch sử đủ điều kiện trống, thời hạn sử dụng, sự ngăn chặn và thay thế. Điểm kiểm tra này thu hồi tất cả tám trường hợp tóm tắt chung. Số liệu Recall từ vựng đầy đủ trở thành 100/106.
 
-## Language and bounded query expansion
+<a id="language-and-bounded-query-expansion"></a>
 
-Name, nickname and preferred form of address share a narrow relation. Query expansion uses existing FTS tokens and existing projections.
-Subject qualifiers still need evidence. A question about Lan cannot accept another person's preferred name based on the relation alone.
-Recent-session page joins use the existing primary-key index. SQLite query-plan inspection confirmed an indexed lookup instead of a page scan.
-No new index or schema change was required.
+## Mở rộng truy vấn ngôn ngữ và có giới hạn
 
-No synonym table maps learning goals to dataset answers. Existing optional vectors remain the route for broader semantic paraphrases.
+Tên, biệt danh và dạng địa chỉ ưa thích có mối quan hệ chặt chẽ. Mở rộng truy vấn sử dụng FTS token hiện có và các phép chiếu hiện có. Vòng loại chủ đề vẫn cần bằng chứng. Một câu hỏi về Lan không thể chấp nhận cái tên ưa thích của người khác chỉ dựa trên mối quan hệ. Các phép nối trang phiên gần đây sử dụng chỉ mục khóa chính hiện có. Việc kiểm tra kế hoạch truy vấn SQLite đã xác nhận việc tra cứu được lập chỉ mục thay vì quét trang. Không cần thay đổi chỉ mục hoặc lược đồ mới.
 
-Grammar removal now precedes accent folding at the context gate.
+Không có bảng từ đồng nghĩa nào ánh xạ mục tiêu học tập với câu trả lời của tập dữ liệu. Các vectơ tùy chọn hiện có vẫn là route cho các cách diễn giải ngữ nghĩa rộng hơn.
+
+Việc loại bỏ ngữ pháp hiện đi trước việc gấp dấu trong ngữ cảnh cổng kiểm tra.
 This preserves Vietnamese `ăn` and `bản` instead of erasing them as English `an` or Vietnamese `bạn`.
-Stored source text stays unchanged. Existing indexed pages need no migration or rebuild.
-A procedural tier plus a topical token also supplies two independent signals for an explicit workflow question.
+Văn bản nguồn được lưu trữ không thay đổi. Các trang được lập chỉ mục hiện tại không cần di chuyển hoặc xây dựng lại.
+Cấp thủ tục cộng với token theo chủ đề cũng cung cấp hai tín hiệu độc lập cho câu hỏi về quy trình làm việc rõ ràng.
 
-The original 21 failures now have a dedicated regression suite using unchanged cases and baseline IDs.
-Sixteen corrected cases must pass every label. Five unresolved semantic paraphrases retain all contamination and safety checks.
-A complete-corpus test enforces the requested recall and contamination targets, alongside baseline context and pass-rate floors.
-No test asserts that an unresolved quality failure is correct behavior.
+21 lỗi ban đầu hiện có bộ hồi quy chuyên dụng sử dụng các trường hợp và ID cơ sở không thay đổi. Mười sáu trường hợp đã sửa phải vượt qua mọi nhãn hiệu. Năm cách diễn giải ngữ nghĩa chưa được giải quyết giữ lại tất cả các kiểm tra về ô nhiễm và an toàn. Thử nghiệm toàn bộ kho dữ liệu thực thi Recall được yêu cầu và các mục tiêu ô nhiễm, cùng với bối cảnh cơ bản và tỷ lệ sàn đạt. Không có thử nghiệm nào khẳng định rằng lỗi chất lượng chưa được giải quyết là hành vi đúng.
 
-Current lexical checkpoint: 101/106 recall hits, 98/106 context hits, 120/128 complete passes.
-Wrong-memory, supersession, false-shared-memory and irrelevant injection counts are zero.
-Eight semantic paraphrases remain excluded from automatic context. Three previously passed through incidental lexical matches.
-This conservative policy does not infer a semantic relationship that lexical retrieval cannot establish.
+Điểm kiểm tra từ vựng hiện tại: lượt truy cập 101/106 Recall, lượt truy cập ngữ cảnh 98/106, lượt hoàn thành 120/128. Bộ nhớ sai, số phiên thay thế, bộ nhớ chia sẻ sai và số lần tiêm không liên quan đều bằng 0. Tám cách diễn giải ngữ nghĩa vẫn bị loại khỏi ngữ cảnh tự động. Ba trước đó đã được thông qua các trận đấu từ vựng ngẫu nhiên. Chính sách bảo thủ này không suy ra mối quan hệ ngữ nghĩa mà việc truy xuất từ ​​vựng không thể thiết lập được.
 
-## Before and after
+<a id="before-and-after"></a>
 
-The original [baseline](./baseline.json) remains unchanged. The final raw results are in [after.json](./after.json).
-Both runs use the same 128 cases, 16 categories, expectations and offline lexical mode.
-False shared-memory measures forbidden context evidence, not generated claims from a model.
+## Trước và sau
 
-| Metric | Before | After |
+[baseline](./baseline.json) ban đầu vẫn không thay đổi. Kết quả thô cuối cùng có dạng [after.json](./after.json). Cả hai lần chạy đều sử dụng cùng 128 trường hợp, 16 danh mục, kỳ vọng và chế độ từ vựng ngoại tuyến. Bộ nhớ chia sẻ sai đo lường bằng chứng ngữ cảnh bị cấm, không tạo ra xác nhận quyền sở hữu từ mô hình.
+
+| Số liệu | Trước | Sau |
 | --- | ---: | ---: |
-| Recall hit rate | 93/106 (87.74%) | 101/106 (95.28%) |
-| Wrong-memory rate | 0/6 (0.00%) | 0/6 (0.00%) |
-| Superseded-memory error rate | 0/16 (0.00%) | 0/16 (0.00%) |
-| False shared-memory rate | 0/8 (0.00%) | 0/8 (0.00%) |
-| Irrelevant-memory injection rate | 8/32 (25.00%) | 0/32 (0.00%) |
-| Context hit rate | 93/106 (87.74%) | 98/106 (92.45%) |
-| Forbidden-content rate | 0/32 (0.00%) | 0/32 (0.00%) |
-| Case pass rate | 107/128 (83.59%) | 120/128 (93.75%) |
+| Tỷ lệ trúng Recall | 93/106 (87,74%) | 101/106 (95,28%) |
+| Tỷ lệ bộ nhớ sai | 0/6 (0,00%) | 0/6 (0,00%) |
+| Tỷ lệ lỗi bộ nhớ thay thế | 0/16 (0,00%) | 0/16 (0,00%) |
+| Tỷ lệ bộ nhớ chia sẻ sai | 0/8 (0,00%) | 0/8 (0,00%) |
+| Tốc độ tiêm bộ nhớ không liên quan | 8/32 (25,00%) | 0/32 (0,00%) |
+| Tỷ lệ trúng bối cảnh | 93/106 (87,74%) | 98/106 (92,45%) |
+| Tỷ lệ nội dung bị cấm | 0/32 (0,00%) | 0/32 (0,00%) |
+| Tỷ lệ vượt qua trường hợp | 107/128 (83,59%) | 120/128 (93,75%) |
 
-Sixteen original failures now pass. Five original recall misses remain.
-Three formerly passing paraphrases now fail automatic context selection because their only overlap was incidental vocabulary.
-All eight remaining failures belong to `semantic_paraphrase`.
+Mười sáu thất bại ban đầu bây giờ đã qua. Vẫn còn năm chiếc Recall ban đầu. Ba cách diễn giải trước đây hiện không thể lựa chọn ngữ cảnh tự động vì sự trùng lặp duy nhất của chúng là từ vựng ngẫu nhiên. Tất cả 8 lỗi còn lại đều thuộc về `semantic_paraphrase`.
 
-| Remaining case | Explicit recall | Automatic context |
+| Trường hợp còn lại | Rõ ràng Recall | Ngữ cảnh tự động |
 | --- | --- | --- |
-| `semantic_paraphrase_001` | Miss | Excluded by relevance gate |
-| `semantic_paraphrase_002` | Hit | Excluded by relevance gate |
-| `semantic_paraphrase_003` | Hit | Excluded by relevance gate |
-| `semantic_paraphrase_004` | Miss | Excluded by relevance gate |
-| `semantic_paraphrase_005` | Hit | Excluded by relevance gate |
-| `semantic_paraphrase_006` | Miss | Excluded by relevance gate |
-| `semantic_paraphrase_007` | Miss | Excluded by relevance gate |
-| `semantic_paraphrase_008` | Miss | Excluded by relevance gate |
+| `semantic_paraphrase_001` | Cô | Bị loại trừ bởi mức độ liên quan cổng kiểm tra |
+| `semantic_paraphrase_002` | Đánh | Bị loại trừ bởi mức độ liên quan cổng kiểm tra |
+| `semantic_paraphrase_003` | Đánh | Bị loại trừ bởi mức độ liên quan cổng kiểm tra |
+| `semantic_paraphrase_004` | Cô | Bị loại trừ bởi mức độ liên quan cổng kiểm tra |
+| `semantic_paraphrase_005` | Đánh | Bị loại trừ bởi mức độ liên quan cổng kiểm tra |
+| `semantic_paraphrase_006` | Cô | Bị loại trừ bởi mức độ liên quan cổng kiểm tra |
+| `semantic_paraphrase_007` | Cô | Bị loại trừ bởi mức độ liên quan cổng kiểm tra |
+| `semantic_paraphrase_008` | Cô | Bị loại trừ bởi mức độ liên quan cổng kiểm tra |
 
-The five recall misses have no usable lexical overlap. No embedding provider is configured in this evaluation mode.
+Năm lỗi Recall không có sự chồng chéo từ vựng có thể sử dụng được. Không có nhà cung cấp nhúng nào được cấu hình trong chế độ đánh giá này.
 The three additional context failures previously matched words such as `khi` or `ngày` without establishing the requested relationship.
-No blanket preference injection or answer-specific synonym expansion was added to recover those points.
-Real embeddings need a separate model-specific evaluation before stronger semantic quality claims.
-The existing vector route is covered with deterministic vectors, not a paid service.
+Không có nội dung ưu tiên chung hoặc mở rộng từ đồng nghĩa dành riêng cho câu trả lời nào được thêm vào để khôi phục các điểm đó.
+Các phần nhúng thực sự cần có đánh giá riêng dành riêng cho mô hình trước khi xác nhận chất lượng ngữ nghĩa mạnh mẽ hơn.
+Vectơ route hiện có được bao phủ bởi các vectơ xác định, không phải là dịch vụ trả phí.
 
-## Production scope
+<a id="production-scope"></a>
 
-- `recall.ts`: separate automatic context filtering from explicit search and route general conversation recaps.
-- `recall-index.ts`: apply the relevance gate after ranking and select bounded evidence from an eligible prior session.
-- `recall-query.ts`: normalize query language, detect recap intent and expand narrow name relations.
+## Phạm vi sản xuất
 
-Memory storage, capture architecture, authority, purge, supersession and provider configuration remain unchanged.
-No dependency, vector database, background generation or paid API was added.
-No dataset expectation, original baseline result or existing regression assertion was removed.
+- `recall.ts`: tách biệt tính năng lọc ngữ cảnh tự động khỏi tìm kiếm rõ ràng và tóm tắt cuộc hội thoại chung của route.
+- `recall-index.ts`: áp dụng mức độ liên quan của cổng kiểm tra sau khi xếp hạng và chọn bằng chứng có giới hạn từ phiên trước đủ điều kiện.
+- `recall-query.ts`: chuẩn hóa ngôn ngữ truy vấn, phát hiện mục đích tóm tắt và mở rộng quan hệ tên hẹp.
 
-## New regression coverage
+Bộ nhớ lưu trữ, kiến ​​trúc thu nhận dữ liệu, quyền hạn, thanh lọc, thay thế và cấu hình nhà cung cấp không thay đổi. Không có phần phụ thuộc, cơ sở dữ liệu vectơ, sinh nội dung nền hoặc API trả phí nào được thêm vào. Không có kỳ vọng về tập dữ liệu, kết quả cơ sở ban đầu hoặc xác nhận hồi quy hiện có nào bị xóa.
 
-The CLI gains 29 tests across `recall-index.test.ts`, `recall.test.ts` and `recall-query.test.ts`.
-They test the actual index and Recall source boundaries, not a replacement memory implementation.
-Coverage includes ranking-independent rejection, exact diagnostics, semantic vector evidence, workspace isolation, supersession and context budgets.
-Recent-session tests cover dates, alternate phrasings, missing history, suppressed sources, expired sources and topical past references.
-Language tests cover composed accents, spelling variants, nickname wording and qualified third-person name queries.
+<a id="new-regression-coverage"></a>
 
-Companion eval gains 22 tests: one for each original failure and one complete-corpus target check.
-Unresolved paraphrases keep their original expectations and safety checks. They are still reported as quality failures.
-The full runner with `--strict` therefore remains a nonzero quality gate until every case passes.
+## Phạm vi hồi quy mới
 
-## Final validation
+CLI đạt được 29 bài kiểm tra trên `recall-index.test.ts`, `recall.test.ts` và `recall-query.test.ts`. Họ kiểm tra chỉ mục thực tế và ranh giới nguồn Recall chứ không phải việc triển khai bộ nhớ thay thế. Phạm vi bao gồm từ chối không phụ thuộc vào xếp hạng, chẩn đoán chính xác, bằng chứng vectơ ngữ nghĩa, cách ly workspace, siêu phiên và ngân sách ngữ cảnh. Các bài kiểm tra phiên gần đây bao gồm ngày tháng, cụm từ thay thế, lịch sử bị thiếu, các nguồn bị chặn, các nguồn đã hết hạn và các tài liệu tham khảo mang tính thời sự trong quá khứ. Các bài kiểm tra ngôn ngữ bao gồm các giọng soạn thảo, các biến thể chính tả, từ ngữ biệt hiệu và các truy vấn tên của người thứ ba đủ tiêu chuẩn.
 
-Final runtime source commit: `1989b0e09da7b17e460e7c4778712a3ed823d252`.
-The artifact records this source commit and the unchanged dataset hash.
-Two final runs produced byte-identical reports after source identity and temporary-path normalization.
+Đánh giá đồng hành đạt được 22 bài kiểm tra: một bài kiểm tra cho mỗi lỗi ban đầu và một bài kiểm tra mục tiêu toàn bộ kho văn bản. Các cách diễn giải chưa được giải quyết vẫn giữ nguyên các kỳ vọng ban đầu và kiểm tra độ an toàn. Họ vẫn được báo cáo là thất bại về chất lượng. Do đó, runner đầy đủ với `--strict` vẫn là cổng kiểm tra có chất lượng khác 0 cho đến khi mọi trường hợp đều trôi qua.
 
-Checks ran sequentially with one Vitest worker and file parallelism disabled.
+<a id="final-validation"></a>
 
-| Command | Result |
+## Xác nhận cuối cùng
+
+Cam kết nguồn runtime cuối cùng: `1989b0e09da7b17e460e7c4778712a3ed823d252`. artifact ghi lại cam kết nguồn này và hàm băm tập dữ liệu không thay đổi. Hai lần chạy cuối cùng tạo ra các báo cáo giống hệt byte sau khi nhận dạng nguồn và chuẩn hóa đường dẫn tạm thời.
+
+Kiểm tra được chạy tuần tự với một Vitest worker và tính năng song song của tệp bị vô hiệu hóa.
+
+| Lệnh | Kết quả |
 | --- | --- |
-| `pnpm -F @angela/cli test --maxWorkers 1 --no-file-parallelism --testTimeout 30000 --hookTimeout 30000` | 50 files, 413 tests passed |
-| Related CLI tests after the final indexed-join refinement | 16 files, 154 tests passed |
-| `pnpm -F @angela/evals-companion test` | 2 files, 45 tests passed |
-| `pnpm -F @angela/cli typecheck` | Passed after the final code change |
-| `pnpm -F @angela/evals-companion typecheck` | Passed after the final code change |
-| Targeted ESLint for changed CLI and eval files | Passed |
-| `pnpm -F @angela/cli build` | Passed after the final code change |
-| `node packages/angela-cli/dist/bin/run.mjs --help` | Passed |
-| `pnpm lint` | Passed, ESLint 0 errors and 603 existing warnings. Oxlint 12 warnings |
-| `NODE_OPTIONS=--max-old-space-size=4096 pnpm typecheck --concurrency=1` | 53 tasks passed before the final SQL join refinement |
-| Final complete companion runner, twice | 120/128 passed, reports byte-identical |
-| `git diff --check` | Passed |
+| `pnpm -F @angela/cli test --maxWorkers 1 --no-file-parallelism --testTimeout 30000 --hookTimeout 30000` | 50 hồ sơ, 413 bài kiểm tra đã vượt qua |
+| Các bài kiểm tra CLI có liên quan sau lần sàng lọc liên kết được lập chỉ mục cuối cùng | 16 hồ sơ, 154 bài kiểm tra đã vượt qua |
+| `pnpm -F @angela/evals-companion test` | 2 hồ sơ, 45 bài kiểm tra đã thành công |
+| `pnpm -F @angela/cli typecheck` | Đã qua sau lần thay đổi mã cuối cùng |
+| `pnpm -F @angela/evals-companion typecheck` | Đã qua sau lần thay đổi mã cuối cùng |
+| ESLint được nhắm mục tiêu cho các tệp CLI và eval đã thay đổi | Đã vượt qua |
+| `pnpm -F @angela/cli build` | Đã qua sau lần thay đổi mã cuối cùng |
+| `node packages/angela-cli/dist/bin/run.mjs --help` | Đã vượt qua |
+| `pnpm lint` | Đã vượt qua, ESLint 0 lỗi và 603 cảnh báo hiện có. Oxlint 12 cảnh báo |
+| `NODE_OPTIONS=--max-old-space-size=4096 pnpm typecheck --concurrency=1` | 53 nhiệm vụ đã được thông qua trước khi sàng lọc tham gia SQL cuối cùng |
+| Người bạn đồng hành hoàn chỉnh cuối cùng runner, hai lần | 120/128 đã vượt qua, báo cáo byte giống hệt nhau |
+| `git diff --check` | Đã vượt qua |
 
-The related CLI command after the final join refinement was:
+Lệnh CLI có liên quan sau lần sàng lọc kết nối cuối cùng là:
 
 ```bash
 pnpm -F @angela/cli exec vitest run --config vitest.config.ts \
@@ -168,20 +150,15 @@ pnpm -F @angela/cli exec vitest run --config vitest.config.ts \
   --testTimeout 30000 --hookTimeout 30000
 ```
 
-The first full CLI run used the default five-second timeout.
-It passed 389 tests and timed out in an unchanged task-retention stress test, followed by cleanup failure.
-The final complete run uses the repository CI timeout of 30 seconds and passes all 413 tests.
-No test timeout configuration or production task code was changed.
+Lần chạy CLI đầy đủ đầu tiên sử dụng thời gian chờ mặc định là 5 giây. Nó đã vượt qua 389 bài kiểm tra và hết thời gian chờ trong một bài kiểm tra căng thẳng duy trì nhiệm vụ không thay đổi, sau đó là lỗi dọn dẹp. Lần chạy hoàn chỉnh cuối cùng sử dụng kho lưu trữ CI có thời gian chờ là 30 giây và vượt qua tất cả 413 bài kiểm tra. Không có cấu hình thời gian chờ thử nghiệm hoặc mã tác vụ sản xuất nào được thay đổi.
 
-The first root typecheck exhausted the default Node heap in `stage-ui` after 46 successful tasks.
-A single sequential retry with a four-gigabyte heap passed all 53 tasks.
-No project TypeScript configuration was changed to suppress errors.
+kiểm tra kiểu dữ liệu gốc đầu tiên đã cạn kiệt vùng Node mặc định trong `stage-ui` sau 46 tác vụ thành công. Một lần thử lại tuần tự duy nhất với vùng nhớ 4 gigabyte đã hoàn thành tất cả 53 nhiệm vụ. Không có cấu hình TypeScript dự án nào được thay đổi để ngăn chặn lỗi.
 
-Build output retains the existing `task-commands.ts` dynamic/static import warning.
-The full companion runner remains nonzero with `--strict` because eight quality cases remain unresolved.
-These are documented quality failures, not hidden or changed expectations.
+Đầu ra bản dựng vẫn giữ lại cảnh báo nhập `task-commands.ts` dynamic/static hiện có. runner đồng hành đầy đủ vẫn khác 0 với `--strict` vì tám trường hợp chất lượng vẫn chưa được giải quyết. Đây là những sai sót về chất lượng được ghi lại, không phải là những kỳ vọng bị che giấu hoặc thay đổi.
 
-## Reproduce
+<a id="reproduce"></a>
+
+## sinh sản
 
 ```bash
 pnpm -F @angela/evals-companion eval --output /tmp/recall-after.json
@@ -191,6 +168,4 @@ pnpm -F @angela/cli exec vitest run --config vitest.config.ts \
   --maxWorkers 1 --no-file-parallelism
 ```
 
-Use `pnpm_config_verify_deps_before_run=false` if local pnpm attempts an unrelated automatic dependency install.
-The native pnpm binary was placed first on PATH for root Turbo typechecking to avoid the known local launcher problem.
-No credentials, real user history or paid API calls enter these reports.
+Sử dụng `pnpm_config_verify_deps_before_run=false` nếu pnpm cục bộ thử cài đặt phụ thuộc tự động không liên quan. Tệp nhị phân pnpm native được đặt đầu tiên trên PATH để kiểm tra kiểu Turbo gốc nhằm tránh sự cố trình khởi chạy cục bộ đã biết. Không có thông tin xác thực, lịch sử người dùng thực hoặc cuộc gọi API trả phí nào được đưa vào các báo cáo này.

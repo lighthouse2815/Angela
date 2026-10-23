@@ -1,15 +1,16 @@
-# Angela namespace migration audit
+<a id="angela-namespace-migration-audit"></a>
 
-Baseline: `5227709` on `main`, 2026-10-22.
+# Kiểm tra di chuyển không gian tên Angela
 
-## Workspace graph
+Đường cơ sở: `5227709` trên `main`, 22-10-2026.
 
-The workspace contains 71 manifests, including the root, and 200 `workspace:` dependency declarations.
-Every workspace dependency resolves to a manifest. No npm dependency is renamed.
-Source packages keep their export paths and module boundaries.
-The Kirie-only `stage-host-context` alias changes with its Vite and TypeScript mappings.
+<a id="workspace-graph"></a>
 
-| Manifest | Package |
+## Đồ thị workspace
+
+workspace chứa 71 bảng kê khai, bao gồm cả phần gốc và 200 phần khai báo phụ thuộc `workspace:`. Mọi phần phụ thuộc workspace đều phân giải thành một bảng kê khai. Không có phần phụ thuộc npm nào được đổi tên. Các gói nguồn giữ đường dẫn xuất và ranh giới mô-đun của chúng. Bí danh `stage-host-context` chỉ dành cho Kirie thay đổi theo ánh xạ Vite và TypeScript của nó.
+
+| Bản kê khai | Trọn gói |
 | --- | --- |
 | `apps/desktop-kirie/package.json` | `@angela/desktop-kirie` |
 | `apps/desktop/package.json` | `@angela/desktop` |
@@ -83,37 +84,40 @@ The Kirie-only `stage-host-context` alias changes with its Vite and TypeScript m
 | `server/packages/server-sdk-shared/package.json` | `@angela/server-sdk-shared` |
 | `services/computer-use-mcp/package.json` | `@angela/computer-use-mcp` |
 
-## External npm packages
+<a id="external-npm-packages"></a>
 
-These packages have registry versions and integrity records in the lockfile. They are outside this workspace.
-Seven appear in the catalog. `duckdb-wasm` is a transitive npm dependency of `drizzle-duckdb-wasm`.
-Their `@proj-airi` namespace, import subpaths, catalogs, and release-age policy remain unchanged.
+## Gói npm bên ngoài
 
-| Package | Referencing files at baseline |
+Các gói này có phiên bản đăng ký và bản ghi tính toàn vẹn trong lockfile. Họ ở bên ngoài workspace này. Bảy xuất hiện trong danh mục. `duckdb-wasm` là phần phụ thuộc npm bắc cầu của `drizzle-duckdb-wasm`. Không gian tên `@proj-airi`, đường dẫn phụ nhập, danh mục và chính sách về thời hạn phát hành vẫn không thay đổi.
+
+| Trọn gói | Các tập tin tham khảo tại đường cơ sở |
 | --- | --- |
 | `@proj-airi/chromatic` | 4 |
 | `@proj-airi/drizzle-duckdb-wasm` | 17 |
-| `@proj-airi/duckdb-wasm` | 6 translated documents and the lockfile |
+| `@proj-airi/duckdb-wasm` | 6 tài liệu đã dịch và lockfile |
 | `@proj-airi/iconify-meteocons` | 6 |
 | `@proj-airi/lobe-icons` | 8 |
 | `@proj-airi/unocss-preset-chromatic` | 6 |
 | `@proj-airi/unplugin-fetch` | 10 |
 | `@proj-airi/unplugin-live2d-sdk` | 9 |
 
-## Compatibility and external references
+<a id="compatibility-and-external-references"></a>
 
-- MCP `Client` names that start with `@proj-airi/` are protocol metadata, not workspace dependencies.
-  This includes `airi-cli`, `computer-use-mcp-*`, and `e2e-*` client names.
-- Electron profiles keep `AIRI` for packaged builds and `@proj-airi/stage-tamagotchi` for development.
-- `Symbol('@proj-airi/chromatic-hue')` labels a Vue injection key. It is not a package import.
-- `@proj-airi/duckdb-wasm` is an external transitive npm package, also referenced in translated upstream documentation.
-- Deferred `stage-pocket` and `auth-server` belong to `../dev-in-future`, outside this repository's workspace.
-- External npm packages retain their upstream repository links and package names.
-- AIRI env variables, IPC/Eventa names, debug globals, URL schemes, storage keys, and card schema fields remain supported contracts.
-- Existing plugin IDs, `extension.airi.json`, VS Code extension IDs, commands, and settings remain compatible.
-- Old release URLs, issue links, credits, third-party assets, and historical investigation evidence retain their original meaning.
+## Khả năng tương thích và tài liệu tham khảo bên ngoài
 
-## Reproduce the inventory
+- Tên MCP `Client` bắt đầu bằng `@proj-airi/` là siêu dữ liệu giao thức, không phải phần phụ thuộc workspace. Điều này bao gồm tên khách hàng `airi-cli`, `computer-use-mcp-*` và `e2e-*`.
+- Cấu hình điện tử giữ `AIRI` cho các bản dựng đóng gói và `@proj-airi/stage-tamagotchi` để phát triển.
+- `Symbol('@proj-airi/chromatic-hue')` gắn nhãn khóa tiêm Vue. Nó không phải là một gói nhập khẩu.
+- `@proj-airi/duckdb-wasm` là gói npm bắc cầu bên ngoài, cũng được tham chiếu trong tài liệu upstream đã dịch.
+- `stage-pocket` và `auth-server` bị trì hoãn thuộc về `../dev-in-future`, bên ngoài workspace của kho lưu trữ này.
+- Các gói npm bên ngoài giữ lại các liên kết kho lưu trữ upstream và tên gói.
+- Các biến env AIRI, tên IPC/Eventa, gỡ lỗi toàn cầu, lược đồ URL, khóa lưu trữ và trường lược đồ thẻ vẫn được hỗ trợ.
+- ID plugin hiện tại, `extension.airi.json`, VS ID tiện ích mở rộng mã, lệnh và cài đặt vẫn tương thích.
+- URL phát hành cũ, liên kết phát hành, credit, tài sản của bên thứ ba và bằng chứng điều tra lịch sử vẫn giữ nguyên ý nghĩa ban đầu của chúng.
+
+<a id="reproduce-the-inventory"></a>
+
+## Tái tạo hàng tồn kho
 
 ```sh
 pnpm list --recursive --depth -1
@@ -121,131 +125,118 @@ rg --hidden --glob '!.git' --glob '!node_modules' '@proj-airi/'
 rg --hidden --glob '!.git' --glob '!node_modules' -i 'airi|moeru-ai/airi|airi\.moeru\.ai'
 ```
 
-The first command lists actual workspace packages. The other commands also include protocol identifiers and upstream evidence.
-Classify each result before changing it.
+Lệnh đầu tiên liệt kê các gói workspace thực tế. Các lệnh khác cũng bao gồm số nhận dạng giao thức và bằng chứng upstream. Phân loại từng kết quả trước khi thay đổi nó.
 
-## Namespace verification
+<a id="namespace-verification"></a>
 
-- `pnpm install --frozen-lockfile --ignore-scripts --network-concurrency=1 --child-concurrency=1`: passed.
-- `pnpm --workspace-concurrency=1 --filter './packages/**' run build`: passed.
-- `pnpm --filter @angela/cli... --workspace-concurrency=1 run build`: passed, including Discord and the MCP service.
-- Root `pnpm typecheck --concurrency=1 --continue`: 46 tasks passed, then `stage-ui` exceeded a 2048 MiB heap.
-- CLI, core-agent, and Discord tests: 75 files passed, 623 tests passed, one skipped.
-- Desktop plugin/profile tests: 2 files and 68 tests passed.
-- Plugin SDK tests: 13 files and 113 tests passed.
-- Server runtime tests: 8 files and 52 tests passed.
-- Server SDK tests: 3 files and 21 tests passed.
-- The full Node test run was stopped during API database tests to limit RAM. Focused suites replace that run.
+## Xác minh không gian tên
 
-The local pnpm launcher lacks a shebang. Turbo uses the cached pnpm shim on `PATH` during checks.
-Checks set `pnpm_config_verify_deps_before_run=false` after explicit installation.
-This prevents pnpm from running the full postinstall during each formatting change.
+- `pnpm install --frozen-lockfile --ignore-scripts --network-concurrency=1 --child-concurrency=1`: đã qua.
+- `pnpm --workspace-concurrency=1 --filter './packages/**' run build`: đã qua.
+- `pnpm --filter @angela/cli... --workspace-concurrency=1 run build`: đã vượt qua, bao gồm Discord và dịch vụ MCP.
+- Root `pnpm typecheck --concurrency=1 --continue`: đã hoàn thành 46 tác vụ, sau đó `stage-ui` đã vượt quá vùng nhớ MiB 2048.
+- Các bài kiểm tra CLI, core-agent và Discord: 75 tệp đã vượt qua, 623 bài kiểm tra đã vượt qua, một bài kiểm tra bị bỏ qua.
+- Các bài kiểm tra desktop plugin/profile: 2 tệp và 68 bài kiểm tra đã được thông qua.
+- Kiểm tra plugin SDK: 13 tệp và 113 bài kiểm tra đã vượt qua.
+- Các bài kiểm tra runtime của máy chủ: 8 tệp và 52 bài kiểm tra đã vượt qua.
+- Các bài kiểm tra SDK của máy chủ: 3 tệp và 21 bài kiểm tra đã vượt qua.
+- Quá trình chạy thử nghiệm Node đầy đủ đã bị dừng trong quá trình kiểm tra cơ sở dữ liệu API để hạn chế RAM. Các bộ tập trung thay thế hoạt động đó.
 
-- Root `pnpm lint`: passed, zero errors. Existing warnings remain.
+Trình khởi chạy pnpm cục bộ thiếu shebang. Turbo sử dụng miếng đệm pnpm được lưu trong bộ nhớ đệm trên `PATH` trong quá trình kiểm tra. Kiểm tra thiết lập `pnpm_config_verify_deps_before_run=false` sau khi cài đặt rõ ràng. Điều này ngăn pnpm chạy toàn bộ cài đặt sau mỗi lần thay đổi định dạng.
 
-## Structural paths
+- Root `pnpm lint`: đã thành công, không có lỗi. Các cảnh báo hiện tại vẫn còn.
 
-| Previous directory | Current directory |
+<a id="structural-paths"></a>
+
+## Đường dẫn cấu trúc
+
+| Thư mục trước | Thư mục hiện tại |
 | --- | --- |
 | `packages/airi-cli` | `packages/angela-cli` |
 | `apps/stage-tamagotchi` | `apps/desktop` |
 | `apps/stage-tamagotchi-kirie` | `apps/desktop-kirie` |
 
-The CLI, web, and desktop build graph retains all 50 tasks and every dependency edge.
-The lockfile importer paths change in the same commit. No external resolution changes.
+Biểu đồ xây dựng CLI, web và desktop giữ lại tất cả 50 tác vụ và mọi cạnh phụ thuộc. Đường dẫn của trình nhập tệp khóa thay đổi trong cùng một cam kết. Không có thay đổi độ phân giải bên ngoài.
 
-- Frozen installation passed after the moves.
-- CLI build, typecheck, and built `--help` passed.
-- CLI path/configuration/MCP/perception checks: 8 files and 58 tests passed.
-- Desktop plugin/profile checks: 2 files and 68 tests passed.
-- ESLint on modified configuration and source files passed with zero errors.
+- Cài đặt đông lạnh được thông qua sau khi di chuyển.
+- Bản dựng CLI, kiểm tra kiểu dữ liệu và bản dựng `--help` đã được thông qua.
+- CLI path/configuration/MCP/perception kiểm tra: 8 tệp và 58 bài kiểm tra đã vượt qua.
+- desktop plugin/profile kiểm tra: 2 tệp và 68 bài kiểm tra đã vượt qua.
+- ESLint trên các tệp nguồn và cấu hình đã sửa đổi được truyền mà không có lỗi.
 
-## Product branding and supported old identifiers
+<a id="product-branding-and-supported-old-identifiers"></a>
 
-UI labels, localized product text, prompts, package descriptions, repository metadata, OpenRouter attribution, and updater fixtures use Angela.
-The original authors, copyright notices, historical posts, third-party assets, and upstream npm projects retain their attribution.
-Translated READMEs identify the upstream project and send product downloads to Angela's release page.
+## Xây dựng thương hiệu sản phẩm và số nhận dạng cũ được hỗ trợ
 
-These identifiers remain supported without conversion:
+Nhãn UI, văn bản sản phẩm được bản địa hóa, prompt, mô tả gói, siêu dữ liệu kho lưu trữ, thuộc tính OpenRouter và trình cập nhật mẫu kiểm thử sử dụng Angela. Các tác giả ban đầu, thông báo bản quyền, bài đăng lịch sử, tài sản của bên thứ ba và các dự án npm upstream vẫn giữ nguyên quyền tác giả của họ. Các README được dịch xác định dự án upstream và gửi các bản tải xuống sản phẩm đến trang phát hành của Angela.
 
-- Electron `AIRI` and `@proj-airi/stage-tamagotchi` profile directories preserve user data.
-- The stored main-window record still uses the title `AIRI` as its lookup key. Its visible window title is Angela.
-- Godot's `config/name="AIRI"` keeps existing `user://` microphone permissions and spotlight settings.
-- Local certificate issuer `AIRI`, its organization, and CA filenames remain trusted.
-- `AIRI_*` and `VITE_AIRI_*` env names, Eventa/IPC names, WebSocket identities, telemetry attributes, and debug globals remain stable.
-- `airi-*` URL schemes, card/module IDs, `engines.airi`, `extension.airi.json`, sticker IDs, and exported adapter names remain stable.
-- VS Code publisher/package IDs, command IDs, and configuration keys preserve existing extension settings.
-- External hosted-provider endpoints, Player2 game keys, model asset locations, and documentation URLs remain upstream addresses.
-- `bucket/airi.json` remains an installer for published upstream AIRI binaries. It does not pretend to install Angela.
-- `scripts/build-airi-docs.sh` builds the external `moeru-ai/airi-docs` repository and retains its env contract.
+Những giá trị nhận dạng này vẫn được hỗ trợ mà không cần chuyển đổi:
 
-Computer-use denies both `airi` and `angela`. Debug target selection accepts both visible titles.
-No external dependency versions, snapshots, integrity data, catalogs, overrides, or patches changed from baseline `5227709`.
+- Thư mục hồ sơ Electron `AIRI` và `@proj-airi/stage-tamagotchi` lưu giữ dữ liệu người dùng.
+- Bản ghi cửa sổ chính được lưu trữ vẫn sử dụng tiêu đề `AIRI` làm khóa tra cứu. Tiêu đề cửa sổ hiển thị của nó là Angela.
+- `config/name="AIRI"` của Godot giữ nguyên các quyền của micrô `user://` và cài đặt đèn chiếu hiện có.
+- Nhà phát hành chứng chỉ cục bộ `AIRI`, tổ chức của nó và tên tệp CA vẫn được tin cậy.
+- Tên env `AIRI_*` và `VITE_AIRI_*`, tên Eventa/IPC, danh tính WebSocket, thuộc tính đo từ xa và toàn cầu gỡ lỗi vẫn ổn định.
+- Lược đồ `airi-*` URL, ID card/module, `engines.airi`, `extension.airi.json`, ID nhãn dán và tên bộ điều hợp đã xuất vẫn ổn định.
+- Mã VS ID publisher/package, ID lệnh và khóa cấu hình duy trì các cài đặt tiện ích mở rộng hiện có.
+- Điểm cuối hosted-nhà cung cấp bên ngoài, khóa trò chơi Player2, vị trí nội dung mô hình và URL tài liệu vẫn là địa chỉ upstream.
+- `bucket/airi.json` vẫn là trình cài đặt cho các tệp nhị phân upstream AIRI đã xuất bản. Nó không giả vờ cài đặt Angela.
+- `scripts/build-airi-docs.sh` xây dựng kho lưu trữ `moeru-ai/airi-docs` bên ngoài và giữ lại hợp đồng env của nó.
 
-Nix hash update helpers now use the `angela` flake output. This machine has no Nix executable.
-Nix dependency and asset hashes cannot be regenerated or verified here.
+Việc sử dụng máy tính từ chối cả `airi` và `angela`. Lựa chọn mục tiêu gỡ lỗi chấp nhận cả tiêu đề hiển thị. Không có phiên bản phụ thuộc bên ngoài, ảnh chụp nhanh, dữ liệu toàn vẹn, danh mục, ghi đè hoặc bản vá nào được thay đổi so với `5227709` cơ sở.
 
-## Final build and regression checks
+Trình trợ giúp cập nhật hàm băm Nix hiện sử dụng đầu ra dạng vảy `angela`. Máy này không có tệp thực thi Nix. Không thể tạo lại hoặc xác minh phần băm nội dung và phụ thuộc Nix tại đây.
 
-All builds used one workspace task at a time and `RAYON_NUM_THREADS=1`.
-CLI tests used one worker and a 1536 MiB heap. Frontend builds used a 2048 MiB heap.
-The final full typecheck used a 2560 MiB heap with one task at a time.
+<a id="final-build-and-regression-checks"></a>
 
-| Check | Result |
+## Kiểm tra hồi quy và xây dựng cuối cùng
+
+Tất cả các bản dựng đều sử dụng một tác vụ workspace tại một thời điểm và `RAYON_NUM_THREADS=1`. Các thử nghiệm CLI đã sử dụng một đống worker và 1536 MiB. Các bản dựng giao diện người dùng đã sử dụng vùng nhớ MiB 2048. kiểm tra kiểu dữ liệu đầy đủ cuối cùng sử dụng vùng nhớ MiB 2560 với một tác vụ tại một thời điểm.
+
+| Kiểm tra | Kết quả |
 | --- | --- |
-| Packages and CLI dependency graph build | Passed |
-| CLI final build, typecheck, and built `--help` | Passed |
-| `pnpm --filter @angela/web... --workspace-concurrency=1 run build` | Passed |
-| `pnpm -F @angela/desktop build` | Passed, main/preload/renderer |
-| `pnpm -F @angela/desktop-kirie build` | Passed, renderer and .NET assembly |
-| Desktop Node suite | 89 files passed, 671 tests passed, 2 skipped |
-| Kirie Node suite | 10 files and 32 tests passed |
-| Provider inference Node suite | 18 files and 186 tests passed |
-| Plugin SDK suite after branding | 13 files and 113 tests passed |
-| Computer-use configuration, debug targets, policy, and executor | 4 files and 32 tests passed |
-| Core-agent, Discord, and locale scripts after branding | 29 files passed, 259 tests passed, 1 skipped |
-| i18n glossary build and tests | Passed, 20 tests |
-| Static updater fixture filenames, sizes, and SHA-512 | Passed |
-| Final frozen installation with scripts disabled | Passed |
-| Final root `pnpm lint` | Passed, zero errors and 603 existing warnings |
-| Root `pnpm typecheck --concurrency=1 --continue` at 2560 MiB | Passed, 53 of 53 tasks |
+| Gói và xây dựng biểu đồ phụ thuộc CLI | Đã vượt qua |
+| Build CLI cuối cùng, kiểm tra kiểu dữ liệu và chạy `--help` từ bản build | Đạt |
+| `pnpm --filter @angela/web... --workspace-concurrency=1 run build` | Đã vượt qua |
+| `pnpm -F @angela/desktop build` | Đã vượt qua, main/preload/renderer |
+| `pnpm -F @angela/desktop-kirie build` | Đã thông qua, lắp ráp renderer và .NET |
+| Bộ desktop Node | 89 tệp đã đạt, 671 bài kiểm tra đã đạt, 2 bị bỏ qua |
+| Bộ Kirie Node | 10 hồ sơ và 32 bài kiểm tra đã vượt qua |
+| Bộ suy luận nhà cung cấp Bộ Node | 18 hồ sơ và 186 bài kiểm tra đã vượt qua |
+| Bộ plugin SDK sau khi xây dựng thương hiệu | 13 hồ sơ và 113 bài kiểm tra đã vượt qua |
+| Cấu hình sử dụng máy tính, mục tiêu gỡ lỗi, chính sách và người thực thi | 4 hồ sơ và 32 bài kiểm tra đã vượt qua |
+| Các tập lệnh Core-agent, Discord và ngôn ngữ sau khi xây dựng thương hiệu | 29 tệp đã đạt, 259 bài kiểm tra đã đạt, 1 bị bỏ qua |
+| xây dựng và kiểm tra bảng thuật ngữ i18n | Đã đậu, 20 bài kiểm tra |
+| Tên tệp, kích thước và SHA-512 của mẫu kiểm thử trình cập nhật tĩnh | Đạt |
+| Cài đặt đóng băng cuối cùng với các tập lệnh bị vô hiệu hóa | Đã vượt qua |
+| Gốc cuối cùng `pnpm lint` | Đã vượt qua, không có lỗi và hiện có 603 cảnh báo |
+| Root `pnpm typecheck --concurrency=1 --continue` tại 2560 MiB | Đã đạt, 53 trên 53 nhiệm vụ |
 
-Kirie required its documented `kirie doctor --fix plugin:core` setup before the native build.
-The CEF archive exceeds the free tmpfs space in `/tmp`. Setup completed with `TMPDIR` on the checkout's disk cache.
-No addon or backend dependency was added to Git or changed in version.
+Kirie yêu cầu thiết lập `kirie doctor --fix plugin:core` được ghi lại trước khi xây dựng native. Kho lưu trữ CEF vượt quá dung lượng tmpfs trống trong `/tmp`. Quá trình thiết lập đã hoàn tất với `TMPDIR` trên bộ đệm đĩa của thanh toán. Không có phần phụ thuộc bổ trợ hoặc phụ trợ nào được thêm vào Git hoặc thay đổi trong phiên bản.
 
-## Checks outside the root filter
+<a id="checks-outside-the-root-filter"></a>
 
-`turbo run typecheck` with `./integrations/**`, `./plugins/**`, and `./engines/**` completed with 38 successful tasks and six failures.
-The root typecheck above remains fully successful.
+## Kiểm tra bên ngoài bộ lọc gốc
 
-| Workspace | Remaining result |
+`turbo run typecheck` với `./integrations/**`, `./plugins/**` và `./engines/**` đã hoàn thành với 38 nhiệm vụ thành công và 6 nhiệm vụ thất bại. Root kiểm tra kiểu dữ liệu ở trên vẫn hoàn toàn thành công.
+
+| workspace | Kết quả còn lại |
 | --- | --- |
-| `@angela/satori-bot` | Existing optional event/channel and response-field type errors |
-| `@angela/telegram-bot` | Existing optional fields, control-flow returns, and unassigned-variable errors |
-| `@angela/twitter-services` | Existing unused function/parameter diagnostics |
-| `@angela/minecraft-bot` | Existing array inference and incompatible `vec3` versions in the locked graph |
-| `@angela/plugin-game-chess` | Existing script refers to absent `tsconfig.json` |
-| `@angela/plugin-claude-code` | Exceeds the 2560 MiB typecheck heap limit |
+| `@angela/satori-bot` | Lỗi event/channel tùy chọn hiện có và loại trường phản hồi |
+| `@angela/telegram-bot` | Các trường tùy chọn hiện có, trả về luồng điều khiển và lỗi biến chưa được gán |
+| `@angela/twitter-services` | Chẩn đoán function/parameter hiện chưa sử dụng |
+| `@angela/minecraft-bot` | Suy luận mảng hiện có và các phiên bản `vec3` không tương thích trong biểu đồ bị khóa |
+| `@angela/plugin-game-chess` | Tập lệnh hiện tại đề cập đến `tsconfig.json` vắng mặt |
+| `@angela/plugin-claude-code` | Vượt quá giới hạn heap 2560 MiB kiểm tra kiểu dữ liệu |
 
-Source comparison against `5227709` found 101 TypeScript diagnostics across 22 files.
-Twenty-one files are byte-identical to baseline. The remaining Telegram file differs only by `AIRI` to `Angela` product text.
-The game-chess `tsconfig.json` is also absent in baseline. The external dependency graph is unchanged.
-These checks expose existing integration debt and a memory limit. This migration does not change that business logic or dependency graph.
+So sánh nguồn với `5227709` đã tìm thấy 101 chẩn đoán TypeScript trên 22 tệp. 21 tệp có byte giống hệt với đường cơ sở. Tệp Telegram còn lại chỉ khác nhau ở văn bản sản phẩm `AIRI` và `Angela`. Trò chơi cờ vua `tsconfig.json` cũng không có trong đường cơ sở. Biểu đồ phụ thuộc bên ngoài không thay đổi. Những lần kiểm tra này cho thấy nợ tích hợp hiện có và giới hạn bộ nhớ. Việc di chuyển này không thay đổi logic nghiệp vụ hoặc biểu đồ phụ thuộc đó.
 
-The targeted API schema and WebSocket contract checks passed: two files, six tests.
-The README release-link CLI uses the root repository metadata for download destinations.
-An isolated real-CLI check passed for old AIRI links, new Angela links, and OSS mirror inputs on Windows and macOS.
-Historical issue URLs remained unchanged. ESLint passed for this final release-helper change.
+Lược đồ API được nhắm mục tiêu và kiểm tra hợp đồng WebSocket đã vượt qua: hai tệp, sáu bài kiểm tra. Liên kết phát hành README CLI sử dụng siêu dữ liệu kho lưu trữ gốc cho đích tải xuống. Một quy trình kiểm tra CLI thực biệt lập đã được thông qua đối với các liên kết AIRI cũ, liên kết Angela mới và đầu vào nhân bản OSS trên Windows và macOS. URL vấn đề lịch sử vẫn không thay đổi. ESLint đã được thông qua cho thay đổi trợ giúp phát hành cuối cùng này.
 
-## Agent configuration
+<a id="agent-configuration"></a>
 
-A separate commit updates 27 agent configuration files across 14 existing skills.
-Package filters and local app paths match the migrated workspace.
-Skill invocation IDs keep their existing names, including `use-agent-browser-for-airi` and `use-vishot-for-airi`.
-Descriptions and UI labels use Angela.
-The IO-trace guide retains the actual `AIRI` and `@proj-airi/stage-tamagotchi` profile paths.
+## Cấu hình agent
 
-All 14 changed skills passed the bundled skill validator with the workspace's existing YAML parser.
-Changed `agents/openai.yaml` files parsed successfully and retained their invocation names and metadata length limits.
-`git diff --check` passed. No skill activation policy changed.
+Một cam kết riêng cập nhật 27 tệp cấu hình agent trên 14 kỹ năng hiện có. Bộ lọc gói và đường dẫn ứng dụng cục bộ khớp với workspace đã di chuyển. ID gọi kỹ năng giữ nguyên tên hiện có của chúng, bao gồm `use-agent-browser-for-airi` và `use-vishot-for-airi`. Mô tả và nhãn UI sử dụng Angela. Hướng dẫn theo dõi IO giữ lại đường dẫn hồ sơ `AIRI` và `@proj-airi/stage-tamagotchi` thực tế.
+
+Tất cả 14 kỹ năng đã thay đổi đều vượt qua trình xác thực kỹ năng đi kèm với trình phân tích cú pháp YAML hiện có của workspace. Đã thay đổi các tệp `agents/openai.yaml` được phân tích cú pháp thành công và giữ lại tên lệnh gọi cũng như giới hạn độ dài siêu dữ liệu của chúng. `git diff --check` đã vượt qua. Không có chính sách kích hoạt kỹ năng nào thay đổi.

@@ -1,12 +1,16 @@
-# Angela CLI Task & Reminder Engine — Implementation Plan
+<a id="angela-cli-task--reminder-engine--implementation-plan"></a>
 
-## Purpose
+# Angela CLI Công cụ nhắc nhở & nhiệm vụ - Kế hoạch thực hiện
 
-Implement the first proactive everyday-assistant capability for Angela CLI: persistent tasks, reminders, deadlines, routines, follow-ups, snoozing, and natural-language task management.
+<a id="purpose"></a>
 
-This feature is intentionally **not** a coding-agent task system. Angela's current product direction is an AI friend / study companion / conversational assistant that can also handle small everyday errands. Coding-specific autonomous workflows are deferred.
+## Mục đích
 
-The feature must feel conversational. Users should be able to say things like:
+Triển khai khả năng hỗ trợ chủ động hàng ngày đầu tiên cho Angela CLI: nhiệm vụ liên tục, lời nhắc, thời hạn, thói quen, theo dõi, báo lại và quản lý tác vụ bằng ngôn ngữ tự nhiên.
+
+Tính năng này **không phải** là một hệ thống nhiệm vụ mã hóa-agent. Định hướng sản phẩm hiện tại của Angela là một người bạn / người bạn đồng hành học tập / trợ lý đàm thoại AI cũng có thể xử lý những công việc lặt vặt nhỏ hàng ngày. Quy trình làm việc tự động dành riêng cho mã hóa được hoãn lại.
+
+Tính năng này phải mang lại cảm giác đàm thoại. Người dùng có thể nói những điều như:
 
 - "10h tối nhắc tao học tiếng Trung"
 - "Mai tao phải nộp bài nghiên cứu"
@@ -17,32 +21,38 @@ The feature must feel conversational. Users should be able to say things like:
 - "Hủy cái nhắc gọi Minh"
 - "Mỗi tối 10h nhắc tao ôn từ"
 
-Do not require slash commands for normal use. Slash commands are a management/debug surface, not the primary UX.
+Không yêu cầu lệnh gạch chéo để sử dụng bình thường. Các lệnh gạch chéo là bề mặt management/debug, không phải UX chính.
 
 ---
 
-## Repository Rules
+<a id="repository-rules"></a>
 
-Before coding:
+## Quy tắc lưu trữ
 
-1. Read the root `AGENTS.md` completely and follow it.
-2. Inspect `packages/angela-cli` and reuse existing persistence, chat/tool, config, logging, prompt, voice, Telegram, and test patterns where applicable.
-3. Search before creating utilities. Do not introduce one-off storage, validation, time, or error-handling patterns if equivalents already exist.
-4. Keep the feature inside `packages/angela-cli` unless existing architecture clearly requires a shared package.
-5. Do not add a new dependency without first checking whether the repository already has a suitable dependency or utility.
-6. Use kebab-case file names.
-7. Use Valibot for persisted-data/tool-input schemas where validation is required, consistent with root rules.
-8. Do not use `any`.
+Trước khi mã hóa:
 
-The implementation should adapt to the actual current CLI architecture rather than blindly copying the example paths below.
+1. Đọc hoàn toàn gốc `AGENTS.md` và làm theo.
+2. Kiểm tra `packages/angela-cli` và sử dụng lại tính bền vững hiện có, chat/tool, cấu hình, ghi nhật ký, prompt, giọng nói, Telegram và các mẫu thử nghiệm nếu có.
+3. Tìm kiếm trước khi tạo tiện ích. Không giới thiệu các mẫu lưu trữ, xác thực, thời gian hoặc xử lý lỗi một lần nếu đã tồn tại các mẫu tương đương.
+4. Giữ tính năng này bên trong `packages/angela-cli` trừ khi kiến ​​trúc hiện tại yêu cầu gói dùng chung một cách rõ ràng.
+5. Không thêm phần phụ thuộc mới mà không kiểm tra trước xem kho lưu trữ đã có phần phụ thuộc hoặc tiện ích phù hợp hay chưa.
+6. Sử dụng tên tệp kebab-case.
+7. Sử dụng Valibot cho các lược đồ persisted-data/tool-input khi cần xác thực, phù hợp với các quy tắc gốc.
+8. Không sử dụng `any`.
+
+Việc triển khai phải thích ứng với kiến ​​trúc CLI thực tế hiện tại thay vì sao chép một cách mù quáng các đường dẫn ví dụ bên dưới.
 
 ---
 
-## Product Requirements
+<a id="product-requirements"></a>
 
-### Task types
+## Yêu cầu sản phẩm
 
-V1 must support:
+<a id="task-types"></a>
+
+### Các loại nhiệm vụ
+
+V1 phải hỗ trợ:
 
 - `todo`
 - `reminder`
@@ -50,17 +60,21 @@ V1 must support:
 - `routine`
 - `follow_up`
 
-### Task statuses
+<a id="task-statuses"></a>
 
-Support at minimum:
+### Trạng thái nhiệm vụ
+
+Hỗ trợ tối thiểu:
 
 - `pending`
 - `completed`
 - `cancelled`
 
-### Required task fields
+<a id="required-task-fields"></a>
 
-Use a validated persisted model equivalent to:
+### Các trường nhiệm vụ bắt buộc
+
+Sử dụng mô hình đã được xác thực tương đương với:
 
 ```ts
 interface AngelaTask {
@@ -89,28 +103,32 @@ interface AngelaTask {
 }
 ```
 
-The exact TypeScript shape may differ if the current repository already has suitable shared types or timestamp conventions.
+Hình dạng TypeScript chính xác có thể khác nếu kho lưu trữ hiện tại đã có các loại chia sẻ hoặc quy ước dấu thời gian phù hợp.
 
-### Persistence guarantees
+<a id="persistence-guarantees"></a>
 
-Tasks must survive CLI restart.
+### Đảm bảo tính bền vững
 
-Persistence must not silently destroy all tasks on malformed data or interrupted writes. Reuse existing atomic/persistence patterns if present. At minimum:
+Nhiệm vụ phải tồn tại khi khởi động lại CLI.
 
-- validate loaded data;
-- avoid partial writes;
-- report recoverable persistence errors clearly;
-- do not duplicate a reminder merely because the CLI restarted.
+Sự kiên trì không được âm thầm hủy bỏ tất cả các tác vụ trên dữ liệu không đúng định dạng hoặc việc ghi bị gián đoạn. Tái sử dụng các mẫu atomic/persistence hiện có nếu có. Tối thiểu:
 
-Do not build an unnecessary database for V1 if the CLI currently uses file-based local persistence and that pattern remains sufficient.
+- xác thực dữ liệu đã tải;
+- tránh viết một phần;
+- báo cáo rõ ràng các lỗi liên tục có thể phục hồi;
+- không sao chép lời nhắc chỉ vì CLI đã khởi động lại.
+
+Không xây dựng cơ sở dữ liệu không cần thiết cho V1 nếu CLI hiện sử dụng tính bền vững cục bộ dựa trên tệp và mẫu đó vẫn đủ.
 
 ---
 
-## Architecture
+<a id="architecture"></a>
 
-Implement the feature in layers so each layer can be tested independently.
+## Ngành kiến ​​​​trúc
 
-Conceptual flow:
+Triển khai tính năng theo lớp để mỗi lớp có thể được kiểm tra độc lập.
+
+Dòng khái niệm:
 
 ```text
 User message
@@ -128,7 +146,7 @@ Task store  Scheduler
        CLI / Voice / later channels
 ```
 
-Recommended domain split, adjusted to the actual repo structure:
+Phân chia tên miền được đề xuất, điều chỉnh theo cấu trúc repo thực tế:
 
 ```text
 packages/angela-cli/src/
@@ -142,42 +160,46 @@ packages/angela-cli/src/
     *.test.ts
 ```
 
-Do not force this directory layout if the package already organizes domain modules differently.
+Không ép buộc bố cục thư mục này nếu gói đã tổ chức các mô-đun miền khác nhau.
 
 ---
 
-## Phase 1 — Persistent Task Domain
+<a id="phase-1--persistent-task-domain"></a>
 
-Implement and test the task model, validation, storage, and service layer first.
+## Giai đoạn 1 - Miền nhiệm vụ liên tục
 
-Required service operations:
+Trước tiên, hãy triển khai và kiểm tra nhiệm vụ mô hình, lớp xác thực, lưu trữ và dịch vụ.
 
-- create task;
-- list/filter tasks;
-- find task by id;
-- update task;
-- complete task;
-- cancel task;
-- snooze task.
+Hoạt động dịch vụ bắt buộc:
 
-Behavior requirements:
+- tạo nhiệm vụ;
+- nhiệm vụ list/filter;
+- tìm nhiệm vụ theo id;
+- nhiệm vụ cập nhật;
+- hoàn thành nhiệm vụ;
+- hủy nhiệm vụ;
+- tạm dừng nhiệm vụ.
 
-- completing a task records completion time;
-- cancelling does not delete history by default;
-- snoozing temporarily changes the next notification time without losing the original task identity;
-- all mutations update `updatedAt`;
-- IDs must be stable across restarts;
-- task queries should be deterministic and sorted sensibly by effective due time.
+Yêu cầu về hành vi:
 
-Tests must cover persistence round-trip and corrupted/invalid persisted data behavior.
+- hoàn thành một nhiệm vụ ghi lại thời gian hoàn thành;
+- việc hủy bỏ không xóa lịch sử theo mặc định;
+- báo lại tạm thời thay đổi thời gian thông báo tiếp theo mà không làm mất danh tính nhiệm vụ ban đầu;
+- tất cả các thay đổi trạng thái cập nhật `updatedAt`;
+- ID phải ổn định trong suốt quá trình khởi động lại;
+- các truy vấn nhiệm vụ phải mang tính xác định và được sắp xếp hợp lý theo thời gian hiệu quả.
+
+Các thử nghiệm phải bao gồm hành vi dữ liệu liên tục và hành vi dữ liệu liên tục của corrupted/invalid.
 
 ---
 
-## Phase 2 — CLI Management Surface
+<a id="phase-2--cli-management-surface"></a>
 
-Add a minimal management surface. Integrate it with the CLI's existing command handling instead of creating a parallel parser.
+## Giai đoạn 2 - Bề mặt quản lý CLI
 
-Required user-facing capabilities:
+Thêm một bề mặt quản lý tối thiểu. Tích hợp nó với khả năng xử lý lệnh hiện có của CLI thay vì tạo trình phân tích cú pháp song song.
+
+Khả năng hướng tới người dùng cần thiết:
 
 ```text
 /tasks
@@ -187,9 +209,9 @@ Required user-facing capabilities:
 /snooze <task> <duration>
 ```
 
-The exact command syntax may follow existing CLI conventions.
+Cú pháp lệnh chính xác có thể tuân theo các quy ước CLI hiện có.
 
-Expected output should be compact and human-readable. Example:
+Đầu ra dự kiến ​​phải nhỏ gọn và dễ đọc. Ví dụ:
 
 ```text
 Hôm nay
@@ -202,17 +224,19 @@ Ngày mai
 3. 09:00  Nộp bài PPLNCKH
 ```
 
-Task selection should not rely only on fragile array indexes internally. If numeric display indexes are supported, resolve them to stable task IDs within the current view.
+Việc lựa chọn tác vụ không nên chỉ dựa vào các chỉ mục mảng dễ vỡ trong nội bộ. Nếu chỉ mục hiển thị số được hỗ trợ, hãy phân giải chúng thành ID tác vụ ổn định trong chế độ xem hiện tại.
 
-Add command tests using the CLI's existing testing approach.
+Thêm các bài kiểm tra lệnh bằng cách sử dụng phương pháp kiểm tra hiện có của CLI.
 
 ---
 
-## Phase 3 — Natural-Language Task Tools
+<a id="phase-3--natural-language-task-tools"></a>
 
-Expose task operations to Angela through the existing LLM/tool mechanism.
+## Giai đoạn 3 - Công cụ tác vụ ngôn ngữ tự nhiên
 
-Required model-facing tools, names adjusted to existing repository conventions:
+Hiển thị các thao tác nhiệm vụ cho Angela thông qua cơ chế LLM/tool hiện có.
+
+Các công cụ đối mặt với mô hình bắt buộc, tên được điều chỉnh theo quy ước kho lưu trữ hiện có:
 
 - `task_create`
 - `task_list`
@@ -221,49 +245,53 @@ Required model-facing tools, names adjusted to existing repository conventions:
 - `task_cancel`
 - `task_snooze`
 
-Tool inputs must be schema-validated.
+Đầu vào của công cụ phải được xác thực bằng lược đồ.
 
 Do **not** implement reminder understanding through keyword/regex detection such as checking for "nhắc tao". Let the model choose task tools from conversational context.
 
-The assistant should answer naturally after tool success, for example:
+Trợ lý sẽ trả lời một cách tự nhiên sau khi công cụ thành công, ví dụ:
 
 ```text
 User: 10h tối nhắc tao học tiếng Trung
 Angela: Ừ, 10 giờ tối tao nhắc.
 ```
 
-For ambiguous dates/times, preserve a conversational UX. Do not invent a precise time when the user gave only a date unless the current product already defines a policy for that case.
+Đối với dates/times mơ hồ, hãy giữ nguyên UX đàm thoại. Đừng phát minh ra thời gian chính xác khi người dùng chỉ đưa ra ngày trừ khi sản phẩm hiện tại đã xác định chính sách cho trường hợp đó.
 
-Relative time interpretation must use the user's/local CLI timezone and current clock, not UTC assumptions.
+Giải thích thời gian tương đối phải sử dụng múi giờ và đồng hồ hiện tại của s/local CLI của người dùng, chứ không phải giả định UTC.
 
-Add tests for tool validation and task service integration. Mock the clock where appropriate.
+Thêm các bài kiểm tra để xác thực công cụ và tích hợp dịch vụ tác vụ. mock đồng hồ khi thích hợp.
 
 ---
 
-## Phase 4 — Reminder Scheduler
+<a id="phase-4--reminder-scheduler"></a>
 
-Implement an in-process scheduler for V1.
+## Giai đoạn 4 - Lên lịch nhắc nhở
 
-The scheduler should:
+Triển khai bộ lập lịch trong quá trình cho V1.
 
-1. load pending scheduled tasks on startup;
-2. determine the nearest effective notification time (`snoozedUntil` when present, otherwise `dueAt`);
-3. schedule the nearest event efficiently;
-4. notify when due;
-5. record `lastNotifiedAt` before/after notification using a design that prevents accidental duplicate delivery on normal restart;
-6. recalculate the next event after every task mutation;
-7. handle system clock changes/restarts reasonably;
-8. support clean shutdown/cancellation.
+Người lập lịch nên:
 
-Prefer a nearest-deadline timer design over polling every second.
+1. tải các tác vụ theo lịch trình đang chờ xử lý khi khởi động;
+2. xác định thời gian thông báo có hiệu lực gần nhất (`snoozedUntil` khi có, nếu không thì `dueAt`);
+3. lên lịch sự kiện gần nhất một cách hiệu quả;
+4. thông báo khi đến hạn;
+5. ghi lại thông báo `lastNotifiedAt` before/after bằng cách sử dụng thiết kế ngăn chặn việc gửi trùng lặp ngẫu nhiên khi khởi động lại bình thường;
+6. tính toán lại sự kiện tiếp theo sau mỗi nhiệm vụ thay đổi trạng thái;
+7. xử lý xung nhịp hệ thống changes/restarts hợp lý;
+8. hỗ trợ shutdown/cancellation. sạch
 
-The scheduler must use an injectable/testable clock boundary if the existing architecture supports dependency injection for clocks (root `AGENTS.md` explicitly permits DI for clocks).
+Thích thiết kế bộ đếm thời gian gần nhất hơn là bỏ phiếu mỗi giây.
 
-### Overdue recovery
+Bộ lập lịch phải sử dụng ranh giới đồng hồ injectable/testable nếu kiến ​​trúc hiện có hỗ trợ nội xạ phụ thuộc cho đồng hồ (root `AGENTS.md` cho phép rõ ràng DI cho đồng hồ).
 
-When Angela starts after being offline, surface overdue tasks instead of silently dropping them.
+<a id="overdue-recovery"></a>
 
-Example:
+### Thu hồi quá hạn
+
+Khi Angela bắt đầu ngoại tuyến, hãy hiển thị các nhiệm vụ quá hạn thay vì âm thầm loại bỏ chúng.
+
+Ví dụ:
 
 ```text
 Lúc bạn không ở đây có 2 việc đã tới hạn:
@@ -272,38 +300,42 @@ Lúc bạn không ở đây có 2 việc đã tới hạn:
 • 08:00 hôm nay — Gửi bài cho nhóm
 ```
 
-Do not spam repeated overdue notifications every startup. Persist enough state to know whether an occurrence was already surfaced.
+Đừng spam các thông báo quá hạn lặp đi lặp lại mỗi lần khởi động. Duy trì trạng thái đủ để biết liệu một sự kiện đã xuất hiện hay chưa.
 
 ---
 
-## Phase 5 — Recurrence and Snooze
+<a id="phase-5--recurrence-and-snooze"></a>
 
-After one-shot reminders are stable, support:
+## Giai đoạn 5 - Tái phát và Tạm dừng
 
-- daily recurrence;
-- weekly recurrence;
-- selected weekdays;
-- snooze by conversational duration such as 10m, 30m, 2h where the existing time parsing layer supports it.
+Sau khi lời nhắc một lần ổn định, hãy hỗ trợ:
 
-Do not expose cron syntax to ordinary users.
+- tái phát hàng ngày;
+- tái phát hàng tuần;
+- các ngày trong tuần đã chọn;
+- báo lại theo thời lượng đàm thoại, chẳng hạn như 10m, 30m, 2h trong đó lớp phân tích thời gian hiện có hỗ trợ nó.
 
-For recurring tasks, clearly define occurrence semantics:
+Không để lộ cú pháp cron cho người dùng thông thường.
 
-- notifying an occurrence must not permanently complete the routine;
-- compute the next occurrence deterministically;
-- avoid duplicate occurrences after restart;
-- cancellation stops future occurrences;
-- allow explicit completion/check-in if useful, without destroying recurrence configuration.
+Đối với các tác vụ định kỳ, hãy xác định rõ ràng ngữ nghĩa sự xuất hiện:
 
-Add recurrence tests around day/week boundaries and timezone handling.
+- việc thông báo một sự việc xảy ra không được hoàn thành vĩnh viễn quy trình đó;
+- tính toán lần xuất hiện tiếp theo một cách xác định;
+- tránh xảy ra trùng lặp sau khi khởi động lại;
+- việc hủy bỏ sẽ dừng các lần xuất hiện trong tương lai;
+- cho phép completion/check-in rõ ràng nếu hữu ích mà không phá hủy cấu hình lặp lại.
+
+Thêm các thử nghiệm lặp lại xung quanh ranh giới day/week và xử lý múi giờ.
 
 ---
 
-## Phase 6 — Notification Abstraction
+<a id="phase-6--notification-abstraction"></a>
 
-Create/reuse a notification boundary so reminder delivery is not hard-coded to terminal printing.
+## Giai đoạn 6 - Trừu tượng hóa thông báo
 
-Conceptually:
+Create/reuse là ranh giới thông báo để việc gửi lời nhắc không được mã hóa cứng để in thiết bị đầu cuối.
+
+Về mặt khái niệm:
 
 ```ts
 interface ReminderNotifier {
@@ -311,17 +343,17 @@ interface ReminderNotifier {
 }
 ```
 
-V1 must implement CLI notification.
+V1 phải triển khai thông báo CLI.
 
-Design the boundary so these can be added later without rewriting scheduler logic:
+Thiết kế ranh giới để có thể thêm những ranh giới này sau mà không cần viết lại logic của bộ lập lịch:
 
-- voice notifier;
-- desktop notifier;
-- Telegram notifier.
+- thông báo bằng giọng nói;
+- desktop thông báo;
+- Telegram thông báo.
 
-The CLI notifier must not corrupt the interactive prompt. If a reminder fires while the user is typing, redraw/preserve input using the CLI's existing terminal UI capabilities.
+Trình thông báo CLI không được làm hỏng prompt tương tác. Nếu lời nhắc kích hoạt khi người dùng đang nhập, redraw/preserve sẽ nhập bằng cách sử dụng khả năng UI của thiết bị đầu cuối hiện có của CLI.
 
-Example presentation:
+Trình bày ví dụ:
 
 ```text
 ────────────────────────────
@@ -332,36 +364,40 @@ Mày bảo tao nhắc học tiếng Trung đấy.
 ────────────────────────────
 ```
 
-Keep generated wording consistent with Angela's current persona system instead of hard-coding only one tone if persona helpers already exist.
+Giữ từ ngữ được tạo nhất quán với hệ thống nhân cách hiện tại của Angela thay vì chỉ mã hóa cứng một giọng điệu nếu người trợ giúp nhân cách đã tồn tại.
 
 ---
 
-## Phase 7 — Voice Integration
+<a id="phase-7--voice-integration"></a>
 
-Only after text reminders are reliable, connect notification output to existing voice/TTS behavior.
+## Giai đoạn 7 - Tích hợp giọng nói
 
-Requirements:
+Chỉ sau khi lời nhắc bằng văn bản đáng tin cậy, hãy kết nối đầu ra thông báo với hành vi voice/TTS hiện có.
 
-- if voice mode is active, reminders may be spoken;
-- do not interrupt Angela mid-sentence unless the current voice architecture explicitly supports safe interruption for reminders;
-- queue the reminder and speak it after the current utterance where appropriate;
-- text notification must still exist as the source of truth/fallback.
+Yêu cầu:
 
-Voice integration must not become a prerequisite for the core task engine tests.
+- nếu chế độ giọng nói đang hoạt động, lời nhắc có thể được phát ra;
+- không ngắt lời Angela giữa câu trừ khi cấu trúc giọng nói hiện tại hỗ trợ rõ ràng việc gián đoạn an toàn để nhắc nhở;
+- xếp hàng lời nhắc và nói lời nhắc đó sau câu nói hiện tại nếu thích hợp;
+- thông báo văn bản vẫn phải tồn tại dưới dạng nguồn của truth/fallback.
+
+Tích hợp giọng nói không được trở thành điều kiện tiên quyết cho các bài kiểm tra công cụ tác vụ cốt lõi.
 
 ---
 
-## Phase 8 — Background Service (Separate Milestone)
+<a id="phase-8--background-service-separate-milestone"></a>
 
-Do **not** block the first usable implementation on a daemon/background service.
+## Giai đoạn 8 - Dịch vụ nền (Cột mốc riêng biệt)
 
-V1 behavior:
+**không** chặn quá trình triển khai có thể sử dụng lần đầu tiên trên dịch vụ daemon/background.
 
-- reminders fire while the CLI process is running;
-- reminders persist while the CLI is closed;
-- reopening the CLI performs overdue recovery.
+Hành vi V1:
 
-After V1 is stable, implement a lightweight background-service milestone, e.g. commands equivalent to:
+- lời nhắc kích hoạt trong khi quá trình CLI đang chạy;
+- lời nhắc vẫn tồn tại khi CLI bị đóng;
+- việc mở lại CLI sẽ thực hiện quá trình khôi phục quá hạn.
+
+Sau khi V1 ổn định, hãy triển khai một cột mốc dịch vụ nền nhẹ, ví dụ: lệnh tương đương với:
 
 ```text
 angela service start
@@ -369,19 +405,21 @@ angela service status
 angela service stop
 ```
 
-The service should own scheduling while sharing the same task store/domain layer with the interactive CLI.
+Dịch vụ phải sở hữu lịch trình trong khi chia sẻ cùng một lớp store/domain nhiệm vụ với CLI tương tác.
 
-Do not duplicate task logic in the service.
+Không trùng lặp logic tác vụ trong dịch vụ.
 
-Linux/systemd-user support can be the first platform if that matches the current CLI platform strategy. Do not prematurely implement every OS service manager in the first change.
+Hỗ trợ Linux/systemd-user có thể là nền tảng đầu tiên nếu phù hợp với chiến lược nền tảng CLI hiện tại. Không triển khai sớm mọi trình quản lý dịch vụ OS trong lần thay đổi đầu tiên.
 
 ---
 
-## Follow-up Behavior
+<a id="follow-up-behavior"></a>
 
-`follow_up` is important to Angela's friend/companion identity.
+## Hành vi theo dõi
 
-Example:
+`follow_up` rất quan trọng đối với danh tính friend/companion của Angela.
+
+Ví dụ:
 
 ```text
 User: Tối nay tao định làm xong slide.
@@ -393,17 +431,19 @@ User: Chưa, còn 2 slide.
 Angela: Ừ. Muốn 30 phút nữa tao hỏi lại không?
 ```
 
-For the first implementation, a follow-up can reuse the same scheduling domain as reminders. Do not build a separate scheduler.
+Đối với lần triển khai đầu tiên, lần tiếp theo có thể sử dụng lại cùng một miền lập lịch làm lời nhắc. Không xây dựng một lịch trình riêng biệt.
 
-The distinction is semantic and can later guide Angela's conversational behavior.
+Sự khác biệt mang tính ngữ nghĩa và sau này có thể hướng dẫn hành vi trò chuyện của Angela.
 
 ---
 
-## Study Companion Compatibility
+<a id="study-companion-compatibility"></a>
 
-Design Task & Reminder Engine as infrastructure for the future Study Companion.
+## Khả năng tương thích của người bạn đồng hành học tập
 
-Future study features should be able to create tasks such as:
+Thiết kế Công cụ nhắc nhở & nhiệm vụ làm cơ sở hạ tầng cho Người bạn đồng hành học tập trong tương lai.
+
+Các tính năng nghiên cứu trong tương lai sẽ có thể tạo ra các nhiệm vụ như:
 
 ```text
 18/10 20:00  Ôn Chapter 3
@@ -412,39 +452,41 @@ Future study features should be able to create tasks such as:
 19/10 21:00  Mock test
 ```
 
-Therefore:
+Vì thế:
 
-- do not couple task creation only to direct user text;
-- expose a clean internal service API;
-- retain optional context/source metadata if the existing architecture has a suitable concept;
-- keep scheduling independent from chat rendering.
+- không kết hợp việc tạo tác vụ chỉ với văn bản trực tiếp của người dùng;
+- phơi bày một dịch vụ nội bộ sạch sẽ API;
+- giữ lại siêu dữ liệu context/source tùy chọn nếu kiến ​​trúc hiện có có khái niệm phù hợp;
+- giữ lịch trình độc lập với kết xuất trò chuyện.
 
-Do not implement the Study Engine in this task.
+Không triển khai Công cụ nghiên cứu trong nhiệm vụ này.
 
 ---
 
 ## Non-Goals
 
-Do not expand this task into:
+Không mở rộng nhiệm vụ này thành:
 
-- autonomous coding-agent planning;
-- GitHub issue/project management;
-- multi-agent orchestration;
-- email/calendar integrations;
-- a full desktop task UI;
-- cloud synchronization;
+- lập kế hoạch mã hóa tự động-agent;
+- Quản lý GitHub issue/project;
+- phối hợp đa agent;
+- tích hợp email/calendar;
+- một nhiệm vụ desktop đầy đủ UI;
+- đồng bộ hóa đám mây;
 - marketplace/plugins;
-- complex natural-language regex parser;
-- cron-expression UX;
-- full proactive life-planning engine.
+- trình phân tích cú pháp biểu thức chính quy ngôn ngữ tự nhiên phức tạp;
+- biểu thức cron UX;
+- động cơ lập kế hoạch cuộc sống chủ động đầy đủ.
 
-Those are later milestones.
+Đó là những cột mốc sau này.
 
 ---
 
-## Required Acceptance Scenarios
+<a id="required-acceptance-scenarios"></a>
 
-The completed V1 should support these end-to-end scenarios through normal conversation where applicable:
+## Các kịch bản chấp nhận bắt buộc
+
+V1 đã hoàn thiện sẽ hỗ trợ các kịch bản toàn diện này thông qua cuộc trò chuyện bình thường nếu có:
 
 1. `10h tối nhắc tao học tiếng Trung`
 2. `Mai nhắc tao nộp bài`
@@ -455,83 +497,93 @@ The completed V1 should support these end-to-end scenarios through normal conver
 7. `Hủy việc gọi Minh`
 8. `Tối nay còn việc gì?`
 9. `Mai có deadline gì không?`
-10. Restart Angela and verify tasks are still present.
-11. Restart after a reminder became overdue and verify overdue recovery.
-12. Verify an already-delivered reminder is not duplicated on normal restart.
-13. Verify a recurring routine advances to its next occurrence correctly.
-14. Verify `/tasks`, `/today`, complete, cancel, and snooze management paths.
+10. Khởi động lại Angela và xác minh các nhiệm vụ vẫn còn.
+11. Khởi động lại sau khi lời nhắc đã quá hạn và xác minh quá trình khôi phục quá hạn.
+12. Xác minh lời nhắc đã được gửi không bị trùng lặp khi khởi động lại bình thường.
+13. Xác minh một quy trình định kỳ tiến tới lần xuất hiện tiếp theo một cách chính xác.
+14. Xác minh `/tasks`, `/today`, hoàn thành, hủy và báo lại các đường dẫn quản lý.
 
 Where a phrase such as `Cái đó` depends on conversational context, reuse the existing chat/session context rather than inventing a global last-task hack unless the current tool architecture already models tool-result references that way.
 
 ---
 
-## Test Requirements
+<a id="test-requirements"></a>
 
-At minimum add automated tests for:
+## Yêu cầu kiểm tra
+
+Tối thiểu thêm các bài kiểm tra tự động cho:
 
 ### Store/service
 
 - create/list/update/complete/cancel;
-- persistence round trip;
-- validation of persisted data;
-- deterministic ordering;
-- snooze semantics.
+- kiên trì chuyến đi khứ hồi;
+- xác nhận dữ liệu liên tục;
+- thứ tự xác định;
+- tạm dừng ngữ nghĩa.
 
-### Scheduler
+<a id="scheduler"></a>
 
-- next due task selection;
-- notification fires once;
-- task changes reschedule timer;
-- overdue startup behavior;
-- restart duplicate prevention;
-- cancellation;
-- fake/test clock behavior.
+### Người lập lịch trình
 
-### Recurrence
+- lựa chọn nhiệm vụ đến hạn tiếp theo;
+- thông báo kích hoạt một lần;
+- thay đổi nhiệm vụ hẹn giờ lên lịch lại;
+- hành vi khởi động quá hạn;
+- khởi động lại ngăn ngừa trùng lặp;
+- hủy bỏ;
+- Hành vi đồng hồ fake/test.
 
-- daily;
-- weekly;
-- selected weekdays;
-- next occurrence calculation;
-- restart around an occurrence;
-- timezone/day boundary.
+<a id="recurrence"></a>
+
+### Tái phát
+
+- hằng ngày;
+- hàng tuần;
+- các ngày trong tuần đã chọn;
+- tính toán lần xuất hiện tiếp theo;
+- khởi động lại xung quanh một lần xuất hiện;
+- Ranh giới timezone/day.
 
 ### Tools/CLI
 
-- tool input validation;
-- tool-to-service integration;
-- task management commands;
-- useful failure messages for missing/invalid task selection.
+- xác nhận đầu vào công cụ;
+- tích hợp công cụ với dịch vụ;
+- lệnh quản lý công việc;
+- thông báo lỗi hữu ích cho việc lựa chọn tác vụ missing/invalid.
 
-Avoid flaky tests based on real waiting/sleeping. Use a fake clock/timers.
-
----
-
-## Implementation Order
-
-Follow this order unless repository architecture provides a strong reason not to:
-
-1. Inspect current CLI architecture and write a short implementation note in the final Codex response.
-2. Task types + validation schema.
-3. Persistent TaskStore.
-4. TaskService + unit tests.
-5. `/tasks`, `/today`, completion/cancel/snooze management commands.
-6. LLM task tools.
-7. In-process scheduler + fake-clock tests.
-8. Overdue recovery + duplicate prevention.
-9. Recurrence.
-10. CLI notifier.
-11. Voice integration if it can be done cleanly without expanding scope.
-12. Update `packages/angela-cli/README.md` with the actual user-facing behavior that was implemented.
-13. Run checks required by `AGENTS.md`.
-
-Do not start the background daemon milestone until the in-process V1 is correct and tested.
+Tránh các thử nghiệm không ổn định dựa trên waiting/sleeping. thật Sử dụng clock/timers. giả
 
 ---
 
-## Suggested Commit Breakdown
+<a id="implementation-order"></a>
 
-Codex may use a different breakdown if necessary, but keep changes reviewable:
+## Lệnh thực hiện
+
+Hãy tuân theo thứ tự này trừ khi kiến ​​trúc kho lưu trữ cung cấp lý do chính đáng để không:
+
+1. Kiểm tra kiến ​​trúc CLI hiện tại và viết ghi chú triển khai ngắn trong phản hồi Codex cuối cùng.
+2. Các loại nhiệm vụ + lược đồ xác nhận.
+3. TaskStore liên tục.
+4. TaskService + kiểm tra đơn vị.
+5. Các lệnh quản lý `/tasks`, `/today`, completion/cancel/snooze.
+6. Công cụ tác vụ LLM.
+7. Bộ lập lịch trong quá trình + kiểm tra đồng hồ giả.
+8. Phục hồi quá hạn + ngăn ngừa trùng lặp.
+9. Tái phát.
+10. CLI thông báo.
+11. Tích hợp giọng nói nếu nó có thể được thực hiện một cách rõ ràng mà không cần mở rộng phạm vi.
+12. Cập nhật `packages/angela-cli/README.md` với hành vi thực tế của người dùng đã được triển khai.
+13. Chạy kiểm tra theo yêu cầu của `AGENTS.md`.
+
+Không bắt đầu mốc nền daemon cho đến khi V1 trong quá trình xử lý chính xác và được kiểm tra.
+
+---
+
+<a id="suggested-commit-breakdown"></a>
+
+## Phân tích cam kết được đề xuất
+
+Codex có thể sử dụng bảng phân tích khác nếu cần, nhưng vẫn đảm bảo các thay đổi có thể được xem xét:
 
 1. `feat(cli): add persistent task domain`
 2. `feat(cli): add task management commands`
@@ -540,42 +592,46 @@ Codex may use a different breakdown if necessary, but keep changes reviewable:
 5. `feat(cli): add snooze and recurring reminders`
 6. `feat(cli): integrate reminder notifications`
 
-Do not mix unrelated refactors into these commits.
+Không trộn lẫn các bộ tái cấu trúc không liên quan vào các cam kết này.
 
 ---
 
-## Definition of Done
+<a id="definition-of-done"></a>
 
-This milestone is done when:
+## Định nghĩa xong
 
-- tasks persist across CLI restart;
-- Angela can create/manage tasks through normal conversation using model tools;
-- `/tasks` and basic task management commands work;
-- one-shot reminders fire while CLI is running;
-- overdue reminders are surfaced after restart;
-- normal restart does not cause duplicate notification spam;
-- snooze works;
-- daily/weekly routines work;
-- scheduler logic has deterministic fake-clock tests;
-- CLI prompt remains usable when a reminder appears;
-- relevant `packages/angela-cli` tests pass;
-- relevant typecheck passes;
-- `pnpm lint` passes or any unrelated pre-existing failures are clearly reported;
-- `packages/angela-cli/README.md` documents the implemented functionality;
-- no unrelated coding-agent features are added.
+Cột mốc này được thực hiện khi:
+
+- các tác vụ vẫn tiếp tục khởi động lại CLI;
+- Angela có thể thực hiện các tác vụ create/manage thông qua cuộc trò chuyện thông thường bằng công cụ mô hình;
+- `/tasks` và các lệnh quản lý tác vụ cơ bản hoạt động;
+- lời nhắc một lần kích hoạt khi CLI đang chạy;
+- lời nhắc quá hạn sẽ xuất hiện sau khi khởi động lại;
+- khởi động lại bình thường không gây ra thư rác thông báo trùng lặp;
+- báo lại hoạt động;
+- Các quy trình daily/weekly hoạt động;
+- logic lập lịch có các bài kiểm tra đồng hồ giả xác định;
+- CLI prompt vẫn có thể sử dụng được khi lời nhắc xuất hiện;
+- vượt qua các bài kiểm tra `packages/angela-cli` có liên quan;
+- thẻ kiểm tra kiểu dữ liệu có liên quan;
+- Các lượt vượt qua `pnpm lint` hoặc mọi lỗi tồn tại trước đó không liên quan đều được báo cáo rõ ràng;
+- `packages/angela-cli/README.md` ghi lại chức năng được triển khai;
+- không có tính năng mã hóa-agent không liên quan nào được thêm vào.
 
 ---
 
-## Instruction to Codex
+<a id="instruction-to-codex"></a>
 
-Implement this plan completely for `packages/angela-cli`, following the actual current architecture of the repository and all applicable `AGENTS.md` instructions.
+## Hướng dẫn sử dụng Codex
 
-Do not stop after only scaffolding the domain types. Continue through the usable V1 described above, including tests and documentation. If the repository already contains an equivalent mechanism, integrate or refactor toward it instead of duplicating it.
+Triển khai hoàn toàn kế hoạch này cho `packages/angela-cli`, tuân theo kiến ​​trúc thực tế hiện tại của kho lưu trữ và tất cả các hướng dẫn `AGENTS.md` hiện hành.
 
-When you finish, report:
+Không dừng lại chỉ sau tạo khung ban đầu các loại tên miền. Tiếp tục xem qua V1 có thể sử dụng được mô tả ở trên, bao gồm các bài kiểm tra và tài liệu. Nếu kho lưu trữ đã chứa cơ chế tương đương, hãy tích hợp hoặc tái cấu trúc cơ chế đó thay vì sao chép nó.
 
-1. what changed;
-2. important architectural decisions;
-3. files/modules added or changed;
-4. commands/tests/typechecks/lint actually run and their results;
-5. any part of this plan that could not be completed and the exact reason.
+Làm xong báo cáo:
+
+1. những gì đã thay đổi;
+2. quyết định kiến ​​trúc quan trọng;
+3. files/modules được thêm hoặc thay đổi;
+4. commands/tests/typechecks/lint thực sự chạy và kết quả của chúng;
+5. bất kỳ phần nào của kế hoạch này không thể hoàn thành và lý do chính xác.

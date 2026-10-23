@@ -1,63 +1,73 @@
-# Design Implementation Notes
+<a id="design-implementation-notes"></a>
 
-The [AIRI Design Guide](../../../DESIGN.md) defines visual identity and reuse rules. This document records source findings and delivery procedures.
+# Ghi chú thực hiện thiết kế
 
-## Format Alignment
+Hướng dẫn thiết kế [AIRI](../../../DESIGN.md) xác định các quy tắc nhận dạng hình ảnh và tái sử dụng. Tài liệu này ghi lại các phát hiện nguồn và thủ tục giao hàng.
 
-The guide follows the eight ordered sections in the [Google DESIGN.md specification](https://github.com/google-labs-code/design.md/blob/main/docs/spec.md).
+<a id="format-alignment"></a>
 
-The optional YAML token block is omitted. Dynamic colors remain in Chromatic and theme settings. Static component values stay linked to their implementations.
+## Căn chỉnh định dạng
 
-The uppercase `DESIGN.md` filename follows the format convention. It is an explicit exception to AIRI's kebab-case file naming rule.
+Hướng dẫn tuân theo tám phần được sắp xếp theo thứ tự trong đặc tả [Google DESIGN.md](https://github.com/google-labs-code/design.md/blob/main/docs/spec.md).
 
-Root `AGENTS.md` explicitly references it. Automatic discovery by external tools is not assumed.
+Khối YAML token tùy chọn bị bỏ qua. Màu sắc động vẫn còn trong cài đặt Màu sắc và chủ đề. Các giá trị thành phần tĩnh vẫn được liên kết với việc triển khai chúng.
 
-No Google CLI or new skill is installed. This change aligns document structure and content, not token export or CLI integration.
+Tên tệp `DESIGN.md` viết hoa tuân theo quy ước định dạng. Đây là một ngoại lệ rõ ràng đối với quy tắc đặt tên tệp kebab-case của AIRI.
 
-## Known Differences and Follow-up Work
+Root `AGENTS.md` tham chiếu rõ ràng đến nó. Việc phát hiện tự động bằng các công cụ bên ngoài không được giả định.
 
-These findings come from source inspection. This guide does not change runtime code.
+Không có Google CLI hoặc kỹ năng mới nào được cài đặt. Thay đổi này căn chỉnh cấu trúc và nội dung tài liệu chứ không phải xuất token hoặc tích hợp CLI.
 
-| Difference | Evidence | Follow-up |
+<a id="known-differences-and-follow-up-work"></a>
+
+## Những khác biệt đã biết và công việc tiếp theo
+
+Những phát hiện này đến từ việc kiểm tra nguồn. Hướng dẫn này không thay đổi mã runtime.
+
+| Sự khác biệt | Bằng chứng | Theo dõi |
 | --- | --- | --- |
-| Input declares size without corresponding styles | `input.vue` declares `size`, but its template only uses variant styles. | Define the size contract, then update the component, reference, and stories. |
-| Two Input variants look identical | `primary` and `secondary` contain identical style arrays. | Decide whether both names remain. Avoid page-specific differences. |
-| Focus treatment varies | Button and GhostButton define focus outlines. IconButton and OverlayButton do not define equivalent rules. | Check keyboard interactions before a shared correction. |
-| Motion timing and reduced-motion support vary | The motion implementations in the design guide define separate parameters. | Group changes by interaction type instead of replacing all durations. |
-| Global visual tokens are incomplete | Color variables are shared. Components still define most radii, spacing, and layer values. | Extract repeated requirements from real use cases before adding tokens. |
+| Đầu vào khai báo kích thước mà không có kiểu tương ứng | `input.vue` khai báo `size`, nhưng mẫu của nó chỉ sử dụng các kiểu biến thể. | Xác định hợp đồng kích thước, sau đó cập nhật thành phần, tài liệu tham khảo và câu chuyện. |
+| Hai biến thể đầu vào trông giống hệt nhau | `primary` và `secondary` chứa các mảng kiểu giống hệt nhau. | Quyết định xem cả hai tên vẫn còn. Tránh sự khác biệt theo từng trang cụ thể. |
+| Điều trị tập trung khác nhau | Nút và GhostButton xác định đường viền tiêu điểm. IconButton và OverlayButton không xác định các quy tắc tương đương. | Kiểm tra tương tác bàn phím trước khi chỉnh sửa chung. |
+| Hỗ trợ thời gian chuyển động và giảm chuyển động khác nhau | Việc triển khai chuyển động trong hướng dẫn thiết kế xác định các tham số riêng biệt. | Nhóm thay đổi theo loại tương tác thay vì thay thế tất cả thời lượng. |
+| Hình ảnh toàn cầu token chưa hoàn thiện | Các biến màu được chia sẻ. Các thành phần vẫn xác định hầu hết các giá trị bán kính, khoảng cách và lớp. | Trích xuất các yêu cầu lặp lại từ các trường hợp sử dụng thực tế trước khi thêm token. |
 
-Address keyboard focus and field sizing first. Then consolidate repeated visual parameters and check business pages. Each runtime change needs behavior and visual evidence.
+Địa chỉ tiêu điểm bàn phím và kích thước trường đầu tiên. Sau đó hợp nhất các tham số hình ảnh lặp lại và kiểm tra các trang kinh doanh. Mỗi thay đổi runtime cần có hành vi và bằng chứng trực quan.
 
-For theme switching, reuse [useTheme](../../../packages/ui/src/composables/use-theme.ts). The UnoCSS rules explicitly permit this composable despite its `disableTransition: true` setting.
+Để chuyển đổi chủ đề, hãy sử dụng lại [useTheme](../../../packages/ui/src/composables/use-theme.ts). Các quy tắc UnoCSS cho phép rõ ràng composable này mặc dù cài đặt `disableTransition: true` của nó.
 
-For direct `useDark` calls, set `disableTransition: false` as required by the repository rules.
+Đối với các cuộc gọi `useDark` trực tiếp, hãy đặt `disableTransition: false` theo yêu cầu của quy tắc kho lưu trữ.
 
-## Design Workflow and Existing Skills
+<a id="design-workflow-and-existing-skills"></a>
 
-The repository already includes implementation, review, and screenshot skills. This documentation task requires no additional design skill installation.
+## Thiết kế quy trình làm việc và các kỹ năng hiện có
 
-| Task | Entry point | Purpose |
+Kho lưu trữ đã bao gồm các kỹ năng triển khai, đánh giá và chụp ảnh màn hình. Nhiệm vụ tài liệu này không yêu cầu cài đặt thêm kỹ năng thiết kế.
+
+| Nhiệm vụ | Điểm vào | Mục đích |
 | --- | --- | --- |
-| Choose visual patterns and components | The design guide and the [component reference](../../../docs/ai/context/ui-components.md) | Understand AIRI design conventions and APIs |
-| Write component styles | [enforce-rules-for-unocss](../../../.agents/skills/enforce-rules-for-unocss/SKILL.md) | Reuse controls, organize utilities, and preserve theme behavior |
-| Write Vue components | [vue-best-practices](../../../.agents/skills/vue-best-practices/SKILL.md) and [TypeScript rules](../../../.agents/skills/enforce-rules-for-typescript/SKILL.md) | Define component boundaries, state, and implementation practices |
-| Review interaction and accessibility | [web-design-guidelines](../../../.agents/skills/web-design-guidelines/SKILL.md) | Supply review checks alongside AIRI visual conventions |
-| Capture visual evidence | [use-vishot](../../../.agents/skills/use-vishot/SKILL.md) | Capture screenshots through the appropriate runtime scenarios |
-| Publish a UI PR | [create-pr](../../../.agents/skills/create-pr/SKILL.md) | Review affected behavior and provide comparable screenshots |
+| Chọn các mẫu và thành phần trực quan | Hướng dẫn thiết kế và tài liệu tham khảo thành phần [](../../../docs/ai/context/ui-components.md) | Hiểu các quy ước và API thiết kế AIRI |
+| Viết kiểu thành phần | [enforce-quy tắc-cho-unocss](../../../.agents/skills/enforce-rules-for-unocss/SKILL.md) | Tái sử dụng các điều khiển, sắp xếp các tiện ích và duy trì hoạt động của chủ đề |
+| Viết các thành phần Vue | Các quy tắc [vue-thực hành tốt nhất](../../../.agents/skills/vue-best-practices/SKILL.md) và [TypeScript](../../../.agents/skills/enforce-rules-for-typescript/SKILL.md) | Xác định ranh giới thành phần, trạng thái và thực tiễn triển khai |
+| Đánh giá tương tác và khả năng tiếp cận | [web-thiết kế-hướng dẫn](../../../.agents/skills/web-design-guidelines/SKILL.md) | Cung cấp kiểm tra đánh giá cùng với các quy ước trực quan AIRI |
+| thu nhận dữ liệu bằng chứng trực quan | [use-vishot](../../../.agents/skills/use-vishot/SKILL.md) | thu nhận dữ liệu chụp ảnh màn hình thông qua các tình huống runtime thích hợp |
+| Xuất bản UI PR | [create-pr](../../../.agents/skills/create-pr/SKILL.md) | Xem lại hành vi bị ảnh hưởng và cung cấp ảnh chụp màn hình tương đương |
 
-The root `AGENTS.md` routes UI design work to the design guide. Skills provide implementation and review procedures without duplicating the design reference.
+Thiết kế `AGENTS.md` route UI gốc hoạt động theo hướng dẫn thiết kế. Kỹ năng cung cấp các thủ tục thực hiện và xem xét mà không trùng lặp tham chiếu thiết kế.
 
-### For each design change
+<a id="for-each-design-change"></a>
 
-1. Locate the shared control and existing business pages. Determine whether the difference belongs to the control or the scenario.
-2. Choose existing variants, sizes, and shapes before extending the API.
-3. When a shared component changes, update its reference and stories.
-4. Check light mode, dark mode, custom hues, long text, loading, and disabled states.
-5. Check keyboard focus, touch targets, the software keyboard, and safe areas.
-6. Record results and unverified items through the PR workflow.
+### Đối với mỗi lần thay đổi thiết kế
 
-Run `pnpm dev:ui` for component previews. Histoire lives in `packages/stage-ui`.
+1. Xác định vị trí kiểm soát được chia sẻ và các trang kinh doanh hiện có. Xác định xem sự khác biệt thuộc về điều khiển hay kịch bản.
+2. Chọn các biến thể, kích thước và hình dạng hiện có trước khi mở rộng API.
+3. Khi một thành phần được chia sẻ thay đổi, hãy cập nhật tài liệu tham khảo và các câu chuyện của nó.
+4. Kiểm tra chế độ sáng, chế độ tối, màu sắc tùy chỉnh, văn bản dài, tải và trạng thái tắt.
+5. Kiểm tra tiêu điểm bàn phím, mục tiêu cảm ứng, bàn phím phần mềm và vùng an toàn.
+6. Ghi lại kết quả và các mục chưa được xác minh thông qua quy trình làm việc PR.
 
-Start with the [button stories](../../../packages/stage-ui/src/components/misc/button.story.vue), [input stories](../../../packages/stage-ui/src/components/form/input/input.story.vue), [select stories](../../../packages/stage-ui/src/components/form/select/select.story.vue), and [swipe action stories](../../../packages/stage-ui/src/components/misc/swipe-actions.story.vue).
+Chạy `pnpm dev:ui` để xem trước thành phần. Lịch sử sống ở `packages/stage-ui`.
 
-Documentation changes require link and format checks. Runtime UI changes also require type checks, relevant tests, and visual acceptance. Source inspection does not replace runtime checks.
+Bắt đầu với các câu chuyện nút [](../../../packages/stage-ui/src/components/misc/button.story.vue), [đầu vào câu chuyện](../../../packages/stage-ui/src/components/form/input/input.story.vue), [chọn câu chuyện](../../../packages/stage-ui/src/components/form/select/select.story.vue) và [swipe câu chuyện hành động](../../../packages/stage-ui/src/components/misc/swipe-actions.story.vue).
+
+Thay đổi tài liệu yêu cầu kiểm tra liên kết và định dạng. Các thay đổi của runtime UI cũng yêu cầu kiểm tra loại, kiểm tra liên quan và chấp nhận trực quan. Kiểm tra nguồn không thay thế kiểm tra runtime.

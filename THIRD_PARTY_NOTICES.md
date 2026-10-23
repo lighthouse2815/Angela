@@ -1,24 +1,20 @@
-# Third-party notices
+<a id="third-party-notices"></a>
 
-Angela derives from [Project AIRI](https://github.com/moeru-ai/airi).
-Substantial upstream code remains in the desktop hosts, web app, shared UI, runtime, plugin system, integrations, and Godot engine.
-The rename does not establish independent authorship of that code.
+# Thông báo của bên thứ ba
 
-The root [MIT license](./LICENSE) retains `Copyright (c) 2024-PRESENT Neko Ayaka` and the complete permission notice.
-Keep that license with copies or substantial portions of the software.
-This document supplements existing notices. It does not replace them or change their terms.
+Angela bắt nguồn từ [Project AIRI](https://github.com/moeru-ai/airi). Mã upstream đáng kể vẫn còn trong desktop host, ứng dụng web, UI được chia sẻ, runtime, hệ thống plugin, tích hợp và công cụ Godot. Việc đổi tên không thiết lập quyền tác giả độc lập của mã đó.
 
-| Source or component | Provenance and notices |
+Giấy phép [MIT gốc](./LICENSE) giữ lại `Copyright (c) 2024-PRESENT Neko Ayaka` và thông báo cấp phép đầy đủ. Giữ giấy phép đó cùng với các bản sao hoặc các phần quan trọng của phần mềm. Tài liệu này bổ sung các thông báo hiện có. Nó không thay thế chúng hoặc thay đổi các điều khoản của chúng.
+
+| Nguồn hoặc thành phần | Xuất xứ và thông báo |
 | --- | --- |
-| Angela Gateway provider engine | Derived from [decolua/9router](https://github.com/decolua/9router). Keep the [MIT license](./third_party/angela-gateway/LICENSE) and [revision record](./third_party/angela-gateway/README.angela.md). |
-| Desktop, Kirie, web, shared packages, integrations, and engine | Derivative AIRI sources. Root [LICENSE](./LICENSE) and Git history retain attribution. |
-| `packages/ccc` | [MIT notice](./packages/ccc/LICENSE), copyright Moeru AI. |
-| `packages/stage-ui-spine` | [Package notices](./packages/stage-ui-spine/LICENSE.md) distinguish MIT source from the Spine Runtimes license. |
-| Godot VRM and MToon addons | Keep the [VRM license](./engines/stage-tamagotchi-godot/addons/vrm/LICENSE) and [MToon license](./engines/stage-tamagotchi-godot/addons/Godot-MToon-Shader/LICENSE). |
-| Fonts, models, stickers, and animation assets | Keep the licenses, author credits, source links, and generation records beside the assets. |
-| OpenSeeFace | [Vendored-source record](./third_party/README.md) and [upstream license](./third_party/openseeface/LICENSE). |
-| Published `@proj-airi/*` npm packages | External dependencies retain their registry names, versions, integrity records, and package licenses. |
+| Động cơ Angela Gateway nhà cung cấp | Bắt nguồn từ [decolua/9router](https://github.com/decolua/9router). Giữ bản ghi [MIT ](./third_party/angela-gateway/LICENSE) và [bản ghi sửa đổi](./third_party/angela-gateway/README.angela.md). |
+| desktop, Kirie, web, gói chia sẻ, tích hợp và công cụ | Nguồn AIRI phái sinh. Root [LICENSE](./LICENSE) và lịch sử Git giữ lại sự ghi nhận. |
+| `packages/ccc` | [MIT thông báo](./packages/ccc/LICENSE), bản quyền Moeru AI. |
+| `packages/stage-ui-spine` | [Thông báo gói](./packages/stage-ui-spine/LICENSE.md) phân biệt nguồn MIT với giấy phép Spine Runtimes. |
+| Tiện ích Godot VRM và MToon | Giữ giấy phép [VRM](./engines/stage-tamagotchi-godot/addons/vrm/LICENSE) và giấy phép [MToon](./engines/stage-tamagotchi-godot/addons/Godot-MToon-Shader/LICENSE). |
+| Phông chữ, mô hình, nhãn dán và nội dung hoạt ảnh | Giữ giấy phép, tác giả credit, liên kết nguồn và bản ghi sinh nội dung bên cạnh nội dung. |
+| OpenSeeFace | [Bản ghi nguồn bán sẵn](./third_party/README.md) và [Giấy phép ngược dòng](./third_party/openseeface/LICENSE). |
+| Các gói npm `@proj-airi/*` đã xuất bản | Các phần phụ thuộc bên ngoài giữ lại tên đăng ký, phiên bản, bản ghi toàn vẹn và giấy phép gói. |
 
-Historical GitHub links identify the original repository, commit, and path.
-Those URL paths retain their historical names when local directories move.
-The Kirie records also reference [BeanDz/airi](https://github.com/BeanDz/airi).
+Các liên kết GitHub lịch sử xác định kho lưu trữ, cam kết và đường dẫn ban đầu. Các đường dẫn URL đó giữ lại tên lịch sử của chúng khi các thư mục cục bộ di chuyển. Bản ghi Kirie cũng tham chiếu [BeanDz/airi](https://github.com/BeanDz/airi).

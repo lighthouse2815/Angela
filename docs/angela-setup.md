@@ -39,7 +39,9 @@ mise exec -- pnpm -F @angela/desktop run start --skipBuild
 
 Nếu Wayland gặp lỗi hiển thị, thử script `start:xwayland` của cùng package.
 
-## Google Gemini
+<a id="google-gemini"></a>
+
+## Google Song Tử
 
 Angela đã tích hợp Google Gemini. Không cần thêm thư viện hoặc sửa code để dùng chat Gemini.
 

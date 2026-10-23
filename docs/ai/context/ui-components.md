@@ -1,818 +1,781 @@
-# `@angela/ui` Component Reference
+<a id="angelaui-component-reference"></a>
 
-> **Auto-maintained**: When adding or updating components in `packages/ui`, update this document accordingly.
+# Tham khảo thành phần `@angela/ui`
 
-Standardized primitives built on [reka-ui](https://reka-ui.com/). Minimal business logic — use these instead of raw DOM elements.
+> **Tự động duy trì**: Khi thêm hoặc cập nhật các thành phần trong `packages/ui`, hãy cập nhật tài liệu này cho phù hợp.
 
-Source: `packages/ui/src/components/`
+Nguyên thủy được tiêu chuẩn hóa được xây dựng trên [reka-ui](https://reka-ui.com/). Logic nghiệp vụ tối thiểu - sử dụng những logic này thay vì các phần tử DOM thô.
+
+Nguồn: `packages/ui/src/components/`
 
 ---
 
-## Animations
+<a id="animations"></a>
+
+## Hoạt hình
 
 ### AnimatedContent
 
-Behavior-only primitive that animates height, opacity, vertical offset, and an
-inner content blur from an external `data-state="open|closed"` lifecycle. The
-lifecycle owner must keep the primitive mounted until the closing animation
-finishes. It can compose with Reka UI content primitives through `as-child`, but
-does not depend on a specific menu, popover, or presence implementation. Visual
-styling remains caller-owned.
+Nguyên thủy chỉ dành cho hành vi tạo hoạt ảnh cho chiều cao, độ mờ, độ lệch dọc và làm mờ nội dung bên trong từ vòng đời `data-state="open|closed"` bên ngoài. Chủ sở hữu vòng đời phải giữ nguyên bản gốc được gắn kết cho đến khi hoạt ảnh đóng kết thúc. Nó có thể Compose với nội dung gốc Reka UI thông qua `as-child`, nhưng không phụ thuộc vào một menu, cửa sổ bật lên hoặc triển khai hiện diện cụ thể. Kiểu dáng trực quan vẫn thuộc sở hữu của người gọi.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `as` | `PrimitiveProps['as']?` | `'div'` | Element or component rendered as the animated outer container |
+| `as` | `PrimitiveProps['as']?` | `'div'` | Phần tử hoặc thành phần được hiển thị dưới dạng vùng chứa hoạt ảnh bên ngoài |
 
-**Slots**: `default`
+**Khe cắm**: `default`
 
 ### TransitionBidirectional
 
-Bidirectional Vue `<Transition>` wrapper with customizable CSS classes.
+Trình bao bọc Vue `<Transition>` hai chiều với các lớp CSS có thể tùy chỉnh.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `fromClass` | `string?` | — | CSS class for initial state |
-| `activeClass` | `string?` | — | CSS class during transition |
-| `toClass` | `string?` | — | CSS class for final state |
+| `fromClass` | `string?` | — | Lớp CSS cho trạng thái ban đầu |
+| `activeClass` | `string?` | — | Lớp CSS trong quá trình chuyển đổi |
+| `toClass` | `string?` | — | Lớp CSS cho trạng thái cuối cùng |
 
-**Slots**: `default`
+**Khe cắm**: `default`
 
 ### TransitionHorizontal
 
-Horizontal slide/fade transition (0.5s hardcoded).
+Chuyển tiếp slide/fade theo chiều ngang (mã hóa cứng 0,5 giây).
 
-**Props**: None | **Slots**: `default`
+**Dụng cụ**: Không có | **Khe cắm**: `default`
 
 ### TransitionVertical
 
-Smooth vertical expand/collapse with height animation and opacity control.
+expand/collapse dọc mượt mà với hoạt ảnh chiều cao và kiểm soát độ mờ.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `duration` | `number?` | `250` | Animation duration (ms) |
-| `easingEnter` | `string?` | `'ease-in-out'` | Enter easing function |
-| `easingLeave` | `string?` | `'ease-in-out'` | Leave easing function |
-| `opacityClosed` | `number?` | `0` | Opacity when closed |
-| `opacityOpened` | `number?` | `1` | Opacity when opened |
+| `duration` | `number?` | `250` | Thời lượng hoạt ảnh (ms) |
+| `easingEnter` | `string?` | `'ease-in-out'` | Nhập chức năng nới lỏng |
+| `easingLeave` | `string?` | `'ease-in-out'` | Để lại chức năng nới lỏng |
+| `opacityClosed` | `number?` | `0` | Độ mờ khi đóng |
+| `opacityOpened` | `number?` | `1` | Độ mờ khi mở |
 
-**Slots**: `default`
+**Khe cắm**: `default`
 
 ---
 
-## Layout
+<a id="layout"></a>
 
-### Collapsible
+## Cách trình bày
 
-Expandable/collapsible container with trigger button and vertical animation.
+<a id="collapsible"></a>
 
-| Prop | Type | Default | Description |
+### Có thể thu gọn
+
+Vùng chứa Expandable/collapsible có nút kích hoạt và hình ảnh động dọc.
+
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `default` | `boolean?` | — | Initial visibility |
-| `label` | `string?` | — | Trigger button label |
+| `default` | `boolean?` | — | Khả năng hiển thị ban đầu |
+| `label` | `string?` | — | Nhãn nút kích hoạt |
 
-**v-model**: `visible: boolean`
-**Slots**: `trigger({ visible, setVisible })`, `default({ visible, setVisible })`
+**v-mô hình**: `visible: boolean` **Khe cắm**: `trigger({ visible, setVisible })`, `default({ visible, setVisible })`
 
-### Screen
+<a id="screen"></a>
 
-Responsive screen component that calculates canvas dimensions based on breakpoints.
+### Màn hình
 
-**Props**: None | **Slots**: `default({ width, height })`
+Thành phần màn hình đáp ứng tính toán kích thước canvas dựa trên các điểm dừng.
+
+**Dụng cụ**: Không có | **Khe cắm**: `default({ width, height })`
 
 ### SettingsCard
 
-Card container for module settings pages. It owns the width, radius, padding,
-stack gap, and background for both themes. Use it for a new module settings page
-instead of repeating the card classes inline.
+Hộp chứa thẻ cho các trang cài đặt mô-đun. Nó sở hữu chiều rộng, bán kính, phần đệm, khoảng cách ngăn xếp và nền cho cả hai chủ đề. Sử dụng nó cho trang cài đặt mô-đun mới thay vì lặp lại các lớp thẻ nội tuyến.
 
-**Props**: None | **Slots**: `default`
+**Dụng cụ**: Không có | **Khe cắm**: `default`
 
 ### ScrollableArea
 
-Reka UI scroll area with shared light-mode and dark-mode scrollbar styles.
-The component forwards HTML attributes to the scroll-area root.
+Vùng cuộn Reka UI với các kiểu thanh cuộn chế độ sáng và chế độ tối được chia sẻ. Thành phần này chuyển tiếp các thuộc tính HTML tới thư mục gốc của vùng cuộn.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `contentAsChild` | `boolean?` | `false` | Render the viewport content wrapper through the single default slot child |
-| `orientation` | `'vertical' \| 'horizontal' \| 'both'` | `'vertical'` | Scrollbar orientations to render |
-| `type` | `ScrollAreaRootProps['type']?` | `'auto'` | Reka UI scrollbar visibility behavior |
-| `viewportClass` | `string \| string[]?` | — | Classes for the Reka UI viewport |
+| `contentAsChild` | `boolean?` | `false` | Hiển thị trình bao bọc nội dung khung nhìn thông qua một khe con mặc định duy nhất |
+| `orientation` | `'vertical' \| 'horizontal' \| 'both'` | `'vertical'` | Hướng thanh cuộn để hiển thị |
+| `type` | `ScrollAreaRootProps['type']?` | `'auto'` | Hành vi hiển thị thanh cuộn Reka UI |
+| `viewportClass` | `string \| string[]?` | — | Các lớp cho khung nhìn Reka UI |
 
-**Slots**: `default`
-**Exposed**: `viewport` (the native scroll owner. Reka UI hides its native scrollbar and renders the configured custom track.)
+**Slots**: `default` **Exfused**: `viewport` (chủ sở hữu cuộn native. Reka UI ẩn thanh cuộn native của nó và hiển thị track tùy chỉnh đã định cấu hình.)
 
-### Skeleton
+<a id="skeleton"></a>
 
-Loading placeholder with animation.
+### Bộ xương
 
-| Prop | Type | Default | Description |
+Đang tải phần giữ chỗ có hình ảnh động.
+
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `animation` | `'pulse' \| 'wave' \| 'none'` | `'pulse'` | Animation style |
+| `animation` | `'pulse' \| 'wave' \| 'none'` | `'pulse'` | Phong cách hoạt hình |
 
-**Slots**: `default`
+**Khe cắm**: `default`
 
-### Truncatable
+<a id="truncatable"></a>
 
-Line-clamped content container that expands and collapses when the overflowing content area is clicked.
+### Có thể cắt ngắn
 
-| Prop | Type | Default | Description |
+Vùng chứa nội dung được kẹp dòng có thể mở rộng và thu gọn khi nhấp vào vùng nội dung tràn.
+
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `lineClamp` | `number?` | `3` | Maximum visible lines while collapsed |
+| `lineClamp` | `number?` | `3` | Dòng hiển thị tối đa khi thu gọn |
 
-**Slots**: `default`
+**Khe cắm**: `default`
 
 ---
 
-## Misc
+<a id="misc"></a>
+
+## linh tinh
 
 ### BottomDrawer
 
-Mobile modal surface built on Vaul Vue. It owns the drag handle, overlay,
-focus boundary, scroll region, and bottom safe area. Dragging
-starts only on the handle, so action buttons and scrolling do not dismiss it.
+Bề mặt phương thức di động được xây dựng trên Vaul Vue. Nó sở hữu tay cầm kéo, lớp phủ, ranh giới tiêu điểm, vùng cuộn và vùng an toàn phía dưới. Quá trình kéo chỉ bắt đầu trên tay cầm, vì vậy các nút tác vụ và cuộn không loại bỏ thao tác này.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `title` | `string` | required | Visible and accessible title |
-| `hideTitle` | `boolean` | `false` | Hides the heading visually and preserves the accessible dialog name |
-| `minimumHeight` | `'content' \| 'half'` | `'content'` | Uses content height or at least half of the viewport height |
+| `title` | `string` | bắt buộc | Tiêu đề hiển thị và dễ tiếp cận |
+| `hideTitle` | `boolean` | `false` | Ẩn tiêu đề một cách trực quan và giữ nguyên tên hộp thoại có thể truy cập |
+| `minimumHeight` | `'content' \| 'half'` | `'content'` | Sử dụng chiều cao nội dung hoặc ít nhất một nửa chiều cao khung nhìn |
 
-Dismiss with the handle, overlay, or Escape. There is no close button.
+Loại bỏ bằng tay cầm, lớp phủ hoặc Thoát. Không có nút đóng.
 
-**v-model**: `boolean`, defaults to `false`.
+**v-mô hình**: `boolean`, mặc định là `false`.
 
-**Slots**: `trigger` (one button), `default` (drawer content).
+**Khe cắm**: `trigger` (một nút), `default` (nội dung ngăn kéo).
 
-**Emits**: `afterClose()` after the dismissal animation;
-`closeAutoFocus(event)` to prevent focus restoration when another modal opens.
-`openAutoFocus(event)` lets the consumer set the initial focus target.
+**Phát ra**: `afterClose()` sau hoạt ảnh loại bỏ; `closeAutoFocus(event)` để ngăn khôi phục tiêu điểm khi một chế độ khác mở ra. `openAutoFocus(event)` cho phép bên sử dụng đặt mục tiêu lấy nét ban đầu.
 
-Use for mobile action menus and settings panels. Desktop dialogs and panels
-that need snap points use their own surface.
+Sử dụng cho các menu hành động và bảng cài đặt trên thiết bị di động. Các hộp thoại và bảng desktop cần điểm truy bắt sẽ sử dụng bề mặt riêng của chúng.
 
-### Avatar
+<a id="avatar"></a>
 
-Shared user-avatar primitive built on Reka UI. It retries when `src` changes and
-renders the fallback when the URL is missing, loading, or fails.
+### Hình đại diện
 
-| Prop | Type | Default | Description |
+Hình đại diện nguyên thủy của người dùng được chia sẻ được xây dựng trên Reka UI. Nó thử lại khi `src` thay đổi và hiển thị phương án dự phòng khi URL bị thiếu, đang tải hoặc bị lỗi.
+
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `src` | `string \| null \| undefined` | `null` | Avatar image URL |
-| `alt` | `string \| null \| undefined` | `null` | Accessible image/fallback description; omit for decorative avatars |
-| `referrerPolicy` | `ImgHTMLAttributes['referrerpolicy']?` | — | Image referrer policy |
-| `crossOrigin` | `ImgHTMLAttributes['crossorigin']?` | — | Image cross-origin mode |
+| `src` | `string \| null \| undefined` | `null` | Ảnh đại diện URL |
+| `alt` | `string \| null \| undefined` | `null` | Mô tả image/fallback có thể truy cập được; bỏ qua hình đại diện trang trí |
+| `referrerPolicy` | `ImgHTMLAttributes['referrerpolicy']?` | — | Chính sách giới thiệu hình ảnh |
+| `crossOrigin` | `ImgHTMLAttributes['crossorigin']?` | — | Chế độ nguồn gốc hình ảnh |
 
-**Slots**: `fallback` (optional override for the built-in user icon)
+**Slots**: `fallback` (ghi đè tùy chọn cho biểu tượng người dùng tích hợp)
 
 ### BasicButton
 
-Behavioral foundation for custom buttons. It owns disabled/loading behavior,
-press animation, sizing, icon/label rendering, and block layout, but supplies no
-surface, border, shape, or color styling.
+Nền tảng hành vi cho các nút tùy chỉnh. Nó sở hữu hành vi disabled/loading, hoạt ảnh nhấn, định cỡ, kết xuất icon/label và bố cục khối, nhưng không cung cấp kiểu dáng bề mặt, đường viền, hình dạng hoặc màu sắc.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `icon` | `string?` | — | UnoCSS/Iconify icon class |
-| `label` | `string?` | — | Button text |
-| `disabled` | `boolean?` | `false` | Disabled state |
-| `loading` | `boolean?` | `false` | Loading state |
-| `size` | `'sm' \| 'md' \| 'lg' \| 'unset'` | `'md'` | Preset size; `unset` leaves sizing to the caller |
-| `block` | `boolean?` | `false` | Full width |
+| `icon` | `string?` | — | Lớp biểu tượng UnoCSS/Iconify |
+| `label` | `string?` | — | Văn bản nút |
+| `disabled` | `boolean?` | `false` | Trạng thái khuyết tật |
+| `loading` | `boolean?` | `false` | Đang tải trạng thái |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'unset'` | `'md'` | kích thước đặt trước; `unset` để lại kích thước cho người gọi |
+| `block` | `boolean?` | `false` | Toàn bộ chiều rộng |
 
-**Slots**: `default` (fallback when no `label`)
+**Slots**: `default` (phương án dự phòng khi không có `label`)
 
-`size="unset"` omits the preset padding and text-size classes in `BasicButton`,
-`Button`, and `GhostButton`. Callers must supply any required sizing, including
-fixed dimensions for circular buttons.
+`size="unset"` bỏ qua các lớp đệm và kích thước văn bản đặt trước trong `BasicButton`, `Button` và `GhostButton`. Người gọi phải cung cấp mọi kích thước được yêu cầu, bao gồm cả kích thước cố định cho các nút tròn.
 
-### Button
+<a id="button"></a>
 
-Solid general-purpose action. It has no border and shows offset outlines on
-hover and keyboard focus. Choose a Wind3 color family independently from its
-primary or secondary visual emphasis.
+### Cái nút
 
-Includes all `BasicButton` props, plus:
+Hành động có mục đích chung vững chắc. Nó không có đường viền và hiển thị các đường viền bù đắp khi di chuột và tiêu điểm bàn phím. Chọn nhóm màu Wind3 độc lập với điểm nhấn trực quan chính hoặc phụ của nó.
 
-| Prop | Type | Default | Description |
+Bao gồm tất cả các đạo cụ `BasicButton`, cộng thêm:
+
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `shape` | `'rect' \| 'rounded' \| 'circle' \| 'parallelogram'` | `'rect'` | Rectangular, pill-like, circular, or rounded angled geometry |
-| `color` | `'neutral' \| 'primary' \| 'cyan' \| 'blue' \| 'green' \| 'lime' \| 'amber' \| 'red' \| 'orange' \| 'purple' \| 'pink'` | `'neutral'` | Wind3 color family; `primary` follows the configured theme hue |
-| `variant` | `'primary' \| 'secondary'` | `'secondary'` | Solid high-emphasis or subtle low-emphasis treatment |
-| `outline` | `boolean?` | `true` | Show the offset outline on hover and keyboard focus |
+| `shape` | `'rect' \| 'rounded' \| 'circle' \| 'parallelogram'` | `'rect'` | Hình học có góc cạnh hình chữ nhật, dạng viên thuốc, hình tròn hoặc tròn |
+| `color` | `'neutral' \| 'primary' \| 'cyan' \| 'blue' \| 'green' \| 'lime' \| 'amber' \| 'red' \| 'orange' \| 'purple' \| 'pink'` | `'neutral'` | Họ màu Wind3; `primary` tuân theo chủ đề đã định cấu hình màu sắc |
+| `variant` | `'primary' \| 'secondary'` | `'secondary'` | Điều trị nhấn mạnh ở mức độ cao hoặc nhấn mạnh ở mức độ thấp tinh tế |
+| `outline` | `boolean?` | `true` | Hiển thị đường viền bù đắp khi di chuột và tiêu điểm bàn phím |
 
 ### GhostButton
 
-Low-emphasis contextual action with a transparent default surface and compact
-spacing. Hover, pressed, and selected states use a subtle primary surface and
-text treatment without an outline. The offset outline is reserved for keyboard
-focus. Includes all `BasicButton` props.
+Hành động theo ngữ cảnh ít được nhấn mạnh với bề mặt mặc định trong suốt và khoảng cách nhỏ gọn. Các trạng thái di chuột, nhấn và chọn sử dụng bề mặt chính tinh tế và cách xử lý văn bản mà không có đường viền. Đường viền offset được dành riêng cho tiêu điểm bàn phím. Bao gồm tất cả các đạo cụ `BasicButton`.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `active` | `boolean?` | `false` | Persist the subtle selected surface for toggle controls |
+| `active` | `boolean?` | `false` | Duy trì bề mặt được chọn tinh tế cho các điều khiển chuyển đổi |
 
 ### IconButton
 
-Minimal icon-only action for controls such as favorite, like, copy, or retry.
-It directly uses `BasicButton`, removes its padding, and does not add a
-background, outline, shape, or forced square dimensions. Supply an accessible
-`aria-label`. Props: `icon`, `disabled`, and `loading`.
+Hành động tối thiểu chỉ dùng biểu tượng cho các điều khiển như yêu thích, thích, sao chép hoặc thử lại. Nó trực tiếp sử dụng `BasicButton`, loại bỏ phần đệm của nó và không thêm nền, đường viền, hình dạng hoặc kích thước hình vuông bắt buộc. Cung cấp `aria-label` có thể truy cập được. Đạo cụ: `icon`, `disabled` và `loading`.
 
 ### OverlayButton
 
-Translucent, backdrop-blurred action without an outline, intended for floating
-controls such as the Tamagotchi Controls Island. Includes all `BasicButton` props.
+Hành động mờ, phông nền mờ không có đường viền, dành cho các điều khiển nổi như Đảo Điều khiển Tamagotchi. Bao gồm tất cả các đạo cụ `BasicButton`.
 
-### Callout
+<a id="callout"></a>
 
-Alert/callout box with themed accent bar.
+### Chú thích
 
-| Prop | Type | Default | Description |
+Hộp Alert/callout với thanh nhấn theo chủ đề.
+
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `theme` | `'primary' \| 'violet' \| 'lime' \| 'orange'` | `'primary'` | Color theme |
-| `label` | `string?` | — | Title |
+| `theme` | `'primary' \| 'violet' \| 'lime' \| 'orange'` | `'primary'` | Chủ đề màu sắc |
+| `label` | `string?` | — | Tiêu đề |
 
-**Slots**: `label`, `default`
+**Khe cắm**: `label`, `default`
 
 ### ContainerError
 
-Error display with copy/feedback buttons and scrollable stack trace.
+Hiển thị lỗi với các nút copy/feedback và dấu vết ngăn xếp có thể cuộn.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `error` | `unknown?` | — | Error object |
-| `message` | `string?` | — | Custom message |
-| `stack` | `string?` | — | Stack trace |
-| `includeStack` | `boolean?` | `true` | Show stack |
-| `showCopyButton` | `boolean?` | `true` | Show copy button |
-| `showFeedbackButton` | `boolean?` | `true` | Show feedback button |
-| `copyButtonLabel` | `string?` | `'Copy'` | Copy button text |
-| `copiedButtonLabel` | `string?` | `'Copied'` | Copied state text |
-| `feedbackButtonLabel` | `string?` | `'Feedback'` | Feedback button text |
-| `heightPreset` | `'sm' \| 'md' \| 'lg' \| 'xl' \| 'auto'` | `'md'` | Container height |
+| `error` | `unknown?` | — | Đối tượng lỗi |
+| `message` | `string?` | — | Tin nhắn tùy chỉnh |
+| `stack` | `string?` | — | Dấu vết ngăn xếp |
+| `includeStack` | `boolean?` | `true` | Hiển thị ngăn xếp |
+| `showCopyButton` | `boolean?` | `true` | Hiển thị nút sao chép |
+| `showFeedbackButton` | `boolean?` | `true` | Hiển thị nút phản hồi |
+| `copyButtonLabel` | `string?` | `'Copy'` | Sao chép văn bản nút |
+| `copiedButtonLabel` | `string?` | `'Copied'` | Sao chép văn bản trạng thái |
+| `feedbackButtonLabel` | `string?` | `'Feedback'` | Văn bản nút phản hồi |
+| `heightPreset` | `'sm' \| 'md' \| 'lg' \| 'xl' \| 'auto'` | `'md'` | Chiều cao container |
 
-**Emits**: `copy(content: string)`, `feedback()`
+**Phát ra**: `copy(content: string)`, `feedback()`
 
 ### ErrorBoundary
 
-Catches synchronous render/setup errors in descendants via `onErrorCaptured` and renders a fallback (built-in `ContainerError` + retry button) instead of letting the error propagate. Use to wrap `<RouterView>` or any subtree where partial failure should not blank the host layout. Async/unhandled rejections are NOT captured — use `app.config.errorHandler` for those.
+Phát hiện các lỗi render/setup đồng bộ ở các con cháu thông qua `onErrorCaptured` và hiển thị phương án dự phòng (`ContainerError` + nút thử lại tích hợp) thay vì để lỗi lan truyền. Sử dụng để bọc `<RouterView>` hoặc bất kỳ cây con nào có lỗi một phần sẽ không làm trống bố cục host. KHÔNG ghi lại các từ chối Async/unhandled - hãy sử dụng `app.config.errorHandler` cho những từ chối đó.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `title` | `string?` | — | Optional title shown above error details |
-| `retryable` | `boolean?` | `true` | Show built-in retry button |
-| `retryLabel` | `string?` | `'Try again'` | Retry button label |
+| `title` | `string?` | — | Tiêu đề tùy chọn hiển thị chi tiết lỗi ở trên |
+| `retryable` | `boolean?` | `true` | Hiển thị nút thử lại tích hợp |
+| `retryLabel` | `string?` | `'Try again'` | Nhãn nút thử lại |
 
-**Slots**: `default`, `fallback({ error, info, retry })`
-**Emits**: `error(err, instance, info)`, `retry()`
-**Exposed**: `retry()`, `hasError()`
+**Khe cắm**: `default`, `fallback({ error, info, retry })` **Phát ra**: `error(err, instance, info)`, `retry()` **Tiếp xúc**: `retry()`, `hasError()`
 
 ### DropdownMenu
 
-Shared dropdown-menu surface built on Reka UI. It owns the root, trigger,
-portal, content surface, and `AnimatedContent` lifecycle. Callers own the menu
-items and their business actions.
+Bề mặt menu thả xuống được chia sẻ được xây dựng trên Reka UI. Nó sở hữu gốc, trình kích hoạt, cổng thông tin, bề mặt nội dung và vòng đời `AnimatedContent`. Người gọi sở hữu các mục trong menu và hoạt động kinh doanh của họ.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `align` | `DropdownMenuContentProps['align']?` | `'start'` | Preferred content alignment before collision handling |
-| `contentClass` | `string \| string[]?` | — | Additional classes for the content surface |
-| `disabled` | `boolean?` | `false` | Disables the trigger |
-| `modal` | `boolean?` | `true` | A non-modal menu leaves the rest of the page interactive while it is open |
-| `side` | `DropdownMenuContentProps['side']?` | `'bottom'` | Preferred content side before collision handling |
-| `sideOffset` | `number?` | `6` | Offset between the trigger and content |
-| `variant` | `'blurry' \| 'default'?` | `'default'` | Selects a translucent or opaque content surface |
+| `align` | `DropdownMenuContentProps['align']?` | `'start'` | Căn chỉnh nội dung ưa thích trước khi xử lý xung đột |
+| `contentClass` | `string \| string[]?` | — | Các lớp bổ sung cho bề mặt nội dung |
+| `disabled` | `boolean?` | `false` | Vô hiệu hóa trình kích hoạt |
+| `modal` | `boolean?` | `true` | Một menu không theo phương thức giúp phần còn lại của trang có tính tương tác khi nó được mở |
+| `side` | `DropdownMenuContentProps['side']?` | `'bottom'` | Bên nội dung ưa thích trước khi xử lý va chạm |
+| `sideOffset` | `number?` | `6` | Bù đắp giữa kích hoạt và nội dung |
+| `variant` | `'blurry' \| 'default'?` | `'default'` | Chọn bề mặt nội dung mờ hoặc mờ |
 
-**Models**: `open` (`boolean`, default `false`). Bind it to open the menu from code, for example after a hover delay.
-**Slots**: `trigger` (one interactive element), `default` (Reka dropdown-menu items).
+**mô hình**: `open` (`boolean`, `false` mặc định). Liên kết nó để mở menu từ mã, ví dụ như sau khi trì hoãn di chuột. **Slots**: `trigger` (một yếu tố tương tác), `default` (các mục menu thả xuống Reka).
 
 ### DoubleCheckButton
 
-Two-stage confirmation button — click once to reveal confirm/cancel.
+Nút xác nhận hai-stage - nhấp một lần để hiển thị confirm/cancel.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `color` | `ButtonColor` | `'red'` | Confirm button color family |
-| `variant` | `ButtonVariant` | `'primary'` | Confirm button visual emphasis |
-| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Size |
-| `block` | `boolean?` | `false` | Full width |
-| `disabled` | `boolean?` | `false` | Disabled |
-| `loading` | `boolean?` | `false` | Loading |
+| `color` | `ButtonColor` | `'red'` | Xác nhận họ màu nút |
+| `variant` | `ButtonVariant` | `'primary'` | Nút xác nhận nhấn mạnh trực quan |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Kích thước |
+| `block` | `boolean?` | `false` | Toàn bộ chiều rộng |
+| `disabled` | `boolean?` | `false` | Vô hiệu hóa |
+| `loading` | `boolean?` | `false` | Đang tải |
 
-**Emits**: `confirm()`, `cancel()`
-**Slots**: `default` (initial text), `confirm` (confirm text), `cancel` (cancel text)
+**Phát ra**: `confirm()`, `cancel()` **Khe cắm**: `default` (văn bản ban đầu), `confirm` (xác nhận văn bản), `cancel` (hủy văn bản)
 
-### Progress
+<a id="progress"></a>
 
-Linear progress bar with animated shine.
+### Tiến triển
 
-| Prop | Type | Default | Description |
+Thanh tiến trình tuyến tính với hình ảnh động tỏa sáng.
+
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `progress` | `number` | *(required)* | Percentage 0–100 |
-| `barClass` | `string?` | — | Custom bar color class |
+| `progress` | `number` | *(bắt buộc)* | Tỷ lệ phần trăm 0–100 |
+| `barClass` | `string?` | — | Lớp màu thanh tùy chỉnh |
 
 ---
 
-## Form — Input
+<a id="form--input"></a>
 
-### Input
+## Biểu mẫu - Đầu vào
 
-Basic text/number input.
+<a id="input"></a>
 
-| Prop | Type | Default | Description |
+### đầu vào
+
+Đầu vào text/number cơ bản.
+
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `type` | `InputType?` | — | HTML input type |
-| `variant` | `'primary' \| 'secondary' \| 'primary-dimmed'` | `'primary'` | Visual variant |
-| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Size |
-| `disabled` | `boolean?` | — | Disable editing and focus |
+| `type` | `InputType?` | — | Loại đầu vào HTML |
+| `variant` | `'primary' \| 'secondary' \| 'primary-dimmed'` | `'primary'` | Biến thể trực quan |
+| `size` | `'sm' \| 'md' \| 'lg'` | `'md'` | Kích thước |
+| `disabled` | `boolean?` | — | Vô hiệu hóa chỉnh sửa và tập trung |
 
-**v-model**: `modelValue: string | number`
+**v-mô hình**: `modelValue: string | number`
 
 ### BasicInputFile
 
-Low-level file input with drag-drop support.
+Đầu vào tệp cấp thấp có hỗ trợ kéo thả.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `accept` | `string?` | — | Accepted MIME types |
-| `multiple` | `boolean?` | — | Allow multiple files |
-| `isDraggingClasses` | `string \| string[]?` | — | Classes when dragging |
-| `isNotDraggingClasses` | `string \| string[]?` | — | Classes when not dragging |
+| `accept` | `string?` | — | Các loại MIME được chấp nhận |
+| `multiple` | `boolean?` | — | Cho phép nhiều tập tin |
+| `isDraggingClasses` | `string \| string[]?` | — | Các lớp khi kéo |
+| `isNotDraggingClasses` | `string \| string[]?` | — | Lớp học khi không kéo |
 
-**v-model**: `modelValue: File[]`
-**Slots**: `default({ isDragging, firstFile, files })`
+**v-mô hình**: `modelValue: File[]` **Khe cắm**: `default({ isDragging, firstFile, files })`
 
 ### InputFile
 
-File input with preview and drag-drop UI.
+Nhập tệp với tính năng xem trước và kéo thả UI.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `accept` | `string?` | — | Accepted file types |
-| `multiple` | `boolean?` | — | Allow multiple |
-| `placeholder` | `string?` | `'Choose file'` | Placeholder text |
+| `accept` | `string?` | — | Các loại tệp được chấp nhận |
+| `multiple` | `boolean?` | — | Cho phép nhiều |
+| `placeholder` | `string?` | `'Choose file'` | Văn bản giữ chỗ |
 
-**v-model**: `modelValue: File[] | undefined`
+**v-mô hình**: `modelValue: File[] | undefined`
 
 ### InputFileCard
 
-Styled file upload card with drag-and-drop zone.
+Thẻ tải lên tệp theo kiểu với vùng kéo và thả.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `accept` | `string?` | — | Accepted file types |
-| `multiple` | `boolean?` | — | Allow multiple |
+| `accept` | `string?` | — | Các loại tệp được chấp nhận |
+| `multiple` | `boolean?` | — | Cho phép nhiều |
 
-**v-model**: inherits from `BasicInputFile`
-**Slots**: `default` (custom upload UI)
+**v-mô hình**: kế thừa từ `BasicInputFile` **Slots**: `default` (tải lên tùy chỉnh UI)
 
 ### InputKeyValue
 
-Two-column input for key-value pairs.
+Đầu vào hai cột cho các cặp khóa-giá trị.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `name` | `string?` | — | Input name attribute |
-| `keyPlaceholder` | `string?` | — | Key placeholder |
-| `valuePlaceholder` | `string?` | — | Value placeholder |
+| `name` | `string?` | — | Thuộc tính tên đầu vào |
+| `keyPlaceholder` | `string?` | — | Trình giữ chỗ chính |
+| `valuePlaceholder` | `string?` | — | Giữ chỗ giá trị |
 
-**v-model**: `propertyKey: string`, `propertyValue: string`
+**v-mô hình**: `propertyKey: string`, `propertyValue: string`
 
 ---
 
-## Form — Textarea
+<a id="form--textarea"></a>
+
+## Biểu mẫu - Vùng văn bản
 
 ### BasicTextarea
 
-Auto-resizing textarea with submit and paste-file events.
-The native row count defaults to one, so typing does not introduce a second
-row. Content grows when it wraps. Native `rows` attributes can override this minimum.
-When set, `defaultHeight` also provides the baseline for content measurement,
-so flex layouts do not stretch the empty measurement box.
+Tự động thay đổi kích thước vùng văn bản với các sự kiện gửi và dán tệp. Số hàng native mặc định là một, vì vậy việc nhập không tạo ra hàng thứ hai. Nội dung phát triển khi nó kết thúc. Thuộc tính native `rows` có thể ghi đè mức tối thiểu này. Khi được đặt, `defaultHeight` cũng cung cấp đường cơ sở để đo lường nội dung, do đó bố cục linh hoạt không kéo dài hộp đo trống.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `defaultHeight` | `string?` | — | Initial height when empty |
-| `submitOnEnter` | `boolean?` | `true` | Submit on Enter (Shift+Enter for newline) |
+| `defaultHeight` | `string?` | — | Chiều cao ban đầu khi trống |
+| `submitOnEnter` | `boolean?` | `true` | Gửi bằng Enter (Shift+Enter cho dòng mới) |
 
-**v-model**: `input: string`
-**Emits**: `submit(message: string)`, `pasteFile(files: File[])`
+**v-mô hình**: `input: string` **Phát ra**: `submit(message: string)`, `pasteFile(files: File[])`
 
-### Textarea
+<a id="textarea"></a>
 
-Styled textarea wrapping `BasicTextarea`.
+### Vùng văn bản
 
-**v-model**: `modelValue: string`
+Bao bọc vùng văn bản theo kiểu `BasicTextarea`.
+
+**v-mô hình**: `modelValue: string`
 
 ---
 
-## Form — Checkbox / Radio
+<a id="form--checkbox--radio"></a>
 
-### Checkbox
+## Biểu mẫu — Hộp kiểm / Radio
 
-Toggle switch using reka-ui `SwitchRoot`.
+<a id="checkbox"></a>
 
-| Prop | Type | Default | Description |
+### Hộp kiểm
+
+Chuyển đổi công tắc bằng reka-ui `SwitchRoot`.
+
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `disabled` | `boolean?` | — | Disabled state |
+| `disabled` | `boolean?` | — | Trạng thái khuyết tật |
 
-**v-model**: `modelValue: boolean`
+**v-mô hình**: `modelValue: boolean`
 
 ### Radio
 
-Single radio button for radio groups.
+Nút radio duy nhất cho các nhóm radio.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `id` | `string` | *(required)* | Unique ID |
-| `name` | `string` | *(required)* | Radio group name |
-| `value` | `string` | *(required)* | Option value |
-| `title` | `string` | *(required)* | Display label |
-| `deprecated` | `boolean?` | `false` | Deprecation indicator |
+| `id` | `string` | *(bắt buộc)* | ID độc đáo |
+| `name` | `string` | *(bắt buộc)* | Tên nhóm phát thanh |
+| `value` | `string` | *(bắt buộc)* | Giá trị tùy chọn |
+| `title` | `string` | *(bắt buộc)* | Nhãn hiển thị |
+| `deprecated` | `boolean?` | `false` | Chỉ báo khấu hao |
 
-**v-model**: `modelValue: string`
+**v-mô hình**: `modelValue: string`
 
 ---
 
-## Form — Range
+<a id="form--range"></a>
 
-### Range
+## Biểu mẫu - Phạm vi
 
-Horizontal slider with progress visualization.
+<a id="range"></a>
 
-| Prop | Type | Default | Description |
+### Phạm vi
+
+Thanh trượt ngang với trực quan hóa tiến trình.
+
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `min` | `number?` | `0` | Minimum value |
-| `max` | `number?` | `100` | Maximum value |
-| `step` | `number?` | `1` | Step increment |
-| `disabled` | `boolean?` | `false` | Disabled |
-| `thumbColor` | `string?` | `'#9090906e'` | Thumb color |
-| `trackColor` | `string?` | `'gray'` | Track color |
-| `trackValueColor` | `string?` | `'red'` | Filled track color |
+| `min` | `number?` | `0` | Giá trị tối thiểu |
+| `max` | `number?` | `100` | Giá trị tối đa |
+| `step` | `number?` | `1` | Tăng bước |
+| `disabled` | `boolean?` | `false` | Vô hiệu hóa |
+| `thumbColor` | `string?` | `'#9090906e'` | Màu ngón tay cái |
+| `trackColor` | `string?` | `'gray'` | Màu track |
+| `trackValueColor` | `string?` | `'red'` | Màu track đầy đủ |
 
-**v-model**: `modelValue: number`
+**v-mô hình**: `modelValue: number`
 
 ### ColorHueRange
 
-HSL hue selector (0–360) with rainbow gradient.
+Bộ chọn màu sắc HSL (0–360) với dải màu cầu vồng.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `disabled` | `boolean?` | — | Disabled |
+| `disabled` | `boolean?` | — | Vô hiệu hóa |
 
-**v-model**: `modelValue: number`
+**v-mô hình**: `modelValue: number`
 
 ### RoundRange
 
-Rounded-style slider.
+Thanh trượt kiểu tròn.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `min` | `number?` | `0` | Minimum |
-| `max` | `number?` | `100` | Maximum |
-| `step` | `number?` | `1` | Step |
-| `disabled` | `boolean?` | `false` | Disabled |
+| `min` | `number?` | `0` | Tối thiểu |
+| `max` | `number?` | `100` | Tối đa |
+| `step` | `number?` | `1` | Bước |
+| `disabled` | `boolean?` | `false` | Vô hiệu hóa |
 
-**v-model**: `modelValue: number`
+**v-mô hình**: `modelValue: number`
 
 ---
 
-## Form — Select
+<a id="form--select"></a>
 
-### Select
+## Biểu mẫu — Chọn
 
-Dropdown select using reka-ui with grouping and custom rendering.
+<a id="select"></a>
 
-| Prop | Type | Default | Description |
+### Lựa chọn
+
+Chọn thả xuống bằng cách sử dụng reka-ui với tính năng nhóm và hiển thị tùy chỉnh.
+
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `options` | `SelectOptionItem<T>[] \| SelectOptionGroupItem<T>[]` | *(required)* | Options |
-| `placeholder` | `string?` | `'Select an option'` | Placeholder |
-| `disabled` | `boolean?` | `false` | Disabled |
-| `by` | `string \| ((a: T, b: T) => boolean)?` | — | Custom comparison |
-| `contentMinWidth` | `string \| number?` | `160` | Dropdown min width |
-| `contentWidth` | `string \| number?` | — | Dropdown width |
-| `contentSide` | `'top' \| 'right' \| 'bottom' \| 'left'` | `'bottom'` | Preferred dropdown side before collision handling |
-| `contentAlign` | `'start' \| 'center' \| 'end'` | `'start'` | Preferred dropdown alignment before collision handling |
-| `shape` | `'rounded' \| 'default'` | `'default'` | Shape |
-| `variant` | `'blurry' \| 'default'` | `'default'` | Variant |
+| `options` | `SelectOptionItem<T>[] \| SelectOptionGroupItem<T>[]` | *(bắt buộc)* | Tùy chọn |
+| `placeholder` | `string?` | `'Select an option'` | Trình giữ chỗ |
+| `disabled` | `boolean?` | `false` | Vô hiệu hóa |
+| `by` | `string \| ((a: T, b: T) => boolean)?` | — | So sánh tùy chỉnh |
+| `contentMinWidth` | `string \| number?` | `160` | Chiều rộng tối thiểu thả xuống |
+| `contentWidth` | `string \| number?` | — | Chiều rộng thả xuống |
+| `contentSide` | `'top' \| 'right' \| 'bottom' \| 'left'` | `'bottom'` | Bên thả xuống ưa thích trước khi xử lý va chạm |
+| `contentAlign` | `'start' \| 'center' \| 'end'` | `'start'` | Căn chỉnh thả xuống ưa thích trước khi xử lý va chạm |
+| `shape` | `'rounded' \| 'default'` | `'default'` | Hình dạng |
+| `variant` | `'blurry' \| 'default'` | `'default'` | Biến thể |
 
-**v-model**: `modelValue: T`
-**Slots**: `value({ option, value, placeholder })`, `option({ option })`
+**v-mô hình**: `modelValue: T` **Khe cắm**: `value({ option, value, placeholder })`, `option({ option })`
 
 ### SelectOption
 
-Individual option item within `Select`.
+Mục tùy chọn riêng lẻ trong `Select`.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `option` | `SelectOptionItem<T>` | *(required)* | Option data |
+| `option` | `SelectOptionItem<T>` | *(bắt buộc)* | Dữ liệu tùy chọn |
 
-**Slots**: `default`
+**Khe cắm**: `default`
 
 ---
 
-## Form — Combobox
+<a id="form--combobox"></a>
 
-### Combobox
+## Biểu mẫu — Hộp tổ hợp
 
-The input shows the selected option label when asynchronous options arrive or the model changes. Search text remains local to the input.
+<a id="combobox"></a>
 
-Searchable dropdown/autocomplete using reka-ui with grouping.
+### Hộp tổ hợp
 
-| Prop | Type | Default | Description |
+Đầu vào hiển thị nhãn tùy chọn đã chọn khi có tùy chọn không đồng bộ hoặc mô hình thay đổi. Văn bản tìm kiếm vẫn cục bộ đối với đầu vào.
+
+dropdown/autocomplete có thể tìm kiếm bằng reka-ui với tính năng nhóm.
+
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `options` | `ComboboxOptionItem<T>[] \| ComboboxOptionGroupItem<T>[]` | *(required)* | Options |
-| `placeholder` | `string?` | — | Placeholder |
-| `disabled` | `boolean?` | `false` | Disabled |
-| `openOnClick` | `boolean?` | `true` | Auto-open dropdown on click |
-| `contentMinWidth` | `string \| number?` | — | Dropdown min width |
-| `contentWidth` | `string \| number?` | — | Dropdown width |
+| `options` | `ComboboxOptionItem<T>[] \| ComboboxOptionGroupItem<T>[]` | *(bắt buộc)* | Tùy chọn |
+| `placeholder` | `string?` | — | Trình giữ chỗ |
+| `disabled` | `boolean?` | `false` | Vô hiệu hóa |
+| `openOnClick` | `boolean?` | `true` | Tự động mở menu thả xuống khi nhấp vào |
+| `contentMinWidth` | `string \| number?` | — | Chiều rộng tối thiểu thả xuống |
+| `contentWidth` | `string \| number?` | — | Chiều rộng thả xuống |
 
-**v-model**: `modelValue: T`
-**Slots**: `option({ option })`, `empty`
+**v-mô hình**: `modelValue: T` **Khe cắm**: `option({ option })`, `empty`
 
 ### ComboboxSelect
 
-Simplified Combobox wrapper for string/number options.
+Trình bao bọc Combobox được đơn giản hóa cho các tùy chọn string/number.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `options` | `{ label, value, description?, disabled?, icon? }[]?` | — | Options |
-| `placeholder` | `string?` | — | Placeholder |
-| `disabled` | `boolean?` | `false` | Disabled |
-| `openOnClick` | `boolean?` | `true` | Auto-open dropdown on click |
-| `title` | `string?` | — | Title |
-| `layout` | `'horizontal' \| 'vertical'?` | — | Layout direction |
-| `contentMinWidth` | `string \| number?` | — | Dropdown min width |
-| `contentWidth` | `string \| number?` | — | Dropdown width |
+| `options` | `{ label, value, description?, disabled?, icon? }[]?` | — | Tùy chọn |
+| `placeholder` | `string?` | — | Trình giữ chỗ |
+| `disabled` | `boolean?` | `false` | Vô hiệu hóa |
+| `openOnClick` | `boolean?` | `true` | Tự động mở menu thả xuống khi nhấp vào |
+| `title` | `string?` | — | Tiêu đề |
+| `layout` | `'horizontal' \| 'vertical'?` | — | Hướng bố trí |
+| `contentMinWidth` | `string \| number?` | — | Chiều rộng tối thiểu thả xuống |
+| `contentWidth` | `string \| number?` | — | Chiều rộng thả xuống |
 
-**v-model**: `modelValue: string | number`
-**Slots**: `option({ option })`, `empty`
+**v-mô hình**: `modelValue: string | number` **Khe cắm**: `option({ option })`, `empty`
 
 ### ComboboxOption
 
-Option item within combobox (uses provide/inject).
+Mục tùy chọn trong combobox (sử dụng provide/inject).
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `value` | `string \| number` | *(required)* | Value |
-| `label` | `string?` | — | Display text |
-| `active` | `boolean?` | — | Active state |
+| `value` | `string \| number` | *(bắt buộc)* | Giá trị |
+| `label` | `string?` | — | Hiển thị văn bản |
+| `active` | `boolean?` | — | Trạng thái hoạt động |
 
-**Slots**: `default`
+**Khe cắm**: `default`
 
 ---
 
-## Form — SelectTab
+<a id="form--selecttab"></a>
+
+## Mẫu — SelectTab
 
 ### SelectTab
 
-Tab-like selection using radio buttons with animated indicator.
+Lựa chọn giống như tab sử dụng các nút radio có chỉ báo hoạt hình.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `options` | `SelectTabOption[]` | *(required)* | Tab options `{ label, value, description?, icon? }` |
-| `disabled` | `boolean?` | `false` | Disabled |
+| `options` | `SelectTabOption[]` | *(bắt buộc)* | Tùy chọn tab `{ label, value, description?, icon? }` |
+| `disabled` | `boolean?` | `false` | Vô hiệu hóa |
 | `readonly` | `boolean?` | `false` | Read-only |
-| `size` | `'sm' \| 'md'` | `'md'` | Size |
+| `size` | `'sm' \| 'md'` | `'md'` | Kích thước |
 
-**v-model**: `modelValue: T`
+**v-mô hình**: `modelValue: T`
 
 ---
 
-## Form — Field (Labeled wrappers)
+<a id="form--field-labeled-wrappers"></a>
 
-All Field components wrap a base input with `label`, `description`, and consistent layout. Common slots: `label`, `description`.
+## Biểu mẫu - Trường (Trình bao bọc được gắn nhãn)
+
+Tất cả các thành phần Trường bao bọc đầu vào cơ sở với `label`, `description` và bố cục nhất quán. Các khe phổ biến: `label`, `description`.
 
 ### FieldButton
 
-Displays field information on the left and a compact action button on the right.
+Hiển thị thông tin trường ở bên trái và nút hành động nhỏ gọn ở bên phải.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `label` | `string` | *(required)* | Field label |
-| `description` | `string?` | — | Helper text |
-| `buttonLabel` | `string` | *(required)* | Action button label |
-| `buttonIcon` | `string?` | — | UnoCSS/Iconify class for the action button |
-| `disabled` | `boolean?` | — | Prevents the action |
-| `loading` | `boolean?` | — | Shows a spinner and prevents the action |
+| `label` | `string` | *(bắt buộc)* | Nhãn trường |
+| `description` | `string?` | — | Văn bản trợ giúp |
+| `buttonLabel` | `string` | *(bắt buộc)* | Nhãn nút hành động |
+| `buttonIcon` | `string?` | — | Lớp UnoCSS/Iconify cho nút hành động |
+| `disabled` | `boolean?` | — | Ngăn chặn hành động |
+| `loading` | `boolean?` | — | Hiển thị một vòng quay và ngăn chặn hành động |
 
-**Slots**: `label`, `description`
+**Khe cắm**: `label`, `description`
 
-**Emits**: `click(event: MouseEvent)`
+**Phát ra**: `click(event: MouseEvent)`
 
 ### FieldInput
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `label` | `string?` | — | Label |
-| `description` | `string?` | — | Helper text |
-| `placeholder` | `string?` | — | Placeholder |
-| `required` | `boolean?` | — | Required indicator |
-| `disabled` | `boolean?` | — | Disable editing and focus |
-| `type` | `InputType?` | — | Input type |
-| `autocomplete` | `string?` | — | Native autocomplete hint |
-| `inputClass` | `string?` | — | Custom input class |
-| `singleLine` | `boolean?` | `true` | `true` = input, `false` = textarea |
+| `label` | `string?` | — | Nhãn |
+| `description` | `string?` | — | Văn bản trợ giúp |
+| `placeholder` | `string?` | — | Trình giữ chỗ |
+| `required` | `boolean?` | — | Chỉ số bắt buộc |
+| `disabled` | `boolean?` | — | Vô hiệu hóa chỉnh sửa và tập trung |
+| `type` | `InputType?` | — | Kiểu đầu vào |
+| `autocomplete` | `string?` | — | Gợi ý tự động hoàn thành native |
+| `inputClass` | `string?` | — | Lớp đầu vào tùy chỉnh |
+| `singleLine` | `boolean?` | `true` | `true` = đầu vào, `false` = vùng văn bản |
 
-**v-model**: `modelValue: T`
+**v-mô hình**: `modelValue: T`
 
 ### FieldCheckbox
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `label` | `string?` | — | Label |
-| `description` | `string?` | — | Helper text |
-| `disabled` | `boolean?` | — | Disabled |
-| `placement` | `'left' \| 'right'` | `'right'` | Switch position |
+| `label` | `string?` | — | Nhãn |
+| `description` | `string?` | — | Văn bản trợ giúp |
+| `disabled` | `boolean?` | — | Vô hiệu hóa |
+| `placement` | `'left' \| 'right'` | `'right'` | Chuyển đổi vị trí |
 
-**v-model**: `modelValue: boolean`
+**v-mô hình**: `modelValue: boolean`
 
 ### FieldTextArea
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `label` | `string?` | — | Label |
-| `description` | `string?` | — | Helper text |
-| `placeholder` | `string?` | — | Placeholder |
-| `required` | `boolean?` | — | Required indicator |
-| `textareaClass` | `string?` | — | Custom textarea class |
-| `rows` | `number?` | `6` | Rows |
+| `label` | `string?` | — | Nhãn |
+| `description` | `string?` | — | Văn bản trợ giúp |
+| `placeholder` | `string?` | — | Trình giữ chỗ |
+| `required` | `boolean?` | — | Chỉ số bắt buộc |
+| `textareaClass` | `string?` | — | Lớp văn bản tùy chỉnh |
+| `rows` | `number?` | `6` | Hàng |
 
-**v-model**: `modelValue: string`
+**v-mô hình**: `modelValue: string`
 
 ### FieldRange
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `min` | `number?` | — | Min |
-| `max` | `number?` | — | Max |
-| `step` | `number?` | — | Step |
-| `label` | `string?` | — | Label |
-| `description` | `string?` | — | Helper text |
-| `formatValue` | `(value: number) => string?` | — | Value formatter |
-| `as` | `'label' \| 'div'` | `'label'` | Wrapper element |
-| `defaultValue` | `number?` | — | When set, shows a reset button next to the label that restores this value. Use with `as="div"`. |
+| `min` | `number?` | — | Tối thiểu |
+| `max` | `number?` | — | Tối đa |
+| `step` | `number?` | — | Bước |
+| `label` | `string?` | — | Nhãn |
+| `description` | `string?` | — | Văn bản trợ giúp |
+| `formatValue` | `(value: number) => string?` | — | Trình định dạng giá trị |
+| `as` | `'label' \| 'div'` | `'label'` | Phần tử bao bọc |
+| `defaultValue` | `number?` | — | Khi được đặt, hiển thị nút đặt lại bên cạnh nhãn khôi phục giá trị này. Sử dụng với `as="div"`. |
 
-**v-model**: `modelValue: number`
+**v-mô hình**: `modelValue: number`
 
 ### FieldInputFile
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `label` | `string?` | — | Label |
-| `description` | `string?` | — | Helper text |
-| `accept` | `string?` | — | Accepted types |
-| `multiple` | `boolean?` | — | Multiple |
-| `placeholder` | `string?` | — | Placeholder |
+| `label` | `string?` | — | Nhãn |
+| `description` | `string?` | — | Văn bản trợ giúp |
+| `accept` | `string?` | — | Các loại được chấp nhận |
+| `multiple` | `boolean?` | — | Nhiều |
+| `placeholder` | `string?` | — | Trình giữ chỗ |
 
-**v-model**: `modelValue: File[] | undefined`
+**v-mô hình**: `modelValue: File[] | undefined`
 
 ### FieldSelect
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `label` | `string` | *(required)* | Label |
-| `description` | `string?` | — | Helper text |
-| `options` | `SelectOptionItem<T>[] \| SelectOptionGroupItem<T>[]?` | — | Options |
-| `placeholder` | `string?` | — | Placeholder |
-| `disabled` | `boolean?` | — | Disabled |
-| `layout` | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout |
-| `by` | `string \| ((a, b) => boolean)?` | — | Comparison |
-| `shape` | `'rounded' \| 'default'?` | — | Shape |
-| `variant` | `'blurry' \| 'default'?` | — | Variant |
+| `label` | `string` | *(bắt buộc)* | Nhãn |
+| `description` | `string?` | — | Văn bản trợ giúp |
+| `options` | `SelectOptionItem<T>[] \| SelectOptionGroupItem<T>[]?` | — | Tùy chọn |
+| `placeholder` | `string?` | — | Trình giữ chỗ |
+| `disabled` | `boolean?` | — | Vô hiệu hóa |
+| `layout` | `'horizontal' \| 'vertical'` | `'horizontal'` | Bố cục |
+| `by` | `string \| ((a, b) => boolean)?` | — | So sánh |
+| `shape` | `'rounded' \| 'default'?` | — | Hình dạng |
+| `variant` | `'blurry' \| 'default'?` | — | Biến thể |
 
-**v-model**: `modelValue: T`
-**Slots**: `label`, `description`, `value`, `option`
+**v-mô hình**: `modelValue: T` **Các khe**: `label`, `description`, `value`, `option`
 
 ### FieldCombobox
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `label` | `string` | *(required)* | Label |
-| `description` | `string?` | — | Helper text |
-| `options` | `{ label, value, description?, disabled?, icon? }[]?` | — | Options |
-| `placeholder` | `string?` | — | Placeholder |
-| `disabled` | `boolean?` | `false` | Disabled |
-| `openOnClick` | `boolean?` | `true` | Auto-open dropdown on click |
-| `layout` | `'horizontal' \| 'vertical'` | `'horizontal'` | Layout |
+| `label` | `string` | *(bắt buộc)* | Nhãn |
+| `description` | `string?` | — | Văn bản trợ giúp |
+| `options` | `{ label, value, description?, disabled?, icon? }[]?` | — | Tùy chọn |
+| `placeholder` | `string?` | — | Trình giữ chỗ |
+| `disabled` | `boolean?` | `false` | Vô hiệu hóa |
+| `openOnClick` | `boolean?` | `true` | Tự động mở menu thả xuống khi nhấp vào |
+| `layout` | `'horizontal' \| 'vertical'` | `'horizontal'` | Bố cục |
 
-**v-model**: `modelValue: string`
-**Slots**: `label`, `description`, `option`, `empty`
+**v-mô hình**: `modelValue: string` **Các khe**: `label`, `description`, `option`, `empty`
 
 ### FieldKeyValues
 
-Dynamic key-value pair list with add/remove.
+Danh sách cặp khóa-giá trị động với add/remove.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `label` | `string?` | — | Label |
-| `description` | `string?` | — | Helper text |
-| `name` | `string?` | — | Input name |
-| `keyPlaceholder` | `string?` | — | Key placeholder |
-| `valuePlaceholder` | `string?` | — | Value placeholder |
-| `required` | `boolean?` | — | Required |
-| `inputClass` | `string?` | — | Custom input class |
+| `label` | `string?` | — | Nhãn |
+| `description` | `string?` | — | Văn bản trợ giúp |
+| `name` | `string?` | — | Tên đầu vào |
+| `keyPlaceholder` | `string?` | — | Trình giữ chỗ chính |
+| `valuePlaceholder` | `string?` | — | Giữ chỗ giá trị |
+| `required` | `boolean?` | — | Bắt buộc |
+| `inputClass` | `string?` | — | Lớp đầu vào tùy chỉnh |
 
-**v-model**: `keyValues: { key: string, value: string }[]`
-**Emits**: `remove(index: number)`, `add(key: string, value: string)`
+**v-mô hình**: `keyValues: { key: string, value: string }[]` **Phát ra**: `remove(index: number)`, `add(key: string, value: string)`
 
 ### FieldValues
 
-Dynamic string list with add/remove.
+Danh sách chuỗi động với add/remove.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `label` | `string?` | — | Label |
-| `description` | `string?` | — | Helper text |
-| `name` | `string?` | — | Input name |
-| `valuePlaceholder` | `string?` | — | Value placeholder |
-| `required` | `boolean?` | — | Required |
-| `inputClass` | `string?` | — | Custom input class |
+| `label` | `string?` | — | Nhãn |
+| `description` | `string?` | — | Văn bản trợ giúp |
+| `name` | `string?` | — | Tên đầu vào |
+| `valuePlaceholder` | `string?` | — | Giữ chỗ giá trị |
+| `required` | `boolean?` | — | Bắt buộc |
+| `inputClass` | `string?` | — | Lớp đầu vào tùy chỉnh |
 
-**v-model**: `items: string[]`
-**Emits**: `remove(index: number)`, `add()`
+**v-mô hình**: `items: string[]` **Phát ra**: `remove(index: number)`, `add()`
 
 ---
 
 ## Composables
 
-Exported from `packages/ui/src/composables/`:
+Đã xuất từ ​​`packages/ui/src/composables/`:
 
-- **`useDeferredMount()`** — Defers component mounting (useful for heavy components).
-- **`useTheme()`** — Theme management composable.
+- **`useDeferredMount()`** — Trì hoãn việc gắn linh kiện (hữu ích cho các linh kiện nặng).
+- **`useTheme()`** — Quản lý chủ đề composable.
 
 ## SwipeActions
 
-Composable trailing actions built on Reka UI's `Primitive` and `asChild`.
-Each Root owns one Content and up to two Lists, one per logical side. Items register
-automatically and follow DOM order. Values must be unique within their List.
-The container does not own conversation storage, undo, or business callbacks.
+Các hành động theo dõi composable được xây dựng trên `Primitive` và `asChild` của Reka UI. Mỗi Root sở hữu một Nội dung và tối đa hai Danh sách, một Danh sách cho mỗi mặt logic. Các mục được đăng ký tự động và tuân theo thứ tự DOM. Các giá trị phải là duy nhất trong Danh sách của chúng. Vùng chứa không sở hữu bộ nhớ cuộc trò chuyện, hoàn tác hoặc cuộc gọi lại kinh doanh.
 
-| Part | Props | Default | Contract |
+| Phần | Đạo cụ | Mặc định | Hợp đồng |
 |------|-------|---------|----------|
-| `SwipeActionsRoot` | `open` | `false` | `v-model:open` controls whether the actions stay revealed |
-| Root | `fullSwipe` | `true` | Allows long-swipe selection; false still permits ordinary reveal and Item presses |
-| Root | `side` | `end` | `v-model:side` selects the revealed edge and retains it when closed |
-| Root | `dir` | Reka provider | Maps start/end to physical edges in LTR or RTL |
-| List | `side` | `end` | Logical edge: start is left in LTR and right in RTL |
-| List | `defaultAction` | Last Item in this List | Stable Item value for long swipe; missing or disabled defaults never select a substitute |
-| Root | `disabled` | `false` | Disables gestures and actions, not the content's own controls |
-| `SwipeActionsContent` | — | — | Translates the caller's opaque content and closes an open row before content activation |
-| `SwipeActionsList` | `actionWidth` | `88` | Settled width per Item in CSS pixels |
-| List | `gap` | `8` | Gap between Items; each outer edge reserves half, including during entry. Capped at half `actionWidth` |
-| `SwipeActionsItem` | `value` | Required | Stable string identity emitted for this action |
-| Item | `disabled` | `false` | Disables pointer, keyboard, and long-swipe selection |
+| `SwipeActionsRoot` | `open` | `false` | `v-model:open` kiểm soát xem các hành động có được tiết lộ hay không |
+| Gốc | `fullSwipe` | `true` | Cho phép lựa chọn vuốt dài; sai vẫn cho phép tiết lộ thông thường và nhấn Mục |
+| Gốc | `side` | `end` | `v-model:side` chọn cạnh lộ và giữ lại khi đóng |
+| Gốc | `dir` | Reka nhà cung cấp | Ánh xạ start/end tới các cạnh vật lý trong LTR hoặc RTL |
+| Danh sách | `side` | `end` | Cạnh logic: bắt đầu ở bên trái trong LTR và bên phải trong RTL |
+| Danh sách | `defaultAction` | Mục cuối cùng trong danh sách này | Giá trị mục ổn định khi vuốt dài; mặc định bị thiếu hoặc bị vô hiệu hóa không bao giờ chọn thay thế |
+| Gốc | `disabled` | `false` | Tắt các cử chỉ và hành động chứ không phải các điều khiển riêng của nội dung |
+| `SwipeActionsContent` | — | — | Dịch nội dung không rõ ràng của người gọi và đóng một hàng mở trước khi kích hoạt nội dung |
+| `SwipeActionsList` | `actionWidth` | `88` | Chiều rộng được giải quyết cho mỗi Mục tính bằng pixel CSS |
+| Danh sách | `gap` | `8` | Khoảng cách giữa các mục; mỗi cạnh ngoài dự trữ một nửa, kể cả khi vào. Giới hạn ở một nửa `actionWidth` |
+| `SwipeActionsItem` | `value` | Bắt buộc | Nhận dạng chuỗi ổn định được phát ra cho hành động này |
+| Mục | `disabled` | `false` | Vô hiệu hóa lựa chọn con trỏ, bàn phím và thao tác vuốt dài |
 
-All parts accept Reka `as` and `asChild`. Root, Content, and List default to
-`div`; Item defaults to a native `button`. With `asChild`, pass one child that
-forwards attributes and listeners. Items fan out toward their List edge; the last Item is outermost.
+Tất cả các bộ phận đều chấp nhận Reka `as` và `asChild`. Gốc, Nội dung và Danh sách mặc định là `div`; Mục mặc định là native `button`. Với `asChild`, truyền một con chuyển tiếp thuộc tính và trình nghe. Các mục hướng về phía Danh sách của chúng; Mục cuối cùng là ngoài cùng.
 
-Root emits `update:open(boolean)`, `update:side(start|end)`, `interactionStart()`,
-and `action(value, side)`. The side distinguishes equal values in different Lists.
-Item emits a cancelable `select` event before Root's action. Its detail contains
-`value`, `side`, and `source` (`press` or `swipe`). `preventDefault()` cancels the action.
-Handle business operations at Root or Item, not both, to avoid duplicate work.
+Root phát ra `update:open(boolean)`, `update:side(start|end)`, `interactionStart()` và `action(value, side)`. Bên phân biệt các giá trị bằng nhau trong các Danh sách khác nhau. Vật phẩm phát ra sự kiện `select` có thể hủy trước hành động của Root. Chi tiết của nó bao gồm `value`, `side` và `source` (`press` hoặc `swipe`). `preventDefault()` hủy hành động. Xử lý các hoạt động kinh doanh tại Root hoặc Item, không phải cả hai, để tránh công việc trùng lặp.
 
-Root's default slot exposes `open`, `side`, `armed`, `committing`, `close`, and `toggle`.
-Content exposes `open`, `side`, `close`, and `toggle`. Call `toggle('start')` or
-`toggle('end')` to reveal a specific List. With no argument, it toggles the selected side.
-Item exposes its `takeover`, `disabled`, logical `side`, and physical `edge` (`left|right`).
-Pass `takeover` and `edge` to SwipeActionButton to mirror the expanded icon.
-List has a default slot. Root and List expose `data-side="start|end"`.
-Root exposes `data-state="open|closed"`, `data-armed`, `data-committing`, and
-`data-disabled`. Item exposes `data-value`, `data-disabled`, and
-`data-state="idle|expanded"`. Hidden actions are inert. Root also exposes
-`--swipe-progress`, rising from 0 to 1 over the first 32px of reveal, for fading
-a resting action trigger.
+Khe mặc định của Root hiển thị `open`, `side`, `armed`, `committing`, `close` và `toggle`. Nội dung hiển thị `open`, `side`, `close` và `toggle`. Gọi `toggle('start')` hoặc `toggle('end')` để hiển thị Danh sách cụ thể. Không có đối số, nó sẽ chuyển đổi phía được chọn. Mục hiển thị `takeover`, `disabled`, `side` logic và `edge` vật lý (`left|right`). Chuyển `takeover` và `edge` sang SwipeActionButton để phản chiếu biểu tượng mở rộng. Danh sách có một vị trí mặc định. Root và List hiển thị `data-side="start|end"`. Root hiển thị `data-state="open|closed"`, `data-armed`, `data-committing` và `data-disabled`. Mục hiển thị `data-value`, `data-disabled` và `data-state="idle|expanded"`. Các hành động ẩn là trơ. Root cũng hiển thị `--swipe-progress`, tăng từ 0 lên 1 trong 32px đầu tiên hiển thị, để làm mờ dần trình kích hoạt hành động đang nghỉ.
 
-Horizontal pointer or trackpad input reveals the actions. The surface stretches
-with resistance and settles with a spring. List is an inline-size query container.
-Items use its container-query units to appear from the outer edge, one at a time,
-as each cell gets space. CSS applies cubic scale and quadratic opacity curves
-to each Item, including its icon and label. Scale stays within the available cell
-to prevent overlap and reserve the configured gap beside Content. Reversing follows the same curves without another animation.
-Items without space stay registered but are inert and hidden from accessibility
-tools; this preserves their order and the long-swipe default.
-Vertical touch gestures and trackpad pinch zoom stay native. Crossing zero during
-a drag reveals the other List if it exists; a missing side stops at zero. Escape, outside clicks, and pointer cancellation never select an
-Item. A keyboard toggle focuses the first enabled action when that action has space to appear.
-Closing a focused action list returns focus to Content before making the List inert.
-A swipe suppresses accidental content clicks. Reduced motion skips springs.
+Đầu vào con trỏ ngang hoặc bàn di chuột sẽ hiển thị các hành động. Bề mặt căng ra nhờ lực cản và lắng xuống bằng một lò xo. Danh sách là một vùng chứa truy vấn có kích thước nội tuyến. Các mục sử dụng các đơn vị truy vấn vùng chứa của nó để xuất hiện từ cạnh ngoài, lần lượt từng mục, khi mỗi ô có khoảng trống. CSS áp dụng các đường cong độ mờ bậc ba và bậc hai cho từng Mục, bao gồm biểu tượng và nhãn của nó. Tỷ lệ nằm trong ô có sẵn để tránh chồng chéo và dành khoảng trống được định cấu hình bên cạnh Nội dung. Đảo ngược theo các đường cong tương tự mà không có hoạt ảnh khác. Các mục không có khoảng trống vẫn được đăng ký nhưng bị trơ và ẩn khỏi các công cụ trợ năng; điều này giữ nguyên thứ tự của chúng và mặc định vuốt dài. Cử chỉ chạm dọc và thu phóng chụm trên bàn di chuột vẫn giữ nguyên native. Vượt qua số 0 trong khi kéo sẽ hiển thị Danh sách khác nếu nó tồn tại; một bên thiếu dừng lại ở số không. Thoát, nhấp chuột bên ngoài và hủy con trỏ không bao giờ chọn một Mục. Chuyển đổi bàn phím tập trung vào hành động được kích hoạt đầu tiên khi hành động đó có khoảng trống để xuất hiện. Việc đóng danh sách hành động tập trung sẽ trả lại tiêu điểm cho Nội dung trước khi làm cho Danh sách trở nên trơ. Thao tác vuốt sẽ ngăn chặn các lần nhấp vô tình vào nội dung. Giảm chuyển động bỏ qua lò xo.
 
-A long swipe expands that List's default Item. Earlier Items move behind Content;
-later Items move past the outer clip. The layout mirrors for the opposite edge.
-Reversal restores the same layout. Selection occurs after release and completion
-of this full-width motion. Keep the combined settled width below the row width.
-Single actions arm at 65% of row width and disarm below 55%, with a 1.6-times
-item-width minimum. Multiple actions also require total width plus 32px to arm
-or plus 8px to disarm. These are prototype parameters, not Apple measurements.
+Vuốt dài sẽ mở rộng Mục mặc định của Danh sách đó. Các mục trước đó di chuyển phía sau Nội dung; Các mục sau này di chuyển qua clip bên ngoài. Cách bố trí gương cho cạnh đối diện. Đảo ngược khôi phục bố cục tương tự. Lựa chọn xảy ra sau khi thả ra và hoàn thành chuyển động toàn chiều rộng này. Giữ chiều rộng cố định kết hợp dưới chiều rộng hàng. Kích hoạt một hành động ở mức 65% chiều rộng hàng và giải giáp dưới 55%, với chiều rộng vật phẩm tối thiểu là 1,6 lần. Nhiều hành động cũng yêu cầu tổng chiều rộng cộng thêm 32px để kích hoạt hoặc cộng thêm 8px để giải giáp. Đây là những thông số nguyên mẫu, không phải phép đo của Apple.
 
-A committed surface stays visible for 500ms while its owner removes the row.
-A retained row then resets. Reordering, removing, disabling, or changing action
-values cancels a pending gesture. The identity captured at release cannot be
-transferred to another Item. The List's DOM observer stops on unmount.
+Một bề mặt đã cam kết vẫn hiển thị trong 500 mili giây trong khi chủ sở hữu của nó xóa hàng. Một hàng được giữ lại sau đó sẽ được đặt lại. Sắp xếp lại, xóa, tắt hoặc thay đổi giá trị hành động sẽ hủy cử chỉ đang chờ xử lý. Danh tính thu được khi phát hành không thể được chuyển sang Vật phẩm khác. Trình quan sát DOM của Danh sách dừng khi ngắt kết nối.
 
 ```vue
 <SwipeActionsRoot v-model:open="open" v-model:side="side" @action="handleAction">
@@ -833,29 +796,22 @@ transferred to another Item. The List's DOM observer stops on unmount.
 </SwipeActionsRoot>
 ```
 
-The stage-ui Histoire story **Misc → Swipe Actions** renders one composed row
-with two start actions and three end actions. The Controls panel toggles label visibility.
+Câu chuyện Lịch sử stage-ui **Misc → Hành động vuốt** hiển thị một hàng tổng hợp có hai hành động bắt đầu và ba hành động kết thúc. Bảng điều khiển bật tắt khả năng hiển thị nhãn.
 
 ## SwipeActionButton
 
-Optional presentation for a `SwipeActionsItem`. It owns the surface, icon,
-label layout, and takeover appearance. The gesture container remains unstyled.
+Bản trình bày tùy chọn cho `SwipeActionsItem`. Nó sở hữu bề mặt, biểu tượng, bố cục nhãn và giao diện tiếp quản. Vùng chứa cử chỉ vẫn chưa được định kiểu.
 
-| Prop | Type | Default | Description |
+| Chống đỡ | Loại | Mặc định | Mô tả |
 |------|------|---------|-------------|
-| `label` | `string` | Required | Visible text and accessible button name |
-| `icon` | `string` | Required | Iconify utility class |
-| `showLabel` | `boolean` | `true` | When false, removes text and fills its area with the action surface |
-| `takeover` | `number` | `0` | Item slot progress from 0 to 1; each Item supplies its own value |
-| `edge` | `left \| right` | `right` | Physical edge from the Item slot; mirrors the expanded icon |
-| `surfaceClass` | `string` | `bg-neutral-500 text-white` | Surface color classes |
+| `label` | `string` | Bắt buộc | Văn bản hiển thị và tên nút có thể truy cập |
+| `icon` | `string` | Bắt buộc | Iconify lớp tiện ích |
+| `showLabel` | `boolean` | `true` | Khi sai, hãy xóa văn bản và lấp đầy vùng của nó bằng bề mặt hành động |
+| `takeover` | `number` | `0` | Tiến trình của ô vật phẩm từ 0 đến 1; mỗi mặt hàng cung cấp giá trị riêng |
+| `edge` | `left \| right` | `right` | Cạnh vật lý từ ô Vật phẩm; phản chiếu biểu tượng mở rộng |
+| `surfaceClass` | `string` | `bg-neutral-500 text-white` | Các lớp màu bề mặt |
 
-Wrap the button with `SwipeActionsItem as-child` and handle Root action or Item select.
-The button disables CSS motion that would otherwise lag behind the gesture.
-Hidden labels retain the accessible name. Icon-only buttons fill the available
-height inside the same vertical padding and keep the icon centered vertically.
-The component provides no slots or custom events; button attributes and listeners
-pass through to the underlying `BasicButton`.
+Gói nút bằng `SwipeActionsItem as-child` và xử lý hành động Root hoặc chọn Mục. Nút này sẽ vô hiệu hóa chuyển động CSS nếu không sẽ làm chậm cử chỉ. Nhãn ẩn giữ lại tên có thể truy cập được. Các nút chỉ có biểu tượng sẽ lấp đầy chiều cao có sẵn bên trong cùng một khoảng đệm dọc và giữ biểu tượng ở giữa theo chiều dọc. Thành phần này không cung cấp vị trí hoặc sự kiện tùy chỉnh; thuộc tính nút và trình nghe chuyển đến `BasicButton` bên dưới.
 
 ```vue
 <SwipeActionButton

@@ -1,40 +1,29 @@
-# Learning memory
+<a id="learning-memory"></a>
 
-Angela retains learning topics, goals, difficulties, and explanation preferences across conversations.
-Records stay on this device and belong to one character.
+# Học trí nhớ
 
-## Storage and ownership
+Angela giữ lại các chủ đề học tập, mục tiêu, khó khăn và cách giải thích trong các cuộc trò chuyện. Hồ sơ lưu lại trên thiết bị này và thuộc về một ký tự.
 
-Use the existing Pinia synchronization for leader-owned edits and localStorage for persistence.
-Persist each edit before publishing its snapshot. Replicated snapshots never write to storage.
-Store at most 50 records per character, with 500 characters per record.
-Include at most 20 records in a chat request. Due reviews precede recent records.
-Saved context is sent to the selected AI provider as part of that request.
+<a id="storage-and-ownership"></a>
 
-## Chat behavior
+## Lưu trữ và quyền sở hữu
 
-Capture the character id from the conversation owner before preparing the request.
-Give the model learning context and tools through the existing chat request flow.
-Memory tools require a verbatim quote from the current user message.
-The model saves only learning facts the user stated. Quoted material and external results are not user facts.
-The model confirms an edit only after the storage tool succeeds.
-Stored text is data, never instructions.
-Disabling memory removes its context and tools from subsequent requests without deleting saved records.
+Sử dụng tính năng đồng bộ hóa Pinia hiện có cho các chỉnh sửa do người lãnh đạo sở hữu và localStorage để duy trì. Kiên trì từng chỉnh sửa trước khi xuất bản ảnh chụp nhanh của nó. Ảnh chụp nhanh được sao chép không bao giờ ghi vào bộ lưu trữ. store tối đa 50 bản ghi cho mỗi ký tự, với 500 ký tự cho mỗi bản ghi. Bao gồm tối đa 20 bản ghi trong yêu cầu trò chuyện. Do đánh giá trước hồ sơ gần đây. Ngữ cảnh đã lưu được gửi đến AI nhà cung cấp đã chọn như một phần của yêu cầu đó.
 
-## Review progress
+<a id="chat-behavior"></a>
 
-An optional review schedule belongs to its learning record. Records without schedules remain supported.
-Users choose intervals of 1, 3, 7, 14, or 30 days in settings. A new schedule starts due.
-Completed reviews increment a count and move the next review by the selected number of 24-hour days.
-Counts describe completed reviews, not mastery. The application does not send background notifications.
-Changing an interval preserves the count and calculates the deadline from the last completed review.
-Editing a fact preserves its schedule. Disabling a schedule removes its progress without deleting the fact.
-Leader-owned schedule and progress actions persist before publication. Replicated snapshots never write to storage.
-The chat tool records a completed review only after explicit user confirmation with current-turn evidence.
-Chat cannot create schedules. Disabling memory removes review context and tools from later requests.
+## Hành vi trò chuyện
 
-## User controls and checks
+thu nhận dữ liệu id ký tự từ chủ sở hữu cuộc trò chuyện trước khi chuẩn bị yêu cầu. Cung cấp bối cảnh và công cụ học tập mô hình thông qua luồng yêu cầu trò chuyện hiện có. Các công cụ ghi nhớ yêu cầu trích dẫn nguyên văn từ tin nhắn hiện tại của người dùng. mô hình chỉ lưu các thông tin học tập mà người dùng đã nêu. Tài liệu được trích dẫn và kết quả bên ngoài không phải là dữ kiện của người dùng. mô hình chỉ xác nhận chỉnh sửa sau khi công cụ lưu trữ thành công. Văn bản được lưu trữ là dữ liệu, không bao giờ là hướng dẫn. Việc tắt bộ nhớ sẽ xóa bối cảnh và công cụ của nó khỏi các yêu cầu tiếp theo mà không xóa các bản ghi đã lưu.
 
-Use Settings → Modules → Long-Term Memory to view, add, edit, delete, or disable learning memory.
-Keep the existing conversation history, account profile, and character notebook independent.
-Check persistence after reload, character isolation, leader/follower edits, disabled tools, and chat context.
+<a id="review-progress"></a>
+
+## Xem lại tiến độ
+
+Lịch trình ôn tập tùy chọn thuộc về hồ sơ học tập của nó. Hồ sơ không có lịch trình vẫn được hỗ trợ. Người dùng chọn khoảng thời gian 1, 3, 7, 14 hoặc 30 ngày trong cài đặt. Một lịch trình mới bắt đầu đến hạn. Các bài đánh giá đã hoàn thành sẽ tăng số lượng và di chuyển bài đánh giá tiếp theo theo số ngày 24 giờ đã chọn. Số lượng mô tả các bài đánh giá đã hoàn thành chứ không phải mức độ thông thạo. Ứng dụng không gửi thông báo nền. Việc thay đổi khoảng thời gian sẽ giữ nguyên số lượng và tính toán thời hạn kể từ lần xem xét hoàn thành gần đây nhất. Việc chỉnh sửa một sự kiện sẽ giữ nguyên lịch trình của nó. Việc vô hiệu hóa lịch trình sẽ loại bỏ tiến trình của nó mà không xóa được thực tế. Lịch trình và hành động tiến độ do người lãnh đạo sở hữu vẫn tồn tại trước khi xuất bản. Ảnh chụp nhanh được sao chép không bao giờ ghi vào bộ lưu trữ. Công cụ trò chuyện chỉ ghi lại đánh giá đã hoàn thành sau khi người dùng xác nhận rõ ràng với bằng chứng hiện tại. Trò chuyện không thể tạo lịch biểu. Việc tắt bộ nhớ sẽ xóa bối cảnh và công cụ đánh giá khỏi các yêu cầu sau này.
+
+<a id="user-controls-and-checks"></a>
+
+## Kiểm soát và kiểm tra của người dùng
+
+Sử dụng Cài đặt → Mô-đun → Bộ nhớ dài hạn để xem, thêm, chỉnh sửa, xóa hoặc tắt bộ nhớ học tập. Giữ lịch sử hội thoại, hồ sơ tài khoản và sổ ghi chép nhân vật hiện có một cách độc lập. Kiểm tra tính bền vững sau khi tải lại, cách ly ký tự, chỉnh sửa leader/follower, công cụ bị tắt và bối cảnh trò chuyện.

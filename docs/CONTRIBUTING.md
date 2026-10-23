@@ -82,7 +82,9 @@ git rebase main
 
 Nhấn **Fork** ở góc trên bên phải trang [Angela](https://github.com/lighthouse2815/Angela).
 
-## Clone repo
+<a id="clone-repo"></a>
+
+## Sao chép kho lưu trữ
 
 ```shell
 git clone https://github.com/<your-github-username>/airi.git
@@ -254,7 +256,9 @@ pnpm -F @angela/discord-bot start
 > nr -F @angela/discord-bot dev
 > ```
 
-### Agent Minecraft
+<a id="agent-minecraft"></a>
+
+### agent Minecraft
 
 ```shell
 cd integrations/minecraft

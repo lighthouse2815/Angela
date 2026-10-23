@@ -1,15 +1,15 @@
 > Angela được phát triển từ [Project AIRI](https://github.com/moeru-ai/airi). Các bài viết lịch sử, liên kết cộng đồng và tài liệu gốc giữ nguyên thông tin ghi nhận tác giả.
 
 <picture>
-  <source
-    width="100%"
+  <nguồn
+    chiều rộng="100%"
     srcset="./assets/banner-dark-1280x640.avif"
-    media="(prefers-color-scheme: dark)"
+    media="(thích-lược đồ màu: tối)"
   />
-  <source
-    width="100%"
+  <nguồn
+    chiều rộng="100%"
     srcset="./assets/banner-light-1280x640.avif"
-    media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"
+    media="(thích-lược đồ màu: nhạt), (thích-lối màu: không ưu tiên)"
   />
   <img width="250" src="./assets/banner-light-1280x640.avif" />
 </picture>
@@ -36,15 +36,15 @@
   <!-- readme-section:release-binary-windows -->
   <a href="https://github.com/lighthouse2815/Angela/releases">
     <picture>
-      <source
-        width="33%"
+      <nguồn
+        chiều rộng="33%"
         srcset="./assets/download-buttons/download-buttons.windows.dark.en-US.avif"
-        media="(prefers-color-scheme: dark)"
+        media="(thích-lược đồ màu: tối)"
       />
-      <source
-        width="33%"
+      <nguồn
+        chiều rộng="33%"
         srcset="./assets/download-buttons/download-buttons.windows.light.en-US.avif"
-        media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"
+        media="(thích-lược đồ màu: nhạt), (thích-lối màu: không ưu tiên)"
       />
       <img width="33%" src="./assets/download-buttons/download-buttons.windows.light.en-US.avif" />
     </picture>
@@ -52,30 +52,30 @@
   <!-- readme-section:release-binary-macos -->
   <a href="https://github.com/lighthouse2815/Angela/releases">
     <picture>
-      <source
-        width="33%"
+      <nguồn
+        chiều rộng="33%"
         srcset="./assets/download-buttons/download-buttons.macos.dark.en-US.avif"
-        media="(prefers-color-scheme: dark)"
+        media="(thích-lược đồ màu: tối)"
       />
-      <source
-        width="33%"
+      <nguồn
+        chiều rộng="33%"
         srcset="./assets/download-buttons/download-buttons.macos.light.en-US.avif"
-        media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"
+        media="(thích-lược đồ màu: nhạt), (thích-lối màu: không ưu tiên)"
       />
       <img width="33%" src="./assets/download-buttons/download-buttons.macos.light.en-US.avif" />
     </picture>
   </a>
   <a href="https://github.com/lighthouse2815/Angela/releases/latest">
     <picture>
-      <source
-        width="33%"
+      <nguồn
+        chiều rộng="33%"
         srcset="./assets/download-buttons/download-buttons.linux.dark.en-US.avif"
-        media="(prefers-color-scheme: dark)"
+        media="(thích-lược đồ màu: tối)"
       />
-      <source
-        width="33%"
+      <nguồn
+        chiều rộng="33%"
         srcset="./assets/download-buttons/download-buttons.linux.light.en-US.avif"
-        media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"
+        media="(thích-lược đồ màu: nhạt), (thích-lối màu: không ưu tiên)"
       />
       <img width="33%" src="./assets/download-buttons/download-buttons.linux.light.en-US.avif" />
     </picture>
@@ -84,45 +84,45 @@
 <p float="left" align="center">
   <a href="https://airi.moeru.ai">
     <picture>
-      <source
-        width="33%"
+      <nguồn
+        chiều rộng="33%"
         srcset="./assets/QR%20code%20button/section.cards.qrcode.dark.en-US.avif"
-        media="(prefers-color-scheme: dark)"
+        media="(thích-lược đồ màu: tối)"
       />
-      <source
-        width="33%"
+      <nguồn
+        chiều rộng="33%"
         srcset="./assets/QR%20code%20button/section.cards.qrcode.light.en-US.avif"
-        media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"
+        media="(thích-lược đồ màu: nhạt), (thích-lối màu: không ưu tiên)"
       />
       <img width="33%" src="./assets/QR%20code%20button/section.cards.qrcode.light.en-US.avif" />
     </picture>
   </a>
   <a href="https://airi.moeru.ai">
     <picture>
-      <source
-        width="33%"
+      <nguồn
+        chiều rộng="33%"
         srcset="./assets/download-buttons/download-buttons.mobile.dark.en-US.avif"
-        media="(prefers-color-scheme: dark)"
+        media="(thích-lược đồ màu: tối)"
       />
-      <source
-        width="33%"
+      <nguồn
+        chiều rộng="33%"
         srcset="./assets/download-buttons/download-buttons.mobile.light.en-US.avif"
-        media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"
+        media="(thích-lược đồ màu: nhạt), (thích-lối màu: không ưu tiên)"
       />
       <img width="33%" src="./assets/download-buttons/download-buttons.mobile.light.en-US.avif" />
     </picture>
   </a>
   <a href="https://airi.moeru.ai">
     <picture>
-      <source
-        width="33%"
+      <nguồn
+        chiều rộng="33%"
         srcset="./assets/download-buttons/download-buttons.browser.dark.en-US.avif"
-        media="(prefers-color-scheme: dark)"
+        media="(thích-lược đồ màu: tối)"
       />
-      <source
-        width="33%"
+      <nguồn
+        chiều rộng="33%"
         srcset="./assets/download-buttons/download-buttons.browser.light.en-US.avif"
-        media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"
+        media="(thích-lược đồ màu: nhạt), (thích-lối màu: không ưu tiên)"
       />
       <img width="33%" src="./assets/download-buttons/download-buttons.browser.light.en-US.avif" />
     </picture>
@@ -357,7 +357,7 @@ npx bumpp --no-commit --no-tag
 - [x] [302.AI (tài trợ)](https://share.302.ai/514k2v)
 - [x] [OpenAI](https://platform.openai.com/docs/guides/gpt/chat-completions-api)
   - [ ] [Azure OpenAI API](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference) (hoan nghênh đóng góp qua PR)
-- [x] [Anthropic Claude](https://anthropic.com)
+- [x] [Nhân loại Claude](https://anthropic.com)
   - [ ] [AWS Claude](https://docs.anthropic.com/en/api/claude-on-amazon-bedrock) (hoan nghênh đóng góp qua PR)
 - [x] [DeepSeek](https://www.deepseek.com/)
 - [x] [Qwen](https://help.aliyun.com/document_detail/2400395.html)
@@ -365,11 +365,11 @@ npx bumpp --no-commit --no-tag
 - [x] [xAI](https://x.ai/)
 - [x] [Groq](https://wow.groq.com/)
 - [x] [Mistral](https://mistral.ai/)
-- [x] [Cloudflare Workers AI](https://developers.cloudflare.com/workers-ai/)
+- [x] [Cloudflare worker AI](https://developers.cloudflare.com/workers-ai/)
 - [x] [Together.ai](https://www.together.ai/)
 - [x] [Fireworks.ai](https://fireworks.ai/)
 - [x] [Novita](https://www.novita.ai/)
-- [x] [Zhipu](https://bigmodel.cn)
+- [x] [hipu](https://bigmodel.cn)
 - [x] [SiliconFlow](https://cloud.siliconflow.cn/i/rKXmRobW)
 - [x] [Stepfun](https://platform.stepfun.com/)
 - [x] [Baichuan](https://platform.baichuan-ai.com)

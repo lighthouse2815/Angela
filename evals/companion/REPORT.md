@@ -1,8 +1,10 @@
-# Companion evaluation report
+<a id="companion-evaluation-report"></a>
+
+# Báo cáo đánh giá đồng hành
 
 Ngày chạy: 2026-10-22. Node: `v26.11.1`. Dataset: 128 case, 16 category, mỗi nhóm 8 case.
-Source commit: `437ae0b1e9a922492fb5b0a9cba8c47abdcfd6c0`.
-Dataset SHA-256: `d4209cd00a219970479c971dd564b50ac47fffff827dedbc7278f0acdac28e27`.
+Cam kết nguồn: `437ae0b1e9a922492fb5b0a9cba8c47abdcfd6c0`.
+Bộ dữ liệu SHA-256: `d4209cd00a219970479c971dd564b50ac47fffff827dedbc7278f0acdac28e27`.
 
 [Baseline JSON](./baseline.json) giữ kết quả từng case, nguồn recall, context đã inject và failure reason.
 `sourceCommit` là commit chứa runner đã chạy. Commit lưu report chỉ thêm tài liệu và artifact.
@@ -17,14 +19,14 @@ Không cấu hình generation hoặc embedding provider. Không gọi API trả 
 
 | Metric | Số case | Tỷ lệ |
 | --- | ---: | ---: |
-| Recall hit rate | 93/106 | 87.74% |
-| Wrong-memory rate | 0/6 | 0.00% |
-| Superseded-memory error rate | 0/16 | 0.00% |
-| False shared-memory rate | 0/8 | 0.00% |
-| Irrelevant-memory injection rate | 8/32 | 25.00% |
-| Context hit rate | 93/106 | 87.74% |
-| Forbidden-content rate | 0/32 | 0.00% |
-| Case pass rate | 107/128 | 83.59% |
+| Tỷ lệ trúng Recall | 93/106 | 87,74% |
+| Tỷ lệ bộ nhớ sai | 0/6 | 0,00% |
+| Tỷ lệ lỗi bộ nhớ thay thế | 0/16 | 0,00% |
+| Tỷ lệ bộ nhớ chia sẻ sai | 0/8 | 0,00% |
+| Tốc độ tiêm bộ nhớ không liên quan | 8/32 | 25,00% |
+| Tỷ lệ trúng bối cảnh | 93/106 | 87,74% |
+| Tỷ lệ nội dung bị cấm | 0/32 | 0,00% |
+| Tỷ lệ vượt qua trường hợp | 107/128 | 83,59% |
 
 Có 13 case thiếu recall và 8 case inject ký ức không liên quan. Tổng cộng 21 case không đạt.
 Hai lần chạy đầy đủ tại cùng source commit tạo report JSON giống hệt từng byte.
@@ -73,12 +75,12 @@ Chưa sửa các điểm yếu này vì task chỉ tạo bộ evaluation.
 
 ## Case không đạt
 
-| Case | Failure reason |
+| Trường hợp | Lý do thất bại |
 | --- | --- |
 | `last_conversation_001` | recall-miss-or-wrong-tier / context-miss / missing-content: oxi hóa |
-| `last_conversation_002` | recall-miss-or-wrong-tier / context-miss / missing-content: IELTS |
-| `last_conversation_003` | recall-miss-or-wrong-tier / context-miss / missing-content: robot |
-| `last_conversation_004` | recall-miss-or-wrong-tier / context-miss / missing-content: flashcard |
+| `last_conversation_002` | Recall-miss-or-sai-tier / bối cảnh-miss / thiếu-nội dung: IELTS |
+| `last_conversation_003` | Recall-miss-or-wrong-tier / bối cảnh-miss / thiếu-nội dung: robot |
+| `last_conversation_004` | Recall-miss-or-wrong-tier / bối cảnh-miss / thiếu-nội dung: flashcard |
 | `last_conversation_006` | recall-miss-or-wrong-tier / context-miss / missing-content: lòng biết ơn |
 | `last_conversation_007` | recall-miss-or-wrong-tier / context-miss / missing-content: hành tinh |
 | `last_conversation_008` | recall-miss-or-wrong-tier / context-miss / missing-content: học bổng |
@@ -87,14 +89,14 @@ Chưa sửa các điểm yếu này vì task chỉ tạo bộ evaluation.
 | `semantic_paraphrase_006` | recall-miss-or-wrong-tier / context-miss / missing-content: giảng lại |
 | `semantic_paraphrase_007` | recall-miss-or-wrong-tier / context-miss / missing-content: điện thoại |
 | `semantic_paraphrase_008` | recall-miss-or-wrong-tier / context-miss / missing-content: tám giờ |
-| `no_shared_memory_004` | irrelevant-injection |
-| `no_shared_memory_005` | irrelevant-injection |
-| `irrelevant_memory_001` | irrelevant-injection |
-| `irrelevant_memory_002` | irrelevant-injection |
-| `irrelevant_memory_003` | irrelevant-injection |
-| `irrelevant_memory_004` | irrelevant-injection |
-| `irrelevant_memory_006` | irrelevant-injection |
-| `irrelevant_memory_007` | irrelevant-injection |
+| `no_shared_memory_004` | tiêm không liên quan |
+| `no_shared_memory_005` | tiêm không liên quan |
+| `irrelevant_memory_001` | tiêm không liên quan |
+| `irrelevant_memory_002` | tiêm không liên quan |
+| `irrelevant_memory_003` | tiêm không liên quan |
+| `irrelevant_memory_004` | tiêm không liên quan |
+| `irrelevant_memory_006` | tiêm không liên quan |
+| `irrelevant_memory_007` | tiêm không liên quan |
 | `vietnamese_variants_005` | recall-miss-or-wrong-tier / context-miss / missing-content: Đậu Đỏ |
 
 ## Kiểm tra đã chạy
@@ -104,16 +106,16 @@ Các lần kiểm tra hoàn tất bên dưới chạy tuần tự. Vitest dùng 
 | Lệnh | Kết quả |
 | --- | --- |
 | `pnpm -F @angela/evals-companion check:dataset` | 128 case hợp lệ, 16 category, ID duy nhất |
-| `pnpm -F @angela/evals-companion typecheck` | Pass |
-| `pnpm -F @angela/evals-companion test` | 1 file, 23 test pass |
+| `pnpm -F @angela/evals-companion typecheck` | Vượt qua |
+| `pnpm -F @angela/evals-companion test` | 1 hồ sơ, 23 bài kiểm tra |
 | `pnpm exec vitest run --project @angela/evals-companion --maxWorkers 1 --no-file-parallelism` | 23 test pass qua cấu hình root |
-| `pnpm -F @angela/cli typecheck` | Pass |
+| `pnpm -F @angela/cli typecheck` | Vượt qua |
 | `pnpm -F @angela/cli build` | Pass, có cảnh báo dynamic import đã có trong CLI |
 | `pnpm lint` | Pass, ESLint 0 lỗi và 603 cảnh báo. Oxlint 12 cảnh báo |
 | Hai lần chạy toàn bộ runner | Cùng summary và JSON giống hệt từng byte |
-| `eval --id preference_change_001 --strict` | Exit 0 |
+| `eval --id preference_change_001 --strict` | Thoát 0 |
 | `eval --id last_conversation_001 --strict` | Exit 1, đúng quality failure đã ghi |
-| `git diff --check` | Pass |
+| `git diff --check` | Vượt qua |
 
 Lệnh regression Memory V2/Recall:
 

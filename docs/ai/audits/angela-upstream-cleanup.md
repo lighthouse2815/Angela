@@ -1,10 +1,14 @@
-# Upstream cleanup
+<a id="upstream-cleanup"></a>
 
-Baseline: `a7286bf` on `main`, 2026-10-22.
+# Dọn dẹp upstream
 
-## Completed migrations
+Đường cơ sở: `a7286bf` trên `main`, 22-10-2026.
 
-| Previous local name | Current local name |
+<a id="completed-migrations"></a>
+
+## Di chuyển đã hoàn tất
+
+| Tên cục bộ trước đây | Tên cục bộ hiện tại |
 | --- | --- |
 | `apps/desktop/src/main/services/airi` | `apps/desktop/src/main/services/angela` |
 | `packages/plugin-sdk-tamagotchi` | `packages/plugin-sdk-desktop` |
@@ -13,202 +17,167 @@ Baseline: `a7286bf` on `main`, 2026-10-22.
 | `00-stage-tamagotchi.avif` | `00-desktop.avif` |
 | `05-airi-card.avif` | `05-character-card.avif` |
 
-The three private package names, workspace imports, lockfile importers, tests, scenario producers, and asset imports change together.
-The public exports inside those packages retain their shape.
-New `dev:desktop`, `build:desktop`, `test-desktop:run`, and `capture:desktop` commands use the current names.
-Existing command aliases remain available.
-Package builds during installation run one task at a time.
-Two ESLint ignore entries for an absent Electron application were removed.
+Ba tên gói riêng, nhập workspace, nhập lockfile, kiểm tra, tạo kịch bản và nhập nội dung thay đổi cùng nhau. Việc xuất khẩu công cộng bên trong các gói đó vẫn giữ được hình dạng của chúng. Các lệnh `dev:desktop`, `build:desktop`, `test-desktop:run` và `capture:desktop` mới sử dụng tên hiện tại. Bí danh lệnh hiện tại vẫn có sẵn. Gói xây dựng trong quá trình cài đặt chạy từng tác vụ một. Hai mục nhập bỏ qua ESLint dành cho ứng dụng Electron vắng mặt đã bị xóa.
 
-Four Kirie historical links now match their versions before commit `8900365`.
-Their repository, pinned commit, original `apps/stage-tamagotchi-kirie` path, and line anchors remain intact.
-Local Kirie links to the Electron services use the new directory.
+Bốn liên kết lịch sử của Kirie hiện khớp với các phiên bản của chúng trước khi xác nhận `8900365`. Kho lưu trữ của họ, cam kết được ghim, đường dẫn `apps/stage-tamagotchi-kirie` ban đầu và các neo dòng vẫn còn nguyên. Các liên kết Kirie cục bộ tới các dịch vụ Electron sử dụng thư mục mới.
 
-The main README links to the root license and [third-party notices](../../../THIRD_PARTY_NOTICES.md).
-The notices identify substantial derivative code and asset provenance.
-All 12 existing tracked license and notice files remain byte-identical to the baseline.
+README chính liên kết với giấy phép gốc và [ thông báo của bên thứ ba](../../../THIRD_PARTY_NOTICES.md). Các thông báo xác định mã phái sinh quan trọng và nguồn gốc tài sản. Tất cả 12 tệp thông báo và giấy phép được theo dõi hiện có vẫn giữ nguyên byte giống với đường cơ sở.
 
-## Required retention
+<a id="required-retention"></a>
 
-| References | Reason |
+## Yêu cầu lưu giữ
+
+| Tài liệu tham khảo | Lý do |
 | --- | --- |
-| Upstream authors, email addresses, SPDX headers, and package licenses | Preserve authorship and license notices. |
-| Historical GitHub links and dated investigation records | Preserve the original repository, commit, path, evidence, and attribution. |
-| Model, font, sticker, and animation credits | Preserve asset identity and provenance. |
-| `AIRI`, `@proj-airi/stage-tamagotchi`, and `.airi` data directories | Preserve existing profiles and stored data. |
-| Certificate issuer names and CA filenames | Preserve trust for existing local certificates. |
-| `AIRI_*`, `VITE_AIRI_*`, Eventa/IPC names, channel identities, telemetry fields, and debug globals | Preserve supported integration contracts. |
-| Card schemas, storage keys, routes, sticker IDs, and their fixtures | Preserve existing data and compatibility coverage. |
-| `extension.airi.json`, extension IDs, VS Code publisher IDs, commands, and settings | Preserve existing extensions and settings. |
-| Existing skill invocation names | Preserve explicit skill calls. |
+| Tác giả upstream, địa chỉ email, tiêu đề SPDX và giấy phép gói | Bảo lưu thông báo về quyền tác giả và giấy phép. |
+| Các liên kết GitHub lịch sử và hồ sơ điều tra ngày tháng | Bảo tồn kho lưu trữ ban đầu, cam kết, đường dẫn, bằng chứng và ghi công. |
+| mô hình, phông chữ, nhãn dán và hoạt ảnh credit | Bảo tồn danh tính và nguồn gốc tài sản. |
+| Thư mục dữ liệu `AIRI`, `@proj-airi/stage-tamagotchi` và `.airi` | Bảo tồn hồ sơ hiện có và dữ liệu được lưu trữ. |
+| Tên nhà phát hành chứng chỉ và tên tệp CA | Duy trì sự tin cậy cho các chứng chỉ cục bộ hiện có. |
+| Tên `AIRI_*`, `VITE_AIRI_*`, Eventa/IPC, nhận dạng kênh, trường đo từ xa và toàn cầu gỡ lỗi | Duy trì các hợp đồng tích hợp được hỗ trợ. |
+| Lược đồ thẻ, khóa lưu trữ, route, ID nhãn dán và mẫu kiểm thử của chúng | Bảo tồn dữ liệu hiện có và phạm vi tương thích. |
+| `extension.airi.json`, ID tiện ích mở rộng, ID nhà xuất bản mã VS, lệnh và cài đặt | Giữ nguyên các tiện ích mở rộng và cài đặt hiện có. |
+| Tên gọi kỹ năng hiện có | Duy trì các cuộc gọi kỹ năng rõ ràng. |
 
-## External dependencies and sources
+<a id="external-dependencies-and-sources"></a>
 
-No workspace manifest declares an internal `@proj-airi/*` package.
-These eight npm packages have published versions and integrity records in the existing lockfile:
+## Các nguồn và phụ thuộc bên ngoài
+
+Không có tệp kê khai workspace nào khai báo gói `@proj-airi/*` nội bộ. Tám gói npm này đã xuất bản các phiên bản và bản ghi tính toàn vẹn trong tệp khóa hiện có:
 
 - `@proj-airi/chromatic`
 - `@proj-airi/drizzle-duckdb-wasm`
-- `@proj-airi/duckdb-wasm` (transitive)
+- `@proj-airi/duckdb-wasm` (chuyển tiếp)
 - `@proj-airi/iconify-meteocons`
 - `@proj-airi/lobe-icons`
 - `@proj-airi/unocss-preset-chromatic`
 - `@proj-airi/unplugin-fetch`
 - `@proj-airi/unplugin-live2d-sdk`
 
-All external resolutions, snapshots, integrity data, catalog entries, and dependency settings match the baseline.
-The lockfile importer graph changes only for the three private package renames.
+Tất cả các độ phân giải bên ngoài, ảnh chụp nhanh, dữ liệu toàn vẹn, mục nhập danh mục và cài đặt phụ thuộc đều khớp với đường cơ sở. Biểu đồ trình nhập tệp khóa chỉ thay đổi đối với ba lần đổi tên gói riêng tư.
 
-The upstream documentation build script remains active in the web Dockerfile and Netlify configuration.
-Its repository URL, checkout name, and environment variables retain their external meaning.
-The Scoop manifest installs published upstream binaries and retains their actual executable names and release URLs.
-Hosted-provider endpoints, model URLs, Player2 identifiers, and external service names retain their actual identities.
+Tập lệnh xây dựng tài liệu upstream vẫn hoạt động trong cấu hình Dockerfile và Netlify trên web. Kho lưu trữ URL, tên thanh toán và các biến môi trường của nó vẫn giữ nguyên ý nghĩa bên ngoài của chúng. Tệp kê khai Scoop cài đặt các tệp nhị phân upstream đã xuất bản và giữ lại tên thực thi cũng như URL phát hành thực tế của chúng. Điểm cuối hosted-nhà cung cấp, URL mô hình, số nhận dạng Player2 và tên dịch vụ bên ngoài vẫn giữ nguyên danh tính thực tế của chúng.
 
-## Names that require a separate contract migration
+<a id="names-that-require-a-separate-contract-migration"></a>
 
-- Native Godot project, assembly, C# namespace, and export names still contain `tamagotchi`.
-  They connect to resource loading, sidecar packaging, and user directories. Cross-platform native export migration is outside this verified change.
-- Some plugin, adapter, card, and E2E filenames retain old names beside supported public IDs and exported APIs.
-  Their consumers require a separate contract review before a rename.
-- Deferred mobile and authentication examples refer to private packages outside this Git repository.
-  They are not npm dependencies. This task does not invent replacement package names or restore those workspaces.
-- Local variable names and test fixture labels can still describe those old contracts.
-  They do not establish upstream ownership of Angela's new work or independent authorship of derivative sources.
+## Tên yêu cầu di chuyển hợp đồng riêng
 
-## Follow-up migration
+- Dự án native Godot, tập hợp, không gian tên C# và tên xuất vẫn chứa `tamagotchi`. Chúng kết nối với việc tải tài nguyên, đóng gói sidecar và thư mục người dùng. Quá trình di chuyển xuất native đa nền tảng nằm ngoài thay đổi đã được xác minh này.
+- Một số tên tệp plugin, bộ điều hợp, thẻ và E2E vẫn giữ lại tên cũ bên cạnh ID công khai được hỗ trợ và API đã xuất. bên sử dụng của họ yêu cầu xem xét hợp đồng riêng trước khi đổi tên.
+- Các ví dụ về xác thực và di động bị trì hoãn đề cập đến các gói riêng tư bên ngoài kho lưu trữ Git này. Chúng không phụ thuộc vào npm. Tác vụ này không tạo ra tên gói thay thế hoặc khôi phục các workspace đó.
+- Tên biến cục bộ và nhãn mẫu kiểm thử thử nghiệm vẫn có thể mô tả các hợp đồng cũ đó. Họ không thiết lập quyền sở hữu upstream đối với tác phẩm mới của Angela hoặc quyền tác giả độc lập đối với các nguồn phái sinh.
 
-The 2026-10-23 migration changes private adapter and bridge names to Angela.
-It changes these paths and their private symbols:
+<a id="follow-up-migration"></a>
 
-- `integrations/discord-bot/src/adapters/airi-adapter.ts` to `angela-adapter.ts`
-- `integrations/twitter-services/src/adapters/airi-adapter.ts` to `angela-adapter.ts`
-- `integrations/minecraft/src/airi` to `src/angela`
-- `packages/server-runtime/src/server-ws/airi` to `server-ws/angela`
-- `integrations/vscode/airi-plugin-vscode` to `angela-plugin-vscode`
-- `integrations/vscode/vscode-airi` to `vscode-angela`
-- four local `plugins/airi-plugin-*` directories to `plugins/angela-plugin-*`
+## Di chuyển tiếp theo
 
-The migration also changes private Minecraft planner helpers from Airi to Angela.
-Existing wire events, environment variables, configuration keys, and external identifiers stay compatible.
+Quá trình di chuyển 2026-10-23 thay đổi tên cầu nối và bộ điều hợp riêng thành Angela. Nó thay đổi các đường dẫn này và các ký hiệu riêng tư của chúng:
 
-Character card source files, types, stores, editor services, and runtime prompt composables now use Angela names.
-Package export aliases keep the original card API names available.
-The canonical settings route is `/settings/angela-card`. Vue Router aliases preserve the original card routes.
-Persisted card keys, the Pinia store ID, the ZIP format, and `extensions.airi` keep their existing values.
-Sticker filenames use `angela-*`. Sticker IDs retain their existing values for saved messages and translations.
+- `integrations/discord-bot/src/adapters/airi-adapter.ts` tới `angela-adapter.ts`
+- `integrations/twitter-services/src/adapters/airi-adapter.ts` tới `angela-adapter.ts`
+- `integrations/minecraft/src/airi` tới `src/angela`
+- `packages/server-runtime/src/server-ws/airi` tới `server-ws/angela`
+- `integrations/vscode/airi-plugin-vscode` tới `angela-plugin-vscode`
+- `integrations/vscode/vscode-airi` tới `vscode-angela`
+- bốn thư mục `plugins/airi-plugin-*` cục bộ tới `plugins/angela-plugin-*`
 
-The local checkout is now `/home/lighthouse2815/Projects/Angela/angela`.
-The checkout directory name is outside Git. GitHub records only paths inside that directory.
-Deferred source paths in the sibling `dev-in-future` directory now target `../angela`.
+Việc di chuyển cũng thay đổi những người trợ giúp lập kế hoạch Minecraft riêng tư từ Airi sang Angela. Các sự kiện dây hiện có, biến môi trường, khóa cấu hình và mã định danh bên ngoài vẫn tương thích.
 
-Native contract and VRM extension filenames now use Angela. Their Godot UIDs stay unchanged.
-Both native C# projects build with zero warnings and errors.
-Four E2E entrypoints now use `e2e-angela-*` filenames. Existing npm script names remain aliases of the new commands.
-The E2E service typecheck passes. Live E2E commands are not run because they control desktop applications.
+Các tệp, loại nguồn thẻ nhân vật, store, dịch vụ biên tập và runtime prompt các composable hiện sử dụng tên Angela. Bí danh xuất gói giữ nguyên tên API của thẻ gốc. Cài đặt chuẩn route là `/settings/angela-card`. Bí danh Vue router bảo toàn thẻ gốc route. Khóa thẻ liên tục, Pinia store ID, định dạng ZIP và `extensions.airi` giữ nguyên các giá trị hiện có của chúng. Tên tệp hình dán sử dụng `angela-*`. ID nhãn dán giữ lại các giá trị hiện có của chúng cho các tin nhắn và bản dịch đã lưu.
 
-Card checks pass: 58 Node tests and 19 browser tests.
-The Electron desktop build passes for main, preload, and renderer.
-The renamed VS Code packages pass typecheck and build. Frozen workspace installation passes.
-Discord passes 22 tests. Minecraft bridge checks pass 14 tests. WebSocket checks pass 27 tests.
+Thanh toán cục bộ hiện là `/home/lighthouse2815/Projects/Angela/angela`. Tên thư mục thanh toán nằm ngoài Git. GitHub chỉ ghi lại các đường dẫn bên trong thư mục đó. Đường dẫn nguồn bị trì hoãn trong thư mục `dev-in-future` anh chị em hiện nhắm mục tiêu `../angela`.
 
-Other checks expose existing limits in optional workspaces:
+Tên tệp hợp đồng native và phần mở rộng VRM hiện sử dụng Angela. UID Godot của họ không thay đổi. Cả hai dự án native C# đều được xây dựng mà không có cảnh báo và lỗi nào. Bốn điểm vào E2E hiện sử dụng tên tệp `e2e-angela-*`. Tên tập lệnh npm hiện tại vẫn là bí danh của các lệnh mới. Dịch vụ E2E kiểm tra kiểu dữ liệu đã vượt qua. Các lệnh trực tiếp E2E không được chạy vì chúng kiểm soát các ứng dụng desktop.
 
-- Minecraft typecheck reports `vec3` version conflicts and inferred-array errors outside the renamed modules.
-- X typecheck reports two unused parser declarations.
-- Chess has no source configuration beside its manifest. Its typecheck cannot find `tsconfig.json`.
-- Claude Code plugin build reports a missing `dist/run.js` binary target. Its build emits `dist/run.mjs`.
-- Web extension typecheck reports existing shared UI and extension-identity errors.
-- Minecraft planner tests cannot start their sandbox on Node 26 because it rejects `--experimental-transform-types`.
+Kiểm tra thẻ vượt qua: 58 bài kiểm tra Node và 19 bài kiểm tra trình duyệt. Bản dựng Electron desktop dành cho tải chính, tải trước và renderer. Các gói Mã VS được đổi tên vượt qua kiểm tra kiểu dữ liệu và xây dựng. Quá trình cài đặt workspace bị đóng băng. Discord vượt qua 22 bài kiểm tra. Kiểm tra cầu Minecraft vượt qua 14 bài kiểm tra. Kiểm tra WebSocket vượt qua 27 bài kiểm tra.
 
-The planner keeps supported `notifyAiri` and `updateAiriContext` aliases for saved scripts.
+Các kiểm tra khác cho thấy các giới hạn hiện có trong workspace tùy chọn:
 
-The filename scan now finds 14 source paths with `airi` in their names.
-They contain skill invocation resources, plugin manifests, original animation assets, the upstream installer, and the upstream documentation script.
+- Minecraft kiểm tra kiểu dữ liệu báo cáo xung đột phiên bản `vec3` và lỗi mảng suy ra bên ngoài các mô-đun được đổi tên.
+- X kiểm tra kiểu dữ liệu báo cáo hai khai báo trình phân tích cú pháp không được sử dụng.
+- Cờ vua không có cấu hình nguồn bên cạnh bảng kê khai của nó. kiểm tra kiểu dữ liệu của nó không thể tìm thấy `tsconfig.json`.
+- Bản dựng plugin Claude Code báo cáo mục tiêu nhị phân `dist/run.js` bị thiếu. Bản dựng của nó phát ra `dist/run.mjs`.
+- Tiện ích mở rộng web kiểm tra kiểu dữ liệu báo cáo lỗi UI được chia sẻ hiện có và lỗi nhận dạng tiện ích mở rộng.
+- Các thử nghiệm lập kế hoạch Minecraft không thể khởi động hộp cát của họ trên Node 26 vì nó từ chối `--experimental-transform-types`.
 
-## Reproduce the scan
+Trình lập kế hoạch tiếp tục hỗ trợ các bí danh `notifyAiri` và `updateAiriContext` cho các tập lệnh đã lưu.
 
-The scan covers tracked text, including hidden files and the lockfile.
-It excludes `.git` history, installed dependencies, generated build output, and unrelated sibling repositories.
-The combined expression counts each matching line once, even when several requested strings overlap.
+Quá trình quét tên tệp hiện tìm thấy 14 đường dẫn nguồn có `airi` trong tên của chúng. Chúng chứa tài nguyên gọi kỹ năng, bảng kê khai plugin, nội dung hoạt ảnh gốc, trình cài đặt upstream và tập lệnh tài liệu upstream.
+
+<a id="reproduce-the-scan"></a>
+
+## Tái tạo quá trình quét
+
+Quá trình quét bao gồm văn bản được theo dõi, bao gồm các tệp ẩn và tệp khóa. Nó loại trừ lịch sử `.git`, các phần phụ thuộc đã cài đặt, đầu ra bản dựng được tạo và các kho lưu trữ anh chị em không liên quan. Biểu thức kết hợp đếm từng dòng phù hợp một lần, ngay cả khi một số chuỗi được yêu cầu trùng nhau.
 
 ```sh
 git grep -n -I -E 'AIRI|airi|stage-tamagotchi'
 git ls-files '*AIRI*' '*airi*' '*tamagotchi*'
 ```
 
-The baseline contains 3,852 matching lines and 4,234 non-overlapping occurrences.
-Filename-only matches require the second command. Binary assets retain their attribution beside the source files.
+Đường cơ sở chứa 3.852 dòng phù hợp và 4.234 lần xuất hiện không chồng chéo. Các kết quả chỉ khớp với tên tệp yêu cầu lệnh thứ hai. Tài sản nhị phân giữ lại thuộc tính của chúng bên cạnh các tệp nguồn.
 
-## Verification
+<a id="verification"></a>
 
-Checks use one workspace task or test worker at a time.
-Node processes use a 2560 MiB heap limit. Rust build tools use `RAYON_NUM_THREADS=1`.
-The local pnpm launcher lacks a shebang. A temporary shell shim invokes the same installed pnpm version for subprocesses.
+## Xác minh
 
-| Command | Result |
+Kiểm tra sử dụng một tác vụ workspace hoặc kiểm tra worker mỗi lần. Các quy trình Node sử dụng giới hạn heap 2560 MiB. Công cụ xây dựng Rust sử dụng `RAYON_NUM_THREADS=1`. Trình khởi chạy pnpm cục bộ thiếu shebang. Miếng chêm shell tạm thời gọi phiên bản pnpm đã cài đặt tương tự cho các quy trình con.
+
+| Lệnh | Kết quả |
 | --- | --- |
-| `pnpm install --frozen-lockfile --network-concurrency=1 --child-concurrency=1` | Passed, including all 38 postinstall build tasks. |
-| `pnpm exec vitest run --config apps/desktop/vitest.node.config.ts --maxWorkers=1` | Passed: 89 files, 671 tests, two existing skips. |
-| `pnpm -F @angela/plugin-sdk-desktop exec vitest run --config vitest.config.ts --maxWorkers=1 --no-file-parallelism` | Passed: one file, 16 tests. |
-| `pnpm -F @angela/scenarios-desktop-electron exec vitest run --maxWorkers=1 --no-file-parallelism` | Passed: three files, 11 tests. |
-| `pnpm -F @angela/desktop-kirie test:unit --maxWorkers=1 --no-file-parallelism` | Passed: 12 files, 38 tests. |
-| `pnpm typecheck --concurrency=1 --continue` | Passed: 53 of 53 tasks. |
-| `pnpm lint` | Passed: zero errors, 603 existing warnings. |
-| `pnpm --filter @angela/cli... --workspace-concurrency=1 run build` | Passed. |
-| `pnpm --filter @angela/web... --workspace-concurrency=1 run build` | Passed. |
-| `pnpm -F @angela/desktop build` | Passed: main, preload, and renderer. |
-| `pnpm -F @angela/desktop-kirie build` | Passed: renderer and .NET assembly. |
-| Scenario checks after the asset renames | Passed: 10 browser tests, 11 Electron tests, both typechecks, browser scenario build, and targeted lint. |
+| `pnpm install --frozen-lockfile --network-concurrency=1 --child-concurrency=1` | Đã vượt qua, bao gồm tất cả 38 nhiệm vụ xây dựng sau cài đặt. |
+| `pnpm exec vitest run --config apps/desktop/vitest.node.config.ts --maxWorkers=1` | Đã vượt qua: 89 tệp, 671 bài kiểm tra, hiện có hai lần bỏ qua. |
+| `pnpm -F @angela/plugin-sdk-desktop exec vitest run --config vitest.config.ts --maxWorkers=1 --no-file-parallelism` | Đạt: một tập tin, 16 bài kiểm tra. |
+| `pnpm -F @angela/scenarios-desktop-electron exec vitest run --maxWorkers=1 --no-file-parallelism` | Đã vượt qua: ba tập tin, 11 bài kiểm tra. |
+| `pnpm -F @angela/desktop-kirie test:unit --maxWorkers=1 --no-file-parallelism` | Đã vượt qua: 12 hồ sơ, 38 bài kiểm tra. |
+| `pnpm typecheck --concurrency=1 --continue` | Đã vượt qua: 53 trên 53 nhiệm vụ. |
+| `pnpm lint` | Đạt: không có lỗi, hiện có 603 cảnh báo. |
+| `pnpm --filter @angela/cli... --workspace-concurrency=1 run build` | Đi qua. |
+| `pnpm --filter @angela/web... --workspace-concurrency=1 run build` | Đi qua. |
+| `pnpm -F @angela/desktop build` | Đã vượt qua: chính, tải trước và renderer. |
+| `pnpm -F @angela/desktop-kirie build` | Đã vượt qua: lắp ráp renderer và .NET. |
+| Kịch bản kiểm tra sau khi đổi tên nội dung | Đã vượt qua: 10 bài kiểm tra trình duyệt, 11 bài kiểm tra Electron, cả các lần kiểm tra kiểu dữ liệu, xây dựng kịch bản trình duyệt và tìm lỗi mã nguồn được nhắm mục tiêu. |
 
-These builds do not establish Windows/macOS installer acceptance or interactive native behavior.
-All historical and external URLs remained unchanged across the 253 text files initially modified or moved in the path migration.
+Các bản dựng này không thiết lập sự chấp nhận trình cài đặt Windows/macOS hoặc hành vi native tương tác. Tất cả các URL lịch sử và bên ngoài vẫn không thay đổi trong 253 tệp văn bản được sửa đổi hoặc di chuyển ban đầu trong quá trình di chuyển đường dẫn.
 
-## Final inventory
+<a id="final-inventory"></a>
 
-The [line inventory](./upstream-reference-inventory.csv) classifies every matching source line with its location, occurrence count, category, and reason.
-The snapshot excludes that generated CSV from its own input. Its copied paths are audit metadata, not additional application dependencies.
-All other tracked text remains in scope, including this report and earlier audits.
+## kiểm kê cuối cùng
 
-| Category | Matching source lines | Retention or remaining work |
+Khoảng không quảng cáo dòng [](./upstream-reference-inventory.csv) phân loại mọi dòng nguồn phù hợp với vị trí, số lần xuất hiện, danh mục và lý do. Ảnh chụp nhanh loại trừ CSV đã tạo khỏi đầu vào của chính nó. Các đường dẫn được sao chép của nó là siêu dữ liệu kiểm tra, không phải các phần phụ thuộc ứng dụng bổ sung. Tất cả văn bản được theo dõi khác vẫn nằm trong phạm vi, bao gồm báo cáo này và các cuộc kiểm toán trước đó.
+
+| Danh mục | Phù hợp với dòng nguồn | Việc giữ lại hoặc công việc còn lại |
 | --- | ---: | --- |
-| Required retention | 2,946 | Authorship, licenses, historical evidence, existing data, and supported integration contracts. |
-| External dependency | 195 | Published packages, hosted providers, external documentation, and upstream installer identities. |
-| Unresolved naming | 584 | Native project names, adapter/API names, implementation identifiers, fixtures, and tooling names that require separate review. |
-| Total | 3,725 | 4,109 non-overlapping occurrences. |
+| Yêu cầu lưu giữ | 2.946 | Quyền tác giả, giấy phép, bằng chứng lịch sử, dữ liệu hiện có và các hợp đồng tích hợp được hỗ trợ. |
+| Phụ thuộc bên ngoài | 195 | Các gói đã xuất bản, hosted nhà cung cấp, tài liệu bên ngoài và danh tính trình cài đặt upstream. |
+| Đặt tên chưa được giải quyết | 584 | Tên dự án native, tên adapter/API, mã định danh triển khai, mẫu kiểm thử và tên công cụ yêu cầu xem xét riêng. |
+| Tổng cộng | 3.725 | 4.109 lần xuất hiện không chồng chéo. |
 
-The unresolved category does not claim that every old implementation name is legally required.
-Those names remain unchanged because this cleanup does not establish a safe migration for all consumers or native exports.
-The detailed rows make that limit visible instead of classifying uncertain names as mandatory notices.
+Danh mục chưa được giải quyết không khẳng định rằng mọi tên triển khai cũ đều được yêu cầu về mặt pháp lý. Những tên đó vẫn không thay đổi vì việc dọn dẹp này không thiết lập quá trình di chuyển an toàn cho tất cả các lần xuất bên sử dụng hoặc native. Các hàng chi tiết hiển thị giới hạn đó thay vì phân loại các tên không chắc chắn thành thông báo bắt buộc.
 
-To exclude the generated snapshot from the source count, run:
+Để loại trừ ảnh chụp nhanh được tạo khỏi số lượng nguồn, hãy chạy:
 
 ```sh
 git grep -n -I -E 'AIRI|airi|stage-tamagotchi' -- . ':!docs/ai/audits/upstream-reference-inventory.csv'
 ```
 
-The final display-label checks passed: 11 CLI MCP tests, CLI typecheck and build, 20 glossary tests, and the Kirie build.
-The updater helper passed `bash -n`. Targeted lint passed. Scene files use the native build because ESLint has no scene parser.
-The final source state also passed the web build, Electron desktop build, and built CLI `--help` command.
-Four updated skills passed the bundled skill validator using the existing workspace YAML parser.
-Their documented scenario path and built Electron entrypoint exist. Existing invocation IDs remain stable.
+Các bước kiểm tra nhãn hiển thị cuối cùng đã vượt qua: 11 bài kiểm tra CLI MCP, CLI kiểm tra kiểu dữ liệu và bản dựng, 20 bài kiểm tra bảng chú giải thuật ngữ và bản dựng Kirie. Trình trợ giúp cập nhật đã chuyển `bash -n`. Lint mục tiêu đã vượt qua. Các tệp cảnh sử dụng bản dựng native vì ESLint không có trình phân tích cú pháp cảnh. Trạng thái nguồn cuối cùng cũng đã thông qua bản dựng web, bản dựng Electron desktop và lệnh CLI `--help` được xây dựng. Bốn kỹ năng cập nhật đã vượt qua trình xác thực kỹ năng đi kèm bằng cách sử dụng trình phân tích cú pháp workspace YAML hiện có. Đường dẫn kịch bản được ghi lại và điểm vào Electron được xây dựng của họ tồn tại. ID lệnh gọi hiện tại vẫn ổn định.
 
-The standalone backend shortcut and the mobile package example were removed from active documentation.
-Deferred mobile guidance now requires workspace restoration before its commands can run.
+Phím tắt phụ trợ độc lập và ví dụ về gói di động đã bị xóa khỏi tài liệu hiện hoạt. Hướng dẫn di động bị trì hoãn hiện yêu cầu khôi phục workspace trước khi các lệnh của nó có thể chạy.
 
-The full tracked-text scan, including the CSV, contains 4,208 matching lines and 4,630 occurrences.
-The generated snapshot contributes 483 matching metadata lines. These copied paths belong to the historical audit record.
+Quét văn bản được theo dõi đầy đủ, bao gồm CSV, chứa 4.208 dòng phù hợp và 4.630 lần xuất hiện. Ảnh chụp nhanh được tạo đóng góp 483 dòng siêu dữ liệu phù hợp. Những đường dẫn được sao chép này thuộc về hồ sơ kiểm tra lịch sử.
 
-The filename scan finds 321 tracked paths:
+Quá trình quét tên tệp tìm thấy 321 đường dẫn được theo dõi:
 
-| Path family | Paths | Reason |
+| Đường dẫn gia đình | Đường dẫn | Lý do |
 | --- | ---: | --- |
-| Native engine tree | 173 | Project, resource, assembly, and export migration remains separate. |
-| Plugin and VS Code extension trees | 67 | Install layouts remain beside supported public extension identities. |
-| Card modules, pages, stores, and stickers | 43 | Supported routes, exports, data, and asset identities remain stable. |
-| Runtime certificates | 10 | Preserve existing certificate paths and trust. |
-| Exported adapters and bridge modules | 9 | Preserve public APIs until consumer migration is reviewed. |
-| Skill resources | 8 | Preserve stable invocation names and their references. |
-| E2E entrypoints | 4 | Preserve existing caller and report conventions pending a tooling migration. |
-| Desktop extension manifests | 3 | Preserve the supported manifest filename. |
-| Animation source assets | 2 | Preserve source attribution and asset imports. |
-| External installer and documentation helper | 2 | Preserve the identities of actual upstream artifacts. |
+| Cây động cơ native | 173 | Di chuyển dự án, tài nguyên, lắp ráp và xuất khẩu vẫn tách biệt. |
+| Cây mở rộng Plugin và VS Code | 67 | Bố cục cài đặt vẫn bên cạnh danh tính tiện ích mở rộng công cộng được hỗ trợ. |
+| Mô-đun thẻ, trang, store và nhãn dán | 43 | route được hỗ trợ, hoạt động xuất, dữ liệu và nhận dạng tài sản vẫn ổn định. |
+| Chứng chỉ runtime | 10 | Bảo toàn đường dẫn chứng chỉ hiện có và sự tin cậy. |
+| Bộ điều hợp và mô-đun cầu xuất khẩu | 9 | Bảo tồn các API công khai cho đến khi quá trình di chuyển bên sử dụng được xem xét. |
+| Tài nguyên kỹ năng | 8 | Giữ nguyên tên gọi ổn định và các tham chiếu của chúng. |
+| Điểm vào E2E | 4 | Giữ nguyên các quy ước báo cáo và người gọi hiện có trong khi chờ di chuyển công cụ. |
+| Bảng kê khai tiện ích mở rộng desktop | 3 | Giữ nguyên tên tệp kê khai được hỗ trợ. |
+| Nội dung nguồn hoạt hình | 2 | Duy trì phân bổ nguồn và nhập nội dung. |
+| Trình cài đặt bên ngoài và trình trợ giúp tài liệu | 2 | Bảo toàn danh tính của upstream artifact thực tế. |

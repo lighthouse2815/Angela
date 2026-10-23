@@ -1,296 +1,201 @@
-# Home Assistant connection
+<a id="home-assistant-connection"></a>
 
-Status: accepted
+# Kết nối Trợ lý tại nhà
 
-## Context
+Trạng thái: đã chấp nhận
 
-Issue #1491 asks AIRI to read and control Home Assistant. A user wants to say
-"turn off the living room light" and have AIRI do it.
+<a id="context"></a>
 
-`plugins/airi-plugin-homeassistant` was a scaffold. Commit `4401b96c9`
-(2025-12-29) added a `package.json`, a `tsconfig.json`, a tsdown config, and a
-single `src/index.ts` that held `console.warn('WIP')`. The scaffold depended on
-`@angela/server-sdk`, which suggests a channel plugin was the starting idea.
-`plugins/airi-plugin-bilibili-laplace` arrived the same day in the same shape.
-Nothing imported the package, and this work removes it, because the integration
-lives in the application instead of in a process of its own.
+## Bối cảnh
 
-## Decision
+Sự cố #1491 yêu cầu AIRI đọc và điều khiển Trợ lý gia đình. Một người dùng muốn nói "tắt đèn phòng khách" và nhờ AIRI làm việc đó.
 
-Home Assistant is a first-class service of the Stage Tamagotchi Electron main
-process, behind typed tools that the renderer mounts for the model.
+`plugins/airi-plugin-homeassistant` là khung ban đầu. Cam kết `4401b96c9` (29/12/2025) đã thêm `package.json`, `tsconfig.json`, cấu hình tsdown và một `src/index.ts` duy nhất chứa `console.warn('WIP')`. khung ban đầu phụ thuộc vào `@angela/server-sdk`, điều này cho thấy plugin kênh là ý tưởng khởi đầu. `plugins/airi-plugin-bilibili-laplace` đến cùng ngày với hình dạng tương tự. Không có gì nhập gói và công việc này sẽ xóa gói đó vì sự tích hợp tồn tại trong ứng dụng thay vì trong một quy trình của chính nó.
 
-| Concern | Location |
+<a id="decision"></a>
+
+## Phán quyết
+
+Home Assistant là dịch vụ hạng nhất của quy trình chính stage Tamagotchi Electron, đằng sau các công cụ đã nhập mà renderer gắn cho mô hình.
+
+| Mối quan tâm | Vị trí |
 | --- | --- |
-| Address, token, and every outbound request | `apps/desktop/src/main/services/airi/home-assistant/` |
-| IPC contract | `apps/desktop/src/shared/eventa/home-assistant.ts` |
-| Home Assistant API client and its validation | `packages/stage-ui/src/libs/home-assistant/client.ts` |
-| Tool definitions | `packages/stage-ui/src/tools/home-assistant.ts` |
-| Tool mounting and the settings page | `apps/desktop/src/renderer/` |
+| Địa chỉ, token và mọi yêu cầu gửi đi | `apps/desktop/src/main/services/airi/home-assistant/` |
+| Hợp đồng IPC | `apps/desktop/src/shared/eventa/home-assistant.ts` |
+| Ứng dụng khách API của Home Assistant và xác nhận của nó | `packages/stage-ui/src/libs/home-assistant/client.ts` |
+| Định nghĩa công cụ | `packages/stage-ui/src/tools/home-assistant.ts` |
+| Trang lắp đặt công cụ và cài đặt | `apps/desktop/src/renderer/` |
 
-The mechanism follows `computer-use` and `mcp-servers`, which are the two
-existing main-process services that hand tools to the model.
+Cơ chế này tuân theo `computer-use` và `mcp-servers`, là hai dịch vụ xử lý chính hiện có cung cấp công cụ cho mô hình.
 
-### Why not a channel plugin
+<a id="why-not-a-channel-plugin"></a>
 
-A channel plugin answers a tool call before the plugin starts any work.
-`builtIn_emitSparkCommand` reaches a module through a typed envelope whose action
-is untyped text, and it returns `spark:command sent (id) to ...` as soon as the
-socket accepts the event. The model therefore cannot read the result of a Home
-Assistant call, and the tool result claims a success that nobody verified.
+### Tại sao không phải là plugin kênh
 
-The protocol carries an ack shape, `spark:emit` with the command `eventId`, and
-`handleSparkEmit` in
-`packages/stage-ui/src/stores/character/orchestrator/store.ts` is an empty
-function. A result can only arrive later, through `context:update` or
-`spark:notify`, which is a different turn.
+Plugin kênh trả lời lệnh gọi công cụ trước khi plugin bắt đầu bất kỳ công việc nào. `builtIn_emitSparkCommand` tiếp cận mô-đun thông qua một phong bì đã nhập có hành động là văn bản chưa được nhập và nó trả về `spark:command sent (id) to ...` ngay khi socket chấp nhận sự kiện. Do đó, mô hình không thể đọc kết quả của cuộc gọi Trợ lý gia đình và kết quả của công cụ cho thấy thành công mà không ai xác minh.
 
-A channel plugin also asks the user to start a process by hand, and the channel
-server stores no configuration, so the plugin must persist its own settings and
-the settings page can only push a live update.
+Giao thức mang hình dạng ack, `spark:emit` với lệnh `eventId` và `handleSparkEmit` trong `packages/stage-ui/src/stores/character/orchestrator/store.ts` là một hàm trống. Kết quả chỉ có thể đến sau, thông qua `context:update` hoặc `spark:notify`, đây là một ngã rẽ khác.
 
-### Why not an extension
+Plugin kênh cũng yêu cầu người dùng bắt đầu quy trình bằng tay và máy chủ kênh store không có cấu hình, vì vậy plugin phải duy trì cài đặt riêng và trang cài đặt chỉ có thể đẩy bản cập nhật trực tiếp.
 
-`@angela/plugin-sdk` gives a typed tool with a real return value, so it meets
-the same requirement. Three facts decide against it here.
+<a id="why-not-an-extension"></a>
 
-- No extension can receive configuration. `ExtensionSetupContext` carries only
-  `extension`, `subscriptions`, `kits`, and `modules`, and the manifest parser
-  rejects unknown fields, so a base URL and a token have no path in.
-- Extension code runs in the Electron main process with no sandbox and no
-  process boundary, and the main process has no `uncaughtException` handler. A
-  throw after `setup` can end the application.
-- `packages/plugin-sdk/src/index.ts` states that the API can change without
-  warning, and no example extension registers a tool. The path is unproven.
+### Tại sao không phải là phần mở rộng
 
-### Why not the MCP tool chain
+`@angela/plugin-sdk` cung cấp một công cụ được gõ có giá trị trả về thực, do đó nó đáp ứng yêu cầu tương tự. Ba sự thật quyết định chống lại nó ở đây.
 
-The model already has typed `builtIn_mcpListTools` and `builtIn_mcpCallTool`
-tools, and the main process runs stdio MCP servers from `mcp.json`. Home
-Assistant ships an MCP server of its own, so a user can wire one up today with no
-code from this repository.
+- Không có tiện ích mở rộng nào có thể nhận cấu hình. `ExtensionSetupContext` chỉ mang `extension`, `subscriptions`, `kits` và `modules`, đồng thời trình phân tích cú pháp tệp kê khai từ chối các trường không xác định, do đó URL cơ sở và token không có đường dẫn vào.
+- Mã mở rộng chạy trong quy trình chính của Electron không có hộp cát và không có ranh giới quy trình, đồng thời quy trình chính không có trình xử lý `uncaughtException`. Việc ném sau `setup` có thể kết thúc ứng dụng.
+- `packages/plugin-sdk/src/index.ts` tuyên bố rằng API có thể thay đổi mà không có cảnh báo và không có tiện ích mở rộng ví dụ nào đăng ký một công cụ. Con đường chưa được chứng minh.
 
-That path stays available and this record does not replace it. It needs a remote
-transport, because Home Assistant serves MCP over HTTP, and it hands entity
-resolution to the model. This integration exists to give the model a real
-Home Assistant tool, and to resolve "the living room light" in the plugin rather
-than in a prompt.
+<a id="why-not-the-mcp-tool-chain"></a>
 
-## What the model calls
+### Tại sao không phải là chuỗi công cụ MCP
 
-Three typed tools arrive in the model's tool list, and the model reads each
-result in the same turn:
+mô hình đã gõ các công cụ `builtIn_mcpListTools` và `builtIn_mcpCallTool` và quy trình chính chạy các máy chủ stdio MCP từ `mcp.json`. Home Assistant cung cấp một máy chủ MCP của riêng mình, vì vậy người dùng có thể kết nối một máy chủ ngay hôm nay mà không cần mã từ kho lưu trữ này.
 
-| Tool | Arguments | Result |
+Đường dẫn đó vẫn có sẵn và bản ghi này không thay thế nó. Nó cần một transport từ xa, vì Home Assistant phục vụ MCP qua HTTP và nó giao độ phân giải thực thể cho mô hình. Sự tích hợp này tồn tại để cung cấp cho mô hình một công cụ Trợ lý gia đình thực sự và để giải quyết "đèn phòng khách" trong plugin thay vì trong prompt.
+
+<a id="what-the-model-calls"></a>
+
+## mô hình gọi là gì
+
+Ba công cụ đã nhập sẽ có trong danh sách công cụ của mô hình và mô hình đọc từng kết quả trong cùng một lượt:
+
+| Công cụ | Lập luận | Kết quả |
 | --- | --- | --- |
-| `home_assistant_list_entities` | `domain` | Entities and their states, capped |
-| `home_assistant_get_state` | `entity_id` | State and attributes |
-| `home_assistant_call_service` | `domain`, `service`, `entity_id`, `data` | The states Home Assistant changed |
+| `home_assistant_list_entities` | `domain` | Các thực thể và trạng thái của chúng, được giới hạn |
+| `home_assistant_get_state` | `entity_id` | Trạng thái và thuộc tính |
+| `home_assistant_call_service` | `domain`, `service`, `entity_id`, `data` | Các tiểu bang Trợ lý gia đình đã thay đổi |
 
-`data` is a JSON object string. The same constraint appears beside
-`builtIn_mcpCallTool`: `z.record()` emits `propertyNames`, which OpenAI rejects.
+`data` là chuỗi đối tượng JSON. Ràng buộc tương tự xuất hiện bên cạnh `builtIn_mcpCallTool`: `z.record()` phát ra `propertyNames`, OpenAI từ chối.
 
-`entity_id` is required on `home_assistant_call_service`. A call with no target
-reaches a whole domain at once, which is a larger action than the user asked
-for. The model calls the service once per entity, so "turn off the lights"
-costs one call per light.
+`entity_id` được yêu cầu trên `home_assistant_call_service`. Một cuộc gọi không có mục tiêu sẽ tiếp cận toàn bộ miền cùng một lúc, đây là một hành động lớn hơn mức người dùng yêu cầu. mô hình gọi dịch vụ một lần cho mỗi thực thể, do đó, "tắt đèn" sẽ tốn một cuộc gọi cho mỗi đèn.
 
-The tools mount only while an address and a token are stored. An unconfigured
-integration stays invisible to the model, because every call fails.
+Các công cụ gắn kết chỉ khi địa chỉ và token được lưu trữ. Tích hợp chưa được định cấu hình sẽ không hiển thị với mô hình vì mọi cuộc gọi đều không thành công.
 
-## Configuration and credentials
+<a id="configuration-and-credentials"></a>
 
-The main process owns the address and the token, in
-`home-assistant-v1.json` under the Electron user data directory. The renderer
-reads back the address and whether a token exists, and never the token.
+## Cấu hình và thông tin xác thực
 
-An empty token field keeps the stored token. A token belongs to one instance, so
-a save that changes the address needs the token for the new address, and the main
-process refuses the save without one. An empty token field therefore keeps the
-secret only while the address stays.
+Quá trình chính sở hữu địa chỉ và token, trong `home-assistant-v1.json` trong thư mục dữ liệu người dùng Electron. renderer đọc lại địa chỉ và xem liệu token có tồn tại hay không và không bao giờ là token.
 
-The token is stored in plain text. Every other settings file in this repository
-stores its secrets the same way, and no code here uses Electron `safeStorage`.
-The settings page states that the token stays on the device.
+Trường token trống sẽ giữ token được lưu trữ. token thuộc về một phiên bản, do đó, việc lưu thay đổi địa chỉ cần có token cho địa chỉ mới và quy trình chính từ chối lưu mà không có địa chỉ. Do đó, trường token trống chỉ giữ bí mật khi địa chỉ vẫn còn.
 
-## The request boundary
+token được lưu trữ ở dạng văn bản thuần túy. Mọi tệp cài đặt khác trong kho lưu trữ store này đều bí mật theo cách tương tự và không có mã nào ở đây sử dụng Electron `safeStorage`. Trang cài đặt cho biết token vẫn ở trên thiết bị.
 
-The renderer sends a path, and the main process applies the address and the
-token. That makes the request handler the only place that decides where a
-request lands, so it accepts three shapes and nothing else:
+<a id="the-request-boundary"></a>
 
-| Method | Path |
+## Ranh giới yêu cầu
+
+renderer gửi một đường dẫn và quy trình chính sẽ áp dụng địa chỉ và token. Điều đó làm cho trình xử lý yêu cầu trở thành nơi duy nhất quyết định nơi yêu cầu đến, vì vậy nó chấp nhận ba hình dạng và không có gì khác:
+
+| Phương pháp | Đường dẫn |
 | --- | --- |
 | `GET` | `/api/states` |
 | `GET` | `/api/states/{domain}.{object_id}` |
 | `POST` | `/api/services/{domain}/{service}` |
 
-Two shapes outside that list matter. `POST /api/template` runs arbitrary Jinja on
-the Home Assistant host, and `POST /api/states/{id}` writes a state. Measurement
-determined that the stored token reached both. The client builds neither shape.
+Hai hình dạng bên ngoài danh sách đó có ý nghĩa quan trọng. `POST /api/template` chạy Jinja tùy ý trên Home Assistant host và `POST /api/states/{id}` ghi trạng thái. Phép đo xác định rằng token được lưu trữ đã đạt được cả hai. Khách hàng không xây dựng hình dạng.
 
-Every segment the client builds matches `[a-z0-9_.]`, so the patterns also reject
-a percent escape, a `..` segment, a doubled slash, and whitespace. After the URL
-is built, the resolved `pathname` must still sit under the base path, because a
-reverse proxy can serve Home Assistant under a subpath.
+Mọi phân đoạn mà khách hàng xây dựng đều khớp với `[a-z0-9_.]`, do đó các mẫu cũng từ chối phần trăm thoát, phân đoạn `..`, dấu gạch chéo kép và khoảng trắng. Sau khi URL được tạo, `pathname` đã được giải quyết vẫn phải nằm trong đường dẫn cơ sở vì proxy ngược có thể phục vụ Home Assistant dưới đường dẫn phụ.
 
-A second rule covers the address. A token belongs to one Home Assistant
-instance, so no update can move the address while the stored token stays behind.
-Without that rule, a renderer moves the address to a server it controls and the
-next request sends the token there.
+Quy tắc thứ hai bao gồm địa chỉ. token thuộc về một phiên bản Home Assistant, do đó, không có bản cập nhật nào có thể di chuyển địa chỉ trong khi token được lưu trữ vẫn ở lại. Nếu không có quy tắc đó, renderer sẽ chuyển địa chỉ đến máy chủ mà nó kiểm soát và yêu cầu tiếp theo sẽ gửi token đến đó.
 
-## Device access
+<a id="device-access"></a>
 
-The user decides which devices the model reaches. The settings page offers three
-modes, and the tools apply the policy.
+## Quyền truy cập thiết bị
 
-| Mode | Reach |
+Người dùng quyết định mô hình tiếp cận thiết bị nào. Trang cài đặt cung cấp ba chế độ và các công cụ áp dụng chính sách.
+
+| Chế độ | Tiếp cận |
 | --- | --- |
-| `all` (default) | Every device |
-| `allow` | The devices on the allow list, and nothing else |
-| `deny` | Every device except the ones on the block list |
+| `all` (mặc định) | Mọi thiết bị |
+| `allow` | Các thiết bị nằm trong danh sách cho phép và không có gì khác |
+| `deny` | Mọi thiết bị ngoại trừ những thiết bị trong danh sách chặn |
 
-The unit is the device, not the domain. One domain holds both a harmless device
-and a door, so a domain rule cannot separate them. A domain is a way to browse
-the list instead: the settings page shows one tab per domain, named in the
-page language.
+Đơn vị là thiết bị, không phải miền. Một miền chứa cả thiết bị vô hại và cánh cửa, do đó quy tắc miền không thể tách chúng ra. Thay vào đó, miền là một cách để duyệt qua danh sách: trang cài đặt hiển thị một tab cho mỗi miền, được đặt tên theo ngôn ngữ của trang.
 
-An empty list keeps its literal meaning under each mode. An empty allow list
-reaches nothing, because "allow only these" with none chosen means "allow none".
-An empty block list reaches everything, which is why `all` and `deny` with an
-empty list behave alike. The default stays `all`, so a new user reaches every
-device.
+Một danh sách trống giữ nguyên nghĩa đen của nó trong mỗi chế độ. Danh sách cho phép trống không đạt được gì, bởi vì "chỉ cho phép những thứ này" mà không có lựa chọn nào có nghĩa là "không cho phép". Danh sách chặn trống tiếp cận mọi thứ, đó là lý do tại sao `all` và `deny` có danh sách trống hoạt động giống nhau. Giá trị mặc định vẫn là `all`, do đó người dùng mới sẽ tiếp cận mọi thiết bị.
 
-The two lists are separate in storage. One shared list turns every allowed
-device into a blocked device the moment the user switches modes.
+Hai danh sách được lưu trữ riêng biệt. Một danh sách chia sẻ sẽ biến mọi thiết bị được phép thành thiết bị bị chặn ngay khi người dùng chuyển chế độ.
 
-The policy lives in the renderer store, beside the module switch, because the
-user owns the choice and the tools that read it live in the renderer.
+Chính sách này tồn tại trong renderer store, bên cạnh công tắc mô-đun, vì người dùng sở hữu lựa chọn và các công cụ đọc nó trực tiếp trong renderer.
 
-The tools run in the leader window, and the settings window is a follower. The
-picker writes its own copy at once, so the control answers, and then applies the
-same policy through a synchronized action. A storage event reaches the leader
-on its own schedule, which leaves a call the model already holds on the rule the
-user just replaced. A push that fails reports it on the page, because the grid
-then shows a rule the leader does not hold. The two lists travel as plain arrays,
-because the transport clones the arguments of a routed call and a Vue reactive
-proxy does not clone.
+Các công cụ chạy trong cửa sổ dẫn đầu và cửa sổ cài đặt là cửa sổ theo dõi. Bộ chọn viết bản sao của chính nó cùng một lúc để bộ điều khiển trả lời, sau đó áp dụng chính sách tương tự thông qua một hành động được đồng bộ hóa. Một sự kiện lưu trữ sẽ đến với người dẫn đầu theo lịch trình riêng của nó, để lại một cuộc gọi mô hình đã giữ nguyên quy tắc mà người dùng vừa thay thế. Một lần đẩy không thành công sẽ báo cáo nó trên trang, vì khi đó lưới sẽ hiển thị một quy tắc mà người dẫn đầu không tuân theo. Hai danh sách di chuyển dưới dạng mảng đơn giản, vì transport sao chép các đối số của cuộc gọi được định tuyến và proxy phản ứng Vue không sao chép.
 
-### What a call can run
+<a id="what-a-call-can-run"></a>
 
-The policy names devices, and a device check is only as good as the service that
-acts on it. Two kinds of service break the link between the device a caller
-checked and what the call changes.
+### Cuộc gọi có thể diễn ra như thế nào
 
-- A service that is its own target. A script registers a service named after it,
-  so `POST /api/services/script/good_night` runs that script and ignores the
-  `entity_id` in the body. Measurement: the script ran while the body named an
-  unrelated switch.
-- A service that expands its target. A service call on a group entity reaches
-  every member. Measurement: a group with two members changed both.
+Chính sách đặt tên cho thiết bị và việc kiểm tra thiết bị chỉ hoạt động tốt khi dịch vụ hoạt động trên đó. Hai loại dịch vụ sẽ phá vỡ liên kết giữa thiết bị mà người gọi đã kiểm tra và nội dung cuộc gọi thay đổi.
 
-A model turn holds the tools it resolved when the turn started. The tools
-therefore read the policy at each call, so a change during that turn reaches the
-calls the turn still makes.
+- Một dịch vụ là mục tiêu riêng của mình. Một tập lệnh đăng ký một dịch vụ được đặt theo tên của nó, vì vậy `POST /api/services/script/good_night` chạy tập lệnh đó và bỏ qua `entity_id` trong nội dung. Đo lường: tập lệnh chạy trong khi nội dung đặt tên cho một công tắc không liên quan.
+- Một dịch vụ mở rộng mục tiêu của nó. Một cuộc gọi dịch vụ trên một thực thể nhóm sẽ đến được với mọi thành viên. Đo lường: một nhóm có hai thành viên thay đổi cả hai.
 
-The integration therefore runs only the services that act on the device the
-caller named. A service outside the list fails, and the message names what the
-domain accepts. A call whose target reports a member list fails too, and the
-model asks the user for one device by name.
+Một lượt mô hình giữ các công cụ mà nó đã giải quyết khi lượt bắt đầu. Do đó, các công cụ sẽ đọc chính sách ở mỗi lệnh gọi, do đó, một thay đổi trong lượt đó sẽ ảnh hưởng đến các lệnh gọi mà lượt đó vẫn thực hiện.
 
-A call also reports the states it changed. A scene, a script, or an automation
-changes devices the user never named, so the report carries the devices the
-policy exposes and a count of the ones it hides. The list and the state read
-apply the same policy, so a blocked device cannot arrive through another
-device's effect.
+Do đó, việc tích hợp chỉ chạy các dịch vụ hoạt động trên thiết bị mà người gọi đặt tên. Một dịch vụ bên ngoài danh sách không thành công và thông báo đặt tên cho những gì miền chấp nhận. Cuộc gọi mà mục tiêu báo cáo danh sách thành viên cũng không thành công và mô hình yêu cầu người dùng nhập tên một thiết bị.
 
-### One instance
+Một cuộc gọi cũng báo cáo các trạng thái mà nó đã thay đổi. Một cảnh, một tập lệnh hoặc một thao tác tự động hóa sẽ thay đổi các thiết bị mà người dùng chưa bao giờ đặt tên, do đó, báo cáo sẽ đưa ra các thiết bị mà chính sách hiển thị và số lượng thiết bị mà chính sách đó ẩn đi. Danh sách và trạng thái đọc áp dụng cùng một chính sách, do đó, thiết bị bị chặn không thể truy cập thông qua hiệu ứng của thiết bị khác.
 
-An entity id means one device on one instance. Changing the address clears both
-lists, because a list written for the old instance reaches a different device
-on the new one.
+<a id="one-instance"></a>
 
-The two lists clear on different sides of the move. An empty allow list reaches
-nothing, so clearing it before the address moves can only take reach away. An
-empty block list reaches everything, so clearing that one before the move opens
-the old instance for the length of the save. It clears after the main process
-holds the new address, when the old instance is out of reach.
+### Một trường hợp
 
-A save reads the address the main process holds at the moment it runs. The value
-the page read when it mounted is empty until that read lands, and an empty value
-reads as a first configuration. The lists of the instance the user leaves then
-survive into the new one.
+Id thực thể có nghĩa là một thiết bị trên một phiên bản. Việc thay đổi địa chỉ sẽ xóa cả hai danh sách vì danh sách được viết cho phiên bản cũ sẽ đến một thiết bị khác trên danh sách mới.
 
-The tools apply the policy rather than the main process. The model reaches Home
-Assistant only through these tools, so this is where a blocked device stays out
-of reach. Two consequences follow.
+Hai danh sách rõ ràng về các mặt khác nhau của việc di chuyển. Danh sách cho phép trống không có tác dụng gì, vì vậy việc xóa nó trước khi di chuyển địa chỉ chỉ có thể làm mất đi phạm vi tiếp cận. Một danh sách chặn trống sẽ tiếp cận mọi thứ, do đó, việc xóa danh sách đó trước khi di chuyển sẽ mở phiên bản cũ trong thời gian lưu. Nó sẽ xóa sau khi tiến trình chính giữ địa chỉ mới, khi phiên bản cũ nằm ngoài tầm với.
 
-- A listing hides a blocked device and reports how many it hid. A silent empty
-  list tells the model that the user owns no such device.
-- A read or a call on a blocked device fails with a message that names the
-  device and the list that holds it. The model reads that message and asks the
-  user for the one change that helps.
+Một lần lưu sẽ đọc địa chỉ mà tiến trình chính giữ tại thời điểm nó chạy. Giá trị mà trang đọc khi nó được gắn sẽ trống cho đến khi trang đó được đọc và giá trị trống sẽ được đọc dưới dạng cấu hình đầu tiên. Danh sách phiên bản mà người dùng rời đi sau đó sẽ tồn tại trong danh sách phiên bản mới.
 
-The policy also appears in each tool description. The model plans from the tool
-list, so a policy stated there costs no failed call to discover.
+Các công cụ áp dụng chính sách hơn là quy trình chính. mô hình chỉ tiếp cận Trợ lý gia đình thông qua các công cụ này, vì vậy đây là lúc thiết bị bị chặn nằm ngoài tầm với. Hai hậu quả theo sau.
 
-The picker lists every device the instance reports, including the blocked ones.
-The settings page needs the whole list, because a device the model cannot reach
-is exactly the one the user must be able to add.
+- Một danh sách ẩn một thiết bị bị chặn và báo cáo số lượng thiết bị đó đã ẩn. Danh sách trống im lặng cho mô hình biết rằng người dùng không sở hữu thiết bị đó.
+- Việc đọc hoặc cuộc gọi trên thiết bị bị chặn không thành công kèm theo thông báo nêu tên thiết bị và danh sách chứa thiết bị đó. mô hình đọc thông báo đó và yêu cầu người dùng thực hiện một thay đổi hữu ích.
 
-The tile grid shows a device that Home Assistant stopped reporting while the
-list holds it. The row keeps a zero count, so the user can still unselect it.
+Chính sách này cũng xuất hiện trong mỗi mô tả công cụ. mô hình lập kế hoạch từ danh sách công cụ, do đó, chính sách nêu rõ rằng không có cuộc gọi khám phá nào bị thất bại.
 
-The policy constrains the model, not a hostile renderer. Code that runs in the
-renderer can widen the policy through the settings handler, and it can build its
-own request. The main process owns the boundary against that.
+Bộ chọn liệt kê mọi thiết bị mà phiên bản báo cáo, bao gồm cả những thiết bị bị chặn. Trang cài đặt cần có toàn bộ danh sách vì thiết bị mà mô hình không thể tiếp cận chính xác là thiết bị mà người dùng phải có thể thêm.
 
-A per-device policy makes one model behaviour worse. A request to "turn off every
-light" now fails device by device when any light is blocked, where a domain rule
-failed once. The listing note and the tool description are the mitigation, and
-neither is perfect.
+Lưới ô xếp hiển thị một thiết bị mà Trợ lý chính đã ngừng báo cáo trong khi danh sách vẫn giữ thiết bị đó. Hàng giữ số 0 nên người dùng vẫn có thể bỏ chọn nó.
 
-## Platform scope
+Chính sách này ràng buộc mô hình chứ không phải renderer thù địch. Mã chạy trong renderer có thể mở rộng chính sách thông qua trình xử lý cài đặt và có thể tạo yêu cầu riêng. Quá trình chính sở hữu ranh giới chống lại điều đó.
 
-Stage Tamagotchi. Stage Web waits.
+Chính sách dành cho mỗi thiết bị khiến hành vi của mô hình trở nên tồi tệ hơn. Yêu cầu "tắt mọi đèn" hiện không thành công trên từng thiết bị khi bất kỳ đèn nào bị chặn, trong đó quy tắc miền không thành công một lần. Ghi chú liệt kê và mô tả công cụ chỉ là biện pháp giảm nhẹ và cả hai đều không hoàn hảo.
 
-A browser page cannot reach a Home Assistant instance on `http://192.168.x.x`
-without `cors_allowed_origins` on the Home Assistant side, and a page served over
-https is blocked by mixed content. Stage Pocket waits for an iOS device to test
-on.
+<a id="platform-scope"></a>
 
-The client already takes a transport, so another platform adds a transport rather
-than a second client.
+## Phạm vi nền tảng
 
-## Alternatives this record leaves open
+stage Tamagotchi. stage Web đang chờ.
 
-- A channel plugin for Stage Web. It shares the same client, and it returns no
-  result to the model.
-- An extension, once the plugin SDK carries configuration and has a working
-  example.
-- The MCP route, which needs no code here at all.
+Một trang trình duyệt không thể truy cập phiên bản Home Assistant trên `http://192.168.x.x` nếu không có `cors_allowed_origins` ở phía Home Assistant và một trang được phân phát qua https bị chặn bởi nội dung hỗn hợp. stage Pocket chờ thiết bị iOS thử nghiệm.
+
+Máy khách đã sử dụng transport, vì vậy một nền tảng khác sẽ thêm transport thay vì máy khách thứ hai.
+
+<a id="alternatives-this-record-leaves-open"></a>
+
+## Các lựa chọn thay thế mà bản ghi này để ngỏ
+
+- Một plugin kênh cho stage Web. Nó chia sẻ cùng một máy khách và không trả lại kết quả nào cho mô hình.
+- Một tiện ích mở rộng, sau khi plugin SDK mang cấu hình và có một ví dụ hoạt động.
+- MCP route, không cần mã nào cả.
 
 ## Non-goals
 
-- No per-domain policy. The unit is the device, so a user who wants to reach
-  every light selects each one, or selects none and leaves the deny list empty.
-- No Stage Web work.
-- No channel plugin. The scaffold under `plugins/` is gone, and a later Stage Web
-  change adds a package back if it needs one.
-- No event subscription. The first phase reads and writes on request. A device
-  that changes state on its own is a later feature.
+- Không có chính sách cho mỗi tên miền. Đơn vị là thiết bị, vì vậy người dùng muốn tiếp cận mọi ánh sáng sẽ chọn từng ánh sáng hoặc không chọn gì và để trống danh sách từ chối.
+- Không có trang web stage nào hoạt động.
+- Không có plugin kênh. khung ban đầu trong `plugins/` đã không còn nữa và thay đổi Web stage sau đó sẽ bổ sung lại gói nếu cần.
+- Không có đăng ký sự kiện. Giai đoạn đầu tiên đọc và viết theo yêu cầu. Một thiết bị tự thay đổi trạng thái là một tính năng mới hơn.
 
-## Open questions
+<a id="open-questions"></a>
 
-- Does the tool set need `requiresExplicitSelection` for `call_service`, the way
-  `computer_use` has it? The shared composer sends no `tools` field, so the gate
-  only works in the Tamagotchi renderer.
-- Does the settings page need a read and control split, so the model reads a
-  door sensor without unlocking it? One selection now grants both.
-- Does the main process own the policy, in addition to the request allowlist?
-  This phase constrains the model only. A renderer with code execution can widen
-  the policy through the settings handler.
-- Does an entity alias map belong in the settings page, so "the living room
-  light" resolves without the model reading the entity list?
-- Does the token move to Electron `safeStorage`?
-- Does the Home Assistant set of tools grow to areas and scenes?
+## Câu hỏi mở
+
+- Bộ công cụ có cần `requiresExplicitSelection` cho `call_service` như `computer_use` không? Trình soạn nhạc được chia sẻ không gửi trường `tools`, vì vậy cổng kiểm tra chỉ hoạt động trong Tamagotchi renderer.
+- Trang cài đặt có cần phân chia đọc và điều khiển để mô hình đọc cảm biến cửa mà không cần mở khóa không? Một lựa chọn hiện cấp cả hai.
+- Quy trình chính có sở hữu chính sách ngoài danh sách cho phép yêu cầu không? Giai đoạn này chỉ ràng buộc mô hình. renderer có chức năng thực thi mã có thể mở rộng chính sách thông qua trình xử lý cài đặt.
+- Bản đồ bí danh thực thể có thuộc về trang cài đặt nên "đèn phòng khách" được giải quyết mà mô hình không đọc danh sách thực thể không?
+- token có chuyển sang Electron `safeStorage` không?
+- Bộ công cụ Home Assistant có phát triển theo khu vực và cảnh không?

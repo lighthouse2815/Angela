@@ -1,20 +1,20 @@
-# Companion behavior generation evaluation
+<a id="companion-behavior-generation-evaluation"></a>
 
-This package evaluates generated answers against [the companion behavior spec](../../docs/ai/companion-behavior-spec.md).
-The 57 synthetic cases cover 29 Rule IDs and 12 categories.
-The existing [companion evaluation](../companion/README.md) separately measures retrieval and context.
+# Đánh giá hành vi đồng hành sinh nội dung
 
-## Saved evaluation evidence
+Gói này đánh giá các câu trả lời được tạo dựa trên [, đặc tả hành vi đồng hành](../../docs/ai/companion-behavior-spec.md). 57 trường hợp tổng hợp bao gồm 29 ID quy tắc và 12 danh mục. Đánh giá đồng hành [ hiện có](../companion/README.md) đo lường riêng biệt khả năng truy xuất và ngữ cảnh.
 
-[REPORT.md](./REPORT.md) records the baseline and source audit.
-[REVIEW.md](./REVIEW.md) documents false passes and judge limits.
-[IMPROVEMENTS.md](./IMPROVEMENTS.md) records the minimal production changes, after results, and unresolved behavior.
-The raw reports retain answers and evidence. Their pass percentages require the coverage and judgment caveats in those documents.
+<a id="saved-evaluation-evidence"></a>
 
-## Run
+## Bằng chứng đánh giá đã lưu
 
-The default command creates disposable stores and prepares real provider requests. It does not contact a model.
-Preparation does not establish behavior compliance. Its behavior pass rate is `null`.
+[REPORT.md](./REPORT.md) ghi lại quá trình kiểm tra cơ sở và nguồn. [REVIEW.md](./REVIEW.md) ghi lại các đường chuyền sai và đánh giá các giới hạn. [IMPROVEMENTS.md](./IMPROVEMENTS.md) ghi lại những thay đổi sản xuất tối thiểu, sau kết quả và hành vi chưa được giải quyết. Các báo cáo thô giữ lại câu trả lời và bằng chứng. Tỷ lệ đậu của họ yêu cầu mức độ đưa tin và đánh giá cẩn thận trong các tài liệu đó.
+
+<a id="run"></a>
+
+## Chạy
+
+Lệnh mặc định tạo store dùng một lần và chuẩn bị các yêu cầu nhà cung cấp thực. Nó không liên lạc với mô hình. Sự chuẩn bị không thiết lập sự tuân thủ hành vi. Tốc độ vượt qua hành vi của nó là `null`.
 
 ```bash
 pnpm -F @angela/evals-companion-generation eval
@@ -24,10 +24,7 @@ pnpm -F @angela/evals-companion-generation check:dataset
 pnpm -F @angela/evals-companion-generation test
 ```
 
-If the provider is available, use `--live` for generation and semantic judging.
-The CLI config and `ANGELA_*` environment variables select the provider, model, endpoint, protocol, and credential.
-The package command loads the existing root `.env.cli.local`. No credential enters report metadata.
-Flags override environment values through the existing CLI config reader.
+Nếu nhà cung cấp có sẵn, hãy sử dụng `--live` cho sinh nội dung và đánh giá ngữ nghĩa. Các biến môi trường CLI và `ANGELA_*` chọn nhà cung cấp, mô hình, điểm cuối, giao thức và thông tin xác thực. Lệnh gói tải `.env.cli.local` gốc hiện có. Không có thông tin xác thực nào nhập siêu dữ liệu báo cáo. Cờ ghi đè các giá trị môi trường thông qua cấu hình CLI bên đọc hiện có.
 
 ```bash
 pnpm -F @angela/evals-companion-generation eval --live --output /tmp/generation-baseline.json
@@ -36,35 +33,26 @@ pnpm -F @angela/evals-companion-generation eval --live --category correction --s
 pnpm -F @angela/evals-companion-generation eval --live --model MODEL --config /path/to/config.json
 ```
 
-`--judge-model` or `ANGELA_EVAL_JUDGE_MODEL` selects another judge model on the same configured provider.
-By default, generation and judge use the same model. This creates correlated-error risk.
-`--no-judge` records live answers and deterministic checks as `unjudged`. It never creates a semantic pass.
-`--timeout-ms` defaults to 45000. Each case permits at most 12 generation requests and 24000 answer characters.
-Judge output is limited to 32000 characters. Generation and judging each receive their own timeout.
-Reports refuse an existing output path. Every completed case checkpoints the report.
-Checkpoint updates use an atomic file replacement.
+`--judge-model` hoặc `ANGELA_EVAL_JUDGE_MODEL` chọn một giám khảo khác mô hình trên cùng nhà cung cấp được cấu hình. Theo mặc định, sinh nội dung và giám khảo sử dụng cùng một mô hình. Điều này tạo ra rủi ro lỗi tương quan. `--no-judge` ghi lại các câu trả lời trực tiếp và kiểm tra xác định dưới dạng `unjudged`. Nó không bao giờ tạo ra một đường chuyền ngữ nghĩa. `--timeout-ms` mặc định là 45000. Mỗi trường hợp cho phép tối đa 12 yêu cầu sinh nội dung và 24000 ký tự trả lời. Đầu ra của Thẩm phán được giới hạn ở 32000 ký tự. sinh nội dung và mỗi người đánh giá sẽ nhận được thời gian chờ riêng. Báo cáo từ chối đường dẫn đầu ra hiện có. Mỗi trường hợp hoàn thành đều kiểm tra báo cáo. Cập nhật điểm kiểm tra sử dụng thay thế tệp nguyên tử.
 
-If a run stops, resume into a new output file:
+Nếu quá trình chạy dừng lại, hãy tiếp tục vào một tệp đầu ra mới:
 
 ```bash
 pnpm -F @angela/evals-companion-generation eval --live --resume /tmp/interrupted.json \
   --output /tmp/resumed.json --model MODEL --timeout-ms 90000
 ```
 
-Keep the original model, provider, selection, timeout, dataset, and judge prompt.
-Resume checks these identities and the production source tree before it runs another case.
-It keeps completed results, including infrastructure failures. It does not retry or replace them.
-The report records each execution segment, its commit, and the original checkpoint hash.
-`--concurrency` accepts one to four independent cases. The default is one.
-Concurrent cases retain dataset order and use separate stores. Checkpoints follow each completed batch.
+Giữ mô hình, nhà cung cấp ban đầu, lựa chọn, thời gian chờ, tập dữ liệu và đánh giá prompt. Tiếp tục kiểm tra các danh tính này và cây nguồn sản xuất trước khi chạy trường hợp khác. Nó giữ kết quả hoàn thành, bao gồm cả các lỗi cơ sở hạ tầng. Nó không thử lại hoặc thay thế chúng. Báo cáo ghi lại từng phân đoạn thực thi, cam kết của nó và hàm băm điểm kiểm tra ban đầu. `--concurrency` chấp nhận một đến bốn trường hợp độc lập. Mặc định là một. Các trường hợp đồng thời giữ lại thứ tự tập dữ liệu và sử dụng store riêng biệt. Điểm kiểm tra theo từng lô hoàn thành.
 
-| Exit | Meaning |
+| Thoát | Ý nghĩa |
 | --- | --- |
-| 0 | Completed run without infrastructure errors. Quality failures remain report data unless strict. |
-| 1 | Strict run has failures, unjudged answers, or preparation-only cases. |
-| 2 | Invalid input, provider failure, empty answer, or invalid judge output. |
+| 0 | Đã hoàn thành chạy mà không có lỗi cơ sở hạ tầng. Lỗi chất lượng vẫn là dữ liệu báo cáo trừ khi nghiêm ngặt. |
+| 1 | Chạy nghiêm ngặt có những thất bại, những câu trả lời không được đánh giá hoặc những trường hợp chỉ chuẩn bị. |
+| 2 | Đầu vào không hợp lệ, lỗi nhà cung cấp, câu trả lời trống hoặc đầu ra đánh giá không hợp lệ. |
 
-## Production boundary
+<a id="production-boundary"></a>
+
+## Ranh giới sản xuất
 
 ```text
 fixture state -> Memory / MemoryStore / session archive / Tasks / taskTools
@@ -73,70 +61,47 @@ fixture state -> Memory / MemoryStore / session archive / Tasks / taskTools
       -> deterministic checks -> separate semantic judge -> report
 ```
 
-The harness accepts only `input`. It cannot read `expected`.
-Fixtures set source text, authority, ownership, workspace, and current history.
-Task fixtures execute real task tools. Delivery fixtures use real claim and acknowledgment methods without external notifications.
-Canonical assistant tool turns retain the actual returned results.
-The `live_task_create_001` case also requires a saved domain event from model-selected production tools.
-Discord exercises its existing text-only path. It does not initialize private companion stores.
+bộ kiểm thử chỉ chấp nhận `input`. Nó không thể đọc `expected`. mẫu kiểm thử đặt văn bản nguồn, quyền hạn, quyền sở hữu, workspace và lịch sử hiện tại. Nhiệm vụ mẫu kiểm thử thực thi các công cụ tác vụ thực tế. Phân phối mẫu kiểm thử sử dụng các phương thức xác nhận và xác nhận thực tế mà không cần thông báo bên ngoài. Công cụ trợ lý Canonical lần lượt giữ lại kết quả trả về thực tế. Trường hợp `live_task_create_001` cũng yêu cầu sự kiện miền đã lưu từ các công cụ sản xuất do mô hình chọn. Discord thực hiện đường dẫn chỉ có văn bản hiện có. Nó không khởi tạo đồng hành riêng tư store.
 
-The harness records exact protocol request bodies at the provider fetch boundary. This includes context after production compaction.
-It records text deltas, tool events, runtime outcomes, warnings, source IDs, and durable post-request state.
-Temporary paths and random fixture page IDs receive aliases. Original source text remains intact.
-Timestamps and generated IDs remain in raw runtime events. Repeated live runs are not byte-identical.
-Headers and provider credentials are excluded. Use synthetic fixtures, because reports intentionally retain conversation and memory text.
+bộ kiểm thử ghi lại các nội dung yêu cầu giao thức chính xác tại ranh giới tìm nạp nhà cung cấp. Điều này bao gồm bối cảnh sau khi nén sản xuất. Nó ghi lại vùng đồng bằng văn bản, sự kiện công cụ, kết quả runtime, cảnh báo, ID nguồn và trạng thái lâu dài sau yêu cầu. Đường dẫn tạm thời và ID trang mẫu kiểm thử ngẫu nhiên nhận được bí danh. Văn bản nguồn gốc vẫn còn nguyên. Dấu thời gian và ID được tạo vẫn còn trong các sự kiện runtime thô. Các lần chạy trực tiếp lặp đi lặp lại không giống nhau về byte. Tiêu đề và thông tin xác thực nhà cung cấp bị loại trừ. Sử dụng mẫu kiểm thử tổng hợp, vì các báo cáo có chủ ý giữ lại văn bản cuộc hội thoại và bộ nhớ.
 
-Retrieval uses the existing lexical mode with embeddings disabled in the disposable runtime.
-No paid embedding request, real user store, filesystem connector, or notification transport enters evaluation.
-These results do not certify desktop learning-memory, compaction under long conversations, or real notification delivery.
+Truy xuất sử dụng chế độ từ vựng hiện có với tính năng nhúng bị vô hiệu hóa trong runtime dùng một lần. Không có yêu cầu nhúng trả phí, store người dùng thực, trình kết nối hệ thống tệp hoặc thông báo transport tham gia đánh giá. Những kết quả này không chứng nhận trí nhớ học tập, khả năng nén trong các cuộc trò chuyện dài hoặc gửi thông báo thực của desktop.
 
-## Dataset and expectations
+<a id="dataset-and-expectations"></a>
 
-`cases.jsonl` contains one case per line. `schema.ts` validates cases through the existing Valibot dependency.
-Every case has an ID, category, fixture `input`, and structured `expected` object.
+## Tập dữ liệu và kỳ vọng
 
-| Expectation | Check |
+`cases.jsonl` chứa một trường hợp trên mỗi dòng. `schema.ts` xác thực các trường hợp thông qua phần phụ thuộc Valibot hiện có. Mọi trường hợp đều có ID, danh mục, mẫu kiểm thử `input` và đối tượng `expected` có cấu trúc.
+
+| Kỳ Vọng | Kiểm tra |
 | --- | --- |
-| `requiredClaims` | Judge checks each required meaning independently. |
-| `forbiddenClaims` | Judge checks asserted meanings. Denials and attributed historical quotes remain valid. |
-| `allowedUncertainty` | Judge checks the required degree and expression of uncertainty. |
-| `expectedEvidenceType` | Judge checks attribution and evidence limits. |
-| `expectedRuleIds` | Associates the case with fixed spec rules. |
-| `expectedActionState` | Judge checks the target action status, independently from incidental valid memory writes. |
-| `expectedMemoryUse` | Source must reach a generation request or an actual tool result. |
-| `forbiddenMemoryUse` | Source must stay outside generation requests and tool results. |
-| `forbiddenDurableText` | Deterministic substring check of post-request memory and observations. |
-| `requiredEvents` | Deterministic check of successful runtime domain events. |
+| `requiredClaims` | Thẩm phán kiểm tra từng ý nghĩa được yêu cầu một cách độc lập. |
+| `forbiddenClaims` | Thẩm phán kiểm tra khẳng định ý nghĩa. Những lời từ chối và trích dẫn lịch sử được cho là vẫn có hiệu lực. |
+| `allowedUncertainty` | Thẩm phán kiểm tra mức độ yêu cầu và biểu hiện của sự không chắc chắn. |
+| `expectedEvidenceType` | Thẩm phán kiểm tra quy kết và giới hạn bằng chứng. |
+| `expectedRuleIds` | Liên kết trường hợp với các quy tắc thông số kỹ thuật cố định. |
+| `expectedActionState` | Thẩm phán kiểm tra trạng thái hành động mục tiêu, độc lập với việc ghi bộ nhớ hợp lệ ngẫu nhiên. |
+| `expectedMemoryUse` | Nguồn phải đạt yêu cầu sinh nội dung hoặc kết quả công cụ thực tế. |
+| `forbiddenMemoryUse` | Nguồn phải nằm ngoài các yêu cầu và kết quả của công cụ sinh nội dung. |
+| `forbiddenDurableText` | Kiểm tra chuỗi con xác định của bộ nhớ và quan sát sau yêu cầu. |
+| `requiredEvents` | Kiểm tra xác định các sự kiện miền runtime thành công. |
 
-Source checks distinguish explicit retrieval, injected context, and tool-mediated reads.
-They do not infer successful recall from plausible prose.
-Durable substring checks are narrow leak probes. They cannot detect every paraphrase or incorrect semantic write.
-Roleplay and temporary-preference cases therefore also need semantic review of storage decisions.
+Kiểm tra nguồn phân biệt truy xuất rõ ràng, bối cảnh được chèn và đọc qua trung gian công cụ. Họ không suy ra Recall thành công từ văn xuôi hợp lý. Kiểm tra chuỗi con bền là các đầu dò rò rỉ hẹp. Họ không thể phát hiện mọi cách diễn giải hoặc viết ngữ nghĩa không chính xác. Do đó, các trường hợp nhập vai và ưu tiên tạm thời cũng cần xem xét ngữ nghĩa của các quyết định lưu trữ.
 
-## Judge contract and metrics
+<a id="judge-contract-and-metrics"></a>
 
-`scoring.ts` owns a versioned judge prompt and a strict result schema.
-Judge requests use native JSON Schema output through the existing provider SDK.
-Unsupported structured output is an infrastructure failure. The runner never silently substitutes a less strict output mode.
-The judge receives the frozen criterion list only after generation. It cannot add, omit, reorder, or rename criteria.
-Quoted answer evidence must occur exactly in the answer. Missing required claims can use an empty quote with an explanation.
-Malformed output is an infrastructure failure. The runner retains raw judge output and does not silently retry or repair it.
+## Hợp đồng thẩm phán và số liệu
 
-Semantic behavior pass rate counts only cases with valid judgments.
-Complete-case pass rate also requires source, durable-state, and action-event checks to pass.
-Both denominators exclude infrastructure failures, preparation, and unjudged answers. The report shows all excluded counts.
-Rule statistics count associated case failures. They do not establish which individual rule caused each failure.
-Failure layers separate retrieval, context, memory writes, generation, tool outcomes, and infrastructure.
+`scoring.ts` sở hữu một phiên bản đánh giá prompt và một lược đồ kết quả nghiêm ngặt. Yêu cầu của người đánh giá sử dụng đầu ra Lược đồ native JSON thông qua nhà cung cấp SDK hiện có. Đầu ra có cấu trúc không được hỗ trợ là lỗi cơ sở hạ tầng. runner không bao giờ âm thầm thay thế chế độ đầu ra ít nghiêm ngặt hơn. Giám khảo chỉ nhận được danh sách tiêu chí cố định sau sinh nội dung. Nó không thể thêm, bỏ, sắp xếp lại hoặc đổi tên tiêu chí. Bằng chứng câu trả lời được trích dẫn phải xuất hiện chính xác trong câu trả lời. Thiếu các xác nhận quyền sở hữu bắt buộc có thể sử dụng trích dẫn trống kèm theo lời giải thích. Đầu ra không đúng định dạng là lỗi cơ sở hạ tầng. runner giữ lại đầu ra đánh giá thô và không âm thầm thử lại hoặc sửa chữa nó.
 
-Reports include the commit, production diff hash, dataset hash, judge prompt hash, model, protocol, sampling setting, and clock.
-Temperature zero reduces variability. Provider changes, stochastic inference, live clocks, and model judging still limit reproducibility.
-Inspect raw answers and judge decisions before selecting any production fix.
-Keep the dataset and baseline unchanged when comparing later fixes.
+Tỷ lệ vượt qua hành vi ngữ nghĩa chỉ tính các trường hợp có phán đoán hợp lệ. Tỷ lệ vượt qua trường hợp hoàn chỉnh cũng yêu cầu kiểm tra nguồn, trạng thái bền vững và sự kiện hành động để vượt qua. Cả hai mẫu số đều loại trừ những thất bại về cơ sở hạ tầng, sự chuẩn bị và những câu trả lời không được đánh giá. Báo cáo hiển thị tất cả số lượng bị loại trừ. Thống kê quy tắc đếm các trường hợp lỗi liên quan. Họ không thiết lập quy tắc riêng nào gây ra từng lỗi. Các lớp lỗi tách biệt việc truy xuất, bối cảnh, ghi bộ nhớ, sinh nội dung, kết quả công cụ và cơ sở hạ tầng.
 
-If pnpm attempts an unrelated automatic install, set `pnpm_config_verify_deps_before_run=false` for the command.
+Các báo cáo bao gồm cam kết, hàm băm khác biệt sản xuất, hàm băm tập dữ liệu, hàm băm prompt đánh giá, mô hình, giao thức, cài đặt lấy mẫu và đồng hồ. Nhiệt độ bằng 0 làm giảm độ biến thiên. Các thay đổi của nhà cung cấp, suy luận ngẫu nhiên, đồng hồ trực tiếp và đánh giá mô hình vẫn hạn chế khả năng tái tạo. Kiểm tra các câu trả lời thô và đưa ra quyết định trước khi chọn bất kỳ bản sửa lỗi sản xuất nào. Giữ nguyên tập dữ liệu và đường cơ sở khi so sánh các bản sửa lỗi sau này.
 
-## Privacy storage probe
+Nếu pnpm thử cài đặt tự động không liên quan, hãy đặt `pnpm_config_verify_deps_before_run=false` cho lệnh.
 
-The durable-state probe reads personal facts, Memory V2 pages and observations, project checkpoints, skills, tasks, and saved session archives.
-It inspects disposable production stores after runtime shutdown. Tool status alone cannot establish that protected text stayed out of storage.
-Regression tests execute real project, skill, and task writes to check probe coverage. Frozen cases and judge expectations remain unchanged.
+<a id="privacy-storage-probe"></a>
+
+## Thăm dò lưu trữ quyền riêng tư
+
+Đầu dò trạng thái bền bỉ đọc thông tin cá nhân, các trang và quan sát của Bộ nhớ V2, điểm kiểm tra dự án, kỹ năng, nhiệm vụ và kho lưu trữ phiên đã lưu. Nó kiểm tra sản phẩm store sản xuất dùng một lần sau khi runtime ngừng hoạt động. Chỉ riêng trạng thái công cụ không thể chứng minh rằng văn bản được bảo vệ không được lưu trữ. Kiểm tra hồi quy thực hiện ghi dự án, kỹ năng và nhiệm vụ thực tế để kiểm tra phạm vi thăm dò. Các vụ án bị đóng băng và kỳ vọng của thẩm phán vẫn không thay đổi.

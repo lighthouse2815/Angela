@@ -1,25 +1,30 @@
-# Implicit companion follow-up implementation audit
+<a id="implicit-companion-follow-up-implementation-audit"></a>
 
-Date: 2026-10-23
+# Kiểm tra việc triển khai theo dõi đồng hành ngầm định
 
-## 1. Inspected main
+Ngày: 23-10-2026
 
-GitHub `main`: `46212a2a54d5951a30a2893f5402589bac9e4c27`.
-The clean checkout was `airi/` under the supplied workspace directory.
-A fetch through the existing GitHub credential helper confirmed the baseline before implementation.
+<a id="1-inspected-main"></a>
 
-## 2. Problems found
+## 1. Đã kiểm tra chính
 
-- Generic `create`, `add`, and `save` authorized task tools for technical objects.
-- Meta framing after the action escaped the classifier.
-- Recent references collapsed separate events and preferred pending tasks over the latest conversational focus.
-- There was no independent persisted domain for meaningful unresolved conversation threads.
-- Review found additional technical-noun phrases, a domain turn-boundary mismatch, and event timing across daylight saving changes.
+GitHub `main`: `46212a2a54d5951a30a2893f5402589bac9e4c27`. Thanh toán sạch là `airi/` trong thư mục workspace được cung cấp. Quá trình tìm nạp thông qua trình trợ giúp thông tin xác thực GitHub hiện có đã xác nhận đường cơ sở trước khi triển khai.
 
-The initial regression run reproduced seven failures before the first fix.
-Review tests separately reproduced four technical-object failures and one daylight saving failure before correction.
+<a id="2-problems-found"></a>
 
-## 3. Architecture before
+## 2. Vấn đề được tìm thấy
+
+- Các công cụ tác vụ được ủy quyền chung `create`, `add` và `save` dành cho các đối tượng kỹ thuật.
+- Tạo khung meta sau hành động đã thoát khỏi bộ phân loại.
+- Các tài liệu tham khảo gần đây đã thu gọn các sự kiện riêng biệt và ưu tiên các nhiệm vụ đang chờ xử lý thay vì tiêu điểm hội thoại mới nhất.
+- Không có miền tồn tại độc lập nào cho các chuỗi hội thoại có ý nghĩa chưa được giải quyết.
+- Quá trình xem xét đã tìm thấy các cụm danh từ kỹ thuật bổ sung, ranh giới theo lượt của miền không khớp và thời gian diễn ra sự kiện trong các thay đổi về tiết kiệm ánh sáng ban ngày.
+
+Lần chạy hồi quy ban đầu đã tạo ra bảy lỗi trước lần sửa lỗi đầu tiên. Các thử nghiệm xem xét đã tái tạo riêng biệt bốn lỗi đối tượng kỹ thuật và một lỗi tiết kiệm ánh sáng ban ngày trước khi sửa.
+
+<a id="3-architecture-before"></a>
+
+## 3. Kiến trúc trước đây
 
 ```text
 Explicit user request -> commitment classifier -> local extraction or task tools
@@ -29,9 +34,11 @@ Task events -> CommitmentMemoryProjection -> historical memory and bounded curre
 Recent task references -> pending-first contextual resolver
 ```
 
-Task persistence, leases, recurrence, recovery, explicit follow-ups, and memory projection already existed.
+Tính bền vững của tác vụ, lease, tái phát, phục hồi, theo dõi rõ ràng và chiếu bộ nhớ đã tồn tại.
 
-## 4. Architecture after
+<a id="4-architecture-after"></a>
+
+## 4. Kiến trúc sau
 
 ```text
 Explicit task request -> existing Task path -----------------------+
@@ -43,86 +50,69 @@ Unresolved current statement -> OpenLoopConversation -> OpenLoops -+-> existing 
                                                                       -> exact resolution or dismissal
 ```
 
-The scheduler accepts optional `ProactiveSource` instances after its existing task-delivery path.
-There is no second scheduler, semantic-memory scan, new dependency, or backend.
-Task schemas, Task persistence, task leases, restart recovery, and CommitmentMemoryProjection remain intact.
+Bộ lập lịch chấp nhận các phiên bản `ProactiveSource` tùy chọn sau đường dẫn phân phối nhiệm vụ hiện có của nó. Không có bộ lập lịch thứ hai, quét bộ nhớ ngữ nghĩa, phần phụ thuộc mới hoặc phần phụ trợ. Các lược đồ tác vụ, tính bền vững của tác vụ, tác vụ lease, khởi động lại khôi phục và CommitmentMemoryProjection vẫn còn nguyên.
 
-## 5. Intent guard
+<a id="5-intent-guard"></a>
 
-`classifyCommitmentIntent` remains the shared authorization boundary for extraction and task tools.
-English task authority requires semantic task phrases. Generic verbs cannot grant it.
-Meta framing is checked before and after the action.
-Technical constructions such as `Create a task parser` and `Add a reminder timestamp validator` are also rejected.
-Direct reminders about running parser tests remain valid.
+## 5. Ý định bảo vệ
 
-## 6. Focus resolution
+`classifyCommitmentIntent` vẫn là ranh giới ủy quyền chung cho các công cụ tác vụ và trích xuất. Cơ quan nhiệm vụ tiếng Anh yêu cầu các cụm từ nhiệm vụ ngữ nghĩa. Động từ chung không thể cấp nó. Khung meta được kiểm tra trước và sau hành động. Các công trình kỹ thuật như `Create a task parser` và `Add a reminder timestamp validator` cũng bị loại bỏ. Lời nhắc trực tiếp về việc chạy thử nghiệm trình phân tích cú pháp vẫn có hiệu lực.
 
-One event creates one group. Only the latest group exists in current focus state.
-A group with multiple identities stays ambiguous even when only one member remains pending.
-Completed, missing, expired, or oversized latest focus never selects an older Task.
-Unrelated replies preserve focus. Verified IDs or complete task-title phrases can establish a new group.
-Task and OpenLoop handlers advance focus at the same request boundary.
-IDs are scoped by workspace, session, and channel, with eight identities, eight requests, and six hours as limits.
+<a id="6-focus-resolution"></a>
 
-## 7. OpenLoop domain
+## 6. Độ phân giải tiêu điểm
 
-`OpenLoops` owns identities, subjects, kinds, provenance, lifecycle, confidence, salience, timing, prompt counts, suppression, and claims.
-Kinds are problem, work in progress, waiting, upcoming event, and goal.
-States are open, resolved, expired, and dismissed.
-OpenLoops remain separate from Tasks and historical memory.
-Fresh unresolved statements can reopen dismissed or expired work with a new identity.
+Một sự kiện tạo ra một nhóm. Chỉ có nhóm mới nhất tồn tại ở trạng thái tiêu điểm hiện tại. Một nhóm có nhiều danh tính vẫn không rõ ràng ngay cả khi chỉ còn một thành viên đang chờ xử lý. Tiêu điểm mới nhất đã hoàn thành, bị thiếu, hết hạn hoặc quá khổ không bao giờ chọn Nhiệm vụ cũ hơn. Những câu trả lời không liên quan sẽ giữ được sự tập trung. ID đã được xác minh hoặc cụm từ tiêu đề nhiệm vụ hoàn chỉnh có thể thành lập một nhóm mới. Trình xử lý tác vụ và OpenLoop nâng cao tiêu điểm ở cùng một ranh giới yêu cầu. ID được phân chia theo workspace, phiên và kênh, với tám danh tính, tám yêu cầu và giới hạn sáu giờ.
 
-## 8. Extraction rules
+<a id="7-openloop-domain"></a>
 
-Deterministic Vietnamese rules accept current unresolved work and the supplied concrete examples.
-They reject quotations, examples, hypotheticals, uncertain statements, historical incidents, feelings alone, preferences, and casual observations.
-Unsupported wording produces no persisted loop.
-Subjects use normalized equality within a workspace. Authentication aliases share one logical key.
-Repeated mentions preserve the cap and original expiry while refreshing activity and salience.
-Named outcomes use subject normalization. Generic completion and dismissal require exact focus.
+## 7. Miền OpenLoop
 
-## 9. Proactive eligibility
+`OpenLoops` sở hữu danh tính, chủ đề, loại, xuất xứ, vòng đời, độ tin cậy, mức độ nổi bật, thời gian, số lượng prompt, loại bỏ và xác nhận quyền sở hữu. Các loại là vấn đề, công việc đang tiến triển, chờ đợi, sự kiện sắp tới và mục tiêu. Các tiểu bang được mở, giải quyết, hết hạn và bãi bỏ. OpenLoops vẫn tách biệt với Nhiệm vụ và bộ nhớ lịch sử. Các báo cáo mới chưa được giải quyết có thể mở lại tác phẩm đã bị loại bỏ hoặc hết hạn với danh tính mới.
 
-- Confidence is at least 0.95 and salience is at least 0.7.
-- The loop is open, unexpired, unsuppressed, and unprompted.
-- Problems and unfinished work wait four hours and expire after 48 hours.
-- Waiting threads wait 12 hours and expire after seven days. Goals wait 12 hours and expire after 48 hours.
-- Tomorrow's events wait until 09:00 after their full local event date. Calendar conversion handles daylight saving changes.
-- Each update adds four hours of inactivity. Conversation activity adds at least 15 minutes of deferral.
-- Frequent conversation adds a one-hour activity deferral. Active runtime requests block implicit delivery.
-- Implicit quiet hours default to 22:00–08:00. Existing configuration can replace that interval.
-- One loop permits one attempt. One user store permits one implicit attempt per eight hours.
+<a id="8-extraction-rules"></a>
 
-## 10. Task suppression
+## 8. Quy tắc trích xuất
 
-A pending equivalent Task dismisses the implicit loop and records its Task ID.
-Task observers apply suppression after persistence. Source reconciliation repairs observer failures and external Task writes.
-The source rechecks fresh Task state immediately before presentation.
-Later implicit mentions do not create another loop while the equivalent Task remains pending.
+Các quy tắc xác định của Việt Nam chấp nhận công việc chưa được giải quyết hiện tại và các ví dụ cụ thể được cung cấp. Họ bác bỏ các trích dẫn, ví dụ, giả thuyết, tuyên bố không chắc chắn, sự kiện lịch sử, cảm xúc đơn thuần, sở thích và quan sát thông thường. Từ ngữ không được hỗ trợ sẽ không tạo ra vòng lặp liên tục. Các đối tượng sử dụng đẳng thức chuẩn hóa trong workspace. Bí danh xác thực chia sẻ một khóa logic. Đề cập lặp đi lặp lại duy trì giới hạn và thời hạn ban đầu trong khi làm mới hoạt động và độ mặn. Các kết quả được đặt tên sử dụng chuẩn hóa chủ đề. Việc hoàn thành và loại bỏ chung yêu cầu sự tập trung chính xác.
 
-## 11. Persistence and restart guarantees
+<a id="9-proactive-eligibility"></a>
 
-Private `open-loops/state.json` uses existing MemoryFile validation, cross-process locks, and atomic rename.
-Pre-presentation claims expire after 30 seconds and use fencing tokens.
-Failures before reservation retry after 60 seconds.
-The one-shot prompt count and global cooldown commit immediately before external presentation.
-Repeated restart cannot reset them or duplicate that implicit attempt.
-A crash after reservation can lose a question. This is at-most-once delivery, not exactly-once network receipt.
-Task reminders retain their existing at-least-once acknowledgment contract.
-Corrupted loop storage remains untouched and cannot stop Task delivery.
+## 9. Chủ động hội đủ điều kiện
 
-## 12. Privacy
+- Độ tin cậy ít nhất là 0,95 và độ nổi bật ít nhất là 0,7.
+- Vòng lặp mở, chưa hết hạn, không bị nén và không được nhắc nhở.
+- Các vấn đề và công việc chưa hoàn thành sẽ chờ bốn giờ và hết hạn sau 48 giờ.
+- Chuỗi chờ chờ 12 giờ và hết hạn sau bảy ngày. Mục tiêu chờ 12 giờ và hết hạn sau 48 giờ.
+- Các sự kiện ngày mai phải chờ đến 09:00 sau ngày diễn ra sự kiện cục bộ đầy đủ. Chuyển đổi lịch xử lý các thay đổi tiết kiệm ánh sáng ban ngày.
+- Mỗi bản cập nhật thêm bốn giờ không hoạt động. Hoạt động trò chuyện sẽ thêm ít nhất 15 phút trì hoãn.
+- Cuộc trò chuyện thường xuyên sẽ thêm thời gian trì hoãn hoạt động thêm một giờ. Các yêu cầu runtime đang hoạt động chặn việc phân phối ngầm.
+- Giờ yên tĩnh ngầm định được mặc định là 22:00–08:00. Cấu hình hiện tại có thể thay thế khoảng thời gian đó.
+- Một vòng lặp cho phép một lần thử. Một người dùng store cho phép một lần thử ngầm trong tám giờ.
 
-Request provenance and existing personal, automatic, and recall controls gate implicit writes and delivery.
-Unavailable controls fail closed. Model output cannot grant consent.
-Protected requests create no loop, Task projection, or proactive candidate.
-The privacy integration test also checks zero memory pages and zero observations.
-Global events contain only IDs, reasons, and lifecycle metadata.
-Focus never crosses another session or channel. Same-user notification routing can establish its exact destination focus.
+<a id="10-task-suppression"></a>
 
-## 13. Exact changed files
+## 10. Ngăn chặn nhiệm vụ
 
-Paths are relative to the repository root.
+Nhiệm vụ tương đương đang chờ xử lý sẽ loại bỏ vòng lặp ẩn và ghi lại Nhiệm vụ ID của nó. Người quan sát nhiệm vụ áp dụng biện pháp ngăn chặn sau khi kiên trì. Đối chiếu nguồn sửa chữa lỗi của người quan sát và ghi Tác vụ bên ngoài. Nguồn kiểm tra lại trạng thái Nhiệm vụ mới ngay trước khi trình bày. Các đề cập ngầm sau này không tạo ra vòng lặp khác trong khi Nhiệm vụ tương đương vẫn đang chờ xử lý.
+
+<a id="11-persistence-and-restart-guarantees"></a>
+
+## 11. Đảm bảo tính bền vững và khởi động lại
+
+`open-loops/state.json` riêng tư sử dụng xác thực MemoryFile hiện có, khóa đa quy trình và đổi tên nguyên tử. Yêu cầu trình bày trước hết hạn sau 30 giây và sử dụng hàng rào token. Lỗi trước khi đặt trước, thử lại sau 60 giây. Số lượng prompt một lần bắn và thời gian hồi chiêu toàn cầu cam kết ngay trước khi trình bày bên ngoài. Khởi động lại nhiều lần không thể thiết lập lại chúng hoặc lặp lại nỗ lực ngầm đó. Một sự cố sau khi đặt chỗ có thể làm mất một câu hỏi. Đây là lần gửi tối đa một lần, không phải là lần nhận chính xác một lần trên mạng. Lời nhắc nhiệm vụ giữ lại hợp đồng xác nhận ít nhất một lần hiện có của họ. Bộ nhớ vòng lặp bị hỏng vẫn không bị ảnh hưởng và không thể ngừng phân phối Nhiệm vụ.
+
+<a id="12-privacy"></a>
+
+## 12. Quyền riêng tư
+
+Yêu cầu xuất xứ và các điều khiển cá nhân, tự động hiện có và Recall kiểm soát việc ghi và phân phối ngầm cổng kiểm tra. Điều khiển không có sẵn không đóng được. Đầu ra mô hình không thể cấp sự đồng ý. Các yêu cầu được bảo vệ không tạo ra vòng lặp, dự báo nhiệm vụ hoặc ứng viên chủ động. Thử nghiệm tích hợp quyền riêng tư cũng không kiểm tra các trang bộ nhớ và không quan sát được. Sự kiện toàn cầu chỉ chứa ID, lý do và siêu dữ liệu vòng đời. Trọng tâm không bao giờ vượt qua phiên hoặc kênh khác. Định tuyến thông báo của cùng một người dùng có thể thiết lập tiêu điểm đích chính xác của nó.
+
+<a id="13-exact-changed-files"></a>
+
+## 13. Các tập tin đã thay đổi chính xác
+
+Đường dẫn có liên quan đến thư mục gốc của kho lưu trữ.
 
 ```text
 docs/ai/adr/2026-10-22-commitment-follow-up.md
@@ -156,121 +146,118 @@ packages/angela-cli/src/telegram.ts
 packages/i18n/src/cli.ts
 ```
 
-## 14. Tests
+<a id="14-tests"></a>
 
-Added:
+## 14. Kiểm tra
 
-- `open-loop-extraction.test.ts`: accepted statements, false positives, outcomes, timing, and daylight saving.
-- `open-loops.test.ts`: durable caps, dedupe, reopening, claim fencing, retention, privacy, observer failure, and corrupted storage.
-- `open-loop-source.test.ts`: retries, uncertain presentation, fresh privacy and Task checks, paused output, quiet hours, and burst caps.
-- `open-loop-scenario.test.ts`: complete runtime flow, three restarts, unavailable model, exact focus, dismissal, suppression, privacy, and Task isolation.
+Đã thêm:
 
-Updated:
+- `open-loop-extraction.test.ts`: các tuyên bố được chấp nhận, kết quả dương tính giả, kết quả, thời gian và tiết kiệm ánh sáng ban ngày.
+- `open-loops.test.ts`: giới hạn lâu dài, loại bỏ trùng lặp, mở lại, rào chắn xác nhận quyền sở hữu, lưu giữ, quyền riêng tư, lỗi quan sát và bộ nhớ bị hỏng.
+- `open-loop-source.test.ts`: thử lại, trình bày không chắc chắn, kiểm tra tác vụ và quyền riêng tư mới, đầu ra bị tạm dừng, giờ yên tĩnh và giới hạn bùng nổ.
+- `open-loop-scenario.test.ts`: luồng runtime hoàn chỉnh, ba lần khởi động lại, mô hình không khả dụng, tập trung chính xác, loại bỏ, loại bỏ, quyền riêng tư và cách ly tác vụ.
 
-- `active-commitments.test.ts`: latest group, inactive focus, removed IDs, title mentions, and batch ambiguity.
-- `commitment-conversation.test.ts`: latest-event semantics and clarification after inactive focus.
-- `commitment-extraction.test.ts`: semantic English task phrases and suffix meta framing.
-- `task-tools.test.ts`: direct model-bypass regressions for technical and meta requests.
+Đã cập nhật:
 
-The existing commitment scenario, scheduler, recurrence, process, memory, and integration suites also passed in the complete CLI run.
+- `active-commitments.test.ts`: nhóm mới nhất, tiêu điểm không hoạt động, ID bị xóa, đề cập tiêu đề và sự mơ hồ hàng loạt.
+- `commitment-conversation.test.ts`: ngữ nghĩa sự kiện mới nhất và làm rõ sau khi tiêu điểm không hoạt động.
+- `commitment-extraction.test.ts`: cụm từ nhiệm vụ tiếng Anh ngữ nghĩa và khung meta hậu tố.
+- `task-tools.test.ts`: hồi quy bỏ qua mô hình trực tiếp cho các yêu cầu kỹ thuật và meta.
 
-## 15. Exact validation results
+Các kịch bản cam kết, bộ lập lịch, lặp lại, quy trình, bộ nhớ và tích hợp hiện có cũng được thông qua trong lần chạy CLI hoàn chỉnh.
 
-| Command | Result |
+<a id="15-exact-validation-results"></a>
+
+## 15. Kết quả xác nhận chính xác
+
+| Lệnh | Kết quả |
 | --- | --- |
-| `pnpm --config.verify-deps-before-run=false -F @angela/cli test --maxWorkers=2` | PASS. 71 files, 716 tests, 75.58 seconds. |
-| `pnpm --config.verify-deps-before-run=false -F @angela/cli typecheck` | PASS. Exit 0. |
-| `pnpm --config.verify-deps-before-run=false -F @angela/cli build` | PASS. Exit 0. |
-| `pnpm --config.verify-deps-before-run=false -F @angela/i18n typecheck` | PASS. Exit 0. |
-| `pnpm --config.verify-deps-before-run=false -F @angela/i18n build` | PASS. Exit 0. |
-| `pnpm --config.verify-deps-before-run=false lint` | PASS. Exit 0. Zero errors, 603 existing warnings outside changed files. |
+| `pnpm --config.verify-deps-before-run=false -F @angela/cli test --maxWorkers=2` | PASS. 71 tệp, 716 bài kiểm tra, 75,58 giây. |
+| `pnpm --config.verify-deps-before-run=false -F @angela/cli typecheck` | PASS. Thoát 0. |
+| `pnpm --config.verify-deps-before-run=false -F @angela/cli build` | PASS. Thoát 0. |
+| `pnpm --config.verify-deps-before-run=false -F @angela/i18n typecheck` | PASS. Thoát 0. |
+| `pnpm --config.verify-deps-before-run=false -F @angela/i18n build` | PASS. Thoát 0. |
+| `pnpm --config.verify-deps-before-run=false lint` | PASS. Thoát 0. Không có lỗi, 603 cảnh báo hiện có bên ngoài các tệp đã thay đổi. |
 | `git diff --check` | PASS. |
-| `pnpm --config.verify-deps-before-run=false typecheck --concurrency=2` | BLOCKED by the installed pnpm shim, then OOM in unchanged `@angela/stage-ui` after retry. |
+| `pnpm --config.verify-deps-before-run=false typecheck --concurrency=2` | BLOCKED bằng miếng chêm pnpm đã cài đặt, sau đó là OOM ở dạng `@angela/stage-ui` không thay đổi sau khi thử lại. |
 
-The first root run stopped with `Exec format error (os error 8)` because the installed pnpm launcher has no shebang.
-A temporary shell wrapper outside the repository made Turbo start package checks.
-That retry completed 46 tasks before `@angela/stage-ui` exhausted its roughly 2 GB JavaScript heap and exited 129.
-No workspace configuration or unrelated source was changed to hide this failure.
+Lần chạy root đầu tiên đã dừng với `Exec format error (os error 8)` vì trình khởi chạy pnpm đã cài đặt không có shebang. Trình bao bọc shell tạm thời bên ngoài kho lưu trữ đã thực hiện kiểm tra gói khởi động Turbo. Lần thử lại đó đã hoàn thành 46 tác vụ trước khi `@angela/stage-ui` sử dụng hết khoảng 2 vùng nhớ GB JavaScript và thoát khỏi 129. Không có cấu hình workspace hoặc nguồn không liên quan nào được thay đổi để che giấu lỗi này.
 
-The first Git hook also triggered dependency verification and hit the same launcher failure.
-Targeted lint and checks ran manually before the first commit.
-Later commits ran the normal staged-file hook through the temporary wrapper.
-No dependencies or lockfiles changed.
+Git hook đầu tiên cũng kích hoạt xác minh phụ thuộc và gặp lỗi tương tự với trình khởi chạy. Công cụ tìm lỗi mã nguồn và kiểm tra được nhắm mục tiêu được chạy thủ công trước lần xác nhận đầu tiên. Các lần xác nhận sau đó đã chạy tệp đã stage bình thường hook thông qua trình bao bọc tạm thời. Không có sự phụ thuộc hoặc tập tin khóa nào được thay đổi.
 
-## Adversarial review
+<a id="adversarial-review"></a>
 
-| Check | Evidence |
+## Đánh giá đối nghịch
+
+| Kiểm tra | Bằng chứng |
 | --- | --- |
-| Generic verbs and technical noun phrases | Task-tool regressions reject direct bypass attempts. |
-| Meta discussion before or after the action | Extraction and tool tests reject examples and code discussions. |
-| Older pending fallback after latest focus becomes inactive | Resolver and runtime snooze tests clarify without editing older work. |
-| Spam after restart | Repeated restart tests retain the one-shot cap. |
-| Task plus OpenLoop duplicates | Runtime suppression and fresh pre-presentation Task tests pass. |
-| Cross-session focus leakage | Exact session/channel tests and unrelated-session runtime resolution pass. |
-| Privacy bypass | Store guards and zero-capture integration test pass. |
-| Unbounded stores or context | 50 open, 30 inactive, eight focus IDs, eight activity timestamps, and six context summaries. |
-| State inferred from stale memory | Only OpenLoops owns lifecycle and candidate state. |
-| Model required for delivery | Generation throws after creation. Fallback delivery and resolution still pass. |
-| Observer failure affecting authoritative state | Throwing metadata observer cannot reject persisted domain transitions. |
-| Presentation crash and lease expiry | Reservation cap prevents replay. Expired claim tokens cannot present. |
+| Động từ chung và cụm danh từ kỹ thuật | Hồi quy công cụ tác vụ từ chối các nỗ lực bỏ qua trực tiếp. |
+| Thảo luận meta trước hoặc sau hành động | Kiểm tra công cụ và trích xuất từ chối các ví dụ và thảo luận về mã. |
+| phương án dự phòng cũ hơn đang chờ xử lý sau khi tiêu điểm mới nhất không hoạt động | Các bài kiểm tra báo lại của Resolver và runtime sẽ làm rõ mà không cần chỉnh sửa tác phẩm cũ hơn. |
+| Thư rác sau khi khởi động lại | Các thử nghiệm khởi động lại lặp đi lặp lại vẫn giữ nguyên giới hạn một lần. |
+| Nhiệm vụ cộng với OpenLoop trùng lặp | Việc ngăn chặn runtime và vượt qua các bài kiểm tra Nhiệm vụ trước khi trình bày mới. |
+| Rò rỉ tiêu điểm giữa các phiên | Kiểm tra session/channel chính xác và vượt qua độ phân giải runtime phiên không liên quan. |
+| Bỏ qua quyền riêng tư | Bộ bảo vệ store và vượt qua bài kiểm tra tích hợp zero-thu nhận dữ liệu. |
+| không giới hạn store hoặc bối cảnh | 50 mở, 30 không hoạt động, 8 ID trọng tâm, 8 dấu thời gian hoạt động và 6 tóm tắt ngữ cảnh. |
+| Trạng thái suy ra từ bộ nhớ cũ | Chỉ OpenLoops sở hữu vòng đời và trạng thái ứng viên. |
+| Cần có mô hình để giao hàng | sinh nội dung ném sau khi tạo. Phân phối và độ phân giải phương án dự phòng vẫn đạt. |
+| Sự cố của người quan sát ảnh hưởng đến trạng thái có thẩm quyền | Việc ném trình quan sát siêu dữ liệu không thể từ chối quá trình chuyển đổi miền liên tục. |
+| Sự cố trình bày và hết hạn lease | Giới hạn đặt trước ngăn cản việc phát lại. Xác nhận quyền sở hữu token đã hết hạn không thể trình bày. |
 
-## 16. Remaining limitations
+<a id="16-remaining-limitations"></a>
 
-The grammar is conservative and mainly Vietnamese. It does not cover arbitrary topics or arbitrary event dates.
-Authentication aliases can over-merge distinct problems. Other subjects require normalized equality.
-Implicit prompts require a running CLI or private Telegram companion host. Standalone desktop service and implicit voice are outside this change.
-At-most-once delivery accepts possible loss after reservation.
-OpenLoop history is separate from semantic-memory purge commands. Resolve or dismiss the focused thread to stop prompting.
-Root workspace typecheck remains incomplete because of the unrelated stage-ui OOM.
+## 16. Những hạn chế còn lại
 
-## 17. One next milestone
+Ngữ pháp bảo thủ và chủ yếu là tiếng Việt. Nó không bao gồm các chủ đề tùy ý hoặc ngày sự kiện tùy ý. Bí danh xác thực có thể kết hợp quá mức các vấn đề riêng biệt. Các môn học khác yêu cầu sự bình đẳng được chuẩn hóa. prompt tiềm ẩn yêu cầu CLI đang chạy hoặc host đồng hành Telegram riêng tư. Dịch vụ desktop độc lập và giọng nói ngầm nằm ngoài sự thay đổi này. Giao hàng tối đa một lần chấp nhận mất mát có thể xảy ra sau khi đặt trước. Lịch sử OpenLoop tách biệt với các lệnh thanh lọc bộ nhớ ngữ nghĩa. Giải quyết hoặc loại bỏ chuỗi tập trung để ngừng nhắc. Root workspace kiểm tra kiểu dữ liệu vẫn chưa hoàn thiện do stage-ui OOM không liên quan.
 
-Evaluate extraction and dedupe against a consented Vietnamese conversation corpus before expanding the grammar.
+<a id="17-one-next-milestone"></a>
 
-## Commits
+## 17. Một cột mốc tiếp theo
 
-- `95531c2`: intent and latest-focus corrections. Pushed to `origin/main`.
-- `488bf93`: implicit OpenLoop foundation. Pushed to `origin/main`.
-- This audit accompanies the final review-fix commit, which includes technical-object guards, shared turn boundaries, and calendar timing.
+Đánh giá việc trích xuất và loại trừ đối với kho ngữ liệu hội thoại tiếng Việt đã được đồng ý trước khi mở rộng ngữ pháp.
 
-## Final hardening pass
+<a id="commits"></a>
 
-Inspected baseline: `62d250fc45fba1965f6c1696d53e46a5385a8000`.
-Implementation head before this audit addendum: `774a626a378770c62689e76b5bd3ce5be7040380`.
-Final head after the follow-up authorization hardening: `d0e0e59`.
+## Cam kết
 
-### Reproduced bugs
+- `95531c2`: các chỉnh sửa về mục đích và tiêu điểm mới nhất. Đã đẩy tới `origin/main`.
+- `488bf93`: nền tảng OpenLoop tiềm ẩn. Đã đẩy tới `origin/main`.
+- Quá trình kiểm tra này đi kèm với cam kết sửa lỗi đánh giá cuối cùng, bao gồm các biện pháp bảo vệ đối tượng kỹ thuật, ranh giới rẽ chung và thời gian theo lịch.
 
-The adversarial task matrix reproduced coding false positives for reminder services, task endpoints, components, repositories, controllers, hooks, pages, CRUD, DTOs, tables, queues, microservices, APIs, Quartz jobs, and Hangfire jobs.
-The existing positive regex also rejected valid coding subjects when they were inside a real task-management request.
-The shared-data-dir suppression test reproduced a cross-workspace dismissal when a Task had no compatible workspace check.
+<a id="final-hardening-pass"></a>
+
+## Bước làm cứng cuối cùng
+
+Đường cơ sở đã được kiểm tra: `62d250fc45fba1965f6c1696d53e46a5385a8000`. Người đứng đầu thực hiện trước phụ lục kiểm tra này: `774a626a378770c62689e76b5bd3ce5be7040380`. Đầu cuối cùng sau khi tăng cường ủy quyền tiếp theo: `d0e0e59`.
+
+<a id="reproduced-bugs"></a>
+
+### Lỗi sao chép
+
+Ma trận tác vụ đối nghịch đã tái tạo các kết quả mã hóa dương tính giả cho các dịch vụ nhắc nhở, điểm cuối tác vụ, thành phần, kho lưu trữ, bộ điều khiển, các hook, trang, CRUD, DTO, bảng, hàng đợi, vi dịch vụ, API, công việc Quartz và công việc Hangfire.
+Regex tích cực hiện có cũng từ chối các đối tượng mã hóa hợp lệ khi chúng nằm trong yêu cầu quản lý tác vụ thực sự.
+Thử nghiệm loại bỏ thư mục dữ liệu được chia sẻ đã tạo ra sự loại bỏ chéo workspace khi một Tác vụ không có kiểm tra workspace tương thích.
 The generic reminder wording produced `Phần thầy...` for a waiting loop.
-Named forget and do-not-ask phrases did not consistently stop current-scope OpenLoop delivery.
-The previous `present` name hid that the one-shot attempt was committed before adapter delivery.
+Các cụm từ được đặt tên là quên và không hỏi không nhất quán dừng việc phân phối OpenLoop ở phạm vi hiện tại.
+Tên `present` trước đó đã che giấu rằng nỗ lực một lần đã được thực hiện trước khi phân phối bộ chuyển đổi.
 
-### Final intent guard
+<a id="final-intent-guard"></a>
 
-`classifyCommitmentIntent` now requires a task-management payload after English creation objects.
-The payload must contain an explicit purpose (`to ...`), title (`: ...`), personal activity, or supported time phrase.
-Bare `task`, `todo`, and `reminder` nouns cannot authorize `task_create`.
-Technical nouns cannot authorize coding requests.
-Coding content remains valid after an explicit management phrase.
-For example, `Create a task to implement the auth endpoint` remains valid.
-`Create a task endpoint` remains uncertain.
-Local extraction and `taskTools` use the same classifier and the same direct hard guard.
+### Người bảo vệ ý định cuối cùng
 
-### Final ownership and suppression
+`classifyCommitmentIntent` hiện yêu cầu tải trọng quản lý tác vụ sau khi tạo đối tượng bằng tiếng Anh. Tải trọng phải chứa mục đích rõ ràng (`to ...`), tiêu đề (`: ...`), hoạt động cá nhân hoặc cụm từ thời gian được hỗ trợ. Các danh từ trần `task`, `todo` và `reminder` không thể ủy quyền cho `task_create`. Danh từ kỹ thuật không thể cho phép yêu cầu mã hóa. Nội dung mã hóa vẫn còn hiệu lực sau một cụm từ quản lý rõ ràng. Ví dụ: `Create a task to implement the auth endpoint` vẫn hợp lệ. `Create a task endpoint` vẫn chưa chắc chắn. Trích xuất cục bộ và `taskTools` sử dụng cùng một bộ phân loại và cùng một bộ bảo vệ cứng trực tiếp.
 
-Tasks remain global per `dataDir`. The existing host-owned `memoryProjection.scope` supplies workspace provenance when the runtime creates a task.
-`OpenLoops.reconcile` suppresses only when normalized subject and exact scope both match.
-A Task from another workspace, a Task with absent provenance, and free-form `Task.context` do not suppress.
-This keeps same-workspace suppression while choosing duplicate prompts over cross-workspace state loss.
-Canonical project scope is assigned before OpenLoop extraction. Nested Git directories use the existing ProjectMemory canonical root.
-No Task schema, task lease, or reminder scheduler contract changed.
+<a id="final-ownership-and-suppression"></a>
 
-### Final wording
+### Quyền sở hữu và đàn áp cuối cùng
 
-`ReminderNotifications` selects a localized template from `OpenLoop.kind`:
+Task vẫn được quản lý toàn cục theo `dataDir`. `memoryProjection.scope` hiện có do host quản lý cung cấp nguồn gốc workspace khi runtime tạo tác vụ. `OpenLoops.reconcile` chỉ ngăn nhắc lại khi cả chủ đề đã chuẩn hóa và phạm vi chính xác đều khớp. Task từ workspace khác, Task thiếu nguồn gốc và `Task.context` tự do không ngăn nhắc lại. Cách này giữ khả năng ngăn nhắc lặp trong cùng workspace, đồng thời chấp nhận prompt trùng thay vì mất trạng thái giữa các workspace. Phạm vi dự án chuẩn được gán trước khi trích xuất OpenLoop. Các thư mục Git lồng nhau dùng thư mục gốc chuẩn ProjectMemory hiện có. Không thay đổi schema Task, cơ chế giữ quyền xử lý tác vụ hay hợp đồng lập lịch nhắc nhở.
+
+<a id="final-wording"></a>
+
+### Lời cuối cùng
+
+`ReminderNotifications` chọn mẫu đã bản địa hóa từ `OpenLoop.kind`:
 
 - `problem`: `Vụ {subject} lúc trước xử lý tới đâu rồi?` / `How is the {subject} issue from earlier going?`
 - `work_in_progress`: `Phần {subject} lúc trước làm tới đâu rồi?` / `How is work on {subject} from earlier going?`
@@ -278,65 +265,72 @@ No Task schema, task lease, or reminder scheduler contract changed.
 - `goal`: `Phần {subject} bạn định làm đã xong chưa?` / `Have you finished {subject} as planned?`
 - `upcoming_event`: `Buổi {subject} hôm trước diễn ra thế nào?` / `How did the {subject} event go?`
 
-Redundant leading prefixes are removed for presentation only. Identity keys remain unchanged.
+Tiền tố hàng đầu dư thừa sẽ bị xóa chỉ để trình bày. Khóa nhận dạng không thay đổi.
 
-### Final forget and dismissal semantics
+<a id="final-forget-and-dismissal-semantics"></a>
+
+### Ngữ nghĩa cuối cùng của việc quên và loại bỏ
 
 Named forms include `Quên vụ auth đi`, `Quên chuyện auth đi`, `Đừng nhớ chuyện auth nữa`, `Đừng hỏi tôi về auth nữa`, `Đừng nhắc chuyện auth nữa`, and `Không cần theo dõi vụ auth nữa`.
-They dismiss only a matching OpenLoop in the current workspace.
+Họ chỉ loại bỏ OpenLoop phù hợp trong workspace hiện tại.
 Generic forms such as `Quên chuyện đó đi` require one exact current OpenLoop focus. Ambiguity returns clarification.
 `Đừng hỏi` leaves personal memory unchanged.
 `Quên` or `Đừng nhớ` also calls the existing `Memory.forget` path for one unambiguous matching personal record.
-Multiple records, disabled personal memory, or forget-storage failure leave personal records unchanged and direct the user to `/memory`.
-Tracking remains dismissed even when memory removal fails.
-The existing broad `/forget` and `/memory` commands retain their own behavior. No broad destructive deletion was added.
-Protected or meta requests do not broaden dismissal.
+Nhiều bản ghi, bộ nhớ cá nhân bị vô hiệu hóa hoặc lỗi quên lưu trữ sẽ khiến các bản ghi cá nhân không thay đổi và hướng người dùng đến `/memory`.
+Việc theo dõi vẫn bị loại bỏ ngay cả khi việc xóa bộ nhớ không thành công.
+Các lệnh `/forget` và `/memory` rộng hiện có vẫn giữ nguyên hành vi của riêng chúng. Không có sự xóa bỏ mang tính hủy diệt rộng rãi nào được thêm vào.
+Yêu cầu được bảo vệ hoặc meta không mở rộng việc loại bỏ.
 
-### Final delivery semantics
+<a id="final-delivery-semantics"></a>
 
-`OpenLoops.present` is now `OpenLoops.reservePresentation`.
-The method commits the one-shot attempt before the adapter call.
-A failure after reservation and before confirmed external presentation can lose the follow-up.
-This includes process crash, Telegram API error, stdout write failure, adapter exception, and network failure.
-Reserved implicit attempts are not retried. Task reminders retain their existing delivery guarantees.
+### Ngữ nghĩa phân phối cuối cùng
 
-### Final tests
+`OpenLoops.present` bây giờ là `OpenLoops.reservePresentation`. Phương thức này thực hiện lần thử một lần trước khi gọi bộ chuyển đổi. Thất bại sau khi đặt trước và trước khi trình bày bên ngoài được xác nhận có thể làm mất quá trình theo dõi. Điều này bao gồm sự cố quy trình, lỗi Telegram API, lỗi ghi thiết bị xuất chuẩn, ngoại lệ bộ điều hợp và lỗi mạng. Những nỗ lực ngầm dành riêng sẽ không được thử lại. Lời nhắc nhiệm vụ vẫn giữ nguyên đảm bảo giao hàng hiện có của họ.
 
-Added or extended tests cover:
+<a id="final-tests"></a>
 
-- coding-intent false positives and valid coding task subjects through both extraction and `task_create`;
-- same-workspace suppression, cross-workspace isolation, absent provenance, and Telegram/shared-user routing;
-- all five kind-specific English and Vietnamese templates;
-- named forget, do-not-ask, generic ambiguity, personal-memory cleanup, memory failure, and disabled-memory behavior;
-- reservation failures across adapter, network, stdout, and process-style retry boundaries;
-- OpenLoop context ordering with open loops before inactive history.
+### bài kiểm tra cuối cùng
 
-### Final validation
+Các bài kiểm tra được thêm hoặc mở rộng bao gồm:
 
-- `pnpm --config.verify-deps-before-run=false -F @angela/cli test --maxWorkers=2`: **PASS**, 72 files, 812 tests before the final two-line authorization refinement.
-- `../../node_modules/.bin/vitest run --config vitest.config.ts --maxWorkers=2` from `packages/angela-cli`: **PASS**, 72 files, 814 tests after the final refinement.
-- `pnpm --config.verify-deps-before-run=false -F @angela/cli typecheck`: **PASS** when run after i18n build completes.
+- dương tính giả có mục đích mã hóa và đối tượng nhiệm vụ mã hóa hợp lệ thông qua cả trích xuất và `task_create`;
+- triệt tiêu cùng workspace, cách ly chéo workspace, không xuất xứ và định tuyến Telegram/shared-user;
+- tất cả năm mẫu tiếng Anh và tiếng Việt dành riêng cho từng loại;
+- được đặt tên là quên, không hỏi, mơ hồ chung chung, dọn dẹp bộ nhớ cá nhân, lỗi bộ nhớ và hành vi bộ nhớ bị vô hiệu hóa;
+- lỗi đặt trước trên các ranh giới thử lại bộ chuyển đổi, mạng, thiết bị xuất chuẩn và kiểu quy trình;
+- Thứ tự ngữ cảnh OpenLoop với các vòng lặp mở trước lịch sử không hoạt động.
+
+<a id="final-validation"></a>
+
+### Xác nhận cuối cùng
+
+- `pnpm --config.verify-deps-before-run=false -F @angela/cli test --maxWorkers=2`: **PASS**, 72 tệp, 812 bài kiểm tra trước khi sàng lọc ủy quyền hai dòng cuối cùng.
+- `../../node_modules/.bin/vitest run --config vitest.config.ts --maxWorkers=2` từ `packages/angela-cli`: **PASS**, 72 tệp, 814 bài kiểm tra sau lần sàng lọc cuối cùng.
+- `pnpm --config.verify-deps-before-run=false -F @angela/cli typecheck`: **PASS** khi chạy sau khi quá trình xây dựng i18n hoàn tất.
 - `pnpm --config.verify-deps-before-run=false -F @angela/cli build`: **PASS**.
 - `pnpm --config.verify-deps-before-run=false -F @angela/i18n typecheck`: **PASS**.
 - `pnpm --config.verify-deps-before-run=false -F @angela/i18n build`: **PASS**.
-- `pnpm --config.verify-deps-before-run=false lint`: **PASS**, zero errors and 603 repository warnings. No changed file has a lint diagnostic.
+- `pnpm --config.verify-deps-before-run=false lint`: **PASS**, không có lỗi và cảnh báo kho lưu trữ 603. Không có tệp đã thay đổi nào có chẩn đoán lỗi mã nguồn.
 - `git diff --check`: **PASS**.
-- Authoritative infrastructure diff against the inspected baseline: **empty** for `tasks.ts`, `task-schema.ts`, `reminder-scheduler.ts`, `recall.ts`, and `memory-v2/commitment-projection.ts`.
-- Root `typecheck --concurrency=2`: previously reached the package checks, then stopped at the existing `@angela/stage-ui` JavaScript heap OOM. No unrelated workspace was changed.
+- Cơ sở hạ tầng có thẩm quyền khác với đường cơ sở đã được kiểm tra: **trống** đối với `tasks.ts`, `task-schema.ts`, `reminder-scheduler.ts`, `recall.ts` và `memory-v2/commitment-projection.ts`.
+- Root `typecheck --concurrency=2`: trước đó đã đạt được kiểm tra gói, sau đó dừng lại ở vùng `@angela/stage-ui` JavaScript OOM hiện có. Không có workspace không liên quan nào được thay đổi.
 
-### Final hardening commits
+<a id="final-hardening-commits"></a>
 
-- `2c0aa2c`: positive task-management intent guard.
-- `a3a4e06`: workspace-compatible OpenLoop suppression.
-- `8395d74`: kind-specific localized wording.
-- `ef5a119`: forget and do-not-ask dismissal semantics plus reservation naming.
-- `97a0180`: open-loop context ordering.
-- `774a626`: final documentation and bounded context test.
-- `d0e0e59`: accept explicit personal activities after `for` without reopening coding false positives.
+### Cam kết làm cứng cuối cùng
 
-These commits are pushed to `origin/main`. The only uncommitted paths are pre-existing deletions of `LICENSE` and `third_party/openseeface/LICENSE`, which were not touched by this work.
+- `2c0aa2c`: bảo vệ mục đích quản lý nhiệm vụ tích cực.
+- `a3a4e06`: Loại bỏ OpenLoop tương thích với workspace.
+- `8395d74`: từ ngữ được bản địa hóa theo loại cụ thể.
+- `ef5a119`: quên và không hỏi ngữ nghĩa loại bỏ cộng với việc đặt tên đặt trước.
+- `97a0180`: thứ tự ngữ cảnh vòng lặp mở.
+- `774a626`: tài liệu cuối cùng và kiểm tra ngữ cảnh có giới hạn.
+- `d0e0e59`: chấp nhận các hoạt động cá nhân rõ ràng sau `for` mà không mở lại mã hóa dương tính giả.
 
-## Closure decision
+Các cam kết này được đẩy lên `origin/main`. Các đường dẫn không được cam kết duy nhất là các đường dẫn đã xóa trước đó của `LICENSE` và `third_party/openseeface/LICENSE`, chưa được tác phẩm này chạm tới.
 
-The Proactive Companion Loop milestone is **CLOSED** for this scope.
-The remaining limitations are documented: conservative deterministic extraction, running CLI or Telegram host for implicit delivery, and the known root `stage-ui` OOM.
+<a id="closure-decision"></a>
+
+## Quyết định đóng cửa
+
+Cột mốc Vòng lặp đồng hành chủ động là **CLOSED** cho phạm vi này. Các hạn chế còn lại đã được ghi lại: trích xuất xác định thận trọng, chạy CLI hoặc Telegram host để phân phối ngầm và `stage-ui` OOM gốc đã biết.

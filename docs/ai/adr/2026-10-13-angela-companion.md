@@ -1,23 +1,28 @@
-# Angela companion
+<a id="angela-companion"></a>
 
-## Goal
+# Angela đồng hành
 
-Angela is a personal AI companion for relaxed conversation and help with learning.
-The user approved reusing AIRI and keeping its existing apps, games, integrations, and tools.
+<a id="goal"></a>
 
-## Decisions
+## Mục tiêu
 
-- Rebrand the main web and desktop surfaces as Angela.
-- Keep internal package names, protocols, storage keys, and custom character cards intact.
-- Give new installations an Angela character that speaks Vietnamese and helps with learning when asked.
-- Keep the character stage, voice pipeline, and tool execution already in the repository.
-- Use existing OpenAI providers for chat, vision, transcription, and speech.
-- Configure API keys through the existing provider settings. Never commit credentials.
-- Replace the code in `lighthouse2815/Angela` as the user requested.
-- Preserve the original AIRI license and attribution.
+Angela là người bạn đồng hành AI cá nhân để trò chuyện thoải mái và hỗ trợ học tập. Người dùng đã chấp thuận việc sử dụng lại AIRI và giữ lại các ứng dụng, trò chơi, tích hợp và công cụ hiện có.
 
-## Validation
+<a id="decisions"></a>
 
-Run character-card tests, locale checks, workspace builds, and lint.
-Check the installed desktop executor before claiming that laptop control works.
-Live API validation needs an API key entered by the user.
+## Quyết định
+
+- Đổi tên trang web chính và các bề mặt desktop thành Angela.
+- Giữ nguyên tên gói nội bộ, giao thức, khóa lưu trữ và thẻ ký tự tùy chỉnh.
+- Cung cấp cho các bản cài đặt mới một nhân vật Angela nói tiếng Việt và hỗ trợ học tập khi được yêu cầu.
+- Giữ ký tự stage, đường dẫn thoại và thực thi công cụ đã có trong kho lưu trữ.
+- Sử dụng OpenAI nhà cung cấp hiện có để trò chuyện, xem, chép lời và nói.
+- Định cấu hình khóa API thông qua cài đặt nhà cung cấp hiện có. Không bao giờ cam kết thông tin xác thực.
+- Thay thế mã trong `lighthouse2815/Angela` theo yêu cầu của người dùng.
+- Giữ nguyên giấy phép và ghi công ban đầu của AIRI.
+
+<a id="validation"></a>
+
+## Xác thực
+
+Chạy kiểm tra thẻ ký tự, kiểm tra ngôn ngữ, bản dựng workspace và tìm lỗi mã nguồn. Kiểm tra trình thực thi desktop đã cài đặt trước khi xác nhận rằng điều khiển máy tính xách tay hoạt động. Xác thực trực tiếp API cần có khóa API do người dùng nhập.

@@ -1,4 +1,6 @@
-# Companion Memory V2 evaluations
+<a id="companion-memory-v2-evaluations"></a>
+
+# Đánh giá bộ nhớ đồng hành V2
 
 Bộ dữ liệu gồm 128 tình huống giả lập, chia đều 16 nhóm. Nội dung chủ yếu bằng tiếng Việt.
 Không chứa hội thoại thật, thông tin cá nhân thật hoặc credential.
@@ -40,7 +42,9 @@ User khác dùng data directory khác. Workspace khác dùng scope khác trong c
 Lịch sử cùng user/workspace qua session được phép recall. Lịch sử session hiện tại thuộc working context và được loại khỏi retrieval.
 Fixture isolation kiểm tra ranh giới Recall đã nhận đúng directory/scope. Nó không chứng minh routing của Telegram hoặc Discord.
 
-### Expected
+<a id="expected"></a>
+
+### Hy vọng
 
 | Trường | Cách chấm |
 | --- | --- |
@@ -61,7 +65,9 @@ Nhắc lại một kế hoạch không đồng nghĩa xác nhận kế hoạch �
 Nhãn `Completed:` bị cấm trong capture case chỉ có lời người dùng hoặc lời hứa chưa xác minh.
 Ký ức cũ được chấm theo ID nguồn. Chuỗi cũ trong câu đính chính vẫn được phép xuất hiện như trích dẫn.
 
-## Category
+<a id="category"></a>
+
+## Loại
 
 Mỗi nhóm có 8 case.
 
@@ -84,7 +90,9 @@ Mỗi nhóm có 8 case.
 | `irrelevant_memory` | Không đưa ký ức khác chủ đề vào context |
 | `vietnamese_variants` | Có dấu, không dấu và cách hỏi khác nhau |
 
-## Scoring
+<a id="scoring"></a>
+
+## Ghi điểm
 
 Chấm theo case, không theo số token. Mỗi tỷ lệ phải ghi tử số và mẫu số.
 Mẫu số rỗng trả về `null`, không giả vờ đạt 100%.

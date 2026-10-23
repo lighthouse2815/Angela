@@ -1,38 +1,32 @@
-# Voice input binding follows the microphone stream
+<a id="voice-input-binding-follows-the-microphone-stream"></a>
 
-Status: Proposed
+# Liên kết đầu vào bằng giọng nói theo luồng micrô
 
-## Context
+Trạng thái: Đề xuất
 
-The Web and Pocket home pages used to start voice input when the saved
-`enabled` setting changed. Device discovery and `getUserMedia` can finish later.
-The pages then started their own VAD on the late stream but did not bind the
-streaming ASR pipeline. A later toggle, device change, or unmount could also
-overlap an earlier asynchronous start or stop.
+<a id="context"></a>
 
-In an Edge reproduction on 2026-09-23, the microphone control remained enabled
-after two spoken phrases, but the Network panel showed no transcription request
-and the Console showed no Hearing Pipeline startup message. The same absence
-remained after an off/on toggle. A refresh restored the enabled control without
-a startup message. This is a client-side startup failure, not an upstream latency
-measurement.
+## Bối cảnh
 
-## Decision
+Trang chủ Web và Pocket được sử dụng để bắt đầu nhập bằng giọng nói khi cài đặt `enabled` đã lưu thay đổi. Việc khám phá thiết bị và `getUserMedia` có thể hoàn tất sau. Sau đó, các trang bắt đầu VAD của riêng chúng trên luồng muộn nhưng không liên kết với đường dẫn truyền dữ liệu liên tục ASR. Việc chuyển đổi, thay đổi hoặc ngắt kết nối thiết bị sau này cũng có thể trùng lặp với lần khởi động hoặc dừng không đồng bộ trước đó.
 
-- A page binds voice input only when it has both `enabled` and a `MediaStream`.
-- A binding identifies the stream object and the provider mode. Changes are
-  serialized: release the old binding, then start the latest requested one.
-- Streaming providers use the Hearing pipeline's VAD. Recorder-backed providers
-  use the page VAD. Do not run both detectors for the same stream.
-- Each streaming consumer releases only its own callbacks. The shared provider
-  session stops when the last consumer leaves.
-- The pipeline serializes provider binding and teardown. A replacement stream
-  creates a new VAD session, even when the provider ID is unchanged.
-- An aborted session cannot deliver late transcript callbacks to a new binding.
-- ASR response cancellation closes the server's upstream WebSocket and stops
-  reading the request audio.
+Trong bản sao Edge vào ngày 23 tháng 9 năm 2026, điều khiển micrô vẫn được bật sau hai cụm từ được nói, nhưng bảng Mạng không hiển thị yêu cầu phiên âm và Bảng điều khiển không hiển thị thông báo khởi động Đường ống Thính giác. Sự vắng mặt tương tự vẫn tồn tại sau khi chuyển đổi off/on. Việc làm mới đã khôi phục điều khiển đã bật mà không có thông báo khởi động. Đây là lỗi khởi động phía máy khách, không phải là phép đo độ trễ upstream.
 
-## State model
+<a id="decision"></a>
+
+## Phán quyết
+
+- Một trang chỉ liên kết đầu vào bằng giọng nói khi nó có cả `enabled` và `MediaStream`.
+- Một ràng buộc xác định đối tượng luồng và chế độ nhà cung cấp. Các thay đổi được tuần tự hóa: giải phóng liên kết cũ, sau đó bắt đầu liên kết được yêu cầu mới nhất.
+- truyền dữ liệu liên tục nhà cung cấp sử dụng VAD của đường dẫn Thính giác. nhà cung cấp được ghi hỗ trợ sử dụng trang VAD. Không chạy cả hai máy dò cho cùng một luồng.
+- Mỗi truyền dữ liệu liên tục bên sử dụng chỉ phát hành các lệnh gọi lại của riêng nó. Phiên nhà cung cấp được chia sẻ sẽ dừng khi bên sử dụng cuối cùng rời đi.
+- Đường ống tuần tự hóa liên kết và phân tách nhà cung cấp. Luồng thay thế sẽ tạo phiên VAD mới, ngay cả khi nhà cung cấp ID không thay đổi.
+- Phiên bị hủy không thể gửi lệnh gọi lại bản ghi muộn tới liên kết mới.
+- Việc hủy phản hồi ASR sẽ đóng upstream WebSocket của máy chủ và dừng đọc âm thanh yêu cầu.
+
+<a id="state-model"></a>
+
+## Trạng thái mô hình
 
 ```mermaid
 stateDiagram-v2
@@ -49,10 +43,11 @@ stateDiagram-v2
   Starting --> Stopping: startup failed
 ```
 
-`Starting → Stopping` waits for the in-flight start before releasing its partial
-resources. A queued older start is skipped when a newer request supersedes it.
+`Starting → Stopping` chờ khởi động trong chuyến bay trước khi giải phóng một phần tài nguyên của nó. Một khởi đầu cũ hơn trong hàng đợi sẽ bị bỏ qua khi một yêu cầu mới hơn thay thế nó.
 
-## Streaming ASR topology
+<a id="streaming-asr-topology"></a>
+
+## Cấu trúc liên kết truyền dữ liệu liên tục ASR
 
 ```mermaid
 flowchart LR
@@ -67,12 +62,11 @@ flowchart LR
   SSE --> Consumers[Page and chat input consumers]
 ```
 
-The browser-to-AIRI leg already uploads audio incrementally and receives SSE.
-Changing only that leg to WebSocket does not remove the AIRI-to-Aliyun hop.
-The current ASR route does not write a per-user usage ledger; the separate TTS
-WebSocket route performs a balance preflight and bills its session at completion.
+Nhánh từ trình duyệt tới AIRI đã tải âm thanh lên dần dần và nhận SSE. Chỉ thay đổi chặng đó thành WebSocket không loại bỏ bước nhảy AIRI-to-Aliyun. ASR route hiện tại không ghi sổ cái sử dụng của mỗi người dùng; TTS WebSocket route riêng biệt thực hiện cân bằng trước và lập hóa đơn cho phiên của nó khi hoàn thành.
 
-## Sequence and timing points
+<a id="sequence-and-timing-points"></a>
+
+## Trình tự và điểm thời gian
 
 ```mermaid
 sequenceDiagram
@@ -98,15 +92,10 @@ sequenceDiagram
   A->>N: Close WebSocket on cancellation
 ```
 
-Measure microphone-ready, VAD speech start, request start, token completion,
-upstream WebSocket open, first transcript, and UI delivery separately. A missing
-request must be reported as a startup failure rather than assigned an upstream
-latency. No upstream timing can be inferred from the Edge reproduction above.
+Đo lường micrô sẵn sàng, bắt đầu giọng nói VAD, bắt đầu yêu cầu, hoàn thành token, upstream WebSocket mở, bản ghi đầu tiên và phân phối UI riêng biệt. Yêu cầu bị thiếu phải được báo cáo là lỗi khởi động thay vì được chỉ định độ trễ upstream. Không thể suy ra thời gian upstream từ quá trình tái tạo Edge ở trên.
 
-## Consequences
+<a id="consequences"></a>
 
-The page no longer starts a redundant VAD for streaming providers. Rapid
-toggles and stream replacements may wait for the previous binding to stop, but
-cannot reuse its stale stream or let its teardown close the new binding.
-Direct-to-provider audio transport and its billing protocol remain separate
-decisions.
+## Hậu quả
+
+Trang không còn khởi động VAD dự phòng cho truyền dữ liệu liên tục nhà cung cấp nữa. Việc chuyển đổi nhanh và thay thế luồng có thể đợi liên kết trước đó dừng lại, nhưng không thể sử dụng lại luồng cũ hoặc để việc phân tách của nó đóng liên kết mới. Âm thanh trực tiếp tới nhà cung cấp transport và giao thức thanh toán của nó vẫn có các quyết định riêng biệt.
