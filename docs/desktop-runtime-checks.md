@@ -48,7 +48,7 @@ Workflow này không đóng gói installer hoặc kiểm tra thư viện native 
 - Build desktop đạt.
 - Lint toàn repository đạt với 603 cảnh báo ESLint và không có lỗi ESLint.
 
-Chưa chạy workflow trên GitHub. Kết quả local không chứng nhận cài dependencies trên runner mới.
+Kết quả này mô tả lần chạy local. Kết quả GitHub mới nằm cuối tài liệu.
 
 ## Smoke overlay Electron
 
@@ -132,3 +132,16 @@ Thay đổi gateway riêng không khởi chạy lại workflow desktop. Desktop 
 Workflow desktop giữ bước typecheck CLI và cài dependency của cả hai ứng dụng.
 Nó build các package cần cho desktop và khai báo kiểu CLI theo thứ tự dependency.
 Gateway engine không cần build cho typecheck. Workflow CLI vẫn kiểm tra build và runtime gateway đầy đủ.
+
+## Kết quả GitHub ngày 24-10-2026
+
+- [CI CLI đạt](https://github.com/lighthouse2815/Angela/actions/runs/40015286369) trên commit `e96e51e`.
+- [CI desktop đạt](https://github.com/lighthouse2815/Angela/actions/runs/40020822765) trên commit `18c6b1c`.
+- Runner desktop cài dependency từ lockfile và build các package phụ thuộc thành công.
+- Runtime chung đạt 74 test. Desktop Node đạt 684 test, 2 test bỏ qua theo cấu hình hiện có.
+- Browser companion đạt 6 test. Typecheck CLI, desktop và script smoke đều đạt.
+- Lint và build desktop đạt.
+- Smoke Electron thật đạt với `phase: done`, cửa sổ hiển thị, renderer có nội dung và Ozone `x11`.
+
+Sandbox helper cần quyền `root:root`, `4755` trên runner Ubuntu này. Workflow cấu hình quyền trước khi mở Electron.
+Kiểm tra click và gõ native vẫn chờ host phù hợp. Kết quả Xvfb chỉ chứng nhận hiển thị cửa sổ.
