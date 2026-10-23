@@ -260,3 +260,18 @@ The report contains verification flags and tool names, without credentials or do
 
 The 2026-10-16 Niri run passed with Gemini 3.1 Flash Lite and real VS Code.
 The saved document matched the requested Vietnamese text. The other file stayed intact and the native clipboard returned to its initial state.
+
+## Companion follow-ups
+
+Open Settings > Modules > Long-Term Memory and enable Companion.
+Learning memory must also remain enabled. Add an unfinished subject or start a shared activity.
+The main Stage presents a follow-up after one minute without input, when the record is due.
+It waits while chat generates or speech plays, and while the Stage is hidden.
+Follow-ups run between 08:00 and 22:00 in the machine timezone, at most once per hour.
+Each record gets one presentation attempt. Closing Angela stops checks until the next launch.
+A reserved attempt can be lost if the renderer closes before the toast appears.
+
+Use Stop asking to dismiss a subject. Use Delete record to remove its companion memory.
+A completed activity records the user report. An elapsed timer never marks an activity complete.
+These local records remain separate from CLI Memory V2 and Telegram OpenLoops.
+The Companion panel and chat use the same character-scoped records across desktop windows.

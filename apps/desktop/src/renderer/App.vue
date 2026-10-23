@@ -70,6 +70,7 @@ import { electronPluginToolsChanged } from '../shared/eventa/plugin/tools'
 import { initializeElectronAuthCallbackBridge } from './bridges/electron-auth-callback'
 import { initializeIOTraceRecordingBridge } from './bridges/io-trace-recording'
 import { initializeStageThreeRuntimeTraceBridge } from './bridges/stage-three-runtime-trace'
+import { useCompanionFollowUps } from './composables/use-companion-follow-ups'
 import { useLanguage } from './composables/use-language'
 import { useLearningReviewReminders } from './composables/use-learning-review-reminders'
 import { useServerChannelSettingsStore } from './stores/settings/server-channel'
@@ -122,6 +123,8 @@ const mcpToolsStore = useTamagotchiMcpToolsStore()
 const pluginToolsStore = useTamagotchiPluginToolsStore()
 const syncedPinia = usePiniaSynced()
 useLearningReviewReminders()
+if (initialRoutePath === '/')
+  useCompanionFollowUps()
 const isSpotlightWindow = initialRoutePath === '/spotlight'
 // The floating chat resizes from its own grip, which keeps the corner beside the character in place.
 const isFloatingChatWindow = initialRoutePath === '/chat-floating'
