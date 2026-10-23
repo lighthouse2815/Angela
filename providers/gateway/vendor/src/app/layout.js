@@ -10,14 +10,14 @@ initConsoleLogCapture();
 
 export const metadata = {
   title: "Angela Gateway - AI Provider Management",
-  description: "One endpoint for all your AI providers. Manage keys, monitor usage, and scale effortlessly.",
+  description: "Your models. One orbit. Connect providers, shape model routes, and review usage in your Angela workspace.",
   icons: {
     icon: "/favicon.svg",
   },
 };
 
 export const viewport = {
-  themeColor: "#102d34",
+  themeColor: "#7651c9",
 };
 
 export default function RootLayout({ children }) {

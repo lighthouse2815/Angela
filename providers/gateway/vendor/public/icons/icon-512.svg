@@ -1,4 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="64" fill="#0a0a0a"/>
-  <text x="256" y="320" font-family="Arial, sans-serif" font-size="200" font-weight="bold" fill="#ffffff" text-anchor="middle">AG</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 32 32" fill="none">
+  <rect width="512" height="512" rx="11" fill="#7651c9"/>
+  <path d="M10 23L16 8L22 23M12 18H20" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <ellipse cx="16" cy="17" rx="12" ry="5" transform="rotate(-30 16 17)" stroke="#d8c7f7" stroke-width="1.2"/>
+  <circle cx="25.5" cy="10.5" r="2" fill="#ece3fc"/>
 </svg>

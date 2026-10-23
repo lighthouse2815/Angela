@@ -35,8 +35,10 @@ Do not rename those identifiers without checking the corresponding protocol.
 The source includes upstream translations and their source-text dictionaries.
 The product rename updates matching brand labels without translating unrelated text.
 
-The web workspace uses jade accents, slate navigation, and responsive panels.
-The landing page links directly to providers, routes, usage, and CLI configuration.
+The web workspace uses violet accents, warm neutral surfaces, and horizontal navigation.
+The overview shows configured accounts and today’s request and token totals from the existing APIs.
+The navigation drawer retains access to all management pages. Light, dark, and mobile layouts use the same identity.
+The landing and login pages share the Angela orbit illustration and app icon.
 Stored protocol identifiers remain unchanged so existing integrations continue to work.
 
 ## Build and tests

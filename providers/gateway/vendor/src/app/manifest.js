@@ -2,11 +2,11 @@ export default function manifest() {
   return {
     name: 'Angela Gateway - AI Infrastructure Management',
     short_name: 'Angela Gateway',
-    description: 'One endpoint for all your AI providers. Manage keys, monitor usage, and scale effortlessly.',
+    description: 'Your models. One orbit. Connect providers, shape model routes, and review usage in your Angela workspace.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#0a0a0a',
-    theme_color: '#0a0a0a',
+    background_color: '#f6f5f1',
+    theme_color: '#7651c9',
     orientation: 'portrait-primary',
     icons: [
       {

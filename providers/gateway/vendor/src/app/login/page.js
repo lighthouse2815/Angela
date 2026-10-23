@@ -1,7 +1,11 @@
 "use client";
 
+import Image from "next/image";
+
 import { useState, useEffect } from "react";
 import { Card, Button, Input } from "@/shared/components";
+import GatewayOrbit from "@/shared/components/gateway-orbit";
+import ThemeToggle from "@/shared/components/ThemeToggle";
 
 export default function LoginPage() {
   const [password, setPassword] = useState("");
@@ -150,12 +154,18 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg p-4 relative overflow-hidden">
+    <div className="angela-login min-h-screen bg-bg relative">
+      <div className="absolute right-5 top-5"><ThemeToggle /></div>
+      <aside className="angela-login-intro">
+        <a href="/landing" className="angela-wordmark"><Image src="/favicon.svg" width="40" height="40" alt="" /><span>angela<span className="text-primary">.</span></span></a>
+        <div><p className="angela-eyebrow">THE ANGELA WORKSPACE</p><h2>Your models.<br /><span className="text-primary">One orbit.</span></h2><GatewayOrbit /></div>
+        <p className="text-xs text-text-muted">Made for your kind of intelligence.</p>
+      </aside>
 
-      <div className="relative z-10 w-full max-w-md">
+      <main className="angela-login-form relative z-10 w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="mx-auto mb-5 flex size-16 items-center justify-center rounded-3xl bg-primary text-3xl font-semibold text-white">A</div>
-          <h1 className="text-3xl font-bold text-primary mb-2">Angela Gateway</h1>
+          <Image src="/favicon.svg" width="52" height="52" alt="" className="mx-auto mb-5" />
+          <h1 className="text-3xl font-semibold tracking-tight mb-3">Welcome to your orbit.</h1>
           <p className="text-text-muted">
             {samlAvailable
               ? "Sign in with SAML 2.0 Single Sign-On"
@@ -265,7 +275,7 @@ export default function LoginPage() {
           </div>
           )}
         </Card>
-      </div>
+      </main>
     </div>
   );
 }

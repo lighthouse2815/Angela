@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import Link from "next/link";
@@ -18,6 +20,7 @@ const VISIBLE_MEDIA_KINDS = ["embedding", "image", "video", "tts", "stt", "syste
 const COMBINED_WEB_ITEM = { id: "web", label: "Web Fetch & Search", icon: "travel_explore", href: "/dashboard/media-providers/web" };
 
 const navItems = [
+  { href: "/dashboard", label: "Overview", icon: "orbit" },
   { href: "/dashboard/endpoint", label: "Endpoint & Key", icon: "api" },
   { href: "/dashboard/providers", label: "Providers", icon: "dns" },
   // { href: "/dashboard/basic-chat", label: "Basic Chat", icon: "chat" }, // Hidden
@@ -70,9 +73,7 @@ export default function Sidebar({ onClose }) {
   }, []);
 
   const isActive = (href) => {
-    if (href === "/dashboard/endpoint") {
-      return pathname === "/dashboard" || pathname.startsWith("/dashboard/endpoint");
-    }
+    if (href === "/dashboard") return pathname === href;
     return pathname.startsWith(href);
   };
 
@@ -114,14 +115,12 @@ export default function Sidebar({ onClose }) {
         {/* Logo */}
         <div className="px-6 pt-8 pb-6 flex flex-col gap-2">
           <Link href="/dashboard" className="flex items-center gap-3">
-            <div className="flex items-center justify-center size-9 rounded-[10px] bg-gradient-to-br from-brand-500 to-brand-700 shadow-[var(--shadow-warm)]">
-              <span className="material-symbols-outlined text-white text-[20px]">auto_awesome</span>
-            </div>
+            <Image src="/favicon.svg" width="36" height="36" alt="" />
             <div className="flex flex-col">
               <h1 className="text-lg font-semibold tracking-tight text-text-main">
                 {APP_CONFIG.name}
               </h1>
-              <span className="text-xs text-text-muted">AI workspace · v{APP_CONFIG.version}</span>
+              <span className="text-xs text-text-muted">Gateway · v{APP_CONFIG.version}</span>
             </div>
           </Link>
           {updateInfo && (
@@ -185,6 +184,7 @@ export default function Sidebar({ onClose }) {
 
             {/* Media Providers accordion */}
             <button
+              aria-expanded={mediaOpen}
               onClick={() => setMediaOpen((v) => !v)}
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-1 rounded-lg transition-all group",
