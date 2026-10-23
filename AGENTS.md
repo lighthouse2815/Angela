@@ -24,10 +24,10 @@ The CLI is a Node application. The gateway vendor is an isolated Next.js workspa
 | `shared/ui/layouts` | Shared layouts, including the stage-web settings layout. |
 | `shared/ui/primitives` | Primitives built on reka-ui, such as inputs, buttons, and layout. They have minimal business logic. |
 | `shared/i18n` | All translations. |
-| `backend/channel/runtime`, `shared/sdk/server`, `backend/contracts/server` | The server channel that `services/` and `plugins/` use. |
+| `backend/channel/runtime`, `shared/sdk/server`, `backend/contracts/server` | The server channel that capabilities and integrations use. |
 | `backend/api` | The hosted Hono resource API and its business domains. |
 | `../dev-in-future/server/apps/auth` | The standalone Better Auth and OIDC service. |
-| `backend/packages` | Shared API schemas and chat contracts that desktop types also consume. |
+| `backend/contracts` | Shared API schemas and chat contracts that desktop types also consume. |
 | `../dev-in-future/server/dev/caddy` | Local Auth and API edge routing. |
 | `../dev-in-future/server/docker-compose.yaml` | The complete local backend stack. |
 
@@ -127,7 +127,7 @@ Use pnpm workspace filters to limit a command to one workspace. Replace `<packag
 - Put project-wide and client ADRs in `docs/ai/adr/`. Put hosted backend ADRs in `backend/docs/ai/adr/`, and obey the ADR rules in `backend/AGENTS.md`.
 - Put a documentation change in the same commit or PR as the code that it describes. This rule applies to ADRs, `README.md` files, and component references.
 - Put agent configuration changes in a separate commit or PR. Agent configuration includes `AGENTS.md`, `CLAUDE.md`, skills, and `.github/copilot-instructions.md`.
-- Keep a structured `README.md` in each `packages/` and `apps/` entry. It tells what the entry does, how to use it, when to use it, and when not to use it.
+- Keep a structured `README.md` in every workspace package. Describe its purpose, commands, supported use, and boundaries.
 - Put all translations in `shared/i18n`. By default, edit only the English source locale and your own locale.
 - Do not edit other locales unless the user asks. Crowdin manages them, and the next Crowdin sync can replace local edits.
 - Do not use English text as a placeholder in other locales. Add only the locales you implement.
