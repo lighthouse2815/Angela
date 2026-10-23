@@ -1,6 +1,4 @@
-> Angela is derived from [Project AIRI](https://github.com/moeru-ai/airi). Historical posts, community links, and upstream documentation retain their original attribution.
-
-> Mobile and hosted authentication are archived. Read [the activation guide](../../dev-in-future/README.md) before using their commands.
+> Angela được phát triển từ [Project AIRI](https://github.com/moeru-ai/airi). Các bài viết lịch sử, liên kết cộng đồng và tài liệu gốc giữ nguyên thông tin ghi nhận tác giả.
 
 <picture>
   <source
@@ -16,18 +14,18 @@
   <img width="250" src="./assets/banner-light-1280x640.avif" />
 </picture>
 
-<h1 align="center">Angela</h1>
+<h1 align="center">Dự án Angela</h1>
 
-<p align="center">Neuro-sama를 재현하여, AI 와이프 / 가상 캐릭터의 영혼 그릇을 우리 세상으로 가져옵니다.</p>
+<p align="center">Lấy ý tưởng từ Neuro-sama và chúng tôi đã tạo ra một AI waifu / nhân vật ảo để mang họ đến với thế giới của chúng ta.</p>
 
 <p align="center">
-  [<a href="https://discord.gg/TgQ3Cu2F7A">Discord 서버 참여</a>] [<a href="https://airi.moeru.ai">체험하기</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/README.md">English</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.zh-CN.md">简体中文</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.ja-JP.md">日本語</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.ru-RU.md">Русский</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.vi.md">Tiếng Việt</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.fr.md">Français</a>]
+  [<a href="https://discord.gg/TgQ3Cu2F7A">Tham gia máy chủ Discord</a>] [<a href="https://airi.moeru.ai">Dùng thử</a>] [<a href="../README.md">Hướng dẫn Angela hiện tại</a>] [<a href="./CONTRIBUTING.md">Hướng dẫn đóng góp</a>]
 </p>
 
 <p align="center">
   <a href="https://deepwiki.com/moeru-ai/airi"><img src="https://deepwiki.com/badge.svg"></a>
   <a href="https://github.com/lighthouse2815/Angela/blob/main/LICENSE"><img src="https://img.shields.io/github/license/moeru-ai/airi.svg?style=flat&colorA=080f12&colorB=1fa669"></a>
-  <a href="https://discord.gg/TgQ3Cu2F7A"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FTgQ3Cu2F7A%3Fwith_counts%3Dtrue&query=%24.approximate_member_count&suffix=%20members&logo=discord&logoColor=white&label=%20&color=7389D8&labelColor=6A7EC2"></a>
+  <a href="https://discord.gg/TgQ3Cu2F7A"><img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FTgQ3Cu2F7A%3Fwith_counts%3Dtrue&query=%24.approximate_member_count&suffix=%20thành viên&logo=discord&logoColor=white&label=%20&color=7389D8&labelColor=6A7EC2"></a>
   <a href="https://x.com/proj_airi"><img src="https://img.shields.io/badge/%40proj__airi-black?style=flat&logo=x&labelColor=%23101419&color=%232d2e30"></a>
   <a href="https://t.me/+7M_ZKO3zUHFlOThh"><img src="https://img.shields.io/badge/Telegram-%235AA9E6?logo=telegram&labelColor=FFFFFF"></a>
   <a href="./wechat.md"><img src="https://img.shields.io/badge/WeChat-%2307C160?logo=wechat&logoColor=%2307C160&labelColor=FFFFFF"></a>
@@ -88,15 +86,15 @@
     <picture>
       <source
         width="33%"
-        srcset="./assets/QR%20code%20button/section.cards.qrcode.dark.kr-KR.avif"
+        srcset="./assets/QR%20code%20button/section.cards.qrcode.dark.en-US.avif"
         media="(prefers-color-scheme: dark)"
       />
       <source
         width="33%"
-        srcset="./assets/QR%20code%20button/section.cards.qrcode.light.kr-KR.avif"
+        srcset="./assets/QR%20code%20button/section.cards.qrcode.light.en-US.avif"
         media="(prefers-color-scheme: light), (prefers-color-scheme: no-preference)"
       />
-      <img width="33%" src="./assets/QR%20code%20button/section.cards.qrcode.light.kr-KR.avif" />
+      <img width="33%" src="./assets/QR%20code%20button/section.cards.qrcode.light.en-US.avif" />
     </picture>
   </a>
   <a href="https://airi.moeru.ai">
@@ -132,230 +130,235 @@
 </p>
 
 <p align="center">
-  <a href="https://www.producthunt.com/products/airi?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-airi" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=993524&theme=neutral&t=1752696535380" alt="Angela - A&#0032;container&#0032;of&#0032;cyber&#0032;living&#0032;souls&#0044;&#0032;re&#0045;creation&#0032;of&#0032;Neuro&#0045;sama | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+  <a href="https://www.producthunt.com/products/airi?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-airi" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=993524&theme=neutral&t=1752696535380" alt="Angela - Một bình chứa linh hồn số, tái tạo Neuro-sama | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
   <a href="https://trendshift.io/repositories/14636" target="_blank"><img src="https://trendshift.io/api/badge/repositories/14636" alt="moeru-ai%2Fairi | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
 </p>
 
-> [Neuro-sama](https://www.youtube.com/@Neurosama)에서 큰 영감을 받았습니다
+> Lấy cảm hứng mạnh mẽ từ [Neuro-sama](https://www.youtube.com/@Neurosama)
 
 > [!TIP]
-> Windows에서는 [winget](https://learn.microsoft.com/windows/package-manager/winget/)으로 Angela를 설치할 수 있습니다:
+> Trên Windows, bạn có thể cài Angela bằng [winget](https://learn.microsoft.com/windows/package-manager/winget/):
 >
 > ```powershell
 > winget install MoeruAI.Angela
 > ```
 >
-> 또는 [Scoop](https://scoop.sh/)으로 Angela를 설치할 수 있습니다:
+> Hoặc cài Angela bằng [Scoop](https://scoop.sh/):
 >
 > ```powershell
 > scoop bucket add airi https://github.com/lighthouse2815/Angela
 > scoop install airi/airi
 > ```
 >
-> macOS에서는 별도의 커스텀 tap을 추가하지 않고 [Homebrew Cask](https://brew.sh/)로 Angela를 설치할 수 있습니다:
+> Trên macOS, bạn có thể cài Angela bằng [Homebrew Cask](https://brew.sh/) mà không cần thêm kho tap riêng:
 >
 > ```sh
 > brew install --cask airi
 > ```
 
 > [!WARNING]
-> **주의:** 본 프로젝트와 관련된 공식 암호화폐나 토큰은 **일절 발행하지 않았습니다**. 관련 정보에 주의하시고 신중하게 판단해 주세요.
+> **Chú ý:** Chúng tôi **không** phát hành bất kỳ loại tiền điện tử hay token chính thức nào liên quan đến dự án này. Hãy kiểm tra kỹ thông tin trước khi tham gia.
 
 > [!NOTE]
 >
-> Angela에서 탄생한 모든 하위 프로젝트를 위한 전용 조직 [@proj-airi](https://github.com/proj-airi)가 있습니다. 확인해 보세요!
+> Chúng tôi có cả một tổ chức riêng [@proj-airi](https://github.com/proj-airi) cho các dự án con xuất phát từ Angela. Hãy xem qua nhé!
 >
-> RAG, 메모리 시스템, 임베디드 데이터베이스, 아이콘, Live2D 유틸리티 등 다양한 프로젝트가 있습니다!
+> Bao gồm: RAG, hệ thống bộ nhớ, cơ sở dữ liệu nhúng, icon, tiện ích Live2D, và nhiều hơn nữa.
 
 > [!TIP]
-> [Crowdin](https://crowdin.com/project/proj-airi)에서 Angela를 번역하거나 `packages/i18n/src/locales/`를 수정하는 Pull Request를 열 수 있습니다. 두 방법은 같은 번역을 업데이트합니다.
+> Bạn có thể dịch Angela trên [Crowdin](https://crowdin.com/project/proj-airi) hoặc mở một pull request thay đổi `packages/i18n/src/locales/`. Cả hai cách đều cập nhật cùng các bản dịch.
 >
-> 영어 원문과 완전히 동일한 번역을 제출하지 마세요. 검토에서 거부됩니다. 번역이 없는 문자열은 영어로 표시됩니다.
+> Không gửi bản dịch giống hệt văn bản tiếng Anh. Bản dịch đó bị từ chối khi xét duyệt. Chuỗi chưa có bản dịch sẽ hiển thị văn bản tiếng Anh.
 >
-> <a href="https://crowdin.com/project/proj-airi" target="_blank" rel="nofollow"><img style="width: 140px; height: 40px;" src="https://badges.crowdin.net/badge/light/crowdin-on-dark.png" srcset="https://badges.crowdin.net/badge/light/crowdin-on-dark.png 1x, https://badges.crowdin.net/badge/light/crowdin-on-dark@2x.png 2x" alt="Crowdin | Agile localization for tech companies" width="140" height="40" /></a>
+> <a href="https://crowdin.com/project/proj-airi" target="_blank" rel="nofollow"><img style="width: 140px; height: 40px;" src="https://badges.crowdin.net/badge/light/crowdin-on-dark.png" srcset="https://badges.crowdin.net/badge/light/crowdin-on-dark.png 1x, https://badges.crowdin.net/badge/light/crowdin-on-dark@2x.png 2x" alt="Crowdin | Bản địa hóa linh hoạt cho công ty công nghệ" width="140" height="40" /></a>
 
-사이버 생명체(사이버 와이프, 디지털 펫)나 함께 놀고 대화할 수 있는 디지털 동반자를 꿈꿔 본 적이 있으신가요?
+Bạn đã từng mơ về một thực thể số sống động (cyber-waifu, thú cưng ảo) hay một bạn đồng hành kỹ thuật số có thể chơi cùng và trò chuyện với bạn chưa?
 
-[ChatGPT](https://chatgpt.com)나 유명한 [Claude](https://claude.ai) 같은 최신 대규모 언어 모델의 힘을 빌려, 가상 존재에게 역할극과 대화를 요청하는 것은 이미 누구나 쉽게 할 수 있는 일이 되었습니다. [Character.ai (c.ai)](https://character.ai)나 [JanitorAI](https://janitorai.com/) 같은 플랫폼, 그리고 [SillyTavern](https://github.com/SillyTavern/SillyTavern) 같은 로컬 환경은 채팅 기반이나 비주얼 어드벤처 게임과 같은 경험을 위한 충분한 솔루션이 되고 있습니다.
+Với sức mạnh của các mô hình LLM (ngôn ngữ lớn) hiện nay như [ChatGPT](https://chatgpt.com) hay [Claude](https://claude.ai), việc yêu cầu nhân vật ảo nhập vai và trò chuyện với chúng ta đã trở nên rất dễ dàng. Các nền tảng như [Character.ai](https://character.ai), [JanitorAI](https://janitorai.com/) hay bản cài tự host như [SillyTavern](https://github.com/SillyTavern/SillyTavern) đã đủ tốt cho trải nghiệm trò chuyện và nhập vai.
 
-> 하지만, 게임을 플레이하는 능력은요? 당신이 코딩하는 것을 볼 수 있고, 게임을 하면서 채팅하고, 영상을 보고, 그 외에도 많은 것을 할 수 있는 능력은?
+> Nhưng còn việc **chơi game cùng bạn, xem bạn code, trò chuyện khi chơi game hoặc xem video, và làm được nhiều việc khác** thì sao?
 
-아마 [Neuro-sama](https://www.youtube.com/@Neurosama)를 이미 알고 계실 겁니다. 그녀는 현재 게임을 플레이하고, 채팅하고, 여러분 및 참여자들과 상호작용할 수 있는 최고의 AI VTuber / 동반자입니다. 이런 존재를 "디지털 휴먼"이라고 부르기도 합니다. **안타깝게도 오픈 소스가 아니기 때문에, 라이브 스트리밍이 끝나면 그녀와 상호작용할 수 없습니다**.
+Có lẽ bạn đã biết [Neuro-sama](https://www.youtube.com/@Neurosama). Cô ấy là VTuber ảo xuất sắc nhất hiện nay, có thể vừa chơi game, vừa trò chuyện và tương tác với bạn cũng như khán giả. Một số người còn gọi đây là “con người số” (digital human). **Đáng tiếc, vì không mã nguồn mở, bạn không thể tương tác với cô ấy khi buổi livestream kết thúc.**
 
-그래서 이 프로젝트 Angela는 여기서 또 다른 가능성을 제시합니다: **언제 어디서나 쉽게, 당신만의 디지털 라이프, 사이버 생명을 가질 수 있도록**.
+Do đó, dự án Angela mang đến một lựa chọn khác: **cho phép bạn sở hữu thực thể số của riêng mình, dễ dàng, mọi lúc, mọi nơi.**
 
-## 최근 DevLog와 이야기
+## DevLog và câu chuyện gần đây
 
-- [DevLog @ 2026.03.23: 모바일 성능과 게임 엔진 탐색](https://airi.moeru.ai/docs/en/blog/DevLog-2026.03.23/) - 2026년 3월 23일
-- [DevLog @ 2026.03.14: VRM 스테이지 수명주기, 캐시, 관측성](https://airi.moeru.ai/docs/en/blog/DevLog-2026.03.14/) - 2026년 3월 14일
-- [DevLog @ 2026.02.16: Dome Keeper 데이터 수집과 학습 파이프라인](https://airi.moeru.ai/docs/en/blog/DevLog-2026.02.16/) - 2026년 2월 16일
-- [DevLog @ 2026.01.01: AIRI Pocket과 FlowChat 메모리 실험](https://airi.moeru.ai/docs/en/blog/DevLog-2026.01.01/) - 2026년 1월 1일
-- [DevLog @ 2025.10.20: Electron 이전, 새 모델, Moeru AI 업데이트](https://airi.moeru.ai/docs/en/blog/DevLog-2025.10.20/) - 2025년 10월 20일
-- [DevLog @ 2025.08.26: airi-factorio의 순수 비전 방향 진척](https://airi.moeru.ai/docs/en/blog/DevLog-2025.08.26/) - 2025년 8월 26일
-- [DevLog @ 2025.08.05: AIRI v0.7 릴리스 하이라이트](https://airi.moeru.ai/docs/en/blog/DevLog-2025.08.05/) - 2025년 8월 5일
-- [DevLog @ 2025.08.01: 스트리밍 텍스트 애니메이션과 자소 클러스터](https://airi.moeru.ai/docs/en/blog/DevLog-2025.08.01/) - 2025년 8월 1일
-- [DevLog @ 2025.07.18: Factorio Learning Environment로 airi-factorio 다시 보기](https://airi.moeru.ai/docs/en/blog/DevLog-2025.07.18/) - 2025년 7월 18일
-- [DreamLog 0x1: Project AIRI의 시작 이야기](https://airi.moeru.ai/docs/en/blog/DreamLog-0x1/) - 2025년 6월 16일
-- ...더 많은 내용은 [문서 사이트](https://airi.moeru.ai/docs/en/)에서
+- [DevLog @ 2026.03.23: Hiệu năng di động và hướng đi với game engine](https://airi.moeru.ai/docs/en/blog/DevLog-2026.03.23/) - ngày 23 tháng 3, 2026
+- [DevLog @ 2026.03.14: Vòng đời, bộ nhớ đệm và khả năng quan sát cho sân khấu VRM](https://airi.moeru.ai/docs/en/blog/DevLog-2026.03.14/) - ngày 14 tháng 3, 2026
+- [DevLog @ 2026.02.16: Thu thập dữ liệu Dome Keeper và pipeline huấn luyện](https://airi.moeru.ai/docs/en/blog/DevLog-2026.02.16/) - ngày 16 tháng 2, 2026
+- [DevLog @ 2026.01.01: AIRI Pocket và thử nghiệm bộ nhớ trong FlowChat](https://airi.moeru.ai/docs/en/blog/DevLog-2026.01.01/) - ngày 1 tháng 1, 2026
+- [DevLog @ 2025.10.20: Chuyển sang Electron, model mới và cập nhật Moeru AI](https://airi.moeru.ai/docs/en/blog/DevLog-2025.10.20/) - ngày 20 tháng 10, 2025
+- [DevLog @ 2025.08.26: Tiến triển hướng thị giác thuần túy cho airi-factorio](https://airi.moeru.ai/docs/en/blog/DevLog-2025.08.26/) - ngày 26 tháng 8, 2025
+- [DevLog @ 2025.08.05: Điểm nổi bật của AIRI v0.7](https://airi.moeru.ai/docs/en/blog/DevLog-2025.08.05/) - ngày 5 tháng 8, 2025
+- [DevLog @ 2025.08.01: Hoạt ảnh văn bản streaming và grapheme cluster](https://airi.moeru.ai/docs/en/blog/DevLog-2025.08.01/) - ngày 1 tháng 8, 2025
+- [DevLog @ 2025.07.18: Nghĩ lại về airi-factorio với Factorio Learning Environment](https://airi.moeru.ai/docs/en/blog/DevLog-2025.07.18/) - ngày 18 tháng 7, 2025
+- [DreamLog 0x1: Câu chuyện phía sau Project AIRI](https://airi.moeru.ai/docs/en/blog/DreamLog-0x1/) - ngày 16 tháng 6, 2025
+- ...xem thêm tại [trang tài liệu](https://airi.moeru.ai/docs)
 
-## 이 프로젝트의 특별한 점은?
+## Dự Án Này Có Gì Đặc Biệt?
 
-다른 AI 기반 VTuber 오픈 소스 프로젝트와 달리, アイリ VTuber는 개발 첫날부터 [WebGPU](https://www.w3.org/TR/webgpu/), [WebAudio](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API), [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers), [WebAssembly](https://webassembly.org/), [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) 등 다양한 웹 기술을 지원하도록 설계되었습니다.
+Khác với các dự án VTuber AI mã nguồn mở khác, **アイリ** được xây dựng ngay từ đầu với sự hỗ trợ của nhiều công nghệ Web như [WebGPU](https://www.w3.org/TR/webgpu/), [WebAudio](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API), [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Using_web_workers), [WebAssembly](https://webassembly.org/), [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket), v.v.
 
 > [!TIP]
-> 웹 기술을 사용하면 성능이 떨어지지 않을까 걱정되시나요?
+> Bạn lo lắng về hiệu năng khi chúng tôi dùng công nghệ Web?
 >
-> 걱정하지 마세요. 브라우저 버전은 브라우저와 웹뷰에서 얼마나 많은 것을 할 수 있는지 보여주기 위한 것이지만, 이에 완전히 의존하지는 않습니다. Angela의 데스크톱 버전은 기본적으로 [NVIDIA CUDA](https://developer.nvidia.com/cuda-toolkit)와 [Apple Metal](https://developer.apple.com/metal/)을 사용할 수 있으며 (HuggingFace와 [candle](https://github.com/huggingface/candle) 프로젝트 덕분에), 복잡한 의존성 관리 없이 사용 가능합니다. 트레이드오프를 고려하여, 그래픽, 레이아웃, 애니메이션, 그리고 WIP 플러그인 시스템에는 부분적으로 웹 기술을 활용하고 있습니다.
+> Đừng lo, phiên bản chạy trên trình duyệt chỉ nhằm minh hoạ khả năng có thể đạt được trong browser và webview. Phiên bản desktop của Angela mặc định có thể dùng [NVIDIA CUDA](https://developer.nvidia.com/cuda-toolkit) và [Apple Metal](https://developer.apple.com/metal/) (nhờ HuggingFace & dự án [candle](https://github.com/huggingface/candle)), mà không cần quản lý phụ thuộc phức tạp. Đồ hoạ, bố cục, animation, và hệ thống plugin (đang phát triển) vẫn tận dụng công nghệ Web để mở rộng dễ dàng.
 
-이는 **アイリ VTuber가 최신 브라우저와 기기에서 실행 가능**하며, 모바일 기기에서도 작동한다는 것을 의미합니다 (PWA 지원 완료). 이를 통해 개발자들이 アイリ VTuber의 기능을 한 단계 더 끌어올리면서도, 사용자에게 TCP 연결이나 기타 비웹 기술이 필요한 기능을 활성화할 수 있는 유연성을 제공합니다. 예를 들어 Discord 음성 채널에 연결하거나, 친구들과 Minecraft나 Factorio를 함께 플레이할 수 있습니다.
+Điều này có nghĩa là **アイリ có thể chạy trên các trình duyệt và thiết bị hiện đại**, kể cả thiết bị di động (đã hỗ trợ PWA). Điều này mở ra nhiều khả năng để chúng tôi (nhà phát triển) nâng VTuber アイリ lên tầm cao mới, đồng thời vẫn để người dùng linh hoạt bật các tính năng cần TCP hoặc công nghệ ngoài Web như kết nối kênh thoại Discord hay chơi Minecraft, Factorio với bạn bè.
 
 > [!NOTE]
 >
-> 저희는 아직 개발 초기 단계에 있으며, アイリ VTuber를 현실로 만들기 위해 재능 있는 개발자분들을 찾고 있습니다.
+> Chúng tôi vẫn đang ở giai đoạn đầu phát triển và tìm kiếm nhà phát triển tài năng để cùng hiện thực hoá アイリ.
 >
-> Vue.js, TypeScript 또는 이 프로젝트에 필요한 개발 도구에 익숙하지 않아도 괜찮습니다. 아티스트, 디자이너로 참여하거나, 첫 번째 라이브 스트리밍을 시작하는 데 도움을 줄 수도 있습니다.
+> Không sao nếu bạn chưa quen Vue.js, TypeScript, hay devtools của dự án này, bạn vẫn có thể tham gia với vai trò hoạ sĩ, nhà thiết kế, hoặc giúp chúng tôi tổ chức buổi livestream đầu tiên.
 >
-> React, Svelte, 심지어 Solid를 주로 사용하시더라도 환영합니다. アイリ VTuber에서 보고 싶은 기능을 추가하거나 실험하고 싶은 기능을 위한 하위 디렉터리를 만들 수 있습니다.
+> Kể cả bạn là fan của React, Svelte hay Solid, chúng tôi vẫn chào đón. Bạn có thể mở thư mục phụ để thêm tính năng mà bạn muốn thử nghiệm cho アイリ.
 >
-> 저희가 찾고 있는 분야 (및 관련 프로젝트):
+> Các mảng (và dự án liên quan) chúng tôi cần:
 >
-> - Live2D 모델러
-> - VRM 모델러
-> - VRChat 아바타 디자이너
-> - 컴퓨터 비전
-> - 강화 학습
-> - 음성 인식
-> - 음성 합성
+> - Người tạo mô hình Live2D
+> - Người tạo mô hình VRM
+> - Nhà thiết kế avatar VRChat
+> - Thị giác máy tính
+> - Học tăng cường (Reinforcement Learning)
+> - Nhận diện giọng nói
+> - Tổng hợp giọng nói
 > - ONNX Runtime
 > - Transformers.js
 > - vLLM
 > - WebGPU
 > - Three.js
-> - WebXR (@moeru-ai 조직의 [다른 프로젝트](https://github.com/moeru-ai/chat)도 확인해 보세요)
+> - WebXR ([xem thêm dự án khác](https://github.com/moeru-ai/chat) của tổ chức @moeru-ai)
 >
-> **관심이 있으시다면, 여기서 자기소개를 해보시는 건 어떨까요? [Would like to join part of us to build AIRI?](https://github.com/moeru-ai/airi/discussions/33)**
+> **Nếu bạn hứng thú, hãy giới thiệu bản thân ở đây: [Muốn tham gia cùng chúng tôi xây dựng AIRI?](https://github.com/moeru-ai/airi/discussions/33)**
 
-## 현재 진행 상황과 로드맵
+## Tiến độ hiện tại và lộ trình
 
-구현된 기능
+Khả năng:
 
-- [x] 두뇌
-  - [x] [Minecraft](https://www.minecraft.net) 플레이
-  - [x] [Factorio](https://www.factorio.com) 플레이 (진행 중, [PoC 및 데모 제공](https://github.com/moeru-ai/airi-factorio))
-  - [x] [Kerbal Space Program](https://www.kerbalspaceprogram.com/) 플레이 (공지 예정)
-  - [ ] [Helldivers 2](https://www.playstation.com/en-hk/games/helldivers-2/pc/) 함께 플레이 (진행 중)
-  - [x] [Telegram](https://telegram.org)에서 채팅
-  - [x] [Discord](https://discord.com)에서 채팅
-  - [ ] 메모리
-    - [x] 순수 브라우저 내 데이터베이스 지원 (DuckDB WASM | `pglite`)
-    - [ ] Memory Alaya (진행 중)
-  - [ ] 순수 브라우저 내 로컬 (WebGPU) 추론
-- [x] 귀
-  - [x] 브라우저에서 음성 입력
-  - [x] [Discord](https://discord.com)에서 음성 입력
-  - [x] 클라이언트 측 음성 인식
-  - [x] 클라이언트 측 말하기 감지
-- [x] 입
-  - [x] [ElevenLabs](https://elevenlabs.io/), Microsoft/Azure Speech, OpenAI 호환 TTS, Alibaba Cloud Model Studio, 로컬 Kokoro TTS를 포함한 다중 제공자 음성 합성
-- [x] 몸
-  - [x] VRM 지원
-    - [x] VRM 모델 제어
-  - [x] VRM 모델 애니메이션
-    - [x] 자동 눈 깜빡임
-    - [x] 자동 시선 추적
-    - [x] 대기 상태 시선 이동
-  - [x] Live2D 지원
-    - [x] Live2D 모델 제어
-  - [x] Live2D 모델 애니메이션
-    - [x] 자동 눈 깜빡임
-    - [x] 자동 시선 추적
-    - [x] 대기 상태 시선 이동
+- [x] Bộ não
+  - [x] Chơi game: [Minecraft](https://www.minecraft.net)
+  - [x] Chơi game: [Factorio](https://www.factorio.com) (đang phát triển, [PoC và demo có sẵn](https://github.com/moeru-ai/airi-factorio))
+  - [x] Chơi game: [Kerbal Space Program](https://www.kerbalspaceprogram.com/) (sẽ công bố sau)
+  - [ ] Chơi cùng trong [Helldivers 2](https://www.playstation.com/en-hk/games/helldivers-2/pc/) (đang thực hiện)
+  - [x] Trò chuyện trên [Telegram](https://telegram.org)
+  - [x] Trò chuyện trên [Discord](https://discord.com)
+  - [ ] Bộ nhớ
+    - [x] Hỗ trợ CSDL trong trình duyệt (DuckDB WASM | `pglite`)
+    - [ ] Bộ nhớ Alaya (đang phát triển)
+  - [ ] Suy luận cục bộ trong trình duyệt (WebGPU)
+- [x] Khả năng nghe hiểu
+  - [x] Nhận âm thanh từ trình duyệt
+  - [x] Nhận âm thanh từ [Discord](https://discord.com)
+  - [x] Nhận diện giọng nói phía máy khách
+  - [x] Phát hiện giọng nói chuyện phía máy khách
+- [x] Giọng nói
+  - [x] Tổng hợp giọng nói qua nhiều nhà cung cấp, gồm [ElevenLabs](https://elevenlabs.io/), Microsoft/Azure Speech, TTS tương thích OpenAI, Alibaba Cloud Model Studio và Kokoro TTS cục bộ
+- [x] Cơ thể
+  - [x] Hỗ trợ VRM
+    - [x] Điều khiển model VRM
+  - [x] Hoạt ảnh cho VRM
+    - [x] Chớp mắt
+    - [x] Tự động nhìn theo
+    - [x] Chuyển động mắt khi nghỉ
+  - [x] Hỗ trợ Live2D
+    - [x] Điều khiển model Live2D
+  - [x] Hoạt ảnh cho Live2D
+    - [x] Chớp mắt
+    - [x] Tự động nhìn theo
+    - [x] Chuyển động mắt khi nghỉ
 
-## 개발
+## Phát Triển
 
-> 이 프로젝트의 상세한 개발 가이드는 [CONTRIBUTING.md](./CONTRIBUTING.md)를 참조하세요
+> Để xem hướng dẫn chi tiết phát triển, tham khảo [CONTRIBUTING.md](./CONTRIBUTING.md)
 
 > [!NOTE]
-> 기본적으로 `pnpm dev`는 Stage Web(브라우저 버전)의 개발 서버를 시작합니다. 데스크톱 버전을 개발하고 싶으시다면, [CONTRIBUTING.md](./CONTRIBUTING.md)를 읽고 환경을 올바르게 설정해 주세요.
+> Mặc định, `pnpm dev` sẽ khởi chạy server cho Stage Web (phiên bản trình duyệt). Nếu muốn phát triển bản desktop, hãy đọc [CONTRIBUTING.md](./CONTRIBUTING.md) để cấu hình đúng môi trường.
 
 ```shell
 pnpm i
 pnpm dev
 ```
 
-### Stage Web (브라우저 버전, [airi.moeru.ai](https://airi.moeru.ai))
+### Stage Web (Bản web tại [airi.moeru.ai](https://airi.moeru.ai))
 
 ```shell
 pnpm dev
 ```
 
-### Stage Tamagotchi (데스크톱 버전)
+### Stage Tamagotchi (phiên bản máy tính)
 
 ```shell
 pnpm dev:desktop
 ```
 
-Tamagotchi용 Nix 패키지도 포함되어 있습니다. flakes를 활성화한 후 다음과 같이 실행할 수 있습니다:
+Gói Nix dành cho Tamagotchi được bao gồm. Để chạy airi với Nix, trước tiên hãy đảm bảo bạn đã bật flakes, sau đó chạy:
 
 ```shell
 nix run github:lighthouse2815/Angela
 ```
 
-#### NixOS
+### Stage Pocket (phiên bản di động)
 
-Electron에 필요한 공유 라이브러리가 NixOS에서는 표준 경로에 없습니다. `flake.nix`에 정의된 FHS 셸을 사용하세요:
-
-```shell
-nix develop .#fhs
-pnpm dev:desktop
-```
-
-### Stage Pocket (모바일 버전)
-
-Capacitor 개발 서버를 시작합니다:
+Khởi chạy server phát triển cho phiên bản web Capacitor:
 
 ```shell
-pnpm dev:pocket:ios --target "<DEVICE_ID_OR_SIMULATOR_NAME>"
-# 또는
-CAPACITOR_DEVICE_ID_IOS="<DEVICE_ID_OR_SIMULATOR_NAME>" pnpm dev:pocket:ios
+pnpm dev:pocket
 ```
 
-`iPhone 16 Pro`처럼 시뮬레이터 이름에는 공백이 들어가므로 대상 이름은 따옴표로 감싸세요.
+Kiểm tra địa chỉ IP trong output của lệnh trên:
 
-`pnpm -F @proj-airi/stage-pocket exec cap run ios --list`를 실행하면 사용 가능한 기기와 시뮬레이터 목록을 확인할 수 있습니다. `@capacitor/cli`는 `../dev-in-future/apps/stage-pocket`에만 선언되어 있어서 저장소 루트에서는 `cap`이 resolve되지 않습니다.
+```shell
+  ROLLDOWN-VITE v7.3.0  ready in 1073 ms
 
-무선 모드에서 Pocket의 서버 채널에 연결해야 하는 경우, Tamagotchi를 루트 권한으로 시작해야 합니다:
+  ➜  Local:   https://localhost:5273/
+  ➜  Network: https://<ip-will-be-here>:5273/
+  ➜  Vue DevTools: Open https://localhost:5273/__devtools__/ as a separate window
+  ➜  Vue DevTools: Press Option(⌥)+Shift(⇧)+D in App to toggle the Vue DevTools
+  ➜  UnoCSS Inspector: https://localhost:5273/__unocss/
+```
+
+Mở project Xcode:
+
+```shell
+CAPACITOR_DEV_SERVER_URL=https://<your-ip-address>:5273 pnpm open:ios
+```
+
+Sau đó Xcode sẽ mở, và bạn có thể bấm nút "Run" để chạy app trên iPhone.
+
+Nếu cần kết nối server channel trên Pocket ở chế độ không dây, bạn cần khởi chạy Tamagotchi với quyền root:
 
 ```shell
 sudo pnpm dev:desktop
 ```
 
-그런 다음 Tamagotchi의 `settings/connections`에서 보안 웹소켓을 활성화하세요.
+Sau đó bật secure websocket trong `settings/connections` của Tamagotchi.
 
-### 문서 사이트
+### Trang tài liệu
 
-문서 사이트는 [moeru-ai/airi-docs](https://github.com/moeru-ai/airi-docs)에 있습니다.
+Trang tài liệu nằm ở [moeru-ai/airi-docs](https://github.com/moeru-ai/airi-docs).
 
-### 배포
+### Xuất bản
 
-`bumpp`를 실행해 모노레포 버전을 업데이트하세요:
+Chạy `bumpp` để cập nhật phiên bản monorepo:
 
 ```shell
 npx bumpp --no-commit --no-tag
 ```
 
-## LLM API 프로바이더 지원 ([xsai](https://github.com/moeru-ai/xsai) 기반)
+## Các LLM API hỗ trợ (cung cấp bởi [xsai](https://github.com/moeru-ai/xsai))
 
-- [x] [AIHubMix (recommended)](https://aihubmix.com/?aff=OOiX)
+- [x] [AIHubMix (đề xuất)](https://aihubmix.com/?aff=OOiX)
 - [x] [OpenRouter](https://openrouter.ai/)
 - [x] [vLLM](https://github.com/vllm-project/vllm)
 - [x] [SGLang](https://github.com/sgl-project/sglang)
 - [x] [Ollama](https://github.com/ollama/ollama)
-- [x] [302.AI (sponsored)](https://share.302.ai/514k2v)
+- [x] [302.AI (tài trợ)](https://share.302.ai/514k2v)
 - [x] [OpenAI](https://platform.openai.com/docs/guides/gpt/chat-completions-api)
-  - [x] [Azure OpenAI API](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference)
+  - [ ] [Azure OpenAI API](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference) (hoan nghênh đóng góp qua PR)
 - [x] [Anthropic Claude](https://anthropic.com)
-  - [ ] [AWS Claude](https://docs.anthropic.com/en/api/claude-on-amazon-bedrock) (PR 환영)
+  - [ ] [AWS Claude](https://docs.anthropic.com/en/api/claude-on-amazon-bedrock) (hoan nghênh đóng góp qua PR)
 - [x] [DeepSeek](https://www.deepseek.com/)
 - [x] [Qwen](https://help.aliyun.com/document_detail/2400395.html)
 - [x] [Google Gemini](https://developers.generativeai.google)
@@ -375,57 +378,56 @@ npx bumpp --no-commit --no-tag
 - [x] [ModelScope](https://modelscope.cn/docs/model-service/API-Inference/intro)
 - [x] [Player2](https://player2.game/)
 - [x] [Tencent Cloud](https://cloud.tencent.com/document/product/1729)
-- [ ] [Sparks](https://www.xfyun.cn/doc/spark/Web.html) (PR 환영)
-- [ ] [Volcano Engine](https://www.volcengine.com/experience/ark?utm_term=202502dsinvite&ac=DSASUQY5&rc=2QXCA1VI) (PR 환영)
+- [ ] [Sparks](https://www.xfyun.cn/doc/spark/Web.html) (hoan nghênh đóng góp qua PR)
+- [ ] [Volcano Engine](https://www.volcengine.com/experience/ark?utm_term=202502dsinvite&ac=DSASUQY5&rc=2QXCA1VI) (hoan nghênh đóng góp qua PR)
 - [x] [Xiaomi Mimo](https://platform.xiaomimimo.com)
 
-## 이 프로젝트에서 탄생한 하위 프로젝트
+## Các dự án phụ khác
 
-- [Awesome AI VTuber](https://github.com/proj-airi/awesome-ai-vtuber): AI VTuber 및 관련 프로젝트의 큐레이션 목록
-- [`unspeech`](https://github.com/moeru-ai/unspeech): `/audio/transcriptions` 및 `/audio/speech`를 위한 범용 엔드포인트 프록시 서버, LiteLLM과 유사하지만 모든 ASR 및 TTS에 대응
-- [`hfup`](https://github.com/moeru-ai/hfup): HuggingFace Spaces로의 배포 및 번들링을 지원하는 도구
-- [`xsai-transformers`](https://github.com/moeru-ai/xsai-transformers): [xsAI](https://github.com/moeru-ai/xsai)용 실험적 [Transformers.js](https://github.com/huggingface/transformers.js) 프로바이더
-- [WebAI: Realtime Voice Chat](https://github.com/proj-airi/webai-realtime-voice-chat): VAD + STT + LLM + TTS로 ChatGPT 실시간 음성을 처음부터 구현한 완전한 예제
-- [`@proj-airi/drizzle-duckdb-wasm`](https://github.com/lighthouse2815/Angela/tree/main/packages/drizzle-duckdb-wasm/README.md): DuckDB WASM용 Drizzle ORM 드라이버
-- [`@proj-airi/duckdb-wasm`](https://www.npmjs.com/package/@proj-airi/duckdb-wasm): 사용하기 쉬운 `@duckdb/duckdb-wasm` 래퍼
-- [AIRI Factorio](https://github.com/moeru-ai/airi-factorio): Angela가 Factorio를 플레이할 수 있게 하는 프로젝트
-- [Angela DomeKeeper](https://github.com/proj-airi/game-playing-ai-dome-keeper): Angela가 DomeKeeper를 플레이할 수 있게 하는 프로젝트
-- [Factorio RCON API](https://github.com/nekomeowww/factorio-rcon-api): Factorio 헤드리스 서버 콘솔용 RESTful API 래퍼
-- [`autorio`](https://github.com/moeru-ai/airi-factorio/tree/main/packages/autorio): Factorio 자동화 라이브러리
-- [`tstl-plugin-reload-factorio-mod`](https://github.com/moeru-ai/airi-factorio/tree/main/packages/tstl-plugin-reload-factorio-mod): 개발 중 Factorio 모드 리로드 지원
-- [Velin](https://github.com/luoling8192/velin): Vue SFC와 Markdown으로 관리하기 쉬운 상태 기반 LLM 프롬프트 작성
-- [`demodel`](https://github.com/moeru-ai/demodel): 다양한 추론 런타임에서 모델과 데이터셋 다운로드를 간편하게 가속
-- [`inventory`](https://github.com/moeru-ai/inventory): 중앙 집중식 모델 카탈로그 및 기본 프로바이더 설정 백엔드 서비스
-- [MCP Launcher](https://github.com/moeru-ai/mcp-launcher): 모든 MCP 서버를 쉽게 빌드하고 실행하는 런처, 모델 세계의 Ollama 같은 존재!
-- [SAD](https://github.com/moeru-ai/sad): 셀프 호스팅 및 브라우저에서 LLM을 실행하기 위한 문서 및 노트
+- [Awesome AI VTuber](https://github.com/proj-airi/awesome-ai-vtuber): Danh sách tuyển chọn các AI VTuber và những dự án liên quan
+- [`unspeech`](https://github.com/moeru-ai/unspeech): Máy chủ proxy endpoint chung cho `/audio/transcriptions` và `/audio/speech`, giống LiteLLM nhưng dành cho bất kỳ ASR và TTS nào
+- [`hfup`](https://github.com/moeru-ai/hfup): Các công cụ hỗ trợ triển khai, đóng gói lên HuggingFace Spaces
+- [`xsai-transformers`](https://github.com/moeru-ai/xsai-transformers): Nhà cung cấp thử nghiệm [🤗 Transformers.js](https://github.com/huggingface/transformers.js) cho [xsAI](https://github.com/moeru-ai/xsai).
+- [WebAI: Realtime Voice Chat](https://github.com/proj-airi/webai-realtime-voice-chat): Ví dụ đầy đủ về việc triển khai voice realtime của ChatGPT từ đầu với VAD + STT + LLM + TTS.
+- [`@proj-airi/drizzle-duckdb-wasm`](https://github.com/lighthouse2815/Angela/tree/main/packages/drizzle-duckdb-wasm/README.md): Trình điều khiển Drizzle ORM cho DuckDB WASM
+- [`@proj-airi/duckdb-wasm`](https://www.npmjs.com/package/@proj-airi/duckdb-wasm): Wrapper dễ sử dụng cho `@duckdb/duckdb-wasm`
+- [AIRI Factorio](https://github.com/moeru-ai/airi-factorio): Cho phép Angela chơi Factorio
+- [Factorio RCON API](https://github.com/nekomeowww/factorio-rcon-api): RESTful API wrapper cho console máy chủ headless Factorio
+- [`autorio`](https://github.com/moeru-ai/airi-factorio/tree/main/packages/autorio): Thư viện tự động hóa Factorio
+- [`tstl-plugin-reload-factorio-mod`](https://github.com/moeru-ai/airi-factorio/tree/main/packages/tstl-plugin-reload-factorio-mod): Tự động tải tạo lại mod Factorio khi đang phát triển
+- [Velin](https://github.com/luoling8192/velin): Sử dụng Vue SFC và Markdown để viết prompt trạng thái dễ quản lý cho LLM
+- [`demodel`](https://github.com/moeru-ai/demodel): Dễ dàng tăng tốc độ tải model và dataset từ nhiều runtime suy luận khác nhau
+- [`inventory`](https://github.com/moeru-ai/inventory): Dịch vụ backend lưu trữ tập trung catalog model và cấu hình nhà cung cấp mặc định
+- [MCP Launcher](https://github.com/moeru-ai/mcp-launcher): Công cụ tạo & khởi chạy MCP dễ dùng cho mọi máy chủ MCP, giống như Ollama nhưng cho MCP!
+- [🥺 SAD](https://github.com/moeru-ai/sad): Tài liệu và ghi chú về tự host và chạy LLM trong trình duyệt.
 
 ```mermaid
 flowchart LR
-  subgraph Apps[Stage applications]
+  subgraph Apps[Ứng dụng Stage]
     Web[stage-web]
     Desktop[stage-tamagotchi]
-    Pocket[stage-pocket\nexperimental]
+    Pocket[stage-pocket\nthử nghiệm]
   end
 
-  subgraph Shared[Shared product packages]
+  subgraph Shared[Các gói sản phẩm dùng chung]
     StageUI[stage-ui]
     Domain[core-agent\ncore-character]
     Audio[pipelines-audio]
-    Renderers[stage-ui-live2d\nstage-ui-three and renderers]
+    Renderers[stage-ui-live2d\nstage-ui-three và các bộ kết xuất]
     SDK[server-sdk\nserver-shared]
   end
 
-  subgraph Channel[Desktop server channel]
+  subgraph Channel[Kênh máy chủ desktop]
     Runtime[server-runtime]
   end
 
-  subgraph Integrations[Source-configured integrations]
+  subgraph Integrations[Tích hợp cấu hình trong mã nguồn]
     Discord[discord-bot]
     Minecraft[minecraft-bot]
-    Other[Telegram, Factorio, MCP, and others]
+    Other[Telegram, Factorio, MCP và các tích hợp khác]
   end
 
-  subgraph Hosted[Hosted backend]
+  subgraph Hosted[Backend được lưu trữ trên máy chủ]
     Edge[Caddy]
     API[api-server]
     Auth[auth-server]
@@ -441,10 +443,10 @@ flowchart LR
   StageUI --> Renderers
   StageUI --> SDK
   Desktop --> Runtime
-  SDK <-->|server channel| Runtime
+  SDK <-->|kênh máy chủ| Runtime
   Discord --> SDK
   Minecraft --> SDK
-  Other -. optional .-> SDK
+  Other -. tùy chọn .-> SDK
   Edge --> API
   Edge --> Auth
   API --> Database
@@ -453,63 +455,63 @@ flowchart LR
   Auth --> Cache
 ```
 
-## 유사 프로젝트
+## Các dự án tương tự
 
-### 오픈 소스
+### Mã nguồn mở
 
-- [kimjammer/Neuro: A recreation of Neuro-Sama originally created in 7 days.](https://github.com/kimjammer/Neuro): 매우 완성도 높은 구현
-- [SugarcaneDefender/z-waif](https://github.com/SugarcaneDefender/z-waif): 게임, 자율 에이전트, 프롬프트 엔지니어링에 뛰어남
-- [semperai/amica](https://github.com/semperai/amica/): VRM, WebXR에 뛰어남
-- [elizaOS/eliza](https://github.com/elizaOS/eliza): 에이전트를 다양한 시스템 및 API에 통합하는 훌륭한 예시
-- [ardha27/AI-Waifu-Vtuber](https://github.com/ardha27/AI-Waifu-Vtuber): Twitch API 통합에 뛰어남
-- [InsanityLabs/AIVTuber](https://github.com/InsanityLabs/AIVTuber): 훌륭한 UI/UX
+- [kimjammer/Neuro: Bản tái hiện Neuro-Sama ban đầu được tạo trong 7 ngày.](https://github.com/kimjammer/Neuro): Bản triển khai rất hoàn chỉnh.
+- [SugarcaneDefender/z-waif](https://github.com/SugarcaneDefender/z-waif): Nổi bật về chơi game, hoạt động tự chủ và thiết kế prompt
+- [semperai/amica](https://github.com/semperai/amica/): Nổi bật về VRM và WebXR
+- [elizaOS/eliza](https://github.com/elizaOS/eliza): Ví dụ và kỹ thuật tích hợp agent vào nhiều hệ thống và API
+- [ardha27/AI-Waifu-Vtuber](https://github.com/ardha27/AI-Waifu-Vtuber): Nổi bật về tích hợp API Twitch
+- [InsanityLabs/AIVTuber](https://github.com/InsanityLabs/AIVTuber): Giao diện và trải nghiệm người dùng tốt
 - [IRedDragonICY/vixevia](https://github.com/IRedDragonICY/vixevia)
 - [t41372/Open-LLM-VTuber](https://github.com/t41372/Open-LLM-VTuber)
 - [PeterH0323/Streamer-Sales](https://github.com/PeterH0323/Streamer-Sales)
 
-### 비오픈 소스
+### Mã nguồn đóng
 
 - https://clips.twitch.tv/WanderingCaringDeerDxCat-Qt55xtiGDSoNmDDr https://www.youtube.com/watch?v=8Giv5mupJNE
 - https://clips.twitch.tv/TriangularAthleticBunnySoonerLater-SXpBk1dFso21VcWD
 - https://www.youtube.com/@NOWA_Mirai
 
-## 프로젝트 현황
+## Trạng thái dự án
 
-![Repobeats analytics image](https://repobeats.axiom.co/api/embed/a1d6fe2c13ea2bb53a5154435a71e2431f70c2ee.svg 'Repobeats analytics image')
+![Biểu đồ phân tích Repobeats](https://repobeats.axiom.co/api/embed/a1d6fe2c13ea2bb53a5154435a71e2431f70c2ee.svg 'Biểu đồ phân tích Repobeats')
 
-## 감사의 말
+## Lời cảm ơn
 
-- [Reka UI](https://github.com/unovue/reka-ui): 문서 사이트 디자인에 활용, 새로운 랜딩 페이지도 이를 기반으로 하며, 수많은 UI 컴포넌트 구현에 감사합니다. (shadcn-vue가 Reka UI를 헤드리스로 사용하고 있으니 확인해 보세요!)
+- [Reka UI](https://github.com/unovue/reka-ui): Đã thiết kế trang tài liệu, trang chủ mới cũng dựa trên dự án này, đồng thời triển khai rất nhiều thành phần trong giao diện. (shadcn-vue sử dụng Reka UI làm headless, bạn nên xem qua!)
 - [pixiv/ChatVRM](https://github.com/pixiv/ChatVRM)
-- [josephrocca/ChatVRM-js: A JS conversion/adaptation of parts of the ChatVRM (TypeScript) code for standalone use in OpenCharacters and elsewhere](https://github.com/josephrocca/ChatVRM-js)
-- UI 및 스타일 디자인은 [Cookard](https://store.steampowered.com/app/2919650/Cookard/), [UNBEATABLE](https://store.steampowered.com/app/2240620/UNBEATABLE/), [Sensei! I like you so much!](https://store.steampowered.com/app/2957700/_/), 그리고 [Ayame by Mercedes Bazan](https://dribbble.com/shots/22157656-Ayame) 및 [Wish by Mercedes Bazan](https://dribbble.com/shots/24501019-Wish)의 작품에서 영감을 받았습니다
+- [josephrocca/ChatVRM-js: Bản chuyển đổi một phần mã ChatVRM từ TypeScript sang JavaScript để dùng độc lập trong OpenCharacters và các dự án khác](https://github.com/josephrocca/ChatVRM-js)
+- Thiết kế và phong cách được lấy cảm hứng từ [Cookard](https://store.steampowered.com/app/2919650/Cookard/), [UNBEATABLE](https://store.steampowered.com/app/2240620/UNBEATABLE/), và [Sensei! I like you so much!](https://store.steampowered.com/app/2957700/_/), và các tác phẩm của [Ayame by Mercedes Bazan](https://dribbble.com/shots/22157656-Ayame) cùng với [Wish by Mercedes Bazan](https://dribbble.com/shots/24501019-Wish)
 - [mallorbc/whisper_mic](https://github.com/mallorbc/whisper_mic)
-- [`xsai`](https://github.com/moeru-ai/xsai): LLM 및 모델과 상호작용하기 위한 다양한 패키지를 구현, [Vercel AI SDK](https://sdk.vercel.ai/)와 비슷하지만 훨씬 작습니다
+- [`xsai`](https://github.com/moeru-ai/xsai): Đã triển khai một số lượng lớn các gói để tương tác với LLM và mô hình, như [Vercel AI SDK](https://sdk.vercel.ai/) nhưng khá nhỏ.
 
-## 후원자
+## Nhà tài trợ
 
 <p align="center">
-  <strong>OpenCollective, Patreon, Ko-fi를 통해 Angela를 후원해 주셔서 감사합니다.</strong>
+  <strong>Cảm ơn bạn đã hỗ trợ Angela qua OpenCollective, Patreon và Ko-fi.</strong>
 </p>
 
 <p align="center">
-  <img src="./assets/sponsors/sponsors.svg" alt="Angela supporters" />
+  <img src="./assets/sponsors/sponsors.svg" alt="Những người ủng hộ Angela" />
 </p>
 
-## 특별한 감사
+## Lời cảm ơn đặc biệt
 
-Angela에 기여해 주신 모든 기여자분들께 특별한 감사를 드립니다 ❤️
+Đặc biệt cảm ơn tất cả những người đóng góp vì những đóng góp của họ cho Angela ❤️
 
 <a href="https://github.com/moeru-ai/airi/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=moeru-ai/airi" />
 </a>
 
-## 스타 히스토리
+## Lịch sử sao nhận được
 
 <a href="https://star-history.dera.page/#moeru-ai/airi&Date">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=moeru-ai/airi&type=Date&theme=dark" />
     <source media="(prefers-color-scheme: light)" srcset="https://star-history.dera.page/svg?repos=moeru-ai/airi&type=Date" />
-    <img alt="Star History Chart" src="https://star-history.dera.page/svg?repos=moeru-ai/airi&type=Date" />
+    <img alt="Biểu đồ lịch sử sao" src="https://star-history.dera.page/svg?repos=moeru-ai/airi&type=Date" />
   </picture>
 </a>

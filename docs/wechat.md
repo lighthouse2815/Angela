@@ -1,5 +1,5 @@
-# 微信群
+# Nhóm WeChat
 
-扫码添加微信后，请备注：Angela，我们会邀请你进群。
+Quét mã để thêm liên hệ WeChat và ghi chú: Angela. Chúng tôi sẽ mời bạn vào nhóm.
 
-![](./assets/wechat-qr.avif)
+![Mã QR liên hệ WeChat](./assets/wechat-qr.avif)

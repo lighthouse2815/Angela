@@ -1,4 +1,4 @@
-> Angela is derived from [Project AIRI](https://github.com/moeru-ai/airi). Historical posts, community links, and upstream documentation retain their original attribution.
+> Angela được phát triển từ [Project AIRI](https://github.com/moeru-ai/airi). Các bài viết lịch sử, liên kết cộng đồng và tài liệu gốc giữ nguyên thông tin ghi nhận tác giả.
 
 <picture>
   <source
@@ -19,7 +19,7 @@
 <p align="center">Lấy ý tưởng từ Neuro-sama và chúng tôi đã tạo ra một AI waifu / nhân vật ảo để mang họ đến với thế giới của chúng ta.</p>
 
 <p align="center">
-  [<a href="https://discord.gg/TgQ3Cu2F7A">Tham gia máy chủ Discord</a>] [<a href="https://airi.moeru.ai">Dùng thử</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/README.md">English</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.zh-CN.md">简体中文</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.ja-JP.md">日本語</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.ru-RU.md">Русский</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.fr.md">Français</a>] [<a href="https://github.com/lighthouse2815/Angela/blob/main/docs/README.ko-KR.md">한국어</a>]
+  [<a href="https://discord.gg/TgQ3Cu2F7A">Tham gia máy chủ Discord</a>] [<a href="https://airi.moeru.ai">Dùng thử</a>] [<a href="../README.md">Hướng dẫn Angela hiện tại</a>] [<a href="./CONTRIBUTING.md">Hướng dẫn đóng góp</a>]
 </p>
 
 <p align="center">
@@ -150,7 +150,7 @@
 > scoop install airi/airi
 > ```
 >
-> Trên macOS, bạn có thể cài Angela bằng [Homebrew Cask](https://brew.sh/) mà không cần thêm custom tap:
+> Trên macOS, bạn có thể cài Angela bằng [Homebrew Cask](https://brew.sh/) mà không cần thêm kho tap riêng:
 >
 > ```sh
 > brew install --cask airi
@@ -170,7 +170,7 @@
 >
 > Không gửi bản dịch giống hệt văn bản tiếng Anh. Bản dịch đó bị từ chối khi xét duyệt. Chuỗi chưa có bản dịch sẽ hiển thị văn bản tiếng Anh.
 >
-> <a href="https://crowdin.com/project/proj-airi" target="_blank" rel="nofollow"><img style="width: 140px; height: 40px;" src="https://badges.crowdin.net/badge/light/crowdin-on-dark.png" srcset="https://badges.crowdin.net/badge/light/crowdin-on-dark.png 1x, https://badges.crowdin.net/badge/light/crowdin-on-dark@2x.png 2x" alt="Crowdin | Agile localization for tech companies" width="140" height="40" /></a>
+> <a href="https://crowdin.com/project/proj-airi" target="_blank" rel="nofollow"><img style="width: 140px; height: 40px;" src="https://badges.crowdin.net/badge/light/crowdin-on-dark.png" srcset="https://badges.crowdin.net/badge/light/crowdin-on-dark.png 1x, https://badges.crowdin.net/badge/light/crowdin-on-dark@2x.png 2x" alt="Crowdin | Bản địa hóa linh hoạt cho công ty công nghệ" width="140" height="40" /></a>
 
 Bạn đã từng mơ về một thực thể số sống động (cyber-waifu, thú cưng ảo) hay một bạn đồng hành kỹ thuật số có thể chơi cùng và trò chuyện với bạn chưa?
 
@@ -194,7 +194,7 @@ Do đó, dự án Angela mang đến một lựa chọn khác: **cho phép bạn
 - [DevLog @ 2025.08.01: Hoạt ảnh văn bản streaming và grapheme cluster](https://airi.moeru.ai/docs/en/blog/DevLog-2025.08.01/) - ngày 1 tháng 8, 2025
 - [DevLog @ 2025.07.18: Nghĩ lại về airi-factorio với Factorio Learning Environment](https://airi.moeru.ai/docs/en/blog/DevLog-2025.07.18/) - ngày 18 tháng 7, 2025
 - [DreamLog 0x1: Câu chuyện phía sau Project AIRI](https://airi.moeru.ai/docs/en/blog/DreamLog-0x1/) - ngày 16 tháng 6, 2025
-- ...xem thêm tại [docs page](https://airi.moeru.ai/docs)
+- ...xem thêm tại [trang tài liệu](https://airi.moeru.ai/docs)
 
 ## Dự Án Này Có Gì Đặc Biệt?
 
@@ -203,7 +203,7 @@ Khác với các dự án VTuber AI mã nguồn mở khác, **アイリ** đư�
 > [!TIP]
 > Bạn lo lắng về hiệu năng khi chúng tôi dùng công nghệ Web?
 >
-> Đừng lo, phiên bản chạy trên trình duyệt chỉ nhằm minh hoạ khả năng có thể đạt được trong browser và webview. Phiên bản desktop của Angela mặc định có thể dùng [NVIDIA CUDA](https://developer.nvidia.com/cuda-toolkit) và [Apple Metal](https://developer.apple.com/metal/) (nhờ HuggingFace & dự án [candle](https://github.com/huggingface/candle)), mà không cần quản lý phụ thuộc phức tạp. Đồ hoạ, bố cục, animation, và hệ thống plugin (WIP) vẫn tận dụng công nghệ Web để mở rộng dễ dàng.
+> Đừng lo, phiên bản chạy trên trình duyệt chỉ nhằm minh hoạ khả năng có thể đạt được trong browser và webview. Phiên bản desktop của Angela mặc định có thể dùng [NVIDIA CUDA](https://developer.nvidia.com/cuda-toolkit) và [Apple Metal](https://developer.apple.com/metal/) (nhờ HuggingFace & dự án [candle](https://github.com/huggingface/candle)), mà không cần quản lý phụ thuộc phức tạp. Đồ hoạ, bố cục, animation, và hệ thống plugin (đang phát triển) vẫn tận dụng công nghệ Web để mở rộng dễ dàng.
 
 Điều này có nghĩa là **アイリ có thể chạy trên các trình duyệt và thiết bị hiện đại**, kể cả thiết bị di động (đã hỗ trợ PWA). Điều này mở ra nhiều khả năng để chúng tôi (nhà phát triển) nâng VTuber アイリ lên tầm cao mới, đồng thời vẫn để người dùng linh hoạt bật các tính năng cần TCP hoặc công nghệ ngoài Web như kết nối kênh thoại Discord hay chơi Minecraft, Factorio với bạn bè.
 
@@ -217,8 +217,8 @@ Khác với các dự án VTuber AI mã nguồn mở khác, **アイリ** đư�
 >
 > Các mảng (và dự án liên quan) chúng tôi cần:
 >
-> - Live2D modeller
-> - VRM modeller
+> - Người tạo mô hình Live2D
+> - Người tạo mô hình VRM
 > - Nhà thiết kế avatar VRChat
 > - Thị giác máy tính
 > - Học tăng cường (Reinforcement Learning)
@@ -239,35 +239,35 @@ Khả năng:
 
 - [x] Bộ não
   - [x] Chơi game: [Minecraft](https://www.minecraft.net)
-  - [x] Chơi game: [Factorio](https://www.factorio.com) (WIP, [PoC và demo có sẵn](https://github.com/moeru-ai/airi-factorio))
+  - [x] Chơi game: [Factorio](https://www.factorio.com) (đang phát triển, [PoC và demo có sẵn](https://github.com/moeru-ai/airi-factorio))
   - [x] Chơi game: [Kerbal Space Program](https://www.kerbalspaceprogram.com/) (sẽ công bố sau)
   - [ ] Chơi cùng trong [Helldivers 2](https://www.playstation.com/en-hk/games/helldivers-2/pc/) (đang thực hiện)
   - [x] Trò chuyện trên [Telegram](https://telegram.org)
   - [x] Trò chuyện trên [Discord](https://discord.com)
   - [ ] Bộ nhớ
     - [x] Hỗ trợ CSDL trong trình duyệt (DuckDB WASM | `pglite`)
-    - [ ] Memory Alaya (WIP)
+    - [ ] Bộ nhớ Alaya (đang phát triển)
   - [ ] Suy luận cục bộ trong trình duyệt (WebGPU)
 - [x] Khả năng nghe hiểu
   - [x] Nhận âm thanh từ trình duyệt
   - [x] Nhận âm thanh từ [Discord](https://discord.com)
-  - [x] Nhận diện giọng nói phía client
-  - [x] Phát hiện giọng nói chuyện phía client
+  - [x] Nhận diện giọng nói phía máy khách
+  - [x] Phát hiện giọng nói chuyện phía máy khách
 - [x] Giọng nói
   - [x] Tổng hợp giọng nói qua nhiều nhà cung cấp, gồm [ElevenLabs](https://elevenlabs.io/), Microsoft/Azure Speech, TTS tương thích OpenAI, Alibaba Cloud Model Studio và Kokoro TTS cục bộ
 - [x] Cơ thể
   - [x] Hỗ trợ VRM
     - [x] Điều khiển model VRM
-  - [x] Animation cho VRM
+  - [x] Hoạt ảnh cho VRM
     - [x] Chớp mắt
     - [x] Tự động nhìn theo
-    - [x] Chuyển động mắt khi idle
+    - [x] Chuyển động mắt khi nghỉ
   - [x] Hỗ trợ Live2D
     - [x] Điều khiển model Live2D
-  - [x] Animation cho Live2D
+  - [x] Hoạt ảnh cho Live2D
     - [x] Chớp mắt
     - [x] Tự động nhìn theo
-    - [x] Chuyển động mắt khi idle
+    - [x] Chuyển động mắt khi nghỉ
 
 ## Phát Triển
 
@@ -349,16 +349,16 @@ npx bumpp --no-commit --no-tag
 
 ## Các LLM API hỗ trợ (cung cấp bởi [xsai](https://github.com/moeru-ai/xsai))
 
-- [x] [AIHubMix (recommended)](https://aihubmix.com/?aff=OOiX)
+- [x] [AIHubMix (đề xuất)](https://aihubmix.com/?aff=OOiX)
 - [x] [OpenRouter](https://openrouter.ai/)
 - [x] [vLLM](https://github.com/vllm-project/vllm)
 - [x] [SGLang](https://github.com/sgl-project/sglang)
 - [x] [Ollama](https://github.com/ollama/ollama)
-- [x] [302.AI (sponsored)](https://share.302.ai/514k2v)
+- [x] [302.AI (tài trợ)](https://share.302.ai/514k2v)
 - [x] [OpenAI](https://platform.openai.com/docs/guides/gpt/chat-completions-api)
-  - [ ] [Azure OpenAI API](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference) (PR welcome)
+  - [ ] [Azure OpenAI API](https://learn.microsoft.com/en-us/azure/ai-services/openai/reference) (hoan nghênh đóng góp qua PR)
 - [x] [Anthropic Claude](https://anthropic.com)
-  - [ ] [AWS Claude](https://docs.anthropic.com/en/api/claude-on-amazon-bedrock) (PR welcome)
+  - [ ] [AWS Claude](https://docs.anthropic.com/en/api/claude-on-amazon-bedrock) (hoan nghênh đóng góp qua PR)
 - [x] [DeepSeek](https://www.deepseek.com/)
 - [x] [Qwen](https://help.aliyun.com/document_detail/2400395.html)
 - [x] [Google Gemini](https://developers.generativeai.google)
@@ -378,8 +378,8 @@ npx bumpp --no-commit --no-tag
 - [x] [ModelScope](https://modelscope.cn/docs/model-service/API-Inference/intro)
 - [x] [Player2](https://player2.game/)
 - [x] [Tencent Cloud](https://cloud.tencent.com/document/product/1729)
-- [ ] [Sparks](https://www.xfyun.cn/doc/spark/Web.html) (PR welcome)
-- [ ] [Volcano Engine](https://www.volcengine.com/experience/ark?utm_term=202502dsinvite&ac=DSASUQY5&rc=2QXCA1VI) (PR welcome)
+- [ ] [Sparks](https://www.xfyun.cn/doc/spark/Web.html) (hoan nghênh đóng góp qua PR)
+- [ ] [Volcano Engine](https://www.volcengine.com/experience/ark?utm_term=202502dsinvite&ac=DSASUQY5&rc=2QXCA1VI) (hoan nghênh đóng góp qua PR)
 - [x] [Xiaomi Mimo](https://platform.xiaomimimo.com)
 
 ## Các dự án phụ khác
@@ -403,31 +403,31 @@ npx bumpp --no-commit --no-tag
 
 ```mermaid
 flowchart LR
-  subgraph Apps[Stage applications]
+  subgraph Apps[Ứng dụng Stage]
     Web[stage-web]
     Desktop[stage-tamagotchi]
-    Pocket[stage-pocket\nexperimental]
+    Pocket[stage-pocket\nthử nghiệm]
   end
 
-  subgraph Shared[Shared product packages]
+  subgraph Shared[Các gói sản phẩm dùng chung]
     StageUI[stage-ui]
     Domain[core-agent\ncore-character]
     Audio[pipelines-audio]
-    Renderers[stage-ui-live2d\nstage-ui-three and renderers]
+    Renderers[stage-ui-live2d\nstage-ui-three và các bộ kết xuất]
     SDK[server-sdk\nserver-shared]
   end
 
-  subgraph Channel[Desktop server channel]
+  subgraph Channel[Kênh máy chủ desktop]
     Runtime[server-runtime]
   end
 
-  subgraph Integrations[Source-configured integrations]
+  subgraph Integrations[Tích hợp cấu hình trong mã nguồn]
     Discord[discord-bot]
     Minecraft[minecraft-bot]
-    Other[Telegram, Factorio, MCP, and others]
+    Other[Telegram, Factorio, MCP và các tích hợp khác]
   end
 
-  subgraph Hosted[Hosted backend]
+  subgraph Hosted[Backend được lưu trữ trên máy chủ]
     Edge[Caddy]
     API[api-server]
     Auth[auth-server]
@@ -443,10 +443,10 @@ flowchart LR
   StageUI --> Renderers
   StageUI --> SDK
   Desktop --> Runtime
-  SDK <-->|server channel| Runtime
+  SDK <-->|kênh máy chủ| Runtime
   Discord --> SDK
   Minecraft --> SDK
-  Other -. optional .-> SDK
+  Other -. tùy chọn .-> SDK
   Edge --> API
   Edge --> Auth
   API --> Database
@@ -459,12 +459,12 @@ flowchart LR
 
 ### Mã nguồn mở
 
-- [kimjammer/Neuro: A recreation of Neuro-Sama originally created in 7 days.](https://github.com/kimjammer/Neuro): very well completed implementation.
-- [SugarcaneDefender/z-waif](https://github.com/SugarcaneDefender/z-waif): Great at gaming, autonomous, and prompt engineering
-- [semperai/amica](https://github.com/semperai/amica/): Great at VRM, WebXR
-- [elizaOS/eliza](https://github.com/elizaOS/eliza): Great examples and software engineering on how to integrate agent into various of systems and APIs
-- [ardha27/AI-Waifu-Vtuber](https://github.com/ardha27/AI-Waifu-Vtuber): Great about Twitch API integrations
-- [InsanityLabs/AIVTuber](https://github.com/InsanityLabs/AIVTuber): Nice UI and UX
+- [kimjammer/Neuro: Bản tái hiện Neuro-Sama ban đầu được tạo trong 7 ngày.](https://github.com/kimjammer/Neuro): Bản triển khai rất hoàn chỉnh.
+- [SugarcaneDefender/z-waif](https://github.com/SugarcaneDefender/z-waif): Nổi bật về chơi game, hoạt động tự chủ và thiết kế prompt
+- [semperai/amica](https://github.com/semperai/amica/): Nổi bật về VRM và WebXR
+- [elizaOS/eliza](https://github.com/elizaOS/eliza): Ví dụ và kỹ thuật tích hợp agent vào nhiều hệ thống và API
+- [ardha27/AI-Waifu-Vtuber](https://github.com/ardha27/AI-Waifu-Vtuber): Nổi bật về tích hợp API Twitch
+- [InsanityLabs/AIVTuber](https://github.com/InsanityLabs/AIVTuber): Giao diện và trải nghiệm người dùng tốt
 - [IRedDragonICY/vixevia](https://github.com/IRedDragonICY/vixevia)
 - [t41372/Open-LLM-VTuber](https://github.com/t41372/Open-LLM-VTuber)
 - [PeterH0323/Streamer-Sales](https://github.com/PeterH0323/Streamer-Sales)
@@ -477,14 +477,14 @@ flowchart LR
 
 ## Trạng thái dự án
 
-![Repobeats analytics image](https://repobeats.axiom.co/api/embed/a1d6fe2c13ea2bb53a5154435a71e2431f70c2ee.svg 'Repobeats analytics image')
+![Biểu đồ phân tích Repobeats](https://repobeats.axiom.co/api/embed/a1d6fe2c13ea2bb53a5154435a71e2431f70c2ee.svg 'Biểu đồ phân tích Repobeats')
 
 ## Lời cảm ơn
 
 - [Reka UI](https://github.com/unovue/reka-ui): Đã thiết kế trang tài liệu, trang chủ mới cũng dựa trên dự án này, đồng thời triển khai rất nhiều thành phần trong giao diện. (shadcn-vue sử dụng Reka UI làm headless, bạn nên xem qua!)
 - [pixiv/ChatVRM](https://github.com/pixiv/ChatVRM)
-- [josephrocca/ChatVRM-js: A JS conversion/adaptation of parts of the ChatVRM (TypeScript) code for standalone use in OpenCharacters and elsewhere](https://github.com/josephrocca/ChatVRM-js)
-- Thiết kế và phong cách được lấy cảm hứng từ [Cookard](https://store.steampowered.com/app/2919650/Cookard/), [UNBEATABLE](https://store.steampowered.com/app/2240620/UNBEATABLE/), and [Sensei! I like you so much!](https://store.steampowered.com/app/2957700/_/), và các artworks của [Ayame by Mercedes Bazan](https://dribbble.com/shots/22157656-Ayame) cùng với [Wish by Mercedes Bazan](https://dribbble.com/shots/24501019-Wish)
+- [josephrocca/ChatVRM-js: Bản chuyển đổi một phần mã ChatVRM từ TypeScript sang JavaScript để dùng độc lập trong OpenCharacters và các dự án khác](https://github.com/josephrocca/ChatVRM-js)
+- Thiết kế và phong cách được lấy cảm hứng từ [Cookard](https://store.steampowered.com/app/2919650/Cookard/), [UNBEATABLE](https://store.steampowered.com/app/2240620/UNBEATABLE/), và [Sensei! I like you so much!](https://store.steampowered.com/app/2957700/_/), và các tác phẩm của [Ayame by Mercedes Bazan](https://dribbble.com/shots/22157656-Ayame) cùng với [Wish by Mercedes Bazan](https://dribbble.com/shots/24501019-Wish)
 - [mallorbc/whisper_mic](https://github.com/mallorbc/whisper_mic)
 - [`xsai`](https://github.com/moeru-ai/xsai): Đã triển khai một số lượng lớn các gói để tương tác với LLM và mô hình, như [Vercel AI SDK](https://sdk.vercel.ai/) nhưng khá nhỏ.
 
@@ -495,7 +495,7 @@ flowchart LR
 </p>
 
 <p align="center">
-  <img src="./assets/sponsors/sponsors.svg" alt="Angela supporters" />
+  <img src="./assets/sponsors/sponsors.svg" alt="Những người ủng hộ Angela" />
 </p>
 
 ## Lời cảm ơn đặc biệt
@@ -512,6 +512,6 @@ flowchart LR
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://star-history.dera.page/svg?repos=moeru-ai/airi&type=Date&theme=dark" />
     <source media="(prefers-color-scheme: light)" srcset="https://star-history.dera.page/svg?repos=moeru-ai/airi&type=Date" />
-    <img alt="Star History Chart" src="https://star-history.dera.page/svg?repos=moeru-ai/airi&type=Date" />
+    <img alt="Biểu đồ lịch sử sao" src="https://star-history.dera.page/svg?repos=moeru-ai/airi&type=Date" />
   </picture>
 </a>

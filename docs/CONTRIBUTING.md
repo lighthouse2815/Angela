@@ -1,28 +1,28 @@
-# Start contributing to [Angela](https://github.com/lighthouse2815/Angela)
+# Bắt đầu đóng góp cho [Angela](https://github.com/lighthouse2815/Angela)
 
-Hello! Thank you for your interest in contributing to this project. This guide will help you get started.
+Cảm ơn bạn đã quan tâm đến việc đóng góp cho dự án. Tài liệu này hướng dẫn các bước bắt đầu.
 
-## Prerequisites
+## Yêu cầu ban đầu
 
 - [Git](https://git-scm.com/downloads)
-- [mise](https://mise.jdx.dev/installing-mise.html), or another version manager that reads `.tool-versions`
+- [mise](https://mise.jdx.dev/installing-mise.html), hoặc công cụ quản lý phiên bản khác đọc được `.tool-versions`
 
-The repository pins tool versions in [`.tool-versions`](../.tool-versions), including Node.js and pnpm.
-The `packageManager` field in [`package.json`](../package.json) also specifies the pnpm version.
-After you clone the repository, install these versions with mise.
+Repo cố định phiên bản công cụ trong [`.tool-versions`](../.tool-versions), gồm Node.js và pnpm.
+Trường `packageManager` trong [`package.json`](../package.json) cũng chỉ định phiên bản pnpm.
+Sau khi clone repo, cài các phiên bản này bằng mise.
 
 <details>
-<summary>Windows setup</summary>
+<summary>Thiết lập Windows</summary>
 
-1. Open PowerShell.
-2. Install [`scoop`](https://scoop.sh/).
+1. Mở PowerShell.
+2. Cài [`scoop`](https://scoop.sh/).
 
    ```powershell
    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
    Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
    ```
 
-3. Install Git and mise with Scoop.
+3. Cài Git và mise bằng Scoop.
 
    ```powershell
    scoop install git mise
@@ -31,10 +31,10 @@ After you clone the repository, install these versions with mise.
 </details>
 
 <details>
-<summary>macOS setup</summary>
+<summary>Thiết lập macOS</summary>
 
-1. Open Terminal, iTerm2, Ghostty, Kitty, or another terminal.
-2. Install Git and mise with Homebrew.
+1. Mở Terminal, iTerm2, Ghostty, Kitty hoặc trình dòng lệnh khác.
+2. Cài Git và mise bằng Homebrew.
 
    ```shell
    brew install git mise
@@ -43,27 +43,27 @@ After you clone the repository, install these versions with mise.
 </details>
 
 <details>
-<summary>Linux setup</summary>
+<summary>Thiết lập Linux</summary>
 
-1. Open a terminal.
-2. Use the [Git installation instructions for Linux](https://git-scm.com/downloads/linux).
-3. Install mise using the [package or installation method for your distribution](https://mise.jdx.dev/installing-mise.html).
+1. Mở trình dòng lệnh.
+2. Làm theo [hướng dẫn cài Git trên Linux](https://git-scm.com/downloads/linux).
+3. Cài mise theo [phương thức phù hợp với bản phân phối của bạn](https://mise.jdx.dev/installing-mise.html).
 
 </details>
 
-## If you have already contributed to this project before
+## Cập nhật repo đã clone
 
 > [!WARNING]
 >
-> If you haven't cloned this repository, skip this section.
+> Nếu chưa clone repo, bỏ qua phần này.
 
-If the `upstream` remote is not configured, add the Angela repository before you fetch changes:
+Nếu chưa cấu hình remote `upstream`, thêm repo Angela trước khi lấy thay đổi:
 
 ```shell
 git remote add upstream https://github.com/lighthouse2815/Angela.git
 ```
 
-Fetch upstream changes and rebase your local `main` branch:
+Lấy thay đổi từ upstream và rebase nhánh `main` cục bộ:
 
 ```shell
 git fetch --all
@@ -71,74 +71,74 @@ git checkout main
 git pull upstream main --rebase
 ```
 
-If you have a working branch, to make your branch up to date with the upstream repository:
+Nếu đang làm trên nhánh riêng, cập nhật nhánh đó theo repo upstream:
 
 ```shell
 git checkout <your-branch-name>
 git rebase main
 ```
 
-## Fork this project
+## Tạo bản fork dự án
 
-Click on the **Fork** button on the top right corner of the [moeru-ai/airi](https://github.com/lighthouse2815/Angela) page.
+Nhấn **Fork** ở góc trên bên phải trang [Angela](https://github.com/lighthouse2815/Angela).
 
-## Clone
+## Clone repo
 
 ```shell
 git clone https://github.com/<your-github-username>/airi.git
 cd Angela
 ```
 
-## Create your working branch
+## Tạo nhánh làm việc
 
 ```shell
 git checkout -b <your-branch-name>
 ```
 
-## Install dependencies
+## Cài các gói phụ thuộc
 
-From the repository root, install the tools recorded in `.tool-versions`:
+Tại thư mục gốc của repo, cài công cụ được ghi trong `.tool-versions`:
 
 ```shell
 mise install
 ```
 
-Make sure that the Node.js and pnpm versions match `.tool-versions`:
+Kiểm tra phiên bản Node.js và pnpm khớp với `.tool-versions`:
 
 ```shell
 mise exec -- node --version
 mise exec -- pnpm --version
 ```
 
-The pnpm version must also match the `packageManager` field in `package.json`.
+Phiên bản pnpm cũng phải khớp với trường `packageManager` trong `package.json`.
 
-mise installs pnpm directly, so this setup does not require Corepack.
+mise cài pnpm trực tiếp nên không cần Corepack.
 
-Install the project dependencies:
+Cài các gói phụ thuộc của dự án:
 
 ```shell
 mise exec -- pnpm install
 ```
 
-The remaining examples assume that [mise is activated for your shell](https://mise.jdx.dev/dev-tools/shims.html).
-Otherwise, run package-manager commands through `mise exec --`, for example `mise exec -- pnpm typecheck`.
+Các ví dụ tiếp theo yêu cầu [kích hoạt mise trong shell](https://mise.jdx.dev/dev-tools/shims.html).
+Nếu chưa kích hoạt, chạy lệnh qua `mise exec --`, ví dụ `mise exec -- pnpm typecheck`.
 
-### Optional package-manager shortcuts
+### Lệnh tắt tùy chọn cho trình quản lý gói
 
-[@antfu/ni](https://github.com/antfu-collective/ni) detects the package manager used by the repository.
+[@antfu/ni](https://github.com/antfu-collective/ni) nhận diện trình quản lý gói của repo.
 
-To use these shortcuts, install `@antfu/ni`:
+Để dùng các lệnh tắt này, cài `@antfu/ni`:
 
 ```shell
 mise exec -- npm install --global @antfu/ni
 ```
 
-- Use `ni` instead of `pnpm install`, `npm install`, or `yarn install`.
-- Use `nr` instead of `pnpm run`, `npm run`, or `yarn run`.
+- Dùng `ni` thay cho `pnpm install`, `npm install` hoặc `yarn install`.
+- Dùng `nr` thay cho `pnpm run`, `npm run` hoặc `yarn run`.
 
-## Choose the application you want to develop on
+## Chọn ứng dụng cần phát triển
 
-### Stage Tamagotchi (Desktop version)
+### Stage Tamagotchi (bản desktop)
 
 ```shell
 pnpm dev:desktop
@@ -146,7 +146,7 @@ pnpm dev:desktop
 
 > [!NOTE]
 >
-> For [@antfu/ni](https://github.com/antfu-collective/ni) users, you can
+> Nếu dùng [@antfu/ni](https://github.com/antfu-collective/ni), chạy:
 >
 > ```shell
 > nr dev:desktop
@@ -154,19 +154,19 @@ pnpm dev:desktop
 
 > [!NOTE]
 >
-> The `dev` and `start` scripts run `install-electron` before `electron-vite`.
+> Các script `dev` và `start` chạy `install-electron` trước `electron-vite`.
 >
-> Electron 42 removed the `postinstall` script. The `electron` package now downloads its binary
-> when you first run its `bin` entry. `electron-vite` reads `node_modules/electron/path.txt`
-> directly, so it never starts that download. A fresh install therefore fails with
+> Electron 42 đã bỏ script `postinstall`. Gói `electron` tải tệp thực thi
+> khi bạn chạy mục `bin` lần đầu. `electron-vite` đọc `node_modules/electron/path.txt`
+> trực tiếp nên không kích hoạt tải xuống. Vì vậy, bản cài mới gặp lỗi
 > `Error: Electron uninstall`.
 >
-> `install-electron` runs the same code as the removed `postinstall` script. It returns
-> immediately when the binary is already present.
+> `install-electron` chạy cùng mã với script `postinstall` đã bị bỏ. Lệnh kết thúc
+> ngay khi tệp thực thi đã tồn tại.
 >
-> Remove this step after `electron-vite` supports the lazy download.
+> Bỏ bước này khi `electron-vite` hỗ trợ tải xuống lúc cần.
 
-### Stage Web (Browser version for [airi.moeru.ai](https://airi.moeru.ai))
+### Stage Web (bản trình duyệt tại [airi.moeru.ai](https://airi.moeru.ai))
 
 ```shell
 pnpm dev
@@ -174,45 +174,45 @@ pnpm dev
 
 > [!NOTE]
 >
-> For [@antfu/ni](https://github.com/antfu-collective/ni) users, you can
+> Nếu dùng [@antfu/ni](https://github.com/antfu-collective/ni), chạy:
 >
 > ```shell
 > nr dev
 > ```
 
-### UI Storyboard
+### Danh mục thành phần giao diện
 
-Browse the live UI component storyboard at [airi.moeru.ai/ui](https://airi.moeru.ai/ui/).
+Xem các thành phần giao diện trực tiếp tại [airi.moeru.ai/ui](https://airi.moeru.ai/ui/).
 
-### Documentation site
+### Trang tài liệu
 
-The documentation site lives in [moeru-ai/airi-docs](https://github.com/moeru-ai/airi-docs), see its README for development.
+Trang tài liệu nằm trong [moeru-ai/airi-docs](https://github.com/moeru-ai/airi-docs). Đọc README của repo đó để phát triển.
 
-### Telegram bot integration
+### Tích hợp bot Telegram
 
-A Postgres database is required.
+Cần có cơ sở dữ liệu Postgres.
 
 ```shell
 cd integrations/telegram-bot
 docker compose up -d
 ```
 
-Configure `.env`
+Cấu hình `.env`
 
 ```shell
 cp .env .env.local
 ```
 
-Edit the credentials in `.env.local`.
+Sửa thông tin xác thực trong `.env.local`.
 
-Migrate the database
+Cập nhật cấu trúc cơ sở dữ liệu
 
 ```shell
 pnpm -F @angela/telegram-bot db:generate
 pnpm -F @angela/telegram-bot db:push
 ```
 
-Run the bot
+Chạy bot
 
 ```shell
 pnpm -F @angela/telegram-bot start
@@ -220,27 +220,27 @@ pnpm -F @angela/telegram-bot start
 
 > [!NOTE]
 >
-> For [@antfu/ni](https://github.com/antfu-collective/ni) users, you can
+> Nếu dùng [@antfu/ni](https://github.com/antfu-collective/ni), chạy:
 >
 > ```shell
 > nr -F @angela/telegram-bot dev
 > ```
 
-### Discord bot integration
+### Tích hợp bot Discord
 
 ```shell
 cd integrations/discord-bot
 ```
 
-Configure `.env`
+Cấu hình `.env`
 
 ```shell
 cp .env .env.local
 ```
 
-Edit the credentials in `.env.local`.
+Sửa thông tin xác thực trong `.env.local`.
 
-Run the bot
+Chạy bot
 
 ```shell
 pnpm -F @angela/discord-bot start
@@ -248,29 +248,29 @@ pnpm -F @angela/discord-bot start
 
 > [!NOTE]
 >
-> For [@antfu/ni](https://github.com/antfu-collective/ni) users, you can
+> Nếu dùng [@antfu/ni](https://github.com/antfu-collective/ni), chạy:
 >
 > ```shell
 > nr -F @angela/discord-bot dev
 > ```
 
-### Minecraft agent
+### Agent Minecraft
 
 ```shell
 cd integrations/minecraft
 ```
 
-Start a Minecraft client, export your world with desired port, and fill-in the port number in `.env.local`.
+Mở Minecraft, chia sẻ thế giới với cổng mong muốn rồi điền số cổng vào `.env.local`.
 
-Configure `.env`
+Cấu hình `.env`
 
 ```shell
 cp .env .env.local
 ```
 
-Edit the credentials in `.env.local`.
+Sửa thông tin xác thực trong `.env.local`.
 
-Run the bot
+Chạy bot
 
 ```shell
 pnpm -F @angela/minecraft-bot start
@@ -278,23 +278,23 @@ pnpm -F @angela/minecraft-bot start
 
 > [!NOTE]
 >
-> For [@antfu/ni](https://github.com/antfu-collective/ni) users, you can
+> Nếu dùng [@antfu/ni](https://github.com/antfu-collective/ni), chạy:
 >
 > ```shell
 > nr -F @angela/minecraft-bot dev
 > ```
 
-## Commit
+## Tạo commit
 
-### Before commit
+### Trước khi commit
 
-Please make sure lint (static checkers) and TypeScript compilers are satisfied:
+Kiểm tra lint và kiểu dữ liệu TypeScript:
 
 ```shell
 pnpm lint && pnpm typecheck
 ```
 
-If you are committing images, consider using AVIF format instead of PNG, JPG etc. You can convert existing images to AVIF by running:
+Nếu commit ảnh, ưu tiên định dạng AVIF. Chuyển ảnh hiện có sang AVIF bằng lệnh:
 
 ```shell
 pnpm to-avif <PATH_TO_IMAGE_OR_DIRECTORY1> <PATH_2> <PATH_3> ...
@@ -302,51 +302,52 @@ pnpm to-avif <PATH_TO_IMAGE_OR_DIRECTORY1> <PATH_2> <PATH_3> ...
 
 > [!NOTE]
 >
-> If you have [@antfu/ni](https://github.com/antfu-collective/ni) installed, you can use `nr` to run the commands:
+> Nếu đã cài [@antfu/ni](https://github.com/antfu-collective/ni), dùng `nr` để chạy lệnh:
 >
 > ```shell
 > nr lint && nr typecheck
 > ```
 
-### Commit
+### Tạo commit
 
 ```shell
 git add .
 git commit -m "<your-commit-message>"
 ```
 
-### Push to your fork repository
+### Push lên repo fork
 
 ```shell
 git push origin <your-branch-name> -u
 ```
 
-You should be able to browse the branch on your fork repository.
+Bạn có thể xem nhánh trên repo fork của mình.
 
-## Creating Pull Request
+## Tạo pull request
 
-Navigate to [moeru-ai/airi](https://github.com/lighthouse2815/Angela) page, click on the **Pull requests** tab, and click on the **New pull request** button, click on the **Compare across forks** link, and select your fork repository.
+Mở trang [Angela](https://github.com/lighthouse2815/Angela), chọn **Pull requests**, rồi nhấn **New pull request**.
+Chọn **Compare across forks**, sau đó chọn repo fork của bạn.
 
-Review the changes, and click on the **Create pull request** button.
+Kiểm tra thay đổi rồi nhấn **Create pull request**.
 
-## Unit Test merge requirement
+## Yêu cầu Unit Test trước khi merge
 
-The `Unit Test` check must pass before a pull request merges into `main`.
-Organization member `luoling8192` described failed unit tests as a CI blocker in
-[PR #2290](https://github.com/moeru-ai/airi/pull/2290#issuecomment-5802515112) and
+Kiểm tra `Unit Test` phải thành công trước khi merge pull request vào `main`.
+Thành viên tổ chức `luoling8192` xác định unit test thất bại là lỗi chặn CI tại
+[PR #2290](https://github.com/moeru-ai/airi/pull/2290#issuecomment-5802515112) và
 [PR #2214](https://github.com/moeru-ai/airi/pull/2214#issuecomment-5802515813).
 
-The proposed [Require Unit Test ruleset](rulesets/require-unit-test.json) adds this requirement alongside the existing `Protect main` ruleset.
-It requires the `Unit Test` check from GitHub Actions and has no bypass actors.
-Existing required checks remain in effect.
+[Bộ quy tắc Require Unit Test](rulesets/require-unit-test.json) bổ sung yêu cầu này bên cạnh bộ quy tắc `Protect main` hiện có.
+Bộ quy tắc yêu cầu kiểm tra `Unit Test` từ GitHub Actions và không cho phép tài khoản nào bỏ qua.
+Các kiểm tra bắt buộc hiện có vẫn có hiệu lực.
 
-A repository administrator must import the JSON file under **Settings → Rules → Rulesets → New ruleset → Import a ruleset**.
-Do not create a duplicate if `Require Unit Test` already exists. Update that ruleset instead.
-Merging this document does not apply the GitHub configuration.
+Quản trị viên repo phải nhập tệp JSON tại **Settings → Rules → Rulesets → New ruleset → Import a ruleset**.
+Nếu đã có `Require Unit Test`, cập nhật bộ quy tắc đó. Không tạo bản trùng.
+Merge tài liệu này không tự áp dụng cấu hình trên GitHub.
 
-Auto-merge is already enabled for the repository.
-With this ruleset active, auto-merge waits for `Unit Test` and the other required checks before a merge.
+Repo đã bật merge tự động.
+Khi bộ quy tắc hoạt động, merge tự động chờ `Unit Test` và các kiểm tra bắt buộc khác thành công.
 
-## Whooo-ya! You made it!
+## Hoàn thành đóng góp đầu tiên
 
-Congratulations! You made your first contribution to this project. You can now wait for the maintainers to review your pull request.
+Bạn đã hoàn thành đóng góp đầu tiên cho dự án. Người bảo trì sẽ xem xét pull request của bạn.

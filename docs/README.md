@@ -1,1 +1,1 @@
-Please refer to [README.md](https://github.com/lighthouse2815/Angela) for the main documentation.
+Xem [README chính](../README.md) để chạy Angela và [tài liệu giới thiệu chi tiết](./README.vi.md) bằng tiếng Việt.
