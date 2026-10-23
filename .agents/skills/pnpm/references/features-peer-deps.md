@@ -135,7 +135,7 @@ catalog:
 ```
 
 ```json
-// packages/ui/package.json
+// shared/ui/primitives/package.json
 {
   "peerDependencies": {
     "react": "^18.0.0",

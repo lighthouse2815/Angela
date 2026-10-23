@@ -4,40 +4,46 @@ This file gives the core rules for all work in the `lighthouse2815/Angela` monor
 
 ## Project Map
 
-All apps use Vue 3, Vite, TypeScript, Pinia, VueUse, UnoCSS, Vitest, and ESLint.
+Desktop and web use Vue 3, Vite, TypeScript, Pinia, VueUse, UnoCSS, Vitest, and ESLint.
+The CLI is a Node application. The gateway vendor is an isolated Next.js workspace.
 
 | Path | Content |
 | --- | --- |
-| `apps/stage-web` | The web app. It uses Vue Router. |
+| `apps/web` | The web app. It uses Vue Router. |
 | `apps/desktop` | The Electron desktop app. |
+| `apps/cli` | Terminal entry points and local command lifecycle. |
+| `core/companion` | Shared runtime, memory, records, tasks, and reminders. |
+| `providers/gateway` | Portable gateway build owner. Its vendor workspace remains isolated. |
+| `capabilities/vision/client` | Camera adapter and Python worker. |
+| `integrations/telegram`, `integrations/discord/runtime`, `integrations/zalo` | Companion channel adapters. |
 | `../dev-in-future/apps/stage-pocket` | The mobile app. It uses Vue Router, Capacitor, Kotlin, and Swift. |
-| `packages/stage-ui` | Business components, composables, and stores that stage-web and desktop share. |
-| `packages/stage-ui-three` | Three.js bindings and Vue components. |
-| `packages/stage-shared` | Logic that the stage packages and the stage apps share. |
-| `packages/stage-pages` | Shared page bases. |
-| `packages/stage-layouts` | Shared layouts, including the stage-web settings layout. |
-| `packages/ui` | Primitives built on reka-ui, such as inputs, buttons, and layout. They have minimal business logic. |
-| `packages/i18n` | All translations. |
-| `packages/server-runtime`, `packages/server-sdk`, `packages/server-shared` | The server channel that `services/` and `plugins/` use. |
-| `server/apps/api` | The hosted Hono resource API and its business domains. |
+| `shared/ui/stage` | Business components, composables, and stores that stage-web and desktop share. |
+| `capabilities/avatar/three` | Three.js bindings and Vue components. |
+| `shared/ui/stage-shared` | Logic that the stage packages and the stage apps share. |
+| `shared/ui/pages` | Shared page bases. |
+| `shared/ui/layouts` | Shared layouts, including the stage-web settings layout. |
+| `shared/ui/primitives` | Primitives built on reka-ui, such as inputs, buttons, and layout. They have minimal business logic. |
+| `shared/i18n` | All translations. |
+| `backend/channel/runtime`, `shared/sdk/server`, `backend/contracts/server` | The server channel that `services/` and `plugins/` use. |
+| `backend/api` | The hosted Hono resource API and its business domains. |
 | `../dev-in-future/server/apps/auth` | The standalone Better Auth and OIDC service. |
-| `server/packages` | Shared API schemas and chat contracts that desktop types also consume. |
+| `backend/packages` | Shared API schemas and chat contracts that desktop types also consume. |
 | `../dev-in-future/server/dev/caddy` | Local Auth and API edge routing. |
 | `../dev-in-future/server/docker-compose.yaml` | The complete local backend stack. |
 
 Key files and directories:
 
-- Pages are in `apps/stage-web/src/pages` and `apps/desktop/src/renderer/pages`. Devtools pages are in the `devtools` folder of each.
-- The router configuration is in `apps/stage-web/vite.config.ts` and `apps/desktop/electron.vite.config.ts`.
-- The settings layouts are `packages/stage-layouts/src/layouts/settings.vue` (stage-web) and `apps/desktop/src/renderer/layouts/settings.vue`.
+- Pages are in `apps/web/src/pages` and `apps/desktop/src/renderer/pages`. Devtools pages are in the `devtools` folder of each.
+- The router configuration is in `apps/web/vite.config.ts` and `apps/desktop/electron.vite.config.ts`.
+- The settings layouts are `shared/ui/layouts/src/layouts/settings.vue` (stage-web) and `apps/desktop/src/renderer/layouts/settings.vue`.
 - A settings or devtools page needs `<route lang="yaml"> meta: layout: settings </route>`. Register its route and icon in the settings layout.
-- In `packages/stage-ui/src`, provider definitions are in `stores/providers/` and orchestration modules are in `stores/modules/`.
-- Business composables are in `packages/stage-ui/src/composables/`. Business components are in `packages/stage-ui/src/components/`.
-- Put a component for one page or one use case in `packages/stage-ui/src/components/scenarios/`.
-- Stories are in `packages/stage-ui/stories`, with `packages/stage-ui/histoire.config.ts`. An example is `packages/stage-ui/src/components/misc/Button.story.vue`.
+- In `shared/ui/stage/src`, provider definitions are in `stores/providers/` and orchestration modules are in `stores/modules/`.
+- Business composables are in `shared/ui/stage/src/composables/`. Business components are in `shared/ui/stage/src/components/`.
+- Put a component for one page or one use case in `shared/ui/stage/src/components/scenarios/`.
+- Stories are in `shared/ui/stage/stories`, with `shared/ui/stage/histoire.config.ts`. An example is `shared/ui/stage/src/components/misc/Button.story.vue`.
 - Eventa contracts are in `apps/desktop/src/shared`. Main and renderer usage examples are in `apps/desktop/src/main/services/electron`.
 - The dependency injection example is `apps/desktop/src/main/index.ts`.
-- Style configuration is in `uno.config.ts`. Existing animations are in `apps/stage-web/src/styles`.
+- Style configuration is in `uno.config.ts`. Existing animations are in `apps/web/src/styles`.
 - Lint rules are in `eslint.config.ts`.
 
 ## Current Development Scope
@@ -73,7 +79,9 @@ Use pnpm workspace filters to limit a command to one workspace. Replace `<packag
 
 ## Code Rules
 
-- Put shared logic in `packages/`. Keep module boundaries clear.
+- Put logic in its functional domain: `core/`, `providers/`, `capabilities/`, `integrations/`, or `backend/`.
+- Put reusable cross-domain UI, localization, configuration, SDKs, and development tools in `shared/`.
+- Keep terminal entry points in `apps/cli` and shared companion orchestration in `core/companion`.
 - Use kebab-case for all file names.
 - Do not use `any`. Prefer type generics. Use `as unknown as <Type>` only when you cannot fix the type safely.
 - Omit TypeScript and JavaScript source extensions in relative imports, dynamic imports, and re-exports. Write `./module`, not `./module.ts` or `./module.js`. Keep an extension only when the runtime or asset format requires it.
@@ -116,11 +124,11 @@ Use pnpm workspace filters to limit a command to one workspace. Replace `<packag
 
 ## Documentation
 
-- Put project-wide and client ADRs in `docs/ai/adr/`. Put hosted backend ADRs in `server/docs/ai/adr/`, and obey the ADR rules in `server/AGENTS.md`.
+- Put project-wide and client ADRs in `docs/ai/adr/`. Put hosted backend ADRs in `backend/docs/ai/adr/`, and obey the ADR rules in `backend/AGENTS.md`.
 - Put a documentation change in the same commit or PR as the code that it describes. This rule applies to ADRs, `README.md` files, and component references.
 - Put agent configuration changes in a separate commit or PR. Agent configuration includes `AGENTS.md`, `CLAUDE.md`, skills, and `.github/copilot-instructions.md`.
 - Keep a structured `README.md` in each `packages/` and `apps/` entry. It tells what the entry does, how to use it, when to use it, and when not to use it.
-- Put all translations in `packages/i18n`. By default, edit only the English source locale and your own locale.
+- Put all translations in `shared/i18n`. By default, edit only the English source locale and your own locale.
 - Do not edit other locales unless the user asks. Crowdin manages them, and the next Crowdin sync can replace local edits.
 - Do not use English text as a placeholder in other locales. Add only the locales you implement.
 - When you add a nested `AGENTS.md`, add a `CLAUDE.md` next to it that contains only `@AGENTS.md`. The root `CLAUDE.md` stops Claude Code from reading a nested `AGENTS.md` without this file.
@@ -154,9 +162,9 @@ Skills are in `.agents/skills/<name>/SKILL.md`. Read the listed file before you 
 | Write or debug tests, reproduce a bug, add mocks, or fix test import boundaries | [`enforce-rules-for-vitest`](.agents/skills/enforce-rules-for-vitest/SKILL.md) |
 | Change UnoCSS, Vue styles, UI components, animations, icons, or color mode | [`enforce-rules-for-unocss`](.agents/skills/enforce-rules-for-unocss/SKILL.md) |
 | Add `synced` to a Pinia store, or change a synced store | [`enforce-rules-for-pinia-synced`](.agents/skills/enforce-rules-for-pinia-synced/SKILL.md) |
-| Write or change a string that users see, or a glossary term | [`packages/i18n/AGENTS.md`](packages/i18n/AGENTS.md) |
+| Write or change a string that users see, or a glossary term | [`shared/i18n/AGENTS.md`](shared/i18n/AGENTS.md) |
 | Review pending Crowdin translations, or find why approved translations did not reach the repository | [`enforce-rules-for-i18n`](.agents/skills/enforce-rules-for-i18n/SKILL.md) |
-| Work under `server/` | [`server/AGENTS.md`](server/AGENTS.md). For `server/apps/api`, also read [`server/apps/api/AGENTS.md`](server/apps/api/AGENTS.md). |
+| Work under `backend/` | [`backend/AGENTS.md`](backend/AGENTS.md). For `backend/api`, also read [`backend/api/AGENTS.md`](backend/api/AGENTS.md). |
 | Write documentation, code comments, commit messages, or PR and issue text | [`simple-english`](.agents/skills/simple-english/SKILL.md) |
 | Analyze why a chat, speech, or audio turn was slow or failed, using saved IO traces | [`analyze-io-traces`](.agents/skills/analyze-io-traces/SKILL.md) |
 | Create or prepare a pull request | [`create-pr`](.agents/skills/create-pr/SKILL.md) |
@@ -165,5 +173,5 @@ Skills are in `.agents/skills/<name>/SKILL.md`. Read the listed file before you 
 
 These directories also have their own `AGENTS.md`. Read it before you work in the directory:
 
-- `packages/model-driver-mediapipe/`
-- `services/computer-use-mcp/`
+- `capabilities/vision/mediapipe/`
+- `capabilities/computer-use/`

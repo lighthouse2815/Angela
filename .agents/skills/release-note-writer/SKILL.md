@@ -52,7 +52,7 @@ Use `To developers` for external developer impact:
 
 - Plugin SDK, plugin manifest, gamelet, widget, extension, public package API, self-host deployment behavior, server-runtime, Docker image behavior, integration contracts.
 - Include deployment behavior changes that affect external operators.
-- Do not include purely internal `server/apps/api` business logic unless users of Angela Cloud or external operators need to act on it.
+- Do not include purely internal `backend/api` business logic unless users of Angela Cloud or external operators need to act on it.
 
 Use `To contributors` for internal project work:
 
@@ -61,7 +61,7 @@ Use `To contributors` for internal project work:
 
 ## End-User Writing
 
-For UI, `apps/stage-*`, `packages/stage-*`, and `packages/ui` changes, emphasize what the user can now do and what annoyance was removed.
+For UI, `apps/stage-*`, `packages/stage-*`, and `shared/ui/primitives` changes, emphasize what the user can now do and what annoyance was removed.
 
 Use patterns like:
 

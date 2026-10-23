@@ -1,6 +1,6 @@
 ---
 name: enforce-rules-for-unocss
-description: Enforce Angela's UnoCSS, Vue styling, shared UI component, animation, icon, and color-mode practices. Use when creating, editing, refactoring, or reviewing Vue templates, component styles, utility classes, UnoCSS configuration, animations, icons, UI primitives, packages/ui components, or VueUse dark-mode behavior in the Angela monorepo.
+description: Enforce Angela's UnoCSS, Vue styling, shared UI component, animation, icon, and color-mode practices. Use when creating, editing, refactoring, or reviewing Vue templates, component styles, utility classes, UnoCSS configuration, animations, icons, UI primitives, shared/ui/primitives components, or VueUse dark-mode behavior in the Angela monorepo.
 ---
 
 # Enforce Angela UnoCSS Rules
@@ -27,17 +27,17 @@ Apply these rules to every affected UI file in Angela.
 ## Reuse Project Styling Infrastructure
 
 - Use or extend shortcuts and rules in `uno.config.ts` when styles should be standardized or reused.
-- Search `apps/stage-web/src/styles` for existing animations before adding one. Reuse or extend an existing animation when it fits.
-- Consult `apps/stage-web/tsconfig.json` and `uno.config.ts` when configuration context is needed.
+- Search `apps/web/src/styles` for existing animations before adding one. Reuse or extend an existing animation when it fits.
+- Consult `apps/web/tsconfig.json` and `uno.config.ts` when configuration context is needed.
 - Keep animations intuitive, lively, and readable.
 
 ## Build on Shared UI Primitives
 
 - Build primitives on `@angela/ui`, which is based on reka-ui, instead of raw DOM controls.
-- Read `docs/ai/context/ui-components.md` for the component API and `packages/ui/src/components/Form` for implementation patterns.
-- When adding or updating a component in `packages/ui`, update `docs/ai/context/ui-components.md` with its description, props, slots, and emits.
+- Read `docs/ai/context/ui-components.md` for the component API and `shared/ui/primitives/src/components/Form` for implementation patterns.
+- When adding or updating a component in `shared/ui/primitives`, update `docs/ai/context/ui-components.md` with its description, props, slots, and emits.
 - Use Iconify icon sets instead of bespoke SVGs.
 
 ## Preserve Theme Behavior
 
-- When using VueUse `useDark`, set `disableTransition: false` or use an existing composable from `packages/ui`.
+- When using VueUse `useDark`, set `disableTransition: false` or use an existing composable from `shared/ui/primitives`.

@@ -23,7 +23,7 @@ Use this section when the diff changes several modules, responsibilities, or own
 Add a small responsibility tree only when it makes the scope easier to understand:
 
 ```text
-server/
+backend/
 ├── routes/             # Accept and validate the protocol input
 ├── services/domain/    # Own the business invariant
 └── services/adapters/  # Connect the domain to an external system

@@ -1,6 +1,6 @@
 # computer-use-mcp Agent Notes
 
-Scope: `services/computer-use-mcp/**`
+Scope: `capabilities/computer-use/**`
 
 ## Mission
 
@@ -12,7 +12,7 @@ Scope: `services/computer-use-mcp/**`
 
 ## Agent Collaboration Policy
 
-This policy is scoped to `services/computer-use-mcp/**`. Do not copy it into the
+This policy is scoped to `capabilities/computer-use/**`. Do not copy it into the
 monorepo-level `AGENTS.md` as a global Angela rule: other packages may not have
 the same runtime risk profile, Spark agent setup, or review workflow.
 
@@ -42,7 +42,7 @@ shape for non-trivial work in this package.
 
 ## Boundary Reminder
 
-- Keep provider-specific behavior in Angela / `packages/stage-ui/**`.
+- Keep provider-specific behavior in Angela / `shared/ui/stage/**`.
 - Keep OS-executor and workflow orchestration logic here.
 - Do not expand this workstream into browser, native click/type/press, or VS Code productization until terminal lane is actually closed.
 

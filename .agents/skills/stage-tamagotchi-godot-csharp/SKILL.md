@@ -3,7 +3,7 @@ name: stage-tamagotchi-godot-csharp
 description: >-
   Apply the Stage Tamagotchi Godot C# development method and code style when
   working in `apps/desktop-kirie` or its migration predecessor,
-  `engines/stage-tamagotchi-godot`. Use it for their `.cs` files, `.csproj`,
+  `capabilities/avatar/godot`. Use it for their `.cs` files, `.csproj`,
   local `.editorconfig`, and Godot-specific C# structure decisions. Do not use
   it for TypeScript, Electron, renderer code, shared workspace configuration,
   or repo-wide C# conventions.
@@ -12,13 +12,13 @@ description: >-
 # Stage Tamagotchi Godot C#
 
 1. Treat `apps/desktop-kirie` and
-   `engines/stage-tamagotchi-godot` as one Godot project migration line.
+   `capabilities/avatar/godot` as one Godot project migration line.
    Use `apps/desktop-kirie` as the active desktop host. Keep changes
    in the directory that owns the affected runtime.
 2. Before editing C# files, read:
-   - `engines/stage-tamagotchi-godot/docs/csharp-development-method.md`
-   - `engines/stage-tamagotchi-godot/.editorconfig`
-   - `engines/stage-tamagotchi-godot/docs/csharp-style.md`
+   - `capabilities/avatar/godot/docs/csharp-development-method.md`
+   - `capabilities/avatar/godot/.editorconfig`
+   - `capabilities/avatar/godot/docs/csharp-style.md`
    These files remain the canonical C# guidance while the application moves
    to `apps/desktop-kirie`.
 3. Treat the development-method document as the primary source of truth for
@@ -38,7 +38,7 @@ description: >-
    - use LINQ for cold-path querying and shaping, not hot-path loops
    - use async at I/O and process boundaries, not as a default runtime model
 6. Apply the local low-level style baseline:
-   - `engines/stage-tamagotchi-godot/.editorconfig`
+   - `capabilities/avatar/godot/.editorconfig`
    - 4 spaces, LF, UTF-8, 100 columns
    - Allman braces
    - `System.*` usings first

@@ -1,6 +1,6 @@
 # model-driver-mediapipe Agent Notes
 
-Scope: `packages/model-driver-mediapipe/**`
+Scope: `capabilities/vision/mediapipe/**`
 
 ## Intent
 

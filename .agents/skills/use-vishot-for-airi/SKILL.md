@@ -5,7 +5,7 @@ description: Run Angela-owned Vishot scenarios for stage-web or desktop, includi
 
 # Use Vishot for Angela
 
-Invoke `$use-vishot`, `$use-vishot-with-electron`, and `$use-vishot-with-input-file`. Reuse the product helper at `packages/scenarios-desktop-electron/src/scenarios/display-model-from-file.ts`.
+Invoke `$use-vishot`, `$use-vishot-with-electron`, and `$use-vishot-with-input-file`. Reuse the product helper at `shared/tooling/scenarios-desktop-electron/src/scenarios/display-model-from-file.ts`.
 
 ## Local model capture
 
@@ -17,7 +17,7 @@ pnpm build:desktop
 AIRI_DISPLAY_MODEL_FORMAT=live2d \
 AIRI_DISPLAY_MODEL_PATH='/Users/neko/Pictures/Angela 静态资产/形象 - Iru/Live2D/Iru v2.0 @ Angela 运行文件.zip' \
 pnpm exec vishot capture \
-  ./packages/scenarios-desktop-electron/src/scenarios/display-model-from-file.ts \
+  ./shared/tooling/scenarios-desktop-electron/src/scenarios/display-model-from-file.ts \
   --target electron \
   --app-entrypoint ./apps/desktop/out/main/index.js \
   --cwd . \

@@ -1,6 +1,6 @@
 # API Server Guide
 
-Agent-facing guide for `server/apps/api`.
+Agent-facing guide for `backend/api`.
 
 ## Overview
 
@@ -11,7 +11,7 @@ Hosted Railway instances share Postgres and Redis. Design hosted features for mu
 ## Deployment Model
 
 - Hosted on **Railway**, multiple instances behind a load balancer.
-- Independent applications: `server/apps/api/src/main.ts` and `../dev-in-future/server/apps/auth/src/main.ts`. There is no runtime role CLI and neither app imports the other service graph.
+- Independent applications: `backend/api/src/main.ts` and `../dev-in-future/server/apps/auth/src/main.ts`. There is no runtime role CLI and neither app imports the other service graph.
 - The API has no background polling loops or fire-and-forget tasks — every business write happens inside the request thread.
 - Stateless per-instance: no local state that matters across requests.
 - Cross-instance coordination via Redis Pub/Sub (WebSocket broadcast). DB-level idempotency (`(userId, requestId)` partial unique index on `flux_transaction`) covers retries.
@@ -29,17 +29,17 @@ Auth is deferred. Activate its workspace through [`../dev-in-future/README.md`](
 pnpm -F @angela/api-server dev                # dev with dotenvx (.env.local)
 pnpm -F @angela/api-server typecheck
 pnpm -F @angela/api-server exec vitest run    # all server tests
-pnpm exec vitest run server/apps/api/src/...     # single test file
+pnpm exec vitest run backend/api/src/...     # single test file
 pnpm -F @angela/api-server db:generate        # drizzle-kit generate
 pnpm -F @angela/api-server db:push            # drizzle-kit push
-pnpm -F @proj-airi/auth-server auth:generate # better-auth → server/packages/auth-shared/src/schema.ts
+pnpm -F @proj-airi/auth-server auth:generate # better-auth → backend/contracts/auth/src/schema.ts
 ```
 
 Local observability is maintained in `proj-airi/airi-railway`; run its `otel/docker-compose.yaml` stack.
 
 ## Architecture Summary
 
-**Entry & DI**: `server/apps/api/src/main.ts` → `src/server.ts` → `src/app.ts`; `../dev-in-future/server/apps/auth/src/main.ts` → `src/server.ts`. The workspace apps have separate package manifests, env schemas, Dockerfiles, and composition roots.
+**Entry & DI**: `backend/api/src/main.ts` → `src/server.ts` → `src/app.ts`; `../dev-in-future/server/apps/auth/src/main.ts` → `src/server.ts`. The workspace apps have separate package manifests, env schemas, Dockerfiles, and composition roots.
 
 **Layering**:
 - **Routes** (`src/routes/`): thin — param validation (Valibot), auth guards, error mapping. No business logic here.

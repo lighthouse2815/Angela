@@ -50,7 +50,7 @@ async function listAll(path, params = {}) {
 
 const project = (await get(`/projects/${PROJECT_ID}`)).data
 const files = await listAll(`/projects/${PROJECT_ID}/files`)
-const filePath = new Map(files.map(file => [file.id, file.path.replace('/packages/i18n/src/locales/en/', '')]))
+const filePath = new Map(files.map(file => [file.id, file.path.replace('/shared/i18n/src/locales/en/', '')]))
 const strings = await listAll(`/projects/${PROJECT_ID}/strings`)
 const source = new Map(strings.filter(string => typeof string.text === 'string').map(string => [string.id, string]))
 

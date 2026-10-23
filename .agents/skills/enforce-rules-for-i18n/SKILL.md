@@ -80,7 +80,7 @@ Reject a translation when:
 
 Approve a translation when its meaning is correct, even if it has small style problems. List those problems in the report, so a translator can fix them on Crowdin. Do not reject a translation only for style.
 
-Compare terms with the existing translations in `packages/i18n/src/locales/<locale>/`. Some Crowdin language ids differ from the folder names:
+Compare terms with the existing translations in `shared/i18n/src/locales/<locale>/`. Some Crowdin language ids differ from the folder names:
 
 | Crowdin | Folder |
 | --- | --- |
