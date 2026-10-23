@@ -5,13 +5,14 @@ import { spawn } from 'node:child_process'
 import { createWriteStream } from 'node:fs'
 import { access, mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
-import { env, exit, kill as killProcess } from 'node:process'
+import { env, exit } from 'node:process'
 import { fileURLToPath } from 'node:url'
 
-import { errorMessageFromValue } from '@angela/stage-shared'
+import { errorMessageFrom } from '@moeru/std'
 
 import { desktopOverlayPollHeartbeatMarker } from '../src/shared/desktop-overlay-heartbeat'
 import { selectDesktopOverlaySmokeCandidateId } from '../src/shared/desktop-overlay-live-window-smoke'
+import { stopProcessGroup } from './lib/process'
 import { CdpClient, findAvailablePort, findDebugTarget, isRecord, sleep, waitFor, waitForRemoteDebug } from './lib/remote-debug'
 
 interface McpResult {
@@ -48,11 +49,19 @@ const userDataDir = resolve(reportDir, 'stage-user-data')
 const mcpSessionRoot = resolve(reportDir, 'computer-use-session')
 const stageLogPath = resolve(reportDir, 'stage-tamagotchi.log')
 const mcpConfigPath = resolve(userDataDir, 'mcp.json')
+const useBuiltApp = env.SMOKE_USE_BUILT_APP === '1'
 const requiredWorkspaceBuildOutputs = [
   'capabilities/vision/electron-screen-capture/dist/main.mjs',
   'shared/sdk/electron-vueuse/dist/main/index.mjs',
   'backend/channel/runtime/dist/server.mjs',
 ]
+if (useBuiltApp) {
+  requiredWorkspaceBuildOutputs.push(
+    'apps/desktop/out/main/index.js',
+    'apps/desktop/out/preload/index.mjs',
+    'apps/desktop/out/renderer/index.html',
+  )
+}
 
 const smokeHtml = `<!doctype html>
 <html>
@@ -93,7 +102,7 @@ async function prepareMcpConfig() {
     COMPUTER_USE_SESSION_ROOT: mcpSessionRoot,
   }
 
-  for (const optionalEnvName of ['PNPM_HOME', 'COREPACK_HOME']) {
+  for (const optionalEnvName of ['PNPM_HOME', 'COREPACK_HOME', 'pnpm_config_verify_deps_before_run']) {
     const value = env[optionalEnvName]?.trim()
     if (value) {
       mcpEnv[optionalEnvName] = value
@@ -136,8 +145,9 @@ async function ensureSmokePrerequisites() {
   throw new Error([
     'APP_START_FAILED: required workspace build outputs are missing.',
     `Missing: ${missingOutputs.join(', ')}`,
-    'Build stage-tamagotchi dependencies manually before this smoke. The smoke command does not auto-build them to avoid saturating the local machine.',
+    'Build desktop and its dependencies manually before this smoke. The smoke command does not auto-build them to avoid saturating the local machine.',
     'Suggested command: pnpm -F \'@angela/desktop^...\' --if-present build',
+    ...(useBuiltApp ? ['Then run: pnpm -F @angela/desktop build'] : []),
   ].join(' '))
 }
 
@@ -218,7 +228,11 @@ function requireRunState(result: McpResult, label: string): Record<string, unkno
 }
 
 function startStage(debugPort: number, heartbeatLines: string[]): ChildProcessWithoutNullStreams {
-  const stageProcess = spawn('pnpm', ['-F', '@angela/desktop', 'dev'], {
+  const args = ['-F', '@angela/desktop', useBuiltApp ? 'start' : 'dev']
+  if (useBuiltApp)
+    args.push('--skipBuild')
+
+  const stageProcess = spawn('pnpm', args, {
     cwd: repoDir,
     detached: true,
     env: {
@@ -250,33 +264,6 @@ function startStage(debugPort: number, heartbeatLines: string[]): ChildProcessWi
   return stageProcess
 }
 
-async function stopStage(stageProcess: ChildProcessWithoutNullStreams | undefined) {
-  if (!stageProcess || stageProcess.exitCode !== null)
-    return
-
-  const signalStageProcessGroup = (signal: NodeJS.Signals) => {
-    try {
-      if (stageProcess.pid) {
-        killProcess(-stageProcess.pid, signal)
-        return
-      }
-    }
-    catch {
-      // Fall back to the pnpm wrapper process if process-group signalling is
-      // unavailable. The smoke starts a detached group to make this reliable on
-      // macOS, but the fallback keeps the helper safe on other local setups.
-    }
-
-    stageProcess.kill(signal)
-  }
-
-  signalStageProcessGroup('SIGTERM')
-  await Promise.race([
-    new Promise(resolve => stageProcess.once('exit', resolve)),
-    sleep(5_000).then(() => signalStageProcessGroup('SIGKILL')),
-  ])
-}
-
 function rejectWhenStageExits(stageProcess: ChildProcessWithoutNullStreams): Promise<never> {
   return new Promise((_, reject) => {
     stageProcess.once('exit', (code, signal) => {
@@ -285,6 +272,21 @@ function rejectWhenStageExits(stageProcess: ChildProcessWithoutNullStreams): Pro
   })
 }
 
+/**
+ * Runs overlay RPC, MCP, and heartbeat checks in an isolated Electron profile.
+ * SMOKE_USE_BUILT_APP=1 selects the existing build. Otherwise, starts the Vite development server.
+ *
+ * Call stack:
+ *
+ * main
+ *   -> ensureSmokePrerequisites
+ *   -> prepareMcpConfig
+ *   -> startStage
+ *   -> connectOverlayClient
+ *   -> ensureOverlayMcpServerReady
+ *   -> callOverlayMcpTool
+ *   -> stopProcessGroup
+ */
 async function main() {
   let stageProcess: ChildProcessWithoutNullStreams | undefined
   let overlayClient: CdpClient | undefined
@@ -308,14 +310,14 @@ async function main() {
       waitForRemoteDebug(debugPort),
       stageExited,
     ]).catch((error) => {
-      throw new Error(`APP_START_FAILED: ${errorMessageFromValue(error)}`)
+      throw new Error(`APP_START_FAILED: ${errorMessageFrom(error) ?? String(error)}`)
     })
 
     overlayClient = await Promise.race([
       connectOverlayClient(debugPort),
       stageExited,
     ]).catch((error) => {
-      throw new Error(`APP_START_FAILED: ${errorMessageFromValue(error)}`)
+      throw new Error(`APP_START_FAILED: ${errorMessageFrom(error) ?? String(error)}`)
     })
 
     // NOTICE:
@@ -329,13 +331,14 @@ async function main() {
       connectOverlayClient(debugPort),
       stageExited,
     ]).catch((error) => {
-      throw new Error(`APP_START_FAILED: ${errorMessageFromValue(error)}`)
+      throw new Error(`APP_START_FAILED: ${errorMessageFrom(error) ?? String(error)}`)
     })
 
     const readiness = await overlayClient.evaluate<{ state: 'booting' | 'ready' | 'degraded', error?: string }>('window.__AIRI_DESKTOP_OVERLAY_SMOKE__.getReadiness()')
     if (readiness.state !== 'ready') {
       throw new Error(`OVERLAY_READINESS_DEGRADED: state=${readiness.state}${readiness.error ? ` error=${readiness.error}` : ''}`)
     }
+    console.info('OVERLAY_RPC_READY')
 
     try {
       await ensureOverlayMcpServerReady(overlayClient)
@@ -361,13 +364,13 @@ async function main() {
       assert(pointerIntent.candidateId === candidateId, `lastPointerIntent candidate mismatch: expected ${candidateId}, got ${String(pointerIntent.candidateId)}`)
     }
     catch (error) {
-      throw new Error(`MCP_CALL_FAILED: ${errorMessageFromValue(error)}`)
+      throw new Error(`MCP_CALL_FAILED: ${errorMessageFrom(error) ?? String(error)}`)
     }
 
     const heartbeat = await waitFor('overlay poll heartbeat', () => {
       return heartbeatLines.find(line => line.includes('snapshotId=') && line.includes('pointerIntent=yes'))
     }, 30_000, 250).catch((error) => {
-      throw new Error(`HEARTBEAT_TIMEOUT: ${errorMessageFromValue(error)}`)
+      throw new Error(`HEARTBEAT_TIMEOUT: ${errorMessageFrom(error) ?? String(error)}`)
     })
 
     console.info(JSON.stringify({
@@ -380,13 +383,13 @@ async function main() {
   finally {
     overlayClient?.close()
     stoppingStage = true
-    await stopStage(stageProcess)
+    await stopProcessGroup(stageProcess)
   }
 }
 
 if (import.meta.main) {
   main().catch((error) => {
-    console.error(errorMessageFromValue(error))
+    console.error(errorMessageFrom(error) ?? String(error))
     console.error(`stage log: ${stageLogPath}`)
     exit(1)
   })

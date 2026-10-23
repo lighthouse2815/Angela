@@ -1,124 +1,56 @@
-<a id="desktop-lane-status"></a>
+# Trạng thái desktop overlay
 
-# Trạng thái desktop luồng
+Cập nhật: 24-10-2026.
 
-Cập nhật: 2026-05-08
+Tài liệu này theo dõi overlay tùy chọn bật bằng `AIRI_DESKTOP_OVERLAY=1`.
+Overlay đọc trạng thái từ MCP `computer_use`. Nó không phải đường thực thi AUV của chat desktop.
 
-Ghi chú này là bản ghi nhớ trạng thái thực tế cho desktop luồng hiện tại hoạt động trong nhánh cắt lại này. Nó được thu hẹp một cách có chủ ý: chỉ trạng thái hiện tại, trở ngại thực tế và những gì sẽ xảy ra bây giờ so với sau này.
+## Kết quả kiểm tra hiện tại
 
-<a id="what-is-already-true"></a>
+Trên Linux Wayland, bản desktop đã build tạo được cửa sổ overlay và mount renderer.
+Lệnh smoke in `OVERLAY_RPC_READY` sau khi Eventa trả về trạng thái `ready`.
+Điều này xác nhận RPC đã đăng ký trước khi renderer gọi handshake.
 
-## Điều gì đã là sự thật
+MCP chưa khởi động được trong lần chạy này.
+Executor mặc định `macos-local` yêu cầu host macOS.
+Chạy riêng server trên Linux xác nhận lỗi `macos-local executor requires a darwin host, current platform is linux`.
 
-- Hướng desktop luồng ổn định:
-  - chỉ macOS
-  - Ưu tiên Chrome
-  - hình ảnh + cây ngữ nghĩa + đầu vào OS
-  - lớp phủ là lớp trực quan hóa, không phải con trỏ hệ thống thứ hai
-- Các đường cơ sở sau đây đã tồn tại trong mã:
-  - `/Users/liuziheng/airi/capabilities/computer-use/src/executors/macos-local.ts`
-    - lưu vị trí con trỏ thực và khôi phục nó bằng `CGWarpMouseCursorPosition(...)`
-  - `/Users/liuziheng/airi/apps/desktop/src/main/windows/shared/window.ts`
-    - `makeWindowPassThrough()` sử dụng sự kiện bỏ qua chuột + hành vi lớp phủ không thể lấy tiêu điểm
-  - `/Users/liuziheng/airi/capabilities/computer-use/src/browser-dom/cdp-bridge.ts`
-    - Nhịp tim 5 giây rơi lệ sau 3 lần thất bại liên tiếp
-  - `/Users/liuziheng/airi/capabilities/computer-use/src/bin/smoke-chrome-grounding.ts`
-    - desktop v3 kiểm tra nhanh chứng minh chuỗi đảm bảo/quan sát/nhấp chuột/trạng thái
-- Cầu mở rộng Chrome và công việc bù đắp iframe không còn là giả định nữa:
-  - nhánh recut đã chứa cầu nối máy khách WebSocket phía mở rộng thực sự
-  - nhánh recut đã chứa sự lan truyền bù khung cho các ứng viên iframe DOM
-- Hợp đồng route của trình duyệt hiện là từ chối khi có lỗi:
-  - nhấp chuột không trái và nhấp chuột nhiều lần vẫn ở trên đầu vào OS
-  - `BrowserDomExtensionBridge` từ chối `ok: false` Responses thay vì coi chúng là thành công
+Lần chạy dev trước đó mở được cửa sổ nhưng timeout khi chờ renderer mount bridge.
+Chế độ kiểm tra bản đã build tránh phụ thuộc Vite dev và không build lại ứng dụng.
 
-<a id="what-is-actually-still-blocking"></a>
+## Các lỗi đã sửa
 
-## Những gì thực sự vẫn đang chặn
+- Smoke import trực tiếp `@moeru/std`, tránh barrel cần `import.meta.env` của Vite.
+- Smoke chuyển tiếp cấu hình kiểm tra dependency của pnpm vào tiến trình MCP.
+- Hai smoke Electron dùng chung cleanup cho nhóm tiến trình riêng.
+- Cleanup xử lý cả trường hợp wrapper đã thoát nhưng Electron con vẫn còn chạy.
+- Cleanup gửi SIGKILL sau năm giây nếu SIGTERM không dừng được nhóm.
 
-Đây là những vấn đề thực tế còn lại, được sắp xếp theo mức độ nghiêm trọng.
+Test hồi quy chạy import trong Node thật và kiểm tra cleanup bằng tiến trình thật.
+Bộ test overlay, CDP và cleanup đạt 49/49 trong 8 file.
+Typecheck desktop, kiểm tra TypeScript các script và build desktop đạt.
+ESLint các script đã sửa đạt.
 
-<a id="1-live-desktop-v3-smoke-exists-but-it-is-baseline-coverage-not-product-support"></a>
+## Chạy lại trên macOS
 
-### 1. trực tiếp desktop v3 kiểm tra nhanh tồn tại, nhưng đó là phạm vi bảo hiểm cơ bản chứ không phải hỗ trợ sản phẩm.
+Cài dependencies và build các package desktop phụ thuộc trước khi chạy smoke.
+Dùng Chrome và cấp quyền desktop tương ứng cho host thực thi.
 
-- kiểm tra nhanh hiện tại chứng minh: `desktop_ensure_chrome -> desktop_observe -> desktop_click_target -> desktop_get_state`
-- Nó không chứng minh được việc định tuyến DOM ngữ nghĩa của Chrome, kết xuất cửa sổ lớp phủ trực tiếp hoặc cách ly đầu vào của người dùng.
+```sh
+pnpm_config_verify_deps_before_run=false pnpm -F @angela/desktop build
+pnpm_config_verify_deps_before_run=false SMOKE_USE_BUILT_APP=1 pnpm -F @angela/desktop smoke:desktop-overlay-live-window
+```
 
-<a id="2-overlay-lifecycle--rpc-readiness-still-needs-a-live-window-pass-on-this-recut-branch"></a>
+Log nằm trong `.temp/desktop-overlay-live-window-smoke-<thời-gian>/stage-tamagotchi.log`.
+Xem [lệnh kiểm tra](desktop-runtime-checks.md#smoke-overlay-electron) để chạy test hồi quy.
 
-### 2. Vòng đời lớp phủ / mức độ sẵn sàng của RPC vẫn cần có thẻ cửa sổ trực tiếp trên nhánh cắt lại này.
+## Phần chưa được xác nhận
 
-- Các tập tin hiện đang được xử lý:
-  - `/Users/liuziheng/airi-desktop-recut/apps/desktop/src/main/windows/desktop-overlay/rpc/contracts.ts`
-  - `/Users/liuziheng/airi-desktop-recut/apps/desktop/src/main/windows/desktop-overlay/rpc/index.electron.ts`
-  - `/Users/liuziheng/airi-desktop-recut/apps/desktop/src/renderer/pages/desktop-overlay-polling.ts`
-  - `/Users/liuziheng/airi-desktop-recut/apps/desktop/src/renderer/pages/desktop-overlay-polling.test.ts`
-- Tình trạng hiện tại:
-  - hợp đồng sẵn sàng đã được nối vào `desktop-overlay/rpc/index.electron.ts`
-  - bộ điều khiển thăm dò renderer đã sẵn sàng và xử lý trạng thái xuống cấp
-  - cửa sổ trực tiếp vẫn cần một thẻ mới trên nhánh recut này để xác nhận bằng chứng runtime hiện tại
-- Đây là rủi ro runtime còn lại trên đường dẫn lớp phủ.
+- Chuỗi `desktop_ensure_chrome → desktop_observe → desktop_click_target → desktop_get_state` trên macOS hiện tại.
+- Heartbeat chứa snapshot và pointer intent sau click native.
+- Overlay không chặn chuột người dùng trong phiên desktop thực.
+- Hành vi Chrome DOM, iframe và khôi phục con trỏ trên host được hỗ trợ.
 
-<a id="3-local-overlay-live-window-smoke-exists-in-the-recut-branch-but-it-still-needs-a-live-run-on-this-branch"></a>
-
-### 3. Lớp phủ cục bộ trực tiếp-window kiểm tra nhanh tồn tại trong nhánh recut, nhưng nó vẫn cần trực tiếp chạy trên nhánh này.
-
-- kiểm tra nhanh hiện được kết nối với `apps/desktop/package.json` dưới dạng `smoke:desktop-overlay-live-window`.
-- Trình trợ giúp lựa chọn ứng viên được chia sẻ đã được thử nghiệm đơn vị.
-- Điều vẫn còn thiếu ở đây là một đường chuyền mới trên nhánh recut này với cửa sổ lớp phủ Electron thực, để xác nhận điểm đánh dấu nhịp tim và việc bỏ phiếu MCP vẫn hoạt động giống như dòng cũ hơn.
-
-<a id="what-is-not-a-current-blocker"></a>
-
-## trở ngại hiện tại không phải là gì
-
-Những mục này là những ý tưởng thực sự hoặc công việc dọn dẹp, nhưng chúng không phải là những thứ nên chặn đường ngay bây giờ.
-
-- Mong muốn lớp phủ sạch sẽ ban đầu trong `apps/desktop/src/main/index.ts`
-- Tái cấu trúc logic định tuyến của trình duyệt lồng nhau để dễ đọc
-- Biến `macos-local.ts` thành phương án dự phòng chỉ cong vênh tức thời mà không có dấu vết chuyển động
-- Viết lại hình ảnh lớp phủ, đánh bóng con trỏ ma hoặc gỡ lỗi renderer bổ sung UI
-
-<a id="how-to-interpret-m13vs-comments"></a>
-
-## Cách diễn giải nhận xét của m13v
-
-Nhận xét của m13v rất hữu ích vì chúng phù hợp với các ràng buộc nền tảng thực, nhưng chúng phải được phân chia chính xác:
-
-- Đã liên kết với mã hiện tại:
-  - lưu → hành động → khôi phục mẫu con trỏ
-  - lớp phủ không được chặn đầu vào của người dùng
-  - sự cố nhịp tim cho các phiên CDP bị lỗi
-- Vẫn hữu ích khi sàng lọc trong tương lai:
-  - giảm dấu vết chuyển động của native để UI sở hữu nhiều hoạt ảnh con trỏ hiển thị hơn
-  - kỷ luật runtime sâu sắc hơn xung quanh vòng đời phiên
-
-Tóm lại: m13v đã đưa ra lời khuyên tốt về runtime. Điều đó không có nghĩa là mọi đề xuất đều là trở ngại hiện tại.
-
-<a id="what-should-happen-now"></a>
-
-## Điều gì sẽ xảy ra bây giờ
-
-1. Không cần thực hiện hành động nào đối với hợp đồng gia hạn hành động chưa xác định; nó đã là từ chối khi có lỗi rồi.
-2. Giữ định tuyến từ chối khi có lỗi trong trình duyệt cho các lỗi nhấp chuột không trái và cầu nối; điều này vẫn được đề cập, không được hỗ trợ bởi sản phẩm.
-3. Chạy lại lớp phủ cục bộ trực tiếp-window kiểm tra nhanh trên nhánh recut này trước khi gọi nó là bằng chứng hiện tại.
-
-<a id="what-should-happen-later"></a>
-
-## Điều gì sẽ xảy ra sau này
-
-Chỉ sau khi ở trên sạch:
-
-1. Theo dõi tùy chọn:
-   - `fix(stage-tamagotchi): validate desktop overlay lifecycle and RPC readiness in live window context`
-2. Theo dõi tùy chọn:
-   - `refactor(computer-use-mcp): evaluate instant-warp-only macOS fallback against ghost-pointer UX`
-3. Theo dõi tùy chọn:
-   - tăng cường kết hợp neo iframe khi iframe anh chị em rất giống nhau
-
-<a id="bottom-line"></a>
-
-## Điểm mấu chốt
-
-desktop luồng không bị chặn theo hướng. Nó bị chặn bởi một số ít vấn đề về tính chính xác và một bước xác thực vòng đời lớp phủ vẫn đang mở.
-
-Không mở lại kiến ​​trúc. Không trộn trong nước đánh bóng. Đừng tiếp tục chồng chất những thay đổi không liên quan lên cùng một PR.
+Các test đơn vị về window contract không thay thế kiểm tra chuột native.
+RPC sẵn sàng không chứng minh thao tác desktop đã thực hiện thành công.
+Giữ trạng thái kiểm tra toàn luồng là chưa đạt cho đến khi smoke trên macOS thành công.

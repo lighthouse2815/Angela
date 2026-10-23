@@ -30,7 +30,7 @@ import { createWriteStream } from 'node:fs'
 import { access, mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { arch, platform, release } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
-import { env, exit, kill as killProcess, version as nodeVersion } from 'node:process'
+import { env, exit, version as nodeVersion } from 'node:process'
 import { fileURLToPath } from 'node:url'
 
 // NOTICE: do not import the stage-shared barrel here. It re-exports
@@ -40,7 +40,8 @@ import { fileURLToPath } from 'node:url'
 // @moeru/std directly instead.
 import { errorMessageFrom } from '@moeru/std'
 
-import { CdpClient, fetchJson, findAvailablePort, findDebugTarget, isRecord, sleep, waitFor, waitForRemoteDebug } from './lib/remote-debug'
+import { stopProcessGroup } from './lib/process'
+import { CdpClient, fetchJson, findAvailablePort, findDebugTarget, isRecord, waitFor, waitForRemoteDebug } from './lib/remote-debug'
 
 function errorMessageFromValue(error: unknown): string {
   return errorMessageFrom(error) ?? String(error)
@@ -124,57 +125,6 @@ function startStage(debugPort: number): ChildProcessWithoutNullStreams {
     },
     stdio: 'pipe',
   })
-}
-
-function isProcessGroupAlive(pid: number): boolean {
-  try {
-    killProcess(-pid, 0)
-    return true
-  }
-  catch {
-    return false
-  }
-}
-
-async function stopStage(stageProcess: ChildProcessWithoutNullStreams | undefined) {
-  if (!stageProcess)
-    return
-
-  // NOTICE:
-  // The pnpm wrapper can exit while Electron children still run in its
-  // process group (CI logged "Terminate orphan process: electron"). Check
-  // the group, not the wrapper's exit code, so no Electron outlives the smoke.
-  const groupAlive = stageProcess.pid !== undefined && isProcessGroupAlive(stageProcess.pid)
-  if (stageProcess.exitCode !== null && !groupAlive)
-    return
-
-  const signalStageProcessGroup = (signal: NodeJS.Signals) => {
-    try {
-      if (stageProcess.pid) {
-        killProcess(-stageProcess.pid, signal)
-        return
-      }
-    }
-    catch {
-      // Fall back to the direct process handle if process-group signalling
-      // is unavailable on this platform.
-    }
-
-    stageProcess.kill(signal)
-  }
-
-  signalStageProcessGroup('SIGTERM')
-  const pid = stageProcess.pid
-  if (pid === undefined) {
-    await Promise.race([
-      new Promise(resolve => stageProcess.once('exit', resolve)),
-      sleep(5_000).then(() => signalStageProcessGroup('SIGKILL')),
-    ])
-    return
-  }
-
-  await waitFor('stage process group exit', () => isProcessGroupAlive(pid) ? undefined : true, 5_000, 100)
-    .catch(() => signalStageProcessGroup('SIGKILL'))
 }
 
 /**
@@ -459,7 +409,7 @@ async function main() {
   }
   finally {
     client?.close()
-    await stopStage(stageProcess)
+    await stopProcessGroup(stageProcess)
     stageLog?.end()
     // Create the dir in case prerequisites failed before it existed. A
     // failed report write must not mask the smoke's own error.

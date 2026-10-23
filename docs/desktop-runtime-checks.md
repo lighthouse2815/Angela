@@ -48,3 +48,43 @@ Workflow này không đóng gói installer hoặc kiểm tra thư viện native 
 - Lint toàn repository đạt với 603 cảnh báo ESLint và không có lỗi ESLint.
 
 Chưa chạy workflow trên GitHub. Kết quả local không chứng nhận cài dependencies trên runner mới.
+
+## Smoke overlay Electron
+
+Chạy smoke sau khi build dependency. Lệnh mở Electron với hồ sơ riêng trong `.temp/`.
+
+```sh
+pnpm_config_verify_deps_before_run=false pnpm -F @angela/desktop smoke:desktop-overlay-live-window
+```
+
+Biến môi trường trên ngăn pnpm tự cài dependencies trước khi chạy smoke.
+Smoke chuyển tiếp biến này vào cấu hình MCP riêng của lần chạy.
+Script chạy bằng Node qua `tsx`. Các import của script phải hoạt động ngoài Vite.
+Test hồi quy chạy import trong một tiến trình Node riêng:
+
+```sh
+pnpm_config_verify_deps_before_run=false pnpm exec vitest run --project stage-tamagotchi:node apps/desktop/scripts/desktop-overlay-live-window-smoke.test.ts
+```
+
+Để kiểm tra bản đã build, đặt `SMOKE_USE_BUILT_APP=1`. Chế độ này không chạy Vite dev hoặc build lại ứng dụng.
+
+```sh
+pnpm_config_verify_deps_before_run=false pnpm -F @angela/desktop build
+pnpm_config_verify_deps_before_run=false SMOKE_USE_BUILT_APP=1 pnpm -F @angela/desktop smoke:desktop-overlay-live-window
+```
+
+Hai smoke overlay và Linux render dùng chung cleanup cho nhóm tiến trình riêng.
+Cleanup dừng cả Electron con khi wrapper pnpm đã thoát. Sau năm giây, nó gửi SIGKILL nếu nhóm vẫn tồn tại.
+
+Executor mặc định là `macos-local`, cần macOS và quyền desktop tương ứng.
+Kết quả Linux Wayland ngày 24-10-2026:
+
+- Lần chạy dev dừng với `overlay smoke bridge timed out after 60000ms`.
+- Bản production mount được renderer và trả về `OVERLAY_RPC_READY` qua Eventa.
+- MCP dừng với `Connection closed`. Chạy riêng server xác nhận `macos-local` từ chối host Linux.
+- Sau cleanup, không còn tiến trình thuộc hồ sơ smoke của lần chạy.
+- Test overlay, CDP và cleanup đạt 49/49 trong 8 file.
+- Typecheck desktop, kiểm tra TypeScript riêng cho các script và build desktop đạt.
+- ESLint các script đã sửa đạt, không có cảnh báo.
+
+Chưa chứng nhận heartbeat với snapshot, click native hoặc cách ly chuột thực tế trên macOS.
