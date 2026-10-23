@@ -1,11 +1,15 @@
 import type { TranscriptionProvider } from './contracts'
 
-import { access, writeFile } from 'node:fs/promises'
+import process from 'node:process'
+
+import { access, copyFile, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { describe, expect, it, vi } from 'vitest'
 
 import { parseYouTubeUrl } from './contracts'
+import { MediaProcess } from './process'
 import { parseCaptionJson, YouTubeTranscriptProvider } from './youtube'
 
 const video = parseYouTubeUrl('https://youtu.be/dQw4w9WgXcQ')
@@ -77,10 +81,8 @@ describe('youTube fallback policy', () => {
       temporary = options.cwd!
       if (args.includes('bestaudio'))
         await writeFile(join(temporary, 'source.webm'), 'fixture audio')
-      if (executable === 'ffmpeg') {
-        await writeFile(join(temporary, 'chunk-000.m4a'), 'first chunk')
-        await writeFile(join(temporary, 'chunk-001.m4a'), 'second chunk')
-      }
+      if (executable === 'ffmpeg')
+        await writeFile(args.at(-1)!, 'fixture encoded chunk')
       return ''
     })
     const transcription: TranscriptionProvider = { transcribe: vi.fn(async () => [{ start: 2, end: 8, text: 'Audio evidence' }]) }
@@ -88,6 +90,10 @@ describe('youTube fallback policy', () => {
     expect(result.source).toBe('transcription')
     expect(result.segments.map(segment => segment.start)).toEqual([2, 602])
     expect(transcription.transcribe).toHaveBeenCalledTimes(2)
+    const encodes = run.mock.calls.filter(call => call[0] === 'ffmpeg')
+    expect(encodes).toHaveLength(2)
+    expect(encodes[0]![1]).toEqual(expect.arrayContaining(['-ss', '0', '-t', '600']))
+    expect(encodes[1]![1]).toEqual(expect.arrayContaining(['-ss', '600', '-t', '600']))
     await expect(access(temporary)).rejects.toThrow()
   })
 
@@ -97,6 +103,33 @@ describe('youTube fallback policy', () => {
     await expect(new YouTubeTranscriptProvider({ run }, { transcribe }).getTranscript(video)).rejects.toThrow('known duration')
     expect(run).toHaveBeenCalledTimes(2)
     expect(transcribe).not.toHaveBeenCalled()
+  })
+
+  it.runIf(process.env.ANGELA_TEST_FFMPEG)('encodes exactly one real audio interval at the 600-second AAC padding boundary', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'angela-aac-boundary-'))
+    const ffmpeg = process.env.ANGELA_TEST_FFMPEG!
+    const media = new MediaProcess()
+    const source = join(directory, 'source.m4a')
+    try {
+      await media.run(ffmpeg, ['-nostdin', '-hide_banner', '-loglevel', 'error', '-f', 'lavfi', '-i', 'anullsrc=r=16000:cl=mono', '-t', '600', '-b:a', '32k', source])
+      const run: MediaProcess['run'] = async (executable, args, options = {}) => {
+        if (executable === ffmpeg)
+          return media.run(executable, args, options)
+        if (args.includes('--dump-single-json'))
+          return metadata({ duration: 600 })
+        if (args.includes('bestaudio'))
+          await copyFile(source, join(options.cwd!, 'source.m4a'))
+        return ''
+      }
+      const transcribe = vi.fn<TranscriptionProvider['transcribe']>(async audio => audio.length ? [{ start: 1, end: 2, text: 'Timestamped evidence' }] : [])
+      const result = await new YouTubeTranscriptProvider({ run }, { transcribe }, { ffmpeg }).getTranscript(video)
+      expect(result.source).toBe('transcription')
+      expect(result.segments).toEqual([{ start: 1, end: 2, text: 'Timestamped evidence' }])
+      expect(transcribe).toHaveBeenCalledOnce()
+    }
+    finally {
+      await rm(directory, { recursive: true, force: true })
+    }
   })
 
   it('does not extract an invalid URL or accept another video', async () => {

@@ -29,4 +29,4 @@ export class MediaProcess {
 }
 
 /** Ignores ambient yt-dlp configuration so extraction never imports cookies or executes configured hooks. */
-export const extractorArgs = ['--ignore-config', '--no-warnings', '--no-playlist', '--no-check-updates', '--socket-timeout', '15', '--retries', '1', '--extractor-retries', '1']
+export const extractorArgs = ['--ignore-config', '--no-warnings', '--no-playlist', '--no-update', '--js-runtimes', 'node', '--socket-timeout', '15', '--retries', '1', '--extractor-retries', '1']

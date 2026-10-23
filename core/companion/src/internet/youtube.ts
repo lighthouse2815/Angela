@@ -175,44 +175,43 @@ export class YouTubeTranscriptProvider implements TranscriptProvider {
     const files = (await readdir(directory)).filter(name => /^source\.[a-z0-9]+$/u.test(name))
     if (files.length !== 1 || (await stat(join(directory, files[0]!))).size > 512 * 1024 * 1024)
       throw new InternetError('LIMIT_EXCEEDED', 'Audio extraction exceeded its source budget.')
-    await this.process.run(this.options.ffmpeg ?? 'ffmpeg', [
-      '-nostdin',
-      '-hide_banner',
-      '-loglevel',
-      'error',
-      '-protocol_whitelist',
-      'file,pipe',
-      '-i',
-      join(directory, files[0]!),
-      '-t',
-      String(duration),
-      '-vn',
-      '-ac',
-      '1',
-      '-ar',
-      '16000',
-      '-b:a',
-      '32k',
-      '-f',
-      'segment',
-      '-segment_time',
-      '600',
-      join(directory, 'chunk-%03d.m4a'),
-    ], { cwd: directory, signal, timeout: 600000 })
-    const chunks = (await readdir(directory)).filter(name => /^chunk-\d{3}\.m4a$/u.test(name)).sort()
-    if (!chunks.length || chunks.length > 24 || chunks.length !== Math.ceil(duration / 600))
-      throw new InternetError('LIMIT_EXCEEDED', 'Audio chunk count does not cover the expected video duration.')
     const segments: TranscriptSegment[] = []
-    for (const [index, name] of chunks.entries()) {
+    // Explicit intervals avoid AAC packet padding creating an extra segment at exact 600-second boundaries.
+    // Each encoded file starts at zero, so provider positions map back to this requested source offset.
+    for (let offset = 0; offset < duration; offset += 600) {
       signal?.throwIfAborted()
-      const path = join(directory, name)
-      if ((await stat(path)).size > 24 * 1024 * 1024)
-        throw new InternetError('LIMIT_EXCEEDED', 'Audio chunk exceeds the upload budget.')
+      const path = join(directory, `chunk-${String(offset / 600).padStart(3, '0')}.m4a`)
+      const chunkDuration = Math.min(600, duration - offset)
+      await this.process.run(this.options.ffmpeg ?? 'ffmpeg', [
+        '-nostdin',
+        '-hide_banner',
+        '-loglevel',
+        'error',
+        '-protocol_whitelist',
+        'file,pipe',
+        '-ss',
+        String(offset),
+        '-i',
+        join(directory, files[0]!),
+        '-t',
+        String(chunkDuration),
+        '-vn',
+        '-ac',
+        '1',
+        '-ar',
+        '16000',
+        '-b:a',
+        '32k',
+        path,
+      ], { cwd: directory, signal, timeout: 120000 })
+      const size = (await stat(path)).size
+      if (!size || size > 24 * 1024 * 1024)
+        throw new InternetError('LIMIT_EXCEEDED', 'Audio chunk is empty or exceeds the upload budget.')
       const result = await this.transcription!.transcribe(await readFile(path), signal)
       for (const segment of result) {
-        if (segment.end > Math.min(600, duration - index * 600) + 1)
+        if (segment.end > chunkDuration + 1)
           throw new InternetError('PROVIDER_FAILED', 'Transcription timestamps exceed the audio chunk.')
-        segments.push(v.parse(segmentSchema, { ...segment, start: segment.start + index * 600, end: segment.end + index * 600 }))
+        segments.push(v.parse(segmentSchema, { ...segment, start: segment.start + offset, end: segment.end + offset }))
       }
     }
     return segments

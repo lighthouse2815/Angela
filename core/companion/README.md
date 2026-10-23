@@ -21,3 +21,7 @@ This package does not start an application when imported. Personal data stays ou
 Media executables are optional host boundaries. No Python repository is installed, imported, or fetched.
 Browser access and summary generation are injected by the host. Transcript evidence stays outside personal memory.
 See [the source audit](../../docs/third-party-audit.md) and [third-party notices](../../THIRD_PARTY_NOTICES.md).
+
+Audio chunks use explicit 600-second source intervals, so AAC padding cannot create a spurious final upload.
+Run `ANGELA_TEST_FFMPEG=/path/to/ffmpeg pnpm exec vitest run core/companion/src/internet/youtube.test.ts` for real encoder coverage.
+The default suite mocks external media and HTTP providers.
