@@ -5,13 +5,13 @@ import { spawn } from 'node:child_process'
 import { createWriteStream } from 'node:fs'
 import { access, mkdir, writeFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
-import { env, exit } from 'node:process'
+import { env, exit, platform } from 'node:process'
 import { fileURLToPath } from 'node:url'
 
 import { errorMessageFrom } from '@moeru/std'
 
 import { desktopOverlayPollHeartbeatMarker } from '../src/shared/desktop-overlay-heartbeat'
-import { selectDesktopOverlaySmokeCandidateId } from '../src/shared/desktop-overlay-live-window-smoke'
+import { resolveDesktopOverlaySmokeExecutor, selectDesktopOverlaySmokeCandidateId } from '../src/shared/desktop-overlay-live-window-smoke'
 import { stopProcessGroup } from './lib/process'
 import { CdpClient, findAvailablePort, findDebugTarget, isRecord, sleep, waitFor, waitForRemoteDebug } from './lib/remote-debug'
 
@@ -86,8 +86,8 @@ function assert(condition: boolean, message: string): asserts condition {
 }
 
 async function prepareMcpConfig() {
-  await mkdir(userDataDir, { recursive: true })
-  await mkdir(mcpSessionRoot, { recursive: true })
+  await mkdir(userDataDir, { recursive: true, mode: 0o700 })
+  await mkdir(mcpSessionRoot, { recursive: true, mode: 0o700 })
 
   const mcpEnv: Record<string, string> = {
     PATH: env.PATH || '',
@@ -95,14 +95,14 @@ async function prepareMcpConfig() {
     SHELL: env.SHELL || '',
     LANG: env.LANG || 'en_US.UTF-8',
     TMPDIR: env.TMPDIR || '',
-    COMPUTER_USE_EXECUTOR: env.COMPUTER_USE_SMOKE_EXECUTOR || env.COMPUTER_USE_EXECUTOR || 'macos-local',
+    COMPUTER_USE_EXECUTOR: resolveDesktopOverlaySmokeExecutor(env, platform),
     COMPUTER_USE_APPROVAL_MODE: env.COMPUTER_USE_SMOKE_APPROVAL_MODE || env.COMPUTER_USE_APPROVAL_MODE || 'never',
     COMPUTER_USE_OPENABLE_APPS: env.COMPUTER_USE_OPENABLE_APPS || 'Terminal,Cursor,Google Chrome',
     COMPUTER_USE_SESSION_TAG: `desktop-overlay-live-window-smoke-${runId}`,
     COMPUTER_USE_SESSION_ROOT: mcpSessionRoot,
   }
 
-  for (const optionalEnvName of ['PNPM_HOME', 'COREPACK_HOME', 'pnpm_config_verify_deps_before_run']) {
+  for (const optionalEnvName of ['PNPM_HOME', 'COREPACK_HOME', 'pnpm_config_verify_deps_before_run', 'COMPUTER_USE_ALLOWED_BOUNDS', ...Object.keys(env).filter(name => name.startsWith('COMPUTER_USE_REMOTE_'))]) {
     const value = env[optionalEnvName]?.trim()
     if (value) {
       mcpEnv[optionalEnvName] = value
@@ -121,10 +121,11 @@ async function prepareMcpConfig() {
     },
   }
 
-  await writeFile(mcpConfigPath, `${JSON.stringify(config, null, 2)}\n`, 'utf-8')
+  await writeFile(mcpConfigPath, `${JSON.stringify(config, null, 2)}\n`, { encoding: 'utf8', mode: 0o600 })
 }
 
 async function ensureSmokePrerequisites() {
+  resolveDesktopOverlaySmokeExecutor(env, platform)
   if (typeof WebSocket !== 'function') {
     throw new TypeError('APP_START_FAILED: WebSocket is unavailable in this Node runtime. Run through the package script or set NODE_OPTIONS=--experimental-websocket.')
   }

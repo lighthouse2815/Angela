@@ -82,6 +82,9 @@ const requiredWorkspaceBuildOutputs = [
   'capabilities/vision/electron-screen-capture/dist/main.mjs',
   'shared/sdk/electron-vueuse/dist/main/index.mjs',
   'backend/channel/runtime/dist/server.mjs',
+  'apps/desktop/out/main/index.js',
+  'apps/desktop/out/preload/index.mjs',
+  'apps/desktop/out/renderer/index.html',
 ]
 
 async function ensureSmokePrerequisites() {
@@ -113,7 +116,7 @@ async function ensureSmokePrerequisites() {
 function startStage(debugPort: number): ChildProcessWithoutNullStreams {
   // Keeps the run hermetic: a fresh user-data dir per run means no persisted
   // onboarding state, window bounds, or provider config leak between runs.
-  return spawn('pnpm', ['-F', '@angela/desktop', 'start'], {
+  return spawn('pnpm', ['-F', '@angela/desktop', 'start', '--skipBuild'], {
     cwd: repoDir,
     detached: true,
     env: {

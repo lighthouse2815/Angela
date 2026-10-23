@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { selectDesktopOverlaySmokeCandidateId } from './desktop-overlay-live-window-smoke'
+import { resolveDesktopOverlaySmokeExecutor, selectDesktopOverlaySmokeCandidateId } from './desktop-overlay-live-window-smoke'
 
 describe('selectDesktopOverlaySmokeCandidateId', () => {
   it('prefers the smoke button label', () => {
@@ -49,5 +49,27 @@ describe('selectDesktopOverlaySmokeCandidateId', () => {
         },
       })
     }).toThrow('desktop_observe did not return the Angela Desktop Overlay Smoke Button chrome_dom candidate')
+  })
+})
+
+describe('live smoke executor prerequisites', () => {
+  it('accepts the local executor only on macOS', () => {
+    expect(resolveDesktopOverlaySmokeExecutor({}, 'darwin')).toBe('macos-local')
+    expect(() => resolveDesktopOverlaySmokeExecutor({}, 'linux')).toThrow('SMOKE_HOST_UNSUPPORTED')
+    expect(() => resolveDesktopOverlaySmokeExecutor({}, 'win32')).toThrow('SMOKE_HOST_UNSUPPORTED')
+  })
+
+  it('requires a configured remote host for Linux X11', () => {
+    expect(() => resolveDesktopOverlaySmokeExecutor({ COMPUTER_USE_SMOKE_EXECUTOR: 'linux-x11' }, 'linux')).toThrow('SMOKE_HOST_UNCONFIGURED')
+    expect(resolveDesktopOverlaySmokeExecutor({
+      COMPUTER_USE_SMOKE_EXECUTOR: 'linux-x11',
+      COMPUTER_USE_REMOTE_SSH_HOST: 'test.example',
+      COMPUTER_USE_REMOTE_SSH_USER: 'test-user',
+    }, 'linux')).toBe('linux-x11')
+  })
+
+  it('honors the smoke-specific setting and rejects dry runs as live evidence', () => {
+    expect(resolveDesktopOverlaySmokeExecutor({ COMPUTER_USE_SMOKE_EXECUTOR: 'macos-local', COMPUTER_USE_EXECUTOR: 'dry-run' }, 'darwin')).toBe('macos-local')
+    expect(() => resolveDesktopOverlaySmokeExecutor({ COMPUTER_USE_EXECUTOR: 'dry-run' }, 'darwin')).toThrow('SMOKE_EXECUTOR_INVALID')
   })
 })

@@ -22,3 +22,19 @@ export function selectDesktopOverlaySmokeCandidateId(runState: Record<string, un
 
   return id
 }
+
+/** A live smoke requires a native executor. A dry run cannot prove pointer or window behavior. */
+export function resolveDesktopOverlaySmokeExecutor(env: Record<string, string | undefined>, platform: string) {
+  const executor = env.COMPUTER_USE_SMOKE_EXECUTOR || env.COMPUTER_USE_EXECUTOR || 'macos-local'
+  if (executor === 'macos-local') {
+    if (platform !== 'darwin')
+      throw new Error('SMOKE_HOST_UNSUPPORTED: macos-local requires macOS. For a remote Linux X11 host, configure COMPUTER_USE_SMOKE_EXECUTOR=linux-x11 and its SSH settings.')
+    return executor
+  }
+  if (executor === 'linux-x11') {
+    if (!env.COMPUTER_USE_REMOTE_SSH_HOST?.trim() || !env.COMPUTER_USE_REMOTE_SSH_USER?.trim())
+      throw new Error('SMOKE_HOST_UNCONFIGURED: linux-x11 requires COMPUTER_USE_REMOTE_SSH_HOST and COMPUTER_USE_REMOTE_SSH_USER.')
+    return executor
+  }
+  throw new Error('SMOKE_EXECUTOR_INVALID: use macos-local or linux-x11 for a live desktop smoke.')
+}
