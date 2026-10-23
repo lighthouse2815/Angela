@@ -61,6 +61,9 @@ Do not start the server through an upstream launcher.
 The Angela CLI integration tests run the actual standalone engine against a local HTTP provider fixture.
 They do not authenticate real AI accounts or call paid models.
 Upstream unit tests remain in `tests/unit/` and use `tests/vitest.config.js`.
+Kimchi and Cline authentication tests use the same Vitest runner.
+Registry checks retain Windsurf's hidden state and its current Codeium endpoint.
+CommandCode image checks require both `mimeType` and `mediaType`.
 
 OAuth application identifiers in the imported source are upstream protocol configuration, not user account credentials.
 Never add personal access tokens, refresh tokens, account databases, or private build state to this directory.
