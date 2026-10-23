@@ -1,21 +1,22 @@
 # `@angela/stage-ui-tachie`
 
-Tachie scene rendering for characters represented by a small set of complete,
-static emotion images.
+Kết xuất cảnh Tachie cho các nhân vật được thể hiện bằng một tập hợp nhỏ các hình ảnh cảm xúc tĩnh, hoàn chỉnh.
 
-## What it does
+<a id="what-it-does"></a>
 
-- Loads `.tachie.zip` archives from local files, blob URLs, or HTTP(S) URLs.
-- Selects images through Angela's shared emotion vocabulary.
-- Renders the active image with PixiJS on a transparent, responsive canvas.
-- Persists scale, position, render scale, and theme-colored shadow settings.
-- Exposes canvas capture for stage screenshots and theme-color extraction.
+## Nó làm gì
 
-## Archive format
+- Tải các kho lưu trữ `.tachie.zip` từ các tệp cục bộ, URL blob hoặc URL HTTP(S).
+- Lựa chọn hình ảnh thông qua vốn từ vựng cảm xúc được chia sẻ của Angela.
+- Hiển thị hình ảnh đang hoạt động với PixiJS trên canvas trong suốt, phản hồi nhanh.
+- Duy trì cài đặt tỷ lệ, vị trí, tỷ lệ hiển thị và bóng theo chủ đề.
+- Hiển thị canvas thu nhận dữ liệu cho ảnh chụp màn hình stage và trích xuất màu chủ đề.
 
-`neutral` is required. Every other image is optional, and missing emotions fall
-back to `neutral`. File extensions are not part of the protocol; image content
-only needs to be decodable by the browser.
+<a id="archive-format"></a>
+
+## Định dạng lưu trữ
+
+`neutral` là bắt buộc. Mọi hình ảnh khác đều là tùy chọn và những cảm xúc còn thiếu sẽ quay trở lại `neutral`. Phần mở rộng tệp không phải là một phần của giao thức; nội dung hình ảnh chỉ cần được giải mã bởi trình duyệt.
 
 ```text
 character.tachie.zip
@@ -24,7 +25,7 @@ character.tachie.zip
 └── surprised.jpg
 ```
 
-A single wrapping directory is also accepted:
+Một thư mục gói duy nhất cũng được chấp nhận:
 
 ```text
 character.tachie.zip
@@ -33,11 +34,11 @@ character.tachie.zip
     └── happy.webp
 ```
 
-Supported names are `neutral`, `happy`, `sad`, `angry`, `think`, `surprised`,
-`awkward`, `question`, and `curious`. Matching is case-insensitive. Every
-recognized image must use the same pixel dimensions.
+Các tên được hỗ trợ là `neutral`, `happy`, `sad`, `angry`, `think`, `surprised`, `awkward`, `question` và `curious`. Kết hợp không phân biệt chữ hoa chữ thường. Mọi hình ảnh được nhận dạng phải sử dụng cùng kích thước pixel.
 
-## How to use
+<a id="how-to-use"></a>
+
+## Cách sử dụng
 
 ```vue
 <script setup lang="ts">
@@ -49,10 +50,10 @@ import { TachieScene } from '@angela/stage-ui-tachie'
 </template>
 ```
 
-## When to use it
+<a id="when-to-use-it"></a>
 
-Use Tachie for low-asset characters whose visual state can be represented by
-one complete image per emotion.
+## Khi nào nên sử dụng nó
 
-Do not use it for layered sprites, rigged animation, lip-sync, or parameterized
-eye and body tracking. Use Live2D, Spine, VRM, or MMD for those models.
+Sử dụng Tachie cho các nhân vật có giá trị thấp mà trạng thái hình ảnh có thể được thể hiện bằng một hình ảnh hoàn chỉnh cho mỗi cảm xúc.
+
+Không sử dụng nó cho các họa tiết xếp lớp, hoạt ảnh gian lận, hát nhép hoặc theo dõi cơ thể và mắt được tham số hóa. Sử dụng Live2D, Spine, VRM hoặc MMD cho những mô hình đó.

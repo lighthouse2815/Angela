@@ -1,43 +1,53 @@
-# Scenarios - Stage Tamagotchi Electron
+<a id="scenarios---stage-tamagotchi-electron"></a>
 
-Own the Electron capture scenarios used to generate tamagotchi docs screenshots.
+# Kịch bản - stage Tamagotchi Electron
 
-## Purpose
+Sở hữu các kịch bản Electron thu nhận dữ liệu được sử dụng để tạo ảnh chụp màn hình tài liệu tamagotchi.
 
-This package owns product-specific Electron scenario definitions and Angela window, navigation, and interaction helpers only. It depends on `@vishot/source-electron` for:
+<a id="purpose"></a>
 
-- the generic `defineScenario()` helper
-- the generic Electron capture context surface
-- raw screenshot capture and scenario loading
+## Mục đích
 
-It does not launch Electron itself and it does not own browser-scene composition or shared screenshot staging.
+Gói này sở hữu các định nghĩa kịch bản Electron dành riêng cho sản phẩm và chỉ có cửa sổ Angela, trình trợ giúp điều hướng và tương tác. Nó phụ thuộc vào `@vishot/source-electron` cho:
 
-## Workflow
+- người trợ giúp `defineScenario()` chung
+- bề mặt bối cảnh chung của Electron thu nhận dữ liệu
+- ảnh chụp màn hình thô thu nhận dữ liệu và tải kịch bản
 
-This package is step 1 of the docs screenshot pipeline.
+Nó không tự khởi chạy Electron và nó không sở hữu bố cục cảnh trình duyệt hoặc dàn dựng ảnh chụp màn hình được chia sẻ.
 
-1. Build `@angela/desktop`.
-2. Run this scenario through `@vishot/cli`.
-3. Write raw outputs to `packages/scenarios-desktop-browser/artifacts/raw`.
-4. Then run the browser package capture (step 2, documented in that package README).
+<a id="workflow"></a>
 
-## Agent Quickstart
+## Quy trình làm việc
 
-From repo root, run:
+Gói này là bước 1 của quy trình chụp ảnh màn hình tài liệu.
+
+1. Xây dựng `@angela/desktop`.
+2. Chạy kịch bản này thông qua `@vishot/cli`.
+3. Ghi kết quả đầu ra thô vào `packages/scenarios-desktop-browser/artifacts/raw`.
+4. Sau đó chạy gói trình duyệt thu nhận dữ liệu (bước 2, được ghi trong gói README đó).
+
+<a id="agent-quickstart"></a>
+
+## agent Khởi động nhanh
+
+Từ gốc repo, chạy:
 
 ```bash
 pnpm -F @angela/desktop build
 pnpm exec vishot capture --target electron ./packages/scenarios-desktop-electron/src/scenarios/demo-controls-settings-chat-websocket/index.ts --app-entrypoint ./apps/desktop/out/main/index.js --cwd . --output-dir ./packages/scenarios-desktop-browser/artifacts/raw --format avif
 ```
 
-Expected result:
+Kết quả mong đợi:
 
-- `27` raw files in `packages/scenarios-desktop-browser/artifacts/raw`
-- names like `00-desktop.avif` ... `26-devtools-vision-capture.avif`
+- Tệp thô `27` trong `packages/scenarios-desktop-browser/artifacts/raw`
+- những cái tên như `00-desktop.avif`... `26-devtools-vision-capture.avif`
 
-### Capture a local display model
+<a id="capture-a-local-display-model"></a>
 
-Use the file-input scenario when the requested evidence must render a local Live2D, VRM, or MMD model instead of a preset:
+### thu nhận dữ liệu một màn hình cục bộ mô hình
+
+Sử dụng kịch bản nhập tệp khi bằng chứng được yêu cầu phải hiển thị Live2D, VRM hoặc MMD mô hình cục bộ thay vì giá trị đặt trước:
 
 ```bash
 AIRI_DISPLAY_MODEL_FORMAT=vrm \
@@ -51,9 +61,11 @@ pnpm exec vishot capture \
   --output-dir ./.vishot/display-model/vrm
 ```
 
-Set `AIRI_DISPLAY_MODEL_FORMAT` to `live2d`, `vrm`, or `mmd`. The scenario skips first-run onboarding in the capture profile, imports and selects the supplied file through the model chooser, captures the main stage, then restores persisted state and removes the imported fixture.
+Đặt `AIRI_DISPLAY_MODEL_FORMAT` thành `live2d`, `vrm` hoặc `mmd`. Kịch bản bỏ qua quá trình triển khai lần đầu tiên trong cấu hình thu nhận dữ liệu, nhập và chọn tệp được cung cấp thông qua bộ chọn mô hình, chụp stage chính, sau đó khôi phục trạng thái lâu dài và xóa mẫu kiểm thử đã nhập.
 
-## Scenario Authoring
+<a id="scenario-authoring"></a>
+
+## Viết kịch bản
 
 ```ts
 import { defineStageTamagotchiScenario } from '../context'
@@ -74,9 +86,11 @@ export default defineStageTamagotchiScenario({
 })
 ```
 
-### Gesture primitive
+<a id="gesture-primitive"></a>
 
-Use `gestures.swipe` to reproduce a direct touch swipe or a two-finger wheel pan:
+### Cử chỉ nguyên thủy
+
+Sử dụng `gestures.swipe` để tái tạo thao tác vuốt chạm trực tiếp hoặc xoay bánh xe bằng hai ngón tay:
 
 ```ts
 export default defineStageTamagotchiScenario({
@@ -93,36 +107,40 @@ export default defineStageTamagotchiScenario({
 })
 ```
 
-Use `input: 'touch'` for the narrow-screen Pointer Event path. The primitive
-calculates the target center, splits the travel into samples, and waits for the
-gesture to settle.
+Sử dụng `input: 'touch'` cho đường dẫn Sự kiện con trỏ màn hình hẹp. Nguyên thủy tính toán trung tâm mục tiêu, chia hành trình thành các mẫu và chờ cử chỉ được xử lý.
 
-## Scenario Layout
+<a id="scenario-layout"></a>
 
-The docs workflow is organized as one section-based scenario module under `src/scenarios/demo-controls-settings-chat-websocket/`. The top-level `index.ts` orchestrates section manifests.
+## Bố cục kịch bản
 
-Important:
+Quy trình làm việc của tài liệu được tổ chức dưới dạng mô-đun kịch bản dựa trên một phần trong `src/scenarios/demo-controls-settings-chat-websocket/`. Bản kê khai phần điều phối `index.ts` cấp cao nhất.
 
-- `--output-dir` for `vishot capture` should point to `packages/scenarios-desktop-browser/artifacts/raw`.
-- This package does not publish docs assets directly; it only prepares raw assets for browser-scene composition.
+Quan trọng:
 
-## Notes
+- `--output-dir` cho `vishot capture` sẽ trỏ đến `packages/scenarios-desktop-browser/artifacts/raw`.
+- Gói này không xuất bản trực tiếp nội dung tài liệu; nó chỉ chuẩn bị nội dung thô cho bố cục cảnh trình duyệt.
 
-- Raw scenario modules live under `src/scenarios`.
-- Scenario entrypoints should point at `index.ts` when the workflow is organized as a section folder.
-- Keep this package focused on Electron capture flows for docs screenshots.
-- Paths in these examples are resolved from the repository root.
+<a id="notes"></a>
 
-## Electron Profile Note (Plugin Discovery)
+## Ghi chú
 
-When running scenarios through Vishot's generic Electron source capture, the built Electron app can use a different `userData` profile than `dev:desktop`.
+- Các mô-đun kịch bản thô trực tiếp trong `src/scenarios`.
+- Điểm nhập kịch bản phải trỏ đến `index.ts` khi quy trình làm việc được tổ chức dưới dạng thư mục phần.
+- Giữ gói này tập trung vào các luồng Electron thu nhận dữ liệu để chụp ảnh màn hình tài liệu.
+- Đường dẫn trong các ví dụ này được giải quyết từ thư mục gốc của kho lưu trữ.
 
-- `dev:desktop` plugin root commonly resolves to:
+<a id="electron-profile-note-plugin-discovery"></a>
+
+## Ghi chú hồ sơ điện tử (Khám phá plugin)
+
+Khi chạy các kịch bản thông qua nguồn Electron chung thu nhận dữ liệu của Vishot, ứng dụng Electron được xây dựng có thể sử dụng cấu hình `userData` khác với `dev:desktop`.
+
+- Root plugin `dev:desktop` thường phân giải thành:
   - `~/Library/Application Support/@angela/desktop/plugins/v1`
-- Vishot/Electron capture runs can resolve plugin root to:
+- Các lần chạy Vishot/Electron thu nhận dữ liệu có thể giải quyết root plugin thành:
   - `~/Library/Application Support/Electron/plugins/v1`
 
-If the chess plugin appears in dev but not in Vishot (`Discovered 0` or `Plugin manifest not found`), link the plugin `dist` directory into the Electron profile plugins root too:
+Nếu plugin cờ vua xuất hiện trong dev nhưng không có trong Vishot (`Discovered 0` hoặc `Plugin manifest not found`), hãy liên kết thư mục plugin `dist` với thư mục gốc của plugin hồ sơ Electron:
 
 ```bash
 mkdir -p "$HOME/Library/Application Support/Electron/plugins/v1"

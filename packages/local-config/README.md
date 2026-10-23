@@ -1,11 +1,10 @@
-# Local Configuration
+<a id="local-configuration"></a>
 
-This package owns the provider configuration shared by Angela CLI, desktop, and local web applications.
-Authentication sessions, account tokens, chat history, and interface preferences stay outside this file.
+# Cấu hình cục bộ
 
-The default path is `~/.config/angela/config.json`.
-`XDG_CONFIG_HOME` changes the configuration directory. `ANGELA_CONFIG` selects an explicit file.
-CLI flags and environment variables are temporary overrides. They do not overwrite the shared file.
+Gói này quản lý cấu hình nhà cung cấp dùng chung giữa Angela CLI, desktop và web cục bộ. Tệp này không chứa phiên xác thực, token tài khoản, lịch sử trò chuyện hoặc tùy chọn giao diện.
+
+Đường dẫn mặc định là `~/.config/angela/config.json`. `XDG_CONFIG_HOME` thay đổi thư mục cấu hình. `ANGELA_CONFIG` chọn một tệp cụ thể. Tham số CLI và biến môi trường chỉ ghi đè tạm thời. Chúng không sửa tệp dùng chung.
 
 ```json
 {
@@ -15,20 +14,11 @@ CLI flags and environment variables are temporary overrides. They do not overwri
 }
 ```
 
-Each provider entry uses its stable instance ID as its key.
-It contains `definitionId`, provider-specific `config`, and its existing validation `status`.
-The `chat.provider` field selects that instance. `chat.model` selects its model.
-Provider settings can contain API keys. The file stays outside Git and uses private file permissions.
+Mỗi mục nhà cung cấp dùng ID ổn định của phiên bản cấu hình làm khóa. Mục này chứa `definitionId`, `config` riêng của nhà cung cấp và `status` kiểm tra hiện có. `chat.provider` chọn phiên bản cấu hình đó. `chat.model` chọn mô hình. Cấu hình nhà cung cấp có thể chứa khóa API. Tệp được lưu ngoài Git và chỉ cấp quyền truy cập riêng tư.
 
-`LocalConfigFile` reads validated snapshots and applies provider patches under an exclusive writer lock.
-Each update reads the latest file before applying changes. Unrelated provider entries remain intact.
-Atomic replacement prevents readers from observing partial JSON.
-After a process crash, remove a stale `.lock` file only after all writers have stopped.
+`LocalConfigFile` đọc bản chụp đã kiểm tra và cập nhật nhà cung cấp dưới khóa ghi độc quyền. Mỗi lần cập nhật đều đọc tệp mới nhất trước khi sửa. Các mục nhà cung cấp không liên quan được giữ nguyên. Thay tệp nguyên tử giúp bên đọc không gặp JSON đang ghi dở. Sau khi tiến trình gặp sự cố, chỉ xóa `.lock` còn sót khi mọi tiến trình ghi đã dừng.
 
-The browser entry contains the schema and HTTP transport without Node imports.
-The `./node` entry owns filesystem access. The `./vite` entry exposes a local development and preview endpoint.
-The endpoint requires a custom request header, same-origin access, and loopback host and client addresses.
-It does not enable CORS or serve configuration to remote clients. Hosted configuration is outside this scope.
+Điểm vào dành cho trình duyệt chứa schema và lớp truyền HTTP, không import Node. Điểm vào `./node` quản lý truy cập hệ thống tệp. Điểm vào `./vite` cung cấp điểm cuối phát triển và xem trước cục bộ. Điểm cuối yêu cầu header riêng, truy cập cùng nguồn và địa chỉ loopback ở cả máy chủ lẫn máy khách. Điểm cuối không bật CORS và không cung cấp cấu hình cho máy khách từ xa. Cấu hình trên máy chủ nằm ngoài phạm vi này.
 
 ```sh
 pnpm -F @angela/local-config typecheck

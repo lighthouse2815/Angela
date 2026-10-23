@@ -1,3 +1,5 @@
-# References
+<a id="references"></a>
 
-Put MediaPipe Tasks Vision API docs / snippets / notes here so the implementation can follow the exact API surface you’re using.
+# Tài liệu tham khảo
+
+Đặt các tài liệu / đoạn trích / ghi chú của MediaPipe Tasks Vision API tại đây để quá trình triển khai có thể tuân theo bề mặt API chính xác mà bạn đang sử dụng.

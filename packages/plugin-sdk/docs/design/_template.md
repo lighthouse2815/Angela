@@ -1,59 +1,89 @@
-# {title}
+<a id="title"></a>
+
+# {tiêu đề}
 
 {toc}
 
-## Summary
+<a id="summary"></a>
 
-{summary}
+## Bản tóm tắt
 
-## Background
+{bản tóm tắt}
 
-{background}
+<a id="background"></a>
 
-## Goals
+## Lý lịch
 
-{goals}
+{lý lịch}
+
+<a id="goals"></a>
+
+## Bàn thắng
+
+{bàn thắng}
 
 ## Non-goals
 
 {non-goals}
 
-## Proposal
+<a id="proposal"></a>
 
-{proposal}
+## Đề xuất
 
-## Design Details
+{đề xuất}
 
-{tagline of design details}
+<a id="design-details"></a>
 
-### {optional sub-sections}
+## Chi tiết thiết kế
 
-{sub-sections}
+{khẩu hiệu chi tiết thiết kế}
 
-### {optional sub-sections}
+<a id="optional-sub-sections"></a>
 
-{sub-sections}
+### {các phần phụ tùy chọn}
 
-## Verify & Test
+{tiểu mục}
 
-### Criteria
+<a id="optional-sub-sections-1"></a>
 
-{how it can be seens as completed, or could be moved to next phase}
+### {các phần phụ tùy chọn}
 
-### Test & QA
+{tiểu mục}
 
-{how to test}
+<a id="verify--test"></a>
 
-## Progress
+## Xác minh & Kiểm tra
 
-{multiple sections of progress}
+<a id="criteria"></a>
 
-## Reviews
+### Tiêu chuẩn
 
-### Q&A
+{làm thế nào nó có thể được coi là đã hoàn thành hoặc có thể được chuyển sang giai đoạn tiếp theo}
 
-{multiple Q&A for explaining what possible questions or challenges could have or being asked}
+<a id="test--qa"></a>
 
-### Related Documentations
+### Kiểm tra & QA
 
-- [{title of the related documentation}]({related path to the related documentation})
+{cách kiểm tra}
+
+<a id="progress"></a>
+
+## Tiến triển
+
+{nhiều phần của tiến trình}
+
+<a id="reviews"></a>
+
+## Đánh giá
+
+<a id="qa"></a>
+
+### Hỏi đáp
+
+{nhiều câu hỏi và câu trả lời để giải thích những câu hỏi hoặc thách thức có thể có hoặc được hỏi}
+
+<a id="related-documentations"></a>
+
+### Tài liệu liên quan
+
+- [{tiêu đề của tài liệu liên quan}]({related path to the related documentation})

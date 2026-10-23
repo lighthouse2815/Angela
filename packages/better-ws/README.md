@@ -1,15 +1,19 @@
 # @angela/better-ws
 
-Runtime-agnostic WebSocket primitives for reliable realtime connections.
+runtime nguyên thủy WebSocket không xác định cho các kết nối thời gian thực đáng tin cậy.
 
-## What it does
+<a id="what-it-does"></a>
 
-- Provides `createClient(...)` and `createServer(...)` runtime primitives.
-- Tracks client connection state and schedules reconnects after unexpected closes.
-- Tracks server peers and supports peer send, broadcast, and named groups.
-- Dispatches raw caller-owned messages without imposing an event, RPC, or extension protocol.
+## Nó làm gì
 
-## How to use
+- Cung cấp các nguyên hàm `createClient(...)` và `createServer(...)` runtime.
+- Trạng thái và lịch trình kết nối máy khách track sẽ kết nối lại sau khi đóng bất ngờ.
+- Máy chủ track ngang hàng và hỗ trợ các nhóm gửi, phát sóng và đặt tên ngang hàng.
+- Gửi tin nhắn thô do người gọi sở hữu mà không áp đặt sự kiện, RPC hoặc giao thức mở rộng.
+
+<a id="how-to-use"></a>
+
+## Cách sử dụng
 
 ```ts
 import { createClient } from '@angela/better-ws'
@@ -44,12 +48,7 @@ const peer = server.accept({
 peer.receive('hello')
 ```
 
-Server peer liveness is opt-in and scheduler-driven. It tracks inbound traffic
-without imposing any protocol event shape. `checkLiveness()` evaluates
-`peers.unhealthyTimeout` and `peers.closeTimeout`; server-side heartbeat
-`mode`, `interval`, `message`, and `isResponse` are reserved for app or
-adapter driven scheduling and do not automatically send pings or classify
-responses.
+Hoạt động ngang hàng của máy chủ được chọn tham gia và điều khiển theo lịch trình. Nó có lưu lượng truy cập vào track mà không áp đặt bất kỳ hình dạng sự kiện giao thức nào. `checkLiveness()` đánh giá `peers.unhealthyTimeout` và `peers.closeTimeout`; nhịp tim phía máy chủ `mode`, `interval`, `message` và `isResponse` được dành riêng cho lập lịch điều khiển theo ứng dụng hoặc bộ điều hợp và không tự động gửi ping hoặc phân loại Responses.
 
 ```ts
 const server = createServer<string>({
@@ -71,8 +70,7 @@ setInterval(() => {
 }, 30_000)
 ```
 
-Heartbeat is opt-in. This example uses an application-level message heartbeat.
-Message heartbeat mode requires `message` so the client knows what to send:
+Nhịp tim được chọn tham gia. Ví dụ này sử dụng nhịp tim của thông báo ở cấp ứng dụng. Chế độ nhịp tim tin nhắn yêu cầu `message` để khách hàng biết nội dung cần gửi:
 
 ```ts
 const client = createClient({
@@ -87,17 +85,11 @@ const client = createClient({
 })
 ```
 
-Native ping heartbeat is used only when a connector exposes `ping()`. In `auto`
-mode, the client uses native `ping()` when available and falls back to message
-heartbeat only when `message` is provided. The built-in browser `WebSocket`
-adapter does not expose native ping frames.
+Nhịp tim ping native chỉ được sử dụng khi đầu nối hiển thị `ping()`. Ở chế độ `auto`, máy khách sử dụng native `ping()` khi khả dụng và chỉ quay lại nhịp tim thông báo khi `message` được cung cấp. Bộ điều hợp `WebSocket` của trình duyệt tích hợp không hiển thị khung ping native.
 
-When `isResponse` is provided, heartbeat uses strict response matching: only a
-matching inbound message clears the pending heartbeat timeout. When `isResponse`
-is omitted, any inbound message is treated as liveness and clears the pending
-timeout.
+Khi `isResponse` được cung cấp, nhịp tim sử dụng tính năng khớp phản hồi nghiêm ngặt: chỉ một tin nhắn gửi đến phù hợp mới xóa được thời gian chờ của nhịp tim đang chờ xử lý. Khi `isResponse` bị bỏ qua, mọi tin nhắn gửi đến đều được coi là có hiệu lực và xóa thời gian chờ đang chờ xử lý.
 
-For non-text messages or non-native runtimes, pass a connector. The connector owns parsing and serialization:
+Với thông điệp không phải văn bản hoặc runtime không được hỗ trợ trực tiếp, truyền một connector. Connector quản lý việc phân tích và tuần tự hóa:
 
 ```ts
 const client = createClient<string>({
@@ -124,18 +116,24 @@ await client.connect()
 client.send('hello')
 ```
 
-## When to use
+<a id="when-to-use"></a>
 
-- You need connection lifecycle, peer registry, reconnect, and broadcast primitives.
-- You want to keep message shape controlled by the application or a higher-level adapter.
-- You are building an Eventa, JSON-RPC, extension, or custom protocol adapter on top.
+## Khi nào nên sử dụng
 
-## When not to use
+- Bạn cần vòng đời kết nối, đăng ký ngang hàng, kết nối lại và phát sóng nguyên gốc.
+- Bạn muốn giữ hình dạng tin nhắn được kiểm soát bởi ứng dụng hoặc bộ điều hợp cấp cao hơn.
+- Bạn đang xây dựng một Eventa, JSON-RPC, tiện ích mở rộng hoặc bộ điều hợp giao thức tùy chỉnh ở trên cùng.
 
-- You need a full application protocol out of the box.
-- You want Socket.IO-compatible clients or packet formats.
-- You only need one direct native `WebSocket` without reconnect or peer management.
+<a id="when-not-to-use"></a>
 
-## License
+## Khi nào không nên sử dụng
+
+- Bạn cần có một giao thức ứng dụng đầy đủ ngay lập tức.
+- Bạn muốn các máy khách hoặc định dạng gói tương thích với socket.IO.
+- Bạn chỉ cần một native `WebSocket` trực tiếp mà không cần kết nối lại hoặc quản lý ngang hàng.
+
+<a id="license"></a>
+
+## Giấy phép
 
 [MIT](../../LICENSE)

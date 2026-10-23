@@ -1,14 +1,16 @@
 # @angela/cap-vite
 
-CLI for [Capacitor](https://capacitorjs.com/) live-reload development using Vite.
+CLI dành cho phát triển tải lại [Capacitor](https://capacitorjs.com/) trực tiếp bằng Vite.
 
-## Usage
+<a id="usage"></a>
+
+## Cách sử dụng
 
 ```bash
 cap-vite [vite args...] -- <ios|android> [cap run args...]
 ```
 
-Examples:
+Ví dụ:
 
 ```bash
 pnpm exec cap-vite -- ios --target <DEVICE_ID_OR_SIMULATOR_NAME>
@@ -16,18 +18,20 @@ pnpm exec cap-vite -- --host 0.0.0.0 --port 5173 -- android --target <DEVICE_ID_
 CAPACITOR_DEVICE_ID_IOS=<DEVICE_ID_OR_SIMULATOR_NAME> pnpm exec cap-vite -- ios
 ```
 
-- Arguments before `--` are forwarded to `vite`.
-- Arguments after `--` are forwarded to `cap run`.
-- If the platform-specific env is set (`CAPACITOR_DEVICE_ID_IOS` or `CAPACITOR_DEVICE_ID_ANDROID`) and `cap run` args do not contain `--target`, `cap-vite` injects `--target` with that value automatically.
-- If no `--target` argument or platform-specific env is set, `cap-vite` uses the first target from `cap run <platform> --list --json`.
-- `cap-vite` always launches the Vite dev server. Do not pass `vite dev` or `vite serve` as extra args.
-- After the dev server starts, press `R` in the terminal to re-run `cap run` without restarting Vite.
+- Các đối số trước `--` được chuyển tiếp tới `vite`.
+- Các đối số sau `--` được chuyển tiếp tới `cap run`.
+- Nếu env dành riêng cho nền tảng được đặt (`CAPACITOR_DEVICE_ID_IOS` hoặc `CAPACITOR_DEVICE_ID_ANDROID`) và các đối số `cap run` không chứa `--target`, `cap-vite` sẽ tự động tiêm `--target` với giá trị đó.
+- Nếu không có đối số `--target` hoặc env dành riêng cho nền tảng nào được đặt, `cap-vite` sẽ sử dụng mục tiêu đầu tiên từ `cap run <platform> --list --json`.
+- `cap-vite` luôn khởi chạy máy chủ Vite dev. Không chuyển `vite dev` hoặc `vite serve` làm đối số bổ sung.
+- Sau khi máy chủ nhà phát triển khởi động, nhấn `R` trong terminal để chạy lại `cap run` mà không cần khởi động lại Vite.
 
-You can see the list of available devices and simulators by running `pnpm exec cap run ios --list` or `pnpm exec cap run android --list`.
+Bạn có thể xem danh sách các thiết bị và trình mô phỏng có sẵn bằng cách chạy `pnpm exec cap run ios --list` hoặc `pnpm exec cap run android --list`.
 
-## Capacitor Configuration
+<a id="capacitor-configuration"></a>
 
-You need to set `server.url` in `capacitor.config.ts` to the env variable `CAPACITOR_DEV_SERVER_URL`, then the cli will handle rest for you.
+## Cấu hình Capacitor
+
+Bạn cần đặt `server.url` trong `capacitor.config.ts` thành biến env `CAPACITOR_DEV_SERVER_URL`, sau đó cli sẽ xử lý phần còn lại cho bạn.
 
 ```ts
 const serverURL = env.CAPACITOR_DEV_SERVER_URL
@@ -48,16 +52,20 @@ const config: CapacitorConfig = {
 export default config
 ```
 
-## Why we need this?
+<a id="why-we-need-this"></a>
 
-- No need to care what `server.url` should be, it will be automatically set to the correct value.
-- Rerun native app when native code changes, you won't forget to start it.
-- Rerun `cap run` on demand from the same terminal when you need a clean native relaunch.
-- No need to open two terminals to run the project, you can run it with one command.
+## Tại sao chúng ta cần điều này?
 
-## Architecture Notes
+- Không cần quan tâm `server.url` là gì, nó sẽ tự động được đặt thành giá trị chính xác.
+- Chạy lại ứng dụng native khi mã native thay đổi, bạn sẽ không quên khởi động nó.
+- Chạy lại `cap run` theo yêu cầu từ cùng một thiết bị đầu cuối khi bạn cần khởi chạy lại native sạch sẽ.
+- Không cần phải mở hai thiết bị đầu cuối để chạy dự án, bạn có thể chạy nó bằng một lệnh.
 
-- Vite arguments are left to the real Vite CLI instead of being reimplemented inside `cap-vite`.
-- `cap-vite` injects a wrapper config so it can append its own Vite plugin without editing the user's existing `vite.config.*`.
-- The injected plugin reads `server.resolvedUrls`, starts `cap run`, and restarts it when files under the native platform directory change or when you press `R` in the terminal.
-- `cap-vite` only splits the two argument groups and passes the `cap run` arguments into the injected plugin through environment variables.
+<a id="architecture-notes"></a>
+
+## Ghi chú kiến ​​trúc
+
+- Các đối số Vite được để lại cho Vite CLI thực thay vì được triển khai lại bên trong `cap-vite`.
+- `cap-vite` chèn cấu hình trình bao bọc để nó có thể thêm plugin Vite của riêng mình mà không cần chỉnh sửa `vite.config.*` hiện có của người dùng.
+- Plugin được chèn sẽ đọc `server.resolvedUrls`, khởi động `cap run` và khởi động lại nó khi các tệp trong thư mục nền tảng native thay đổi hoặc khi bạn nhấn `R` trong thiết bị đầu cuối.
+- `cap-vite` chỉ tách hai nhóm đối số và chuyển các đối số `cap run` vào plugin được chèn thông qua các biến môi trường.

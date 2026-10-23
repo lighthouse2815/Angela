@@ -1,45 +1,55 @@
-# document-sync
+<a id="document-sync"></a>
 
-Synchronizes small documents of one user between devices. It resolves conflicts for each field, not for each document.
+# đồng bộ hóa tài liệu
 
-## What it does
+Đồng bộ hóa các tài liệu nhỏ của một người dùng giữa các thiết bị. Nó giải quyết xung đột cho từng trường chứ không phải cho từng tài liệu.
 
-- A document is a set of independent fields. You select the fields.
-- A field that one device changed takes that change.
-- A field that two devices changed takes the server value. The local document becomes a conflict copy, so no change is lost.
-- An edit has priority over a deletion from another device.
-- The module works offline. It sends the local changes on the next run.
-- The server keeps past revisions of each field. A feature that passes `history` to `createFieldSyncStore` can list them and read the content at a past revision.
+<a id="what-it-does"></a>
 
-## When to use it
+## Nó làm gì
 
-- One user owns the documents and edits them on more than one device.
-- The documents are small. Each run reads all documents of the feature.
-- You set limits for the account (`limits` of `createFieldSyncStore`). A feature that stores more than a few megabytes for one account needs another design.
+- Một tài liệu là một tập hợp các trường độc lập. Bạn chọn các trường.
+- Trường mà một thiết bị thay đổi sẽ nhận thay đổi đó.
+- Trường mà hai thiết bị đã thay đổi sẽ nhận giá trị máy chủ. Tài liệu cục bộ trở thành bản sao xung đột nên không có thay đổi nào bị mất.
+- Chỉnh sửa có quyền ưu tiên hơn việc xóa khỏi thiết bị khác.
+- Mô-đun hoạt động ngoại tuyến. Nó sẽ gửi những thay đổi cục bộ trong lần chạy tiếp theo.
+- Máy chủ lưu giữ các phiên bản trước đây của từng trường. Một tính năng chuyển `history` sang `createFieldSyncStore` có thể liệt kê chúng và đọc nội dung ở bản sửa đổi trước đây.
 
-## When not to use it
+<a id="when-to-use-it"></a>
 
-- Append-only data with a large volume, for example chat messages. Use the chat synchronization.
-- Files. Store the file in object storage and synchronize its description.
-- Secrets. The server stores the values as plain JSON.
+## Khi nào nên sử dụng nó
 
-## How to add a feature
+- Một người dùng sở hữu tài liệu và chỉnh sửa chúng trên nhiều thiết bị.
+- Các tài liệu có kích thước nhỏ. Mỗi lần chạy sẽ đọc tất cả tài liệu của đối tượng địa lý.
+- Bạn đặt giới hạn cho tài khoản (`limits` của `createFieldSyncStore`). Một tính năng mà store có dung lượng lớn hơn vài megabyte cho một tài khoản cần có thiết kế khác.
 
-Each feature owns its tables and its routes. The server and the client share only the algorithm.
+<a id="when-not-to-use-it"></a>
 
-Server, in `server/apps/api`:
+## Khi nào không nên sử dụng nó
 
-1. Declare two tables in the schema file of the feature, and generate the migration. Copy `server/apps/api/src/schemas/character-cards.ts` as the template. The tables need the columns of `FieldSyncTables` in `services/domain/field-sync/tables.ts`. The compiler rejects a table that misses one. The field table only appends rows, and its primary key includes `revision`. Its `value` column accepts `null`, which means that the revision removed the field.
-2. Create the service with `createFieldSyncStore(db, { documents, fields }, { validate, limits, history })`. Put every rule about the content in `validate`. Pass `history` to keep past revisions. Without it, the store keeps only the current value of each field.
-3. Write the routes of the feature. Call `list`, `push`, and `remove`, and parse the requests with `parseDocumentId`, `parsePushRequest`, and `parseDeleteRevision`. Call `history` and `snapshot` for routes that read past revisions, and parse their requests with `parseHistoryQuery` and `parseRevisionParam`.
+- Chỉ nối thêm dữ liệu có dung lượng lớn, chẳng hạn như tin nhắn trò chuyện. Sử dụng tính năng đồng bộ hóa trò chuyện.
+- Tập tin. store tệp trong bộ nhớ đối tượng và đồng bộ hóa mô tả của nó.
+- Bí mật. Máy chủ store có các giá trị dưới dạng JSON đơn giản.
 
-Client, in `packages/stage-ui`:
+<a id="how-to-add-a-feature"></a>
 
-1. Write a function that splits a document into fields, and a function that joins the fields. Keep values that must change together in one field.
-2. Call `synchronize` with a client for the route, the stored sync state, and the functions that read and write the local documents.
-3. Call `history` and `snapshot` on the client of `createDocumentSyncClient` to read past revisions. Both return `null` when the document, or that revision of it, is gone.
+## Cách thêm một tính năng
 
-`server/apps/api/src/services/domain/character-cards.ts`, `stores/modules/angela-card.ts`, and `libs/character-card-sync/card-fields.ts` are the reference use.
+Mỗi tính năng sở hữu các bảng và route của nó. Máy chủ và máy khách chỉ chia sẻ thuật toán.
+
+Máy chủ, trong `server/apps/api`:
+
+1. Khai báo hai bảng trong tệp lược đồ của đối tượng địa lý và tạo di chuyển. Sao chép `server/apps/api/src/schemas/character-cards.ts` làm mẫu. Các bảng cần các cột của `FieldSyncTables` trong `services/domain/field-sync/tables.ts`. Trình biên dịch từ chối một bảng bị thiếu. Bảng trường chỉ nối thêm các hàng và khóa chính của nó bao gồm `revision`. Cột `value` của nó chấp nhận `null`, có nghĩa là bản sửa đổi đã loại bỏ trường này.
+2. Tạo dịch vụ với `createFieldSyncStore(db, { documents, fields }, { validate, limits, history })`. Đặt mọi quy tắc về nội dung trong `validate`. Vượt qua `history` để giữ lại các bản sửa đổi trước đây. Không có nó, store chỉ giữ giá trị hiện tại của từng trường.
+3. Viết route của tính năng này. Gọi `list`, `push` và `remove`, đồng thời phân tích các yêu cầu bằng `parseDocumentId`, `parsePushRequest` và `parseDeleteRevision`. Gọi `history` và `snapshot` cho route để đọc các bản sửa đổi trước đây và phân tích các yêu cầu của chúng bằng `parseHistoryQuery` và `parseRevisionParam`.
+
+Khách hàng, trong `packages/stage-ui`:
+
+1. Viết hàm chia tài liệu thành các trường và hàm nối các trường. Giữ các giá trị phải thay đổi cùng nhau trong một trường.
+2. Gọi `synchronize` bằng ứng dụng khách để biết route, trạng thái đồng bộ hóa được lưu trữ cũng như các chức năng đọc và ghi tài liệu cục bộ.
+3. Gọi `history` và `snapshot` trên máy khách `createDocumentSyncClient` để đọc các bản sửa đổi trước đây. Cả hai đều trả về `null` khi tài liệu hoặc bản sửa đổi đó không còn nữa.
+
+`server/apps/api/src/services/domain/character-cards.ts`, `stores/modules/angela-card.ts` và `libs/character-card-sync/card-fields.ts` là mục đích sử dụng tham khảo.
 
 ```ts
 import { createDocumentSyncClient, synchronize } from '../libs/document-sync'
@@ -54,18 +64,21 @@ await synchronize({
 })
 ```
 
-## Extending the tables
+<a id="extending-the-tables"></a>
 
-A feature can add columns, indexes, and other tables. An added column must accept `null` or have a default. The store inserts a document row with only `ownerId` and `documentId`, and the compiler does not catch a required column.
-For a required value, store it in a field, or in another table that has the key `(ownerId, documentId)`.
+## Mở rộng các bảng
 
-## Rules for the caller
+Một tính năng có thể thêm cột, chỉ mục và các bảng khác. Cột được thêm phải chấp nhận `null` hoặc có giá trị mặc định. store chèn một hàng tài liệu chỉ có `ownerId` và `documentId` và trình biên dịch không bắt được cột bắt buộc. Đối với một giá trị bắt buộc, hãy store nó trong một trường hoặc trong một bảng khác có khóa `(ownerId, documentId)`.
 
-- `applyLocal` must write the local documents before it awaits anything. The run compares and writes in one task.
-- A field value must not be `null`. Omit the field.
-- Run one synchronization at a time for each feature and account.
-- `synchronize` returns the documents that the server refused with 400 or 413. Show the user that these documents stay on the device. The run does not stop for them.
-- `applyLocal` returns the ids of the documents that it could not apply, for example because the content is invalid. The run then keeps their sync state. Without it, the next run reads the missing document as a deletion and deletes the server copy.
-- A document that every device creates with the same id, such as the built-in character card, sends only its edits. `readLocal` leaves out the parts that equal the built-in content, and `applyLocal` adds them back. The built-in content can depend on the language of the device, so it must not leave the device.
+<a id="rules-for-the-caller"></a>
 
-The design record is `server/docs/ai/adr/2026-10-06-document-sync.md`.
+## Quy tắc dành cho người gọi
+
+- `applyLocal` phải viết các tài liệu cục bộ trước khi chờ đợi bất cứ điều gì. Việc chạy so sánh và viết trong một nhiệm vụ.
+- Giá trị trường không được là `null`. Bỏ qua lĩnh vực này.
+- Chạy một lần đồng bộ hóa cho từng tính năng và tài khoản.
+- `synchronize` trả về các tài liệu mà máy chủ từ chối với 400 hoặc 413. Cho người dùng biết rằng các tài liệu này vẫn còn trên thiết bị. Cuộc chạy không dừng lại đối với họ.
+- `applyLocal` trả về id của tài liệu mà nó không thể áp dụng, chẳng hạn vì nội dung không hợp lệ. Quá trình chạy sau đó sẽ giữ trạng thái đồng bộ hóa của chúng. Nếu không có nó, lần chạy tiếp theo sẽ đọc tài liệu bị thiếu dưới dạng xóa và xóa bản sao máy chủ.
+- Một tài liệu mà mọi thiết bị tạo ra có cùng id, chẳng hạn như thẻ ký tự tích hợp, chỉ gửi các chỉnh sửa của nó. `readLocal` loại bỏ những phần tương đương với nội dung tích hợp sẵn và `applyLocal` sẽ thêm chúng trở lại. Nội dung tích hợp có thể phụ thuộc vào ngôn ngữ của thiết bị nên không được rời khỏi thiết bị.
+
+Bản ghi thiết kế là `server/docs/ai/adr/2026-10-06-document-sync.md`.

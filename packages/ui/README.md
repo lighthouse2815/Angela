@@ -1,12 +1,14 @@
 # @angela/ui
 
-A stylized UI component library built with [Reka UI](https://reka-ui.com/) and [UnoCSS](https://unocss.dev/).
+Thư viện thành phần UI cách điệu được xây dựng bằng [Reka UI](https://reka-ui.com/) và [UnoCSS](https://unocss.dev/).
 
-To preview the components, refer to the [`stage-ui`](../stage-ui) package for instructions for running the Histoire UI storyboard.
+Để xem trước các thành phần, hãy tham khảo gói [`stage-ui`](../stage-ui) để biết hướng dẫn chạy bảng phân cảnh Histoire UI.
 
-## Get started
+<a id="get-started"></a>
 
-Install the library:
+## Bắt đầu
+
+Cài đặt thư viện:
 
 ```shell
 ni @angela/ui -D # from @antfu/ni, can be installed via `npm i -g @antfu/ni`
@@ -15,15 +17,15 @@ yarn i @angela/ui -D
 npm i @angela/ui -D
 ```
 
-This library requires `unocss` with Attributify Mode and a style reset.
+Thư viện này yêu cầu `unocss` có Chế độ phân bổ và đặt lại kiểu.
 
-First, install `unocss` if you haven't already:
+Đầu tiên, hãy cài đặt `unocss` nếu bạn chưa có:
 
 ```shell
 pnpm i -D unocss
 ```
 
-Next, in your `uno.config.ts`, add `presetAttributify()` to your presets array:
+Tiếp theo, trong `uno.config.ts` của bạn, hãy thêm `presetAttributify()` vào mảng cài sẵn của bạn:
 ```ts
 import { defineConfig, presetAttributify } from 'unocss'
 
@@ -35,12 +37,14 @@ export default defineConfig({
 })
 ```
 
-Finally, import the reset styles in your `main.ts`:
+Cuối cùng, nhập kiểu đặt lại trong `main.ts` của bạn:
 ```ts
 import '@unocss/reset/tailwind.css'
 ```
 
-## Usage
+<a id="usage"></a>
+
+## Cách sử dụng
 
 ```vue
 <script setup lang="ts">
@@ -52,47 +56,36 @@ import { Button } from '@angela/ui'
 </template>
 ```
 
-## Components
+<a id="components"></a>
 
-* [Animations](src/components/Animations)
+## Linh kiện
+
+* [Hoạt hình](src/components/Animations)
     * [TransitionVertical](src/components/Animations/TransitionVertical.vue)
 * [Form](src/components/Form)
-    * [Checkbox](src/components/Form/Checkbox)
-    * [Select](src/components/Form/Select)
+    * [Hộp kiểm](src/components/Form/Checkbox)
+    * [Chọn](src/components/Form/Select)
     * [Field](src/components/Form/Field)
-    * [Input](src/components/Form/Input)
-    * [Radio](src/components/Form/Radio)
-    * [Range](src/components/Form/Range)
+    * [Đầu vào](src/components/Form/Input)
+    * [Đài phát thanh](src/components/Form/Radio)
+    * [Phạm vi](src/components/Form/Range)
     * [ComboboxSelect](src/components/Form/Select)
-    * [Textarea](src/components/Form/Textarea)
+    * [Vùng văn bản](src/components/Form/Textarea)
 
-## License
+<a id="license"></a>
+
+## Giấy phép
 
 [MIT](../../LICENSE)
 
-## Swipe actions
+<a id="swipe-actions"></a>
 
-Compose `SwipeActionsRoot`, `SwipeActionsContent`, `SwipeActionsList`, and
-`SwipeActionsItem`. Bind `v-model:open` on Root and give each Item a unique,
-stable `value` within its List. Add Lists with `side="start"` and `side="end"`
-for bidirectional swipes. Root's `v-model:side` selects the revealed edge; `dir`
-maps logical edges in RTL. Its `action(value, side)` event identifies the selected
-action. Each List uses its last Item as the long-swipe default. The List's
-`defaultAction` can choose a different value; `fullSwipe=false` disables long-swipe selection.
+## Thao tác vuốt
 
-Items register and follow DOM order automatically. Reordering or removing them
-cancels pending gestures. All parts support Reka UI's `as` and `asChild`.
-List controls per-action width and gap. `:gap="16"` leaves 16px between Items
-and 8px at each outer edge, including beside Content during entry. Its container size lets Items appear
-one at a time from the outer edge, with reversible scale and opacity curves.
-Items without space remain registered but cannot receive input or focus.
-Use an opaque background for Content.
+Compose `SwipeActionsRoot`, `SwipeActionsContent`, `SwipeActionsList` và `SwipeActionsItem`. Liên kết `v-model:open` trên Root và cấp cho mỗi Mục một `value` duy nhất, ổn định trong Danh sách của nó. Thêm Danh sách với `side="start"` và `side="end"` để vuốt hai chiều. `v-model:side` của Root chọn cạnh được tiết lộ; `dir` ánh xạ các cạnh logic trong RTL. Sự kiện `action(value, side)` của nó xác định hành động đã chọn. Mỗi Danh sách sử dụng Mục cuối cùng làm mặc định cho thao tác vuốt dài. `defaultAction` của Danh sách có thể chọn một giá trị khác; `fullSwipe=false` vô hiệu hóa lựa chọn vuốt dài.
 
-Use `SwipeActionButton` inside `SwipeActionsItem as-child` for the standard
-surface, icon, and text. Pass the Item slot's `takeover` and physical `edge` to the button.
-`showLabel=false` fills the former text area while keeping the accessible name.
+Các mục đăng ký và làm theo thứ tự DOM tự động. Sắp xếp lại hoặc xóa chúng sẽ hủy các cử chỉ đang chờ xử lý. Tất cả các bộ phận đều hỗ trợ `as` và `asChild` của Reka UI. Danh sách kiểm soát chiều rộng và khoảng cách trên mỗi hành động. `:gap="16"` để lại 16px giữa các Mục và 8px ở mỗi cạnh ngoài, bao gồm cả bên cạnh Nội dung trong khi nhập. Kích thước vùng chứa của nó cho phép các Mục xuất hiện lần lượt từ cạnh ngoài, với các đường cong tỷ lệ và độ mờ có thể đảo ngược. Các mục không có khoảng trống vẫn được đăng ký nhưng không thể nhận đầu vào hoặc tiêu điểm. Sử dụng nền mờ cho Nội dung.
 
-Use these components for persistent action areas on either side. They do not own
-conversation storage, undo, or swipe-to-reply behavior. See the
-[component reference](../../docs/ai/context/ui-components.md#swipeactions) and
-the stage-ui Histoire story **Misc → Swipe Actions**.
+Sử dụng `SwipeActionButton` bên trong `SwipeActionsItem as-child` cho bề mặt, biểu tượng và văn bản tiêu chuẩn. Chuyển `takeover` của ô Vật phẩm và `edge` vật lý vào nút. `showLabel=false` lấp đầy vùng văn bản cũ trong khi vẫn giữ tên có thể truy cập được.
+
+Sử dụng các thành phần này cho các vùng hoạt động liên tục ở cả hai bên. Họ không sở hữu hành vi lưu trữ cuộc trò chuyện, hoàn tác hoặc vuốt để trả lời. Xem tài liệu tham khảo thành phần [](../../docs/ai/context/ui-components.md#swipeactions) và câu chuyện Lịch sử stage-ui **Khác → Thao tác vuốt**.

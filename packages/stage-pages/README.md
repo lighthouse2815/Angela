@@ -1,36 +1,48 @@
-# Stage Pages
+<a id="stage-pages"></a>
 
-`@angela/stage-pages` contains route-level Vue pages that multiple Angela stage applications share.
+# Trang stage
 
-## Use
+`@angela/stage-pages` chứa các trang Vue cấp route mà nhiều ứng dụng Angela stage chia sẻ.
 
-Add a page under `src/pages`. Each stage application scans this directory through its Vite router configuration.
+<a id="use"></a>
 
-Import a shared page through the package boundary when code needs the component directly:
+## Sử dụng
+
+Thêm một trang dưới `src/pages`. Mỗi ứng dụng stage quét thư mục này thông qua cấu hình Vite router của nó.
+
+Nhập trang được chia sẻ thông qua ranh giới gói khi mã cần trực tiếp thành phần:
 
 ```ts
 import PolaroidPage from '@angela/stage-pages/pages/devtools/polaroid.vue'
 ```
 
-## When to use this package
+<a id="when-to-use-this-package"></a>
 
-Use this package when two or more stage applications need the same page behavior and route structure.
+## Khi nào nên sử dụng gói này
 
-## When not to use this package
+Sử dụng gói này khi hai hoặc nhiều ứng dụng stage cần có cùng hành vi trang và cấu trúc route.
 
-Keep application-specific pages in the owning application. Put reusable business components in `@angela/stage-ui`.
+<a id="when-not-to-use-this-package"></a>
 
-Put primitive UI components in `@angela/ui`. Put shared layouts in `@angela/stage-layouts`.
+## Khi nào không nên sử dụng gói này
 
-## Provider settings
+Giữ các trang dành riêng cho ứng dụng trong ứng dụng sở hữu. Đặt các thành phần kinh doanh có thể tái sử dụng vào `@angela/stage-ui`.
 
-The active chat and vision provider routes live under `/settings/providers`. They use `ProviderGenerationSettings` from stage-ui to render protocol and native search options from the provider catalog. The V2 editor is a separate consumer and does not replace these routes.
+Đặt các thành phần UI nguyên thủy vào `@angela/ui`. Đặt bố cục được chia sẻ trong `@angela/stage-layouts`.
 
-## Hearing settings
+<a id="provider-settings"></a>
 
-`/settings/modules/hearing` is the overview. It holds the shared `HearingConfig` controls (input mode, microphone switch, input device) and the transcript delivery settings (Auto send and transcript rewrite).
+## Cài đặt nhà cung cấp
 
-- `/settings/modules/hearing/transcriber` selects the transcription provider and model. Its playground asks for microphone permission only when monitoring starts.
-- `/settings/modules/hearing/wake-words` lists the wake words of each card and the detector status. When two cards share a pronunciation, the user chooses the character that answers it. The choice stays on the device, and both cards keep their words.
+Trò chuyện tích cực và tầm nhìn nhà cung cấp route trực tiếp trong `/settings/providers`. Họ sử dụng `ProviderGenerationSettings` từ stage-ui để hiển thị giao thức và các tùy chọn tìm kiếm native từ danh mục nhà cung cấp. Trình chỉnh sửa V2 là một bên sử dụng riêng biệt và không thay thế các route này.
 
-The character card page shows an alert while a shared pronunciation has no character. The alert links to the wake words page.
+<a id="hearing-settings"></a>
+
+## Cài đặt thính giác
+
+`/settings/modules/hearing` là tổng quan. Nó chứa các điều khiển `HearingConfig` được chia sẻ (chế độ đầu vào, công tắc micrô, thiết bị đầu vào) và cài đặt phân phối bản ghi (Tự động gửi và ghi lại bản ghi).
+
+- `/settings/modules/hearing/transcriber` chọn phiên âm nhà cung cấp và mô hình. Sân chơi của nó chỉ yêu cầu quyền sử dụng micrô khi quá trình giám sát bắt đầu.
+- `/settings/modules/hearing/wake-words` liệt kê các từ đánh thức của từng thẻ và trạng thái của máy dò. Khi hai thẻ có cùng cách phát âm, người dùng sẽ chọn ký tự trả lời nó. Lựa chọn vẫn còn trên thiết bị và cả hai thẻ đều giữ lời.
+
+Trang thẻ ký tự hiển thị cảnh báo trong khi cách phát âm được chia sẻ không có ký tự. Cảnh báo liên kết đến trang từ đánh thức.

@@ -1,12 +1,14 @@
 # `@angela/input-playstation-dualsense-5`
 
-This package reads and writes Sony PlayStation 5 DualSense reports through WebHID. It has no UI code.
+Gói này đọc và ghi báo cáo Sony PlayStation 5 DualSense thông qua WebHID. Nó không có mã UI.
 
-The package supports the standard DualSense controller with product ID `0x0ce6`. It supports USB and Bluetooth reports.
+Gói hỗ trợ bộ điều khiển DualSense tiêu chuẩn với sản phẩm ID `0x0ce6`. Nó hỗ trợ các báo cáo USB và Bluetooth.
 
-## Use the package
+<a id="use-the-package"></a>
 
-Call `requestDualSenseDevice()` from a user action. WebHID requires a user action before it shows the device chooser.
+## Sử dụng gói
+
+Gọi `requestDualSenseDevice()` từ hành động của người dùng. WebHID yêu cầu hành động của người dùng trước khi hiển thị trình chọn thiết bị.
 
 ```ts
 import {
@@ -36,16 +38,20 @@ stopInput()
 await controller.close()
 ```
 
-Use `getGrantedDualSenseDevices()` to find devices that already have permission. Use `onDualSenseConnectionChange()` to observe connect and disconnect events.
+Sử dụng `getGrantedDualSenseDevices()` để tìm các thiết bị đã có quyền. Sử dụng `onDualSenseConnectionChange()` để quan sát các sự kiện kết nối và ngắt kết nối.
 
-## When to use it
+<a id="when-to-use-it"></a>
 
-Use this package when a Chromium renderer needs raw DualSense input, motion sensors, touch points, LEDs, rumble, or adaptive triggers.
+## Khi nào nên sử dụng nó
 
-Do not use this package for a generic gamepad. Use the Gamepad API when standard buttons and axes are sufficient.
+Sử dụng gói này khi Crom renderer cần đầu vào DualSense thô, cảm biến chuyển động, điểm tiếp xúc, đèn LED, tiếng ầm ầm hoặc bộ kích hoạt thích ứng.
 
-WebHID requires a secure context. The host browser must support WebHID.
+Không sử dụng gói này cho gamepad thông thường. Sử dụng Gamepad API khi các nút và trục tiêu chuẩn đã đủ.
 
-## Reference
+WebHID yêu cầu bối cảnh an toàn. Trình duyệt host phải hỗ trợ WebHID.
+
+<a id="reference"></a>
+
+## Thẩm quyền giải quyết
 
 - https://github.com/nondebug/dualsense

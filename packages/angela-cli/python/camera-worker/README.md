@@ -1,9 +1,10 @@
-# Local camera worker
+<a id="local-camera-worker"></a>
 
-This worker owns camera capture and OpenSeeFace inference. It emits derived JSONL events through stdout.
-Upstream diagnostics go to stderr. Frames remain in memory and never enter files, network requests, or the protocol.
+# Camera cục bộ worker
 
-From the repository root, create Angela's pinned CPU environment:
+worker này sở hữu camera thu nhận dữ liệu và OpenSeeFace suy luận. Nó phát ra các sự kiện JSONL dẫn xuất thông qua thiết bị xuất chuẩn. Chẩn đoán upstream đi tới stderr. Các khung vẫn còn trong bộ nhớ và không bao giờ nhập tệp, yêu cầu mạng hoặc giao thức.
+
+Từ thư mục gốc của kho lưu trữ, tạo môi trường CPU được ghim của Angela:
 
 ```sh
 uv sync --locked --project packages/angela-cli/python/camera-worker
@@ -11,34 +12,22 @@ packages/angela-cli/python/camera-worker/.venv/bin/python packages/angela-cli/py
 packages/angela-cli/python/camera-worker/.venv/bin/python packages/angela-cli/python/camera-worker/worker.py --smoke
 ```
 
-`--check` imports dependencies and checks required files without opening a camera.
-`--smoke` loads real models and processes one synthetic black frame without opening a camera.
-For Windows, use `.venv/Scripts/python.exe`.
+`--check` nhập các phần phụ thuộc và kiểm tra các tệp cần thiết mà không cần mở máy ảnh. `--smoke` tải mô hình thực và xử lý một khung màu đen tổng hợp mà không cần mở máy ảnh. Đối với Windows, hãy sử dụng `.venv/Scripts/python.exe`.
 
-For an explicit live camera test, run:
+Để kiểm tra máy ảnh trực tiếp rõ ràng, hãy chạy:
 
 ```sh
 packages/angela-cli/python/camera-worker/.venv/bin/python packages/angela-cli/python/camera-worker/worker.py --device 0 --fps 10
 ```
 
-Stop with Ctrl+C. The worker releases the device on exit.
-Capture uses one replaceable frame slot. Inference runs at most ten times per second by default.
-An unavailable device reports `camera_unavailable`. Check device permissions and whether another application owns the camera.
+Dừng lại với Ctrl + C. worker giải phóng thiết bị khi thoát. thu nhận dữ liệu sử dụng một khe khung có thể thay thế được. Theo mặc định, suy luận chạy tối đa mười lần mỗi giây. Thiết bị không khả dụng báo cáo `camera_unavailable`. Kiểm tra quyền của thiết bị và liệu ứng dụng khác có sở hữu máy ảnh hay không.
 
-Run hardware-free tests with the system Python:
+Chạy thử nghiệm không cần phần cứng với hệ thống Python:
 
 ```sh
 python3 -m unittest discover -s packages/angela-cli/python/camera-worker -p test.py
 ```
 
-`face_observation` contains timestamp, presence, tracker confidence, optional pose/features, and sampling metrics.
-`ready` follows the first successful capture/inference. `error` contains a bounded diagnostic code.
-Missing pose or features means unknown. Failed 3D fitting never becomes a neutral cue.
-Pose conversion accounts for OpenSeeFace's row/column coordinates and equivalent frontal Euler representations.
-Smile-like geometry uses mouth-corner lift relative to mouth width. It does not identify a person or infer feelings.
+`face_observation` chứa dấu thời gian, sự hiện diện, độ tin cậy của trình theo dõi, pose/features tùy chọn và số liệu lấy mẫu. `ready` tiếp nối capture/inference. `error` thành công đầu tiên chứa mã chẩn đoán có giới hạn. Thiếu tư thế hoặc đặc điểm có nghĩa là không xác định. Việc lắp 3D không thành công không bao giờ trở thành tín hiệu trung lập. Đặt các tài khoản chuyển đổi cho tọa độ row/column của OpenSeeFace và các biểu diễn Euler phía trước tương đương. Hình học giống nụ cười sử dụng lực nâng ở góc miệng so với chiều rộng của miệng. Nó không xác định một người hoặc suy ra cảm xúc.
 
-The runtime uses Python 3.11, NumPy 1.26.4, ONNX Runtime CPU 1.23.2, and headless OpenCV 4.11.0.86.
-The complete dependency graph and hashes are in `uv.lock`.
-Upstream's ONNX Runtime 1.9 wheel requires an executable stack and fails on the development kernel.
-Angela uses a separate runtime instead of changing the upstream source or weakening kernel protections.
-Pillow and training libraries are not required by this worker.
+runtime sử dụng Python 3.11, NumPy 1.26.4, ONNX runtime CPU 1.23.2 và không có giao diện OpenCV 4.11.0.86. Biểu đồ phụ thuộc hoàn chỉnh và các giá trị băm nằm trong `uv.lock`. Bánh xe ONNX runtime 1.9 của upstream yêu cầu ngăn xếp thực thi và bị lỗi trên hạt nhân phát triển. Angela sử dụng runtime riêng thay vì thay đổi nguồn upstream hoặc làm suy yếu khả năng bảo vệ kernel. worker này không yêu cầu thư viện gối và huấn luyện.

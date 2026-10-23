@@ -1,59 +1,69 @@
-# Hello!
+<a id="hello"></a>
 
-Thanks for trying Departure Mono (departuremono.com), licensed under the SIL OFL. Send your questions and suggestions to hello@helenazhang.com or DM me on Twitter/X: @minor_axis. Donations much appreciated at: buymeacoffee.com/helenazhang. Enjoy!
+# Xin chào!
+
+Cảm ơn bạn đã dùng thử Departure Mono (departuremono.com), được cấp phép theo SIL OFL. Gửi câu hỏi và đề xuất của bạn tới hello@helenazhang.com hoặc DM cho tôi trên Twitter/X: @minor_axis. Đóng góp được đánh giá cao tại: buymeacoffee.com/helenazhang. Hãy tận hưởng!
 
 — Helena Zhang (helenazhang.com)
 
-## Font Information
+<a id="font-information"></a>
 
-Version 1.500 features 1,186 glyphs, including support for:
+## Thông tin phông chữ
 
-- Basic Latin, Latin-1, Latin Extended-A, and most Latinate languages
-- Cyrillic
-- Basic Greek
-- Small caps
-- Old-style numerals and fractions
-- Simple box-drawing characters and selected symbols
+Phiên bản 1.500 có 1.186 glyph, bao gồm hỗ trợ cho:
 
-## Usage
+- Tiếng Latin cơ bản, tiếng Latin-1, tiếng Latin mở rộng-A và hầu hết các ngôn ngữ Latinh
+- chữ cái Cyrillic
+- Tiếng Hy Lạp cơ bản
+- Mũ nhỏ
+- Số và phân số kiểu cũ
+- Ký tự vẽ hộp đơn giản và các ký hiệu được chọn
 
-For pixel-perfect results, set the font size to increments of 11px.
+<a id="usage"></a>
 
-Experiment with tighter or wider tracking (letter-spacing).
+## Cách sử dụng
 
-## Changelog
+Để có kết quả pixel hoàn hảo, hãy đặt kích thước phông chữ tăng dần 11px.
+
+Thử nghiệm theo dõi chặt chẽ hơn hoặc rộng hơn (khoảng cách giữa các chữ cái).
+
+<a id="changelog"></a>
+
+## Nhật ký thay đổi
 
 v1.500
-- 1,186 glyphs
-- Added box-drawing characters: ▁ ▂ ▃ ▅ ▆ ▇ ▔ ▏ ▎ ▍ ▌ ▋ ▊ ▉ ▐ ▕ ▖ ▗ ▘ ▙ ▚ ▛ ▜ ▝ ▞ ▟ ■ □ ▪ ▫ ╦ ╖ ╓ ┰ ┒ ┧ ┎ ┟ ╁ ┯ ┑ ┩ ┍ ┡ ╇ ╤ ╕ ╒ ╍ ╏ ╻ ┳ ┓ ┏ ━ ╸ ╾ ┉ ┋ ╺ ┅ ┇ ╹ ┻ ┛ ╿ ┗ ┃ ╋ ┫ ┣ ╅ ┭ ┵ ┽ ┲ ┺ ╊ ╃ ╮ ╭ ╯ ╰ ╳ ╲ ╱ ╌ ╎ ╷ ╴ ╼ ┈ ┊ ╶ ┄ ┆ ╵ ╽ ╆ ┮ ┶ ┾ ┱ ┹ ╉ ╄ ╨ ╜ ╙ ╀ ┸ ┦ ┚ ┞ ┖ ╈ ┷ ┪ ┙ ┢ ┕ ╧ ╛ ╘ ╫ ╢ ╟ ╂ ┨ ┠ ┿ ┥ ┝ ╪ ╡ ╞ 🮂 🮃 🮄 🮅 🮆 🮇 🮈 🮉 🮊 🮋
-+ Added brackets: ❰ ❮ ❱ ❯ ❬ ❭
+- 1.186 hình tượng
+- Đã thêm ký tự vẽ hộp: ▂ ▃ ▅ ▆ ▇ ▔ ▏ ▎ ▍ ▌ ▋ ▊ ▉ ▐ ▕ ▖ ▗ ▘ ▙ ▚ ▛ ▜ ▝ ▞ ▟ ■ □ ▪ ▫ ╦ ╖ ╓ ┰ ┒ ┧ ┎ ┟ ╁ ┯ ┑ ┩ ┍ ┡ ╇ ╤ ╕ ╒ ╍ ╏ ╻ ┳ ┓ ┏ ━ ╸ ╾ ┉ ┋ ╺ ┅ ┇ ╹ ┻ ┛ ╿ ┗ ┃ ╋ ┫ ┣ ╅ ┭ ┵ ┽ ┲ ┺ ╊ ╃ ╮ ╭ ╯ ╰ ╳ ╲ ╱ ╌ ╎ ╷ ╴ ╼ ┈ ┊ ╶ ┄ ┆ ╵ ╽ ╆ ┮ ┶ ┾ ┱ ┹ ╉ ╄ ╨ ╜ ╙ ╀ ┸ ┦ ┚ ┞ ┖ ╈ ┷ ┪ ┙ ┢ ┕ ╧ ╛ ╘ ╫ ╢ ╟ ╂ ┨ ┠ ┿ ┥ ┝ ╪ ╡ ╞ 🮂 🮃 🮄 🮅 🮆 🮇 🮈 🮉 🮊 🮋
++ Đã thêm dấu ngoặc: ❰ ❮ ❱ ❯ ❬ ❭
 
 v1.422
-- 1,034 glyphs
-- Added stars: ★ ☆ ✦ ✧
-- Fixed bug: Ё and ё were missing accents
-- Adjusted: ₽ Д д Ы ы Ъ ъ
-- Serifed: Г г Ѓ ѓ Ґ ґ Ӷ ӷ
+- 1.034 hình tượng
+- Đã thêm sao: ★ ☆ ✦ ✧
+- Đã sửa lỗi: Ё và ё bị thiếu dấu
+- Đã điều chỉnh: ₽ D d Y y Ъ ъ
+- Serifed: Г г Ѓ ѓ Ґ ґ ж з
 
 v1.420
-- 1,030 glyphs
-- Added Cyrillic characters: А Б В Г Ѓ Ґ Ӷ Ғ Ҕ Д Е Ѐ Ё Ж З И Й Ѝ Ҋ К Ќ Л М Н О П Р С Т У Ў Ф Х Ч Ц Ш Щ Џ Ь Ы Ъ Љ Њ Ѕ Є Э І Ї Ј Ћ Ю Я Ђ Ѣ Ѵ Җ Ҙ Қ Ҟ Ҡ Ң Ҥ Ҧ Ԥ Ҩ Ҫ Ҭ Ү Ұ Ҳ Ҵ Ҷ Һ Ԧ Ҽ Ҿ Ӏ Ӂ Ӄ Ӆ Ӈ Ӊ Ӌ Ӎ Ӑ Ӓ Ӕ Ӗ Ӛ Ӝ Ӟ Ӡ Ӣ Ӥ Ӧ Ө Ӫ Ӭ Ӯ Ӱ Ӳ Ӵ Ӹ Ӽ Ԑ Ԓ Ԝ Ҍ Ҏ а б в г ѓ ґ ӷ ғ ҕ д е ѐ ё ж з и й ѝ ҋ к ќ л м н о п р с т у ў ф х ч ц ш щ џ ь ы ъ љ њ ѕ є э і ї ј ћ ю я ђ ѣ ѵ җ ҙ қ ҟ ҡ ң ҥ ҧ ԥ ҩ ҫ ҭ ү ұ ҳ ҵ ҷ һ ԧ ҽ ҿ ӏ ӂ ӄ ӆ ӈ ӊ ӌ ӎ ӑ ӓ ӕ ӗ ӛ ӝ ӟ ӡ ӣ ӥ ӧ ө ӫ ӭ ӯ ӱ ӳ ӵ ӹ ӽ ԑ ԓ ԝ ҍ ҏ
-- Added Greek characters: Ά Έ Ή Ί Ό Ύ Ώ Ϊ Ϋ ί ϊ ΐ ύ ϋ ΰ ό ώ ά έ ή ΄ ΅ ͺ
-- Added: № ∙
-- Adjusted: Ľ ť ĸ δ ι ʻ
+- 1.030 hình tượng
+- Đã thêm các ký tự Cyrillic: A B V G Ѓ Ґ Ҷ G Ḕ D E Ѐ Њ Z I Y Ѝ Ҋ K Ќ L M N O P R S T U Ь F H C S SH Ь Ь Ъ Љ Њ І І І І І І Ѵ Ҙ Ҙ Ҙ Q Ҥ Ҥ yr Ҩ Ҭ Ҭ Ү Ү Ќ Ѓ Г Г Г Г Г Г Г Г Г UD Ъ Ҭ Ұ Ҳ Ҵ Ҽ yr yr yr Ў a b v g ѓ ґ g g ҕ d e ѐ ё j z i y ѝ ҋ k ќ l m n o p r sh gh ć u ў њ ѕ є e і ї ј ћ yu ya ђ ѣ ѵ җ z q q q n ҥ ҧ p w s t u Ң h ć ć yr e ҏ Џ Џ Е Г к Г Н П У Х Ч ơi
+- Đã thêm ký tự Hy Lạp:
+- Đã thêm: № ∙
+- Đã điều chỉnh: Ľ ť ĸ δ ι ʻ
 
 v1.350
-- 775 glyphs
-- Added fractions: ↉ ⅓ ⅔ ⅕ ⅖ ⅗ ⅘ ⅙ ⅚ ⅐ ⅑
-- Added a centered alternate for *
-- Adjusted old-style numerals 0, 1, 2 to be x-height
-- Adjusted ½ ¼ ¾ ⅛ ⅜ ⅝ ⅞ ‰ to fit in bounding box
-- Adjusted curly brackets to horizontally align with other brackets
-- Adjusted position of * and °
+- 775 hình tượng
+- Đã thêm phân số: ↉ ⅓ ⅔ ⅕ ⅖ ⅗ ⅘ ⅙ ⅚ ⅐ ⅑
+- Đã thêm một tùy chọn thay thế ở giữa cho *
+- Điều chỉnh các chữ số kiểu cũ 0, 1, 2 thành x-height
+- Đã điều chỉnh ½ ¼ ¾ ⅛ ⅜ ⅝ ⅞ ‰ để vừa với hộp giới hạn
+- Dấu ngoặc nhọn đã điều chỉnh để căn chỉnh theo chiều ngang với các dấu ngoặc khác
+- Vị trí đã điều chỉnh của * và °
 
 v1.346
-- 763 glyphs
+- 763 hình tượng
 
-## Thanks
+<a id="thanks"></a>
 
-A big thank you to: Tobias Fried, Christine Lee, Daniel Stern, Kim Slawson, Parker McGowan, Alex Krivov, Karl Peterson, Alexander Zaytsev, Vadim Pleshkov, and Maxim Iorsh for their general feedback and testing across languages
+## Cảm ơn
+
+Xin chân thành cảm ơn: Tobias Fried, Christine Lee, Daniel Stern, Kim Slawson, Parker McGowan, Alex Krivov, Karl Peterson, Alexander Zaytsev, Vadim Pleshkov và Maxim Iorsh vì những phản hồi chung và thử nghiệm của họ trên nhiều ngôn ngữ

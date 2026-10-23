@@ -1,26 +1,32 @@
 # `@angela/model-driver-lipsync`
 
-Shared lip-sync profiles and model-neutral mouth-driving policies for Angela.
+Cấu hình hát nhép được chia sẻ và các chính sách lái xe bằng miệng trung lập mô hình dành cho Angela.
 
-## What It Does
+<a id="what-it-does"></a>
 
-- Exposes the shared wLipSync profile.
-- Converts raw AEIOUS frames into stable AEIOU weights.
-- Owns winner selection, silence detection, and weight smoothing.
-- Provides the existing Live2D lip-sync driver.
-- Exposes the browser-only wLipSync node factory through a separate runtime entry.
+## Nó làm gì
 
-The package does not write weights to VRM expressions or MMD morphs. Each renderer owns that mapping.
+- Hiển thị hồ sơ wLipSync được chia sẻ.
+- Chuyển đổi khung AEIOUS thô thành trọng số AEIOU ổn định.
+- Sở hữu lựa chọn người chiến thắng, phát hiện sự im lặng và làm mịn trọng lượng.
+- Cung cấp trình điều khiển hát nhép Live2D hiện có.
+- Hiển thị wLipSync Node hàm tạo chỉ dành cho trình duyệt thông qua một mục nhập runtime riêng biệt.
 
-## Exports
+Gói không ghi trọng số vào biểu thức VRM hoặc hình thái MMD. Mỗi renderer đều sở hữu ánh xạ đó.
 
-- `@angela/model-driver-lipsync`: the Live2D driver.
-- `@angela/model-driver-lipsync/shared/wlipsync`: the profile, types, and pure vowel driver.
-- `@angela/model-driver-lipsync/runtime/wlipsync`: the browser-only audio-node factory.
+<a id="exports"></a>
 
-The shared entry has no Web Audio side effects. Node-based tools and tests can import it safely.
+## Xuất khẩu
 
-## How To Use It
+- `@angela/model-driver-lipsync`: trình điều khiển Live2D.
+- `@angela/model-driver-lipsync/shared/wlipsync`: cấu hình, kiểu và trình điều khiển nguyên âm thuần túy.
+- `@angela/model-driver-lipsync/runtime/wlipsync`: âm thanh chỉ dành cho trình duyệt-Node hàm tạo.
+
+Mục được chia sẻ không có tác dụng phụ Web Audio. Các công cụ và bài kiểm tra dựa trên Node có thể nhập nó một cách an toàn.
+
+<a id="how-to-use-it"></a>
+
+## Cách sử dụng nó
 
 ```ts
 import { createWLipSyncNode } from '@angela/model-driver-lipsync/runtime/wlipsync'
@@ -34,16 +40,20 @@ const driver = createWLipSyncVowelDriver()
 const weights = driver.update(node, deltaSeconds)
 ```
 
-The caller owns the `AudioContext`, the source node, and the source lifecycle.
+Người gọi sở hữu `AudioContext`, Node nguồn và vòng đời của nguồn.
 
-## When To Use It
+<a id="when-to-use-it"></a>
 
-- Use the shared entry when a renderer needs standard AEIOU weights.
-- Use the runtime entry when browser code creates a wLipSync audio node.
-- Keep renderer-specific expression and morph mappings in the renderer package.
+## Khi nào nên sử dụng nó
 
-## When Not To Use It
+- Sử dụng mục nhập được chia sẻ khi renderer cần trọng lượng AEIOU tiêu chuẩn.
+- Sử dụng mục nhập runtime khi mã trình duyệt tạo âm thanh wLipSync Node.
+- Giữ ánh xạ hình thái và biểu thức dành riêng cho renderer trong gói renderer.
 
-- Do not import the runtime entry from Node-only code.
-- Do not add Vue, Three.js, VRM, or MMD dependencies to this package.
-- Do not move renderer-specific model writes into the shared driver.
+<a id="when-not-to-use-it"></a>
+
+## Khi nào không nên sử dụng nó
+
+- Không nhập mục nhập runtime từ mã chỉ dành cho Node.
+- Không thêm các phần phụ thuộc Vue, Three.js, VRM hoặc MMD vào gói này.
+- Không di chuyển ghi mô hình dành riêng cho renderer vào trình điều khiển dùng chung.

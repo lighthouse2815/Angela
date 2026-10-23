@@ -1,29 +1,26 @@
+<a id="angela-gateway"></a>
+
 # Angela Gateway
 
-Angela Gateway is the local multi-account provider engine included with Angela CLI.
-It provides account login, token refresh, model routing, streaming, fallback, and a shared inference key.
+Angela Gateway là công cụ nhà cung cấp đa tài khoản cục bộ đi kèm với Angela CLI. Nó cung cấp thông tin đăng nhập tài khoản, làm mới token, định tuyến mô hình, truyền dữ liệu liên tục, phương án dự phòng và khóa suy luận chung.
 
-The complete provider implementation lives in [the vendored source](../../third_party/angela-gateway).
-Users do not install a separate gateway application or registry package.
+Việc triển khai nhà cung cấp hoàn chỉnh có trong [nguồn được cung cấp](../../third_party/angela-gateway). Người dùng không cài đặt ứng dụng cổng hoặc gói đăng ký riêng.
 
 ## Build
 
-From the repository root, run `pnpm build:cli`.
-The workspace dependency builds this package before the CLI.
-The build installs locked engine dependencies in an isolated workspace and creates a standalone server in `dist/`.
-Its React dependencies do not enter the main Vue workspace.
-The build uses temporary private state, not the account directory.
+Tại thư mục gốc repo, chạy `pnpm build:cli`. Gói này được build trước CLI theo quan hệ phụ thuộc của workspace. Quá trình build cài các gói phụ thuộc đã khóa phiên bản trong workspace riêng và tạo máy chủ độc lập trong `dist/`. Các gói React không được đưa vào workspace Vue chính. Quá trình build dùng trạng thái riêng tạm thời thay vì thư mục tài khoản.
 
-`pnpm package:cli` includes this package and its built server in the portable release.
-Node.js remains a runtime requirement. pnpm and the source checkout are not runtime requirements.
+`pnpm package:cli` đưa gói này cùng máy chủ đã build vào bản phát hành đóng gói độc lập. Khi chạy vẫn cần Node.js. Không cần pnpm hoặc bản mã nguồn đã checkout.
 
-## Use
+<a id="use"></a>
+
+## Sử dụng
 
 ```sh
 angela gateway start
 ```
 
-In another terminal:
+Trong một thiết bị đầu cuối khác:
 
 ```sh
 angela gateway login
@@ -34,18 +31,14 @@ angela gateway use --model PROVIDER_ALIAS/MODEL_ID
 angela
 ```
 
-`login` prints the local dashboard address. Account authentication uses the browser when the provider requires it.
-Keep the foreground gateway open. Ctrl+C stops its server.
-The API endpoint is `http://127.0.0.1:20129/v1/` by default.
+`login` in địa chỉ bảng điều khiển cục bộ. Khi nhà cung cấp yêu cầu, việc xác thực tài khoản diễn ra trong trình duyệt. Giữ tiến trình gateway đang chạy. Nhấn Ctrl+C để dừng máy chủ. Điểm cuối API mặc định là `http://127.0.0.1:20129/v1/`.
 
-## Boundaries
+<a id="boundaries"></a>
 
-This package is for local provider accounts. It is not Angela's hosted resource API or a memory store.
-It does not configure other AI tools, install a tray, or update global applications during startup.
-The inference key cannot access account management.
-Remote exposure, TLS, service installation, and desktop account screens are outside this CLI-first integration.
+## Phạm vi trách nhiệm
 
-Provider availability, subscription access, and authentication requirements remain controlled by each provider.
-The included engine does not grant access to models or quotas that an account does not have.
+Gói này quản lý tài khoản nhà cung cấp cục bộ. Đây không phải API tài nguyên trên máy chủ hay kho bộ nhớ của Angela. Khi khởi động, gói không cấu hình công cụ AI khác, cài biểu tượng khay hệ thống hoặc cập nhật ứng dụng toàn cục. Khóa suy luận không có quyền quản lý tài khoản. Công khai dịch vụ ra mạng, TLS, cài dịch vụ và màn hình tài khoản desktop nằm ngoài phạm vi tích hợp ưu tiên CLI này.
 
-See [provenance and local changes](../../third_party/angela-gateway/README.angela.md) for copyright and upstream details.
+Các yêu cầu về tính khả dụng, quyền truy cập đăng ký và xác thực của nhà cung cấp vẫn được kiểm soát bởi mỗi nhà cung cấp. Công cụ đi kèm không cấp quyền truy cập vào mô hình hoặc hạn ngạch mà tài khoản không có.
+
+Xem [xuất xứ và các thay đổi cục bộ](../../third_party/angela-gateway/README.angela.md) để biết chi tiết về bản quyền và upstream.

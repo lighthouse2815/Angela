@@ -1,24 +1,28 @@
 # @angela/pipelines-audio
 
-Shared audio-pipeline orchestration for Angela. The package owns input sharing, capture intervals, detector windows, playback groups, and text chunking. It does not depend on a UI.
+Dàn nhạc đường truyền âm thanh được chia sẻ cho Angela. Gói này sở hữu tính năng chia sẻ đầu vào, khoảng thời gian thu nhận dữ liệu, cửa sổ dò tìm, nhóm phát lại và phân đoạn văn bản. Nó không phụ thuộc vào UI.
 
-## Use it for
+<a id="use-it-for"></a>
 
-- Sharing one audio source between recording, transcription, and detectors.
-- Building and scheduling speech playback pipelines.
-- Parsing streaming-control events.
+## Sử dụng nó cho
 
-## Do not use it for
+- Chia sẻ một nguồn âm thanh giữa ghi âm, phiên âm và phát hiện.
+- Xây dựng và lên lịch quy trình phát lại giọng nói.
+- Phân tích các sự kiện điều khiển truyền dữ liệu liên tục.
 
-- Vue or Electron lifecycle state.
-- Provider credentials and product-specific error UI.
-- Browser sources and file encoding, which belong in `@angela/audio`.
+<a id="do-not-use-it-for"></a>
 
-## Input, capture, and observation
+## Không sử dụng nó cho
 
-`AudioInput` shares one `LiveAudioSource`, for example a microphone. The first subscriber opens the source, and the last one to leave closes it.
-A live source cannot wait for its readers. A file is an `AudioSource` but not a live source. Each consumer of a file opens its own stream, and that stream keeps native backpressure.
-Each subscription, capture, and observer ends with its own abort signal. There is no lease to release.
+- Trạng thái vòng đời của Vue hoặc Electron.
+- Thông tin xác thực nhà cung cấp và lỗi dành riêng cho sản phẩm UI.
+- Nguồn trình duyệt và mã hóa tệp thuộc về `@angela/audio`.
+
+<a id="input-capture-and-observation"></a>
+
+## Đầu vào, thu nhận dữ liệu và quan sát
+
+`AudioInput` chia sẻ một `LiveAudioSource`, ví dụ như micrô. Người đăng ký đầu tiên mở nguồn và người cuối cùng rời đi sẽ đóng nguồn. Nguồn trực tiếp không thể đợi bên đọc của nó. Tệp là `AudioSource` nhưng không phải là nguồn trực tiếp. Mỗi bên sử dụng của một tệp sẽ mở luồng riêng của nó và luồng đó giữ áp suất ngược cho native. Mỗi đăng ký, thu nhận dữ liệu và người quan sát kết thúc bằng tín hiệu hủy bỏ của chính nó. Không có lease để phát hành.
 
 ```ts
 const input = new AudioInput(source, { historyMs: 360 })
@@ -32,38 +36,27 @@ for await (const event of output)
   showTranscript(event)
 ```
 
-- `subscribe({ from, signal, maxBufferedMs })` returns blocks from now, or first replays retained history from `from`.
-- `capture(input, { from, signal, maxBufferedMs })` adds `started`, `finish()`, `cancel(reason)`, and a gap check.
-- `retain(signal)` returns a lease. Its holder calls `hold(position)` to keep history from that position.
-- `observe(input, options, detector, onResult)` runs a detector over windows with `ordered` or `latest` scheduling.
-- `audioWindows(shape)` is the windowing transform alone, for callers that schedule their own work.
-- `createScope(signal)` owns one lifetime: an abort signal, reverse-order cleanups, and child scopes.
+- `subscribe({ from, signal, maxBufferedMs })` trả về các khối từ bây giờ hoặc phát lại lần đầu lịch sử được giữ lại từ `from`.
+- `capture(input, { from, signal, maxBufferedMs })` thêm `started`, `finish()`, `cancel(reason)` và kiểm tra khoảng cách.
+- `retain(signal)` trả về lease. Người nắm giữ nó gọi `hold(position)` để giữ lịch sử từ vị trí đó.
+- `observe(input, options, detector, onResult)` chạy trình phát hiện trên các cửa sổ có lập lịch `ordered` hoặc `latest`.
+- `audioWindows(shape)` chỉ là biến đổi cửa sổ dành cho người gọi lên lịch công việc của riêng họ.
+- `createScope(signal)` sở hữu một vòng đời: tín hiệu hủy bỏ, dọn dẹp theo thứ tự ngược và phạm vi con.
 
-Observers support sliding windows and growing windows.
-`preRollMs` keeps the history that pending detector windows need, including time spent in inference.
-A sample gap restarts window growth. Frame coordinates never cross source connections.
-A live source cannot wait for a slow reader. Each subscription, capture, and `ordered` observer has a `maxBufferedMs` limit, 60 seconds by default.
-When a reader falls behind that limit, only that reader fails. The source and the other readers continue.
-There are no mandatory detector deadlines. Plugins own their models, retained results, and disposal.
+Người quan sát ủng hộ cửa sổ trượt và cửa sổ đang phát triển. `preRollMs` lưu giữ lịch sử mà các cửa sổ phát hiện đang chờ xử lý cần, bao gồm cả thời gian suy luận. Khoảng cách mẫu khởi động lại sự tăng trưởng của cửa sổ. Tọa độ khung không bao giờ chéo các kết nối nguồn. Nguồn trực tiếp không thể đợi bên đọc chậm. Mỗi người đăng ký, thu nhận dữ liệu và người quan sát `ordered` có giới hạn `maxBufferedMs`, theo mặc định là 60 giây. Khi bên đọc tụt xuống dưới giới hạn đó thì chỉ bên đọc đó không thành công. Nguồn và bên đọc khác tiếp tục. Không có thời hạn phát hiện bắt buộc. Các plugin sở hữu mô hình, giữ lại kết quả và loại bỏ.
 
-Captures and observers settle with `Outcome`: `finished` with a value, `cancelled` with a reason, or `failed` with an error.
-A finished capture reports its interval. An observer finishes when the source ends and its last window is processed.
+Người chụp và người quan sát giải quyết bằng `Outcome`: `finished` có giá trị, `cancelled` có lý do hoặc `failed` có lỗi. thu nhận dữ liệu đã hoàn thành báo cáo khoảng thời gian của nó. Trình quan sát kết thúc khi nguồn kết thúc và cửa sổ cuối cùng của nó được xử lý.
 
-## Playback ownership
+<a id="playback-ownership"></a>
 
-`Playback.openGroup()` creates an independent queue. Groups can play concurrently.
-`finish()` drains one group. `stop({ fadeMs })` closes admission, discards queued clips, and waits for actual silence.
-A cancelled clip does not cancel other clips in its group.
+## Quyền sở hữu phát lại
 
-The driver owns the audio clock. `playback.nowMs()` reads it.
-A clip can set `startAtMs` on that clock. The group still starts clips in order.
-Each receipt entry reports `throughMs` and the rendered `interval` on the same clock.
-A caller can start the next output relative to that interval, for example 2 seconds after a clip ends.
-A group does not mix clips or schedule lanes against each other.
-Playback knows no chat session, turn, or agent notification contract.
-`Response` in core-agent supplies those conversation boundaries and producer ordering.
+`Playback.openGroup()` tạo một hàng đợi độc lập. Các nhóm có thể chơi đồng thời. `finish()` tiêu hao một nhóm. `stop({ fadeMs })` đóng quá trình tiếp nhận, loại bỏ các clip đã xếp hàng đợi và chờ sự im lặng thực sự. Một clip bị hủy sẽ không hủy các clip khác trong nhóm của nó.
 
-## Checks
+Người lái xe sở hữu đồng hồ âm thanh. `playback.nowMs()` đọc nó. Một clip có thể đặt `startAtMs` trên đồng hồ đó. Nhóm vẫn bắt đầu các clip theo thứ tự. Mỗi mục biên nhận báo cáo `throughMs` và `interval` được hiển thị trên cùng một đồng hồ. Người gọi có thể bắt đầu đầu ra tiếp theo liên quan đến khoảng thời gian đó, chẳng hạn như 2 giây sau khi clip kết thúc. Một nhóm không trộn các clip hoặc lên lịch các luồng với nhau. Phát lại không có phiên trò chuyện, lượt hoặc hợp đồng thông báo agent. `Response` trong core-agent cung cấp các ranh giới hội thoại và thứ tự nhà sản xuất đó.
 
-Run `pnpm -F @angela/pipelines-audio typecheck` and `pnpm -F @angela/pipelines-audio test:run`.
-Public tests cover capture independence, delayed history use, source gaps, file finalization, cancellation, and playback receipts.
+<a id="checks"></a>
+
+## Kiểm tra
+
+Chạy `pnpm -F @angela/pipelines-audio typecheck` và `pnpm -F @angela/pipelines-audio test:run`. Các thử nghiệm công khai bao gồm tính độc lập của thu nhận dữ liệu, lịch sử sử dụng bị trì hoãn, khoảng trống nguồn, hoàn thiện tệp, hủy và xác nhận phát lại.

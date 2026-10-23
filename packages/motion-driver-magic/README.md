@@ -1,10 +1,10 @@
 # `@angela/motion-driver-magic`
 
-MAGIC means Markovian Animation Generator with Illusory Conditioning.
-This package fits procedural motion models and generates normalized motion frames.
-Its root entry point exports the VAR and AR-HMM models.
+MAGIC có nghĩa là Trình tạo hoạt hình Markovian với Điều hòa ảo ảnh. Gói này phù hợp với chuyển động theo thủ tục mô hình và tạo ra các khung chuyển động chuẩn hóa. Điểm vào gốc của nó xuất VAR và AR-HMM mô hình.
 
-## Use the package
+<a id="use-the-package"></a>
+
+## Sử dụng gói
 
 ```ts
 import type { TrainingSequence } from '@angela/motion-driver-magic'
@@ -22,10 +22,10 @@ const generator = model.toGenerator({ seed: 1 })
 const frame = generator.next({ noiseScale: 1 })
 ```
 
-## When to use it
+<a id="when-to-use-it"></a>
 
-Use this package for model fitting and seeded procedural motion generation.
-The caller controls scheduling, filtering, transport, and renderer integration.
+## Khi nào nên sử dụng nó
 
-Do not import Vue, renderer objects, recording editors, or browser scheduling into this package.
-Convert application recordings to fixed-width numeric frames before fitting a model.
+Sử dụng gói này để lắp mô hình và chuyển động thủ tục gieo mầm sinh nội dung. Người gọi kiểm soát việc lập lịch, lọc, tích hợp transport và renderer.
+
+Không nhập các đối tượng Vue, renderer, trình chỉnh sửa bản ghi hoặc lập lịch trình duyệt vào gói này. Chuyển đổi bản ghi ứng dụng sang khung số có chiều rộng cố định trước khi lắp mô hình.

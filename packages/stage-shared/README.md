@@ -1,23 +1,25 @@
 # `@angela/stage-shared`
 
-Shared contracts and runtime-neutral helpers for Angela stage applications and UI packages.
+Hợp đồng chia sẻ và người trợ giúp trung lập runtime cho các ứng dụng Angela stage và các gói UI.
 
-## Use this package
+<a id="use-this-package"></a>
 
-Use this package when a type or behavior must cross stage application boundaries without depending on Electron, browser-only code, or a feature UI package.
+## Sử dụng gói này
 
-The `plugin-host` entrypoint owns the serializable Plugin Host snapshots exchanged between the Electron main process and shared renderer code:
+Sử dụng gói này khi một loại hoặc hành vi phải vượt qua ranh giới ứng dụng stage mà không phụ thuộc vào Electron, mã chỉ dành cho trình duyệt hoặc gói tính năng UI.
+
+Điểm vào `plugin-host` sở hữu các ảnh chụp nhanh host của Plugin có thể tuần tự hóa được trao đổi giữa quy trình chính của Electron và mã renderer được chia sẻ:
 
 ```ts
 import type { PluginHostDebugSnapshot } from '@angela/stage-shared/plugin-host'
 ```
 
-The `model-assets` entrypoint owns model file manifests, download status, and
-the storage adapter contract. Use a platform adapter to store and open files.
-It does not own a recognizer or Worker.
+Điểm nhập `model-assets` sở hữu các bảng kê khai tệp mô hình, trạng thái tải xuống và hợp đồng bộ điều hợp lưu trữ. Sử dụng bộ điều hợp nền tảng cho store và mở tệp. Nó không sở hữu bộ nhận dạng hoặc worker.
 
-## Do not use this package
+<a id="do-not-use-this-package"></a>
 
-Keep Electron IPC definitions in the Electron application. Keep UI state and actions in `@angela/stage-ui`. Keep Extension runtime and manifest behavior in `@angela/plugin-sdk`.
+## Không sử dụng gói này
 
-Do not add application startup, persistence, or platform-specific side effects here.
+Giữ các định nghĩa về Electron IPC trong ứng dụng Electron. Giữ trạng thái và hành động của UI trong `@angela/stage-ui`. Giữ tiện ích mở rộng runtime và hành vi hiển thị trong `@angela/plugin-sdk`.
+
+Không thêm các tác dụng phụ khởi động ứng dụng, kiên trì hoặc dành riêng cho nền tảng ở đây.

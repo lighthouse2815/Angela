@@ -1,66 +1,80 @@
-# Multi-Transport Plugin Contexts
+<a id="multi-transport-plugin-contexts"></a>
 
-- [Summary](#summary)
-- [Background](#background)
-- [Goals](#goals)
-- [Non-goals](#non-goals)
-- [Proposal](#proposal)
-- [Design Details](#design-Details)
-  - [Context And Transport Model](#context-and-transport-model)
-  - [Lifecycle Placement](#lifecycle-placement)
-  - [Host Runtime Layout](#host-runtime-layout)
-  - [API Binding Strategy](#api-binding-strategy)
-  - [Local Vs Remote Plugins](#local-vs-remote-plugins)
-  - [Multi-Plugin Isolation](#multi-plugin-isolation)
-- [Verify & Test](#verify--test)
-  - [Criteria](#criteria)
+# Bối cảnh plugin đa transport
+
+- [Tóm tắt](#summary)
+- [Nền](#background)
+- [Mục tiêu](#goals)
+- [Không có mục tiêu](#non-goals)
+- [Đề xuất](#proposal)
+- [Chi tiết thiết kế](#design-Details)
+  - [Context và transport Model](#context-and-transport-model)
+  - [Vị trí vòng đời](#lifecycle-placement)
+  - Bố cục [Host runtime](#host-runtime-layout)
+  - Chiến lược ràng buộc [API](#api-binding-strategy)
+  - [Local và Remote Plugin](#local-vs-remote-plugins)
+  - [Cách ly đa plugin](#multi-plugin-isolation)
+- [Xác minh và kiểm tra](#verify--test)
+  - [Tiêu chí](#criteria)
   - [Test & QA](#test--qa)
-- [Progress](#progress)
-  - [Status](#status)
-  - [Next Steps](#next-steps)
-- [Reviews](#reviews)
+- [Tiến trình](#progress)
+  - [Trạng thái](#status)
+  - [Các bước tiếp theo](#next-steps)
+- [Đánh giá](#reviews)
   - [Q&A](#qa)
-  - [Related Documentations](#related-documentations)
+  - [Tài liệu liên quan](#related-documentations)
 
-## Summary
+<a id="summary"></a>
 
-Introduce a host-side transport-aware context factory that provides one Eventa context per plugin instance. Plugin SDK APIs become context-bound factories, allowing local (in-memory/worker) and remote (WebSocket) plugins to share the same API surface while using different transports. This enables multiple plugins within a single Plugin Host without cross-talk or global channel coupling.
+## Bản tóm tắt
 
-## Background
+Giới thiệu ngữ cảnh nhận biết transport phía host hàm tạo cung cấp một ngữ cảnh Eventa cho mỗi phiên bản plugin. API SDK của plugin trở thành hàm tạo theo ngữ cảnh, cho phép các plugin cục bộ (in-memory/worker) và từ xa (WebSocket) chia sẻ cùng một bề mặt API trong khi sử dụng các phương thức vận chuyển khác nhau. Điều này cho phép nhiều plugin trong một Plugin host duy nhất mà không cần ghép kênh chéo hoặc kênh toàn cầu.
 
-`plugin-sdk` currently exposes APIs (for example `providers.listProviders`) that call `defineInvoke` on a globally imported channel. This couples plugins to a single shared context and prevents the host from isolating multiple plugins or using different transports per plugin. We also need a path to support local plugins (in-process or worker) and remote plugins (WebSocket) with consistent ergonomics.
+<a id="background"></a>
 
-Eventa is context-oriented: contexts are created per transport (in-memory, WebSocket, worker, electron) and the invoke/handler APIs attach to that context. Multiple contexts can co-exist in the same process.
+## Lý lịch
 
-## Goals
+`plugin-sdk` hiện hiển thị các API (ví dụ `providers.listProviders`) gọi `defineInvoke` trên kênh được nhập toàn cầu. Điều này kết hợp các plugin vào một ngữ cảnh được chia sẻ duy nhất và ngăn host cách ly nhiều plugin hoặc sử dụng các phương thức vận chuyển khác nhau cho mỗi plugin. Chúng tôi cũng cần một đường dẫn để hỗ trợ các plugin cục bộ (đang xử lý hoặc worker) và các plugin từ xa (WebSocket) với công thái học nhất quán.
 
-- Provide one context per plugin instance, scoped by transport.
-- Allow the same API surface to work for local and remote plugins.
-- Keep transport selection under Plugin Host control, not plugin control.
-- Support multiple plugins within one host without channel conflicts.
-- Keep the API ergonomics for plugin authors simple and explicit.
+Eventa hướng theo ngữ cảnh: các ngữ cảnh được tạo trên mỗi transport (trong bộ nhớ, WebSocket, worker, electron) và các API invoke/handler đính kèm với ngữ cảnh đó. Nhiều bối cảnh có thể cùng tồn tại trong cùng một quá trình.
+
+<a id="goals"></a>
+
+## Bàn thắng
+
+- Cung cấp một ngữ cảnh cho mỗi phiên bản plugin, trong phạm vi transport.
+- Cho phép cùng một bề mặt API hoạt động cho các plugin cục bộ và từ xa.
+- Giữ lựa chọn transport dưới sự kiểm soát của Plugin host, không phải kiểm soát plugin.
+- Hỗ trợ nhiều plugin trong một host mà không bị xung đột kênh.
+- Giữ công thái học API dành cho tác giả plugin đơn giản và rõ ràng.
 
 ## Non-goals
 
-- Designing the full plugin lifecycle orchestration (phase transitions, capability config, etc.).
-- Implementing a new transport stack beyond Eventa adapters (unless required by runtime gaps).
-- Defining extension packaging or distribution formats beyond `ExtensionManifestV2` entrypoints.
+- Thiết kế điều phối vòng đời plugin đầy đủ (chuyển pha, cấu hình khả năng, v.v.).
+- Triển khai ngăn xếp transport mới ngoài bộ điều hợp Eventa (trừ khi được yêu cầu bởi các khoảng trống runtime).
+- Xác định các định dạng phân phối hoặc đóng gói mở rộng ngoài các điểm vào `ExtensionManifestV2`.
 
-## Proposal
+<a id="proposal"></a>
 
-1. Introduce a host-side `createPluginContext(transport)` factory that returns an Eventa context bound to the plugin's transport.
-2. Convert plugin SDK APIs to context-bound factories (`createApis(ctx)`), replacing global channel usage.
-3. Resolve transport per plugin instance during host setup and pass the created context into plugin `init()`.
-4. Add runtime-specific implementations under `plugin-host/runtimes/node` and `plugin-host/runtimes/web` to handle different transport adapters.
-5. Optional: introduce shared reliable WebSocket helpers if needed, but prefer Eventa adapters first.
+## Đề xuất
 
-## Design Details
+1. Thêm hàm tạo `createPluginContext(transport)` phía host, trả về ngữ cảnh Eventa gắn với transport của plugin.
+2. Chuyển đổi API SDK của plugin thành hàm tạo (`createApis(ctx)`) theo ngữ cảnh, thay thế việc sử dụng kênh toàn cầu.
+3. Giải quyết transport trên mỗi phiên bản plugin trong quá trình thiết lập host và chuyển ngữ cảnh đã tạo vào plugin `init()`.
+4. Thêm các triển khai dành riêng cho runtime trong `plugin-host/runtimes/node` và `plugin-host/runtimes/web` để xử lý các bộ điều hợp transport khác nhau.
+5. Tùy chọn: giới thiệu những người trợ giúp WebSocket đáng tin cậy được chia sẻ nếu cần, nhưng trước tiên hãy ưu tiên bộ điều hợp Eventa.
 
-Transport-aware contexts for isolated multi-plugin hosts.
+<a id="design-details"></a>
 
-### Context And Transport Model
+## Chi tiết thiết kế
 
-Define a small transport config type owned by the Plugin Host:
+Bối cảnh nhận biết transport cho nhiều plugin host bị cô lập.
+
+<a id="context-and-transport-model"></a>
+
+### Bối cảnh và transport mô hình
+
+Xác định loại cấu hình transport nhỏ do Plugin host sở hữu:
 
 ```ts
 export type PluginTransport
@@ -71,32 +85,38 @@ export type PluginTransport
     | { kind: 'electron', target: 'main' | 'renderer', webContentsId?: number }
 ```
 
-`createPluginContext(transport)` creates and returns an Eventa context based on the transport adapter (in-memory, WebSocket, worker, electron).
+`createPluginContext(transport)` tạo và trả về bối cảnh Eventa dựa trên bộ điều hợp transport (trong bộ nhớ, WebSocket, worker, electron).
 
-### Lifecycle Placement
+<a id="lifecycle-placement"></a>
 
-Context creation happens during host setup, before any plugin lifecycle method is called.
+### Vị trí vòng đời
 
-1. Load plugin module (FileSystemLoader / UrlLoader).
-2. Resolve transport for the plugin (manifest + host config).
-3. Create context via `createPluginContext(transport)`.
-4. Bind APIs with `createApis(ctx)`.
-5. Call `plugin.init({ host: ctx, apis })`.
+Việc tạo bối cảnh diễn ra trong quá trình thiết lập host, trước khi bất kỳ phương thức vòng đời plugin nào được gọi.
 
-### Host Runtime Layout
+1. Tải mô-đun plugin (FileSystemLoader / UrlLoader).
+2. Giải quyết transport cho plugin (tệp kê khai + cấu hình host).
+3. Tạo bối cảnh thông qua `createPluginContext(transport)`.
+4. Liên kết API với `createApis(ctx)`.
+5. Gọi `plugin.init({ host: ctx, apis })`.
+
+<a id="host-runtime-layout"></a>
+
+### Bố cục host runtime
 
 - `packages/plugin-sdk/src/plugin-host/transports/`:
-  - transport type definitions and helpers
+  - Định nghĩa và trợ giúp loại transport
 - `packages/plugin-sdk/src/plugin-host/runtimes/node/`:
-  - in-memory, node-worker, websocket implementations
+  - trong bộ nhớ, Node-worker, triển khai websocket
 - `packages/plugin-sdk/src/plugin-host/runtimes/web/`:
-  - web-worker, websocket implementations
+  - web-worker, triển khai websocket
 - `packages/plugin-sdk/src/plugin-host/index.ts`:
-  - exports the runtime-appropriate `createPluginContext` via conditional exports
+  - xuất khẩu `createPluginContext` phù hợp với runtime thông qua xuất khẩu có điều kiện
 
-### API Binding Strategy
+<a id="api-binding-strategy"></a>
 
-Replace direct channel usage with context-bound factories:
+### Chiến lược ràng buộc API
+
+Thay thế việc sử dụng kênh trực tiếp bằng hàm tạo theo ngữ cảnh:
 
 ```ts
 export function createProviders(ctx: EventaContext) {
@@ -112,83 +132,101 @@ export function createApis(ctx: EventaContext) {
 }
 ```
 
-Plugins call `createApis(ctx)` provided by the host instead of importing global singletons.
+Các plugin gọi `createApis(ctx)` do host cung cấp thay vì nhập các đơn vị toàn cầu.
 
-### Local Vs Remote Plugins
+<a id="local-vs-remote-plugins"></a>
 
-- Local plugins:
-  - `in-memory` for simplest case
-  - `node-worker` or `web-worker` for isolation
-- Remote plugins:
-  - `websocket` transport bound to a specific URL or connection
+### Plugin cục bộ và từ xa
 
-Transport selection is a host concern; plugins are transport-agnostic.
+- Các plugin cục bộ:
+  - `in-memory` cho trường hợp đơn giản nhất
+  - `node-worker` hoặc `web-worker` để cách ly
+- Các plugin từ xa:
+  - `websocket` transport được liên kết với một URL hoặc kết nối cụ thể
 
-### Multi-Plugin Isolation
+Lựa chọn transport là mối quan tâm của host; các plugin là transport-bất khả tri.
 
-Each plugin has its own context and transport. APIs are bound to that context, preventing cross-talk. The host keeps a registry mapping plugin ID to its context, transport, and loaded module for lifecycle management.
+<a id="multi-plugin-isolation"></a>
 
-## Verify & Test
+### Cách ly nhiều plugin
 
-### Criteria
+Mỗi plugin có ngữ cảnh và transport riêng. Các API bị ràng buộc với bối cảnh đó, ngăn chặn việc trao đổi chéo. host giữ plugin ánh xạ đăng ký ID vào ngữ cảnh của nó, transport và mô-đun được tải để quản lý vòng đời.
 
-- Multiple plugins can be loaded in one host without shared global channels and without cross-plugin invoke/handler leakage.
-- Local plugin calls use in-memory or worker contexts without manual wiring in plugin code.
-- Remote plugin calls use WebSocket contexts and do not affect local plugins.
-- Lifecycle transitions are host-validated by an explicit state model (invalid transitions are rejected with typed errors).
-- Capability grant/revoke is enforced at the host boundary and covered by tests for deny-by-default behavior.
-- Transport reliability behavior is defined and tested (heartbeat, reconnect, duplicate-event handling, ordering guarantees).
-- Protocol compatibility is versioned and negotiated (host/plugin version mismatch produces deterministic outcomes).
-- Required observability fields (correlation id, plugin id, transport kind, phase/status) are present in control-plane events.
+<a id="verify--test"></a>
 
-### Test & QA
+## Xác minh & Kiểm tra
 
-- Unit test: create two plugin contexts in the same process, verify isolated invoke/handler pairs.
-- Unit test: FileSystemLoader + in-memory context binds correctly to `createApis(ctx)`.
-- Integration test (optional): WebSocket adapter roundtrip using a stub server.
+<a id="criteria"></a>
 
-## Progress
+### Tiêu chuẩn
 
-### Status
+- Nhiều plugin có thể được tải trong một host mà không cần chia sẻ các kênh toàn cầu và không có rò rỉ invoke/handler plugin chéo.
+- Lệnh gọi plugin cục bộ sử dụng ngữ cảnh trong bộ nhớ hoặc worker mà không cần nối dây thủ công trong mã plugin.
+- Cuộc gọi plugin từ xa sử dụng ngữ cảnh WebSocket và không ảnh hưởng đến plugin cục bộ.
+- Các quá trình chuyển đổi vòng đời được host xác thực bằng trạng thái rõ ràng mô hình (các quá trình chuyển đổi không hợp lệ sẽ bị từ chối do lỗi đánh máy).
+- Khả năng grant/revoke được thực thi ở ranh giới host và được bao phủ bởi các thử nghiệm về hành vi từ chối theo mặc định.
+- Hành vi đáng tin cậy của transport được xác định và kiểm tra (nhịp tim, kết nối lại, xử lý sự kiện trùng lặp, đảm bảo đặt hàng).
+- Khả năng tương thích giao thức được phiên bản và thương lượng (phiên bản host/plugin không khớp tạo ra kết quả xác định).
+- Các trường khả năng quan sát bắt buộc (id tương quan, id plugin, loại transport, phase/status) có trong các sự kiện trên mặt phẳng điều khiển.
 
-- Planned.
-- Baseline architecture validated; hardening required before production use.
+<a id="test--qa"></a>
 
-### Next Steps
+### Kiểm tra & QA
 
-1. Finish transport wiring:
-   - Implement `createPluginContext` for node/web runtimes (in-memory, websocket, worker, and electron where available).
-   - Remove fallback global channel usage from runtime paths once context injection is complete.
-2. Formalize lifecycle contract:
-   - Define a typed state machine for module lifecycle and capability configuration phases.
-   - Enforce transitions in Plugin Host with structured error responses.
-3. Add security and policy enforcement:
-   - Implement deny-by-default capability checks and explicit grant/revoke flows.
-   - Add tests for unauthorized invoke paths and revocation behavior.
-4. Define reliability and compatibility:
-   - Specify reconnect/heartbeat/backpressure semantics for WebSocket transports.
-   - Introduce protocol/api version negotiation for host-plugin compatibility.
-5. Expand test matrix:
-   - Multi-plugin isolation tests with mixed transports in one host.
-   - Integration tests for websocket roundtrip and reconnect recovery.
-   - Regression tests validating required observability metadata on lifecycle/control events.
+- Kiểm tra đơn vị: tạo hai bối cảnh plugin trong cùng một quy trình, xác minh các cặp invoke/handler bị cô lập.
+- Kiểm tra đơn vị: FileSystemLoader + bối cảnh trong bộ nhớ liên kết chính xác với `createApis(ctx)`.
+- Kiểm tra tích hợp (tùy chọn): Chuyến đi khứ hồi bộ chuyển đổi WebSocket bằng máy chủ stub.
 
-## Reviews
+<a id="progress"></a>
 
-### Q&A
+## Tiến triển
 
-- Q: Why not keep global channels and just switch the active channel?
-  A: Global channels make multi-plugin isolation impossible and require global state mutation. Context-per-plugin avoids cross-talk and matches Eventa's design.
+<a id="status"></a>
 
-- Q: Do plugins need to know about transports?
-  A: No. The host injects the context and APIs; plugins remain transport-agnostic.
+### Trạng thái
 
-- Q: Should we build a shared reliable WebSocket package?
-  A: Only if we need custom reconnection/heartbeat logic across multiple packages. Start with Eventa adapters; factor out shared logic later if required.
+- Đã lên kế hoạch.
+- Kiến trúc cơ bản đã được xác thực; yêu cầu làm cứng trước khi sử dụng sản xuất.
 
-- Q: Can workers be used for plugin isolation?
-  A: Yes. Use Eventa web-worker or node-worker adapters to bridge a per-plugin context to the worker.
+<a id="next-steps"></a>
 
-### Related Documentations
+### Các bước tiếp theo
 
-- [Plugin Lifecycle](./plugin-lifecycle.md)
+1. Kết thúc hệ thống dây điện transport:
+   - Triển khai `createPluginContext` cho node/web runtime (trong bộ nhớ, websocket, worker và electron nếu có).
+   - Xóa việc sử dụng kênh chung phương án dự phòng khỏi đường dẫn runtime sau khi quá trình chèn ngữ cảnh hoàn tất.
+2. Chính thức hóa hợp đồng vòng đời:
+   - Xác định máy trạng thái đã nhập cho các giai đoạn cấu hình khả năng và vòng đời mô-đun.
+   - Thực thi chuyển đổi trong Plugin host có lỗi cấu trúc Responses.
+3. Thêm bảo mật và thực thi chính sách:
+   - Thực hiện kiểm tra khả năng từ chối theo mặc định và các luồng grant/revoke rõ ràng.
+   - Thêm các bài kiểm tra về đường dẫn gọi trái phép và hành vi thu hồi.
+4. Xác định độ tin cậy và khả năng tương thích:
+   - Chỉ định ngữ nghĩa reconnect/heartbeat/backpressure cho việc truyền tải WebSocket.
+   - Giới thiệu đàm phán phiên bản protocol/api để tương thích với plugin host.
+5. Mở rộng ma trận thử nghiệm:
+   - Các thử nghiệm cách ly nhiều plugin với các phương thức vận chuyển hỗn hợp trong một host.
+   - Kiểm tra tích hợp cho chuyến đi khứ hồi websocket và khôi phục kết nối lại.
+   - Kiểm tra hồi quy xác thực siêu dữ liệu có khả năng quan sát cần thiết trên các sự kiện lifecycle/control.
+
+<a id="reviews"></a>
+
+## Đánh giá
+
+<a id="qa"></a>
+
+### Hỏi đáp
+
+- Hỏi: Tại sao không giữ lại các kênh toàn cầu mà chỉ chuyển kênh hoạt động? Trả lời: Các kênh toàn cầu không thể tách biệt nhiều plugin và yêu cầu trạng thái toàn cầu thay đổi trạng thái. Ngữ cảnh trên mỗi plugin tránh nói chuyện chéo và phù hợp với thiết kế của Eventa.
+
+- Câu hỏi: Các plugin có cần biết về phương thức vận chuyển không? Đáp: Không. host đưa vào ngữ cảnh và API; các plugin vẫn không có tính chất bất khả tri của transport.
+
+- Câu hỏi: Chúng ta có nên xây dựng gói WebSocket dùng chung đáng tin cậy không? Trả lời: Chỉ khi chúng tôi cần logic reconnection/heartbeat tùy chỉnh trên nhiều gói. Bắt đầu với bộ điều hợp Eventa; tính ra logic được chia sẻ sau nếu được yêu cầu.
+
+- Câu hỏi: worker có thể được sử dụng để cách ly plugin không? Đ: Vâng. Sử dụng bộ điều hợp Eventa web-worker hoặc Node-worker để kết nối ngữ cảnh trên mỗi plugin với worker.
+
+<a id="related-documentations"></a>
+
+### Tài liệu liên quan
+
+- [Vòng đời plugin](./plugin-lifecycle.md)

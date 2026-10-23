@@ -1,140 +1,166 @@
-# Provider Inference Extraction Specification
+<a id="provider-inference-extraction-specification"></a>
 
-Status: Proposed for architecture review
+# Đặc tả trích xuất suy luận nhà cung cấp
 
-Phase: 1 of the provider extraction
+Trạng thái: Đề xuất xem xét kiến ​​trúc
 
-Target package: `@angela/provider-inference`
+Giai đoạn: 1 của quá trình chiết nhà cung cấp
 
-## 1. Purpose
+Gói mục tiêu: `@angela/provider-inference`
 
-This specification defines the first provider extraction from `@angela/stage-ui`.
+<a id="1-purpose"></a>
 
-Phase 1 extracts provider definitions from `packages/stage-ui/src/libs/providers/providers`.
+## 1. Mục đích
 
-The package must not depend on Vue, Vue Pinia, or Browser data persistence APIs.
+Thông số kỹ thuật này xác định trích xuất nhà cung cấp đầu tiên từ `@angela/stage-ui`.
 
-Browser-specific APIs are allowed when a provider needs them.
+Giai đoạn 1 trích xuất các định nghĩa nhà cung cấp từ `packages/stage-ui/src/libs/providers/providers`.
 
-The package must load in Node.js and Browser test environments.
+Gói này không được phụ thuộc vào các API lưu giữ dữ liệu của Vue, Vue Pinia hoặc Trình duyệt.
 
-Each provider must declare or demonstrate the runtime that it can execute in.
+API dành riêng cho trình duyệt được cho phép khi nhà cung cấp cần chúng.
 
-This phase keeps the existing provider definition design unless a change removes a forbidden dependency.
+Gói phải tải trong môi trường kiểm tra Node.js và Trình duyệt.
 
-## 2. Terms
+Mỗi nhà cung cấp phải khai báo hoặc chứng minh runtime mà nó có thể thực thi.
 
-- A **provider definition** describes configuration, validation, capabilities, and provider creation.
-- A **provider instance** performs an operation such as text generation or speech generation.
-- A **cloud-api provider** calls a hosted remote service.
-- A **local-api provider** calls a service that runs on the user's machine or network.
-- A **local-run provider** runs a model or platform capability in the current application runtime.
-- A **portable provider** passes tests in both Node.js and Browser runtimes.
-- A **Browser-only provider** executes in Browser but not in Node.js.
-- A **runtime adapter** supplies a capability that differs between runtimes.
-- A **provider registry** stores provider definitions and returns them by identifier.
+Giai đoạn này giữ nguyên thiết kế định nghĩa nhà cung cấp hiện có trừ khi có thay đổi loại bỏ phần phụ thuộc bị cấm.
 
-## 3. Phase 1 Goals
+<a id="2-terms"></a>
 
-Phase 1 has these goals:
+## 2. Điều khoản
 
-1. Create `packages/provider-inference` as an independent workspace package.
-2. Extract provider definitions that do not depend on Vue, Vue Pinia, or Browser persistence.
-3. Allow Browser APIs inside provider implementations when the provider needs them.
-4. Classify providers as `cloud-api`, `local-api`, or `local-run`.
-5. Verify the runtime support of each provider with Node.js and Browser tests.
-6. Use `vitest-plugin-fakemic` for ASR pipeline acceptance.
-7. Keep the provider definition interface close to its current shape.
-8. Keep UI, Pinia state, persistence, and application assembly in stage-ui.
+- **Định nghĩa nhà cung cấp** mô tả cấu hình, xác thực, khả năng và tạo nhà cung cấp.
+- **Phiên bản nhà cung cấp** thực hiện một thao tác như văn bản sinh nội dung hoặc lời nói sinh nội dung.
+- **cloud-api nhà cung cấp** gọi dịch vụ từ xa hosted.
+- **local-api nhà cung cấp** gọi một dịch vụ chạy trên máy hoặc mạng của người dùng.
+- **nhà cung cấp chạy cục bộ** chạy mô hình hoặc khả năng nền tảng trong ứng dụng hiện tại runtime.
+- **nhà cung cấp di động** đã vượt qua các bài kiểm tra trong cả Node.js và Trình duyệt runtime.
+- **nhà cung cấp chỉ dành cho trình duyệt** thực thi trong Trình duyệt nhưng không thực thi trong Node.js.
+- **Bộ chuyển đổi runtime** cung cấp khả năng khác nhau giữa runtime.
+- **nhà cung cấp đăng ký** store nhà cung cấp định nghĩa và trả về chúng theo mã định danh.
 
-## 4. Scope
+<a id="3-phase-1-goals"></a>
 
-### 4.1 Included
+## 3. Mục tiêu giai đoạn 1
 
-Phase 1 includes:
+Giai đoạn 1 có các mục tiêu sau:
 
-- Provider definitions under `packages/stage-ui/src/libs/providers/providers`.
-- The provider registry in `providers/registry.ts`.
-- Core provider types that portable or Browser provider definitions require.
-- Provider validators and capability types that do not depend on Vue or Pinia.
-- Provider tests that use Node.js, Browser, or explicit runtime fakes.
-- Cross-runtime and Browser-specific test configuration.
-- Package exports, TypeScript configuration, and the `tsdown` build configuration.
+1. Tạo `packages/provider-inference` dưới dạng gói workspace độc lập.
+2. Trích xuất các định nghĩa nhà cung cấp không phụ thuộc vào tính bền vững của Vue, Vue Pinia hoặc Trình duyệt.
+3. Cho phép API trình duyệt bên trong triển khai nhà cung cấp khi nhà cung cấp cần chúng.
+4. Phân loại nhà cung cấp thành `cloud-api`, `local-api` hoặc `local-run`.
+5. Xác minh sự hỗ trợ runtime của từng nhà cung cấp bằng các bài kiểm tra Node.js và Trình duyệt.
+6. Sử dụng `vitest-plugin-fakemic` để chấp nhận đường ống ASR.
+7. Giữ giao diện định nghĩa nhà cung cấp gần với hình dạng hiện tại của nó.
+8. Giữ trạng thái UI, Pinia, tính bền vững và tập hợp ứng dụng trong stage-ui.
 
-The package can use Browser APIs such as `window`, `navigator`, `MediaStream`, `SpeechRecognition`, `FileReader`, `Worker`, and WebGPU.
+<a id="4-scope"></a>
 
-The package can use shared APIs such as `fetch`, `URL`, `AbortSignal`, `ReadableStream`, `Response`, `Blob`, and `ArrayBuffer`.
+## 4. Phạm vi
 
-### 4.2 Excluded
+<a id="41-included"></a>
 
-Phase 1 excludes:
+### 4.1 Bao gồm
 
-- Vue components and Vue composables.
-- Vue Pinia stores and Pinia synchronization.
-- Browser persistence, including `localStorage`, IndexedDB, Cache API, and cookie access.
-- Electron-only native implementations.
-- Stage-ui stores, authentication, server configuration, and analytics.
+Giai đoạn 1 bao gồm:
+
+- Định nghĩa nhà cung cấp trong `packages/stage-ui/src/libs/providers/providers`.
+- Sổ đăng ký nhà cung cấp trong `providers/registry.ts`.
+- Các loại nhà cung cấp lõi mà định nghĩa nhà cung cấp di động hoặc Trình duyệt yêu cầu.
+- Trình xác thực nhà cung cấp và các loại khả năng không phụ thuộc vào Vue hoặc Pinia.
+- Các thử nghiệm nhà cung cấp sử dụng Node.js, Trình duyệt hoặc hàng giả runtime rõ ràng.
+- Cấu hình thử nghiệm Cross-runtime và dành riêng cho trình duyệt.
+- Xuất gói, cấu hình TypeScript và cấu hình bản dựng `tsdown`.
+
+Gói có thể sử dụng các API trình duyệt như `window`, `navigator`, `MediaStream`, `SpeechRecognition`, `FileReader`, `Worker` và WebGPU.
+
+Gói có thể sử dụng các API được chia sẻ như `fetch`, `URL`, `AbortSignal`, `ReadableStream`, `Response`, `Blob` và `ArrayBuffer`.
+
+<a id="42-excluded"></a>
+
+### 4.2 Bị loại trừ
+
+Giai đoạn 1 loại trừ:
+
+- Các thành phần Vue và Vue các composable.
+- Đồng bộ hóa Vue Pinia store và Pinia.
+- Tính bền vững của trình duyệt, bao gồm `localStorage`, IndexedDB, Bộ nhớ đệm API và quyền truy cập cookie.
+- Triển khai native chỉ có điện tử.
+- stage-ui store, xác thực, cấu hình máy chủ và phân tích.
 - `packages/stage-ui/src/services/inference-service-providers.ts`.
-- The runtime implementation under `packages/stage-ui/src/libs/inference`.
-- The full `@angela/testing-audio` package as a dependency of the core package.
+- Việc triển khai runtime trong `packages/stage-ui/src/libs/inference`.
+- Gói `@angela/testing-audio` đầy đủ dưới dạng phần phụ thuộc của gói lõi.
 
-Phase 1 does not add a compatibility layer for the old provider import path.
+Giai đoạn 1 không thêm lớp tương thích cho đường dẫn nhập nhà cung cấp cũ.
 
-## 5. Runtime Policy
+<a id="5-runtime-policy"></a>
 
-### 5.1 Forbidden dependencies
+## 5. Chính sách runtime
 
-The new package must not import or use:
+<a id="51-forbidden-dependencies"></a>
+
+### 5.1 Các phụ thuộc bị cấm
+
+Gói mới không được nhập hoặc sử dụng:
 
 - `vue`
 - `vue-i18n`
 - `pinia`
 - `pinia-plugin-synced`
 - `@angela/stage-ui`
-- Stage-ui stores or persistence modules
+- stage-ui store hoặc các mô-đun kiên trì
 - `localStorage`
 - `indexedDB`
 - `caches`
 - `document.cookie`
-- Browser storage wrappers that use these APIs internally
+- Trình bao bọc bộ nhớ trình duyệt sử dụng các API này trong nội bộ
 
-Type-only imports also count as dependencies when they enter the package type graph.
+Chỉ nhập loại cũng được tính là phụ thuộc khi chúng nhập biểu đồ loại gói.
 
-### 5.2 Allowed Browser APIs
+<a id="52-allowed-browser-apis"></a>
 
-Browser APIs are not a package-wide restriction.
+### 5.2 API trình duyệt được phép
 
-A provider can use a Browser API when its definition loads safely in Node.js and reports the correct availability there.
+API trình duyệt không phải là hạn chế trên toàn gói.
 
-A Browser-only provider must not access the Browser API during module import.
+nhà cung cấp có thể sử dụng Trình duyệt API khi định nghĩa của nó tải an toàn trong Node.js và báo cáo tính khả dụng chính xác ở đó.
 
-A Browser-only provider must access the API inside a guarded availability function or inside provider execution.
+nhà cung cấp chỉ dành cho trình duyệt không được truy cập API của trình duyệt trong quá trình nhập mô-đun.
 
-The Node.js test must load the provider definition without defining Browser globals.
+nhà cung cấp chỉ dành cho trình duyệt phải truy cập API bên trong chức năng sẵn có được bảo vệ hoặc bên trong thực thi nhà cung cấp.
 
-The Browser test must exercise the provider with a real or explicit fake Browser capability.
+Kiểm tra Node.js phải tải định nghĩa nhà cung cấp mà không xác định các phần tổng thể của Trình duyệt.
 
-### 5.3 Persistence rule
+Bài kiểm tra Trình duyệt phải thực hiện nhà cung cấp với khả năng Trình duyệt giả mạo thực sự hoặc rõ ràng.
 
-Provider configuration remains in the host application.
+<a id="53-persistence-rule"></a>
 
-The provider package receives configuration values as function input.
+### 5.3 Quy tắc kiên trì
 
-The provider package does not save credentials, model selection, validation state, or runtime state.
+Cấu hình nhà cung cấp vẫn còn trong ứng dụng host.
 
-## 6. Runtime Classification
+Gói nhà cung cấp nhận các giá trị cấu hình làm đầu vào chức năng.
 
-The classification describes provider behavior.
+Gói nhà cung cấp không lưu thông tin xác thực, lựa chọn mô hình, trạng thái xác thực hoặc trạng thái runtime.
 
-It does not require a new field in `ProviderDefinition` during Phase 1.
+<a id="6-runtime-classification"></a>
 
-The classification uses the fixed `cloud` and `local` source folders.
+## 6. Phân loại runtime
 
-### 6.1 Cloud API
+Việc phân loại mô tả hành vi của nhà cung cấp.
 
-Cloud API providers call hosted services.
+Nó không yêu cầu trường mới trong `ProviderDefinition` trong Giai đoạn 1.
 
-Expected cloud API providers include:
+Việc phân loại sử dụng các thư mục nguồn `cloud` và `local` cố định.
+
+<a id="61-cloud-api"></a>
+
+### 6.1 Đám mây API
+
+Đám mây API nhà cung cấp gọi các dịch vụ hosted.
+
+Đám mây dự kiến ​​API nhà cung cấp bao gồm:
 
 - `302-ai`
 - `aihubmix`
@@ -179,23 +205,25 @@ Expected cloud API providers include:
 - `xai`
 - `zai`
 
-`official` is also a cloud API provider by behavior.
+`official` cũng là một đám mây API nhà cung cấp theo hành vi.
 
-Its current implementation remains excluded because it depends on Vue, Pinia, authentication, and stage-ui server state.
+Việc triển khai hiện tại của nó vẫn bị loại trừ vì nó phụ thuộc vào trạng thái máy chủ Vue, Pinia, xác thực và stage-ui.
 
-Some cloud API definitions also support a user-selected local endpoint.
+Một số định nghĩa API trên đám mây cũng hỗ trợ điểm cuối cục bộ do người dùng chọn.
 
-`openai-compatible` is one example.
+`openai-compatible` là một ví dụ.
 
-`cloudflare-workers-ai` remains a cloud API provider. Its name does not mean that it uses a Browser Worker.
+`cloudflare-workers-ai` vẫn là một đám mây API nhà cung cấp. Tên của nó không có nghĩa là nó sử dụng Trình duyệt worker.
 
-The endpoint configuration, and not the folder name, decides the actual service location.
+Cấu hình điểm cuối chứ không phải tên thư mục sẽ quyết định vị trí dịch vụ thực tế.
 
-### 6.2 Local API
+<a id="62-local-api"></a>
 
-Local API providers call a local HTTP or WebSocket service.
+### 6.2 API cục bộ
 
-Expected local API providers include:
+API nhà cung cấp cục bộ gọi dịch vụ HTTP hoặc WebSocket cục bộ.
+
+API cục bộ dự kiến ​​​​nhà cung cấp bao gồm:
 
 - `index-tts-vllm`
 - `lm-studio`
@@ -203,21 +231,23 @@ Expected local API providers include:
 - `player2-speech`
 - `voicevox`
 
-A local API provider can run in Node.js and Browser when it uses a compatible transport.
+API nhà cung cấp cục bộ có thể chạy trong Node.js và Trình duyệt khi nó sử dụng transport tương thích.
 
-Browser tests must account for CORS and local network access.
+Kiểm tra trình duyệt phải tính đến CORS và quyền truy cập mạng cục bộ.
 
-CORS is a deployment constraint, not a Vue or persistence dependency.
+CORS là một ràng buộc triển khai, không phải là sự phụ thuộc vào Vue hay tính bền vững.
 
-The test suite must use a fake transport for deterministic provider contract tests.
+Bộ thử nghiệm phải sử dụng transport giả để kiểm tra hợp đồng nhà cung cấp xác định.
 
-The suite can use a live local service in a separate opt-in test.
+Bộ phần mềm có thể sử dụng dịch vụ cục bộ trực tiếp trong một thử nghiệm chọn tham gia riêng biệt.
 
-### 6.3 Local run
+<a id="63-local-run"></a>
 
-Local run providers execute in the current runtime.
+### 6.3 Chạy cục bộ
 
-Expected local run providers include:
+nhà cung cấp chạy cục bộ thực thi trong runtime hiện tại.
+
+nhà cung cấp chạy cục bộ dự kiến ​​​​bao gồm:
 
 - `browser-web-speech-api`
 - `kokoro-local`
@@ -225,27 +255,31 @@ Expected local run providers include:
 - `apple-speech`
 - `speech-noop`
 
-`browser-web-speech-api` is Browser-only because Node.js does not provide Web Speech recognition.
+`browser-web-speech-api` chỉ dành cho Trình duyệt vì Node.js không cung cấp tính năng nhận dạng Giọng nói trên Web.
 
-`kokoro-local` is Browser-oriented because it uses WebGPU and a Worker-based inference adapter.
+`kokoro-local` hướng đến Trình duyệt vì nó sử dụng WebGPU và bộ điều hợp suy luận dựa trên worker.
 
-`local-audio` contains Browser and Electron local implementations.
+`local-audio` chứa các triển khai cục bộ của Trình duyệt và Điện tử.
 
-`apple-speech` uses a native Electron implementation.
+`apple-speech` sử dụng triển khai native Electron.
 
-`speech-noop` has no external runtime requirement.
+`speech-noop` không có yêu cầu runtime bên ngoài.
 
-The classification does not mean that every local run provider enters the portable package.
+Việc phân loại không có nghĩa là mọi nhà cung cấp chạy cục bộ đều được đưa vào gói di động.
 
-Each implementation must pass the dependency and runtime audit before it moves.
+Mỗi lần triển khai phải vượt qua phần phụ thuộc và kiểm tra runtime trước khi di chuyển.
 
-## 7. Folder Layout
+<a id="7-folder-layout"></a>
 
-Phase 1 uses `cloud` and `local` as the top-level provider folders.
+## 7. Bố cục thư mục
 
-This layout is a Phase 1 decision.
+Giai đoạn 1 sử dụng `cloud` và `local` làm thư mục nhà cung cấp cấp cao nhất.
 
-### 7.1 Cloud and local folders
+Bố cục này là quyết định của Giai đoạn 1.
+
+<a id="71-cloud-and-local-folders"></a>
+
+### 7.1 Đám mây và thư mục cục bộ
 
 ```text
 src/providers/
@@ -253,106 +287,118 @@ src/providers/
   local/
 ```
 
-The `cloud` folder contains cloud API providers.
+Thư mục `cloud` chứa đám mây API nhà cung cấp.
 
-The `local` folder contains local API and local run providers.
+Thư mục `local` chứa API cục bộ và nhà cung cấp chạy cục bộ.
 
-Local API and local run providers can share the `local` folder.
+API cục bộ và nhà cung cấp chạy cục bộ có thể chia sẻ thư mục `local`.
 
-The provider classification and test matrix must keep these two local categories distinct.
+Ma trận kiểm tra và phân loại nhà cung cấp phải phân biệt hai loại cục bộ này.
 
-Providers with configurable endpoints use their primary provider behavior for folder placement.
+nhà cung cấp với các điểm cuối có thể định cấu hình sử dụng hành vi nhà cung cấp chính của chúng để đặt thư mục.
 
-For example, `openai-compatible` can call a cloud or local endpoint.
+Ví dụ: `openai-compatible` có thể gọi điểm cuối cục bộ hoặc đám mây.
 
-Its folder path does not define the configured endpoint.
+Đường dẫn thư mục của nó không xác định điểm cuối được cấu hình.
 
-Do not create `local-api` or `local-run` subfolders during Phase 1.
+Không tạo các thư mục con `local-api` hoặc `local-run` trong Giai đoạn 1.
 
-Add more folders only in a later architecture-reviewed change.
+Chỉ thêm nhiều thư mục hơn trong thay đổi được xem xét về kiến ​​trúc sau này.
 
-### 7.2 Layout rules
+<a id="72-layout-rules"></a>
 
-The implementation must follow these rules:
+### 7.2 Quy tắc bố cục
 
-- The registry imports definitions without hidden side effects.
-- Browser-only definitions load without breaking Node.js imports.
-- The test matrix maps to each provider category.
+Việc thực hiện phải tuân theo các quy tắc sau:
 
-The folder name is an organization aid.
+- Sổ đăng ký nhập các định nghĩa mà không có tác dụng phụ ẩn.
+- Tải các định nghĩa chỉ dành cho trình duyệt mà không làm hỏng quá trình nhập Node.js.
+- Ma trận thử nghiệm ánh xạ tới từng danh mục nhà cung cấp.
 
-The folder name is not a runtime capability contract.
+Tên thư mục là một trợ giúp tổ chức.
 
-The provider definition must not gain a `kind` or `category` field only to support a folder layout.
+Tên thư mục không phải là hợp đồng khả năng runtime.
 
-If a machine-readable category is required later, add an optional field in a separate architecture-reviewed change.
+Định nghĩa nhà cung cấp không được chỉ lấy trường `kind` hoặc `category` để hỗ trợ bố cục thư mục.
 
-## 8. Runtime Compatibility Verification
+Nếu sau này cần có danh mục có thể đọc được bằng máy, hãy thêm trường tùy chọn vào một thay đổi đã được xem xét kiến ​​trúc riêng biệt.
 
-The leader's statement is directionally correct for most cloud API and local API providers.
+<a id="8-runtime-compatibility-verification"></a>
 
-The statement is not correct for every current provider.
+## 8. Xác minh khả năng tương thích runtime
 
-The source audit found these groups:
+Tuyên bố của người đứng đầu là chính xác theo hướng đối với hầu hết đám mây API và API nhà cung cấp cục bộ.
 
-- Most HTTP providers use `@xsai`, `fetch`, `URL`, `Response`, or `ReadableStream`.
-- Most HTTP providers have no Vue or Pinia runtime import.
-- Browser Web Speech requires a Browser capability.
-- Kokoro local requires WebGPU and a Worker-based inference adapter.
-- Apple Speech requires Electron IPC and a native plugin.
-- Official providers require Vue, Pinia, authentication, and stage-ui server state.
-- Aliyun NLS creates a WebSocket and needs a Node transport decision.
-- Mimo audio uses `FileReader` and needs a small file-reading change for Node.js.
-- Several definitions use a type-only vue-i18n import.
+Tuyên bố này không đúng với mọi nhà cung cấp hiện tại.
 
-The final runtime result must come from tests, not from the source classification alone.
+Kiểm toán nguồn đã tìm thấy các nhóm này:
 
-### 8.1 Node.js test requirements
+- Hầu hết HTTP nhà cung cấp sử dụng `@xsai`, `fetch`, `URL`, `Response` hoặc `ReadableStream`.
+- Hầu hết HTTP nhà cung cấp không có tính năng nhập Vue hoặc Pinia runtime.
+- Bài phát biểu trên web của trình duyệt yêu cầu khả năng của Trình duyệt.
+- Kokoro cục bộ yêu cầu WebGPU và bộ điều hợp suy luận dựa trên worker.
+- Apple Speech yêu cầu Electron IPC và plugin native.
+- nhà cung cấp chính thức yêu cầu trạng thái máy chủ Vue, Pinia, xác thực và stage-ui.
+- Aliyun NLS tạo WebSocket và cần quyết định Node transport.
+- Âm thanh Mimo sử dụng `FileReader` và cần một thay đổi nhỏ về cách đọc tệp cho Node.js.
+- Một số định nghĩa chỉ sử dụng cách nhập vue-i18n theo loại.
 
-Run every moved provider definition in a Node.js Vitest project.
+Kết quả runtime cuối cùng phải đến từ các cuộc thử nghiệm chứ không chỉ từ việc phân loại nguồn.
 
-The Node.js project must use no Browser environment.
+<a id="81-nodejs-test-requirements"></a>
 
-The Node.js project must not define `window`, `document`, `navigator`, `localStorage`, `indexedDB`, or `Worker`.
+### 8.1 Yêu cầu kiểm tra Node.js
 
-For a dual-runtime provider, test configuration, provider creation, validators, and provider request behavior.
+Chạy mọi định nghĩa nhà cung cấp đã di chuyển trong dự án Node.js Vitest.
 
-For a Browser-only provider, test import safety and `isAvailableBy` in Node.js.
+Dự án Node.js không được sử dụng môi trường Trình duyệt.
 
-For an Electron-only provider, keep the provider outside the portable package.
+Dự án Node.js không được xác định `window`, `document`, `navigator`, `localStorage`, `indexedDB` hoặc `Worker`.
 
-### 8.2 Browser test requirements
+Đối với runtime nhà cung cấp kép, cấu hình thử nghiệm, tạo nhà cung cấp, trình xác thực và hành vi yêu cầu nhà cung cấp.
 
-Run every moved provider definition in a Vitest Browser project.
+Đối với nhà cung cấp chỉ dành cho Trình duyệt, hãy kiểm tra độ an toàn khi nhập và `isAvailableBy` trong Node.js.
 
-Use the repository Playwright Browser provider.
+Đối với nhà cung cấp chỉ có Electron, hãy giữ nhà cung cấp bên ngoài gói di động.
 
-For a dual-runtime provider, test the same public behavior as the Node.js test.
+<a id="82-browser-test-requirements"></a>
 
-For a Browser-only provider, test the Browser capability and provider execution.
+### 8.2 Yêu cầu kiểm tra trình duyệt
 
-For Browser APIs that do not exist in headless Chromium, use an explicit fake.
+Chạy mọi định nghĩa nhà cung cấp đã di chuyển trong dự án Trình duyệt Vitest.
 
-Do not use Browser persistence to prepare a unit test.
+Sử dụng kho lưu trữ Playwright Trình duyệt nhà cung cấp.
 
-### 8.3 Runtime result categories
+Đối với runtime nhà cung cấp kép, hãy kiểm tra hành vi công khai tương tự như kiểm tra Node.js.
 
-Each provider test report must use one of these results:
+Đối với nhà cung cấp chỉ dành cho Trình duyệt, hãy kiểm tra khả năng của Trình duyệt và thực thi nhà cung cấp.
 
-- `node-and-browser`: provider execution passes in both runtimes.
-- `browser-only`: provider loads in Node.js and executes in Browser.
-- `node-only`: provider loads in Browser and executes in Node.js.
-- `runtime-excluded`: provider remains outside the package because it needs Electron, Vue, Pinia, or persistence.
+Đối với API trình duyệt không tồn tại trong không có giao diện Chrome, hãy sử dụng API giả mạo rõ ràng.
 
-Phase 1 accepts `browser-only` for providers such as Web Speech.
+Không sử dụng tính kiên trì của Trình duyệt để chuẩn bị bài kiểm tra đơn vị.
 
-Phase 1 expects `node-and-browser` for the HTTP cloud API and local API candidates.
+<a id="83-runtime-result-categories"></a>
 
-## 9. Minimal Provider Definition Changes
+### 8.3 Loại kết quả runtime
 
-The current provider definition remains the primary interface.
+Mỗi báo cáo thử nghiệm nhà cung cấp phải sử dụng một trong các kết quả sau:
 
-Phase 1 keeps these fields and behaviors:
+- `node-and-browser`: Việc thực thi nhà cung cấp được thực hiện trong cả runtime.
+- `browser-only`: nhà cung cấp tải trong Node.js và thực thi trong Trình duyệt.
+- `node-only`: nhà cung cấp tải trong Trình duyệt và thực thi trong Node.js.
+- `runtime-excluded`: nhà cung cấp vẫn nằm ngoài gói vì nó cần Electron, Vue, Pinia hoặc tính bền bỉ.
+
+Giai đoạn 1 chấp nhận `browser-only` cho nhà cung cấp chẳng hạn như Web Speech.
+
+Giai đoạn 1 dự kiến ​​​​`node-and-browser` cho đám mây HTTP API và các ứng viên API cục bộ.
+
+<a id="9-minimal-provider-definition-changes"></a>
+
+## 9. Thay đổi định nghĩa nhà cung cấp tối thiểu
+
+Định nghĩa nhà cung cấp hiện tại vẫn là giao diện chính.
+
+Giai đoạn 1 giữ các trường và hành vi này:
 
 - `id`
 - `name`
@@ -370,337 +416,385 @@ Phase 1 keeps these fields and behaviors:
 - `configuredBy`
 - `business`
 
-The following changes are required:
+Những thay đổi sau đây là bắt buộc:
 
-1. Replace `ComposerTranslation` with a plain translator function type.
-2. Keep the existing `{ t }` context shape for provider definitions.
-3. Move the Vue `views` field to a stage-ui view registry.
-4. Keep `isAvailableBy` as the existing runtime availability hook.
-5. Keep Browser capability checks inside `isAvailableBy` or provider execution.
+1. Thay thế `ComposerTranslation` bằng loại chức năng dịch đơn giản.
+2. Giữ hình dạng ngữ cảnh `{ t }` hiện có cho các định nghĩa nhà cung cấp.
+3. Di chuyển trường Vue `views` sang sổ đăng ký dạng xem stage-ui.
+4. Giữ `isAvailableBy` làm runtime sẵn có hook hiện có.
+5. Tiếp tục kiểm tra khả năng của Trình duyệt trong quá trình thực thi `isAvailableBy` hoặc nhà cung cấp.
 
-The translator change removes the vue-i18n type dependency.
+Thay đổi trình dịch sẽ loại bỏ phần phụ thuộc loại vue-i18n.
 
-The view change removes the Vue component dependency.
+Thay đổi chế độ xem sẽ loại bỏ sự phụ thuộc vào thành phần Vue.
 
-The existing provider creation, validation, capability, and extra method contracts stay unchanged.
+Các hợp đồng tạo, xác thực, khả năng và phương thức bổ sung nhà cung cấp hiện tại không thay đổi.
 
-Phase 1 does not add a provider category field.
+Giai đoạn 1 không thêm trường danh mục nhà cung cấp.
 
-Phase 1 does not add a dependency container to every provider definition.
+Giai đoạn 1 không thêm vùng chứa phụ thuộc vào mọi định nghĩa nhà cung cấp.
 
-An adapter is added only when a provider cannot run in both target runtimes without one.
+Bộ điều hợp chỉ được thêm khi nhà cung cấp không thể chạy trên cả runtime đích mà không có bộ điều hợp.
 
-### 9.1 Mimo audio change
+<a id="91-mimo-audio-change"></a>
 
-`providers/mimo-audio/index.ts` uses `FileReader` for transcription input.
+### 9.1 Thay đổi âm thanh Mimo
 
-Replace that helper with `Blob.arrayBuffer()` and a cross-runtime base64 conversion.
+`providers/mimo-audio/index.ts` sử dụng `FileReader` làm đầu vào phiên âm.
 
-This change removes a Node.js execution failure.
+Thay thế trình trợ giúp đó bằng `Blob.arrayBuffer()` và chuyển đổi base64 chéo runtime.
 
-It does not change the provider definition shape.
+Thay đổi này loại bỏ lỗi thực thi Node.js.
 
-### 9.2 Aliyun NLS change
+Nó không thay đổi hình dạng định nghĩa nhà cung cấp.
 
-`providers/aliyun-nls/provider.ts` creates a global WebSocket.
+<a id="92-aliyun-nls-change"></a>
 
-Browser WebSocket support is available in the target Browser runtime.
+### 9.2 Aliyun NLS thay đổi
 
-Node.js needs an explicit WebSocket adapter or a Node transport.
+`providers/aliyun-nls/provider.ts` tạo WebSocket toàn cầu.
 
-The Phase 1 decision is pending architecture review and the Node test result.
+Hỗ trợ trình duyệt WebSocket có sẵn trong Trình duyệt đích runtime.
 
-The token and URL utility modules can move independently when their import graph stays separate.
+Node.js cần bộ chuyển đổi WebSocket rõ ràng hoặc Node transport.
 
-### 9.3 Official provider change
+Quyết định về Giai đoạn 1 đang chờ xem xét kiến ​​trúc và kết quả kiểm tra Node.
 
-The official provider definitions remain in stage-ui during Phase 1.
+Các mô-đun tiện ích token và URL có thể di chuyển độc lập khi biểu đồ nhập của chúng tách biệt.
 
-The definitions use Vue state and Pinia chat session state.
+<a id="93-official-provider-change"></a>
 
-They also use stage-ui authentication and server configuration.
+### 9.3 Thay đổi nhà cung cấp chính thức
 
-Moving them requires a reviewed application adapter.
+Các định nghĩa nhà cung cấp chính thức vẫn có trong stage-ui trong Giai đoạn 1.
 
-That adapter is not part of the core provider definition redesign.
+Các định nghĩa sử dụng trạng thái Vue và trạng thái phiên trò chuyện Pinia.
 
-## 10. Restricted Parts
+Họ cũng sử dụng cấu hình máy chủ và xác thực stage-ui.
 
-The following parts cannot enter the core package without a separate change.
+Di chuyển chúng đòi hỏi một bộ điều hợp ứng dụng được xem xét.
 
-### 10.1 Provider barrel
+Bộ điều hợp đó không phải là một phần của thiết kế lại định nghĩa nhà cung cấp cốt lõi.
 
-`providers/index.ts` imports every provider for side effects.
+<a id="10-restricted-parts"></a>
 
-It currently loads Vue, Electron, local inference, and Browser runtime modules together.
+## 10. Các bộ phận bị hạn chế
 
-Split it into a portable or approved-runtime barrel and a stage-ui runtime barrel.
+Các phần sau không thể vào gói lõi nếu không có thay đổi riêng.
 
-The root package entry point must not load excluded providers.
+<a id="101-provider-barrel"></a>
 
-### 10.2 Vue and Pinia dependencies
+### Thùng 10.1 nhà cung cấp
 
-The following files contain forbidden Vue or Pinia dependencies:
+`providers/index.ts` nhập mọi nhà cung cấp để tìm tác dụng phụ.
+
+Nó hiện đang tải các mô-đun Vue, Electron, suy luận cục bộ và Trình duyệt runtime cùng nhau.
+
+Chia nó thành thùng runtime di động hoặc được phê duyệt và thùng stage-ui runtime.
+
+Điểm vào gói gốc không được tải nhà cung cấp bị loại trừ.
+
+<a id="102-vue-and-pinia-dependencies"></a>
+
+### 10.2 Phụ thuộc Vue và Pinia
+
+Các tệp sau chứa các phần phụ thuộc Vue hoặc Pinia bị cấm:
 
 - `providers/official/index.ts`
 - `providers/official/shared.ts`
 - `providers/apple-speech/hearing-settings.vue`
 - `providers/provider-definitions.test.ts`
 - `providers/voicevox/define.test.ts`
-- `providers/elevenlabs/index.ts`, through type-only vue-i18n usage
-- `providers/openai-audio/index.ts`, through type-only vue-i18n usage
-- `providers/unspeech/index.ts`, through type-only vue-i18n usage
-- `providers/local-audio/index.ts`, through type-only vue-i18n usage
+- `providers/elevenlabs/index.ts`, thông qua việc sử dụng vue-i18n chỉ có loại
+- `providers/openai-audio/index.ts`, thông qua việc sử dụng vue-i18n chỉ có loại
+- `providers/unspeech/index.ts`, thông qua việc sử dụng vue-i18n chỉ có loại
+- `providers/local-audio/index.ts`, thông qua việc sử dụng vue-i18n chỉ có loại
 
-The type-only imports require replacement with the core translator type.
+Việc nhập chỉ loại yêu cầu thay thế bằng loại trình dịch cốt lõi.
 
-The runtime Vue and Pinia imports require stage-ui ownership or a reviewed adapter.
+Quá trình nhập runtime Vue và Pinia yêu cầu quyền sở hữu stage-ui hoặc bộ chuyển đổi đã được đánh giá.
 
-### 10.3 Browser persistence
+<a id="103-browser-persistence"></a>
 
-Provider definitions must not import provider stores or persistence helpers.
+### 10.3 Tính kiên trì của trình duyệt
 
-`packages/stage-ui/src/stores/providers/config.ts` remains in stage-ui.
+Các định nghĩa nhà cung cấp không được nhập nhà cung cấp store hoặc các trình trợ giúp liên tục.
 
-It owns Pinia state and `useLocalStorage` persistence.
+`packages/stage-ui/src/stores/providers/config.ts` vẫn còn trong stage-ui.
 
-The provider package receives the resulting configuration as input.
+Nó sở hữu trạng thái Pinia và tính bền bỉ `useLocalStorage`.
 
-The existing `packages/testing-audio` setup also uses `localStorage` for application preparation.
+Gói nhà cung cấp nhận cấu hình kết quả làm đầu vào.
 
-That usage is valid in the integration harness but forbidden in the provider package.
+Thiết lập `packages/testing-audio` hiện tại cũng sử dụng `localStorage` để chuẩn bị ứng dụng.
 
-### 10.4 Apple Speech
+Việc sử dụng đó hợp lệ trong tích hợp bộ kiểm thử nhưng bị cấm trong gói nhà cung cấp.
 
-The following files remain in stage-ui:
+<a id="104-apple-speech"></a>
+
+### 10.4 Bài phát biểu của Apple
+
+Các tệp sau vẫn còn trong stage-ui:
 
 - `providers/apple-speech/index.ts`
 - `providers/apple-speech/provider.ts`
 - `providers/apple-speech/hearing-settings.vue`
 - `providers/apple-speech/index.test.ts`
 
-The provider uses Electron renderer IPC and the Apple Speech Electron plugin.
+nhà cung cấp sử dụng Electron renderer IPC và plugin Apple Speech Electron.
 
-It accesses `window.electron.ipcRenderer` and native platform state.
+Nó truy cập trạng thái nền tảng `window.electron.ipcRenderer` và native.
 
-The view uses Vue and VueUse.
+Chế độ xem sử dụng Vue và VueUse.
 
-This provider is an Electron local-run provider, not a Web and Node provider.
+nhà cung cấp này là nhà cung cấp do Electron chạy cục bộ, không phải là Web và Node nhà cung cấp.
 
-### 10.5 Browser Web Speech
+<a id="105-browser-web-speech"></a>
 
-`providers/browser-web-speech-api` can enter the package after the type graph is clean.
+### 10.5 Bài phát biểu trên web của trình duyệt
 
-Browser API use is allowed for this provider.
+`providers/browser-web-speech-api` có thể nhập gói sau khi biểu đồ loại sạch.
 
-The provider uses `window.SpeechRecognition` and Browser media behavior.
+Việc sử dụng trình duyệt API được cho phép đối với nhà cung cấp này.
 
-Node.js does not provide Speech Recognition.
+nhà cung cấp sử dụng hành vi phương tiện `window.SpeechRecognition` và Trình duyệt.
 
-The Node test must load the definition and report unavailable support.
+Node.js không cung cấp Nhận dạng giọng nói.
 
-The Browser test must use a real or explicit fake Speech Recognition implementation.
+Kiểm tra Node phải tải định nghĩa và báo cáo hỗ trợ không có sẵn.
 
-This provider is `browser-only`, not `runtime-excluded`.
+Bài kiểm tra Trình duyệt phải sử dụng triển khai Nhận dạng giọng nói giả mạo thực sự hoặc rõ ràng.
 
-### 10.6 Kokoro local provider
+nhà cung cấp này là `browser-only`, không phải `runtime-excluded`.
 
-`providers/kokoro-local/index.ts` needs review before it moves.
+<a id="106-kokoro-local-provider"></a>
 
-It uses `navigator.gpu` and stage-shared WebGPU state.
+### 10.6 Lỗi cục bộ nhà cung cấp
 
-It calls the stage-ui inference adapter.
+`providers/kokoro-local/index.ts` cần được xem xét trước khi di chuyển.
 
-That adapter uses a Worker and local model runtime behavior.
+Nó sử dụng trạng thái `navigator.gpu` và stage-shared WebGPU.
 
-Browser API use is allowed, but the stage-ui inference import is not a core package dependency.
+Nó gọi bộ điều hợp suy luận stage-ui.
 
-The provider can move after the local inference capability has a package-owned or injected adapter.
+Bộ điều hợp đó sử dụng hành vi worker và mô hình runtime cục bộ.
 
-### 10.7 Local audio providers
+Cho phép sử dụng trình duyệt API, nhưng việc nhập suy luận stage-ui không phải là phần phụ thuộc gói cốt lõi.
 
-`providers/local-audio/index.ts` needs review before it moves.
+nhà cung cấp có thể di chuyển sau khi khả năng suy luận cục bộ có bộ điều hợp được sở hữu hoặc tiêm vào gói.
 
-It contains Browser and Electron local implementations.
+<a id="107-local-audio-providers"></a>
 
-It uses device memory and WebGPU checks.
+### 10.7 Âm thanh cục bộ nhà cung cấp
 
-It uses stage-shared platform detection and local audio runtime modules.
+`providers/local-audio/index.ts` cần được xem xét trước khi di chuyển.
 
-Its Browser branch can enter a later package revision after the runtime adapter is isolated.
+Nó chứa các triển khai cục bộ của Trình duyệt và Electron.
 
-Its Electron branch remains in stage-ui.
+Nó sử dụng bộ nhớ thiết bị và kiểm tra WebGPU.
 
-### 10.8 Mimo audio provider
+Nó sử dụng tính năng phát hiện nền tảng stage-shared và các mô-đun runtime âm thanh cục bộ.
 
-`providers/mimo-audio/index.ts` can enter the cloud API group after the `FileReader` helper changes.
+Nhánh Trình duyệt của nó có thể nhập bản sửa đổi gói sau khi bộ điều hợp runtime bị cô lập.
 
-The current helper is not available in Node.js.
+Nhánh Electron của nó vẫn ở stage-ui.
 
-The required change is local to audio input conversion.
+<a id="108-mimo-audio-provider"></a>
 
-The provider definition interface does not need to change.
+### 10.8 Kịch câm âm thanh nhà cung cấp
 
-### 10.9 Aliyun NLS provider
+`providers/mimo-audio/index.ts` có thể vào nhóm API trên đám mây sau khi trình trợ giúp `FileReader` thay đổi.
 
-The following files need a Node transport decision:
+Trình trợ giúp hiện tại không có sẵn trong Node.js.
+
+Thay đổi bắt buộc là chuyển đổi cục bộ sang đầu vào âm thanh.
+
+Giao diện định nghĩa nhà cung cấp không cần thay đổi.
+
+<a id="109-aliyun-nls-provider"></a>
+
+### 10.9 Aliyun NLS nhà cung cấp
+
+Các tệp sau cần có quyết định Node transport:
 
 - `providers/aliyun-nls/provider.ts`
 - `providers/aliyun-nls/session.ts`
 - `providers/aliyun-nls/provider.test.ts`
 
-The provider creates and manages WebSocket connections.
+nhà cung cấp tạo và quản lý các kết nối WebSocket.
 
-Browser WebSocket is allowed.
+Trình duyệt WebSocket được cho phép.
 
-Node.js requires an injected adapter or a compatible Node implementation.
+Node.js yêu cầu bộ điều hợp được đưa vào hoặc triển khai Node tương thích.
 
-Keep the provider outside the `node-and-browser` set until the adapter test passes.
+Giữ nhà cung cấp bên ngoài bộ `node-and-browser` cho đến khi quá trình kiểm tra bộ điều hợp vượt qua.
 
-The following files can move as utility modules when their import graph stays independent:
+Các tệp sau có thể di chuyển dưới dạng mô-đun tiện ích khi biểu đồ nhập của chúng vẫn độc lập:
 
 - `providers/aliyun-nls/token.ts`
 - `providers/aliyun-nls/token.test.ts`
 - `providers/aliyun-nls/utils.ts`
 
-### 10.10 NVIDIA availability dependency
+<a id="1010-nvidia-availability-dependency"></a>
 
-`providers/nvidia/index.ts` uses the stage-shared `isStageTamagotchi` helper.
+### 10.10 Sự phụ thuộc vào tính khả dụng của NVIDIA
 
-That helper reads Vite environment state.
+`providers/nvidia/index.ts` sử dụng trình trợ giúp stage-shared `isStageTamagotchi`.
 
-The new package cannot depend on application build environment state for Node.js execution.
+Người trợ giúp đó đọc trạng thái môi trường Vite.
 
-Move the availability decision to stage-ui or replace it with a reviewed runtime-neutral hook.
+Gói mới không thể phụ thuộc vào trạng thái môi trường xây dựng ứng dụng để thực thi Node.js.
 
-The HTTP provider implementation itself remains a cloud API candidate.
+Chuyển quyết định về tính khả dụng sang stage-ui hoặc thay bằng hook không phụ thuộc runtime đã được xem xét.
 
-### 10.11 UI metadata
+Bản thân việc triển khai HTTP nhà cung cấp vẫn là một ứng viên API trên nền tảng đám mây.
 
-The following files remain in stage-ui:
+<a id="1011-ui-metadata"></a>
+
+### 10.11 Siêu dữ liệu UI
+
+Các tệp sau vẫn còn trong stage-ui:
 
 - `packages/stage-ui/src/libs/providers/metadata.ts`
 - `packages/stage-ui/src/libs/providers/hearing-view.ts`
 
-The metadata module uses Vue i18n and stage-ui schema helpers.
+Mô-đun siêu dữ liệu sử dụng trình trợ giúp lược đồ Vue i18n và stage-ui.
 
-The hearing view module uses Vue injection and computed references.
+Mô-đun chế độ xem thính giác sử dụng tính năng tiêm Vue và các tham chiếu được tính toán.
 
-These modules render or prepare UI behavior.
+Các mô-đun này hiển thị hoặc chuẩn bị hành vi UI.
 
-They do not belong in the provider core.
+Chúng không thuộc lõi nhà cung cấp.
 
-## 11. ASR Acceptance Feasibility
+<a id="11-asr-acceptance-feasibility"></a>
 
-Using `@angela/vitest-plugin-fakemic` for ASR acceptance is feasible.
+## 11. Tính khả thi của việc chấp nhận ASR
 
-The plugin starts a Playwright Web or Electron runtime.
+Sử dụng `@angela/vitest-plugin-fakemic` để chấp nhận ASR là khả thi.
 
-It gives Chromium a file-backed fake microphone input.
+Plugin khởi động Playwright Web hoặc Electron runtime.
 
-It can therefore test the real audio path from microphone input to ASR output.
+Nó cung cấp cho Chrome đầu vào micrô giả được hỗ trợ bằng tệp.
 
-The plugin does not replace provider unit tests.
+Do đó, nó có thể kiểm tra đường dẫn âm thanh thực từ đầu vào micrô đến đầu ra ASR.
 
-It does not directly test an isolated provider function.
+Plugin không thay thế các bài kiểm tra đơn vị nhà cung cấp.
 
-### 11.1 Test ownership
+Nó không trực tiếp kiểm tra chức năng nhà cung cấp bị cô lập.
 
-Keep full audio pipeline acceptance in `@angela/testing-audio`.
+<a id="111-test-ownership"></a>
 
-That package already owns runtime startup, routes, selectors, application preparation, and audio observations.
+### 11.1 Kiểm tra quyền sở hữu
 
-Update its provider setup to import definitions from `@angela/provider-inference` after the extraction.
+Duy trì khả năng chấp nhận đường truyền âm thanh đầy đủ trong `@angela/testing-audio`.
 
-Do not add `@angela/testing-audio` as a dependency of the provider package.
+Gói đó đã sở hữu phần khởi động runtime, route, bộ chọn, chuẩn bị ứng dụng và quan sát âm thanh.
 
-The provider package can use `@angela/vitest-plugin-fakemic` as a development dependency only if it later owns a package-specific runtime harness.
+Cập nhật thiết lập nhà cung cấp của nó để nhập định nghĩa từ `@angela/provider-inference` sau khi trích xuất.
 
-### 11.2 Audio fixtures
+Không thêm `@angela/testing-audio` làm phần phụ thuộc của gói nhà cung cấp.
 
-The existing `testing-audio` package contains these usable WAV fixtures:
+Gói nhà cung cấp chỉ có thể sử dụng `@angela/vitest-plugin-fakemic` làm phần phụ thuộc phát triển nếu sau này nó sở hữu runtime bộ kiểm thử dành riêng cho gói.
+
+<a id="112-audio-fixtures"></a>
+
+### 11.2 Âm thanh mẫu kiểm thử
+
+Gói `testing-audio` hiện có chứa các WAV mẫu kiểm thử có thể sử dụng được này:
 
 - `cases/long-leading-silence/input.test.wav`
 - `cases/single-utterance-pipeline/input.test.wav`
 - `cases/two-utterance-streaming/input.test.wav`
 
-Copy the required WAV files into package-owned test fixtures when a package-local acceptance suite needs them.
+Sao chép các tệp WAV cần thiết vào mẫu kiểm thử thử nghiệm thuộc sở hữu gói khi bộ chấp nhận gói cục bộ cần chúng.
 
-Copy the files without copying the `testing-audio` application harness.
+Sao chép các tập tin mà không sao chép ứng dụng `testing-audio` bộ kiểm thử.
 
-Record the source path and fixture purpose in the package test documentation.
+Ghi lại đường dẫn nguồn và mục đích của mẫu kiểm thử trong tài liệu kiểm tra gói.
 
-The current fixtures cover leading silence, one utterance, and streaming multiple utterances.
+mẫu kiểm thử hiện tại bao gồm khoảng lặng dẫn đầu, một câu nói và truyền dữ liệu liên tục nhiều câu nói.
 
-### 11.3 ASR test layers
+<a id="113-asr-test-layers"></a>
 
-Use three test layers:
+### 11.3 Lớp thử nghiệm ASR
 
-1. Node.js provider tests for request construction, response parsing, errors, and stream handling.
-2. Browser provider tests for Browser APIs and Browser runtime behavior.
-3. Fakemic pipeline acceptance for real microphone, VAD, ASR, and UI integration.
+Sử dụng ba lớp thử nghiệm:
 
-Use `*.audio.test.ts` for cases that run in both configured audio runtimes.
+1. Node.js nhà cung cấp kiểm tra việc xây dựng yêu cầu, phân tích cú pháp phản hồi, lỗi và xử lý luồng.
+2. Trình duyệt nhà cung cấp kiểm tra API trình duyệt và hành vi runtime của trình duyệt.
+3. Chấp nhận đường dẫn giả mạo cho micrô thực, tích hợp VAD, ASR và UI.
 
-Use `*.audio.web.test.ts` for Browser-only cases.
+Sử dụng `*.audio.test.ts` cho các trường hợp chạy ở cả âm thanh được định cấu hình runtime.
 
-Use `*.audio.electron.test.ts` only for Electron native cases.
+Sử dụng `*.audio.web.test.ts` cho các trường hợp chỉ dành cho Trình duyệt.
 
-Do not use `@angela/testing-audio` persistence setup in Node.js provider tests.
+Chỉ sử dụng `*.audio.electron.test.ts` cho các trường hợp Electron native.
 
-## 12. Test Plan
+Không sử dụng thiết lập bền vững `@angela/testing-audio` trong các thử nghiệm Node.js nhà cung cấp.
 
-### 12.1 Registry tests
+<a id="12-test-plan"></a>
 
-Test provider registration.
+## 12. Kế hoạch kiểm tra
 
-Test lookup by provider identifier.
+<a id="121-registry-tests"></a>
 
-Test deterministic provider listing.
+### 12.1 Kiểm tra đăng ký
 
-Test that the core entry point does not register excluded Electron or Vue providers.
+Kiểm tra đăng ký nhà cung cấp.
 
-Test Browser-only definitions through the core registry without Browser globals in Node.js.
+Kiểm tra tra cứu bằng mã định danh nhà cung cấp.
 
-### 12.2 Provider tests
+Kiểm tra danh sách nhà cung cấp xác định.
 
-Test configuration creation for each moved provider.
+Kiểm tra xem điểm vào lõi không đăng ký Electron hoặc Vue nhà cung cấp bị loại trừ.
 
-Test configuration validation.
+Kiểm tra các định nghĩa chỉ dành cho Trình duyệt thông qua sổ đăng ký cốt lõi mà không có toàn cục Trình duyệt trong Node.js.
 
-Test runtime validation with deterministic transports.
+<a id="122-provider-tests"></a>
 
-Test provider instance creation.
+### 12.2 Thử nghiệm nhà cung cấp
 
-Test declared chat, transcription, and speech capabilities.
+Kiểm tra việc tạo cấu hình cho mỗi nhà cung cấp đã di chuyển.
 
-Test model and voice discovery where the provider defines those methods.
+Kiểm tra xác nhận cấu hình.
 
-Use explicit fetch fakes for HTTP providers.
+Kiểm tra xác thực runtime bằng các phương thức vận chuyển xác định.
 
-Use explicit Browser capability fakes for Browser-only providers.
+Kiểm tra việc tạo phiên bản nhà cung cấp.
 
-Use an explicit WebSocket adapter for Aliyun NLS if it enters the package.
+Kiểm tra khả năng trò chuyện, phiên âm và lời nói đã được khai báo.
 
-### 12.3 Cross-runtime matrix
+Kiểm tra mô hình và phát hiện giọng nói trong đó nhà cung cấp xác định các phương thức đó.
 
-Run Node.js and Browser projects for every moved provider.
+Sử dụng giả mạo tìm nạp rõ ràng cho HTTP nhà cung cấp.
 
-Record one runtime result for every provider.
+Sử dụng giả mạo khả năng của Trình duyệt rõ ràng cho nhà cung cấp chỉ dành cho Trình duyệt.
 
-Require `node-and-browser` for cloud API and local API candidates unless the provider has a documented runtime exception.
+Sử dụng bộ chuyển đổi WebSocket rõ ràng cho Aliyun NLS nếu nó được đưa vào gói.
 
-Require `browser-only` for Browser-specific local-run providers.
+<a id="123-cross-runtime-matrix"></a>
 
-Keep Electron-only providers outside the portable package.
+### 12.3 Ma trận chéo runtime
 
-### 12.4 Import audit
+Chạy các dự án Node.js và Trình duyệt cho mọi nhà cung cấp được di chuyển.
 
-Scan source imports and declaration output for forbidden packages.
+Ghi lại một kết quả runtime cho mỗi nhà cung cấp.
 
-Scan source code for Browser persistence APIs.
+Yêu cầu `node-and-browser` cho đám mây API và các ứng viên API cục bộ trừ khi nhà cung cấp có ngoại lệ runtime được ghi lại.
 
-The audit must reject:
+Yêu cầu `browser-only` cho nhà cung cấp chạy cục bộ dành riêng cho Trình duyệt.
+
+Giữ nhà cung cấp chỉ dành cho Electron bên ngoài gói di động.
+
+<a id="124-import-audit"></a>
+
+### 12.4 Kiểm toán nhập khẩu
+
+Quét nguồn nhập và khai báo đầu ra cho các gói bị cấm.
+
+Quét mã nguồn để tìm API lưu trữ của trình duyệt.
+
+Cuộc kiểm toán phải từ chối:
 
 - `vue`
 - `vue-i18n`
@@ -711,99 +805,109 @@ The audit must reject:
 - `caches`
 - `document.cookie`
 - `@angela/stage-ui`
-- Stage-ui stores and persistence modules
+- stage-ui store và các mô-đun kiên trì
 
-The audit must allow approved Browser APIs.
+Quá trình kiểm tra phải cho phép các API trình duyệt được phê duyệt.
 
-The audit must also report Browser-only APIs so that the runtime test matrix includes them.
+Quá trình kiểm tra cũng phải báo cáo các API chỉ dành cho trình duyệt để ma trận kiểm tra runtime bao gồm chúng.
 
-### 12.5 Workspace checks
+<a id="125-workspace-checks"></a>
 
-Run the provider package typecheck.
+### 12.5 workspace kiểm tra
 
-Run the provider package Node.js tests.
+Chạy gói nhà cung cấp kiểm tra kiểu dữ liệu.
 
-Run the provider package Browser tests.
+Chạy thử nghiệm gói nhà cung cấp Node.js.
 
-Run the ASR acceptance project with `@angela/vitest-plugin-fakemic`.
+Chạy thử nghiệm Trình duyệt gói nhà cung cấp.
 
-Run the stage-ui typecheck.
+Chạy dự án chấp nhận ASR với `@angela/vitest-plugin-fakemic`.
 
-Run the repository typecheck.
+Chạy stage-ui kiểm tra kiểu dữ liệu.
 
-Run the repository lint command.
+Chạy kho lưu trữ kiểm tra kiểu dữ liệu.
 
-## 13. Migration Rules
+Chạy lệnh lint kho lưu trữ.
 
-The implementation must follow these rules:
+<a id="13-migration-rules"></a>
 
-1. Move the core provider contract before moving provider definitions.
-2. Replace Vue i18n types with the runtime-neutral translator type.
-3. Keep the `{ t }` context shape to reduce provider changes.
-4. Move Vue views to a stage-ui view registry.
-5. Split the side-effect barrel into approved and runtime-specific barrels.
-6. Move cloud API and local API candidates after the runtime audit.
-7. Move Browser-only providers only when Node.js import safety passes.
-8. Keep Electron providers in stage-ui.
-9. Keep Pinia and persistence in stage-ui.
-10. Update stage-ui imports in one migration.
-11. Remove old provider imports after the migration.
-12. Do not add a provider category field only for folder organization.
-13. Do not hide a forbidden dependency behind a runtime check.
+## 13. Quy tắc di chuyển
 
-The provider package owns provider definitions and their registry.
+Việc thực hiện phải tuân theo các quy tắc sau:
 
-Stage-ui owns UI, persistence, authentication, platform assembly, and Electron integration.
+1. Di chuyển hợp đồng nhà cung cấp cốt lõi trước khi di chuyển các định nghĩa nhà cung cấp.
+2. Thay thế loại Vue i18n bằng loại trình dịch trung tính runtime.
+3. Giữ hình dạng bối cảnh `{ t }` để giảm các thay đổi của nhà cung cấp.
+4. Di chuyển chế độ xem Vue sang sổ đăng ký chế độ xem stage-ui.
+5. Chia thùng tác dụng phụ thành các thùng dành riêng cho runtime đã được phê duyệt.
+6. Di chuyển đám mây API và các ứng viên API cục bộ sau quá trình kiểm tra runtime.
+7. Chỉ di chuyển nhà cung cấp chỉ dành cho trình duyệt khi an toàn nhập Node.js đã vượt qua.
+8. Giữ Electron nhà cung cấp trong stage-ui.
+9. Giữ Pinia và sự kiên trì trong stage-ui.
+10. Cập nhật nhập stage-ui trong một lần di chuyển.
+11. Xóa các mục nhập nhà cung cấp cũ sau khi di chuyển.
+12. Không thêm trường danh mục nhà cung cấp chỉ cho tổ chức thư mục.
+13. Không ẩn phần phụ thuộc bị cấm đằng sau kiểm tra runtime.
 
-## 14. Acceptance Criteria
+Gói nhà cung cấp sở hữu các định nghĩa nhà cung cấp và sổ đăng ký của chúng.
 
-Phase 1 is complete when all conditions pass:
+stage-ui sở hữu UI, tính bền bỉ, xác thực, lắp ráp nền tảng và tích hợp Electron.
 
-- `packages/provider-inference` exists as a workspace package.
-- The package root loads in Node.js without Browser globals.
-- The package root loads in a Browser test project.
-- The package has no Vue, Vue Pinia, or Browser persistence dependency.
-- Browser-specific providers use guarded runtime access.
-- Every moved provider has a Node.js and Browser test result.
-- Cloud API and local API candidates pass both runtime tests, or have a documented exception.
-- Browser-only local-run providers pass Browser behavior tests and Node.js import tests.
-- Electron-only providers remain in stage-ui.
-- `vitest-plugin-fakemic` validates the ASR pipeline.
-- The ASR acceptance suite uses a fixture from the existing audio test set or a documented copy.
-- The provider definition design changes only for Vue removal, view ownership, or a required runtime adapter.
-- Stage-ui uses the new provider core interface.
-- `inference-service-providers.ts` remains a stage-ui configuration service.
-- Typecheck and lint pass for the repository.
+<a id="14-acceptance-criteria"></a>
 
-## 15. Later Phases
+## 14. Tiêu chí chấp nhận
 
-Later phases can address:
+Giai đoạn 1 hoàn tất khi tất cả các điều kiện đều đạt:
 
-- Additional provider subfolders after an architecture review.
-- A Node WebSocket adapter for Aliyun NLS.
-- An injected local inference adapter for Kokoro.
-- A split Browser and Electron implementation for local audio.
-- A native speech adapter for Apple Speech.
-- A reviewed application adapter for official providers.
-- A separate provider configuration package for remote CRUD.
-- Public package release and external package documentation.
+- `packages/provider-inference` tồn tại dưới dạng gói workspace.
+- Tải gốc gói trong Node.js mà không có toàn cầu Trình duyệt.
+- Tải gốc gói trong dự án thử nghiệm Trình duyệt.
+- Gói này không có phần phụ thuộc bền vững của Vue, Vue Pinia hoặc Trình duyệt.
+- nhà cung cấp dành riêng cho trình duyệt sử dụng quyền truy cập runtime được bảo vệ.
+- Mỗi nhà cung cấp được di chuyển đều có kết quả kiểm tra Node.js và Trình duyệt.
+- Cloud API và các ứng viên API cục bộ vượt qua cả hai bài kiểm tra runtime hoặc có một ngoại lệ được ghi lại.
+- nhà cung cấp chạy cục bộ chỉ dành cho trình duyệt vượt qua các bài kiểm tra hành vi của trình duyệt và các bài kiểm tra nhập Node.js.
+- nhà cung cấp chỉ có điện tử vẫn còn trong stage-ui.
+- `vitest-plugin-fakemic` xác thực đường dẫn ASR.
+- Bộ chấp nhận ASR sử dụng mẫu kiểm thử từ bộ kiểm tra âm thanh hiện có hoặc bản sao tài liệu.
+- Thiết kế định nghĩa nhà cung cấp chỉ thay đổi khi xóa Vue, quyền sở hữu chế độ xem hoặc bộ điều hợp runtime được yêu cầu.
+- stage-ui sử dụng giao diện lõi nhà cung cấp mới.
+- `inference-service-providers.ts` vẫn là dịch vụ cấu hình stage-ui.
+- kiểm tra kiểu dữ liệu và lint pass cho kho lưu trữ.
 
-These changes require new interfaces or runtime adapters.
+<a id="15-later-phases"></a>
 
-They do not change the Phase 1 provider contract without architecture review.
+## 15. Giai đoạn sau
 
-## 16. Fixed Decisions
+Các giai đoạn sau có thể giải quyết:
 
-The following decisions are fixed for Phase 1:
+- Các thư mục con nhà cung cấp bổ sung sau khi xem xét kiến ​​trúc.
+- Bộ chuyển đổi Node WebSocket dành cho Aliyun NLS.
+- Bộ điều hợp suy luận cục bộ được đưa vào cho Kokoro.
+- Triển khai Trình duyệt và Electron riêng biệt cho âm thanh cục bộ.
+- Bộ điều hợp giọng nói native cho Apple Speech.
+- Bộ chuyển đổi ứng dụng đã được đánh giá dành cho nhà cung cấp chính thức.
+- Gói cấu hình nhà cung cấp riêng cho CRUD từ xa.
+- Phát hành gói công khai và tài liệu gói bên ngoài.
 
-- The extraction source is `packages/stage-ui/src/libs/providers/providers`.
-- The top-level provider folders are `cloud` and `local`.
-- `local-api` and `local-run` share the `local` folder during Phase 1.
-- Vue, Vue Pinia, and Browser persistence remain forbidden.
-- Browser-specific APIs are allowed.
-- `inference-service-providers.ts` does not move.
-- Provider definitions keep their current shape as far as possible.
-- Node.js and Browser tests both run for moved providers.
-- `vitest-plugin-fakemic` validates ASR pipeline behavior.
-- `testing-audio` WAV fixtures can be copied for package-owned acceptance tests.
-- `testing-audio` application setup does not become a core package dependency.
+Những thay đổi này yêu cầu giao diện mới hoặc bộ điều hợp runtime.
+
+Họ không thay đổi hợp đồng nhà cung cấp Giai đoạn 1 mà không xem xét kiến ​​trúc.
+
+<a id="16-fixed-decisions"></a>
+
+## 16. Quyết định cố định
+
+Các quyết định sau đây được ấn định cho Giai đoạn 1:
+
+- Nguồn trích xuất là `packages/stage-ui/src/libs/providers/providers`.
+- Các thư mục nhà cung cấp cấp cao nhất là `cloud` và `local`.
+- `local-api` và `local-run` chia sẻ thư mục `local` trong Giai đoạn 1.
+- Vue, Vue Pinia và tính kiên trì của Trình duyệt vẫn bị cấm.
+- API dành riêng cho trình duyệt được cho phép.
+- `inference-service-providers.ts` không di chuyển.
+- Các định nghĩa nhà cung cấp giữ nguyên hình dạng hiện tại của chúng ở mức tối đa.
+- Cả hai bài kiểm tra Node.js và Trình duyệt đều chạy cho nhà cung cấp đã di chuyển.
+- `vitest-plugin-fakemic` xác thực hành vi của đường ống ASR.
+- `testing-audio` WAV mẫu kiểm thử có thể được sao chép cho các thử nghiệm chấp nhận thuộc sở hữu gói.
+- Thiết lập ứng dụng `testing-audio` không trở thành phần phụ thuộc của gói cốt lõi.

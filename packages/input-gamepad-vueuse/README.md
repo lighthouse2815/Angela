@@ -1,9 +1,10 @@
 # `@angela/input-gamepad-vueuse`
 
-This package provides Vue composables for `@angela/input-gamepad`.
-It owns the monitor lifecycle and exposes readonly reactive controller state.
+Gói này cung cấp Vue các composable cho `@angela/input-gamepad`. Nó sở hữu vòng đời của màn hình và hiển thị trạng thái bộ điều khiển phản ứng chỉ đọc.
 
-## Use the package
+<a id="use-the-package"></a>
+
+## Sử dụng gói
 
 ```ts
 import { useStandardGamepad } from '@angela/input-gamepad-vueuse'
@@ -25,14 +26,12 @@ watchEffect(() => {
 })
 ```
 
-The composable starts after its Vue scope mounts. It stops when that scope is disposed.
-Use `pause()` and `resume()` when a mounted feature must stop input temporarily.
+composable bắt đầu sau khi gắn phạm vi Vue của nó. Nó dừng lại khi phạm vi đó được xử lý. Sử dụng `pause()` và `resume()` khi tính năng được gắn phải tạm thời dừng đầu vào.
 
-## When to use it
+<a id="when-to-use-it"></a>
 
-Use this package in Vue browser and Electron renderer code.
-Use `@angela/input-gamepad` in framework-independent code.
+## Khi nào nên sử dụng nó
 
-This package exposes standard buttons, sticks, and analog triggers.
-It does not expose motion sensors, touchpads, lights, or adaptive triggers.
-Use a device-specific package for these features.
+Sử dụng gói này trong trình duyệt Vue và mã Electron renderer. Sử dụng `@angela/input-gamepad` trong mã độc lập với khung.
+
+Gói này hiển thị các nút, cần gạt và bộ kích hoạt tương tự tiêu chuẩn. Nó không để lộ cảm biến chuyển động, bàn di chuột, đèn hoặc bộ kích hoạt thích ứng. Sử dụng gói dành riêng cho thiết bị cho các tính năng này.

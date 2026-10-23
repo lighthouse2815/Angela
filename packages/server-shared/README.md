@@ -1,8 +1,10 @@
 # @angela/server-shared
 
-The shared type definitions for all server-side packages of Angela.
+Các định nghĩa kiểu chia sẻ cho tất cả các gói phía máy chủ của Angela.
 
-## Usage
+<a id="usage"></a>
+
+## Cách sử dụng
 
 ```shell
 ni @angela/server-shared -D # from @antfu/ni, can be installed via `npm i -g @antfu/ni`
@@ -15,47 +17,61 @@ npm i @angela/server-shared -D
 import type { WebSocketEvents } from '@angela/server-shared'
 ```
 
-## How to use the events in distributed use cases?
+<a id="how-to-use-the-events-in-distributed-use-cases"></a>
 
-### Scenarios
+## Làm cách nào để sử dụng các sự kiện trong các trường hợp sử dụng phân tán?
+
+<a id="scenarios"></a>
+
+### kịch bản
 
 #### Minecraft agent
 
-##### 1. Urgent combat (witch attack)
+<a id="1-urgent-combat-witch-attack"></a>
 
-- Minecraft sends `spark:notify` (kind=alarm, urgency=immediate, payload hp/location/gear, destinations=["character"]).
-- Character `spark:emit` working ("Seen it").
-- Character issues `spark:command` with interrupt=force and options (retreat vs push).
-- Minecraft `spark:emit` working ("Pillared up; healing") then done/blocked as it executes.
-- Optional `context:update` for summary/memory.
+##### 1. Chiến đấu khẩn cấp (tấn công phù thủy)
 
-##### 2. Prep plan (Ender Dragon)
+- Minecraft gửi `spark:notify` (loại=báo động, khẩn cấp=ngay lập tức, tải trọng hp/location/gear, đích=["ký tự"]).
+- Nhân vật `spark:emit` đang hoạt động ("Đã xem").
+- Nhân vật đưa ra `spark:command` với ngắt=lực và các tùy chọn (rút lui và đẩy).
+- Minecraft `spark:emit` đang hoạt động ("Được nâng cấp; đang hồi phục") rồi đến done/blocked khi nó thực thi.
+- `context:update` tùy chọn cho summary/memory.
 
-- Discord/user intent triggers character `spark:command` to Minecraft (intent=plan, interrupt=soft, steps gather beds/pots/gear, fallback).
-- Optional `context:update` with tips (lane='game').
-- Minecraft streams `spark:emit` progress.
-- If ambushed, Minecraft raises new `spark:notify` (alarm/immediate) to preempt.
-- Character revises with another `spark:command`.
-- Completion via `spark:emit` done + summary note.
+<a id="2-prep-plan-ender-dragon"></a>
 
-##### 3. Routine nudge
+##### 2. Kế hoạch chuẩn bị (Ender Dragon)
 
-- Minecraft signals low food via `spark:notify` (kind=reminder, urgency=soon, destinations=["character"]).
-- Character defers to next tick and sends `spark:command` (interrupt=soft, intent=plan: "gather food nearby").
-- Minecraft `spark:emit` queued/working then done.
+- Ý định của Discord/user kích hoạt nhân vật `spark:command` vào Minecraft (ý định=kế hoạch, ngắt=mềm, các bước thu thập beds/pots/gear, phương án dự phòng).
+- `context:update` tùy chọn có mẹo (luồng='game').
+- Minecraft truyền phát tiến trình `spark:emit`.
+- Nếu bị phục kích, Minecraft sẽ tăng `spark:notify` (alarm/immediate) mới để chiếm ưu thế.
+- Sửa đổi nhân vật bằng một `spark:command` khác.
+- Hoàn thành thông qua `spark:emit` + ghi chú tóm tắt.
 
-##### 4. Multi-step command while researching (plan + live control)
+<a id="3-routine-nudge"></a>
+
+##### 3. Cú huých thường lệ
+
+- Minecraft báo hiệu sắp hết thức ăn thông qua `spark:notify` (loại=nhắc nhở, khẩn cấp=sớm, điểm đến=["nhân vật"]).
+- Nhân vật trì hoãn đến tích tắc tiếp theo và gửi `spark:command` (ngắt=mềm, ý định=kế hoạch: "thu thập thức ăn gần đó").
+- Minecraft `spark:emit` queued/working thế là xong.
+
+<a id="4-multi-step-command-while-researching-plan--live-control"></a>
+
+##### 4. Lệnh nhiều bước trong khi nghiên cứu (kế hoạch + điều khiển trực tiếp)
 
 > [!NOTE]
-> Using `intent=plan` keeps the loop alive even with un-finalized ideas—similar to TODO scaffolding in coding agents—while richer guidance is still being researched.
+> Việc sử dụng `intent=plan` giúp vòng lặp tồn tại ngay cả với những ý tưởng chưa hoàn thiện—tương tự như TODO tạo khung ban đầu trong mã hóa các agent—trong khi hướng dẫn phong phú hơn vẫn đang được nghiên cứu.
 
-- Character receives a user goal (e.g., fortify base) and issues an initial `spark:command` to Minecraft (interrupt=soft, intent=plan, steps to gather materials) so the agent keeps working.
-- Character simultaneously performs memory/search/design tasks outside the game loop (wiki lookup, prior notes).
-- As insights arrive, character sends `context:update` (lane='game', hints/ideas) to enrich the sub-agent without preemption.
-- If an urgent event occurs during prep, Minecraft raises `spark:notify` (alarm) → character responds with a short `spark:emit` working and a `spark:command` (interrupt=force) to handle it (e.g., retreat, block up).
-- Once design is ready, character sends a refined `spark:command` (`intent=proposal` (or `action`), `interrupt=soft`) with structured options/steps/fallbacks.
-- Minecraft streams `spark:emit` progress; when complete, character summarizes via `spark:emit` or `context:update` for memory.
+- Nhân vật nhận được mục tiêu của người dùng (ví dụ: củng cố căn cứ) và cấp `spark:command` ban đầu cho Minecraft (ngắt=mềm, ý định=kế hoạch, các bước thu thập nguyên liệu) để agent tiếp tục hoạt động.
+- Nhân vật đồng thời thực hiện các nhiệm vụ memory/search/design bên ngoài vòng lặp trò chơi (tra cứu wiki, ghi chú trước).
+- Khi có thông tin chi tiết, nhân vật sẽ gửi `context:update` (luồng='game', hints/ideas) để làm phong phú thêm agent phụ mà không cần ưu tiên.
+- Nếu một sự kiện khẩn cấp xảy ra trong quá trình chuẩn bị, Minecraft sẽ đưa ra `spark:notify` (báo động) → nhân vật phản hồi bằng một `spark:emit` ngắn đang hoạt động và một `spark:command` (ngắt=lực) để xử lý nó (ví dụ: rút lui, chặn lại).
+- Sau khi thiết kế đã sẵn sàng, nhân vật sẽ gửi `spark:command` (`intent=proposal` (hoặc `action`), `interrupt=soft`) có cấu trúc options/steps/fallbacks.
+- Minecraft truyền phát tiến trình `spark:emit`; khi hoàn tất, ký tự tóm tắt qua `spark:emit` hoặc `context:update` cho bộ nhớ.
 
-## License
+<a id="license"></a>
+
+## Giấy phép
 
 [MIT](../../LICENSE)

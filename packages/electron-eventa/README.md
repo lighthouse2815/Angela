@@ -1,8 +1,10 @@
 # @angela/electron-eventa
 
-Shared Eventa contract definitions for Electron IPC across Angela apps.
+Định nghĩa hợp đồng Eventa được chia sẻ cho Electron IPC trên các ứng dụng Angela.
 
-## Exports
+<a id="exports"></a>
 
-- `@angela/electron-eventa`: core Electron contracts (`electron`, `bounds`, `cursorScreenPoint`, etc.)
-- `@angela/electron-eventa/electron-updater`: auto-updater contracts and state types
+## Xuất khẩu
+
+- `@angela/electron-eventa`: hợp đồng Electron cốt lõi (`electron`, `bounds`, `cursorScreenPoint`, v.v.)
+- `@angela/electron-eventa/electron-updater`: hợp đồng và loại trạng thái tự động cập nhật

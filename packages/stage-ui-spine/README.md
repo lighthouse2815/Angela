@@ -1,25 +1,31 @@
 # @angela/stage-ui-spine
 
-Spine 2D scene components and stores for Angela. Provides Vue components, composables, and utilities for rendering and managing Spine animations within the stage UI.
+Các thành phần cảnh Spine 2D và store cho Angela. Cung cấp các thành phần Vue, các composable và các tiện ích để hiển thị và quản lý hoạt ảnh Spine trong stage UI.
 
-## Prerequisites
+<a id="prerequisites"></a>
 
-**You must hold a valid [Spine Editor license](https://esotericsoftware.com/spine-purchase) (Essential, Professional, or Enterprise) to develop with this package.**
+## Điều kiện tiên quyết
 
-The Spine Runtimes (`@esotericsoftware/spine-webgl`) are provided under the [Spine Runtimes License Agreement](https://esotericsoftware.com/spine-runtimes-license), which requires each developer integrating the runtimes to hold their own Spine Editor license at the time of integration.
+**Bạn phải có giấy phép [Spine Editor hợp lệ](https://esotericsoftware.com/spine-purchase) (Cần thiết, Chuyên nghiệp hoặc Doanh nghiệp) để phát triển với gói này.**
 
-End users of a shipped product that uses Spine animations do not need their own Spine license.
+Spine Runtimes (`@esotericsoftware/spine-webgl`) được cung cấp theo Thỏa thuận cấp phép [Spine runtime](https://esotericsoftware.com/spine-runtimes-license), yêu cầu mỗi nhà phát triển tích hợp runtime phải có giấy phép Spine Editor của riêng họ tại thời điểm tích hợp.
 
-## Usage
+Người dùng cuối của sản phẩm được vận chuyển sử dụng hoạt ảnh Spine không cần giấy phép Spine của riêng họ.
+
+<a id="usage"></a>
+
+## Cách sử dụng
 
 ```ts
 import { SpineScene } from '@angela/stage-ui-spine/components/scenes'
 import { useSpineStore } from '@angela/stage-ui-spine/stores/spine'
 ```
 
-## License
+<a id="license"></a>
 
-- **Original code** (components, stores, composables, utilities): MIT License
-- **Spine Runtimes** (`@esotericsoftware/spine-webgl`): [Spine Runtimes License Agreement](https://esotericsoftware.com/spine-runtimes-license)
+## Giấy phép
 
-See [LICENSE.md](./LICENSE.md) for full details.
+- **Mã gốc** (linh kiện, store, các composable, tiện ích): Giấy phép MIT
+- **Spine Runtimes** (`@esotericsoftware/spine-webgl`): Thỏa thuận cấp phép [Spine runtime](https://esotericsoftware.com/spine-runtimes-license)
+
+Xem [LICENSE.md](./LICENSE.md) để biết chi tiết đầy đủ.

@@ -1,8 +1,10 @@
-# Vitest plugin for fake microphones
+<a id="vitest-plugin-for-fake-microphones"></a>
 
-This package supplies fake-microphone Web and Electron runtimes with Vitest project integration.
+# Plugin Vitest cho micro giả
 
-Import the Vitest interface from the package root:
+Gói này cung cấp Web micrô giả và Electron runtime có tích hợp dự án Vitest.
+
+Nhập giao diện Vitest từ gói gốc:
 
 ```ts
 import fakemic, {
@@ -13,9 +15,9 @@ import fakemic, {
 } from '@angela/vitest-plugin-fakemic'
 ```
 
-`src/index.ts` owns project configuration, runtime launch, task collection, and preflight scheduling. `src/runner.ts` owns task execution.
+`src/index.ts` sở hữu cấu hình dự án, khởi chạy runtime, thu thập nhiệm vụ và lập lịch trình trước chuyến bay. `src/runner.ts` sở hữu khả năng thực thi nhiệm vụ.
 
-Runtime configuration contains only serializable values. A `prepare` module adapts the launched Playwright runtime into an application session.
+Cấu hình runtime chỉ chứa các giá trị có thể tuần tự hóa. Mô-đun `prepare` điều chỉnh Playwright runtime đã khởi chạy thành một phiên ứng dụng.
 
 ```ts
 fakemic({
@@ -29,4 +31,4 @@ fakemic({
 })
 ```
 
-Application packages own selectors, routes, probes, Provider settings, and prepare modules.
+Các gói ứng dụng sở hữu bộ chọn, route, đầu dò, cài đặt nhà cung cấp và mô-đun chuẩn bị.

@@ -1,17 +1,21 @@
 # @angela/electron-vueuse
 
-VueUse-like composables and helpers shared across Angela Electron apps.
+VueUse giống các composable và các trợ giúp được chia sẻ trên các ứng dụng Angela Electron.
 
-## What it provides
+<a id="what-it-provides"></a>
 
-- Renderer composables for common Electron behaviors (`mouse`, `window bounds`, `auto updater`, etc.)
-- A reusable Eventa context/invoke pattern (`useElectronEventaContext`, `useElectronEventaInvoke`)
-- Eventa context/invoke ergonomics for renderer code
-- Main-process loop utilities (`useLoop`, `createRendererLoop`)
+## Những gì nó cung cấp
 
-For IPC contract definitions, use `@angela/electron-eventa`.
+- renderer các composable cho các hành vi phổ biến của Electron (`mouse`, `window bounds`, `auto updater`, v.v.)
+- Mẫu Eventa context/invoke có thể tái sử dụng (`useElectronEventaContext`, `useElectronEventaInvoke`)
+- Công thái học Eventa context/invoke cho mã renderer
+- Tiện ích vòng lặp quy trình chính (`useLoop`, `createRendererLoop`)
 
-## Usage
+Đối với định nghĩa hợp đồng IPC, hãy sử dụng `@angela/electron-eventa`.
+
+<a id="usage"></a>
+
+## Cách sử dụng
 
 ```ts
 import { electron } from '@angela/electron-eventa'

@@ -1,8 +1,12 @@
-# MediaPipe Tasks Vision (minimal API notes)
+<a id="mediapipe-tasks-vision-minimal-api-notes"></a>
 
-This package targets `@mediapipe/tasks-vision` (web, JS/TS).
+# Tầm nhìn nhiệm vụ MediaPipe (ghi chú API tối thiểu)
 
-## Core init
+Gói này nhắm mục tiêu `@mediapipe/tasks-vision` (web, JS/TS).
+
+<a id="core-init"></a>
+
+## Khởi tạo cốt lõi
 
 ```ts
 import { FilesetResolver, PoseLandmarker } from '@mediapipe/tasks-vision'
@@ -15,30 +19,40 @@ const pose = await PoseLandmarker.createFromOptions(vision, {
 })
 ```
 
-## Video inference
+<a id="video-inference"></a>
 
-MediaPipe Tasks Vision `detectForVideo()` runs synchronously and can block the main thread.
+## Suy luận video
+
+MediaPipe Nhiệm vụ Vision `detectForVideo()` chạy đồng bộ và có thể chặn luồng chính.
 
 ```ts
 const nowMs = performance.now()
 const res = pose.detectForVideo(videoEl, nowMs)
 ```
 
-## Result shapes (single-person usage)
+<a id="result-shapes-single-person-usage"></a>
 
-### Pose
+## Hình dạng kết quả (cách sử dụng của một người)
 
-- `res.landmarks`: `NormalizedLandmark[][]` (take `[0]` for single person)
-- each landmark includes `{ x, y, z, visibility?, presence? }` with `x/y` in `[0..1]`
+<a id="pose"></a>
 
-### Hands
+### Tư thế
 
-- `res.landmarks`: `NormalizedLandmark[][]` (each entry is 21 landmarks for one hand)
-- `res.handedness`: `Category[][]` aligned with `landmarks`
-  - `handedness[i][0].categoryName` is typically `'Left' | 'Right'`
-  - `handedness[i][0].score` is confidence
+- `res.landmarks`: `NormalizedLandmark[][]` (lấy `[0]` cho người độc thân)
+- mỗi mốc bao gồm `{ x, y, z, visibility?, presence? }` với `x/y` trong `[0..1]`
 
-### Face (optional)
+<a id="hands"></a>
 
-- `res.faceLandmarks`: `NormalizedLandmark[][]` (468 landmarks, heavy)
-- For the workshop we treat this as presence-only by default.
+### bàn tay
+
+- `res.landmarks`: `NormalizedLandmark[][]` (mỗi mục nhập là 21 điểm cho một tay)
+- `res.handedness`: `Category[][]` được căn chỉnh theo `landmarks`
+  - `handedness[i][0].categoryName` thường là `'Left' | 'Right'`
+  - `handedness[i][0].score` là sự tự tin
+
+<a id="face-optional"></a>
+
+### Khuôn mặt (tùy chọn)
+
+- `res.faceLandmarks`: `NormalizedLandmark[][]` (468 mốc, nặng)
+- Đối với hội thảo, chúng tôi coi đây là tùy chọn chỉ hiện diện theo mặc định.

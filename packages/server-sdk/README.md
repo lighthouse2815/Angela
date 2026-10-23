@@ -1,8 +1,10 @@
 # @angela/server-sdk
 
-The SDK for cliet-side code to connect to the server-side components.
+SDK dành cho mã phía clet để kết nối với các thành phần phía máy chủ.
 
-## Usage
+<a id="usage"></a>
+
+## Cách sử dụng
 
 ```shell
 ni @angela/server-sdk -D # from @antfu/ni, can be installed via `npm i -g @antfu/ni`
@@ -26,22 +28,24 @@ client.onEvent('input:text', async (event) => {
 })
 ```
 
-`connect()` now resolves when the client is fully ready for use, not just when the websocket transport has opened. In practice that means:
+`connect()` hiện giải quyết khi máy khách đã hoàn toàn sẵn sàng để sử dụng, không chỉ khi websocket transport đã mở. Trong thực tế điều đó có nghĩa là:
 
-- the socket is open
-- authentication succeeded when a token is configured
-- the module has announced itself successfully
+- socket đang mở
+- xác thực thành công khi token được định cấu hình
+- mô-đun đã tự thông báo thành công
 
-Useful runtime helpers:
+Người trợ giúp runtime hữu ích:
 
-- `client.connectionStatus` exposes the current lifecycle state
-- `client.isReady` tells you whether the client has completed authentication + announce
-- `client.send()` returns `false` instead of silently dropping messages when the socket is unavailable
-- `client.sendOrThrow()` is available when you want strict delivery semantics
+- `client.connectionStatus` hiển thị trạng thái vòng đời hiện tại
+- `client.isReady` cho bạn biết liệu máy khách đã hoàn tất xác thực + thông báo chưa
+- `client.send()` trả về `false` thay vì âm thầm gửi tin nhắn khi socket không khả dụng
+- `client.sendOrThrow()` khả dụng khi bạn muốn ngữ nghĩa phân phối nghiêm ngặt
 
-### Read chat images and recordings
+<a id="read-chat-images-and-recordings"></a>
 
-Chat events do not carry image or audio bytes. `output:gen-ai:chat:message` lists the images and recordings of the user message in `gen-ai:chat.attachments`, each with a reference such as `airi-asset:<id>`. Read the bytes with `getAsset`:
+### Đọc hình ảnh và ghi âm trò chuyện
+
+Sự kiện trò chuyện không mang byte hình ảnh hoặc âm thanh. `output:gen-ai:chat:message` liệt kê các hình ảnh và bản ghi tin nhắn của người dùng trong `gen-ai:chat.attachments`, mỗi hình ảnh có một tham chiếu như `airi-asset:<id>`. Đọc byte với `getAsset`:
 
 ```typescript
 client.onEvent('output:gen-ai:chat:message', async (event) => {
@@ -52,11 +56,13 @@ client.onEvent('output:gen-ai:chat:message', async (event) => {
 })
 ```
 
-The stage answers the request. `getAsset` rejects when the asset is missing, when it is larger than 50 MB, or when no stage answers within 10 seconds.
+stage trả lời yêu cầu. `getAsset` từ chối khi nội dung bị thiếu, khi nó lớn hơn 50 MB hoặc khi không có stage trả lời trong vòng 10 giây.
 
-The stage answers only a client that announced a module. The server tells the stage which connection asked, and the answer goes back to that connection only.
-- `client.onEvent()` returns an unsubscribe function
+stage chỉ trả lời khách hàng đã công bố mô-đun. Máy chủ cho stage biết kết nối nào được yêu cầu và câu trả lời chỉ quay lại kết nối đó.
+- `client.onEvent()` trả về chức năng hủy đăng ký
 
-## License
+<a id="license"></a>
+
+## Giấy phép
 
 [MIT](../../LICENSE)

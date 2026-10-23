@@ -1,52 +1,37 @@
-# Camera perception domain
+<a id="camera-perception-domain"></a>
 
-`observation.ts` defines the strict provider-neutral protocol and the local Eventa contract.
-Raw media, identity, and full landmarks are rejected at this boundary.
-Python JSONL enters the provider only after Valibot validation.
+# Miền nhận thức của máy ảnh
 
-`AffectEngine` consumes observations and owns a bounded rolling window.
-Its clock is an explicit millisecond argument on `observe` and `getState`. Production defaults to `Date.now()`.
-Tests pass timestamps directly and need no timers, sleeps, webcam, or model runtime.
+`observation.ts` xác định giao thức trung lập nhà cung cấp nghiêm ngặt và hợp đồng Eventa cục bộ. Phương tiện thô, danh tính và các mốc đầy đủ bị từ chối tại ranh giới này. Python JSONL chỉ nhập nhà cung cấp sau khi xác thực Valibot.
 
-The engine emits `facePresent`, expression, attention, tracker confidence, stable duration, and observation time.
-Expression values are `neutral`, `smile`, and `unknown`. Attention values are `screen`, `away`, and `unknown`.
-Neutral means no clear smile-like mouth geometry. Screen means approximate head direction, not measured eye gaze.
+`AffectEngine` sử dụng các quan sát và sở hữu một cửa sổ cuộn có giới hạn. Đồng hồ của nó là một đối số mili giây rõ ràng trên `observe` và `getState`. Sản xuất mặc định là `Date.now()`. Các bài kiểm tra vượt qua dấu thời gian trực tiếp và không cần hẹn giờ, ngủ, webcam hoặc mô hình runtime.
 
-Default behavior:
+Động cơ phát ra `facePresent`, biểu cảm, sự chú ý, sự tự tin của người theo dõi, thời lượng ổn định và thời gian quan sát. Các giá trị biểu thức là `neutral`, `smile` và `unknown`. Các giá trị chú ý là `screen`, `away` và `unknown`. Trung tính có nghĩa là không có hình dạng miệng giống như nụ cười rõ ràng. Màn hình có nghĩa là hướng đầu gần đúng, không đo được ánh mắt.
 
-| Rule | Value |
+Hành vi mặc định:
+
+| Quy tắc | Giá trị |
 | --- | --- |
-| Rolling window | 1000 ms, at most 300 observations |
-| Freshness limit | 2000 ms |
-| Face evidence | Confidence at least 0.65 in 80% of window samples |
-| Face debounce | 400 ms and at least three samples |
-| Expression debounce | 700 ms and at least three samples |
-| Screen debounce | 600 ms and at least three samples |
-| Away debounce | 1800 ms and at least three samples |
-| Smile | Mean score at least 0.65, mouth opening at most 0.45 |
-| Neutral | Mean score at most 0.25, mouth opening at most 0.25 |
-| Screen | Mean absolute yaw at most 18°, pitch at most 15° |
-| Away | Mean absolute yaw at least 30° or pitch at least 25° |
+| Cửa sổ cuốn | 1000 ms, tối đa 300 quan sát |
+| Giới hạn độ tươi | 2000 mili giây |
+| Bằng chứng khuôn mặt | Độ tin cậy ít nhất 0,65 trong 80% mẫu cửa sổ |
+| Lột mặt | 400 ms và ít nhất ba mẫu |
+| Biểu thức gỡ bỏ | 700 ms và ít nhất ba mẫu |
+| Gỡ lỗi màn hình | 600 ms và ít nhất ba mẫu |
+| Ra mắt | 1800 ms và ít nhất ba mẫu |
+| Cười | Điểm trung bình tối thiểu là 0,65, độ mở miệng tối đa là 0,45 |
+| Trung lập | Điểm trung bình tối đa là 0,25, độ mở miệng tối đa là 0,25 |
+| Màn hình | Độ lệch tuyệt đối trung bình tối đa là 18°, nghiêng tối đa 15° |
+| Đi xa | Độ lệch tuyệt đối trung bình ít nhất là 30° hoặc nghiêng ít nhất 25° |
 
-The remaining ranges produce unknown. Missing features or pose also produce unknown.
-Absolute pose offsets prevent left and right head turns from averaging into a screen cue.
-A break in sample continuity resets the debouncers. Stale state expires even when no new frame arrives.
-Durations measure confirmed output stability, not the length of one frame.
+Các phạm vi còn lại tạo ra không xác định. Thiếu tính năng hoặc tư thế cũng tạo ra những điều chưa biết. Sự chênh lệch tư thế tuyệt đối ngăn cản việc quay đầu trái và phải từ mức trung bình thành tín hiệu trên màn hình. Sự gián đoạn trong tính liên tục của mẫu sẽ đặt lại trình gỡ lỗi. Trạng thái cũ hết hạn ngay cả khi không có khung hình mới nào đến. Thời lượng đo độ ổn định đầu ra được xác nhận chứ không phải độ dài của một khung hình.
 
-This domain provides advisory conversational cues. It does not classify inner feelings, identity, health, or understanding.
-The heuristic thresholds need real-camera evaluation across users and lighting conditions.
+Miền này cung cấp các tín hiệu đàm thoại mang tính tư vấn. Nó không phân loại cảm xúc bên trong, bản sắc, sức khỏe hoặc sự hiểu biết. Các ngưỡng heuristic cần được đánh giá bằng camera thực đối với người dùng và điều kiện ánh sáng.
 
-## Request context and conversational reactions
+<a id="request-context-and-conversational-reactions"></a>
 
-`CameraContextProvider` supplies the current compact state on every relevant request while camera perception is ON.
-Freshness and evidence gates still apply. Reading the same state again does not hide it.
-The CLI's existing `resolveStep` hook refreshes the outgoing system prompt before each model call, including tool continuations.
-Task and memory context remain available through their existing system turns.
-Camera observations and injected cues never enter durable conversation, session, or memory storage.
-Camera updates do not initiate model requests.
+## Yêu cầu bối cảnh và phản ứng đàm thoại
 
-The provider tracks conversational reaction opportunities separately.
-An unchanged cue allows another commentary opportunity after sixty seconds. A changed cue requires at least ten seconds.
-These intervals affect the prompt's commentary guidance only. Every eligible request still receives the current state.
-During a quiet interval, Angela can adapt its tone or pace and cautiously answer explicit questions about cues.
-The policy does not detect whether a previous reply used an opportunity.
+`CameraContextProvider` cung cấp trạng thái nhỏ gọn hiện tại cho mọi yêu cầu liên quan trong khi cảm nhận của máy ảnh là ON. Sự mới mẻ và bằng chứng cổng kiểm tra vẫn được áp dụng. Đọc lại cùng một trạng thái không che giấu nó. CLI hiện có của `resolveStep` hook làm mới hệ thống gửi đi prompt trước mỗi lệnh gọi mô hình, bao gồm cả phần tiếp theo của công cụ. Bối cảnh nhiệm vụ và bộ nhớ vẫn có sẵn thông qua các lượt hệ thống hiện có của chúng. Các quan sát của camera và tín hiệu được đưa vào không bao giờ được đưa vào cuộc trò chuyện, phiên hoặc bộ nhớ lâu dài. Cập nhật máy ảnh không bắt đầu yêu cầu mô hình.
+
+Các cơ hội phản ứng đàm thoại nhà cung cấp track riêng biệt. Tín hiệu không thay đổi sẽ cho phép bạn có cơ hội bình luận khác sau sáu mươi giây. Một tín hiệu đã thay đổi cần ít nhất mười giây. Những khoảng thời gian này chỉ ảnh hưởng đến hướng dẫn bình luận của prompt. Mọi yêu cầu đủ điều kiện vẫn nhận được trạng thái hiện tại. Trong khoảng thời gian yên tĩnh, Angela có thể điều chỉnh giọng điệu hoặc nhịp độ của nó và trả lời một cách thận trọng các câu hỏi rõ ràng về tín hiệu. Chính sách này không phát hiện liệu thư trả lời trước đó có sử dụng cơ hội hay không.

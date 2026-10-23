@@ -1,10 +1,12 @@
 # `@angela/input-gamepad`
 
-This package reads controllers through the browser Gamepad API. It accepts controllers that expose the W3C `standard` mapping.
+Gói này đọc bộ điều khiển thông qua trình duyệt Gamepad API. Nó chấp nhận các bộ điều khiển hiển thị ánh xạ W3C `standard`.
 
-The package converts browser button indices to physical names. For example, button `0` becomes `faceBottom`. The printed label can be `×`, `A`, or `B`.
+Gói chuyển đổi các chỉ mục nút trình duyệt thành tên vật lý. Ví dụ: nút `0` trở thành `faceBottom`. Nhãn in có thể là `×`, `A` hoặc `B`.
 
-## Use the package
+<a id="use-the-package"></a>
+
+## Sử dụng gói
 
 ```ts
 import { StandardGamepadMonitor } from '@angela/input-gamepad'
@@ -24,12 +26,14 @@ stopListening()
 monitor.stop()
 ```
 
-## When to use it
+<a id="when-to-use-it"></a>
 
-Use this package directly in framework-independent browser code. It supports buttons, sticks, and analog triggers.
+## Khi nào nên sử dụng nó
 
-In Vue code, use `@angela/input-gamepad-vueuse`. It owns the polling lifecycle and exposes readonly reactive state.
+Sử dụng gói này trực tiếp trong mã trình duyệt độc lập với khung. Nó hỗ trợ các nút, gậy và kích hoạt tương tự.
 
-Do not use this package for motion sensors, touchpads, lights, or adaptive triggers. Use a device-specific adapter for these features.
+Trong mã Vue, sử dụng `@angela/input-gamepad-vueuse`. Nó sở hữu vòng đời bỏ phiếu và hiển thị trạng thái phản ứng chỉ đọc.
 
-The package ignores controllers without the `standard` mapping. This rule prevents device-specific button indices from entering application code.
+Không sử dụng gói này cho cảm biến chuyển động, bàn di chuột, đèn hoặc bộ kích hoạt thích ứng. Sử dụng bộ chuyển đổi dành riêng cho thiết bị cho các tính năng này.
+
+Gói bỏ qua các bộ điều khiển không có ánh xạ `standard`. Quy tắc này ngăn các chỉ mục nút dành riêng cho thiết bị nhập mã ứng dụng.

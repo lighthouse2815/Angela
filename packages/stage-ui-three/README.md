@@ -1,102 +1,122 @@
 # `@angela/stage-ui-three`
 
-Three.js runtime components, stores, composables, and diagnostics used by Angela stage surfaces.
+Các thành phần Three.js runtime, store, các composable và chẩn đoán được sử dụng bởi các bề mặt Angela stage.
 
-## What It Does
+<a id="what-it-does"></a>
 
-- Hosts the shared Three scene root used by stage pages.
-- Loads, mounts, reuses, and disposes VRM models.
-- Exposes a package-local model store for camera, light, environment, and model view state.
-- Provides Three-specific hit testing, render-target helpers, and VRM preview generation.
-- Exposes a local `trace` submodule for Three/VRM runtime diagnostics.
+## Nó làm gì
 
-## Exports
+- host gốc ba cảnh được chia sẻ được sử dụng bởi các trang stage.
+- Tải, gắn, tái sử dụng và thải bỏ VRM mô hình.
+- Cung cấp store mô hình nội bộ của gói để quản lý camera, ánh sáng, môi trường và trạng thái khung nhìn mô hình.
+- Cung cấp ba thử nghiệm lần truy cập cụ thể, trình trợ giúp mục tiêu kết xuất và bản xem trước VRM sinh nội dung.
+- Hiển thị mô-đun con `trace` cục bộ để chẩn đoán Three/VRM runtime.
 
-- `ThreeScene`: the main Three-backed stage component.
-- `useModelStore`: Pinia store for Three scene and model configuration.
-- `@angela/stage-ui-three/trace`: local Eventa trace bus and snapshot helpers.
-- `@angela/stage-ui-three/composables/vrm`: VRM loading and animation helpers.
-- `@angela/stage-ui-three/utils/vrm-preview`: one-off VRM preview rendering.
-- `composables/hit-test` and `composables/render-target`: renderer readback helpers.
+<a id="exports"></a>
 
-## VRM Lifecycle
+## Xuất khẩu
 
-VRM runtime management is explicit in this package.
+- `ThreeScene`: thành phần stage ba mặt chính.
+- `useModelStore`: Pinia store cho cấu hình ba cảnh và mô hình.
+- `@angela/stage-ui-three/trace`: xe buýt theo dõi sự kiện cục bộ và người trợ giúp chụp nhanh.
+- `@angela/stage-ui-three/composables/vrm`: Trình trợ giúp tải và hoạt hình VRM.
+- `@angela/stage-ui-three/utils/vrm-preview`: kết xuất xem trước VRM một lần.
+- `composables/hit-test` và `composables/render-target`: Trình trợ giúp đọc lại renderer.
 
-- `VRMModel.vue` drives load, commit, and cleanup separately instead of relying on component remounts as the primary lifecycle.
-- Detached VRM instances are cached through `components/Model/vrm-instance-cache.ts` as `ManagedVrmInstance` values.
-- Cache entries are scoped by `scopeKey` and matched by `modelSrc` before reuse.
-- Component unmount may stash the current instance for reuse.
-- Model switch clears the active instance and any detached cache for the current scope.
-- Fresh loads prepare the next VRM off-screen, then commit it into the active scene once ready.
+<a id="vrm-lifecycle"></a>
 
-This keeps ordinary remounts and HMR from immediately forcing deep VRM disposal, while still making model switches deterministic.
+## Vòng đời VRM
 
-## Lip-Sync Boundary
+Quản lý VRM runtime được nêu rõ ràng trong gói này.
 
-`ThreeScene` receives the `AudioContext` and current audio source from its caller. The package does not import the Stage audio store.
+- Các ổ đĩa `VRMModel.vue` tải, cam kết và dọn dẹp riêng biệt thay vì dựa vào việc kết nối lại thành phần làm vòng đời chính.
+- Các phiên bản VRM tách rời được lưu vào bộ nhớ đệm thông qua `components/Model/vrm-instance-cache.ts` dưới dạng giá trị `ManagedVrmInstance`.
+- Các mục trong bộ nhớ đệm được xác định phạm vi theo `scopeKey` và được khớp với `modelSrc` trước khi sử dụng lại.
+- Việc ngắt kết nối thành phần có thể lưu phiên bản hiện tại để sử dụng lại.
+- Công tắc mô hình xóa phiên bản đang hoạt động và mọi bộ đệm đã tách rời cho phạm vi hiện tại.
+- Tải mới chuẩn bị màn hình ngoài VRM tiếp theo, sau đó đưa nó vào cảnh hoạt động khi đã sẵn sàng.
 
-The shared driver produces AEIOU weights. The VRM adapter maps these weights to `aa`, `ee`, `ih`, `oh`, and `ou` expressions.
+Điều này giúp cho việc kết nối lại thông thường và HMR không bị buộc phải xử lý sâu VRM ngay lập tức, trong khi vẫn khiến các chuyển đổi mô hình mang tính quyết định.
 
-## Scene Lifecycle
+<a id="lip-sync-boundary"></a>
 
-`ThreeScene` coordinates two independent async readiness signals before the scene becomes interactive:
+## Ranh giới hát nhép
 
-- **VRM load**: `VRMModel` emits `sceneBootstrap` (geometry data) then `loaded` once the model is committed into the scene.
-- **Controls init**: `OrbitControls` emits `orbitControlsReady` once it has obtained the camera and renderer references.
+`ThreeScene` nhận `AudioContext` và nguồn âm thanh hiện tại từ người gọi. Gói không nhập âm thanh stage store.
 
-These two signals are coordinated through a binding transaction tracked in `useModelStore`:
+Trình điều khiển dùng chung tạo ra trọng số AEIOU. Bộ điều hợp VRM ánh xạ các trọng số này thành các biểu thức `aa`, `ee`, `ih`, `oh` và `ou`.
 
-- `scenePhase`: the current phase of the scene — `pending` → `loading` → `binding` → `mounted` (or `error` / `no-model`).
-- `sceneTransactionDepth`: incremented at the start of a load or rebind cycle, decremented when binding completes. The scene is considered mid-flight whenever depth > 0.
-- `sceneMutationLocked`: computed from `scenePhase` and `sceneTransactionDepth`. True whenever the scene is not yet mounted or a transaction is in progress. Used to gate user interactions like orbit controls.
+<a id="scene-lifecycle"></a>
 
-When either signal arrives, `ThreeScene` calls `completeSceneBinding()`. That function:
+## Vòng đời cảnh
 
-1. Sets `scenePhase` to `'binding'` immediately to block premature `mounted` resolution.
-2. Applies the pending `SceneBootstrap` payload (camera position, model origin, eye height, etc.) if one exists.
-3. Calls `controlsRef.update()` after a `nextTick` so OrbitControls reads the updated camera state.
-4. Resolves `scenePhase` to its final value based on current `modelPhase` and `canvasReady`.
+`ThreeScene` phối hợp hai tín hiệu sẵn sàng không đồng bộ độc lập trước khi cảnh trở nên tương tác:
 
-Whichever signal arrives second completes the binding. The first signal to arrive finds the other not yet ready and resolves back to `'loading'`.
+- **Tải VRM**: `VRMModel` phát ra `sceneBootstrap` (dữ liệu hình học) sau đó là `loaded` sau khi mô hình được đưa vào hiện trường.
+- **Điều khiển ban đầu**: `OrbitControls` phát ra `orbitControlsReady` sau khi nhận được các tham chiếu máy ảnh và renderer.
 
-### Camera Preservation on Model Switch
+Hai tín hiệu này được phối hợp thông qua giao dịch ràng buộc được theo dõi trong `useModelStore`:
 
-`SceneBootstrap` carries a `cacheHit` flag. `ThreeScene.applySceneBootstrap` uses the transaction reason to decide how to apply bootstrap data:
+- `scenePhase`: giai đoạn hiện tại của cảnh — `pending` → `loading` → `binding` → `mounted` (hoặc `error` / `no-model`).
+- `sceneTransactionDepth`: tăng khi bắt đầu chu kỳ tải hoặc khởi động lại, giảm khi liên kết hoàn tất. Cảnh được coi là đang bay khi độ sâu > 0.
+- `sceneMutationLocked`: được tính từ `scenePhase` và `sceneTransactionDepth`. Đúng bất cứ khi nào cảnh chưa được gắn kết hoặc giao dịch đang được tiến hành. Được sử dụng để tương tác với người dùng cổng kiểm tra như điều khiển quỹ đạo.
 
-- `initial-load` / `unknown`: camera position and target are reset to the model's computed defaults.
-- `model-switch`: the user's existing camera offset and look-at angle relative to the previous model origin are preserved and projected onto the new model origin.
+Khi một trong hai tín hiệu đến, `ThreeScene` gọi `completeSceneBinding()`. Chức năng đó:
 
-### Subtree Watch
+1. Đặt `scenePhase` thành `'binding'` ngay lập tức để chặn độ phân giải `mounted` sớm.
+2. Áp dụng tải trọng `SceneBootstrap` đang chờ xử lý (vị trí camera, điểm gốc mô hình, chiều cao mắt, v.v.) nếu có.
+3. Gọi `controlsRef.update()` sau `nextTick` để OrbitControls đọc trạng thái camera được cập nhật.
+4. Phân giải `scenePhase` về giá trị cuối cùng dựa trên `modelPhase` và `canvasReady` hiện tại.
 
-`ThreeScene` watches `modelRef` and `controlsRef` with `flush: 'sync'` to detect immediate detach events within the same tick. When `controlsRef` goes null (e.g. TresJS internal remount), `controlsReady` resets and a new binding transaction opens. When `modelRef` goes null, `scenePhase` reverts to `loading` without opening a new transaction, since the next `loadStart` event from `VRMModel` will open one.
+Bất kỳ tín hiệu nào đến thứ hai sẽ hoàn thành việc liên kết. Tín hiệu đầu tiên đến sẽ tìm thấy tín hiệu khác chưa sẵn sàng và chuyển trở lại `'loading'`.
 
-## `trace` Submodule
+<a id="camera-preservation-on-model-switch"></a>
 
-`@angela/stage-ui-three/trace` provides:
+### Bảo quản camera trên mô hình Switch
 
-- A local Eventa context for Three/VRM runtime trace events.
-- Ref-counted enable/disable controls so hot paths can short-circuit when tracing is off.
-- Shared event definitions for:
-  - Three render info
-  - Three hit-test readback
-  - VRM update frame breakdown
-  - VRM load start / end / error
-  - VRM dispose start / end
-- Resource snapshot helpers for renderer memory and VRM scene summaries.
+`SceneBootstrap` mang cờ `cacheHit`. `ThreeScene.applySceneBootstrap` sử dụng lý do giao dịch để quyết định cách áp dụng dữ liệu bootstrap:
 
-The trace bus is intentionally local to `stage-ui-three`. Desktop apps can bridge it across renderer windows when needed, but the source of truth stays in this package.
+- `initial-load` / `unknown`: vị trí và mục tiêu của camera được đặt lại về giá trị mặc định đã tính toán của mô hình.
+- `model-switch`: Độ lệch camera hiện tại của người dùng và góc nhìn so với nguồn gốc mô hình trước đó được giữ nguyên và chiếu lên nguồn gốc mô hình mới.
 
-## When To Use It
+<a id="subtree-watch"></a>
 
-- Use it when a stage surface needs a Three-backed renderer.
-- Use `useModelStore` when the page needs to control camera, lighting, model transforms, or renderer-facing state.
-- Use `@angela/stage-ui-three/trace` when you need Three/VRM runtime telemetry without routing through Vue parent chains.
-- Use `utils/vrm-preview` for isolated preview rendering that should not participate in the main stage lifecycle.
+### Xem cây con
 
-## When Not To Use It
+`ThreeScene` theo dõi `modelRef` và `controlsRef` bằng `flush: 'sync'` để phát hiện các sự kiện tách ra ngay lập tức trong cùng một tích tắc. Khi `controlsRef` không có giá trị (ví dụ: kết nối lại nội bộ TresJS), `controlsReady` sẽ đặt lại và một giao dịch ràng buộc mới sẽ mở ra. Khi `modelRef` vô hiệu, `scenePhase` trở lại `loading` mà không mở giao dịch mới, vì sự kiện `loadStart` tiếp theo từ `VRMModel` sẽ mở một giao dịch mới.
 
-- Do not use it as a global business event bus.
-- Do not use the `trace` submodule for Live2D or non-Three runtime telemetry.
-- Do not route renderer-to-main control flow through the `trace` submodule; keep control IPC in app-level contracts.
-- Do not use the VRM instance cache as a general shared asset cache across apps or windows.
+<a id="trace-submodule"></a>
+
+## Mô-đun con `trace`
+
+`@angela/stage-ui-three/trace` cung cấp:
+
+- Bối cảnh Eventa cục bộ cho các sự kiện theo dõi Three/VRM runtime.
+- Các điều khiển enable/disable được tính lại để các đường dẫn nóng có thể bị đoản mạch khi tắt tính năng theo dõi.
+- Định nghĩa sự kiện được chia sẻ cho:
+  - Ba thông tin kết xuất
+  - Đọc lại ba bài kiểm tra lần truy cập
+  - Phân tích khung cập nhật VRM
+  - Bắt đầu/kết thúc/lỗi tải VRM
+  - VRM xử lý bắt đầu / kết thúc
+- Trình trợ giúp chụp nhanh tài nguyên cho bộ nhớ renderer và tóm tắt cảnh VRM.
+
+Bus theo dõi được cố ý cục bộ hóa thành `stage-ui-three`. Các ứng dụng desktop có thể kết nối nó qua các cửa sổ renderer khi cần, nhưng nguồn gốc của sự thật vẫn nằm trong gói này.
+
+<a id="when-to-use-it"></a>
+
+## Khi nào nên sử dụng nó
+
+- Sử dụng nó khi bề mặt stage cần renderer ba mặt sau.
+- Sử dụng `useModelStore` khi trang cần điều khiển máy ảnh, ánh sáng, biến đổi mô hình hoặc trạng thái quay mặt về renderer.
+- Sử dụng `@angela/stage-ui-three/trace` khi bạn cần đo từ xa Three/VRM runtime mà không cần định tuyến qua chuỗi mẹ Vue.
+- Sử dụng `utils/vrm-preview` để hiển thị bản xem trước riêng biệt không tham gia vào vòng đời stage chính.
+
+<a id="when-not-to-use-it"></a>
+
+## Khi nào không nên sử dụng nó
+
+- Không sử dụng nó như một xe buýt sự kiện kinh doanh toàn cầu.
+- Không sử dụng mô-đun con `trace` cho phép đo từ xa Live2D hoặc không phải Ba runtime.
+- Không điều khiển route renderer-to-main thông qua mô-đun con `trace`; giữ quyền kiểm soát IPC trong các hợp đồng cấp ứng dụng.
+- Không sử dụng bộ đệm phiên bản VRM làm bộ đệm nội dung chung được chia sẻ trên các ứng dụng hoặc cửa sổ.

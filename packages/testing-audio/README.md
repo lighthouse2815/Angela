@@ -1,14 +1,16 @@
-# Testing audio
+<a id="testing-audio"></a>
 
-This package runs recorded microphone tests through the real Angela audio pipeline.
+# Kiểm tra âm thanh
+
+Gói này chạy các bài kiểm tra micrô đã ghi thông qua đường ống âm thanh thực của Angela.
 
 ```text
 input.wav -> virtual microphone -> VAD -> ASR -> LLM -> TTS -> playback -> UI
 ```
 
-The package exports audio-aware `describe`, `it`, and `expect` APIs. Vitest owns the task tree and result protocol. Each project starts its configured Playwright runtime.
+Gói này xuất các API `describe`, `it` và `expect` nhận biết âm thanh. Vitest sở hữu cây nhiệm vụ và giao thức kết quả. Mỗi dự án bắt đầu Playwright runtime được cấu hình của nó.
 
-`src` only owns test scheduling, runtime startup, browser probes, and matchers. Case-specific environment, storage, Provider, route, and UI operations live under `cases/shared`:
+`src` chỉ sở hữu tính năng lập lịch kiểm tra, khởi động runtime, thăm dò trình duyệt và so khớp. Môi trường, bộ lưu trữ, hoạt động nhà cung cấp, route và UI theo từng trường hợp cụ thể trực tiếp trong `cases/shared`:
 
 ```text
 cases/shared/
@@ -16,15 +18,17 @@ cases/shared/
   interactions/    # reusable UI operations selected by a case
 ```
 
-## Configure a case
+<a id="configure-a-case"></a>
 
-The optional `preflight` field is an ordered callback array. The fake-microphone Vitest integration starts the runtime before it invokes these callbacks. Each callback receives:
+## Cấu hình một trường hợp
 
-- `env`: the process environment for this case
-- `runtime`: the clean Playwright runtime
-- `skip`: Vitest's case-level skip control
+Trường `preflight` tùy chọn là mảng gọi lại theo thứ tự. Tích hợp Vitest micrô giả khởi động runtime trước khi nó gọi các lệnh gọi lại này. Mỗi cuộc gọi lại nhận được:
 
-Every case explicitly selects the configuration it needs. Do not create one shared “complete pipeline” preflight that hides the Provider combination.
+- `env`: môi trường xử lý cho trường hợp này
+- `runtime`: Playwright runtime sạch sẽ
+- `skip`: Kiểm soát bỏ qua cấp trường hợp của Vitest
+
+Mỗi trường hợp đều chọn rõ ràng cấu hình mà nó cần. Không tạo một preflight "đường dẫn hoàn chỉnh" được chia sẻ để che giấu sự kết hợp nhà cung cấp.
 
 ```ts
 import { describe, expect, it } from '../../src'
@@ -64,13 +68,15 @@ describe('audio input pipeline', () => {
 })
 ```
 
-A case can independently choose its VAD behavior, ASR, LLM, and TTS configuration. A configuration callback can read its own environment, write local storage, use another persistence mechanism, or deliberately leave onboarding incomplete.
+Một trường hợp có thể chọn cấu hình VAD, ASR, LLM và TTS một cách độc lập. Lệnh gọi lại cấu hình có thể đọc môi trường của chính nó, ghi bộ nhớ cục bộ, sử dụng cơ chế lưu giữ khác hoặc cố tình để quá trình triển khai chưa hoàn tất.
 
-## Test wake word detection
+<a id="test-wake-word-detection"></a>
 
-Use `configureWakeWord` to add Angela Cards with wake words. Each configuration adds one card with one wake word and its pronunciations. The callback also turns on the microphone and selects the `wake-word` Hearing input mode. The case does not need an ASR Provider.
+## Kiểm tra phát hiện từ đánh thức
 
-Set `pipelines: ['kws']`. Then the Web runner downloads and verifies the pinned KWS model before the file microphone starts. The Web page gets the model from the workspace cache, not from the network. Electron uses its bundled model.
+Sử dụng `configureWakeWord` để thêm Thẻ Angela kèm theo lời đánh thức. Mỗi cấu hình thêm một thẻ có một từ đánh thức và cách phát âm của nó. Cuộc gọi lại cũng bật micrô và chọn chế độ đầu vào Nghe `wake-word`. Vỏ máy không cần ASR nhà cung cấp.
+
+Đặt `pipelines: ['kws']`. Sau đó, Web runner tải xuống và xác minh KWS mô hình được ghim trước khi micrô của tệp bắt đầu. Trang Web lấy mô hình từ bộ đệm workspace chứ không phải từ mạng. Electron sử dụng mô hình đi kèm của nó.
 
 ```ts
 import { describe, expect, it } from '../../src'
@@ -96,51 +102,55 @@ describe('wake word detection', () => {
 })
 ```
 
-A wake does not change the active card. It begins a voice input in the chat session of the matched character. `waitForVoiceInput` reads that input from the voice host snapshot on the speech bus. `readSessionCharacterId` reads the session owner from the stored chat session index.
+Việc đánh thức không làm thay đổi thẻ đang hoạt động. Nó bắt đầu nhập giọng nói trong phiên trò chuyện của nhân vật phù hợp. `waitForVoiceInput` đọc đầu vào đó từ ảnh chụp nhanh host bằng giọng nói trên bus lời nói. `readSessionCharacterId` đọc chủ sở hữu phiên từ chỉ mục phiên trò chuyện được lưu trữ.
 
-In the `wake-word` mode, speech alone does not begin an input. Thus the first voice input of the case comes from a wake.
+Ở chế độ `wake-word`, chỉ có giọng nói sẽ không bắt đầu đầu vào. Do đó, đầu vào bằng giọng nói đầu tiên của trường hợp này xuất phát từ sự đánh thức.
 
 Each pronunciation is a token sequence of the pinned zh/en Zipformer model. The vocabulary is in `packages/stage-ui/src/libs/voice/kws-vocabulary.json`. English tokens are CMU phonemes with stress digits, for example `AY1`. Mandarin tokens are pinyin initials and finals with tone marks, for example `zh ī m a k āi m én` for 芝麻开门. A neutral tone has no mark.
 
-The wake word cases:
+Các trường hợp từ đánh thức:
 
-| Case | What it proves | Recording | Wake words (pronunciations) |
+| Trường hợp | Nó chứng tỏ điều gì | Ghi âm | Đánh thức từ (phát âm) |
 | --- | --- | --- | --- |
-| `wake-word` | A wake begins the input in the owner's session, not the active card's session. | "Light up" 3 times, macOS Samantha voice, 35 s leading silence | "Light up": `L AY1 T AH1 P` |
-| `wake-word-routing` | One detector holds the words of two characters. The input goes to the character whose word was said. | "Hello computer" 3 times, OpenAI `tts-1` `alloy` voice, 15 s leading silence | "Light up": `L AY1 T AH1 P`. "Hello computer": `HH AH0 L OW1 K AH0 M P Y UW1 T ER0` |
+| `wake-word` | Quá trình đánh thức bắt đầu quá trình nhập trong phiên của chủ sở hữu chứ không phải phiên của thẻ đang hoạt động. | "Thắp sáng" 3 lần, macOS giọng Samantha, 35 giây im lặng | “Thắp sáng”: `L AY1 T AH1 P` |
+| `wake-word-routing` | Một máy dò giữ các từ của hai ký tự. Đầu vào sẽ chuyển đến ký tự có từ được nói. | "Xin chào máy tính" 3 lần, giọng OpenAI `tts-1` `alloy`, im lặng 15 giây | "Thắp sáng": `L AY1 T AH1 P`. "Chào máy tính": `HH AH0 L OW1 K AH0 M P Y UW1 T ER0` |
 | `wake-word-second-pronunciation` | A pronunciation after the first one wakes the character, and a Mandarin token sequence matches Mandarin speech. | "芝麻开门" 3 times, OpenAI `tts-1` `alloy` voice, 15 s leading silence | "Open sesame": `OW1 P AH0 N S EH1 S AH0 M IY0`, then `zh ī m a k āi m én` |
 
-All fixtures are 16 kHz mono 16-bit PCM WAV files. The leading silence gives the detector time to start before speech begins. A pause of 1 second follows each phrase.
+Tất cả mẫu kiểm thử đều là các tệp PCM WAV đơn âm 16 kHz. Khoảng lặng chủ đạo giúp máy dò có thời gian khởi động trước khi bắt đầu phát biểu. Sau mỗi cụm từ có khoảng dừng 1 giây.
 
-### Generate the fixtures
+<a id="generate-the-fixtures"></a>
 
-`scripts/generate-wake-word-fixtures.ts` writes the `wake-word-routing` and `wake-word-second-pronunciation` fixtures. It sends each phrase to the OpenAI-compatible `/audio/speech` endpoint and asks for 24 kHz `pcm` audio. Then it converts the audio to 16 kHz, removes silence around each phrase, and adds the fixture pauses. It does not need `ffmpeg`.
+### Tạo mẫu kiểm thử
 
-The script reads the `TESTING_AUDIO_TTS_*` variables in the same way as the cases. Set them in `packages/testing-audio/.env.local` or `.env.test.local`. Then run:
+`scripts/generate-wake-word-fixtures.ts` ghi `wake-word-routing` và `wake-word-second-pronunciation` mẫu kiểm thử. Nó gửi từng cụm từ đến điểm cuối `/audio/speech` tương thích với OpenAI và yêu cầu âm thanh `pcm` 24 ​​kHz. Sau đó, nó chuyển đổi âm thanh thành 16 kHz, loại bỏ khoảng lặng xung quanh mỗi cụm từ và thêm các khoảng dừng mẫu kiểm thử. Nó không cần `ffmpeg`.
+
+Tập lệnh đọc các biến `TESTING_AUDIO_TTS_*` theo cách tương tự như các trường hợp. Đặt chúng trong `packages/testing-audio/.env.local` hoặc `.env.test.local`. Sau đó chạy:
 
 ```bash
 pnpm -F @angela/testing-audio exec tsx scripts/generate-wake-word-fixtures.ts
 ```
 
-The speech changes a little on each request. After you generate the fixtures, run the cases on both hosts. If a phrase does not wake the character, change the phrase or its pronunciation. Do not change the assertions.
+Bài phát biểu thay đổi một chút theo từng yêu cầu. Sau khi bạn tạo mẫu kiểm thử, hãy chạy các trường hợp trên cả host. Nếu một cụm từ không đánh thức được ký tự, hãy thay đổi cụm từ đó hoặc cách phát âm của nó. Đừng thay đổi các khẳng định.
 
-Run the cases on both hosts:
+Chạy các trường hợp trên cả host:
 
 ```bash
 pnpm -F @angela/testing-audio test:run cases/wake-word
 ```
 
-For one host, build its app and select `--project audio-web` or `--project audio-electron`.
+Đối với một host, hãy xây dựng ứng dụng của nó và chọn `--project audio-web` hoặc `--project audio-electron`.
 
-## Provider environment
+<a id="provider-environment"></a>
 
-Each case selects its environment variables. `loadCaseEnvironment` uses Vite test mode to read repository, `packages/stage-ui`, and package environment files. Process variables have the highest priority.
+## Môi trường nhà cung cấp
 
-Put local test credentials in `packages/testing-audio/.env.test.local`. Git ignores this file.
+Mỗi trường hợp chọn các biến môi trường của nó. `loadCaseEnvironment` sử dụng chế độ kiểm tra Vite để đọc các tệp môi trường kho lưu trữ, `packages/stage-ui` và gói. Các biến quy trình có mức độ ưu tiên cao nhất.
 
-The OpenAI-compatible Provider helpers do not read the environment. Pass the endpoint, API key, model, and voice from the case callback.
+Đặt thông tin xác thực kiểm tra cục bộ vào `packages/testing-audio/.env.test.local`. Git bỏ qua tập tin này.
 
-The included cases use these explicit variables:
+Trình trợ giúp nhà cung cấp tương thích với OpenAI không đọc được môi trường. Truyền điểm cuối, khóa API, mô hình và giọng nói từ lệnh gọi lại trường hợp.
+
+Các trường hợp được bao gồm sử dụng các biến rõ ràng sau:
 
 ```dotenv
 TESTING_AUDIO_ASR_PROVIDER=openai-compatible-audio-transcription
@@ -165,29 +175,31 @@ TESTING_AUDIO_TTS_API_BASE_URL=https://api.openai.com/v1/
 TESTING_AUDIO_TTS_API_KEY=...
 ```
 
-These tests send audio and text to external Providers. Each run can incur Provider charges.
+Các thử nghiệm này sẽ gửi âm thanh và văn bản tới nhà cung cấp bên ngoài. Mỗi lần chạy có thể phải chịu phí nhà cung cấp.
 
-## Run the tests
+<a id="run-the-tests"></a>
 
-Build both targets and run all runtime projects:
+## Chạy thử nghiệm
+
+Xây dựng cả hai mục tiêu và chạy tất cả các dự án runtime:
 
 ```bash
 pnpm -F @angela/testing-audio test:run
 ```
 
-Use existing builds:
+Sử dụng các bản dựng hiện có:
 
 ```bash
 pnpm -F @angela/testing-audio test:existing-builds
 ```
 
-Run one runtime project:
+Chạy một dự án runtime:
 
 ```bash
 pnpm -F @angela/testing-audio exec vitest run --project audio-web
 pnpm -F @angela/testing-audio exec vitest run --project audio-electron
 ```
 
-Use `*.audio.web.test.ts` for Web-only cases. Use `*.audio.electron.test.ts` for Electron-only cases. The `*.audio.test.ts` pattern runs in both projects.
+Sử dụng `*.audio.web.test.ts` cho các trường hợp chỉ dành cho Web. Sử dụng `*.audio.electron.test.ts` cho các trường hợp chỉ có Electron. Mẫu `*.audio.test.ts` chạy trong cả hai dự án.
 
-Do not use Vitest Browser Mode for these cases. Each task needs a case-specific Chromium fake-microphone process argument.
+Không sử dụng Chế độ trình duyệt Vitest cho những trường hợp này. Mỗi tác vụ cần có một đối số quy trình micrô giả Chrome dành riêng cho từng trường hợp.

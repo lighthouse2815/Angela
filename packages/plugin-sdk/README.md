@@ -1,10 +1,12 @@
 # @angela/plugin-sdk
 
-Runtime-agnostic SDK for Angela extensions.
+runtime-agnostic SDK dành cho tiện ích mở rộng Angela.
 
-## Extension Manifest
+<a id="extension-manifest"></a>
 
-Each installable Extension package has an `extension.airi.json` file at its root. The current Host accepts only Manifest v2:
+## Bản kê khai tiện ích mở rộng
+
+Mỗi gói Tiện ích mở rộng có thể cài đặt đều có tệp `extension.airi.json` ở gốc. host hiện tại chỉ chấp nhận Bản kê khai v2:
 
 ```json
 {
@@ -32,36 +34,38 @@ Each installable Extension package has an `extension.airi.json` file at its root
 }
 ```
 
-Manifest parsing is strict. Unknown fields, unsafe ids, empty entrypoints, and missing runtime entrypoints fail validation.
+Phân tích cú pháp kê khai là nghiêm ngặt. Các trường không xác định, id không an toàn, điểm nhập trống và điểm nhập runtime bị thiếu không xác thực được.
 
-Kit Provider declarations use exact semantic versions. Kit Consumer declarations accept semantic version ranges.
+Khai báo Kit nhà cung cấp sử dụng các phiên bản ngữ nghĩa chính xác. Khai báo bộ bên sử dụng chấp nhận phạm vi phiên bản ngữ nghĩa.
 
-The manifest owns the Extension version for the Host session. `defineExtension(...)` must use the same Extension id.
+Tệp kê khai sở hữu phiên bản Tiện ích mở rộng cho phiên host. `defineExtension(...)` phải sử dụng cùng một ID tiện ích mở rộng.
 
-## Kit API Naming
+<a id="kit-api-naming"></a>
 
-Kits should hide transport details from extension authors. A normal extension should use a kit as a normal API object directly from setup:
+## Đặt tên bộ API
+
+Bộ công cụ nên ẩn thông tin chi tiết về transport khỏi tác giả tiện ích mở rộng. Tiện ích mở rộng thông thường nên sử dụng bộ công cụ làm đối tượng API bình thường ngay từ quá trình thiết lập:
 
 ```ts
 const gamelets = await ctx.kits.use(gameletKit)
 await gamelets.mount(input)
 ```
 
-Explicit module scopes are an advanced lifecycle and attribution API. Use `module.kits.use(...)` only when the host needs a contribution to be associated with a sub-scope that may later be inspected, disposed, or restarted independently.
+Phạm vi mô-đun rõ ràng là vòng đời và phân bổ nâng cao API. Chỉ sử dụng `module.kits.use(...)` khi host cần đóng góp để liên kết với phạm vi phụ mà sau này có thể được kiểm tra, xử lý hoặc khởi động lại một cách độc lập.
 
-When a kit needs to work across process or network boundaries, expose shared Eventa invoke contracts from the kit package and build the client from those contracts. Do not introduce kit-specific transport method names such as `invokeGamelet`, `gameletRpc`, or `gameletRuntime`.
+Khi một bộ công cụ cần hoạt động xuyên qua các ranh giới quy trình hoặc mạng, hãy hiển thị các hợp đồng gọi Eventa được chia sẻ từ gói bộ công cụ và xây dựng ứng dụng khách từ các hợp đồng đó. Không giới thiệu các tên phương thức transport dành riêng cho bộ công cụ như `invokeGamelet`, `gameletRpc` hoặc `gameletRuntime`.
 
-Use these names consistently:
+Sử dụng những tên này một cách nhất quán:
 
-| Name | Meaning |
+| Tên | Ý nghĩa |
 | --- | --- |
-| `gameletKitApis` | Shared Eventa API contract exported by the kit package. This is usually a map of `defineInvokeEventa(...)` entries. |
-| `gameletKitService` | Host-side implementation of the kit behavior. It owns real side effects such as mounting, updating, and cleaning up UI. |
-| `gameletKit` | The kit definition consumed by `ctx.kits.use(...)` or an optional module scope. It owns identity, version, availability policy, and client creation. |
-| `gamelets` | The client instance returned to extension authors. Prefer a plural namespace when the client exposes multiple operations. |
-| `createGameletKit(...)` | Factory that wires dependencies into `gameletKit`, including local client creation and remote Eventa-backed client creation. |
+| `gameletKitApis` | Hợp đồng Eventa API được chia sẻ được xuất theo gói kit. Đây thường là bản đồ của các mục `defineInvokeEventa(...)`. |
+| `gameletKitService` | Việc triển khai bộ công cụ phía host. Nó sở hữu các tác dụng phụ thực sự như gắn, cập nhật và dọn dẹp UI. |
+| `gameletKit` | Định nghĩa bộ công cụ được sử dụng bởi `ctx.kits.use(...)` hoặc phạm vi mô-đun tùy chọn. Nó sở hữu danh tính, phiên bản, chính sách sẵn có và tạo ứng dụng khách. |
+| `gamelets` | Phiên bản máy khách được trả về cho tác giả tiện ích mở rộng. Thích một không gian tên số nhiều khi máy khách hiển thị nhiều thao tác. |
+| `createGameletKit(...)` | hàm tạo kết nối các phần phụ thuộc vào `gameletKit`, bao gồm tạo ứng dụng khách cục bộ và tạo ứng dụng khách được hỗ trợ bởi Eventa từ xa. |
 
-Example shape:
+Hình dạng ví dụ:
 
 ```ts
 export const gameletKitApis = {
@@ -87,7 +91,7 @@ export function createGameletKit(options: { service: GameletKitService }) {
 }
 ```
 
-Remote clients should reuse Eventa invoke instead of defining a parallel RPC protocol. Use a lazy context callback when the underlying transport can reconnect or be created after the client object:
+Máy khách từ xa nên sử dụng lại lệnh gọi Eventa thay vì xác định giao thức RPC song song. Sử dụng hàm gọi lại ngữ cảnh lười biếng khi transport cơ bản có thể kết nối lại hoặc được tạo sau đối tượng máy khách:
 
 ```ts
 const mount = defineInvoke(getContext, gameletKitApis.mount)
@@ -99,4 +103,4 @@ const gamelets = {
 }
 ```
 
-The shared artifact is the Eventa API contract, not the implementation function. Local clients may call `gameletKitService` directly; remote clients call the same API through Eventa. Both should expose the same authoring shape.
+artifact được chia sẻ là hợp đồng Eventa API, không phải chức năng triển khai. Khách hàng cục bộ có thể gọi trực tiếp đến `gameletKitService`; khách hàng từ xa gọi cùng một API thông qua Eventa. Cả hai nên thể hiện hình dạng tác giả giống nhau.

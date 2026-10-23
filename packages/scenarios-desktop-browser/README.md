@@ -1,19 +1,23 @@
-# Scenarios - Stage Tamagotchi Browser
+<a id="scenarios---stage-tamagotchi-browser"></a>
 
-Compose final browser-scene exports for Angela desktop from raw Electron screenshots.
+# Kịch bản - Trình duyệt Tamagotchi stage
 
-## Purpose
+Compose xuất cảnh trình duyệt cuối cùng cho Angela desktop từ ảnh chụp màn hình Electron thô.
 
-This package is the tamagotchi browser composition layer. It contains:
+<a id="purpose"></a>
 
-- the Vite/Vue scene app
-- the scene composition components and capture roots
-- file-based scene routing from `src/scenes/**` via `unplugin-vue-router`
-- the `capture` script that exports final browser captures through `@vishot/renderer-browser`
+## Mục đích
 
-It expects raw business screenshots to exist in `artifacts/raw` before final export runs.
+Gói này là lớp thành phần trình duyệt tamagotchi. Nó chứa:
 
-Current docs capture target route:
+- ứng dụng cảnh Vite/Vue
+- các thành phần bố cục cảnh và gốc thu nhận dữ liệu
+- định tuyến cảnh dựa trên tệp từ `src/scenes/**` qua `unplugin-vue-router`
+- tập lệnh `capture` xuất trình duyệt cuối cùng được chụp thông qua `@vishot/renderer-browser`
+
+Nó hy vọng ảnh chụp màn hình doanh nghiệp thô sẽ tồn tại trong `artifacts/raw` trước khi tiến hành xuất lần cuối.
+
+Tài liệu hiện tại thu nhận dữ liệu nhắm mục tiêu route:
 
 - `/docs/setup-and-use` -> `src/scenes/docs/setup-and-use/index.vue`
 - `/docs/setup-and-use/intro-chat` -> `src/scenes/docs/setup-and-use/intro-chat.vue`
@@ -21,14 +25,18 @@ Current docs capture target route:
 - `/docs/setup-and-use/main-window` -> `src/scenes/docs/setup-and-use/main-window.vue`
 - `/docs/setup-and-use/settings` -> `src/scenes/docs/setup-and-use/settings.vue`
 
-## Workflow
+<a id="workflow"></a>
 
-1. Run Electron capture first and populate `artifacts/raw` (see electron package README).
-2. Run browser capture and output final composed files to docs assets.
+## Quy trình làm việc
 
-## Agent Quickstart
+1. Chạy Electron thu nhận dữ liệu trước và điền `artifacts/raw` (xem gói electron README).
+2. Chạy trình duyệt thu nhận dữ liệu và xuất các tệp được soạn thảo cuối cùng thành nội dung tài liệu.
 
-From repo root, run:
+<a id="agent-quickstart"></a>
+
+## agent Khởi động nhanh
+
+Từ gốc repo, chạy:
 
 ```bash
 pnpm exec vishot capture --target electron ./packages/scenarios-desktop-electron/src/scenarios/demo-controls-settings-chat-websocket/index.ts --app-entrypoint ./apps/desktop/out/main/index.js --cwd . --output-dir ./packages/scenarios-desktop-browser/artifacts/raw --format avif
@@ -38,23 +46,25 @@ pnpm -F @angela/scenarios-desktop-browser capture --format avif --route '/docs/s
 pnpm -F @angela/scenarios-desktop-browser capture --format avif --route '/docs/setup-and-use/settings' --output-dir ../../airi-docs/content/en/docs/manual/tamagotchi/setup-and-use/assets --settle-ms 800
 ```
 
-Expected results:
+Kết quả mong đợi:
 
-- Raw: `27` files under `packages/scenarios-desktop-browser/artifacts/raw`
-- Final docs assets: `manual-*.avif` and `intro-chat-window.avif` under `airi-docs/content/en/docs/manual/tamagotchi/setup-and-use/assets`
+- Nguyên: Tệp `27` trong `packages/scenarios-desktop-browser/artifacts/raw`
+- Nội dung tài liệu cuối cùng: `manual-*.avif` và `intro-chat-window.avif` thuộc `airi-docs/content/en/docs/manual/tamagotchi/setup-and-use/assets`
 
-The documentation lives in [moeru-ai/airi-docs](https://github.com/moeru-ai/airi-docs). Clone it to `airi-docs/` at the repository root (ignored by Git) before capturing.
+Tài liệu tồn tại trong [moeru-ai/airi-docs](https://github.com/moeru-ai/airi-docs). Sao chép nó vào `airi-docs/` tại thư mục gốc của kho lưu trữ (bị Git bỏ qua) trước khi chụp.
 
-## Capture Flags
+<a id="capture-flags"></a>
 
-The browser capture script supports:
+## Cờ thu nhận dữ liệu
 
-- `--format <png|avif>` (default: `png`)
-- `--route </path>` (default: `/docs/setup-and-use`)
-- `--output-dir <path>` (default: `artifacts/final`)
-- `--settle-ms <number>` (default: `500`) extra delay after scene ready before screenshot
+Tập lệnh thu nhận dữ liệu của trình duyệt hỗ trợ:
 
-Examples:
+- `--format <png|avif>` (mặc định: `png`)
+- `--route </path>` (mặc định: `/docs/setup-and-use`)
+- `--output-dir <path>` (mặc định: `artifacts/final`)
+- `--settle-ms <number>` (mặc định: `500`) tăng thêm độ trễ sau khi cảnh sẵn sàng trước ảnh chụp màn hình
+
+Ví dụ:
 
 ```bash
 pnpm -F @angela/scenarios-desktop-browser capture --format avif --settle-ms 800
@@ -63,14 +73,16 @@ pnpm -F @angela/scenarios-desktop-browser capture --route /docs/setup-and-use/se
 pnpm -F @angela/scenarios-desktop-browser capture --format avif --route /docs/setup-and-use --output-dir ../../airi-docs/content/en/docs/manual/tamagotchi/setup-and-use/assets --settle-ms 800
 ```
 
-The browser capture flow starts from Playwright PNG screenshots, then optionally transforms to AVIF via Vishot `imageTransformers`.
+Luồng thu nhận dữ liệu của trình duyệt bắt đầu từ ảnh chụp màn hình Playwright PNG, sau đó chuyển đổi tùy ý thành AVIF thông qua Vishot `imageTransformers`.
 
-## Notes
+<a id="notes"></a>
 
-- This package can host multiple scene pages. Add Vue SFC routes under `src/scenes/**` (for example `src/scenes/docs/setup-and-use/index.vue`).
-- The default capture route is `/docs/setup-and-use`. Override it with `--route /your/path`.
-- Captures are produced only for roots mounted by the exact route you pass. For full setup manual assets, run captures for `/docs/setup-and-use/intro-chat`, `/docs/setup-and-use/intro-websocket`, `/docs/setup-and-use/main-window`, and `/docs/setup-and-use/settings`.
-- Final export depends on the browser scene reaching the `__SCENARIO_CAPTURE_READY__` flag after its raw images load.
-- If raw capture is missing or stale, final export will fail or render outdated assets.
-- If you enable AVIF output, the final artifact filenames switch from `.png` to `.avif` because the transformer replaces the emitted PNG files after capture.
-- Paths in these `pnpm -F` examples are resolved from the filtered package working directory.
+## Ghi chú
+
+- Gói này có thể host nhiều trang cảnh. Thêm Vue SFC route trong `src/scenes/**` (ví dụ `src/scenes/docs/setup-and-use/index.vue`).
+- thu nhận dữ liệu route mặc định là `/docs/setup-and-use`. Ghi đè nó bằng `--route /your/path`.
+- Việc chụp chỉ được thực hiện đối với các rễ được gắn bởi route chính xác mà bạn vượt qua. Để có nội dung thủ công thiết lập đầy đủ, hãy chạy bản ghi cho `/docs/setup-and-use/intro-chat`, `/docs/setup-and-use/intro-websocket`, `/docs/setup-and-use/main-window` và `/docs/setup-and-use/settings`.
+- Việc xuất cuối cùng phụ thuộc vào cảnh trình duyệt đạt cờ `__SCENARIO_CAPTURE_READY__` sau khi tải hình ảnh thô của nó.
+- Nếu thu nhận dữ liệu thô bị thiếu hoặc cũ, quá trình xuất cuối cùng sẽ không thành công hoặc hiển thị nội dung lỗi thời.
+- Nếu bạn bật đầu ra AVIF, tên tệp artifact cuối cùng sẽ chuyển từ `.png` sang `.avif` vì máy biến áp sẽ thay thế các tệp PNG được phát ra sau thu nhận dữ liệu.
+- Đường dẫn trong các ví dụ `pnpm -F` này được giải quyết từ thư mục làm việc của gói đã lọc.

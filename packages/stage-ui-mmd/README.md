@@ -1,42 +1,29 @@
 # @angela/stage-ui-mmd
 
-MMD (MikuMikuDance) scene components, composables, and stores for Angela.
+Các thành phần cảnh MMD (MikuMikuDance), các composable và store cho Angela.
 
-## What it does
+<a id="what-it-does"></a>
 
-Renders PMX/PMD models with VMD/VPD motion support inside Angela's stage,
-reaching feature parity with the Live2D and VRM renderers:
+## Nó làm gì
 
-- **Model loading** for `.pmx`/`.pmd`, from a packaged ZIP (model + textures)
-  or a bare model URL.
-- **Physics** for hair, skirts, and custom rigs via Bullet (Ammo.js) — rigid
-  bodies and 6-DOF spring joints, toggleable at runtime.
-- **IK** (CCD solver) and **append-bone ("grant")** propagation for standard
-  and custom rigs.
-- **Importable, mappable motions**: import VMD clips (persisted to IndexedDB,
-  synced across windows), set one as the looping idle, preview any as a
-  one-shot, remove them, and map Angela emotions to gesture motions.
-- **Morph-based lip-sync** driven by the shared wLipSync profile, mapping
-  phonemes to the canonical あいうえお mouth morphs, with per-slot morph
-  remapping for non-standard models.
-- **Emotion expressions** via morph cross-fades.
-- **Looking-at modes** (camera / cursor / disabled) with idle saccades, plus
-  procedural blink.
-- **Scene settings**: model transform, camera FOV, ambient + directional
-  lights, albedo glow, render scale, physics gravity, and per-material opacity
-  — all live, persisted, and synced across windows.
+Kết xuất PMX/PMD mô hình với hỗ trợ chuyển động VMD/VPD bên trong stage của Angela, đạt được tính năng tương đương với Live2D và VRM các renderer:
 
-It builds on [`@moeru/three-mmd`](https://github.com/moeru-ai/three-mmd) for
-PMX/PMD loading, VMD animation building, IK, append-bone propagation, toon
-materials, outlines, and the shared runtime update order. Physics comes from
-`@moeru/three-mmd-physics-ammo` and is loaded lazily, so the Ammo WASM runtime
-is initialized only after a live MMD model is mounted.
+- **Tải mô hình** cho `.pmx`/`.pmd`, từ ZIP đóng gói (mô hình + kết cấu) hoặc mô hình URL trần.
+- **Vật lý** dành cho tóc, váy và giàn tùy chỉnh thông qua Bullet (Ammo.js) — phần thân cứng và khớp lò xo 6-DOF, có thể bật tắt tại runtime.
+- **IK** (bộ giải CCD) và **sự lan truyền xương nối ("cấp")** cho các giàn tiêu chuẩn và tùy chỉnh.
+- **Chuyển động có thể nhập, có thể ánh xạ**: nhập các clip VMD (lưu giữ với IndexedDB, được đồng bộ hóa trên các cửa sổ), đặt một clip làm chuyển động lặp ở chế độ chờ, xem trước bất kỳ clip nào dưới dạng một lần quay, xóa chúng và ánh xạ cảm xúc của Angela thành các chuyển động cử chỉ.
+- **Đồng bộ hóa nhép dựa trên hình thái** được điều khiển bởi cấu hình wLipSync chung, ánh xạ các âm vị thành các hình thái miệng あいうえお chuẩn, với ánh xạ hình thái theo từng vị trí cho mô hình không chuẩn.
+- **Biểu hiện cảm xúc** thông qua các hình thái mờ dần.
+- **Chế độ nhìn** (máy ảnh / con trỏ / bị tắt) với chuyển động không hoạt động, cộng với nhấp nháy theo quy trình.
+- **Cài đặt cảnh**: Biến đổi mô hình, camera FOV, đèn xung quanh + định hướng, ánh sáng phản chiếu, tỷ lệ kết xuất, trọng lực vật lý và độ mờ trên mỗi vật liệu — tất cả trực tiếp, được duy trì và đồng bộ hóa trên các cửa sổ.
 
-## How to use
+Nó được xây dựng trên [`@moeru/three-mmd`](https://github.com/moeru-ai/three-mmd) để tải PMX/PMD, xây dựng hoạt hình VMD, IK, truyền lan xương nối, vật liệu toon, đường viền và thứ tự cập nhật runtime được chia sẻ. Vật lý đến từ `@moeru/three-mmd-physics-ammo` và được tải một cách lười biếng, vì vậy Đạn WASM runtime chỉ được khởi tạo sau khi lắp trực tiếp MMD mô hình.
 
-The package exposes the same scene contract as the other renderers, so it is
-wired through `@angela/stage-ui`'s `Stage.vue` automatically when the
-selected model resolves to the `mmd` renderer:
+<a id="how-to-use"></a>
+
+## Cách sử dụng
+
+Gói hiển thị hợp đồng cảnh giống như các renderer khác, do đó, nó được tự động kết nối qua `Stage.vue` của `@angela/stage-ui` khi mô hình được chọn phân giải thành `mmd` renderer:
 
 ```ts
 import { MMDScene, useMMD } from '@angela/stage-ui-mmd'
@@ -54,20 +41,20 @@ import { MMDScene, useMMD } from '@angela/stage-ui-mmd'
 />
 ```
 
-The component exposes `canvasElement()`, `captureFrame()`,
-`setEmotion(name, intensity)`, `listMorphs()`, and `listMotions()`.
+Thành phần này hiển thị `canvasElement()`, `captureFrame()`, `setEmotion(name, intensity)`, `listMorphs()` và `listMotions()`.
 
-Runtime configuration (physics/IK/grant toggles, gaze tracking, scale,
-morph overrides, emotion→motion mapping) lives in the `useMMD` Pinia store and
-is edited through the model settings panel.
+Cấu hình runtime (physics/IK/grant chuyển đổi, theo dõi ánh mắt, tỷ lệ, ghi đè hình thái, cảm xúc→ánh xạ chuyển động) nằm trong `useMMD` Pinia store và được chỉnh sửa thông qua bảng cài đặt mô hình.
 
-## When to use it
+<a id="when-to-use-it"></a>
 
-- Displaying MMD/MikuMikuDance characters (`.pmx`/`.pmd`) on the Angela stage.
-- When you need physics-driven secondary motion, IK, and VMD playback.
+## Khi nào nên sử dụng nó
 
-## When not to use it
+- Hiển thị các ký tự MMD/MikuMikuDance (`.pmx`/`.pmd`) trên Angela stage.
+- Khi bạn cần phát lại chuyển động phụ dựa trên vật lý, IK và VMD.
 
-- For VRM avatars use `@angela/stage-ui-three`; for Live2D use
-  `@angela/stage-ui-live2d`; for Spine use `@angela/stage-ui-spine`.
-- In environments without WebGL/WASM support (MMD physics requires Ammo WASM).
+<a id="when-not-to-use-it"></a>
+
+## Khi nào không nên sử dụng nó
+
+- Đối với hình đại diện VRM, hãy sử dụng `@angela/stage-ui-three`; đối với Live2D, hãy sử dụng `@angela/stage-ui-live2d`; đối với Spine, hãy sử dụng `@angela/stage-ui-spine`.
+- Trong môi trường không hỗ trợ WebGL/WASM (vật lý MMD yêu cầu Đạn WASM).

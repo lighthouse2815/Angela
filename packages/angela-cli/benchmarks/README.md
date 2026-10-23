@@ -1,8 +1,10 @@
-# Angela runtime memory measurements
+<a id="angela-runtime-memory-measurements"></a>
 
-Memory V2 latency measurements and limitations are in [the Memory V2 report](../../../docs/ai/audits/angela-memory-v2.md).
+# Đo bộ nhớ Angela runtime
 
-Run each scenario in a fresh Node process with explicit garbage collection:
+Các phép đo và giới hạn độ trễ của bộ nhớ V2 có trong báo cáo [ của Bộ nhớ V2](../../../docs/ai/audits/angela-memory-v2.md).
+
+Chạy từng kịch bản trong quy trình Node mới với tính năng thu thập rác rõ ràng:
 
 ```sh
 node --expose-gc --import tsx packages/angela-cli/scripts/benchmark-memory.ts cli
@@ -11,48 +13,37 @@ ANGELA_BENCHMARK_CYCLES=2560 node --expose-gc --import tsx packages/angela-cli/s
 node --import tsx packages/angela-cli/scripts/benchmark-entry.ts
 ```
 
-The benchmark uses temporary storage, actual Chat generation, Recall, task stores, sessions, and Telegram update handlers.
-The model and Telegram network boundaries return deterministic responses. The orchestration benchmark uses no paid API, device, or connected MCP transport.
-Each Telegram scenario completes a request and releases its session lock before the next user.
-Measurements include `rss`, `heapUsed`, `heapTotal`, `external`, and active referenced resource types after GC.
-Node does not report unreferenced timers through `getActiveResourcesInfo`. Runtime lifecycle tests check owned resources separately.
-The entry benchmark launches the actual CLI with default built-in MCP and piped input. A preload observes idle input and process completion.
-Its measurements include the CLI process, but exclude the MCP child process. Neither benchmark measures GPU memory or live-model response sizes.
-The orchestration benchmark also records Telegram memory while its first model request is active.
-The release benchmark uses finalization counters without retaining session or Recall objects.
+Điểm chuẩn sử dụng bộ nhớ tạm thời, trò chuyện thực tế sinh nội dung, Recall, tác vụ store, phiên và trình xử lý cập nhật Telegram. Ranh giới mạng mô hình và Telegram trả về Responses xác định. Điểm chuẩn điều phối không sử dụng API, thiết bị hoặc MCP transport được kết nối. Mỗi kịch bản Telegram hoàn thành một yêu cầu và giải phóng khóa phiên của nó trước người dùng tiếp theo. Các phép đo bao gồm `rss`, `heapUsed`, `heapTotal`, `external` và các loại tài nguyên được tham chiếu hoạt động sau GC. Node không báo cáo bộ tính giờ không được tham chiếu thông qua `getActiveResourcesInfo`. Các bài kiểm tra vòng đời của runtime sẽ kiểm tra riêng các tài nguyên được sở hữu. Điểm chuẩn đầu vào khởi chạy CLI thực tế với MCP tích hợp mặc định và đầu vào theo đường ống. Tải trước quan sát đầu vào nhàn rỗi và quá trình hoàn thành. Các phép đo của nó bao gồm quy trình CLI, nhưng loại trừ quy trình con MCP. Cả điểm chuẩn đều không đo kích thước bộ nhớ GPU hoặc kích thước phản hồi trực tiếp-mô hình. Điểm chuẩn điều phối cũng ghi lại bộ nhớ Telegram trong khi yêu cầu mô hình đầu tiên của nó đang hoạt động. Điểm chuẩn phát hành sử dụng bộ đếm quyết toán mà không giữ lại phiên hoặc đối tượng Recall.
 
-## Initial audit
+<a id="initial-audit"></a>
 
-| Module | Retained state and lifetime |
+## Kiểm toán ban đầu
+
+| Mô-đun | Trạng thái và tuổi thọ được giữ lại |
 | --- | --- |
-| `bin/run.ts` | Eager Memory, ProjectMemory, Recall, Camera, Tasks, scheduler, provider, and Chat for the CLI lifetime. MCP connects before input. |
-| `chat.ts` | Full conversation remains live. Context compaction only reduces outgoing requests. A memory request copies turn references. |
-| `memory.ts` | Disk-backed facts, capped at 50 entries. Request tool closures retain a snapshot until generation completes. |
-| `project-memory.ts` | One bounded disk checkpoint. Git root discovery starts a short-lived child process. |
-| `recall.ts` | SQLite index, one watcher, one interval, optional remote embedding client, workspace cache, and selected excerpts per instance. |
-| `tasks.ts`, `task-tools.ts` | Disk-backed tasks. Scheduler subscriptions need cleanup. Definitions and clock context can be request-local. |
-| `reminder-scheduler.ts` | One reconciliation timer per store, temporary lease timers during delivery, and a task subscription. |
-| `telegram.ts` | Jobs disappear after completion. Chat permissions, MCP clients, and companion promises survive until host shutdown. |
-| `telegram-companion.ts` | Eager Memory, Tasks, Recall, notifications, and scheduler per allowed user, including inactive users. |
-| `discord.ts` | Conversations and locks are request-local. Each channel queue has four slots, but concurrent channel count has no explicit cap. |
-| `mcp.ts` | Discovery schemas, name set, client, and serial approval promise remain until the adapter closes. |
-| `sessions.ts` | A writer mirrors full portable messages while Chat also owns the converted conversation. Listing reads all sessions concurrently. |
-| `skills.ts` | File-stamp cache retains full instructions for every listed skill without eviction. |
+| `bin/run.ts` | Bộ nhớ háo hức, ProjectMemory, Recall, Máy ảnh, Nhiệm vụ, bộ lập lịch, nhà cung cấp và Trò chuyện trong suốt thời gian sử dụng CLI. MCP kết nối trước khi nhập. |
+| `chat.ts` | Cuộc trò chuyện đầy đủ vẫn là trực tiếp. Việc nén bối cảnh chỉ làm giảm các yêu cầu gửi đi. Yêu cầu bộ nhớ sao chép các tham chiếu lần lượt. |
+| `memory.ts` | Thông tin được sao lưu trên đĩa, giới hạn ở 50 mục. Yêu cầu đóng công cụ sẽ giữ lại ảnh chụp nhanh cho đến khi sinh nội dung hoàn tất. |
+| `project-memory.ts` | Một điểm kiểm tra đĩa có giới hạn. Khám phá gốc Git bắt đầu một tiến trình con tồn tại trong thời gian ngắn. |
+| `recall.ts` | Chỉ mục SQLite, một trình theo dõi, một khoảng thời gian, ứng dụng khách nhúng từ xa tùy chọn, bộ đệm workspace và các đoạn trích được chọn cho mỗi phiên bản. |
+| `tasks.ts`, `task-tools.ts` | Các tác vụ được sao lưu bằng đĩa. Đăng ký bộ lập lịch cần dọn dẹp. Các định nghĩa và bối cảnh đồng hồ có thể theo yêu cầu cục bộ. |
+| `reminder-scheduler.ts` | Một bộ hẹn giờ điều chỉnh cho mỗi store, bộ hẹn giờ lease tạm thời trong quá trình phân phối và đăng ký tác vụ. |
+| `telegram.ts` | Công việc biến mất sau khi hoàn thành. Quyền trò chuyện, ứng dụng khách MCP và lời hứa đồng hành vẫn tồn tại cho đến khi host ngừng hoạt động. |
+| `telegram-companion.ts` | Bộ nhớ háo hức, Nhiệm vụ, Recall, thông báo và lập lịch cho mỗi người dùng được phép, bao gồm cả người dùng không hoạt động. |
+| `discord.ts` | Cuộc trò chuyện và khóa là yêu cầu cục bộ. Mỗi hàng đợi kênh có bốn vị trí, nhưng số lượng kênh đồng thời không có giới hạn rõ ràng. |
+| `mcp.ts` | Lược đồ khám phá, bộ tên, ứng dụng khách và lời hứa phê duyệt nối tiếp vẫn còn cho đến khi bộ điều hợp đóng. |
+| `sessions.ts` | Người viết phản chiếu toàn bộ tin nhắn di động trong khi Trò chuyện cũng sở hữu cuộc hội thoại đã chuyển đổi. Danh sách đọc tất cả các phiên đồng thời. |
+| `skills.ts` | Bộ đệm ẩn dấu tệp giữ lại hướng dẫn đầy đủ cho mọi kỹ năng được liệt kê mà không bị trục xuất. |
 
-Voice devices start on demand. Static CLI imports still load voice, camera, evaluation, and Telegram modules for text-only startup.
-Embeddings require `ANGELA_EMBEDDING_MODEL`. No local model loads automatically.
+Thiết bị thoại khởi động theo yêu cầu. Nhập CLI tĩnh vẫn tải các mô-đun thoại, máy ảnh, đánh giá và Telegram để khởi động chỉ bằng văn bản. Phần nhúng yêu cầu `ANGELA_EMBEDDING_MODEL`. Không có mô hình cục bộ nào được tải tự động.
 
-## Results
+<a id="results"></a>
 
-Baseline source: `d430e76`, before runtime migration. The initial audit describes `d48991f`.
-The baseline source was extracted into a separate temporary directory and used the same installed workspace dependencies.
-The baseline measurement hook gained the same in-flight Telegram sample as the final script. Application behavior was unchanged.
-All JSON files record bytes on the same machine with Node 26.11.1 and explicit GC.
-The final measurement snapshot contains runtime changes through `ba21572`.
-It excludes concurrent `memory-v2` changes and restores `recall-index.ts` from `836a68c` for this comparison.
-The CLI scenarios include startup, one message, and twenty messages in one working conversation.
+## Kết quả
 
-| Scenario | RSS before → after, MiB | Heap used before → after, MiB |
+Nguồn cơ sở: `d430e76`, trước khi di chuyển runtime. Cuộc kiểm tra ban đầu mô tả `d48991f`. Nguồn cơ sở đã được trích xuất vào một thư mục tạm thời riêng biệt và sử dụng cùng các phần phụ thuộc workspace đã cài đặt. Phép đo cơ bản hook đã thu được mẫu Telegram trên chuyến bay giống như tập lệnh cuối cùng. Hành vi của ứng dụng không thay đổi. Tất cả các tệp JSON đều ghi byte trên cùng một máy với Node 26.11.1 và GC rõ ràng. Ảnh chụp nhanh phép đo cuối cùng chứa các thay đổi của runtime thông qua `ba21572`. Nó loại trừ các thay đổi `memory-v2` đồng thời và khôi phục `recall-index.ts` từ `836a68c` cho so sánh này. Các kịch bản CLI bao gồm khởi động, một tin nhắn và 20 tin nhắn trong một cuộc trò chuyện đang hoạt động.
+
+| Kịch bản | RSS trước → sau, MiB | Heap được sử dụng trước → sau, MiB |
 | --- | --- | --- |
 | `entry.idle` | 202.82 → 169.37 | 40.95 → 31.54 |
 | `entry.message.1` | 205.24 → 179.28 | 43.06 → 39.19 |
@@ -64,52 +55,37 @@ The CLI scenarios include startup, one message, and twenty messages in one worki
 | `telegram.user.1` | 176.00 → 164.14 | 41.41 → 39.01 |
 | `telegram.users.24` | 177.00 → 164.29 | 43.07 → 40.27 |
 
-The raw files also contain `heapTotal` and `external`. RSS varies with V8 heap reservation, JIT activity, and the native allocator.
-The two CLI measurements use different harnesses. Compare each scenario only with its corresponding baseline.
-These deterministic runs establish an orchestration baseline, not a statistical performance guarantee.
+Các tệp thô cũng chứa `heapTotal` và `external`. RSS thay đổi tùy theo việc đặt trước vùng nhớ heap V8, hoạt động JIT và bộ cấp phát native. Hai phép đo CLI sử dụng bộ kiểm thử khác nhau. Chỉ so sánh từng kịch bản với đường cơ sở tương ứng của nó. Những hoạt động xác định này thiết lập đường cơ sở điều phối chứ không phải đảm bảo hiệu suất thống kê.
 
-After 2,560 create/send/release cycles, runtime states, listeners, reminder routes, and owned reminder timers remained at zero.
-Heap use was 39.36 MiB after twenty cycles and 38.27 MiB after 2,560 cycles.
-RSS peaked at 189.49 MiB at 1,280 cycles and returned to 133.00 MiB at 2,560 cycles.
-Finalization callbacks observed 2,559 released scopes and Recall objects at that sample. Finalization timing remains controlled by V8.
-Focused tests also verify closed Recall indexes/watchers/timers, MCP clients, Telegram eviction, Discord queue bounds, and shared reminder scheduling.
+Sau 2.560 chu kỳ create/send/release, trạng thái runtime, người nghe, lời nhắc route và bộ hẹn giờ nhắc nhở sở hữu vẫn ở mức 0. Mức sử dụng heap là 39,36 MiB sau 20 chu kỳ và 38,27 MiB sau 2.560 chu kỳ. RSS đạt đỉnh 189,49 MiB ở 1.280 chu kỳ và quay trở lại 133,00 MiB ở 2.560 chu kỳ. Lệnh gọi lại quyết toán đã quan sát thấy 2.559 phạm vi được phát hành và đối tượng Recall tại mẫu đó. Thời gian hoàn thiện vẫn được kiểm soát bởi V8. Các thử nghiệm tập trung cũng xác minh các máy khách Recall indexes/watchers/timers, MCP đã đóng, trục xuất Telegram, giới hạn hàng đợi Discord và lập lịch nhắc nhở được chia sẻ.
 
-## Remaining hotspots
+<a id="remaining-hotspots"></a>
 
-- Session JSON parsing and atomic replacement temporarily materialize the full disk history. Working state does not retain that portable snapshot.
-- The latest assistant turn and native provider continuation remain until context compaction. A single large tool result can still consume substantial request memory.
-- Recall still performs its existing SQLite synchronization and optional remote embedding requests. Each active logical context owns one lifecycle.
-- The provider registry and imported module code remain in Node's module cache. Voice code remains cached after its first explicit use.
-- Discord keeps gateway guild and channel metadata that its SDK requires. Message history is uncached, and user/member caches have limits.
-- Reminder delivery retains small routes for authorized users to preserve background notifications. It does not evict reminders with conversation state.
+## Các điểm nóng còn lại
 
-No EventStore, event history, worker pool, dependency, or local model was added.
+- Phiên JSON phân tích cú pháp và thay thế nguyên tử tạm thời hiện thực hóa toàn bộ lịch sử đĩa. Trạng thái làm việc không giữ lại ảnh chụp nhanh di động đó.
+- Lượt trợ lý mới nhất và phần tiếp theo của native nhà cung cấp vẫn được duy trì cho đến khi nén bối cảnh. Một kết quả công cụ lớn vẫn có thể tiêu tốn bộ nhớ yêu cầu đáng kể.
+- Recall vẫn thực hiện đồng bộ hóa SQLite hiện có và các yêu cầu nhúng từ xa tùy chọn. Mỗi bối cảnh logic hoạt động sở hữu một vòng đời.
+- Sổ đăng ký nhà cung cấp và mã mô-đun đã nhập vẫn còn trong bộ đệm mô-đun của Node. Mã giọng nói vẫn được lưu vào bộ nhớ đệm sau lần sử dụng rõ ràng đầu tiên.
+- Discord giữ siêu dữ liệu kênh và bang hội cổng mà SDK yêu cầu. Lịch sử tin nhắn không được lưu vào bộ nhớ đệm và bộ nhớ đệm user/member có giới hạn.
+- Việc gửi lời nhắc sẽ giữ lại route nhỏ để người dùng được ủy quyền lưu giữ thông báo nền. Nó không loại bỏ lời nhắc với trạng thái hội thoại.
+
+Không có EventStore, lịch sử sự kiện, nhóm worker, phần phụ thuộc hoặc mô hình cục bộ nào được thêm vào.
 
 
-## Telegram lifecycle closure
+<a id="telegram-lifecycle-closure"></a>
 
-The Memory V2 audit contains the current lifecycle results and their limits.
-The older RSS measurements above describe the earlier immediate-release runtime.
+## Đóng vòng đời của Telegram
+
+Quá trình kiểm tra Bộ nhớ V2 chứa các kết quả của vòng đời hiện tại và các giới hạn của chúng. Các phép đo RSS cũ hơn ở trên mô tả runtime được phát hành ngay trước đó.
 
 ```sh
 pnpm exec tsx packages/angela-cli/scripts/benchmark-telegram-lifecycle.ts packages/angela-cli/benchmarks/telegram-lifecycle-after.json
 pnpm exec tsx packages/angela-cli/scripts/benchmark-session-resources.ts packages/angela-cli/benchmarks/session-resources-after.json
 ```
 
-Run from the repository root with workspace dependencies already installed.
-In a worktree with shared dependencies, set `pnpm_config_verify_deps_before_run=false` to prevent automatic installation.
-Run each command separately. Both commands remove their temporary user data after completion.
+Chạy từ kho lưu trữ gốc với các phụ thuộc workspace đã được cài đặt. Trong worktree có các phần phụ thuộc được chia sẻ, hãy đặt `pnpm_config_verify_deps_before_run=false` để ngăn cài đặt tự động. Chạy từng lệnh riêng biệt. Cả hai lệnh đều xóa dữ liệu người dùng tạm thời sau khi hoàn thành.
 
-`telegram-lifecycle-before.json` records the starting runtime at `4bece26`.
-That baseline compares real immediate-release Telegram requests with an explicitly retained reference scope.
-`telegram-lifecycle-after.json` compares real Telegram requests with retention disabled and enabled on the same final runtime.
-It also measures four users, concurrent batches, and reopening after automatic TTL eviction.
-The concurrent request metric measures batch completion. First-text measurements remain specific to each request through async-local instrumentation.
-The benchmark sets TTL to one second for expiration checks. Production defaults remain ten minutes and 32 idle entries.
-All Telegram API calls and model responses use local deterministic fixtures. Runtime, persistence, Memory V2, and SQLite remain real.
+`telegram-lifecycle-before.json` ghi lại runtime bắt đầu tại `4bece26`. Đường cơ sở đó so sánh các yêu cầu Telegram phát hành ngay lập tức thực sự với phạm vi tham chiếu được giữ lại rõ ràng. `telegram-lifecycle-after.json` so sánh các yêu cầu Telegram thực với tình trạng lưu giữ bị vô hiệu hóa và được bật trên cùng một runtime cuối cùng. Nó cũng đo lường bốn người dùng, các đợt đồng thời và mở lại sau khi TTL tự động bị trục xuất. Số liệu yêu cầu đồng thời đo lường mức độ hoàn thành hàng loạt. Các phép đo văn bản đầu tiên vẫn cụ thể cho từng yêu cầu thông qua công cụ đo lường không đồng bộ cục bộ. Điểm chuẩn đặt TTL thành một giây để kiểm tra hết hạn. Mặc định sản xuất vẫn còn 10 phút và 32 mục không hoạt động. Tất cả các cuộc gọi Telegram API và mô hình Responses đều sử dụng mẫu kiểm thử xác định cục bộ. runtime, tính bền bỉ, Bộ nhớ V2 và SQLite vẫn có hiệu lực.
 
-`session-resources-after.json` exercises 1,000 direct runtime cycles with real in-memory MCP transports and five reminder destinations.
-It records checkpoints at 100, 500, and 1,000 cycles with four retained idle sessions.
-Each closed Recall must report zero resources before instrumentation releases its reference.
-All live Recall, MCP, runtime, and reminder counts must be zero after shutdown.
-This resource fixture does not measure Telegram network latency or provider performance.
+`session-resources-after.json` thực hiện 1.000 chu kỳ runtime trực tiếp với các lần truyền MCP thực trong bộ nhớ và năm đích nhắc nhở. Nó ghi lại các điểm kiểm tra ở chu kỳ 100, 500 và 1.000 với bốn phiên nhàn rỗi được giữ lại. Mỗi Recall đã đóng phải báo cáo tài nguyên bằng 0 trước khi công cụ phát hành tham chiếu của nó. Tất cả số lượng trực tiếp Recall, MCP, runtime và lời nhắc phải bằng 0 sau khi tắt máy. Tài nguyên mẫu kiểm thử này không đo độ trễ mạng Telegram hoặc hiệu suất nhà cung cấp.

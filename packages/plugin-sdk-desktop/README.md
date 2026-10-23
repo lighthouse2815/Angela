@@ -1,17 +1,18 @@
 # @angela/plugin-sdk-desktop
 
-Desktop helpers for Angela extensions, including widgets, gamelets, and tools.
-This private workspace package supplies contracts shared by the Electron host, Kirie renderer, and desktop plugins.
+Trình trợ giúp desktop dành cho tiện ích mở rộng Angela, bao gồm các tiện ích, trò chơi nhỏ và công cụ. Gói workspace riêng tư này cung cấp các hợp đồng được chia sẻ bởi các plugin Electron host, Kirie renderer và desktop.
 
-## Use
+<a id="use"></a>
 
-Import the feature from its public subpath:
+## Sử dụng
+
+Nhập đối tượng địa lý từ đường dẫn phụ công khai của nó:
 
 ```ts
 import type { WidgetsIframeInitPayload } from '@angela/plugin-sdk-desktop/widgets'
 ```
 
-Build and check the package from the repository root:
+Xây dựng và kiểm tra gói từ kho lưu trữ gốc:
 
 ```sh
 pnpm -F @angela/plugin-sdk-desktop build
@@ -19,6 +20,4 @@ pnpm -F @angela/plugin-sdk-desktop typecheck
 pnpm -F @angela/plugin-sdk-desktop exec vitest run --maxWorkers=1
 ```
 
-Use this package for desktop extension contracts.
-Use [`@angela/plugin-sdk`](../plugin-sdk/README.md) for host-independent extension manifests and lifecycle APIs.
-The package rename preserves existing event names, extension IDs, and manifest fields.
+Sử dụng gói này cho các hợp đồng gia hạn desktop. Sử dụng [`@angela/plugin-sdk`](../plugin-sdk/README.md) cho các tệp kê khai tiện ích mở rộng và API vòng đời độc lập với host. Việc đổi tên gói sẽ giữ nguyên tên sự kiện, ID tiện ích mở rộng và trường bảng kê khai hiện có.

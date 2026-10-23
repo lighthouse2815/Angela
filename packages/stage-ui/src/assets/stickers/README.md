@@ -1,49 +1,46 @@
-# Angela chat stickers
+<a id="angela-chat-stickers"></a>
 
-Twelve static chibi reactions use AIRI's official blue-haired Live2D character.
-The images share the cyan hair, angular yellow clip, loop ahoge, sailor collar, and yellow tie.
+# Nhãn dán trò chuyện Angela
 
-## Reference and attribution
+Mười hai phản ứng chibi tĩnh sử dụng nhân vật Live2D tóc xanh chính thức của AIRI. Các hình ảnh có mái tóc màu lục lam, kẹp màu vàng góc cạnh, vòng ahoge, cổ áo thủy thủ và cà vạt màu vàng.
 
-- [Official DevLog: new Live2D model](https://airi.moeru.ai/docs/en/blog/DevLog-2025.10.20/).
-- [Reference video at the reviewed source revision](https://github.com/moeru-ai/airi/blob/87230a0d4f33eefd2b976c41c4a989b0bf1046ce/docs/content/en/blog/DevLog-2025.10.20/assets/airi.mp4). The reference frame is at 00:03.
-- [Official repository banner](https://github.com/moeru-ai/airi/blob/87230a0d4f33eefd2b976c41c4a989b0bf1046ce/docs/content/public/banner-light-1280x640.avif), used to cross-check the same character.
+<a id="reference-and-attribution"></a>
 
-Character design attribution remains with Angela, Moeru AI, and their artists.
-These generated illustrations are contributed under the repository's MIT license.
-This contribution does not redistribute the original Live2D model or reference media.
+## Tham chiếu và ghi công
+
+- [Official DevLog: mẫu Live2D](https://airi.moeru.ai/docs/en/blog/DevLog-2025.10.20/) mới.
+- [Video tham khảo tại bản sửa đổi nguồn được đánh giá](https://github.com/moeru-ai/airi/blob/87230a0d4f33eefd2b976c41c4a989b0bf1046ce/docs/content/en/blog/DevLog-2025.10.20/assets/airi.mp4). Khung tham chiếu là lúc 00:03.
+- [ZBiểu ngữ kho lưu trữ chính thức](https://github.com/moeru-ai/airi/blob/87230a0d4f33eefd2b976c41c4a989b0bf1046ce/docs/content/public/banner-light-1280x640.avif), được sử dụng để kiểm tra chéo cùng một ký tự.
+
+Việc thiết kế nhân vật vẫn thuộc về Angela, Moeru AI và các nghệ sĩ của họ. Những hình minh họa được tạo ra này được đóng góp theo giấy phép MIT của kho lưu trữ. Đóng góp này không phân phối lại Live2D mô hình gốc hoặc phương tiện tham chiếu.
 
 ## Generation
 
-The built-in OpenAI GPT image-generation tool produced one image per emotion on 2026-10-05.
-The tool's exact model version is not exposed. No external runtime image service is required.
-The happy reaction established the style. Later reactions used that image as a style reference.
-Transparent output was requested. The final PNGs retain their generated alpha channels without background replacement.
-[Generation manifest](generation.json) records the final prompts, reference roles, image checksums, and review notes.
+Công cụ OpenAI GPT image-sinh nội dung tích hợp sẵn tạo ra một hình ảnh cho mỗi cảm xúc vào ngày 2026-10-05. Phiên bản mô hình chính xác của công cụ không được tiết lộ. Không cần dịch vụ hình ảnh runtime bên ngoài. Phản ứng vui vẻ đã tạo nên phong cách. Các phản ứng sau này đã sử dụng hình ảnh đó làm tài liệu tham khảo về phong cách. Đầu ra minh bạch đã được yêu cầu. Các PNG cuối cùng giữ lại các kênh alpha đã tạo mà không cần thay thế nền. [Bản kê khai thế hệ](generation.json) ghi lại prompt cuối cùng, vai trò tham chiếu, tổng kiểm tra hình ảnh và ghi chú đánh giá.
 
-## Catalog
+<a id="catalog"></a>
 
-| File | Name | Emotion tags |
+## Danh mục
+
+| Tập tin | Tên | Thẻ cảm xúc |
 | --- | --- | --- |
-| `angela-happy.png` | Happy | happy |
-| `angela-sad.png` | Sad | sad |
-| `angela-confused.png` | Confused | confused |
-| `angela-surprised.png` | Surprised | surprised |
-| `angela-thanks.png` | Thank you | thanks, affectionate |
-| `angela-celebrate.png` | Celebration | celebrate, happy |
-| `angela-angry.png` | Angry | angry |
-| `angela-tired.png` | Tired | tired |
-| `angela-affectionate.png` | Love | affectionate, happy |
-| `angela-awkward.png` | Awkward | awkward |
-| `angela-agree.png` | Yes | agree |
-| `angela-disagree.png` | No thanks | disagree |
+| `angela-happy.png` | Hạnh phúc | hạnh phúc |
+| `angela-sad.png` | Buồn | buồn |
+| `angela-confused.png` | Bối rối | bối rối |
+| `angela-surprised.png` | Ngạc nhiên | ngạc nhiên |
+| `angela-thanks.png` | Cảm ơn bạn | cảm ơn, trìu mến |
+| `angela-celebrate.png` | Lễ kỷ niệm | ăn mừng, vui vẻ |
+| `angela-angry.png` | Tức Giận | tức giận |
+| `angela-tired.png` | Mệt mỏi | mệt mỏi |
+| `angela-affectionate.png` | Tình yêu | tình cảm, hạnh phúc |
+| `angela-awkward.png` | Lúng túng | vụng về |
+| `angela-agree.png` | Có | đồng ý |
+| `angela-disagree.png` | Không, cảm ơn | không đồng ý |
 
-## Inspection
+<a id="inspection"></a>
 
-Each image was inspected for matching character features, clear emotion, natural hands, complete hair, and a complete bust silhouette.
-Five drafts were regenerated to correct canvas shape or edge cropping.
-The selected images are square RGBA PNGs. Their visible artwork stays inside the canvas.
-Browser tests decode every catalog image. Settings previews display them at 96 pixels and chat images at 160 pixels.
+## Điều tra
 
-The previous four development images and their catalog entries are removed.
-There is no old-ID migration. Unknown saved IDs retain the translated unavailable placeholder.
+Mỗi hình ảnh đều được kiểm tra để đảm bảo các đặc điểm nhân vật phù hợp, cảm xúc rõ ràng, bàn tay tự nhiên, mái tóc hoàn chỉnh và hình bóng bán thân hoàn chỉnh. Năm bản nháp đã được tái tạo để chỉnh sửa hình dạng canvas hoặc cắt xén cạnh. Các hình ảnh được chọn là PNG RGBA hình vuông. Tác phẩm nghệ thuật có thể nhìn thấy của họ vẫn ở bên trong khung vẽ. Kiểm tra trình duyệt giải mã mọi hình ảnh danh mục. Bản xem trước cài đặt hiển thị chúng ở 96 pixel và hình ảnh trò chuyện ở 160 pixel.
+
+Bốn hình ảnh phát triển trước đó và các mục danh mục của chúng sẽ bị xóa. Không có sự di chuyển ID cũ. ID đã lưu không xác định sẽ giữ lại phần giữ chỗ đã dịch không có sẵn.

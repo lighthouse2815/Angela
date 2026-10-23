@@ -1,9 +1,10 @@
 # `@angela/model-driver-magic-live2d`
 
-This package applies MAGIC motion generators to normalized Live2D poses.
-It owns pose conversion, fixed-rate scheduling, output filtering, and target release.
+Gói này áp dụng bộ tạo chuyển động MAGIC cho các tư thế Live2D được chuẩn hóa. Nó sở hữu chuyển đổi tư thế, lập lịch tỷ lệ cố định, lọc đầu ra và phát hành mục tiêu.
 
-## Use the package
+<a id="use-the-package"></a>
+
+## Sử dụng gói
 
 ```ts
 import { createDriver } from '@angela/model-driver-magic-live2d'
@@ -18,5 +19,4 @@ const driver = createDriver({
 driver.start(model.toGenerator({ seed: 1 }))
 ```
 
-The package does not import Vue, Pinia, BroadcastChannel, or a Live2D renderer.
-The application supplies the target adapter at the driver seam.
+Gói không nhập Vue, Pinia, BroadcastChannel hoặc Live2D renderer. Ứng dụng cung cấp bộ chuyển đổi mục tiêu ở đường nối trình điều khiển.
