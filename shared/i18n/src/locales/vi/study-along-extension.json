@@ -1,0 +1,13 @@
+{
+  "title": "Học cùng Angela",
+  "description": "Chỉ chia sẻ tab YouTube hiện tại. Nội dung trang, cookie, mật khẩu và lịch sử vẫn ở trình duyệt.",
+  "extensionId": "ID tiện ích — nhập ID này trong Cài đặt Angela",
+  "pairing": "Dán thông tin ghép nối từ Cài đặt Angela",
+  "connect": "Kết nối Angela",
+  "share": "Chia sẻ tab video này",
+  "stop": "Dừng chia sẻ",
+  "connected": "Đã kết nối",
+  "disconnected": "Chưa kết nối",
+  "saved": "Đã lưu.",
+  "error": "Kiểm tra ghép nối, mở video YouTube và thử lại."
+}

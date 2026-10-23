@@ -1,10 +1,10 @@
-import type { BrowserContextProvider, LessonContext, Transcript, TranscriptProvider, VideoSummarizer } from './internet/contracts'
+import type { BrowserMediaContextProvider, LessonContext, Transcript, TranscriptProvider, VideoSummarizer } from './internet/contracts'
 
 import * as v from 'valibot'
 
 import { InternetError, parseYouTubeUrl, secondsSchema, transcriptSchema } from './internet/contracts'
 
-export type { BrowserContextProvider, LessonContext, Transcript, TranscriptionProvider, TranscriptProvider, TranscriptSegment, VideoContext, VideoSummarizer } from './internet/contracts'
+export type { BrowserContextProvider, BrowserMediaContextProvider, LessonContext, Transcript, TranscriptionProvider, TranscriptProvider, TranscriptSegment, VideoContext, VideoSummarizer } from './internet/contracts'
 export { InternetError, parseYouTubeUrl } from './internet/contracts'
 
 /** Storage implementations own expiry, capacity, and private persistence. */
@@ -23,7 +23,7 @@ export class InternetService {
   constructor(
     private readonly provider: TranscriptProvider,
     private readonly cache: TranscriptCache,
-    private readonly browser?: BrowserContextProvider,
+    private readonly browser?: BrowserMediaContextProvider,
     private readonly summarizer?: VideoSummarizer,
     private readonly signal?: AbortSignal,
   ) {}

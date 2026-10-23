@@ -16,10 +16,13 @@ import { useLogg } from '@guiiai/logg'
 import { defineInvokeHandler } from '@moeru/eventa'
 import { app, BrowserWindow } from 'electron'
 
+import { studyBrowserPair, studyBrowserRevoke } from '../../../../shared/eventa/browser-media'
 import { internetDiagnostics, videoResearch } from '../../../../shared/eventa/internet'
 import { onAppBeforeQuit } from '../../../libs/bootkit/lifecycle'
 import { isLocalAppURL } from '../../../libs/electron/url'
 import { McpBrowserContextProvider } from './browser'
+import { ChromeExtensionBrowserProvider } from './browser/extension'
+import { ActiveBrowserMediaProvider } from './browser/provider'
 import { ManagedMediaProcess, MediaToolResolver } from './media/resolver'
 import { diagnoseInternet, StudyAlongRuntime } from './runtime'
 
@@ -30,7 +33,9 @@ export function createInternetRuntime(mcp: McpManager) {
   const resolver = new MediaToolResolver({ packaged: app.isPackaged, resourcesPath: process.resourcesPath, developmentResources: join(app.getAppPath(), 'resources'), platform: process.platform, arch: process.arch, env: process.env })
   const media = new ManagedMediaProcess(resolver)
   const abort = new AbortController()
-  const browser = new McpBrowserContextProvider(mcp)
+  const extension = new ChromeExtensionBrowserProvider(join(app.getPath('userData'), 'internet'))
+  const browser = new ActiveBrowserMediaProvider(extension, new McpBrowserContextProvider(mcp))
+  void extension.start().catch(() => log.warn('Study Along browser bridge requires attention in settings.'))
 
   async function transcriptionConfig() {
     const id = process.env.ANGELA_VIDEO_TRANSCRIPTION_PROVIDER
@@ -124,9 +129,13 @@ export function createInternetRuntime(mcp: McpManager) {
     stopped = true
     abort.abort()
     await Promise.allSettled(active)
+    await extension.stop()
   })
   return {
     execute,
+    pairBrowser: (extensionId: string) => extension.pair(extensionId),
+    revokeBrowser: () => extension.revoke(),
+    browserStatus: () => extension.status(),
     diagnostics: async () => {
       const tools = await Promise.all([resolver.inspect('yt-dlp'), resolver.inspect('ffmpeg')])
       const rows = await diagnoseInternet(mcp, async name => Boolean(tools[name === 'extractor' ? 0 : 1]!.path), async () => {
@@ -136,6 +145,8 @@ export function createInternetRuntime(mcp: McpManager) {
         }
         catch { return false }
       })
+      const extensionState = extension.status()
+      rows.unshift({ capability: 'Chrome Extension', status: extensionState.connected ? 'READY' : 'NEED_SETUP', detail: extensionState.error ?? 'Only the explicitly shared active tab can answer fresh media context requests.' })
       return [...rows, ...tools.map(tool => ({ capability: tool.tool, status: tool.path ? 'READY' as const : 'NEED_SETUP' as const, detail: tool.detail, toolSource: tool.source }))]
     },
   }
@@ -156,5 +167,13 @@ export function setupInternet(context: ReturnType<typeof createContext>['context
   defineInvokeHandler(context, internetDiagnostics, (_, options) => {
     authorize(options?.raw?.ipcMainEvent)
     return runtime.diagnostics()
+  })
+  defineInvokeHandler(context, studyBrowserPair, (input, options) => {
+    authorize(options?.raw?.ipcMainEvent)
+    return runtime.pairBrowser(input.extensionId)
+  })
+  defineInvokeHandler(context, studyBrowserRevoke, (_, options) => {
+    authorize(options?.raw?.ipcMainEvent)
+    return runtime.revokeBrowser()
   })
 }

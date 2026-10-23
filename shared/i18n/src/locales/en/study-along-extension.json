@@ -1,0 +1,13 @@
+{
+  "title": "Angela Study Along",
+  "description": "Share only the current YouTube tab. Page text, cookies, passwords, and history stay in the browser.",
+  "extensionId": "Extension ID — enter this in Angela Settings",
+  "pairing": "Paste pairing from Angela Settings",
+  "connect": "Connect to Angela",
+  "share": "Share this video tab",
+  "stop": "Stop sharing",
+  "connected": "Connected",
+  "disconnected": "Not connected",
+  "saved": "Saved.",
+  "error": "Check pairing, open your YouTube video, and try again."
+}

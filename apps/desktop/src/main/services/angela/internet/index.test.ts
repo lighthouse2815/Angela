@@ -16,7 +16,7 @@ function clients() {
   const context = createContext<ElectronMainContextExtensions, ElectronMainEmitOptions>()
   const execute = vi.fn(async () => ({ video: { ...parseYouTubeUrl('https://youtu.be/dQw4w9WgXcQ'), currentTime: 1114 }, transcript: { source: 'official' as const, language: 'en', generatedAt: Date.now() }, recentSegments: [{ start: 1110, end: 1114, text: 'AddScoped' }], range: { start: 1024, end: 1174 }, truncated: false, nextTimestamp: null }))
   const diagnostics = vi.fn(async () => [])
-  setupInternet(context, { execute, diagnostics })
+  setupInternet(context, { execute, diagnostics, pairBrowser: vi.fn(), revokeBrowser: vi.fn(), browserStatus: () => ({ connected: false, paired: false, error: null }) })
   return { video: defineInvoke(context, videoResearch), diagnostics: defineInvoke(context, internetDiagnostics), execute, diagnose: diagnostics }
 }
 

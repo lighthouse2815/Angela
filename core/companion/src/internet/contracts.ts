@@ -15,6 +15,7 @@ export interface VideoContext {
   currentTime: number | null
   duration: number | null
   platform: 'youtube'
+  paused?: boolean
 }
 
 export type TranscriptSegment = v.InferOutput<typeof segmentSchema>
@@ -54,9 +55,13 @@ export interface TranscriptionProvider {
 }
 
 /** Browser adapters observe only the browser already connected through Angela's permission boundary. */
-export interface BrowserContextProvider {
-  getActiveTab: () => Promise<{ url: string, title: string }>
+export interface BrowserMediaContextProvider {
   getActiveMediaContext: () => Promise<VideoContext>
+}
+
+/** General browser observation also exposes the current tab when no media is present. */
+export interface BrowserContextProvider extends BrowserMediaContextProvider {
+  getActiveTab: () => Promise<{ url: string, title: string }>
 }
 
 /** A summary model receives bounded evidence, never a full long transcript in one request. */

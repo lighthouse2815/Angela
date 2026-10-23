@@ -12,7 +12,9 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "compile": "vue-tsc --noEmit",
-    "postinstall": "wxt prepare"
+    "postinstall": "wxt prepare",
+    "build:study-along": "wxt build --config wxt.study-along.config.ts",
+    "zip:study-along": "wxt zip --config wxt.study-along.config.ts"
   },
   "devDependencies": {
     "@angela/server-sdk": "workspace:^",

@@ -118,3 +118,13 @@ The network-independent test suite covers URL parsing, transcript windows, cachi
 Mocked acceptance tests prove data flow. They do not prove that a particular public video or paid account is currently accessible.
 Desktop packaging includes the original MIT text at `resources/licenses/agent-reach-LICENSE.txt`.
 See [the source and license audit](./third-party-audit.md).
+
+## Normal Chrome and Chromium tabs
+
+A dedicated restricted extension build now supplies media context through an authenticated local bridge.
+Build it with `pnpm -F @angela/plugin-web-extension build:study-along`.
+The extension popup accepts pairing credentials issued only by a trusted Angela settings window.
+Its **Share this video tab** action grants access to the current YouTube tab.
+The desktop prefers a fresh authorized extension response, then falls back to the existing Playwright provider.
+Explicit URL and timestamp arguments remain authoritative and do not probe other browser tabs.
+See [the extension setup](../integrations/plugins/web-extension/README.md#build-study-along-with-limited-permissions).

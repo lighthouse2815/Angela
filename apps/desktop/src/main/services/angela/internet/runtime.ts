@@ -1,4 +1,4 @@
-import type { BrowserContextProvider, TranscriptProvider, VideoSummarizer } from '@angela/companion/internet'
+import type { BrowserMediaContextProvider, TranscriptProvider, VideoSummarizer } from '@angela/companion/internet'
 
 import type { InternetDiagnostic } from '../../../../shared/eventa/internet'
 import type { McpManager } from '../mcp-servers'
@@ -30,7 +30,7 @@ export class StudyAlongRuntime {
   constructor(
     private readonly provider: TranscriptProvider,
     cacheDirectory: string,
-    private readonly browser: BrowserContextProvider,
+    private readonly browser: BrowserMediaContextProvider,
     private readonly summarizer: () => Promise<VideoSummarizer>,
     private readonly signal?: AbortSignal,
   ) {
