@@ -55,7 +55,7 @@ The CDP port is project- and run-command-specific. Do not assume `9222`, `9250`,
 For Angela desktop on POSIX shells:
 
 ```bash
-APP_REMOTE_DEBUG=true APP_REMOTE_DEBUG_PORT=9250 pnpm dev:tamagotchi
+APP_REMOTE_DEBUG=true APP_REMOTE_DEBUG_PORT=9250 pnpm dev:desktop
 ```
 
 For Windows PowerShell:
@@ -63,13 +63,13 @@ For Windows PowerShell:
 ```powershell
 $env:APP_REMOTE_DEBUG = "true"
 $env:APP_REMOTE_DEBUG_PORT = "9250"
-pnpm dev:tamagotchi
+pnpm dev:desktop
 ```
 
 For Windows Git Bash:
 
 ```bash
-APP_REMOTE_DEBUG=true APP_REMOTE_DEBUG_PORT=9250 pnpm dev:tamagotchi
+APP_REMOTE_DEBUG=true APP_REMOTE_DEBUG_PORT=9250 pnpm dev:desktop
 ```
 
 Adjust the port to match what the user actually started. If the project uses a different mechanism, inspect its Electron launch code before giving command advice.
@@ -160,7 +160,7 @@ The main window hosts the stage and its controls. Settings and chat have separat
 The `9250` examples below assume the app was started by the person running it with:
 
 ```bash
-APP_REMOTE_DEBUG=true APP_REMOTE_DEBUG_PORT=9250 pnpm dev:tamagotchi
+APP_REMOTE_DEBUG=true APP_REMOTE_DEBUG_PORT=9250 pnpm dev:desktop
 ```
 
 That port is not intrinsic to Angela or Electron. It depends on the current command and environment. Most desktop code lives under `apps/desktop`; inspect that app's Electron startup and window code when the port, routes, or remote-debug behavior differ.

@@ -6,7 +6,7 @@ Build or start Angela desktop with a known CDP port. Prefer a dedicated user-dat
 APP_REMOTE_DEBUG=true \
 APP_REMOTE_DEBUG_PORT=9250 \
 APP_REMOTE_DEBUG_NO_OPEN=true \
-pnpm dev:tamagotchi
+pnpm dev:desktop
 ```
 
 If using the built app, launch its Electron executable with `apps/desktop/out/main/index.js` and an explicit `--user-data-dir` under a newly created temporary directory.
