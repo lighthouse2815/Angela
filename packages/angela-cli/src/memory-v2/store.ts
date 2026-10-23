@@ -29,6 +29,7 @@ const inputSchema = v.object({
 /** Owns authoritative memory in RecallIndex's connection. Every mutation and its FTS projection commit together. */
 export class MemoryStore {
   private readonly statements = new Map<string, StatementSync>()
+  private transactionDepth = 0
 
   constructor(private readonly database: DatabaseSync) {
     if (database.prepare('SELECT name FROM sqlite_master WHERE type=\'table\' AND name=\'memory_schema\'').get()) {
@@ -115,7 +116,10 @@ export class MemoryStore {
   }
 
   private transaction<T>(run: () => T): T {
+    if (this.transactionDepth)
+      return run()
     this.database.exec('BEGIN IMMEDIATE')
+    this.transactionDepth++
     try {
       const result = run()
       this.database.exec('COMMIT')
@@ -125,6 +129,19 @@ export class MemoryStore {
       this.database.exec('ROLLBACK')
       throw error
     }
+    finally {
+      this.transactionDepth--
+    }
+  }
+
+  /** Commits synchronous domain edits together. An exception rolls back pages and their search projections. */
+  atomic<T>(run: () => T): T {
+    return this.transaction(run)
+  }
+
+  /** Lists current pages of one domain in an exact scope. */
+  list(scope: string, kind: string) {
+    return this.sql('SELECT * FROM memory_pages WHERE scope=? AND kind=? AND status=\'active\'').all(scope, kind).map(row => this.page(row)!)
   }
 
   private page(row?: ReturnType<StatementSync['get']>) {
@@ -356,6 +373,8 @@ export class MemoryStore {
 
   /** Destructive operations checkpoint obsolete WAL frames. A busy reader reports incomplete physical cleanup for a retry. */
   reclaim() {
+    if (this.transactionDepth)
+      return
     const result = this.sql('PRAGMA wal_checkpoint(TRUNCATE)').get()
     if (Number(result?.busy) > 0)
       throw new Error('Memory purge checkpoint is busy')

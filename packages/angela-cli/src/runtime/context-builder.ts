@@ -1,5 +1,6 @@
 import type { cliMessages } from '@angela/i18n/cli'
 
+import type { CompanionRecords } from '../companion/records'
 import type { Memory } from '../memory'
 import type { OpenLoops } from '../open-loops'
 import type { RequestPrivacy } from '../privacy-policy'
@@ -13,6 +14,7 @@ import { taskContext } from '../task-tools'
 
 /** Only enabled request capabilities enter context construction. No source or prompt is cached here. */
 export interface ContextSources {
+  records?: CompanionRecords
   privacy?: RequestPrivacy
   openLoops?: OpenLoops
   workspace?: string
@@ -73,6 +75,12 @@ export async function buildContext(sources: ContextSources, text: string, signal
   catch {
     signal?.throwIfAborted()
     sources.warn(sources.recall ? sources.messages.recallInvalid : sources.messages.memoryUnavailable)
+  }
+  if (sources.records) {
+    try {
+      parts.push(await sources.records.context())
+    }
+    catch { sources.warn(sources.messages.memoryUnavailable) }
   }
   if (sources.project) {
     try {

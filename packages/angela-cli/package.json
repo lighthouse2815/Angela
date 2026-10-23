@@ -5,6 +5,20 @@
   "private": true,
   "description": "Terminal chat and MCP client for Angela",
   "license": "MIT",
+  "exports": {
+    "./runtime": {
+      "types": "./dist/runtime/runtime.d.mts",
+      "default": "./dist/runtime/runtime.mjs"
+    },
+    "./companion": {
+      "types": "./dist/companion/records.d.mts",
+      "default": "./dist/companion/records.mjs"
+    },
+    "./companion-contracts": {
+      "types": "./dist/companion/contracts.d.mts",
+      "default": "./dist/companion/contracts.mjs"
+    }
+  },
   "bin": {
     "angela": "./dist/bin/run.mjs"
   },
@@ -39,6 +53,7 @@
     "@moeru/std": "catalog:",
     "@xsai/shared": "catalog:",
     "@xsai/shared-chat": "catalog:",
+    "@xsai/tool": "catalog:",
     "abort-controller": "catalog:",
     "grammy": "catalog:",
     "valibot": "catalog:",

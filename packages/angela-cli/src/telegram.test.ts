@@ -16,6 +16,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 import { Bot } from 'grammy'
 import { afterEach, expect, it, vi } from 'vitest'
 
+import { CompanionRecords } from './companion/records'
 import { McpTools } from './mcp'
 import { Memory } from './memory'
 import { AngelaRuntime } from './runtime/runtime'
@@ -652,3 +653,42 @@ it('excludes disabled-memory request text from Telegram recovery checkpoints bef
   for (const file of await sessions.list())
     expect(JSON.stringify(await sessions.read(file.id))).not.toContain('tôi muốn học .NET')
 })
+
+it('reads desktop records for the linked owner and publishes Telegram corrections to the same character source', async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>().mockResolvedValueOnce(completion('I remember the preference'))
+  const host = await connect(fetch, undefined, 100)
+  const desktop = await CompanionRecords.open(host.directory, host.directory)
+  try {
+    const original = await desktop.execute({ type: 'learning.save', category: 'preference', text: 'Listen before giving advice' })
+    await host.message('What support style do I prefer?')
+    await vi.waitFor(() => expect(host.reply).toHaveBeenCalledWith('I remember the preference'), { timeout: 5000 })
+    await host.idle()
+    expect(String(fetch.mock.calls[0][1]?.body)).toContain('Listen before giving advice')
+    fetch.mockResolvedValueOnce(companionCompletion('companion_memory', {
+      action: 'learning.save',
+      id: original.entryId,
+      text: 'Ask before giving advice',
+      source_quote: 'Ask before giving advice',
+      category: 'preference',
+      kind: 'preference',
+      status: 'completed',
+      interval: 0,
+      due_at: null,
+    })).mockResolvedValueOnce(completion('Preference updated'))
+    await host.message('Ask before giving advice')
+    await vi.waitFor(() => expect(host.reply).toHaveBeenCalledWith('Preference updated'), { timeout: 5000 })
+    await host.idle()
+    expect(await desktop.context()).toContain('Ask before giving advice')
+    expect(await desktop.context()).not.toContain('Listen before giving advice')
+    fetch.mockResolvedValueOnce(completion('Other user'))
+    await host.message('What support style do I prefer?', 200)
+    await vi.waitFor(() => expect(host.reply).toHaveBeenCalledWith('Other user'), { timeout: 5000 })
+    expect(String(fetch.mock.calls[3][1]?.body)).not.toContain('Ask before giving advice')
+    const other = await CompanionRecords.open(host.directory, host.directory, 'other-character')
+    try {
+      expect(await other.context()).not.toContain('Ask before giving advice')
+    }
+    finally { other.close() }
+  }
+  finally { desktop.close() }
+}, 15000)

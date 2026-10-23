@@ -25,6 +25,7 @@ import { randomUUID } from 'node:crypto'
 
 import { ActiveCommitments } from '../active-commitments'
 import { SystemClock } from '../clock'
+import { CompanionRecords } from '../companion/records'
 import { OpenLoopConversation } from '../open-loop-conversation'
 import { openLoopOutcome } from '../open-loop-extraction'
 import { OpenLoopSource } from '../open-loop-source'
@@ -434,6 +435,7 @@ export interface SessionOptions {
   workspace: string
   sessionId: string
   channel: 'cli' | 'telegram' | 'discord' | 'desktop' | 'zalo'
+  characterId?: string
   locale?: string
   connectMcp?: (signal: AbortSignal) => Promise<McpTools | undefined>
   warn?: (message: string) => void
@@ -623,6 +625,7 @@ export class RuntimeSession {
     this.lastRequest = envelope
     let capture: MemoryCapture | undefined
     let recall: Recall | undefined
+    let records: CompanionRecords | undefined
     const emit = async (payload: EventPayload, evidence = '', verified = false) => {
       const event: AngelaEvent = { ...envelope, ...payload, id: randomUUID(), timestamp: new Date(this.runtime.clock.now()).toISOString() }
       this.runtime.events.emit(event)
@@ -656,6 +659,16 @@ export class RuntimeSession {
             memoryEnabled = (await sources.memory.read()).enabled
           }
           catch { sources.warn(this.runtime.messages.memoryUnavailable) }
+          try {
+            records = await CompanionRecords.open(this.options.dataDir, this.options.workspace, this.options.characterId)
+            memoryEnabled &&= (await records.execute({ type: 'read' })).snapshot.enabled
+            sources.records = records
+          }
+          catch {
+            records?.close()
+            records = undefined
+            sources.warn(this.runtime.messages.memoryUnavailable)
+          }
           sources.privacy = requestPrivacy(text, memoryEnabled, chat.privacy)
           chat.applyPrivacy(sources.privacy)
           this.lastPrivacyAllowed = sources.privacy.durableMemoryAllowed
@@ -757,6 +770,7 @@ export class RuntimeSession {
         catch { this.options.warn?.(this.runtime.messages.memoryUnavailable) }
         capture = undefined
         registry?.close()
+        records?.close()
         await this.retrieval?.then(recall => recall?.finishRequest()).catch(() => {})
         if (signal.aborted) {
           await this.client?.then(client => client?.close()).catch(() => {})
@@ -832,3 +846,8 @@ export class RuntimeSession {
     return this.closing
   }
 }
+
+export type { OpenLoop } from '../open-loops'
+export { requestPrivacy } from '../privacy-policy'
+export { ReminderNotifications } from '../reminder-notifications'
+export type { Task } from '../task-schema'

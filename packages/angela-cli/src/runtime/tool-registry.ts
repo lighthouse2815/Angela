@@ -40,6 +40,12 @@ export async function buildTools(sources: ContextSources, text: string, sessionI
     }
     catch { sources.warn(sources.messages.memoryUnavailable) }
   }
+  if (sources.records) {
+    try {
+      tools.push(...await sources.records.tools(text, privacy))
+    }
+    catch { sources.warn(sources.messages.memoryUnavailable) }
+  }
   if (sources.project) {
     try {
       tools.push(...await sources.project.tools(text, sessionId, observations, privacy))
@@ -59,6 +65,7 @@ export async function buildTools(sources: ContextSources, text: string, sessionI
   }
   const domains = new Map<string, 'personal' | 'project' | 'task' | 'workflow'>([
     ['personal_memory', 'personal'],
+    ['companion_memory', 'personal'],
     ['project_memory', 'project'],
     ['memory_page_save', 'workflow'],
     ['skill_save', 'workflow'],

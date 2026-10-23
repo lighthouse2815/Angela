@@ -21,6 +21,7 @@ import { APICallError } from '@xsai/shared'
 import { AbortController as TelegramAbortController } from 'abort-controller'
 import { Bot, InlineKeyboard } from 'grammy'
 
+import { characterDataDir } from './companion/records'
 import { readConfig } from './config'
 import { formatRequestError } from './errors'
 import { Memory } from './memory'
@@ -57,7 +58,7 @@ export class TelegramChat {
     private readonly messages: typeof cliMessages.en,
     private readonly allowedUsers: ReadonlySet<number>,
     private readonly connectTools: (sessionId: string, confirm: ConstructorParameters<typeof McpTools>[1], signal: AbortSignal) => Promise<McpTools | undefined>,
-    private readonly companionConfig: { dataDir: string, env: NodeJS.ProcessEnv, locale: string, baseUrl?: string, apiKey: string, sharedUserId?: number },
+    private readonly companionConfig: { dataDir: string, env: NodeJS.ProcessEnv, locale: string, baseUrl?: string, apiKey: string, sharedUserId?: number, characterId?: string },
     runtime?: AngelaRuntime,
   ) {
     this.ownsRuntime = !runtime
@@ -152,9 +153,10 @@ export class TelegramChat {
   }
 
   private root(chatId: number) {
-    return this.companionConfig.sharedUserId === chatId
+    const directory = this.companionConfig.sharedUserId === chatId
       ? this.companionConfig.dataDir
       : join(this.companionConfig.dataDir, 'telegram', 'companions', String(this.bot.botInfo.id), String(chatId))
+    return characterDataDir(directory, this.companionConfig.characterId)
   }
 
   private reminders(chatId: number) {
@@ -174,7 +176,7 @@ export class TelegramChat {
   }
 
   private async command(chatId: number, text: string) {
-    const scope = await this.runtime.acquire({ dataDir: this.root(chatId), workspace: this.workspace, sessionId: this.sessionId(chatId), channel: 'telegram', locale: this.companionConfig.locale })
+    const scope = await this.runtime.acquire({ dataDir: this.root(chatId), workspace: this.workspace, sessionId: this.sessionId(chatId), channel: 'telegram', characterId: this.companionConfig.characterId, locale: this.companionConfig.locale })
     try {
       await this.reminders(chatId)
       return await scope.command(text)
@@ -472,6 +474,7 @@ export class TelegramChat {
         workspace: this.workspace,
         sessionId: session.record.id,
         channel: 'telegram',
+        characterId: this.companionConfig.characterId,
         locale: this.companionConfig.locale,
         connectMcp: async connectionSignal => await this.connectTools(this.sessionId(chatId), async (request, approvalSignal) => {
           output.approval(request)
@@ -600,7 +603,7 @@ export async function runTelegram(args: string[], env: NodeJS.ProcessEnv) {
   const sharedUserId = merged.ANGELA_TELEGRAM_SHARED_USER_ID
   if (sharedUserId && (!ids.includes(sharedUserId) || !/^\d+$/u.test(sharedUserId)))
     throw new Error(messages.telegramSharedUser)
-  const workspace = await realpath(config.cwd ?? process.cwd())
+  const workspace = await realpath(config.cwd ?? merged.ANGELA_WORKSPACE ?? process.cwd())
   if (!(await stat(workspace)).isDirectory())
     throw new Error(messages.invalidWorkspace)
   const definition = listProviders().find(provider => provider.id === config.definitionId)
@@ -615,6 +618,7 @@ export async function runTelegram(args: string[], env: NodeJS.ProcessEnv) {
     return await McpTools.connect(config, workspace, join(config.dataDir, 'telegram', 'computer-use', id), confirm, messages, merged, signal)
   }, {
     dataDir: config.dataDir,
+    characterId: merged.ANGELA_TELEGRAM_CHARACTER_ID ?? 'default',
     env: merged,
     locale: config.locale,
     baseUrl: config.baseUrl,
