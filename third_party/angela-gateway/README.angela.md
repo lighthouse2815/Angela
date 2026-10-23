@@ -35,6 +35,10 @@ Do not rename those identifiers without checking the corresponding protocol.
 The source includes upstream translations and their source-text dictionaries.
 The product rename updates matching brand labels without translating unrelated text.
 
+The web workspace uses jade accents, slate navigation, and responsive panels.
+The landing page links directly to providers, routes, usage, and CLI configuration.
+Stored protocol identifiers remain unchanged so existing integrations continue to work.
+
 ## Build and tests
 
 Run `pnpm build:cli` from the repository root.
