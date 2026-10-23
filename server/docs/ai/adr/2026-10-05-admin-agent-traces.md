@@ -1,23 +1,22 @@
-# Admin agent traces from request logs
+<a id="admin-agent-traces-from-request-logs"></a>
 
-Status: accepted
+# Dấu vết quản trị viên agent từ nhật ký yêu cầu
 
-## Decision
+Trạng thái: đã chấp nhận
 
-The admin Trace page reads agent turns from `llm_request_log`.
-One trace is one non-empty `interaction_id`.
-One generation is one request log row.
-One upstream attempt is one `llm_request_attempt` row.
+<a id="decision"></a>
 
-The request log remains the source of prompt, completion, model, token, provider, status, and timing data.
-The admin API groups these rows for the Trace page.
-This change adds no trace table and no second write path.
+## Phán quyết
 
-Remove the Langfuse exporter and its generation wrapper from the API.
-Keep the OpenTelemetry pipeline for infrastructure traces, metrics, and logs.
-OpenTelemetry does not receive prompt or completion content.
+Trang Trace của quản trị viên ghi agent lượt từ `llm_request_log`. Một dấu vết là một `interaction_id` không trống. Một sinh nội dung là một hàng nhật ký yêu cầu. Một lần thử upstream là một hàng `llm_request_attempt`.
 
-## Boundary
+Nhật ký yêu cầu vẫn là nguồn của prompt, dữ liệu hoàn thành, mô hình, token, nhà cung cấp, trạng thái và dữ liệu thời gian. Quản trị viên API nhóm các hàng này cho trang Theo dõi. Thay đổi này không thêm bảng theo dõi và không có đường dẫn ghi thứ hai.
+
+Xóa trình xuất Langfuse và trình bao bọc sinh nội dung của nó khỏi API. Giữ quy trình OpenTelemetry để theo dõi, số liệu và nhật ký cơ sở hạ tầng. OpenTelemetry không nhận được prompt hoặc nội dung hoàn thành.
+
+<a id="boundary"></a>
+
+## ranh giới
 
 ```text
 client session ID      -> llm_request_log.session_id
@@ -27,27 +26,29 @@ upstream dispatch      -> llm_request_attempt
 admin Trace page       -> grouped read model
 ```
 
-The client already sends the session ID and round ID.
-The API does not need a new client event for the first Trace page.
-A future client event is required for exact tool runtime, ASR, TTS playback, and local IO timing.
+Máy khách đã gửi phiên ID và làm tròn ID. API không cần sự kiện khách hàng mới cho trang Theo dõi đầu tiên. Cần có một sự kiện khách hàng trong tương lai để phát lại công cụ chính xác runtime, ASR, TTS và thời gian IO cục bộ.
 
-## Scope
+<a id="scope"></a>
 
-- Remove the Langfuse packages, exporter setup, and generation calls.
-- Add admin queries for trace summaries and trace details.
-- Group requests by `interaction_id` without copying rows.
-- Show complete request content only in trace details.
-- Add navigation between sessions, traces, and requests.
+## Phạm vi
+
+- Xóa các gói Langfuse, thiết lập nhà xuất khẩu và các lệnh gọi sinh nội dung.
+- Thêm truy vấn quản trị viên để có bản tóm tắt theo dõi và chi tiết theo dõi.
+- Nhóm các yêu cầu theo `interaction_id` mà không cần sao chép hàng.
+- Chỉ hiển thị nội dung yêu cầu đầy đủ trong chi tiết theo dõi.
+- Thêm điều hướng giữa các phiên, dấu vết và yêu cầu.
 
 ## Non-goals
 
-- Do not add client IOTrace upload.
-- Do not infer exact tool duration or tool success.
-- Do not put prompt or completion content in OpenTelemetry spans.
-- Do not migrate historical data.
-- Do not change request billing or routing.
+- Không thêm ứng dụng khách tải lên IOTrace.
+- Không suy ra chính xác thời gian sử dụng dao hoặc mức độ thành công của dao.
+- Không đặt prompt hoặc nội dung hoàn thành trong các nhịp OpenTelemetry.
+- Không di chuyển dữ liệu lịch sử.
+- Không thay đổi yêu cầu thanh toán hoặc định tuyến.
 
-## Module graph
+<a id="module-graph"></a>
+
+## Biểu đồ mô-đun
 
 ```mermaid
 flowchart LR
@@ -60,7 +61,9 @@ flowchart LR
   Gateway --> OTel[OpenTelemetry infrastructure telemetry]
 ```
 
-## Affected files
+<a id="affected-files"></a>
+
+## Các tập tin bị ảnh hưởng
 
 ```text
 server/apps/api/
@@ -86,7 +89,9 @@ proj-airi/admin-dashboard/
   src/router.ts
 ```
 
-## Read sequence
+<a id="read-sequence"></a>
+
+## Đọc trình tự
 
 ```mermaid
 sequenceDiagram
@@ -106,22 +111,21 @@ sequenceDiagram
   GraphQL-->>Dashboard: Ordered generations
 ```
 
-## Rollout
+<a id="rollout"></a>
 
-Deploy the admin API before the dashboard.
-The old dashboard does not call the new fields.
-Deploy the AIRI API after the Trace page is available.
-Removing Langfuse stops new external observations but does not delete existing Langfuse data.
+## Triển khai
 
-Rollback the AIRI API to restore Langfuse export.
-Rollback the dashboard independently if the new read model has a problem.
-No database rollback is necessary.
+Triển khai quản trị viên API trước bảng điều khiển. Trang tổng quan cũ không gọi các trường mới. Triển khai AIRI API sau khi trang Theo dõi có sẵn. Việc xóa Langfuse sẽ dừng các quan sát bên ngoài mới nhưng không xóa dữ liệu Langfuse hiện có.
 
-## Verification
+Khôi phục AIRI API để khôi phục xuất Langfuse. Khôi phục bảng điều khiển một cách độc lập nếu mô hình đọc mới có vấn đề. Không cần khôi phục cơ sở dữ liệu.
 
-- Test trace grouping, filters, paging, sorting, failed counts, tokens, and models.
-- Test that trace details return generations in time order with request content and attempts.
-- Run GraphQL generation and Go tests.
-- Run dashboard GraphQL generation, unit tests, typecheck, and build.
-- Verify session-to-trace, trace-to-request, and request-to-trace navigation in a browser.
-- Run the API tests that cover chat, Responses, and speech routes after Langfuse removal.
+<a id="verification"></a>
+
+## Xác minh
+
+- Kiểm tra nhóm theo dõi, bộ lọc, phân trang, sắp xếp, số lượng không thành công, token và mô hình.
+- Kiểm tra xem chi tiết theo dõi có trả về lần sinh nội dung theo thứ tự thời gian với nội dung yêu cầu và số lần thử hay không.
+- Chạy thử nghiệm GraphQL sinh nội dung và Go.
+- Chạy bảng điều khiển GraphQL sinh nội dung, kiểm tra đơn vị, kiểm tra kiểu dữ liệu và xây dựng.
+- Xác minh điều hướng phiên theo dõi, theo dõi theo yêu cầu và yêu cầu theo dõi trong trình duyệt.
+- Chạy các bài kiểm tra API bao gồm trò chuyện, Responses và lời nói route sau khi loại bỏ Langfuse.

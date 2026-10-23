@@ -1,42 +1,42 @@
-# Mimic Baseline Training Boundary
+<a id="mimic-baseline-training-boundary"></a>
 
-## Summary
+# Ranh giới đào tạo cơ bản bắt chước
 
-This document defines the future training line for `computer-use-mcp`.
+<a id="summary"></a>
 
-The current decision is deliberately conservative:
+## Bản tóm tắt
 
-- Do not start full VLA or embodied model training now.
-- Do not wire any learned model into runtime execution now.
-- Do not mix this line with chafa, CLI, desktop UI pet work, or terminal coding
-  workflows.
-- Start with a bounded mimic baseline / learned candidate scorer experiment.
+Tài liệu này xác định dòng đào tạo trong tương lai cho `computer-use-mcp`.
 
-The learned component should eventually rank low-level UI candidates or actions.
-It must not understand user language, execute tools, bypass approval, or decide
-that a task is complete.
+Quyết định hiện tại là cố tình bảo thủ:
 
-## Status
+- Đừng bắt đầu đào tạo VLA đầy đủ hoặc mô hình thể hiện ngay bây giờ.
+- Đừng kết nối bất kỳ mô hình nào đã học vào quá trình thực thi runtime ngay bây giờ.
+- Không kết hợp dòng này với chafa, CLI, desktop UI công việc thú cưng hoặc quy trình mã hóa thiết bị đầu cuối.
+- Bắt đầu với thử nghiệm bắt chước đường cơ sở/người chấm điểm ứng viên đã học của có giới hạn.
 
-Current status: experiment boundary only.
+Thành phần đã học cuối cùng sẽ xếp hạng các ứng viên hoặc hành động UI cấp thấp. Nó không được hiểu ngôn ngữ người dùng, thực thi các công cụ, bỏ qua phê duyệt hoặc quyết định rằng một nhiệm vụ đã hoàn thành.
 
-This package does not currently contain a trained computer-use model. Any future
-mimic scorer is advisory data until explicit runtime integration, approval, and
-verification contracts are written and tested.
+<a id="status"></a>
 
-## Architecture Boundary
+## Trạng thái
 
-The intended division of responsibility is:
+Trạng thái hiện tại: chỉ ranh giới thử nghiệm.
 
-- LLM / planner handles language understanding and decomposes the user goal into
-  a structured current subgoal.
-- Observer provides screenshot, DOM / AX tree, candidate elements, current
-  URL/title/state, and previous action trace.
-- Mimic policy performs only `observation -> candidate/action ranking`.
-- Runtime gate, approval discipline, action executor, and verification gate
-  decide whether anything can execute.
+Gói này hiện không chứa mô hình sử dụng máy tính được đào tạo. Bất kỳ công cụ ghi điểm bắt chước nào trong tương lai đều là dữ liệu tư vấn cho đến khi các hợp đồng xác minh, phê duyệt và tích hợp runtime rõ ràng được viết và thử nghiệm.
 
-Authority order:
+<a id="architecture-boundary"></a>
+
+## Ranh giới kiến ​​trúc
+
+Sự phân chia trách nhiệm dự kiến ​​là:
+
+- LLM / Planner xử lý việc hiểu ngôn ngữ và phân tách mục tiêu của người dùng thành mục tiêu phụ hiện tại có cấu trúc.
+- Người quan sát cung cấp ảnh chụp màn hình, cây DOM / AX, các phần tử ứng viên, URL/title/state hiện tại và dấu vết hành động trước đó.
+- Chính sách bắt chước chỉ thực hiện `observation -> candidate/action ranking`.
+- runtime cổng kiểm tra, kỷ luật phê duyệt, người thực thi hành động và xác minh cổng kiểm tra quyết định liệu mọi thứ có thể được thực thi hay không.
+
+Lệnh của cơ quan có thẩm quyền:
 
 ```text
 runtime/system rules
@@ -50,17 +50,19 @@ mimic scorer ranking
 model guess
 ```
 
-The mimic scorer can inform selection. It cannot authorize execution.
+Người ghi điểm bắt chước có thể đưa ra lựa chọn. Nó không thể cho phép thực thi.
 
-## V1 Experiment Shape
+<a id="v1-experiment-shape"></a>
 
-If an experiment folder is created, use:
+## Hình dạng thí nghiệm V1
+
+Nếu thư mục thử nghiệm được tạo, hãy sử dụng:
 
 ```text
 services/computer-use-mcp/experiments/mimic-baseline/
 ```
 
-Possible files:
+Các tập tin có thể:
 
 ```text
 trace-schema.ts
@@ -70,23 +72,23 @@ eval-candidate-scorer.ts
 README.md
 ```
 
-V1 scope:
+Phạm vi V1:
 
-1. Define a trace schema.
-2. Define observation, candidate, and action data structures.
-3. Build a trace collector for deterministic browser/macOS UI tasks.
-4. Save task goal, current subgoal, screenshot, DOM / AX candidates, previous
-   actions, human-chosen next action, and expected effect / verification result
-   when available.
-5. Map human click/type/scroll actions back to candidate IDs.
-6. Build a dataset builder.
-7. Build an offline eval script.
+1. Xác định lược đồ theo dõi.
+2. Xác định cấu trúc dữ liệu quan sát, ứng viên và hành động.
+3. Xây dựng trình thu thập dấu vết cho các nhiệm vụ browser/macOS UI xác định.
+4. Lưu mục tiêu nhiệm vụ, mục tiêu phụ hiện tại, ảnh chụp màn hình, ứng viên DOM / AX, hành động trước đó, hành động tiếp theo do con người chọn và hiệu quả / kết quả xác minh dự kiến ​​​​khi có sẵn.
+5. Ánh xạ các hành động click/type/scroll của con người trở lại ID ứng viên.
+6. Xây dựng trình tạo tập dữ liệu.
+7. Xây dựng kịch bản đánh giá ngoại tuyến.
 
-Do not implement training before this substrate exists.
+Không thực hiện đào tạo trước khi chất nền này tồn tại.
 
-## Trace Schema V1 Sketch
+<a id="trace-schema-v1-sketch"></a>
 
-The first schema should be append-only friendly and deterministic.
+## Sơ đồ dấu vết V1 Phác thảo
+
+Lược đồ đầu tiên phải thân thiện với phần bổ sung và mang tính xác định.
 
 ```ts
 interface MimicTraceRecordV1 {
@@ -132,7 +134,7 @@ interface MimicTraceRecordV1 {
 }
 ```
 
-Candidate and action structures should stay low-level:
+Cơ cấu ứng viên và hành động nên ở mức thấp:
 
 ```ts
 interface MimicCandidateV1 {
@@ -159,11 +161,13 @@ interface MimicActionV1 {
 }
 ```
 
-Do not put raw secrets, cookies, API keys, or full browser storage into traces.
+Không đặt bí mật thô, cookie, khóa API hoặc toàn bộ bộ nhớ trình duyệt vào dấu vết.
 
-## Dataset Builder Contract
+<a id="dataset-builder-contract"></a>
 
-The dataset builder should convert trace records into bounded examples:
+## Hợp đồng xây dựng tập dữ liệu
+
+Trình xây dựng tập dữ liệu sẽ chuyển đổi các bản ghi theo dõi thành các ví dụ có giới hạn:
 
 ```text
 input:
@@ -179,75 +183,79 @@ label:
   no-target / unmapped status when not mapped
 ```
 
-The first dataset format can be JSONL. It should keep screenshots as referenced
-files, not inline base64, unless a later training backend requires packaging.
+Định dạng tập dữ liệu đầu tiên có thể là JSONL. Nó phải giữ ảnh chụp màn hình dưới dạng tệp được tham chiếu, không phải base64 nội tuyến, trừ khi phần phụ trợ đào tạo sau này yêu cầu đóng gói.
 
-## Offline Eval Metrics
+<a id="offline-eval-metrics"></a>
 
-The first offline eval script should report:
+## Số liệu đánh giá ngoại tuyến
 
-- Top-1 candidate match
-- Top-3 candidate match
-- action type accuracy
-- no-target / unmapped-action rate
-- unsafe / invalid candidate rate if applicable
+Tập lệnh đánh giá ngoại tuyến đầu tiên sẽ báo cáo:
 
-Eval output should be deterministic and file-based. It should not call a runtime
-tool, mutate the desktop, or require a model provider key for the first schema
-contract.
+- Tỷ lệ khớp ứng viên Top-1
+- Tỷ lệ khớp ứng viên Top-3
+- độ chính xác của loại hành động
+- tỷ lệ không có mục tiêu/hành động chưa được ánh xạ
+- tỷ lệ ứng viên không an toàn/không hợp lệ nếu có
 
-## Promotion Gates
+Đầu ra đánh giá phải mang tính xác định và dựa trên tệp. Nó không được gọi công cụ runtime, thay đổi desktop hoặc yêu cầu khóa mô hình nhà cung cấp cho hợp đồng lược đồ đầu tiên.
 
-Do not discuss runtime integration until all of these are true:
+<a id="promotion-gates"></a>
 
-- at least 50 to 100 clean traces exist
-- candidate extraction is stable for the target demo tasks
-- human action mapping has an explainable low unmapped rate
-- offline top-k metrics are repeatable
-- unsafe / invalid candidate cases are measured, not hand-waved
-- approval and verification boundaries remain unchanged
+## Khuyến mãi cổng kiểm tra
 
-Even after those gates pass, a learned scorer must enter runtime as advisory
-ranking only. It must not execute tools directly.
+Không thảo luận về việc tích hợp runtime cho đến khi tất cả những điều này đều đúng:
 
-## Chika Ownership Boundary
+- tồn tại ít nhất 50 đến 100 dấu vết sạch
+- trích xuất ứng viên ổn định cho các nhiệm vụ demo mục tiêu
+- lập bản đồ hành động của con người có tỷ lệ chưa được lập bản đồ thấp có thể giải thích được
+- số liệu top-k ngoại tuyến có thể lặp lại
+- Các trường hợp ứng viên không an toàn hoặc không hợp lệ phải được đo lường, không được bỏ qua.
+- ranh giới phê duyệt và xác minh không thay đổi
 
-Chika may own these bounded experiment tasks:
+Ngay cả sau khi vượt qua cổng kiểm tra, người ghi điểm đã học chỉ phải nhập runtime dưới dạng xếp hạng tư vấn. Nó không được thực thi các công cụ trực tiếp.
 
-- collector
-- schema
-- deterministic browser demo task
-- candidate mapping
-- dataset builder
-- offline eval
+<a id="chika-ownership-boundary"></a>
 
-Chika should not own these in the first slice:
+## Ranh giới sở hữu Chika
 
-- full VLA training
-- runtime execution integration
-- Windows support
-- terminal coding workflow integration
-- model deployment
-- product claims that Angela has a trained computer-use model
+Chika có thể sở hữu các nhiệm vụ thử nghiệm có giới hạn này:
+
+- người sưu tầm
+- lược đồ
+- nhiệm vụ demo trình duyệt xác định
+- lập bản đồ ứng viên
+- trình tạo tập dữ liệu
+- đánh giá ngoại tuyến
+
+Chika không nên sở hữu những thứ này ở lát đầu tiên:
+
+- đào tạo VLA đầy đủ
+- Tích hợp thực thi runtime
+- Hỗ trợ Windows
+- tích hợp quy trình mã hóa thiết bị đầu cuối
+- Triển khai mô hình
+- sản phẩm tuyên bố rằng Angela đã được đào tạo cách sử dụng máy tính mô hình
 
 ## Non-Goals
 
-- No full VLA training.
-- No runtime auto-execution.
-- No terminal coding workflow.
-- No Windows support.
-- No model deployment.
-- No MCP schema changes unless strictly necessary for trace serialization.
-- No desktop/chafa/CLI pet integration.
-- No product claim that Angela has a trained computer-use model.
+- Không có đào tạo VLA đầy đủ.
+- Không có tính năng tự động thực thi runtime.
+- Không có quy trình mã hóa thiết bị đầu cuối.
+- Không có hỗ trợ Windows.
+- Không triển khai mô hình.
+- Không có thay đổi lược đồ MCP trừ khi thực sự cần thiết cho việc tuần tự hóa dấu vết.
+- Không tích hợp thú cưng desktop/chafa/CLI.
+- Không có sản phẩm nào khẳng định Angela có mô hình được đào tạo sử dụng máy tính.
 
-## Reminder Trigger
+<a id="reminder-trigger"></a>
 
-When this line is reopened, remind the owner of the current decision:
+## Kích hoạt lời nhắc
+
+Khi dòng này được mở lại, hãy nhắc nhở chủ sở hữu về quyết định hiện tại:
 
 ```text
 Do not train or deploy yet. First prove the mimic trace schema, deterministic
 collector, candidate mapping, dataset builder, and offline eval.
 ```
 
-Revisit the training decision only after the promotion gates above are met.
+Chỉ xem lại quyết định đào tạo sau khi đạt được mức thăng cấp cổng kiểm tra ở trên.

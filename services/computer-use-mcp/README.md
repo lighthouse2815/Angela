@@ -1,93 +1,97 @@
 # computer-use-mcp
 
-Angela-specific macOS desktop orchestration MCP service.
+Dịch vụ MCP điều phối macOS desktop dành riêng cho Angela.
 
-## Why This Exists
+<a id="why-this-exists"></a>
 
-This package exists because Angela already has many useful pieces in the monorepo —
-providers, chat UX, MCP attachment, desktop app surfaces, browser integrations,
-tool bridges, and workflow-related logic — but those pieces are still too easy to
-use as isolated features instead of one coherent agent system.
+## Tại sao điều này tồn tại
 
-`computer-use-mcp` is the missing execution substrate for that gap.
+Gói này tồn tại vì Angela đã có nhiều phần hữu ích trong monorepo — nhà cung cấp, trò chuyện UX, tệp đính kèm MCP, bề mặt ứng dụng desktop, tích hợp trình duyệt, cầu nối công cụ và logic liên quan đến quy trình làm việc — nhưng những phần đó vẫn quá dễ sử dụng như các tính năng biệt lập thay vì một hệ thống agent mạch lạc.
 
-The current goal is not to add "another computer use demo". The goal is to give
-Angela a unified way to:
+`computer-use-mcp` là chất nền thực thi còn thiếu cho khoảng trống đó.
 
-- observe the current desktop or browser state
-- choose the right execution surface for the task
-- run deterministic actions through tools and terminal commands
-- keep approvals, trace, and audit artifacts attached to the run
-- compose those actions into repeatable workflows instead of one-off demos
+Mục tiêu hiện tại không phải là thêm "bản demo sử dụng máy tính khác". Mục tiêu là cung cấp cho Angela một cách thống nhất để:
 
-In short:
+- quan sát trạng thái desktop hoặc trình duyệt hiện tại
+- chọn bề mặt thực thi phù hợp cho nhiệm vụ
+- chạy các hành động xác định thông qua các công cụ và lệnh đầu cuối
+- giữ các phê duyệt, theo dõi và kiểm tra artifact gắn liền với hoạt động
+- Compose những hành động đó thành các quy trình công việc có thể lặp lại thay vì các bản demo một lần
 
-- Angela remains the control plane and agent shell
-- `computer-use-mcp` is the local execution and workflow substrate
-- the value is in orchestration, not in cursor movement by itself
+Tóm lại:
 
-## What It Is
+- Angela vẫn là máy bay điều khiển và agent shell
+- `computer-use-mcp` là nền tảng quy trình làm việc và thực thi cục bộ
+- giá trị nằm ở sự phối hợp chứ không phải ở sự di chuyển của con trỏ
 
-This package is no longer positioned as a generic remote computer-use experiment.
-The current v1 shape is:
+<a id="what-it-is"></a>
 
-- Angela keeps the control plane:
-  - MCP tool surface
-  - approval queue protocol
-  - audit log
-  - trace history
-  - screenshot persistence
-- `computer-use-mcp` provides a local macOS execution layer:
-  - window observation
-  - screenshots
-  - app open/focus
-  - mouse/keyboard injection
-  - background terminal command execution
-- Angela desktop adds a native approval adapter:
-  - `approval_required` still comes from MCP
-  - Electron shows a native dialog
-  - Angela automatically calls approve/reject on the user's behalf
+## Nó là gì
 
-The intended story is:
+Gói này không còn được định vị là thử nghiệm sử dụng máy tính từ xa chung nữa. Hình dạng v1 hiện tại là:
 
-- Angela uses tools first
-- visual observation is supplementary, not the primary execution path
-- terminal commands are executed by a background shell runner, not by scripting Terminal tabs
-- desktop/Electron/native apps and browser DOM are treated as different execution surfaces
+- Angela giữ máy bay điều khiển:
+  - Bề mặt công cụ MCP
+  - giao thức xếp hàng phê duyệt
+  - nhật ký kiểm tra
+  - dấu vết lịch sử
+  - kiên trì chụp ảnh màn hình
+- `computer-use-mcp` cung cấp lớp thực thi macOS cục bộ:
+  - quan sát cửa sổ
+  - ảnh chụp màn hình
+  - ứng dụng open/focus
+  - tiêm mouse/keyboard
+  - thực thi lệnh thiết bị đầu cuối nền
+- Angela desktop bổ sung bộ điều hợp phê duyệt native:
+  - `approval_required` vẫn đến từ MCP
+  - Electron hiển thị hộp thoại native
+  - Angela tự động gọi approve/reject thay mặt người dùng
 
-## Why It Is Not "Just A Mouse Toy"
+Câu chuyện dự định là:
 
-This package should not be understood as a coordinate-replay automation toy.
+- Angela sử dụng công cụ đầu tiên
+- quan sát trực quan là bổ sung, không phải là con đường thực hiện chính
+- các lệnh đầu cuối được thực thi bởi shell runner nền, không phải bằng các tab Terminal tập lệnh
+- Các ứng dụng desktop/Electron/native và trình duyệt DOM được coi là các bề mặt thực thi khác nhau
 
-What makes it different:
+<a id="why-it-is-not-just-a-mouse-toy"></a>
 
-- it exposes an MCP tool surface instead of a one-off macro recorder
-- it keeps action policy, approval, trace history, and audit output per run
-- it distinguishes between desktop control and browser DOM control instead of forcing everything through blind clicks
-- it prefers deterministic execution paths (`terminal_exec`, workflows, `browser_dom_*`) before raw coordinate actions
-- it is designed to be called by Angela automatically as part of a task flow, not merely driven by a human demo operator
+## Tại sao nó không phải là "Chỉ là một con chuột đồ chơi"
 
-That means the package is useful only when it helps Angela turn scattered local
-capabilities into one observable, controllable task system.
+Gói này không nên được hiểu là một món đồ chơi tự động hóa phát lại tọa độ.
 
-## Current Executor Modes
+Điều gì làm cho nó khác biệt:
+
+- nó hiển thị bề mặt công cụ MCP thay vì trình ghi macro một lần
+- nó giữ chính sách hành động, phê duyệt, lịch sử theo dõi và kết quả kiểm tra mỗi lần chạy
+- nó phân biệt giữa điều khiển desktop và điều khiển DOM của trình duyệt thay vì buộc mọi thứ thông qua các cú nhấp chuột mù
+- nó ưu tiên các đường dẫn thực thi xác định (`terminal_exec`, quy trình công việc, `browser_dom_*`) trước các hành động tọa độ thô
+- nó được thiết kế để Angela tự động gọi như một phần của luồng nhiệm vụ chứ không chỉ đơn thuần do con người điều khiển
+
+Điều đó có nghĩa là gói này chỉ hữu ích khi nó giúp Angela biến các khả năng cục bộ rải rác thành một hệ thống nhiệm vụ có thể quan sát và kiểm soát được.
+
+<a id="current-executor-modes"></a>
+
+## Chế độ thực thi hiện tại
 
 - `dry-run`
-  - default
-  - never injects input
-  - still captures best-effort local screenshots for debugging
+  - mặc định
+  - không bao giờ tiêm đầu vào
+  - vẫn chụp ảnh màn hình cục bộ với nỗ lực tốt nhất để gỡ lỗi
 - `macos-local`
-  - current primary backend
-  - window observation via `NSWorkspace + CGWindowList`
-  - input injection via Swift + Quartz `CGEvent`
-  - app open/focus via `open -a` and `activate`
+  - phụ trợ chính hiện tại
+  - quan sát cửa sổ qua `NSWorkspace + CGWindowList`
+  - tiêm đầu vào qua Swift + Quartz `CGEvent`
+  - ứng dụng open/focus qua `open -a` và `activate`
 - `linux-x11`
-  - retained as a legacy experimental backend
-  - not the main v1 story anymore
+  - được giữ lại như một phụ trợ thử nghiệm kế thừa
+  - không còn là câu chuyện v1 chính nữa
 
-## Tool Surface
+<a id="tool-surface"></a>
 
-Desktop observation and control:
+## Bề mặt công cụ
+
+Quan sát và điều khiển desktop:
 
 - `desktop_get_capabilities`
 - `desktop_observe_windows`
@@ -100,19 +104,19 @@ Desktop observation and control:
 - `desktop_scroll`
 - `desktop_wait`
 
-Terminal orchestration:
+Điều phối thiết bị đầu cuối:
 
 - `terminal_exec`
 - `terminal_get_state`
 - `terminal_reset_state`
 
-Clipboard bridge:
+Cầu bảng nhớ tạm:
 
 - `secret_read_env_value`
 - `clipboard_read_text`
 - `clipboard_write_text`
 
-Browser DOM bridge:
+Trình duyệt cầu nối DOM:
 
 - `browser_agent_get_status`
 - `browser_agent_run`
@@ -130,88 +134,92 @@ Browser DOM bridge:
 - `browser_dom_get_computed_styles`
 - `browser_dom_trigger_event`
 
-Approval and audit helpers:
+Người trợ giúp phê duyệt và kiểm toán:
 
 - `desktop_list_pending_actions`
 - `desktop_approve_pending_action`
 - `desktop_reject_pending_action`
 - `desktop_get_session_trace`
 
-Workflow orchestration:
+Điều phối quy trình làm việc:
 
 - `workflow_open_workspace`
-  - reveals a workspace in Finder and opens it in the configured IDE
+  - hiển thị workspace trong Finder và mở nó trong IDE đã định cấu hình
 - `workflow_validate_workspace`
-  - opens the workspace, confirms `pwd`, inspects local changes, and runs a validation command such as `pnpm typecheck`
+  - mở workspace, xác nhận `pwd`, kiểm tra các thay đổi cục bộ và chạy lệnh xác thực như `pnpm typecheck`
 - `workflow_run_tests`
-  - runs a test command from the workspace root
+  - chạy lệnh kiểm tra từ root workspace
 - `workflow_inspect_failure`
-  - focuses the IDE and re-runs or inspects a failing command path
+  - tập trung IDE và chạy lại hoặc kiểm tra đường dẫn lệnh bị lỗi
 - `workflow_browse_and_act`
-  - generic browse-and-act flow for app observation and follow-up actions
+  - luồng duyệt và hành động chung để quan sát ứng dụng và các hành động tiếp theo
 - `workflow_resume`
-  - resumes a workflow that paused on `approval_required`
+  - tiếp tục quy trình làm việc đã tạm dừng trên `approval_required`
 
-## Policy Model
+<a id="policy-model"></a>
 
-The current macOS v1 boundary is intentionally narrow and explicit:
+## Chính sách mô hình
 
-- global screen coordinates are allowed for UI actions
-- `allowApps` is not used as a hard gate for click/type/scroll
-- `denyApps` still blocks sensitive foreground apps
-- `COMPUTER_USE_OPENABLE_APPS` only gates `desktop_open_app` and `desktop_focus_app`
-- Angela itself is in the default deny list to avoid self-operation
-- terminal commands always require approval
-- app open/focus always require approval
-- click/type/press/scroll still use per-action approval
+Ranh giới macOS v1 hiện tại được cố ý thu hẹp và rõ ràng:
 
-## Environment Variables
+- tọa độ màn hình chung được phép cho các hành động UI
+- `allowApps` không được sử dụng làm cổng kiểm tra cứng cho click/type/scroll
+- `denyApps` vẫn chặn các ứng dụng nền trước nhạy cảm
+- `COMPUTER_USE_OPENABLE_APPS` chỉ kiểm soát quyền gọi `desktop_open_app` và `desktop_focus_app`
+- Bản thân Angela nằm trong danh sách từ chối mặc định để tránh tự thao tác
+- lệnh đầu cuối luôn yêu cầu phê duyệt
+- ứng dụng open/focus luôn yêu cầu phê duyệt
+- click/type/press/scroll vẫn sử dụng phê duyệt cho mỗi hành động
 
-Core:
+<a id="environment-variables"></a>
+
+## Biến môi trường
+
+Cốt lõi:
 
 - `COMPUTER_USE_EXECUTOR`
-  - `dry-run`, `macos-local`, or `linux-x11`
+  - `dry-run`, `macos-local` hoặc `linux-x11`
 - `COMPUTER_USE_APPROVAL_MODE`
-  - `actions` (default), `all`, `never`
+  - `actions` (mặc định), `all`, `never`
 - `COMPUTER_USE_SESSION_ROOT`
-  - local output directory for screenshots and `audit.jsonl`
+  - thư mục đầu ra cục bộ cho ảnh chụp màn hình và `audit.jsonl`
 - `COMPUTER_USE_TIMEOUT_MS`
 - `COMPUTER_USE_DEFAULT_CAPTURE_AFTER`
 - `COMPUTER_USE_MAX_OPERATIONS`
 - `COMPUTER_USE_MAX_OPERATION_UNITS`
 - `COMPUTER_USE_MAX_PENDING_ACTIONS`
 
-macOS orchestration:
+dàn nhạc macOS:
 
 - `COMPUTER_USE_OPENABLE_APPS`
-  - default `Terminal,Cursor,Google Chrome`
+  - mặc định `Terminal,Cursor,Google Chrome`
 - `COMPUTER_USE_DENY_APPS`
-  - default includes `1Password`, `Keychain`, `System Settings`, `Activity Monitor`, `Angela`
+  - mặc định bao gồm `1Password`, `Keychain`, `System Settings`, `Activity Monitor`, `Angela`
 - `COMPUTER_USE_DENY_WINDOW_TITLES`
 - `COMPUTER_USE_TERMINAL_SHELL`
-  - default current shell, otherwise `/bin/zsh`
+  - shell hiện tại mặc định, nếu không thì `/bin/zsh`
 - `COMPUTER_USE_ALLOWED_BOUNDS`
-  - optional global coordinate clamp
+  - kẹp tọa độ toàn cầu tùy chọn
 
-Browser DOM bridge:
+Trình duyệt cầu nối DOM:
 
 - `COMPUTER_USE_BROWSER_DOM_BRIDGE_ENABLED`
-  - default `true`
+  - mặc định `true`
 - `COMPUTER_USE_BROWSER_DOM_BRIDGE_HOST`
-  - default `127.0.0.1`
+  - mặc định `127.0.0.1`
 - `COMPUTER_USE_BROWSER_DOM_BRIDGE_PORT`
-  - default `8765`
+  - mặc định `8765`
 - `COMPUTER_USE_BROWSER_DOM_BRIDGE_TIMEOUT_MS`
-  - default `10000`
+  - mặc định `10000`
 
-Autonomous browser agent:
+Trình duyệt tự động agent:
 
 - `COMPUTER_USE_BROWSER_AGENT_ROOT`
-  - optional override for the embedded browser-agent workspace under `src/bin/computer_use`
+  - ghi đè tùy chọn cho trình duyệt được nhúng-agent workspace trong `src/bin/computer_use`
 - `COMPUTER_USE_PYTHON`
-  - optional python executable override for `browser_agent_run`; defaults to the embedded `.venv/bin/python` when present, otherwise `python3`
+  - ghi đè thực thi python tùy chọn cho `browser_agent_run`; mặc định là `.venv/bin/python` được nhúng khi có mặt, nếu không thì `python3`
 
-Legacy remote runner:
+Điều khiển từ xa runner kế thừa:
 
 - `COMPUTER_USE_REMOTE_SSH_HOST`
 - `COMPUTER_USE_REMOTE_SSH_USER`
@@ -222,7 +230,7 @@ Legacy remote runner:
 - `COMPUTER_USE_REMOTE_OBSERVATION_SERVE_PORT`
 - `COMPUTER_USE_REMOTE_OBSERVATION_TOKEN`
 
-Binary overrides:
+Ghi đè nhị phân:
 
 - `COMPUTER_USE_SWIFT_BINARY`
 - `COMPUTER_USE_OSASCRIPT_BINARY`
@@ -231,10 +239,11 @@ Binary overrides:
 - `COMPUTER_USE_SSH_BINARY`
 - `COMPUTER_USE_TAR_BINARY`
 
-## Angela Integration
+<a id="angela-integration"></a>
 
-Angela still connects through `mcp.json`.
-Example local macOS entry:
+## Tích hợp Angela
+
+Angela vẫn kết nối qua `mcp.json`. Ví dụ mục nhập macOS cục bộ:
 
 ```json
 {
@@ -257,32 +266,31 @@ Example local macOS entry:
 }
 ```
 
-On the Angela desktop side, approvals are handled like this:
+Về phía Angela desktop, việc phê duyệt được xử lý như sau:
 
-1. model calls a `computer_use::*` tool
-2. MCP returns `approval_required`
-3. Electron shows a native approval dialog
-4. Angela automatically calls `desktop_approve_pending_action` or `desktop_reject_pending_action`
-5. terminal/app approvals can be reused for the current run only
+1. mô hình gọi công cụ `computer_use::*`
+2. MCP trả về `approval_required`
+3. Electron hiển thị hộp thoại phê duyệt native
+4. Angela tự động gọi `desktop_approve_pending_action` hoặc `desktop_reject_pending_action`
+5. Các phê duyệt terminal/app chỉ có thể được sử dụng lại cho lần chạy hiện tại
 
-For browser DOM automation, `computer-use-mcp` also exposes a local WebSocket bridge that matches the user's Chrome extension bridge pattern:
+Để tự động hóa DOM của trình duyệt, `computer-use-mcp` cũng hiển thị cầu nối WebSocket cục bộ phù hợp với mẫu cầu mở rộng Chrome của người dùng:
 
-1. `computer-use-mcp` listens on `ws://127.0.0.1:8765` by default
-2. the unpacked browser extension background service worker connects to that socket
-3. Angela can then call `browser_dom_*` MCP tools against the active browser tab
+1. `computer-use-mcp` nghe trên `ws://127.0.0.1:8765` theo mặc định
+2. dịch vụ nền mở rộng trình duyệt đã giải nén worker kết nối với socket đó
+3. Angela sau đó có thể gọi các công cụ `browser_dom_*` MCP dựa vào tab trình duyệt đang hoạt động
 
-If you override `COMPUTER_USE_BROWSER_DOM_BRIDGE_HOST` or
-`COMPUTER_USE_BROWSER_DOM_BRIDGE_PORT`, mirror the same endpoint in the Chrome
-extension via `chrome.storage.local.set({ browserDomBridgeHost, browserDomBridgePort })`
-so the background worker reconnects to the correct socket.
+Nếu bạn ghi đè `COMPUTER_USE_BROWSER_DOM_BRIDGE_HOST` hoặc `COMPUTER_USE_BROWSER_DOM_BRIDGE_PORT`, hãy phản chiếu cùng một điểm cuối trong tiện ích mở rộng của Chrome thông qua `chrome.storage.local.set({ browserDomBridgeHost, browserDomBridgePort })` để worker nền kết nối lại với socket chính xác.
 
-Use the two surfaces differently:
+Sử dụng hai bề mặt khác nhau:
 
-- `desktop_*` for Angela itself, native macOS apps, Electron windows, Finder, Terminal, VS Code
-- `browser_dom_*` for real browser pages, cross-frame DOM reads, form filling, selector-based interaction, and iframe-heavy flows
-- `browser_agent_run` for goal-driven browser tasks where Angela should delegate the web exploration loop instead of manually hard-coding each browser step
+- `desktop_*` cho chính Angela, ứng dụng macOS native, cửa sổ Electron, Finder, Terminal, Mã VS
+- `browser_dom_*` dành cho các trang trình duyệt thực, đọc DOM đa khung, điền biểu mẫu, tương tác dựa trên bộ chọn và các luồng iframe nặng
+- `browser_agent_run` dành cho các tác vụ trình duyệt hướng đến mục tiêu trong đó Angela nên ủy quyền vòng lặp khám phá web thay vì mã hóa cứng từng bước trình duyệt theo cách thủ công
 
-## Validation Commands
+<a id="validation-commands"></a>
+
+## Lệnh xác thực
 
 - `pnpm -F @angela/computer-use-mcp typecheck`
 - `pnpm -F @angela/computer-use-mcp test`
@@ -291,62 +299,67 @@ Use the two surfaces differently:
 - `pnpm -F @angela/computer-use-mcp e2e:airi-chat`
 - `pnpm -F @angela/computer-use-mcp e2e:airi-discord`
 
-Legacy remote validation remains available:
+Xác thực từ xa cũ vẫn có sẵn:
 
 - `pnpm -F @angela/computer-use-mcp bootstrap:remote`
 - `pnpm -F @angela/computer-use-mcp smoke:remote`
 
-## Demo Story To Record
+<a id="demo-story-to-record"></a>
 
-If you want to record a convincing demo, show the system as an orchestrated task
-runner instead of a flashy cursor dance.
+## Demo câu chuyện để ghi lại
 
-Recommended recording structure:
+Nếu bạn muốn ghi lại một bản demo thuyết phục, hãy hiển thị hệ thống dưới dạng một tác vụ được dàn dựng runner thay vì một điệu nhảy con trỏ hào nhoáng.
 
-1. Show the Angela desktop window, a terminal, and the generated report directory.
-2. Start the local Angela desktop app and the `computer-use-mcp` service.
-3. Show that Angela can call the MCP tools automatically instead of only listing them.
-4. Demonstrate one short task that exercises the full loop:
-  - observe state
-  - execute a tool or workflow
-  - produce a visible result
-  - persist trace / audit / screenshots
-5. End by opening the generated `report.json`, `audit.jsonl`, or screenshots so the demo finishes with evidence rather than just screen motion.
+Cấu trúc ghi đề xuất:
 
-Good first demos:
+1. Hiển thị cửa sổ Angela desktop, thiết bị đầu cuối và thư mục báo cáo được tạo.
+2. Khởi động ứng dụng Angela desktop cục bộ và dịch vụ `computer-use-mcp`.
+3. Chứng tỏ rằng Angela có thể gọi các công cụ MCP một cách tự động thay vì chỉ liệt kê chúng.
+4. Trình bày một nhiệm vụ ngắn thực hiện vòng lặp đầy đủ:
+  - quan sát trạng thái
+  - thực thi một công cụ hoặc quy trình công việc
+  - tạo ra một kết quả có thể nhìn thấy được
+  - duy trì dấu vết/kiểm tra/ảnh chụp màn hình
+5. Kết thúc bằng cách mở `report.json`, `audit.jsonl` hoặc ảnh chụp màn hình đã tạo để bản demo kết thúc bằng bằng chứng thay vì chỉ chuyển động trên màn hình.
 
-- open a workspace, confirm `pwd`, inspect local changes, and run `pnpm typecheck`
-- create and run a Python hello-world project through `terminal_exec`
-- use desktop control for Angela or native apps and use `browser_dom_*` only when the task truly moves into a browser page
+Bản demo đầu tiên tốt:
 
-### Discord integration demo
+- mở workspace, xác nhận `pwd`, kiểm tra các thay đổi cục bộ và chạy `pnpm typecheck`
+- tạo và chạy dự án hello-world Python thông qua `terminal_exec`
+- sử dụng điều khiển desktop cho các ứng dụng Angela hoặc native và chỉ sử dụng `browser_dom_*` khi tác vụ thực sự chuyển sang một trang trình duyệt
 
-For a management-readable Angela demo, the Discord settings flow is more representative than a generic hello-world reply:
+<a id="discord-integration-demo"></a>
 
-1. start Angela desktop and `integrations/discord-bot`
-2. open `/settings/modules/messaging-discord`
-3. enable the module and save settings
-4. verify that the Discord bot receives the forwarded config from Angela and reconnects itself
-5. finish by opening `report.json`, screenshots, audit log, and `discord-bot.log`
+### Bản demo tích hợp Discord
 
-Notes:
+Đối với bản demo Angela có thể đọc được trong quản lý, luồng cài đặt Discord mang tính đại diện hơn là câu trả lời chung chung:
 
-- for a pure local-secret run, set `AIRI_E2E_DISCORD_TOKEN`
-- for a more agentic run, set `AIRI_E2E_DISCORD_TOKEN_SOURCE=portal` or `auto` and let Angela retrieve the token from the live browser / Discord Developer Portal session
-- `clipboard_read_text` / `clipboard_write_text` are the intended bridge when Angela must move a copied token from the browser back into Angela settings
-- the observable harness keeps the token out of the desktop audit trail by applying the secret through the renderer instead of typing it through Quartz key events
-- if you only want to validate the Angela → Discord bot configuration plumbing without a real token, set `AIRI_E2E_DISCORD_ALLOW_LOGIN_FAILURE=true`
+1. bắt đầu Angela desktop và `integrations/discord-bot`
+2. mở `/settings/modules/messaging-discord`
+3. kích hoạt mô-đun và lưu cài đặt
+4. xác minh rằng bot Discord nhận được cấu hình được chuyển tiếp từ Angela và tự kết nối lại
+5. kết thúc bằng cách mở `report.json`, ảnh chụp màn hình, nhật ký kiểm tra và `discord-bot.log`
 
-Less convincing demos:
+Ghi chú:
 
-- long videos of coordinate clicking with no trace output
-- browser form-filling done only by screen coordinates when DOM tools were available
-- tasks that cannot explain afterwards what the agent observed, executed, or verified
+- để chạy bí mật cục bộ thuần túy, hãy đặt `AIRI_E2E_DISCORD_TOKEN`
+- để hoạt động hiệu quả hơn, hãy đặt `AIRI_E2E_DISCORD_TOKEN_SOURCE=portal` hoặc `auto` và để Angela truy xuất token từ trình duyệt trực tiếp / phiên Cổng thông tin dành cho nhà phát triển Discord
+- `clipboard_read_text` / `clipboard_write_text` là cầu nối dự định khi Angela phải di chuyển token đã sao chép từ trình duyệt trở lại cài đặt của Angela
+- bộ kiểm thử có thể quan sát giúp token nằm ngoài dấu vết kiểm tra desktop bằng cách áp dụng bí mật thông qua renderer thay vì nhập nó thông qua các sự kiện chính của Quartz
+- nếu bạn chỉ muốn xác thực hệ thống ống nước cấu hình bot Angela → Discord mà không có token thực, hãy đặt `AIRI_E2E_DISCORD_ALLOW_LOGIN_FAILURE=true`
 
-## Known Limits
+Bản demo kém thuyết phục hơn:
 
-- macOS only for the main v1 path
-- no accessibility tree grounding yet
-- PTY/TUI terminal support is product-supported on the self-acquire mainline; legacy outward terminal reroute remains secondary
-- no multi-monitor orchestration policy yet
-- global coordinates are allowed, so the safety boundary is approval + audit, not strict app isolation
+- video dài về nhấp chuột tọa độ không có đầu ra dấu vết
+- việc điền biểu mẫu trình duyệt chỉ được thực hiện bằng tọa độ màn hình khi có sẵn công cụ DOM
+- các nhiệm vụ sau đó không thể giải thích những gì agent đã quan sát, thực hiện hoặc xác minh
+
+<a id="known-limits"></a>
+
+## Giới hạn đã biết
+
+- macOS chỉ dành cho đường dẫn v1 chính
+- chưa có cây trợ năng đối chiếu ngữ cảnh
+- Hỗ trợ thiết bị đầu cuối PTY/TUI được hỗ trợ bởi sản phẩm trên tuyến chính tự cấp phát; định tuyến lại thiết bị đầu cuối bên ngoài kế thừa vẫn là thứ yếu
+- chưa có chính sách phối hợp đa màn hình
+- tọa độ toàn cầu được cho phép, vì vậy ranh giới an toàn là phê duyệt + kiểm tra, không phải cách ly ứng dụng nghiêm ngặt

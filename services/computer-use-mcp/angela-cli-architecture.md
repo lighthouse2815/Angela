@@ -1,67 +1,70 @@
-# Angela Coding CLI + Chafa Architecture
+<a id="angela-coding-cli--chafa-architecture"></a>
 
-## Purpose
+# Angela Mã hóa CLI + Kiến trúc Chafa
 
-Define a narrow architecture for a terminal-facing Angela coding CLI that can
-optionally render an animated avatar through `chafa`, without coupling terminal
-presentation to the `computer-use-mcp` runtime.
+<a id="purpose"></a>
 
-This document is a boundary and contract proposal. It is not an implementation
-plan for a full CLI in this PR.
+## Mục đích
 
-## Shipped Terminal Client
+Xác định kiến ​​trúc hẹp cho mã hóa Angela CLI hướng về thiết bị đầu cuối có thể tùy ý hiển thị hình đại diện hoạt hình thông qua `chafa` mà không cần kết hợp bản trình bày thiết bị đầu cuối với `computer-use-mcp` runtime.
 
-[`packages/angela-cli`](../../packages/angela-cli/README.md) provides text chat, MCP terminal tools, host approval, and saved sessions.
-It uses generation events from `core-agent` and tool calls over stdio MCP.
-The runner event envelope and Chafa renderer below remain proposals.
+Tài liệu này là một ranh giới và đề xuất hợp đồng. Đây không phải là kế hoạch triển khai cho CLI đầy đủ trong PR này.
 
-## Runner Event Proposal
+<a id="shipped-terminal-client"></a>
 
-As of 2026-04-26, the main branch does not expose a stable coding runner event
-stream. A CLI that renders real progress needs a runner contract first. Starting
-with terminal animation before that contract exists would produce presentation
-without reliable runtime state.
+## Máy khách đầu cuối đã vận chuyển
 
-The correct dependency order is:
+[`packages/angela-cli`](../../packages/angela-cli/README.md) cung cấp tính năng trò chuyện bằng văn bản, công cụ đầu cuối MCP, phê duyệt host và các phiên đã lưu. Nó sử dụng các sự kiện sinh nội dung từ `core-agent` và các lệnh gọi công cụ qua stdio MCP. Phong bì sự kiện runner và Chafa renderer bên dưới vẫn là đề xuất.
 
-1. Define a coding runner event contract.
-2. Emit deterministic runner events from the coding runner.
-3. Build a text-first CLI that consumes those events.
-4. Add optional `chafa` avatar rendering as a display adapter.
+<a id="runner-event-proposal"></a>
 
-## Confirmed Decisions
+## Đề xuất sự kiện runner
 
-1. Future CLI package location: `packages/angela-cli`.
-2. First integration channel: in-process runner callback.
-3. JSONL over stdin/file remains a follow-up adapter for replay, fixtures, and
-   tooling interoperability.
-4. `chafa` is optional presentation only.
+Kể từ ngày 26 tháng 04 năm 2026, nhánh chính không hiển thị luồng sự kiện runner mã hóa ổn định. CLI thể hiện tiến độ thực sự cần có hợp đồng runner trước tiên. Bắt đầu với hoạt ảnh đầu cuối trước khi hợp đồng đó tồn tại sẽ tạo ra bản trình bày không có trạng thái runtime đáng tin cậy.
 
-## Hard Boundaries
+Thứ tự phụ thuộc đúng là:
 
-1. No `chafa` dependency belongs in `services/computer-use-mcp` core runtime.
-2. `computer-use-mcp` must remain headless-safe and CI-safe.
-3. The CLI consumes runner events; it must not own planning, tool execution, or
-   runtime policy.
-4. Missing `chafa` must degrade to plain text rendering.
-5. Non-TTY output must support plain text or JSONL output.
-6. CLI rendering changes must not be mixed with coding memory or runner runtime
-   refactors.
+1. Xác định hợp đồng sự kiện runner mã hóa.
+2. Phát ra các sự kiện runner xác định từ mã hóa runner.
+3. Xây dựng CLI dạng văn bản đầu tiên sử dụng các sự kiện đó.
+4. Thêm kết xuất hình đại diện `chafa` tùy chọn làm bộ điều hợp hiển thị.
 
-## Proposed Location Split
+<a id="confirmed-decisions"></a>
 
-- Core runtime: `services/computer-use-mcp`.
-- CLI package: `packages/angela-cli`.
-- Event contract: initially colocated with the runner that emits it, then
-  exported for CLI consumption.
-- Text renderer: `packages/angela-cli/src/renderers/text.ts`.
-- Chafa adapter: `packages/angela-cli/src/renderers/chafa-avatar.ts`.
-- JSONL adapter: `packages/angela-cli/src/adapters/jsonl.ts`.
+## Quyết định đã được xác nhận
 
-## Runner Event Contract Draft
+1. Vị trí gói CLI trong tương lai: `packages/angela-cli`.
+2. Kênh tích hợp đầu tiên: gọi lại runner trong quá trình.
+3. JSONL trên stdin/file vẫn là bộ chuyển đổi tiếp theo để phát lại, mẫu kiểm thử và khả năng tương tác của công cụ.
+4. `chafa` chỉ là bản trình bày tùy chọn.
 
-Use an append-only event envelope. The first transport should be an in-process
-callback. JSONL is an adapter over the same envelope.
+<a id="hard-boundaries"></a>
+
+## Ranh giới cứng
+
+1. Không có phần phụ thuộc `chafa` nào thuộc về lõi `services/computer-use-mcp` runtime.
+2. `computer-use-mcp` phải duy trì không có giao diện an toàn và CI an toàn.
+3. CLI sử dụng các sự kiện runner; nó không được phép lập kế hoạch, thực thi công cụ hoặc chính sách runtime.
+4. Thiếu `chafa` phải chuyển sang hiển thị văn bản thuần túy.
+5. Đầu ra không phải TTY phải hỗ trợ đầu ra văn bản thuần túy hoặc JSONL.
+6. Các thay đổi kết xuất CLI không được trộn lẫn với bộ nhớ mã hóa hoặc bộ tái cấu trúc runner runtime.
+
+<a id="proposed-location-split"></a>
+
+## Phân chia vị trí được đề xuất
+
+- Lõi runtime: `services/computer-use-mcp`.
+- Gói CLI: `packages/angela-cli`.
+- Hợp đồng sự kiện: ban đầu được đặt cùng vị trí với runner phát ra nó, sau đó được xuất để tiêu thụ CLI.
+- Soạn tin renderer: `packages/angela-cli/src/renderers/text.ts`.
+- Bộ chuyển đổi Chafa: `packages/angela-cli/src/renderers/chafa-avatar.ts`.
+- JSONL thích ứng: ​​`packages/angela-cli/src/adapters/jsonl.ts`.
+
+<a id="runner-event-contract-draft"></a>
+
+## Dự thảo hợp đồng sự kiện runner
+
+Sử dụng phong bì sự kiện chỉ gắn thêm. transport đầu tiên phải là lệnh gọi lại đang trong quá trình. JSONL là một bộ chuyển đổi trên cùng một phong bì.
 
 ```ts
 interface RunnerEventEnvelope<TKind extends string = string, TPayload = unknown> {
@@ -73,14 +76,16 @@ interface RunnerEventEnvelope<TKind extends string = string, TPayload = unknown>
 }
 ```
 
-Contract rules:
+Nguyên tắc hợp đồng:
 
-- `seq` is strictly increasing per `runId`.
-- `at` is an ISO timestamp.
-- events are append-only; later events must not rewrite earlier events.
-- crash and timeout paths must emit deterministic terminal events.
+- `seq` tăng nghiêm ngặt trong từng `runId`.
+- `at` là dấu thời gian ISO.
+- các sự kiện chỉ được thêm vào; các sự kiện sau không được viết lại các sự kiện trước đó.
+- đường dẫn sự cố và thời gian chờ phải phát ra các sự kiện đầu cuối xác định.
 
-## Minimum Event Kinds
+<a id="minimum-event-kinds"></a>
+
+## Các loại sự kiện tối thiểu
 
 - `run_started`
 - `preflight_started`
@@ -94,7 +99,9 @@ Contract rules:
 - `run_finished`
 - `run_crashed`
 
-## Minimum Payloads
+<a id="minimum-payloads"></a>
+
+## Tải trọng tối thiểu
 
 `run_started`:
 
@@ -164,135 +171,163 @@ interface RunFinishedPayload {
 }
 ```
 
-## CLI Architecture
+<a id="cli-architecture"></a>
 
-The CLI should have three separable layers.
+## Kiến trúc CLI
 
-### 1. Input Adapter
+CLI phải có ba lớp có thể tách rời.
 
-Input adapters convert transport-specific input into `RunnerEventEnvelope`
-events.
+<a id="1-input-adapter"></a>
 
-Initial adapters:
+### 1. Bộ chuyển đổi đầu vào
 
-- in-process runner callback
+Bộ điều hợp đầu vào chuyển đổi đầu vào dành riêng cho transport thành các sự kiện `RunnerEventEnvelope`.
+
+Bộ điều hợp ban đầu:
+
+- gọi lại runner đang trong quá trình
 - stdin JSONL
-- JSONL file replay
+- Phát lại tập tin JSONL
 
-### 2. State Reducer
+<a id="2-state-reducer"></a>
 
-The reducer builds deterministic `CliViewState` from events.
+### 2. Trạng thái reducer
 
-Rules:
+reducer xây dựng `CliViewState` xác định từ các sự kiện.
 
-- no terminal I/O in the reducer
-- no process spawning in the reducer
-- no animation timing in the reducer
-- reducer tests should use fixture event streams
+Quy tắc:
 
-### 3. Renderer Adapter
+- không có thiết bị đầu cuối I/O trong reducer
+- Không khởi tạo tiến trình trong reducer
+- không có thời gian hoạt ảnh trong reducer
+- Các thử nghiệm reducer nên sử dụng luồng sự kiện mẫu kiểm thử
 
-Renderer adapters consume `CliViewState`.
+<a id="3-renderer-adapter"></a>
 
-Initial renderers:
+### 3. Bộ chuyển đổi renderer
 
-- text renderer, always available
-- JSONL passthrough renderer for tooling
-- optional `chafa` avatar renderer
+Bộ điều hợp renderer tiêu thụ `CliViewState`.
 
-## Chafa Adapter
+các renderer ban đầu:
 
-The `chafa` adapter should:
+- văn bản renderer, luôn có sẵn
+- JSONL chuyển qua renderer cho dụng cụ
+- hình đại diện `chafa` tùy chọn renderer
 
-- probe `chafa` binary availability at startup
-- disable itself when stdout is not a TTY
-- convert sprite or frame assets to ANSI frames
-- pace animation independently from runner event rate
-- fall back to text-only rendering on failure
+<a id="chafa-adapter"></a>
 
-Initial CLI flags:
+## Bộ chuyển đổi Chafa
+
+Bộ chuyển đổi `chafa` nên:
+
+- thăm dò tính khả dụng nhị phân `chafa` khi khởi động
+- tự tắt khi thiết bị xuất chuẩn không phải là TTY
+- chuyển đổi nội dung sprite hoặc khung thành khung ANSI
+- tốc độ hoạt ảnh độc lập với tốc độ sự kiện runner
+- quay lại hiển thị chỉ văn bản khi thất bại
+
+Cờ CLI ban đầu:
 
 - `--avatar=chafa|none`
 - `--no-avatar`
 - `--events=runner|stdin|jsonl-file`
 - `--output=pretty|jsonl`
 
-## Testing Strategy
+<a id="testing-strategy"></a>
 
-1. Contract tests for event schema and monotonic `seq`.
-2. Reducer tests from fixture JSONL streams.
-3. Text renderer snapshot tests.
-4. Chafa adapter tests with mocked binary probing and mocked child process
-   execution.
-5. CI defaults to text mode and does not require `chafa`.
+## Chiến lược thử nghiệm
 
-## Delivery Stages
+1. Kiểm tra hợp đồng cho lược đồ sự kiện và `seq` đơn điệu.
+2. reducer kiểm tra từ các luồng mẫu kiểm thử JSONL.
+3. Kiểm tra ảnh chụp nhanh renderer.
+4. Kiểm tra bộ điều hợp Chafa bằng cách thăm dò nhị phân mô phỏng và thực thi quy trình con mô phỏng.
+5. CI mặc định ở chế độ văn bản và không yêu cầu `chafa`.
 
-### Stage 1: Contract
+<a id="delivery-stages"></a>
 
-- define the runner event envelope
-- add success, failure, and timeout fixture streams
-- do not render terminal UI yet
+## Giai đoạn giao hàng
 
-### Stage 2: Text CLI
+<a id="stage-1-contract"></a>
+
+### stage 1: Hợp đồng
+
+- xác định đường bao sự kiện runner
+- thêm các luồng mẫu kiểm thử thành công, thất bại và hết thời gian chờ
+- chưa kết xuất thiết bị đầu cuối UI
+
+<a id="stage-2-text-cli"></a>
+
+### stage 2: Soạn tin CLI
 
 - scaffold `packages/angela-cli`
-- consume runner events
-- render run, step, tool, error, and final report state in plain text
+- tiêu thụ các sự kiện runner
+- hiển thị trạng thái chạy, bước, công cụ, lỗi và báo cáo cuối cùng ở dạng văn bản thuần túy
 
-### Stage 2.5: JSONL Adapter
+<a id="stage-25-jsonl-adapter"></a>
 
-- support stdin JSONL replay
-- support JSONL file replay
-- use fixtures for offline demos and tests
+### stage 2.5: Bộ chuyển đổi JSONL
 
-### Stage 3: Chafa Renderer
+- hỗ trợ phát lại stdin JSONL
+- hỗ trợ phát lại tập tin JSONL
+- sử dụng mẫu kiểm thử cho các bản demo và thử nghiệm ngoại tuyến
 
-- add optional `chafa` renderer
-- keep plain text as the default fallback
-- keep CI and headless runs independent from `chafa`
+<a id="stage-3-chafa-renderer"></a>
 
-## Acceptance Criteria
+### stage 3: renderer đã chết
 
-1. No `chafa` dependency is added under `services/computer-use-mcp`.
-2. CLI works when `chafa` is not installed.
-3. CI does not require `chafa`.
-4. The reducer is testable from mocked event streams.
-5. Terminal output degrades to plain text.
-6. Runner behavior is not changed for animation-first UX.
+- thêm `chafa` renderer tùy chọn
+- giữ văn bản thuần túy làm phương án dự phòng mặc định
+- giữ CI và không có giao diện chạy độc lập với `chafa`
 
-## Review Checklist
+<a id="acceptance-criteria"></a>
 
-Layering:
+## Tiêu chí chấp nhận
 
-- no renderer code in `computer-use-mcp` runtime
-- no `chafa` dependency in runtime packages
-- CLI code stays under `packages/angela-cli`
+1. Không có phần phụ thuộc `chafa` nào được thêm vào trong `services/computer-use-mcp`.
+2. CLI hoạt động khi `chafa` chưa được cài đặt.
+3. CI không yêu cầu `chafa`.
+4. reducer có thể kiểm tra được từ các luồng sự kiện giả định.
+5. Đầu ra của thiết bị đầu cuối chuyển thành văn bản thuần túy.
+6. Hành vi của runner không được thay đổi đối với UX có hoạt ảnh đầu tiên.
+
+<a id="review-checklist"></a>
+
+## Danh sách kiểm tra đánh giá
+
+Phân lớp:
+
+- không có mã renderer trong `computer-use-mcp` runtime
+- không có sự phụ thuộc `chafa` trong các gói runtime
+- Mã CLI vẫn nằm dưới `packages/angela-cli`
 
 Runtime:
 
-- runner remains headless-safe
-- runner emits events without depending on terminal state
-- failures and timeouts produce deterministic events
+- runner vẫn an toàn với không có giao diện
+- runner phát ra các sự kiện mà không phụ thuộc vào trạng thái đầu cuối
+- lỗi và thời gian chờ tạo ra các sự kiện xác định
 
 Fallback:
 
-- missing `chafa` does not fail CLI execution
-- non-TTY mode uses text or JSONL output
+- Thiếu `chafa` không làm việc thực thi CLI thất bại
+- chế độ không phải TTY sử dụng văn bản hoặc đầu ra JSONL
 
-Scope:
+Phạm vi:
 
-- do not mix CLI rendering with coding memory changes
-- do not mix CLI rendering with desktop/browser runtime changes
+- không kết hợp kết xuất CLI với các thay đổi bộ nhớ mã hóa
+- không kết hợp kết xuất CLI với các thay đổi desktop/browser runtime
 
-## Out of Scope
+<a id="out-of-scope"></a>
 
-- long-term memory promotion and governance
-- desktop/browser runtime refactors
-- terminal animation before a runner event contract exists
-- changing coding runner completion semantics for display purposes
+## Ngoài phạm vi
 
-## Suggested Follow-up PRs
+- thúc đẩy và quản lý trí nhớ dài hạn
+- Bộ tái cấu trúc desktop/browser runtime
+- hoạt ảnh đầu cuối trước khi tồn tại hợp đồng sự kiện runner
+- thay đổi ngữ nghĩa hoàn thành mã hóa runner cho mục đích hiển thị
+
+<a id="suggested-follow-up-prs"></a>
+
+## PR tiếp theo được đề xuất
 
 - `feat(cli): define coding runner event contract`
 - `feat(cli): scaffold airi coding cli text renderer`

@@ -1,44 +1,30 @@
-# Apple IAP sandbox accounts
+<a id="apple-iap-sandbox-accounts"></a>
 
-Status: accepted. The requester confirmed dedicated test accounts.
+# Tài khoản hộp cát Apple IAP
 
-## Decision
+Trạng thái: đã chấp nhận. Người yêu cầu đã xác nhận các tài khoản thử nghiệm chuyên dụng.
 
-Keep `APPLE_IAP_ENV=production` on the shared API. Add an optional
-`APPLE_IAP_SANDBOX_USER_IDS` list of exact internal user IDs. An empty list
-keeps production verification unchanged. A nonempty list enables a second
-Apple Sandbox verifier. Unverified bundle and environment claims select a verifier.
-Each verifier retains Apple's signature and bundle checks. Xcode verification
-is never a fallback on the production API.
+<a id="decision"></a>
 
-After verification, both device submissions and charge notifications check the
-resolved account against the list before settlement. An unlisted device user
-gets 403 and keeps the transaction for a later retry. An unlisted notification
-gets 200 without a grant. The account token must still belong to the user.
+## Phán quyết
 
-Sandbox orders use `sandbox:<bundleId>:<transactionId>` as their processor order
-ID. Production IDs stay unchanged. Both delivery paths use the same key.
-The notification envelope and inner transaction must have the same bundle and
-environment.
+Giữ `APPLE_IAP_ENV=production` trên API được chia sẻ. Thêm danh sách `APPLE_IAP_SANDBOX_USER_IDS` tùy chọn gồm ID người dùng nội bộ chính xác. Danh sách trống sẽ giữ nguyên việc xác minh sản xuất. Danh sách không trống sẽ kích hoạt trình xác minh Apple Sandbox thứ hai. Các yêu cầu về gói và môi trường chưa được xác minh hãy chọn một người xác minh. Mỗi người xác minh sẽ giữ lại chữ ký và kiểm tra gói của Apple. Xác minh Xcode không bao giờ là phương án dự phòng trên API sản xuất.
 
-## Scope and non-goals
+Sau khi xác minh, cả việc gửi thiết bị và thông báo tính phí đều kiểm tra tài khoản đã giải quyết dựa trên danh sách trước khi giải quyết. Người dùng thiết bị chưa niêm yết nhận được 403 và giữ giao dịch để thử lại sau. Một thông báo không công khai sẽ nhận được 200 mà không cần trợ cấp. Tài khoản token vẫn phải thuộc về người dùng.
 
-This is account-level access control, not a second wallet or database.
-Sandbox Flux enters the existing balance of a dedicated test account and can
-consume real provider resources. Operators must use new, dedicated accounts,
-keep them separate from normal accounts, and remove access after testing.
-The deployment owner confirmed that there are no historical Sandbox orders
-and no old Sandbox writers during rollout. New Sandbox purchases use the
-namespaced order ID from their first settlement. The existing unique index
-on `(processor, processor_order_id)` prevents duplicate grants, including
-concurrent device and notification deliveries. No schema migration or
-historical order compatibility is required for this rollout.
+Đơn đặt hàng hộp cát sử dụng `sandbox:<bundleId>:<transactionId>` làm đơn đặt hàng bộ xử lý ID. ID sản xuất không thay đổi. Cả hai đường dẫn phân phối đều sử dụng cùng một khóa. Phong bì thông báo và giao dịch bên trong phải có cùng gói và môi trường.
 
-This change does not deploy services, configure App Store Connect, implement
-refunds, create test accounts, or publish an iOS build. General TestFlight
-access and App Review account provisioning need separate operational decisions.
+<a id="scope-and-non-goals"></a>
 
-## Dependencies and affected files
+## Phạm vi và ngoài phạm vi
+
+Đây là kiểm soát quyền truy cập cấp tài khoản, không phải ví hoặc cơ sở dữ liệu thứ hai. Sandbox Flux nhập số dư hiện có của tài khoản thử nghiệm chuyên dụng và có thể tiêu thụ tài nguyên nhà cung cấp thực. Người vận hành phải sử dụng các tài khoản mới, chuyên dụng, tách biệt chúng với các tài khoản thông thường và xóa quyền truy cập sau khi thử nghiệm. Chủ sở hữu triển khai đã xác nhận rằng không có đơn đặt hàng Sandbox nào trước đây và không có tác giả Sandbox cũ nào trong quá trình triển khai. Các giao dịch mua Sandbox mới sử dụng thứ tự được đặt tên ID từ lần thanh toán đầu tiên của họ. Chỉ mục duy nhất hiện có trên `(processor, processor_order_id)` ngăn chặn các khoản trợ cấp trùng lặp, bao gồm cả việc gửi thông báo và thiết bị đồng thời. Không cần di chuyển lược đồ hoặc khả năng tương thích thứ tự lịch sử cho lần triển khai này.
+
+Thay đổi này không triển khai dịch vụ, định cấu hình Kết nối ứng dụng store, thực hiện hoàn tiền, tạo tài khoản thử nghiệm hoặc xuất bản bản dựng iOS. Việc cung cấp tài khoản Đánh giá ứng dụng và truy cập TestFlight chung cần có các quyết định vận hành riêng biệt.
+
+<a id="dependencies-and-affected-files"></a>
+
+## Các phần phụ thuộc và các tập tin bị ảnh hưởng
 
 ```mermaid
 flowchart LR
@@ -83,11 +69,13 @@ sequenceDiagram
   end
 ```
 
-## Test plan
+<a id="test-plan"></a>
 
-- Reproduce sandbox settlement for an unlisted user before the fix.
-- Cover both device and notification gates, token ownership, and envelope mismatch.
-- Cover environment routing, disabled Sandbox, invalid signatures, and Xcode rejection.
-- Cover shared device/notification order identity and production ID preservation.
-- Run payment core duplicate-settlement tests, API typecheck, and repository final checks.
-- After deployment, use a new allowlisted account and a new iOS build for real sandbox purchases.
+## kế hoạch kiểm tra
+
+- Tái tạo quá trình giải quyết hộp cát cho người dùng không công khai trước khi khắc phục sự cố.
+- Bao gồm cả thiết bị và thông báo cổng kiểm tra, quyền sở hữu token và phong bì không khớp.
+- Bao gồm định tuyến môi trường, Sandbox bị vô hiệu hóa, chữ ký không hợp lệ và từ chối Xcode.
+- Bìa chia sẻ nhận dạng đơn hàng device/notification và bảo quản sản xuất ID.
+- Chạy các thử nghiệm giải quyết trùng lặp cốt lõi thanh toán, API kiểm tra kiểu dữ liệu và kiểm tra cuối cùng của kho lưu trữ.
+- Sau khi triển khai, hãy sử dụng tài khoản mới có trong danh sách cho phép và bản dựng iOS mới để mua hàng trong hộp cát thực.

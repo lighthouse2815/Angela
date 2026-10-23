@@ -1,184 +1,121 @@
-# The Capacitor
+<a id="the-capacitor"></a>
 
-Status: accepted
+# Capacitor
 
-## Decision
+Trạng thái: đã chấp nhận
 
-RevenueCat is the source for entitlement status.
-The local database does not store subscription status and does not store webhook events.
+<a id="decision"></a>
 
-The app reads `customerInfo` in the client SDK for the current Capacitor, expiry, and management URL.
-The server reads the RevenueCat REST API v2 to grant Capacitor Flux.
-It reads the customer's subscriptions, the active entitlements, and the product of each subscription that gives access.
-The subscription gives the billing period start, the active entitlement gives the end of access, and the product gives the store identifier.
-API v2 reports `status` and `auto_renewal_status`, so the server infers nothing from dates.
-A customer that RevenueCat does not know has no subscriptions.
+## Phán quyết
 
-Capacitor Flux is a second bucket in the Flux wallet. It is not a second billing system.
-`user_flux` holds both buckets in one row:
+RevenueCat là nguồn cho trạng thái quyền lợi. Cơ sở dữ liệu cục bộ không có trạng thái đăng ký store và không có các sự kiện webhook store.
 
-- `flux` is purchased Flux. It does not expire.
-- `capacitor_flux` is Capacitor Flux. It refills to the quota at each reset boundary.
-- `capacitor_quota`, `capacitor_expires_at`, and `capacitor_period_start` describe the current billing period.
-- `capacitor_filled_at` is the time of the last refill.
-- `capacitor_reset_at` is an admin reset time for this one wallet.
-- `fallback_to_flux` chooses whether purchased Flux pays after Capacitor Flux runs out. The default is off.
+Ứng dụng đọc `customerInfo` trong ứng dụng khách SDK cho Capacitor hiện tại, thời hạn sử dụng và quản lý URL. Máy chủ đọc RevenueCat REST API v2 để cấp Capacitor Flux. Nó đọc các đăng ký của khách hàng, các quyền hiện có và sản phẩm của mỗi đăng ký cấp quyền truy cập. Đăng ký sẽ bắt đầu thời hạn thanh toán, quyền hiện hoạt sẽ kết thúc quyền truy cập và sản phẩm sẽ cung cấp mã định danh store. API v2 báo cáo `status` và `auto_renewal_status`, vì vậy máy chủ không suy luận gì về ngày tháng. Một khách hàng mà RevenueCat không biết thì không có đăng ký.
 
-One Flux equals 1,000,000 micro-Flux in both buckets.
+Capacitor Flux là bucket thứ hai trong ví Flux. Nó không phải là một hệ thống thanh toán thứ hai. `user_flux` giữ cả bucket trong một hàng:
 
-### Spend
+- `flux` được mua Flux. Nó không hết hạn.
+- `capacitor_flux` là Capacitor Flux. Nó nạp lại hạn ngạch ở mỗi ranh giới đặt lại.
+- `capacitor_quota`, `capacitor_expires_at` và `capacitor_period_start` mô tả kỳ thanh toán hiện tại.
+- `capacitor_filled_at` là thời điểm nạp lại lần cuối.
+- `capacitor_reset_at` là thời gian đặt lại quản trị viên cho ví này.
+- `fallback_to_flux` chọn xem Flux đã mua có thanh toán hay không sau khi Capacitor Flux hết. Mặc định là tắt.
 
-`postFluxUsage` is the only debit path.
-It keeps the `flux_usage` idempotency and the wallet row lock.
-Settlement takes whole Flux from the Capacitor first.
-The rest comes from purchased Flux when the user has no active Capacitor or `fallback_to_flux` is on.
-One fee can use both buckets.
-A fee that no bucket can pay stays outstanding, as it did before.
-A later Capacitor grant or credit pays it.
+Một Flux bằng 1.000.000 micro-Flux trong cả bucket.
 
-Admission uses the same rule. It counts the buckets that can pay now.
+<a id="spend"></a>
 
-### Grant
+### Tiêu
 
-The server does not select a rule from the webhook event type.
-A webhook only tells the server that a customer changed.
-The server reads the customer's entitlements and calls `BillingService.syncCapacitor`.
-`POST /api/v1/revenuecat/sync` runs the same reconciliation for the signed-in user.
-The client calls it after a purchase and when the Capacitor page opens.
-Thus a late webhook does not reject the first requests of a new subscriber, and a lost webhook is repaired on the next page visit.
-The route allows 10 calls for each user in one minute, because each call reads RevenueCat.
-The latest purchase wins when two mapped Capacitors are active.
+`postFluxUsage` là đường dẫn ghi nợ duy nhất. Nó giữ tính bình thường của `flux_usage` và khóa hàng ví. Việc thanh toán sẽ lấy toàn bộ Flux từ Capacitor trước tiên. Phần còn lại đến từ Flux đã mua khi người dùng không bật Capacitor hoặc `fallback_to_flux` đang hoạt động. Một khoản phí có thể sử dụng cả bucket. Một khoản phí mà không bucket nào có thể trả vẫn còn tồn đọng, như trước đây. Một khoản trợ cấp Capacitor sau này hoặc credit sẽ trả số tiền đó.
 
-`syncCapacitor` stores the quota, the expiry, and the period start. It does not grant Flux directly.
+Tuyển sinh sử dụng quy tắc tương tự. Nó đếm số bucket có thể thanh toán ngay bây giờ.
 
-When a webhook creates the first wallet, it preserves `INITIAL_USER_FLUX` and writes the initial ledger row in the same transaction.
-The balance read and the webhook use the same wallet initialization operation. Repeated deliveries do not repeat the initial grant.
-The refill rule below decides the grant.
-A smaller quota caps the bucket. The cap writes a `capacitor_quota_cap` ledger row in the same transaction.
-With no active Capacitor, `capacitor_expires_at` becomes now.
+<a id="grant"></a>
 
-These rules cover purchase, renewal, product change, extension, expiration, refund, and transfer.
-A repeated delivery or a late delivery gives the same result, so the server keeps no event log.
-`TRANSFER` names its users in `transferred_from` and `transferred_to`. The server reconciles each of them.
-A Capacitor without an expiry is not sold and does not grant Flux.
+### Khoản trợ cấp
 
-`syncCapacitor` holds a Postgres advisory lock for the user while it reads RevenueCat.
-Two webhooks for one user cannot write an older answer after a newer answer.
-The wallet row stays unlocked during the read, so debits continue.
-The read has a 5-second timeout.
+Máy chủ không chọn quy tắc từ loại sự kiện webhook. Webhook chỉ cho máy chủ biết rằng khách hàng đã thay đổi. Máy chủ đọc quyền lợi của khách hàng và gọi `BillingService.syncCapacitor`. `POST /api/v1/revenuecat/sync` chạy điều chỉnh tương tự cho người dùng đã đăng nhập. Khách hàng gọi nó sau khi mua hàng và khi trang Capacitor mở ra. Do đó, webhook muộn không từ chối yêu cầu đầu tiên của người đăng ký mới và webhook bị mất sẽ được sửa chữa trong lần truy cập trang tiếp theo. route cho phép mỗi người dùng thực hiện 10 cuộc gọi trong một phút vì mỗi cuộc gọi đều đọc RevenueCat. Giao dịch mua mới nhất sẽ thắng khi hai Tụ điện được ánh xạ đang hoạt động.
 
-The server does not reconcile when `REVENUECAT_CAPACITORS` is unset or empty. The wallet stays as it is.
-A sync with no products would expire every active Capacitor.
-The webhook returns an error when the read fails, or when `REVENUECAT_V2_API_KEY` or `REVENUECAT_PROJECT_ID` is unset.
-RevenueCat then sends the event again.
-`TEST` events do not read RevenueCat.
-RevenueCat sells Capacitors only. Flux packs stay on Stripe and Apple IAP.
+`syncCapacitor` store hạn ngạch, thời hạn sử dụng và thời gian bắt đầu. Nó không cấp Flux trực tiếp.
 
-### Refill
+Khi webhook tạo ví đầu tiên, hệ thống giữ `INITIAL_USER_FLUX` và ghi bản ghi sổ cái ban đầu trong cùng giao dịch. Việc đọc số dư và webhook dùng chung thao tác khởi tạo ví. Webhook được gửi lại không cấp số dư ban đầu thêm lần nữa. Quy tắc nạp lại bên dưới quyết định số dư được cấp. Hạn ngạch nhỏ hơn giới hạn dung lượng bộ tích lũy. Thao tác giới hạn ghi bản ghi sổ cái `capacitor_quota_cap` trong cùng giao dịch. Khi không có Capacitor đang hoạt động, `capacitor_expires_at` được đặt bằng thời điểm hiện tại.
 
-One rule fills the Capacitor.
-A refill is due when `capacitor_filled_at` is before the reset boundary of an active Capacitor.
-The boundary is the latest of these times:
+Các quy tắc này bao gồm mua hàng, gia hạn, thay đổi sản phẩm, gia hạn, hết hạn, hoàn tiền và chuyển nhượng. Việc gửi lặp lại hoặc giao hàng trễ đều cho kết quả như nhau nên máy chủ không lưu giữ nhật ký sự kiện. `TRANSFER` đặt tên cho người dùng của mình trong `transferred_from` và `transferred_to`. Máy chủ hòa giải từng người trong số họ. Capacitor không hết hạn sẽ không được bán và không cấp Flux.
+
+`syncCapacitor` giữ khóa tư vấn Postgres cho người dùng trong khi đọc RevenueCat. Hai webhooks cho một người dùng không thể viết câu trả lời cũ hơn sau câu trả lời mới hơn. Hàng ví vẫn được mở khóa trong quá trình đọc, do đó việc ghi nợ vẫn tiếp tục. Quá trình đọc có thời gian chờ 5 giây.
+
+Máy chủ không điều chỉnh khi `REVENUECAT_CAPACITORS` không được đặt hoặc trống. Ví vẫn giữ nguyên như cũ. Đồng bộ hóa không có sản phẩm sẽ hết hạn sau mỗi Capacitor hoạt động. Webhook trả về lỗi khi đọc không thành công hoặc khi `REVENUECAT_V2_API_KEY` hoặc `REVENUECAT_PROJECT_ID` không được đặt. RevenueCat sau đó gửi lại sự kiện. Sự kiện `TEST` không đọc RevenueCat. RevenueCat chỉ bán Tụ điện. Các gói Flux vẫn có trên Stripe và Apple IAP.
+
+<a id="refill"></a>
+
+### Nạp tiền
+
+Một quy tắc điền vào Capacitor. Việc nạp lại sẽ đến hạn khi `capacitor_filled_at` ở trước ranh giới đặt lại của Capacitor đang hoạt động. Ranh giới là mới nhất trong số những thời điểm này:
 
 - `capacitor_period_start`.
-- The start of the current reset window, when `CAPACITOR_RESET_INTERVAL` is `day` or `week`. Windows count from the period start.
-- `CAPACITOR_RESET_AT`, a one-time reset for every wallet.
-- `capacitor_reset_at`, a one-time reset for one wallet.
+- Bắt đầu cửa sổ đặt lại hiện tại, khi `CAPACITOR_RESET_INTERVAL` là `day` hoặc `week`. Số lượng Windows tính từ thời điểm bắt đầu.
+- `CAPACITOR_RESET_AT`, thiết lập lại một lần cho mọi ví.
+- `capacitor_reset_at`, thiết lập lại một lần cho một ví.
 
-A reset time in the future does not count until it passes.
-A refill sets `capacitor_flux` to `capacitor_quota`. Unused Capacitor Flux is forfeit.
-A boundary that is not later than the last refill does not refill.
-Thus a return to an earlier billing period keeps the spent amount.
+Thời gian đặt lại trong tương lai không được tính cho đến khi nó trôi qua. Việc nạp tiền sẽ đặt `capacitor_flux` thành `capacitor_quota`. Capacitor Flux không sử dụng sẽ bị hủy. Một ranh giới không muộn hơn lần nạp cuối cùng sẽ không được nạp lại. Do đó, việc quay trở lại thời hạn thanh toán trước đó sẽ giữ nguyên số tiền đã chi tiêu.
 
-No job runs the refill.
-Admission writes a due refill when it reads the wallet. It settles outstanding fees in the same transaction, under the wallet row lock.
-A settlement writes a due refill the same way.
-Admission must write the refill, because a rejected request never reaches a settlement.
-A refill that is only counted pays the same outstanding fee again after each reset.
-A reset for every wallet is one ConfigKV write.
+Không có công việc chạy nạp tiền. Tuyển sinh viết một lần nạp tiền khi nó đọc ví. Nó giải quyết các khoản phí còn tồn đọng trong cùng một giao dịch, theo khóa hàng ví. Một thỏa thuận giải quyết viết một khoản nạp tiền đến hạn theo cách tương tự. Việc nhập học phải viết thêm tiền, bởi vì yêu cầu bị từ chối sẽ không bao giờ được giải quyết. Một lần nạp tiền chỉ được tính sẽ trả lại khoản phí chưa thanh toán tương tự sau mỗi lần đặt lại. Một lần đặt lại cho mỗi ví là một lần ghi ConfigKV.
 
-The admin tools write `CAPACITOR_RESET_INTERVAL`, `CAPACITOR_RESET_AT`, and `capacitor_reset_at`.
-This API has no admin route for them.
+Các công cụ quản trị viết `CAPACITOR_RESET_INTERVAL`, `CAPACITOR_RESET_AT` và `capacitor_reset_at`. API này không có quản trị viên route cho họ.
 
-Capacitors are sold by the month. The client lists only packages with a monthly billing period.
+Tụ điện được bán theo tháng. Khách hàng chỉ liệt kê các gói có thời hạn thanh toán hàng tháng.
 
-A fee that the Capacitor cannot pay stays outstanding while the fallback is off.
-The fallback switch does not cancel that fee.
-The next refill pays it, or purchased Flux pays it after the Capacitor expires.
-One request can exceed the balance by a small amount, the same as in the wallet before Capacitors.
+Một khoản phí mà Capacitor không thể thanh toán vẫn còn tồn đọng trong khi phương án dự phòng tắt. Switch phương án dự phòng không hủy khoản phí đó. Lần nạp tiền tiếp theo sẽ thanh toán số tiền đó hoặc Flux đã mua sẽ thanh toán số tiền đó sau khi Capacitor hết hạn. Một yêu cầu có thể vượt quá số dư một lượng nhỏ, giống như trong ví trước Tụ điện.
 
-### Expiry
+<a id="expiry"></a>
 
-Every read judges expiry. A Capacitor with a past `capacitor_expires_at` counts as 0.
-No job clears it.
+### Hết hạn
 
-### Read
+Mỗi lần đọc thẩm phán hết hạn. Capacitor có `capacitor_expires_at` trong quá khứ được tính là 0. Không có công việc nào xóa nó.
 
-`GET /api/v1/flux` returns `capacitorPercent`, `capacitorRechargesAt`, and `fallbackToFlux` with the balance.
-`capacitorRechargesAt` is the start of the next reset window. It is null without a reset interval, because the Capacitor then recharges only on renewal.
-Windows count from each user's period start, so the client shows this time.
-The percent is `capacitor_flux / capacitor_quota`. It is null without an active Capacitor.
-The cached balance can show the amount before a reset for 60 seconds.
-The response omits Capacitor Flux counts.
-`PUT /api/v1/flux/fallback` saves `fallbackToFlux`.
-`GET /api/v1/revenuecat/capacitors` returns the product ids in `REVENUECAT_CAPACITORS`.
-The client lists only these products. A purchase of another product takes the payment and grants no Capacitor Flux.
-Chat and speech do not call RevenueCat.
+<a id="read"></a>
 
-### Ledger
+### Đọc
 
-`flux_transaction.pool` is `wallet` or `capacitor`.
-The balance columns of a row describe the bucket in `pool`.
-A refill is a `credit` row in the Capacitor pool. Its `balanceBefore` is the forfeited Capacitor Flux.
-A settlement that uses both buckets writes one `debit` row for each pool.
-Purchased Flux capacity and `GET /flux/history` read only the wallet pool.
+`GET /api/v1/flux` trả về `capacitorPercent`, `capacitorRechargesAt` và `fallbackToFlux` cùng với số dư. `capacitorRechargesAt` là điểm bắt đầu của cửa sổ đặt lại tiếp theo. Nó là vô giá trị nếu không có khoảng thời gian đặt lại vì Capacitor sau đó chỉ sạc lại khi gia hạn. Số lượng Windows tính từ thời điểm bắt đầu chu kỳ của mỗi người dùng, vì vậy máy khách sẽ hiển thị thời gian này. Phần trăm là `capacitor_flux / capacitor_quota`. Nó là vô giá trị nếu không có Capacitor hoạt động. Số dư được lưu trong bộ nhớ cache có thể hiển thị số tiền trước khi đặt lại trong 60 giây. Phản hồi bỏ qua số lượng Capacitor Flux. `PUT /api/v1/flux/fallback` lưu `fallbackToFlux`. `GET /api/v1/revenuecat/capacitors` trả về id sản phẩm trong `REVENUECAT_CAPACITORS`. Khách hàng chỉ liệt kê những sản phẩm này. Việc mua một sản phẩm khác sẽ phải thanh toán và không cấp Capacitor Flux. Trò chuyện và lời nói không gọi RevenueCat.
 
-The web purchase SDK cannot replace a subscription in the app.
-A subscriber opens the management URL to change Capacitors.
-The webhook applies the new Capacitor Flux after the store changes the product.
+<a id="ledger"></a>
 
-### Account deletion
+### Sổ cái
 
-A deleted user cannot open the management URL, so a subscription that can still charge refuses the deletion.
-The server does not cancel a subscription. The user cancels it, and then deletes the account.
-The rule also covers App Store and Google Play subscriptions, which the server cannot cancel.
+`flux_transaction.pool` là `wallet` hoặc `capacitor`. Các cột cân bằng của một hàng mô tả bucket trong `pool`. Lần nạp lại là một hàng `credit` trong nhóm Capacitor. `balanceBefore` của nó là Capacitor Flux bị tịch thu. Một giải pháp sử dụng cả bucket ghi một hàng `debit` cho mỗi nhóm. Đã mua dung lượng Flux và `GET /flux/history` chỉ đọc nhóm ví.
 
-A subscription can still charge unless its `status` is `expired` or `incomplete`, or its `auto_renewal_status` is `will_not_renew`.
-For the status `unknown`, the renewal status decides.
-A promotional subscription has no product, so it grants no Capacitor.
-Thus a cancelled subscription does not refuse. It keeps its access until the period ends, and the deletion clears the wallet.
-A subscription in `in_billing_retry` refuses. It gives no access, but a recovered payment charges the customer.
+Giao dịch mua trên web SDK không thể thay thế đăng ký trong ứng dụng. Thuê bao mở URL quản lý để thay đổi Tụ điện. Webhook áp dụng Capacitor Flux mới sau khi store thay đổi sản phẩm.
 
-The Auth service asks `POST /internal/auth/user-deletion/check` on the private network. The check changes nothing.
-It returns 409 `SUBSCRIPTION_ACTIVE` for a refusal. Auth then returns the Better Auth error `SUBSCRIPTION_ACTIVE`, which the account page shows.
-Auth asks at two points:
+<a id="account-deletion"></a>
 
-- Before the deletion request sends the confirmation email. A Better Auth `before` hook on `/delete-user` runs the check, because the email callback can run in the background.
-- First in `beforeDelete`, before it revokes external authorizations. The user can subscribe after the email.
+### Xóa tài khoản
 
-The resource cleanup has no subscription rule. A refusal after the revocation would leave the account without its social grants.
-A failed read of RevenueCat refuses the deletion.
-Without the API v2 key or the project id, the check passes when no webhook secret is set, because that deployment sells no subscriptions.
-With a webhook secret, the missing configuration is an error, and the check returns 503.
+Người dùng đã xóa không thể mở URL quản lý, vì vậy đăng ký vẫn có thể tính phí sẽ từ chối xóa. Máy chủ không hủy đăng ký. Người dùng hủy nó và sau đó xóa tài khoản. Quy tắc này cũng bao gồm các đăng ký Ứng dụng store và Google Play mà máy chủ không thể hủy.
 
-## Scope
+Thuê bao vẫn có thể tính phí trừ khi `status` của nó là `expired` hoặc `incomplete` hoặc `auto_renewal_status` của nó là `will_not_renew`. Đối với trạng thái `unknown`, trạng thái gia hạn sẽ quyết định. Đăng ký khuyến mại không có sản phẩm nên không cấp Capacitor. Vì vậy, một thuê bao bị hủy không từ chối. Nó giữ quyền truy cập cho đến khi thời gian kết thúc và việc xóa sẽ xóa ví. Đăng ký trong `in_billing_retry` từ chối. Nó không cấp quyền truy cập nhưng khoản thanh toán đã thu hồi sẽ tính phí cho khách hàng.
 
-Remove the local subscription status mirror and the webhook event log.
-Read entitlement status from RevenueCat on the client and on the server.
-Keep Capacitor Flux in the Flux wallet.
+Dịch vụ Auth hỏi `POST /internal/auth/user-deletion/check` trên mạng riêng. Việc kiểm tra không thay đổi gì cả. Nó trả về 409 `SUBSCRIPTION_ACTIVE` khi bị từ chối. Sau đó, Auth trả về lỗi Better Auth `SUBSCRIPTION_ACTIVE` mà trang tài khoản hiển thị. Auth hỏi ở hai điểm:
+
+- Trước khi yêu cầu xóa gửi email xác nhận. Better Auth `before` hook trên `/delete-user` chạy kiểm tra vì lệnh gọi lại email có thể chạy ở chế độ nền.
+- Đầu tiên là trong `beforeDelete`, trước khi nó thu hồi các ủy quyền bên ngoài. Người dùng có thể đăng ký sau email.
+
+Việc dọn dẹp tài nguyên không có quy tắc đăng ký. Việc từ chối sau khi thu hồi sẽ khiến tài khoản không có trợ cấp xã hội. Việc đọc RevenueCat không thành công sẽ từ chối xóa. Nếu không có khóa API v2 hoặc id dự án, quá trình kiểm tra sẽ vượt qua khi không có bí mật webhook nào được đặt vì quá trình triển khai đó không bán đăng ký. Với bí mật webhook, cấu hình bị thiếu là lỗi và kiểm tra trả về 503.
+
+<a id="scope"></a>
+
+## Phạm vi
+
+Xóa bản sao trạng thái đăng ký cục bộ và nhật ký sự kiện webhook. Đọc trạng thái quyền được hưởng từ RevenueCat trên máy khách và trên máy chủ. Giữ Capacitor Flux trong ví Flux.
 
 ## Non-goals
 
-Capacitor Flux recall inside a period that stays active.
-A reconciliation job without a webhook.
-Showing Capacitor Flux amounts on the Capacitor cards.
-Yearly Capacitors.
-Flux packs through RevenueCat.
-An admin route in this API for resets.
-In-app product replacement checkout.
-Expiry batches for purchased Flux.
+Capacitor Flux Recall trong khoảng thời gian vẫn hoạt động. Một công việc hòa giải không có webhook. Hiển thị số tiền Capacitor Flux trên thẻ Capacitor. Tụ điện hàng năm. Flux đóng gói thông qua RevenueCat. Một quản trị viên route trong API này để đặt lại. Kiểm tra thay thế sản phẩm trong ứng dụng. Các lô hết hạn dành cho Flux đã mua.
 
-## Module graph
+<a id="module-graph"></a>
+
+## Biểu đồ mô-đun
 
 ```mermaid
 flowchart LR
@@ -197,7 +134,9 @@ flowchart LR
   FluxRoute --> FluxService[flux.ts]
 ```
 
-## Sequence
+<a id="sequence"></a>
+
+## Sự liên tiếp
 
 ```mermaid
 sequenceDiagram
@@ -223,7 +162,9 @@ sequenceDiagram
   API->>DB: Lock user_flux, refill when due, settle
 ```
 
-## Affected files
+<a id="affected-files"></a>
+
+## Các tập tin bị ảnh hưởng
 
 ```text
 server/apps/api/
@@ -241,19 +182,8 @@ packages/stage-ui/src/composables/use-subscription.ts
 packages/stage-pages/src/pages/settings/capacitor.vue
 ```
 
-## Test plan
+<a id="test-plan"></a>
 
-Run the Capacitor Flux tests for a new period, a known period, a changed period, an earlier period, no period, and expiry.
-Run the reset tests for the interval window, the reset for every wallet, the reset for one wallet, and an expired Capacitor.
-Run the settlement tests for the Capacitor-first order, a fee across both buckets, and the fallback switch.
-Run the RevenueCat subscriber client tests for the join of subscription, entitlement, and product, for pages, and for upstream errors.
-Run the RevenueCat subscription sync tests for Capacitor selection.
-Run the webhook tests for a repeated event, `PRODUCT_CHANGE`, `EXPIRATION`, `TRANSFER`, and a failed read.
-Run the flux route tests for the Capacitor percent and the fallback choice.
-Run the client test that maps `customerInfo` to the current Capacitor.
-Run the admission test for a due refill with an outstanding fee.
-Run the route tests for the sync of a signed-in user, an anonymous sync, and the product list.
-Run the subscriber client tests for each renewal status, for `in_billing_retry`, and for a missing configuration.
-Run the internal route tests for the deletion check.
-Run the Auth tests for a refused request without an email, and for a refused email link without a revocation.
-Run the client tests for the sync before the balance read and for the product filter.
+## kế hoạch kiểm tra
+
+Chạy thử nghiệm Capacitor Flux cho một khoảng thời gian mới, một khoảng thời gian đã biết, một khoảng thời gian đã thay đổi, một khoảng thời gian trước đó, không có khoảng thời gian và hết hạn. Chạy thử nghiệm đặt lại cho khoảng thời gian, đặt lại cho mọi ví, đặt lại cho một ví và Capacitor đã hết hạn. Chạy thử nghiệm độ thanh toán cho đơn hàng đầu tiên Capacitor, có tính phí trên cả bucket và bộ chuyển đổi phương án dự phòng. Chạy các bài kiểm tra ứng dụng khách đăng ký RevenueCat để tham gia đăng ký, quyền và sản phẩm, cho các trang cũng như các lỗi upstream. Chạy thử nghiệm đồng bộ hóa đăng ký RevenueCat để lựa chọn Capacitor. Chạy kiểm tra webhook cho một sự kiện lặp lại, `PRODUCT_CHANGE`, `EXPIRATION`, `TRANSFER` và đọc không thành công. Chạy các bài kiểm tra Flux route để biết phần trăm Capacitor và lựa chọn phương án dự phòng. Chạy thử nghiệm máy khách để ánh xạ `customerInfo` tới Capacitor hiện tại. Chạy bài kiểm tra đầu vào để nạp tiền đúng hạn với một khoản phí chưa thanh toán. Chạy thử nghiệm route để đồng bộ hóa người dùng đã đăng nhập, đồng bộ hóa ẩn danh và danh sách sản phẩm. Chạy thử nghiệm máy khách của người đăng ký cho từng trạng thái gia hạn, cho `in_billing_retry` và cho cấu hình bị thiếu. Chạy các bài kiểm tra route nội bộ để kiểm tra việc xóa. Chạy kiểm tra xác thực cho yêu cầu bị từ chối không có email và đối với liên kết email bị từ chối mà không bị thu hồi. Chạy thử nghiệm máy khách để đồng bộ hóa trước khi đọc số dư và cho bộ lọc sản phẩm.

@@ -1,8 +1,10 @@
 # @angela/server-sdk-shared
 
-Eventa contracts for the hosted chat WebSocket.
+Hợp đồng sự kiện cho trò chuyện hosted WebSocket.
 
-## Usage
+<a id="usage"></a>
+
+## Cách sử dụng
 
 ```shell
 ni @angela/server-sdk-shared -D
@@ -15,12 +17,12 @@ import type { WireMessage } from '@angela/server-sdk-shared'
 import { newMessages, pullMessages, sendMessages } from '@angela/server-sdk-shared'
 ```
 
-The package uses Eventa `1.0.0-beta.15`. Its WebSocket adapter accepts beta.13
-`id/type/payload` envelopes and sends these fields with current envelopes.
+Gói sử dụng Eventa `1.0.0-beta.15`. Bộ điều hợp WebSocket của nó chấp nhận các phong bì `id/type/payload` beta.13 và gửi các trường này cùng với các phong bì hiện tại.
 
-`/ws/chat` keeps query-token authentication for deployed clients. `/ws/v2/chat`
-authenticates after the WebSocket opens with `chat:authenticate`.
+`/ws/chat` giữ xác thực truy vấn-token cho các máy khách đã triển khai. `/ws/v2/chat` xác thực sau khi WebSocket mở bằng `chat:authenticate`.
 
-## License
+<a id="license"></a>
+
+## Giấy phép
 
 [MIT](../../../LICENSE)

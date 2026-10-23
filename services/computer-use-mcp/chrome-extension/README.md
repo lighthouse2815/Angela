@@ -1,23 +1,31 @@
-# Angela Desktop Grounding — Chrome Extension
+<a id="angela-desktop-grounding--chrome-extension"></a>
 
-Read-only Chrome DOM observation bridge for the Angela Desktop Grounding layer.
+# Angela desktop đối chiếu ngữ cảnh — Tiện ích mở rộng của Chrome
 
-## What it does
+chỉ đọc Cầu quan sát Chrome DOM dành cho lớp Angela desktop đối chiếu ngữ cảnh.
 
-- Collects interactive elements (buttons, links, inputs, etc.) from all frames in the active Chrome tab
-- Reports element positions, ARIA roles, text, and rect coordinates
-- Feeds this data into the desktop grounding snap resolver for coordinate mapping
+<a id="what-it-does"></a>
 
-## What it does NOT do
+## Nó làm gì
 
-- ❌ No DOM mutations (no clicking, typing, scrolling on DOM elements)
-- ❌ No `eval` / `new Function` / `chrome.scripting.executeScript`
-- ❌ No external network requests (no Python bridge, no offscreen documents)
-- ❌ No popup UI
+- Thu thập các yếu tố tương tác (nút, liên kết, đầu vào, v.v.) từ tất cả các khung trong tab Chrome đang hoạt động
+- Báo cáo vị trí phần tử, vai trò ARIA, văn bản và tọa độ trực tiếp
+- Cung cấp dữ liệu này vào trình phân giải nhanh desktop đối chiếu ngữ cảnh để ánh xạ tọa độ
 
-All user interactions are performed via real macOS OS-level input events (CGEvent) through the desktop grounding executor.
+<a id="what-it-does-not-do"></a>
 
-## Architecture
+## Những việc không thực hiện
+
+- ❌ Không có DOM các thay đổi trạng thái (không click, gõ, cuộn trên các phần tử DOM)
+- ❌ Không có `eval` / `new Function` / `chrome.scripting.executeScript`
+- ❌ Không có yêu cầu mạng bên ngoài (không có cầu nối Python, không có tài liệu ngoài màn hình)
+- ❌ Không có cửa sổ bật lên UI
+
+Tất cả các tương tác của người dùng được thực hiện thông qua các sự kiện đầu vào cấp độ macOS OS (CGEvent) thực tế thông qua trình thực thi desktop đối chiếu ngữ cảnh.
+
+<a id="architecture"></a>
+
+## Ngành kiến ​​​​trúc
 
 ```
 background.js (Service Worker)
@@ -27,26 +35,32 @@ msg_bridge.js (ISOLATED world)
 content.js (MAIN world, window.__AIRI_DG__)
 ```
 
-## Installation (development)
+<a id="installation-development"></a>
 
-1. Open `chrome://extensions/`
-2. Enable "Developer mode"
-3. Click "Load unpacked"
-4. Select this `chrome-extension/` directory
-5. The extension will auto-inject into all pages
+## Cài đặt (phát triển)
 
-## Supported commands
+1. Mở `chrome://extensions/`
+2. Bật "Chế độ nhà phát triển"
+3. Nhấp vào "Tải đã giải nén"
+4. Chọn thư mục `chrome-extension/` này
+5. Tiện ích mở rộng sẽ tự động chèn vào tất cả các trang
 
-| Command | Description |
+<a id="supported-commands"></a>
+
+## Các lệnh được hỗ trợ
+
+| Lệnh | Mô tả |
 |---------|-------------|
-| `getActiveTab` | Get active tab info (id, url, title) |
-| `getAllFrames` | List all frames in active tab |
-| `readAllFramesDOM` | Collect interactive elements from all frames |
-| `findElement` | Find single element by CSS selector |
-| `findElements` | Find multiple elements by CSS selector |
-| `getClickTarget` | Get element center point for click targeting |
-| `getElementAttributes` | Get all attributes of an element |
+| `getActiveTab` | Nhận thông tin tab đang hoạt động (id, url, tiêu đề) |
+| `getAllFrames` | Liệt kê tất cả các khung trong tab đang hoạt động |
+| `readAllFramesDOM` | Thu thập các yếu tố tương tác từ tất cả các khung hình |
+| `findElement` | Tìm phần tử đơn bằng bộ chọn CSS |
+| `findElements` | Tìm nhiều phần tử bằng bộ chọn CSS |
+| `getClickTarget` | Nhận điểm trung tâm của phần tử để nhắm mục tiêu theo lượt nhấp |
+| `getElementAttributes` | Nhận tất cả các thuộc tính của một phần tử |
 
-## Provenance
+<a id="provenance"></a>
 
-Adapted from the repository's Chrome extension source with DOM-action methods stripped.
+## Xuất xứ
+
+Được điều chỉnh từ nguồn tiện ích mở rộng Chrome của kho lưu trữ đã loại bỏ các phương thức hành động DOM.

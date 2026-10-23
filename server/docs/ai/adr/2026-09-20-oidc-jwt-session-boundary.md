@@ -1,73 +1,68 @@
-# OIDC JWT identity at the Better Auth boundary
+<a id="oidc-jwt-identity-at-the-better-auth-boundary"></a>
 
-Status: accepted
+# Danh tính OIDC JWT tại ranh giới Better Auth
 
-## Context
+Trạng thái: đã chấp nhận
 
-The Auth service issues OIDC access tokens for AIRI clients. These clients also
-call Better Auth profile and account endpoints with the access token.
+<a id="context"></a>
 
-Better Auth session middleware accepts its session cookie format. It does not
-accept the asymmetric JWT access tokens from the OAuth Provider plugin.
+## Bối cảnh
 
-The existing bridge verifies each JWT and creates a database Session. It then
-injects the new Session token as a request cookie. Client session polling can
-therefore create one database row per request. PostgreSQL does not remove rows
-when `expires_at` passes.
+Dịch vụ Auth cấp quyền truy cập OIDC token cho máy khách AIRI. Những khách hàng này cũng gọi hồ sơ Better Auth và các điểm cuối tài khoản với quyền truy cập token.
 
-The custom `/get-session` and `/list-sessions` routes also call Better Auth
-before their direct JWT verifier. This order invokes the bridge on the hottest
-authentication path. Their verifier also fetches this service's public JWKS
-endpoint over loopback HTTP.
+Phần mềm trung gian phiên Better Auth chấp nhận định dạng cookie phiên của nó. Nó không chấp nhận quyền truy cập JWT không đối xứng token từ plugin OAuth nhà cung cấp.
 
-## Decision
+Cầu nối hiện có xác minh từng JWT và tạo Phiên cơ sở dữ liệu. Sau đó, nó sẽ chèn Phiên token mới làm cookie yêu cầu. Do đó, việc thăm dò phiên khách hàng có thể tạo một hàng cơ sở dữ liệu cho mỗi yêu cầu. PostgreSQL không xóa hàng khi `expires_at` đi qua.
 
-Use one local access-token verifier for Auth routes and the Better Auth plugin.
-The verifier loads JWKS data in-process and caches the key set for 60 seconds.
-It validates the verified JWT claims with Valibot.
+`/get-session` và `/list-sessions` route tùy chỉnh cũng gọi Better Auth trước trình xác minh JWT trực tiếp của họ. Lệnh này gọi cầu nối trên đường dẫn xác thực nóng nhất. Trình xác minh của họ cũng tìm nạp điểm cuối JWKS công khai của dịch vụ này qua loopback HTTP.
 
-Apply the change in two stacked pull requests:
+<a id="decision"></a>
 
-1. The custom token routes validate the JWT before Better Auth session lookup.
-2. The plugin supplies verified identity through the request context. It does
-   not create a Session row.
+## Phán quyết
 
-The final plugin treats the JWT as the credential for ordinary operations. If
-the token contains an active original `sid`, the plugin supplies that Session
-token to Better Auth's authoritative middleware. Sensitive and fresh-session
-operations require this active Session.
+Sử dụng một trình xác minh truy cập cục bộ-token cho Auth route và plugin Better Auth. Trình xác minh tải dữ liệu JWKS đang xử lý và lưu bộ khóa vào bộ nhớ đệm trong 60 giây. Nó xác nhận các xác nhận quyền sở hữu JWT đã được xác minh bằng Valibot.
 
-The OAuth Provider includes `sid` in access tokens created from an active login
-Session. A refreshed token can omit `sid` after that Session expires or is
-deleted. Such a token remains valid for ordinary operations until `exp`, but it
-cannot authorize a sensitive operation.
+Áp dụng thay đổi trong hai yêu cầu kéo xếp chồng lên nhau:
 
-## Scope
+1. token route tùy chỉnh xác thực JWT trước khi tra cứu phiên Better Auth.
+2. Plugin cung cấp danh tính đã được xác minh thông qua ngữ cảnh yêu cầu. Nó không tạo ra một hàng Phiên.
 
-- Auth service OIDC access-token validation
-- Custom Auth token routes
-- Better Auth request identity
-- Better Auth sensitive-session behavior
-- Account-ban checks for JWT callers
+Plugin cuối cùng coi JWT là thông tin xác thực cho các hoạt động thông thường. Nếu token chứa `sid` gốc đang hoạt động, plugin sẽ cung cấp Phiên token đó cho phần mềm trung gian có thẩm quyền của Better Auth. Các hoạt động nhạy cảm và phiên mới yêu cầu Phiên hoạt động này.
+
+OAuth nhà cung cấp bao gồm `sid` trong quyền truy cập token được tạo từ Phiên đăng nhập đang hoạt động. token được làm mới có thể bỏ qua `sid` sau khi Phiên đó hết hạn hoặc bị xóa. token như vậy vẫn có hiệu lực đối với các hoạt động thông thường cho đến `exp`, nhưng nó không thể ủy quyền cho một hoạt động nhạy cảm.
+
+<a id="scope"></a>
+
+## Phạm vi
+
+- Dịch vụ xác thực quyền truy cập OIDC-Xác thực token
+- Xác thực tùy chỉnh token route
+- Nhận dạng yêu cầu Better Auth
+- Hành vi phiên nhạy cảm Better Auth
+- Kiểm tra lệnh cấm tài khoản đối với người gọi JWT
 
 ## Non-goals
 
-- Delete historical expired Session rows
-- Change access-token or refresh-token lifetimes
-- Change OAuth Provider database tables
-- Replace Better Auth or its OAuth Provider plugin
-- Change resource API authentication
+- Xóa các hàng Phiên đã hết hạn trong lịch sử
+- Thay đổi thời gian truy cập-token hoặc làm mới-token
+- Thay đổi bảng cơ sở dữ liệu OAuth nhà cung cấp
+- Thay thế Better Auth hoặc plugin OAuth nhà cung cấp của nó
+- Thay đổi xác thực tài nguyên API
 
-## Consequences
+<a id="consequences"></a>
 
-- Normal JWT requests do not create Session rows.
-- JWT verification does not call the service over loopback HTTP.
-- Key rotation reaches each verifier within 60 seconds.
-- Ordinary JWT requests still load the current user for deletion and ban state.
-- Sensitive operations retain Session revocation and freshness checks.
-- Existing expired rows require a separate production cleanup plan.
+## Hậu quả
 
-## Module dependencies
+- Các yêu cầu JWT bình thường không tạo các hàng Phiên.
+- Xác minh JWT không gọi dịch vụ qua vòng lặp HTTP.
+- Xoay phím đến từng người xác minh trong vòng 60 giây.
+- Các yêu cầu JWT thông thường vẫn tải người dùng hiện tại về trạng thái xóa và cấm.
+- Các hoạt động nhạy cảm giữ lại việc thu hồi Phiên và kiểm tra độ mới.
+- Các hàng đã hết hạn hiện tại cần có kế hoạch dọn dẹp sản xuất riêng.
+
+<a id="module-dependencies"></a>
+
+## Phần phụ thuộc của mô-đun
 
 ```mermaid
 flowchart LR
@@ -82,7 +77,9 @@ flowchart LR
   Plugin --> Session[Original Session lookup by sid]
 ```
 
-## Affected files
+<a id="affected-files"></a>
+
+## Các tập tin bị ảnh hưởng
 
 ```text
 server/
@@ -98,7 +95,9 @@ server/
     2026-09-20-oidc-jwt-session-boundary.md
 ```
 
-## Request sequence
+<a id="request-sequence"></a>
+
+## Trình tự yêu cầu
 
 ```mermaid
 sequenceDiagram
@@ -124,13 +123,15 @@ sequenceDiagram
   end
 ```
 
-## Test plan
+<a id="test-plan"></a>
 
-- Make sure that valid JWT routes do not call Better Auth session lookup.
-- Make sure that invalid JWTs retain the Better Auth fallback.
-- Make sure that invalid claims do not create request identity.
-- Make sure that the plugin never calls `createSession`.
-- Make sure that an active `sid` supplies the original Session cookie.
-- Make sure that an expired `sid` cannot supply the Session cookie.
-- Make sure that banned users do not receive request identity.
-- Run Auth tests, Auth typecheck, repository lint, and CI.
+## kế hoạch kiểm tra
+
+- Đảm bảo rằng JWT route hợp lệ không gọi tra cứu phiên Better Auth.
+- Đảm bảo rằng các JWT không hợp lệ giữ lại Better Auth phương án dự phòng.
+- Đảm bảo rằng các xác nhận quyền sở hữu không hợp lệ không tạo ra danh tính yêu cầu.
+- Đảm bảo rằng plugin không bao giờ gọi `createSession`.
+- Đảm bảo rằng `sid` đang hoạt động cung cấp cookie Phiên gốc.
+- Đảm bảo rằng `sid` đã hết hạn không thể cung cấp cookie Phiên.
+- Đảm bảo rằng người dùng bị cấm không nhận được danh tính yêu cầu.
+- Chạy kiểm tra Auth, Auth kiểm tra kiểu dữ liệu, lint kho lưu trữ và CI.

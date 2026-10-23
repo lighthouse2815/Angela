@@ -1,17 +1,21 @@
 # `@angela/auth-shared`
 
-Neutral authentication contracts shared by the resource API and the standalone auth service.
+Hợp đồng xác thực trung lập được chia sẻ bởi tài nguyên API và dịch vụ xác thực độc lập.
 
-## Use it for
+<a id="use-it-for"></a>
 
-- The Better Auth-owned PostgreSQL schema.
-- The authenticated principal/session shape exchanged inside server code.
-- Authorization policy that must remain identical in both processes, such as ban expiry handling.
+## Sử dụng nó cho
 
-## Do not use it for
+- Lược đồ PostgreSQL thuộc sở hữu của Better Auth.
+- Hình dạng principal/session được xác thực được trao đổi bên trong mã máy chủ.
+- Chính sách ủy quyền phải giống hệt nhau trong cả hai quy trình, chẳng hạn như xử lý lệnh cấm hết hạn.
 
-- Better Auth runtime construction or HTTP routes.
-- Service environment parsing, database pools, Redis, email, or telemetry.
-- Importing either `server/apps/api` or `../dev-in-future/server/apps/auth`.
+<a id="do-not-use-it-for"></a>
 
-Keeping this package free of runtime composition lets both applications depend on the same protocol without depending on each other.
+## Không sử dụng nó cho
+
+- Cấu trúc Better Auth runtime hoặc HTTP route.
+- Phân tích cú pháp môi trường dịch vụ, nhóm cơ sở dữ liệu, Redis, email hoặc đo từ xa.
+- Đang nhập `server/apps/api` hoặc `../dev-in-future/server/apps/auth`.
+
+Việc giữ gói này không có thành phần runtime cho phép cả hai ứng dụng phụ thuộc vào cùng một giao thức mà không phụ thuộc lẫn nhau.

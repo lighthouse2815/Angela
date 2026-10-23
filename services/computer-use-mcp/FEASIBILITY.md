@@ -1,108 +1,127 @@
-# Feasibility Summary
+<a id="feasibility-summary"></a>
 
-This document records the validated state of the Angela-specific macOS desktop orchestration v1 in `services/computer-use-mcp`.
+# Tóm tắt tính khả thi
 
-## Bottom Line
+Tài liệu này ghi lại trạng thái xác thực của dàn nhạc macOS desktop v1 dành riêng cho Angela trong `services/computer-use-mcp`.
 
-The current direction is feasible and materially stronger than the earlier pure-vision-only path.
-The validated architecture is now:
+<a id="bottom-line"></a>
 
-- Angela keeps the control plane
-- `computer-use-mcp` keeps trace, audit, screenshot persistence, policy, and the MCP surface
-- the primary execution backend is local macOS window automation
-- Angela desktop handles human approval through native dialogs
-- terminal commands run in a controlled background shell runner instead of a Terminal tab script
+## Dòng dưới cùng
 
-That makes the feature an orchestration layer, not just a mouse-clicking demo.
+Hướng hiện tại là khả thi và mạnh mẽ hơn về mặt vật chất so với con đường chỉ có tầm nhìn thuần túy trước đó. Kiến trúc được xác nhận bây giờ là:
 
-## What Was Verified
+- Angela giữ máy bay điều khiển
+- `computer-use-mcp` theo dõi, kiểm tra, lưu giữ ảnh chụp màn hình, chính sách và bề mặt MCP
+- chương trình phụ trợ thực thi chính là tự động hóa cửa sổ macOS cục bộ
+- Angela desktop xử lý sự chấp thuận của con người thông qua hộp thoại native
+- lệnh đầu cuối chạy trong nền được kiểm soát shell runner thay vì tập lệnh tab Terminal
 
-### 1. The service still fits Angela's MCP attachment model
+Điều đó làm cho tính năng này trở thành một lớp điều phối chứ không chỉ là bản demo bằng cú nhấp chuột.
 
-Angela continues to use the existing stdio MCP bridge through `mcp.json`.
-No transport rewrite was required.
+<a id="what-was-verified"></a>
 
-### 2. The service now exposes a tool-first desktop orchestration surface
+## Những gì đã được xác minh
 
-Validated surface in this checkout:
+<a id="1-the-service-still-fits-angelas-mcp-attachment-model"></a>
 
-- desktop observation tools
-- deterministic app open/focus tools
-- background terminal execution tools
-- primitive UI interaction tools
-- approval / trace / audit helpers
+### 1. Dịch vụ vẫn phù hợp với tệp đính kèm MCP mô hình của Angela
 
-This is a better fit for Angela than leading with pure screenshot-driven action selection.
+Angela tiếp tục sử dụng cầu stdio MCP hiện có thông qua `mcp.json`. Không cần phải viết lại transport.
 
-### 3. Terminal execution is now first-class and auditable
+<a id="2-the-service-now-exposes-a-tool-first-desktop-orchestration-surface"></a>
 
-Validated by tests:
+### 2. Dịch vụ hiện hiển thị bề mặt điều phối desktop đầu tiên của công cụ
 
-- commands run in a local background shell process
-- non-zero exit codes are returned without throwing away stderr/stdout
-- cwd is sticky across calls unless explicitly overridden
-- reset clears terminal state
+Bề mặt được xác thực trong lần thanh toán này:
 
-This gives Angela a deterministic execution path for many developer workflows without relying on Terminal.app scripting.
+- Công cụ quan sát desktop
+- ứng dụng xác định công cụ open/focus
+- công cụ thực thi thiết bị đầu cuối nền
+- công cụ tương tác UI nguyên thủy
+- người trợ giúp phê duyệt/theo dõi/kiểm toán
 
-### 4. Native approval now sits in the Angela desktop layer
+Điều này phù hợp hơn với Angela hơn là dẫn đầu bằng lựa chọn hành động thuần túy dựa trên ảnh chụp màn hình.
 
-Validated by implementation shape:
+<a id="3-terminal-execution-is-now-first-class-and-auditable"></a>
 
-- MCP still returns `approval_required`
-- Angela renderer intercepts `computer_use` pending actions
-- Electron main shows a native approval dialog
-- Angela automatically follows up with approve/reject tool calls
-- session-scoped approval reuse is limited to terminal and app open/focus actions
+### 3. Việc thực thi thiết bị đầu cuối hiện là hạng nhất và có thể kiểm tra được
 
-That keeps approval as a user action, not a model action.
+Xác nhận bằng các bài kiểm tra:
 
-### 5. The old remote Linux path still compiles and tests
+- các lệnh chạy trong quy trình shell nền cục bộ
+- mã thoát khác 0 được trả về mà không vứt bỏ stderr/stdout
+- cwd bị dính trong các cuộc gọi trừ khi được ghi đè rõ ràng
+- thiết lập lại xóa trạng thái đầu cuối
 
-The previous `linux-x11` backend remains available as a legacy experimental path.
-It is not the primary v1 story anymore, but it was intentionally kept compiling so existing remote smoke tooling still works.
+Điều này mang lại cho Angela một lộ trình thực thi xác định cho nhiều quy trình làm việc của nhà phát triển mà không cần dựa vào tập lệnh Terminal.app.
 
-## Current Boundary
+<a id="4-native-approval-now-sits-in-the-angela-desktop-layer"></a>
 
-Main v1 story:
+### 4. Phê duyệt native hiện nằm trong lớp Angela desktop
 
-- executor: `macos-local`
-- apps explicitly supported for open/focus by default:
+Xác nhận bởi hình thức thực hiện:
+
+- MCP vẫn trả về `approval_required`
+- Angela renderer chặn các hành động đang chờ xử lý của `computer_use`
+- Electron main hiển thị hộp thoại phê duyệt native
+- Angela tự động theo dõi các lệnh gọi công cụ approve/reject
+- Việc sử dụng lại phê duyệt trong phạm vi phiên được giới hạn ở các hành động open/focus của thiết bị đầu cuối và ứng dụng
+
+Như vậy, người dùng thực hiện phê duyệt. Mô hình không được tự phê duyệt.
+
+<a id="5-the-old-remote-linux-path-still-compiles-and-tests"></a>
+
+### 5. Đường dẫn Linux từ xa cũ vẫn biên dịch và kiểm tra
+
+Phần phụ trợ `linux-x11` trước đó vẫn có sẵn dưới dạng đường dẫn thử nghiệm cũ. Đây không còn là câu chuyện v1 chính nữa nhưng nó đã được cố tình biên dịch để công cụ kiểm tra nhanh từ xa hiện có vẫn hoạt động.
+
+<a id="current-boundary"></a>
+
+## Ranh giới hiện tại
+
+Câu chuyện v1 chính:
+
+- người thi hành: `macos-local`
+- các ứng dụng được hỗ trợ rõ ràng cho open/focus theo mặc định:
   - `Terminal`
   - `Cursor`
   - `Google Chrome`
-- safety boundary:
-  - native approval dialogs
+- ranh giới an toàn:
+  - Hộp thoại phê duyệt native
   - `denyApps`
-  - trace / audit
-  - screenshot persistence
-  - operation budgets
+  - theo dõi/kiểm toán
+  - kiên trì chụp ảnh màn hình
+  - ngân sách hoạt động
 
-Explicit non-goals of this pass:
+ngoài phạm vi rõ ràng của thẻ này:
 
-- PTY/TUI terminal automation
-- deep accessibility tree grounding
-- strict app-level UI sandboxing
-- remote sandbox hosting for other users
-- Windows / Wayland / multi-monitor support
+- Tự động hóa thiết bị đầu cuối PTY/TUI
+- cây tiếp cận sâu đối chiếu ngữ cảnh
+- hộp cát UI cấp ứng dụng nghiêm ngặt
+- lưu trữ sandbox từ xa cho người dùng khác
+- Hỗ trợ Windows / Wayland / đa màn hình
 
-## Commands Verified In This Checkout
+<a id="commands-verified-in-this-checkout"></a>
+
+## Các lệnh đã được xác minh trong lần thanh toán này
 
 - `pnpm -F @angela/computer-use-mcp typecheck`
 - `pnpm -F @angela/computer-use-mcp test`
 - `pnpm -F @angela/stage-ui typecheck`
 - `pnpm -F @angela/desktop typecheck`
 
-## Practical Interpretation
+<a id="practical-interpretation"></a>
 
-The feature is now credible as:
+## Phiên dịch thực tế
 
-- a macOS desktop orchestration layer for Angela
-- a way to connect chat, MCP, terminal execution, and UI observation into one task flow
-- a safer incremental path than trying to solve generic pure-vision computer use first
+Tính năng này hiện đáng tin cậy vì:
 
-It should not be pitched as:
+- lớp điều phối macOS desktop dành cho Angela
+- một cách để kết nối trò chuyện, MCP, thực thi thiết bị đầu cuối và quan sát UI vào một luồng nhiệm vụ
+- một con đường gia tăng an toàn hơn là cố gắng giải quyết việc sử dụng máy tính tầm nhìn thuần túy chung chung trước tiên
 
-- a general desktop sandbox platform
-- a no-approval autonomous agent
-- a production-grade app-isolated desktop security boundary
+Nó không nên được quảng cáo là:
+
+- nền tảng hộp cát desktop chung
+- không cần phê duyệt agent tự động
+- ranh giới bảo mật desktop tách biệt với ứng dụng cấp sản xuất

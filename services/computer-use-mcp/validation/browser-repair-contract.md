@@ -1,24 +1,26 @@
-# Browser Repair Contract Validation
+<a id="browser-repair-contract-validation"></a>
 
-Date: 2026-06-01
+# Xác thực hợp đồng sửa chữa trình duyệt
 
-Scope:
+Ngày: 2026-06-01
+
+Phạm vi:
 - `services/computer-use-mcp/src/browser-dom/browser-repair-contract.ts`
 - `services/computer-use-mcp/src/browser-dom/browser-repair-contract.test.ts`
 - `services/computer-use-mcp/src/server/register-tools.ts`
 - `services/computer-use-mcp/src/server/register-tools-pty-approval.test.ts`
 
-Privacy note:
-- Evidence is sanitized for a public repository.
-- No local absolute paths, tokens, account identifiers, screenshots, or raw environment dumps are included.
+Lưu ý về quyền riêng tư:
+- Bằng chứng được vệ sinh cho một kho lưu trữ công cộng.
+- Không bao gồm đường dẫn tuyệt đối cục bộ, token, số nhận dạng tài khoản, ảnh chụp màn hình hoặc kết xuất môi trường thô.
 
-Commands run:
+Các lệnh chạy:
 
 ```sh
 pnpm install --ignore-scripts --frozen-lockfile
 ```
 
-Result: passed. Lockfile stayed unchanged; lifecycle scripts were intentionally skipped for local verification setup.
+Kết quả: đã đậu. Lockfile không thay đổi; các tập lệnh vòng đời đã bị cố tình bỏ qua để thiết lập xác minh cục bộ.
 
 ```sh
 pnpm -F @angela/computer-use-mcp exec vitest run \
@@ -27,7 +29,7 @@ pnpm -F @angela/computer-use-mcp exec vitest run \
   --config ./vitest.config.ts
 ```
 
-Result: passed. 2 test files, 12 tests.
+Kết quả: đã đậu. 2 tập tin kiểm tra, 12 bài kiểm tra.
 
 ```sh
 pnpm exec moeru-lint --fix \
@@ -38,25 +40,25 @@ pnpm exec moeru-lint --fix \
   services/computer-use-mcp/src/server/register-tools-pty-approval.test.ts
 ```
 
-Result: passed with 0 warnings and 0 errors when run under Node 24.
+Kết quả: đã vượt qua với 0 cảnh báo và 0 lỗi khi chạy trong Node 24.
 
 ```sh
 git diff --check
 ```
 
-Result: passed.
+Kết quả: đã đậu.
 
 ```sh
 pnpm -F @angela/computer-use-mcp typecheck
 ```
 
-Result: failed on existing baseline files outside this change:
+Kết quả: không thành công trên các tệp cơ sở hiện có ngoài thay đổi này:
 - `src/chrome-session-manager.ts`
 - `src/chrome-session-manager.test.ts`
 - `src/desktop-grounding.ts`
 
-Observed baseline error classes:
-- `TS2339` and `TS2353` around `ChromeSessionInfo.ensureOutcome`
-- `TS2451` / `TS2304` around duplicated `chromeWindowBounds` and missing `isChromeInFront`
+Các lớp lỗi cơ bản được quan sát:
+- `TS2339` và `TS2353` xung quanh `ChromeSessionInfo.ensureOutcome`
+- `TS2451` / `TS2304` xung quanh `chromeWindowBounds` trùng lặp và thiếu `isChromeInFront`
 
-No typecheck errors were reported for the files changed by this patch.
+Không có lỗi kiểm tra kiểu dữ liệu nào được báo cáo cho các tệp được bản vá này thay đổi.

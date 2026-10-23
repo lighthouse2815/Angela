@@ -1,135 +1,110 @@
-> Desktop development keeps the API types and shared contracts here.
-> Auth, Compose, Caddy, and Railway files moved to [dev-in-future](../../dev-in-future/README.md).
-> The local desktop does not require this hosted stack.
+> Việc phát triển desktop giữ các loại API và các hợp đồng chung ở đây.
+> Các tệp Auth, Compose, Caddy và Rail đã được chuyển sang [dev-in-future](../../dev-in-future/README.md).
+> desktop cục bộ không yêu cầu ngăn xếp hosted này.
 
-# Angela Backend
+<a id="angela-backend"></a>
 
-Angela's hosted backend source lives under this folder. Workspace package
-names stay stable; the directory groups service source and database ownership
-while production deployment configuration remains in `proj-airi/airi-railway`.
+# Angela phụ trợ
 
-## Layout
+Nguồn phụ trợ hosted của Angela nằm trong thư mục này. Tên gói workspace ổn định; thư mục nhóm nguồn dịch vụ và quyền sở hữu cơ sở dữ liệu trong khi cấu hình triển khai sản xuất vẫn ở `proj-airi/airi-railway`.
 
-- `apps/api`: resource API, business domains, database migrations, and API runtime.
-- `../dev-in-future/server/apps/auth`: deferred Better Auth and OIDC source outside this repository.
-- `packages/auth-shared`: Auth-owned database schema and principal contracts.
-- `packages/server-sdk-shared`: Eventa contracts for the hosted chat WebSocket.
-- `../dev-in-future/server/dev/caddy` and `server/docker-compose.yaml`: deferred routing and backend stack outside this repository.
+<a id="layout"></a>
 
-## Run locally
+## Cách trình bày
 
-Run the retained API from the repository root:
+- `apps/api`: tài nguyên API, miền kinh doanh, di chuyển cơ sở dữ liệu và API runtime.
+- `../dev-in-future/server/apps/auth`: nguồn Better Auth và OIDC bị trì hoãn bên ngoài kho lưu trữ này.
+- `packages/auth-shared`: Lược đồ cơ sở dữ liệu do Auth sở hữu và các hợp đồng chính.
+- `packages/server-sdk-shared`: Hợp đồng Eventa cho trò chuyện hosted WebSocket.
+- `../dev-in-future/server/dev/caddy` và `server/docker-compose.yaml`: định tuyến hoãn lại và ngăn xếp phụ trợ bên ngoài kho lưu trữ này.
+
+<a id="run-locally"></a>
+
+## Chạy cục bộ
+
+Chạy API được giữ lại từ thư mục gốc của kho lưu trữ:
 
 ```sh
 pnpm -F @angela/api-server dev
 ```
 
-The complete backend stack requires the deferred Auth, Compose, Caddy, and catalog files.
-Read the [restoration guide](../../dev-in-future/README.md) before building that stack.
-The root backend shortcut is absent. Docker cannot copy the deferred source from outside its build context.
+Ngăn xếp phụ trợ hoàn chỉnh yêu cầu các tệp Auth, Compose, Caddy và danh mục bị trì hoãn. Đọc hướng dẫn khôi phục [](../../dev-in-future/README.md) trước khi xây dựng ngăn xếp đó. Phím tắt phụ trợ gốc không có. Docker không thể sao chép nguồn trì hoãn từ bên ngoài bối cảnh xây dựng của nó.
 
-## Railway deployment
+<a id="railway-deployment"></a>
 
-API and Auth are separate long-running Railway services built from the same
-repository. Keep each service's **Root Directory** at the repository root.
-Both Dockerfiles copy workspace manifests and shared packages from that build
-context. The project-level Railway configuration lives in
-`proj-airi/airi-railway/.railway/railway.ts`.
+## Triển khai đường sắt
 
-| Service | Public role | Private dependency |
+API và Auth là các dịch vụ Đường sắt dài hạn riêng biệt được xây dựng từ cùng một kho lưu trữ. Giữ **Thư mục gốc** của mỗi dịch vụ ở thư mục gốc của kho lưu trữ. Cả Dockerfiles đều sao chép các tệp kê khai và gói chia sẻ workspace từ bối cảnh xây dựng đó. Cấu hình Đường sắt cấp dự án tồn tại trong `proj-airi/airi-railway/.railway/railway.ts`.
+
+| Dịch vụ | Vai trò công cộng | Sự phụ thuộc riêng tư |
 | --- | --- | --- |
-| Resource API | Product and resource API | Auth issuer and JWKS |
-| Auth | Better Auth and OIDC issuer | Resource API deletion endpoint |
+| Tài nguyên API | Sản phẩm và tài nguyên API | Nhà phát hành xác thực và JWKS |
+| Xác thực | Nhà phát hành Better Auth và OIDC | Điểm cuối xóa tài nguyên API |
 
-The Infrastructure as Code file pins each Dockerfile, start command,
-`/readyz` healthcheck, and watch patterns. Run the Railway plan from the
-deployment repository before you apply a change.
+Tệp Cơ sở hạ tầng dưới dạng Mã ghim từng Dockerfile, lệnh bắt đầu, kiểm tra tình trạng `/readyz` và các mẫu đồng hồ. Chạy gói Đường sắt từ kho triển khai trước khi bạn áp dụng thay đổi.
 
-### Service-to-service contract
+<a id="service-to-service-contract"></a>
 
-Share database, Redis, and observability variables using Railway reference
-variables rather than copying secret values between services. Configure the
-two directional private links as follows:
+### Hợp đồng dịch vụ với dịch vụ
 
-| Consumer | Variable | Value source | Purpose |
+Chia sẻ cơ sở dữ liệu, Redis và các biến có thể quan sát bằng cách sử dụng các biến tham chiếu Đường sắt thay vì sao chép các giá trị bí mật giữa các dịch vụ. Định cấu hình hai liên kết riêng tư định hướng như sau:
+
+| bên sử dụng | Biến | Nguồn giá trị | Mục đích |
 | --- | --- | --- | --- |
-| Resource API | `AUTH_SERVER_URL` | Auth's canonical public issuer URL | JWT issuer, audience, and public JWKS identity |
-| Resource API | `AUTH_SERVER_INTERNAL_URL` | Auth's Railway private domain | Private JWKS fetch; it does not change issuer validation |
-| Auth | `PUBLIC_URL` | Auth's canonical public issuer URL | Better Auth and OIDC issuer URL; must equal API `AUTH_SERVER_URL` |
-| Auth | `RESOURCE_SERVER_URL` | API's Railway private domain | Private call before deleting a user's business data |
+| API tài nguyên | `AUTH_SERVER_URL` | Issuer công khai chuẩn URL của Auth | Issuer, audience và danh tính JWKS công khai của JWT |
+| Tài nguyên API | `AUTH_SERVER_INTERNAL_URL` | Tên miền riêng của Auth's Rail | Tìm nạp JWKS riêng tư; nó không thay đổi xác nhận của nhà phát hành |
+| Xác thực | `PUBLIC_URL` | Nhà phát hành công khai chuẩn của Auth URL | Nhà phát hành Better Auth và OIDC URL; phải bằng API `AUTH_SERVER_URL` |
+| Xác thực | `RESOURCE_SERVER_URL` | Miền riêng Đường sắt của API | Gọi riêng trước khi xóa dữ liệu doanh nghiệp của người dùng |
 
-Set `RATE_LIMIT_TRUSTED_PROXY=railway` only for services directly receiving
-Railway proxy traffic. Keep `/internal/*` private: Auth calls the API over its
-private domain, and public routing must not expose the API's internal Auth
-routes.
+Chỉ đặt `RATE_LIMIT_TRUSTED_PROXY=railway` cho các dịch vụ nhận trực tiếp lưu lượng proxy Đường sắt. Giữ `/internal/*` ở chế độ riêng tư: Auth gọi API qua miền riêng của nó và định tuyến công khai không được để lộ Auth route nội bộ của API.
 
-The API remains the shared database migration owner. Do not add a Railway
-pre-deploy migration command to Auth, and do not make Auth startup run shared
-migrations. After either service deploys, Railway must receive `200` from that
-service's `/readyz`; deployment success alone is not sufficient evidence that
-the service can reach its required dependencies.
+API vẫn là chủ sở hữu di chuyển cơ sở dữ liệu dùng chung. Không thêm lệnh di chuyển trước khi triển khai Đường sắt vào Auth và không khởi động Auth chạy di chuyển được chia sẻ. Sau khi triển khai một trong hai dịch vụ, Đường sắt phải nhận `200` từ `/readyz` của dịch vụ đó; Chỉ triển khai thành công thôi thì chưa đủ bằng chứng cho thấy dịch vụ có thể đạt được các yêu cầu phụ thuộc cần thiết.
 
-## Dev environment
+<a id="dev-environment"></a>
 
-The Railway `dev` environment is one shared slot. It has fixed public URLs, so
-OAuth callbacks and payment webhooks stay registered when the code changes.
+## Môi trường phát triển
 
-Work on your own branch in this repository. Do not merge into a shared test
-branch. The `server-dev` branch is no longer a deploy source.
+Môi trường Rail `dev` là một vị trí được chia sẻ. Nó có các URL công khai cố định, vì vậy lệnh gọi lại OAuth và webhook thanh toán vẫn được đăng ký khi mã thay đổi.
 
-To test a branch, run the `Deploy to server-dev` workflow:
+Làm việc trên nhánh của riêng bạn trong kho lưu trữ này. Không hợp nhất vào một nhánh thử nghiệm được chia sẻ. Nhánh `server-dev` không còn là nguồn triển khai nữa.
+
+Để kiểm tra một nhánh, hãy chạy quy trình công việc `Deploy to server-dev`:
 
 ```sh
 gh workflow run deploy-server-dev.yml -f branch=<branch> -f reset_database=true
 ```
 
-The workflow does these steps in order:
+Quy trình làm việc thực hiện các bước này theo thứ tự:
 
-1. It resets the dev Neon branch to its parent branch, `production`. The dev
-   database then holds a copy of the production schema and data.
-2. It sets the source branch of the Railway `ts-api` and `auth-server` services
-   and deploys them. The API applies its migrations on startup.
-3. It starts the `Cloudflare Workers (server-dev)` workflow on the same branch.
+1. Nó đặt lại nhánh dev Neon về nhánh mẹ của nó, `production`. Sau đó, cơ sở dữ liệu dev giữ một bản sao của lược đồ và dữ liệu sản xuất.
+2. Nó thiết lập nhánh nguồn của các dịch vụ Đường sắt `ts-api` và `auth-server` và triển khai chúng. API áp dụng quá trình di chuyển khi khởi động.
+3. Nó bắt đầu quy trình làm việc `Cloudflare Workers (server-dev)` trên cùng một nhánh.
 
-Railway deploys each later push to the branch. The frontend does not follow
-pushes. Run the workflow again with `reset_database=false` to build it again.
+Đường sắt triển khai từng đợt đẩy sau tới nhánh. Giao diện người dùng không tuân theo các cú đẩy. Chạy lại quy trình làm việc với `reset_database=false` để xây dựng lại nó.
 
-The branch must be in this repository. Railway cannot deploy a branch of a
-fork.
+Chi nhánh phải nằm trong kho lưu trữ này. Đường sắt không thể triển khai một nhánh của fork.
 
-The reset removes all data that the previous branch wrote. This includes dev
-accounts that are not in production. Set
-`reset_database=false` only when the database already has the migrations of
-the branch and no others. The Drizzle migrator applies only migrations that are
-newer than the last applied migration. If the database already has a newer
-migration from a different branch, the migrator skips the older migrations of
-the new branch and reports no error.
+Việc thiết lập lại sẽ xóa tất cả dữ liệu mà nhánh trước đã ghi. Điều này bao gồm các tài khoản nhà phát triển không được sản xuất. Chỉ đặt `reset_database=false` khi cơ sở dữ liệu đã có di chuyển của nhánh và không có di chuyển nào khác. Trình di chuyển Drizzle chỉ áp dụng các lần di chuyển mới hơn lần di chuyển được áp dụng gần đây nhất. Nếu cơ sở dữ liệu đã có quá trình di chuyển mới hơn từ một nhánh khác thì trình di chuyển sẽ bỏ qua các quá trình di chuyển cũ hơn của nhánh mới và không báo cáo lỗi.
 
-The reset does not clear Redis. Cached values from the previous branch can stay
-until they expire.
+Việc thiết lập lại không xóa Redis. Các giá trị được lưu trong bộ nhớ đệm từ nhánh trước có thể tồn tại cho đến khi hết hạn.
 
-The workflow needs this repository configuration:
+Quy trình công việc cần cấu hình kho lưu trữ này:
 
-| Name | Kind | Value |
+| Tên | Loại | Giá trị |
 | --- | --- | --- |
-| `RAILWAY_DEV_TOKEN` | Secret | Railway project token for the `dev` environment |
-| `NEON_API_KEY` | Secret | Neon API key for the project that holds the dev database |
-| `NEON_PROJECT_ID` | Variable | Neon project ID |
-| `NEON_SERVER_DEV_BRANCH` | Variable | Name of the Neon branch that the dev `DATABASE_URL` points to |
+| `RAILWAY_DEV_TOKEN` | Bí mật | Dự án đường sắt token cho môi trường `dev` |
+| `NEON_API_KEY` | Bí mật | Khóa neon API cho dự án chứa cơ sở dữ liệu nhà phát triển |
+| `NEON_PROJECT_ID` | Biến | Dự án neon ID |
+| `NEON_SERVER_DEV_BRANCH` | Biến | Tên nhánh Neon mà dev `DATABASE_URL` trỏ tới |
 
-The dev Neon branch is `serverlize-dev`. Its parent is `production`, so the
-Neon API key can also read the production branch. Keep the key in the secret
-only.
+Nhánh dev Neon là `serverlize-dev`. Cha mẹ của nó là `production`, vì vậy khóa Neon API cũng có thể đọc nhánh sản xuất. Chỉ giữ chìa khóa trong bí mật.
 
-## Package boundaries
+<a id="package-boundaries"></a>
 
-Frontend applications remain under `apps/`. Hosted-backend packages that
-define a resource API protocol can live under `server/packages/`, even when a
-frontend consumes their generated contract.
+## Ranh giới gói
 
-Cross-runtime server SDK and protocol packages remain under `packages/`
-because Web, Electron, plugins, and independent services consume them.
+Các ứng dụng giao diện người dùng vẫn thuộc `apps/`. Các gói phụ trợ hosted xác định giao thức API tài nguyên có thể trực tiếp trong `server/packages/`, ngay cả khi giao diện người dùng sử dụng hợp đồng được tạo của chúng.
 
-Production Caddy routing, OpenTelemetry Collector configuration, observability
-storage, and Grafana dashboards live in `proj-airi/airi-railway` so deployment
-topology is not duplicated in the application repository.
+Máy chủ Cross-runtime SDK và các gói giao thức vẫn thuộc `packages/` vì Web, Electron, plugin và các dịch vụ độc lập sử dụng chúng.
+
+Định tuyến Caddy sản xuất, cấu hình OpenTelemetry Collector, khả năng lưu trữ có thể quan sát và bảng thông tin Grafana trực tiếp trong `proj-airi/airi-railway` để cấu trúc liên kết triển khai không bị trùng lặp trong kho ứng dụng.

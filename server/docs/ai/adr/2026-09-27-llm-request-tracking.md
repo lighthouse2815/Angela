@@ -1,28 +1,29 @@
-# Extensible LLM request tracking
+<a id="extensible-llm-request-tracking"></a>
 
-Date: 2026-09-27
-Status: accepted
+# Theo dõi yêu cầu LLM có thể mở rộng
 
-## Decision and scope
+Ngày: 27-09-2026 Trạng thái: đã chấp nhận
 
-Split diagnostic tracking from provider-cost settlement.
-This change targets main. The billing PR depends on this tracking foundation.
-Tracking owns the shared observation contract and usage extraction, not pricing or wallet mutation.
-It neither imports nor queries settlement storage. Charged Flux in diagnostics is observational, not an accounting source of truth.
+<a id="decision-and-scope"></a>
 
-## Data ownership
+## Quyết định và phạm vi
 
-- `llm_request_log`: one summary per user and request ID, nullable correlation for historical rows, request lifecycle, selected models, usage, timing and dimensions.
-- `llm_request_attempt`: one local dispatch per request and sequence, route/credential references, gateway, status and provider evidence.
-- `flux_transaction` and `user_flux`: existing ledger and wallet, unchanged here.
-- Settlement storage belongs to the later billing PR, not this migration.
+Tách theo dõi chẩn đoán khỏi quyết toán chi phí nhà cung cấp. Thay đổi này nhắm mục tiêu chính. Việc thanh toán PR phụ thuộc vào nền tảng theo dõi này. Việc theo dõi sở hữu hợp đồng quan sát được chia sẻ và trích xuất việc sử dụng, không phải giá cả hoặc ví thay đổi trạng thái. Nó không nhập cũng như không truy vấn bộ nhớ giải quyết. Flux được tính phí trong chẩn đoán chỉ mang tính quan sát chứ không phải là nguồn tính toán chính xác.
 
-No cascading foreign key joins diagnostic retention to accounting retention.
-Deleting diagnostic rows cannot remove evidence or permit a settled request to charge twice.
-Versioned, bounded JSON observations keep new gateway fields extensible. Frequently queried fields have dedicated columns.
-Unknown upstream facts remain null. Only dispatches observed by this router become attempts; hidden gateway retries are not invented.
+<a id="data-ownership"></a>
 
-## Architecture
+## Quyền sở hữu dữ liệu
+
+- `llm_request_log`: một bản tóm tắt cho mỗi người dùng và yêu cầu ID, mối tương quan vô hiệu đối với các hàng lịch sử, vòng đời yêu cầu, mô hình đã chọn, mức sử dụng, thời gian và thứ nguyên.
+- `llm_request_attempt`: một công văn cục bộ cho mỗi yêu cầu và trình tự, tham chiếu route/credential, cổng, trạng thái và bằng chứng nhà cung cấp.
+- `flux_transaction` và `user_flux`: sổ cái và ví hiện có, không thay đổi ở đây.
+- Bộ nhớ thanh toán thuộc về PR thanh toán sau này, không thuộc về quá trình di chuyển này.
+
+Không có khóa ngoại xếp tầng nào kết hợp lưu giữ chẩn đoán với lưu giữ kế toán. Việc xóa các hàng chẩn đoán không thể xóa bằng chứng hoặc cho phép yêu cầu đã giải quyết tính phí hai lần. Đã được phiên bản, các quan sát có giới hạn JSON giúp mở rộng các trường cổng mới. Các trường được truy vấn thường xuyên có các cột dành riêng. Thông tin upstream chưa biết vẫn không có giá trị. Chỉ các công văn được router này quan sát mới trở thành lần thử; thử lại cổng ẩn không được phát minh.
+
+<a id="architecture"></a>
+
+## Ngành kiến ​​​​trúc
 
 ```mermaid
 flowchart LR
@@ -56,7 +57,7 @@ sequenceDiagram
   API->>Tracking: Best-effort terminal observation
 ```
 
-Affected files:
+Các tập tin bị ảnh hưởng:
 
 ```text
 server/apps/api/
@@ -69,44 +70,34 @@ server/apps/api/
   drizzle/0026_llm_request_tracking.sql
 ```
 
-## Lifecycle and failures
+<a id="lifecycle-and-failures"></a>
 
-Request states move from running to completed, failed, cancelled or interrupted when the request path observes an outcome.
-Attempts start as running, may receive headers, and end on failure or the selected request's terminal observation.
-The explicit stale-recovery operation marks running observations unknown without inventing end times, usage or cost.
-It does not resubmit requests or mutate settlements. There is no recovery scheduler in this change.
-Request/attempt persistence is awaited before dispatch. Tracking failure stops dispatch rather than running an untracked retry.
-The later billing PR adds its own intake. Tracking does not create pending accounting rows.
-Final diagnostic writes remain best effort and do not roll back completed settlement.
+## Vòng đời và những thất bại
 
-## Query boundary
+Trạng thái yêu cầu chuyển từ trạng thái đang chạy sang hoàn thành, không thành công, bị hủy hoặc bị gián đoạn khi đường dẫn yêu cầu quan sát thấy kết quả. Các nỗ lực bắt đầu khi đang chạy, có thể nhận được tiêu đề và kết thúc khi không thành công hoặc quan sát cuối cùng của yêu cầu đã chọn. Hoạt động khôi phục lỗi cũ rõ ràng đánh dấu việc chạy các quan sát không xác định mà không phát minh ra thời gian kết thúc, mức sử dụng hoặc chi phí. Nó không gửi lại yêu cầu hoặc thay đổi các khu định cư. Không có lịch trình phục hồi trong thay đổi này. Sự kiên trì của Request/attempt được chờ đợi trước khi gửi đi. Lỗi theo dõi sẽ dừng gửi đi thay vì chạy thử lại không được theo dõi. PR thanh toán sau sẽ bổ sung thêm lượng tiêu thụ của riêng mình. Việc theo dõi không tạo ra các hàng kế toán đang chờ xử lý. Việc ghi chẩn đoán cuối cùng vẫn phải nỗ lực hết sức và không khôi phục lại quá trình giải quyết đã hoàn thành.
 
-Authenticated owner-scoped APIs expose `/api/v1/llm-requests` and `/api/v1/llm-requests/:requestId`.
-Every request and attempt query includes user ownership. This API does not expose settlement data.
-DTOs omit raw evidence, credential references and internal price snapshots.
-The list uses bounded offset pagination. No admin cross-user API or Activity UI is included.
+<a id="query-boundary"></a>
 
-## Rollout and non-goals
+## Ranh giới truy vấn
 
-Merge this PR first. The billing PR adds its separate 0027 migration afterward.
-This PR supplies only 0026 tracking migration. Main's existing 0025 stays unchanged.
-Historical rows remain readable with null new dimensions. Do not fabricate historical correlation or provider facts.
-This is not an upgrade path from the earlier unpublished combined migration draft.
-This PR preserves main's billing behavior. The dependent billing PR removes the old LLM rate policy.
-No full prompt/completion bodies, automatic gateway lookup, independent gateway process, retention job or dashboard is added.
-OpenRouter and other gateways can gain adapters and metadata without changing the billing boundary.
+Các API trong phạm vi chủ sở hữu đã được xác thực sẽ hiển thị `/api/v1/llm-requests` và `/api/v1/llm-requests/:requestId`. Mọi yêu cầu và truy vấn thử đều bao gồm quyền sở hữu của người dùng. API này không hiển thị dữ liệu lún. DTO bỏ qua bằng chứng thô, tài liệu tham khảo thông tin xác thực và ảnh chụp nhanh giá nội bộ. Danh sách sử dụng phân trang bù có giới hạn. Không bao gồm API người dùng chéo quản trị viên hoặc Hoạt động UI.
 
-## Verification plan
+<a id="rollout-and-non-goals"></a>
 
-Client input failures return 400. Request outcome follows the delivered status,
-including malformed upstream JSON and settlement rejection; attempts retain their
-upstream header status. Alias routing counters cover all candidates. Responses
-preserves the same interaction dimensions as Chat Completions.
+## Triển khai và ngoài phạm vi
 
-- Request and attempt lifecycle, local retry outcomes and ownership isolation.
-- Safe query DTOs, nullable history, bounded and sanitized provider evidence.
-- Diagnostic writes and retention never change wallet or ledger state.
-- Tracking compiles and runs without settlement storage.
-- Apply both migrations in order, preserve historical rows and settled accounting.
-- Real HTTP routes with PGlite, billing regression suite, workspace typecheck and lint.
-- Live provider traffic and production deployment remain unverified.
+Hợp nhất PR này trước. Sau đó, PR thanh toán sẽ bổ sung thêm quá trình di chuyển 0027 riêng biệt. PR này chỉ cung cấp di chuyển theo dõi 0026. 0025 hiện tại của Main không thay đổi. Các hàng lịch sử vẫn có thể đọc được khi không có thứ nguyên mới. Không bịa đặt mối tương quan lịch sử hoặc sự thật nhà cung cấp. Đây không phải là đường dẫn nâng cấp từ bản dự thảo di chuyển kết hợp chưa được xuất bản trước đó. PR này duy trì hành vi thanh toán của chính. Thanh toán phụ thuộc PR loại bỏ chính sách giá LLM cũ. Không có nội dung prompt/completion đầy đủ, tra cứu cổng tự động, quy trình cổng độc lập, công việc lưu giữ hoặc bảng thông tin được thêm vào. OpenRouter và các cổng khác có thể nhận được bộ điều hợp và siêu dữ liệu mà không thay đổi ranh giới thanh toán.
+
+<a id="verification-plan"></a>
+
+## Kế hoạch xác minh
+
+Lỗi đầu vào của máy khách trả về 400. Kết quả yêu cầu tuân theo trạng thái đã gửi, bao gồm upstream JSON không đúng định dạng và từ chối giải quyết; các lần thử vẫn giữ trạng thái tiêu đề upstream của chúng. Bộ đếm định tuyến bí danh bao gồm tất cả các ứng viên. Responses duy trì các kích thước tương tác giống như Chat Completions.
+
+- Vòng đời yêu cầu và thử, kết quả thử lại cục bộ và cách ly quyền sở hữu.
+- DTO truy vấn an toàn, lịch sử vô hiệu, có giới hạn và bằng chứng nhà cung cấp đã được khử trùng.
+- Việc ghi và lưu giữ chẩn đoán không bao giờ thay đổi trạng thái ví hoặc sổ cái.
+- Quá trình theo dõi biên dịch và chạy mà không cần lưu trữ thanh toán.
+- Áp dụng cả hai lần di chuyển theo thứ tự, bảo tồn các hàng lịch sử và kế toán ổn định.
+- HTTP route thực với PGlite, bộ hồi quy thanh toán, workspace kiểm tra kiểu dữ liệu và lint.
+- Việc triển khai sản xuất và lưu lượng trực tiếp nhà cung cấp vẫn chưa được xác minh.

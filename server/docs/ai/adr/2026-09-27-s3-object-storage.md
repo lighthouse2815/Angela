@@ -1,27 +1,28 @@
-# Optional S3 object storage for the API
+<a id="optional-s3-object-storage-for-the-api"></a>
 
-Status: proposed
+# Bộ lưu trữ đối tượng S3 tùy chọn cho API
 
-## Decision
+Tình trạng: đề xuất
 
-Add an optional, bucket-scoped S3 adapter to the API. Use the official AWS SDK selected in the earlier attachment work (#2636).
-The adapter owns object transport and short-lived URL signatures. Domain services own keys, authorization, metadata, and upload completion rules.
-The application owns one client and destroys its connections at shutdown. Missing configuration disables storage. Partial configuration fails startup.
+<a id="decision"></a>
 
-## Scope
+## Phán quyết
 
-Support server uploads, streamed downloads, HEAD, deletion, and presigned PUT/GET URLs.
-Support custom endpoints and optional path-style requests for services such as MinIO.
-Use the AWS default credential chain, including standard AWS environment variables and IAM roles. Do not define separate S3 credential variables.
-Use explicit region configuration when storage is enabled. Signed URLs have a fixed 900-second lifetime.
+Thêm bộ điều hợp S3 tùy chọn, trong phạm vi bucket vào API. Sử dụng AWS SDK chính thức được chọn trong tác phẩm đính kèm trước đó (#2636). Bộ điều hợp sở hữu đối tượng transport và chữ ký URL tồn tại trong thời gian ngắn. Dịch vụ miền sở hữu khóa, ủy quyền, siêu dữ liệu và quy tắc hoàn tất tải lên. Ứng dụng sở hữu một máy khách và hủy kết nối của nó khi tắt máy. Thiếu cấu hình sẽ vô hiệu hóa việc lưu trữ. Cấu hình một phần không khởi động được.
+
+<a id="scope"></a>
+
+## Phạm vi
+
+Hỗ trợ tải lên máy chủ, tải xuống trực tuyến, HEAD, xóa và URL PUT/GET được chỉ định. Hỗ trợ các điểm cuối tùy chỉnh và các yêu cầu kiểu đường dẫn tùy chọn cho các dịch vụ như MinIO. Sử dụng chuỗi thông tin xác thực mặc định AWS, bao gồm các biến môi trường AWS tiêu chuẩn và vai trò IAM. Không xác định các biến thông tin xác thực S3 riêng biệt. Sử dụng cấu hình vùng rõ ràng khi bật bộ nhớ. Các URL đã ký có thời gian tồn tại cố định là 900 giây.
 
 ## Non-goals
 
-This PR adds no public HTTP endpoints, attachment tables, cloud-sync protocol changes, or bucket provisioning.
-It is independent of #2636. That PR can use this adapter in a later change.
-Domain callers must authorize requests before signing URLs. Signed URLs are temporary bearer credentials and must not enter durable records or logs.
+PR này không thêm điểm cuối HTTP công khai, bảng đính kèm, thay đổi giao thức đồng bộ hóa đám mây hoặc cung cấp bucket. Nó độc lập với #2636. PR đó có thể sử dụng bộ chuyển đổi này trong lần thay đổi sau. Người gọi tên miền phải ủy quyền các yêu cầu trước khi ký URL. URL đã ký là thông tin xác thực mang tính tạm thời và không được nhập các hồ sơ hoặc nhật ký lâu dài.
 
-## Modules
+<a id="modules"></a>
+
+## Mô-đun
 
 ```mermaid
 flowchart LR
@@ -43,7 +44,9 @@ server/apps/api/
 └── README.md                             # Documents deployment and callers
 ```
 
-## Behavior
+<a id="behavior"></a>
+
+## Hành vi
 
 ```mermaid
 sequenceDiagram
@@ -70,17 +73,16 @@ sequenceDiagram
   end
 ```
 
-GET returns the SDK stream. Its caller must consume or destroy the stream to release the connection.
-Storage errors propagate to domain callers. The adapter does not convert failed reads to empty objects.
-Shutdown follows the existing application lifecycle. Callers must stop requests and consume streams before client disposal.
-The adapter preserves object keys exactly and never derives them from untrusted HTTP paths.
+GET trả về luồng SDK. Người gọi nó phải sử dụng hoặc hủy luồng để giải phóng kết nối. Lỗi lưu trữ lan truyền đến người gọi tên miền. Bộ điều hợp không chuyển đổi các lần đọc thất bại thành các đối tượng trống. Tắt máy tuân theo vòng đời ứng dụng hiện có. Người gọi phải dừng yêu cầu và sử dụng luồng trước khi xử lý ứng dụng khách. Bộ điều hợp bảo toàn chính xác các khóa đối tượng và không bao giờ lấy chúng từ các đường dẫn HTTP không đáng tin cậy.
 
-## Test plan
+<a id="test-plan"></a>
 
-- Validate disabled, complete, and incomplete configuration and endpoints.
-- Verify signing through standard AWS environment credentials, including session tokens, with a fixed 900-second expiry.
-- Exercise actual SDK signing with deterministic test credentials and verify signed headers and addressing modes.
-- Exercise object requests through a local HTTP server and verify bytes, metadata, errors, and stream consumption.
-- Exercise a disposable MinIO bucket, including direct uploads and rejection of changed signed headers.
-- Run API typecheck, repository typecheck, and repository lint.
-- Production credentials, bucket permissions, and browser CORS require deployment-specific verification.
+## kế hoạch kiểm tra
+
+- Xác thực cấu hình và điểm cuối bị vô hiệu hóa, hoàn chỉnh và không đầy đủ.
+- Xác minh việc đăng nhập thông qua thông tin đăng nhập môi trường AWS tiêu chuẩn, bao gồm cả phiên token, với thời gian hết hạn cố định là 900 giây.
+- Thực hiện việc ký SDK thực tế bằng thông tin xác thực kiểm tra xác định và xác minh các tiêu đề cũng như chế độ địa chỉ đã ký.
+- Thực hiện các yêu cầu đối tượng thông qua máy chủ HTTP cục bộ và xác minh byte, siêu dữ liệu, lỗi và mức tiêu thụ luồng.
+- Thực hiện MinIO bucket dùng một lần, bao gồm tải lên trực tiếp và từ chối các tiêu đề đã ký đã thay đổi.
+- Chạy API kiểm tra kiểu dữ liệu, kho lưu trữ kiểm tra kiểu dữ liệu và kho lưu trữ lint.
+- Thông tin xác thực sản xuất, quyền bucket và trình duyệt CORS yêu cầu xác minh cụ thể theo triển khai.

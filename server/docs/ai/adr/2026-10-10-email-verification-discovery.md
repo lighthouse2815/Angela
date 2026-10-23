@@ -1,14 +1,16 @@
-# Email verification in identifier discovery
+<a id="email-verification-in-identifier-discovery"></a>
 
-Status: accepted
+# Xác minh email trong khám phá định danh
 
-`POST /api/auth/check-email` adds `emailVerified` from `user.emailVerified` (false for unknown emails). It is a navigation hint, not authentication; an absent field means unknown status.
-The existing public endpoint and rate limit remain. This exposes verification state alongside account existence; no migration, login bypass, or email delivery change is included.
+Trạng thái: đã chấp nhận
 
-The web sign-in page sends existing unverified users to `/verify-email` before password entry and preserves the OIDC continuation.
-Supported policy: missing verification status keeps the existing login flow during independent deployments. Authentication still enforces verification.
+`POST /api/auth/check-email` thêm `emailVerified` từ `user.emailVerified` (sai đối với các email không xác định). Đó là gợi ý điều hướng, không phải xác thực; một trường vắng mặt có nghĩa là trạng thái không xác định. Điểm cuối công khai hiện tại và giới hạn tốc độ vẫn được giữ nguyên. Điều này cho thấy trạng thái xác minh cùng với sự tồn tại của tài khoản; không bao gồm di chuyển, bỏ qua đăng nhập hoặc thay đổi gửi email.
 
-## Dependencies and affected files
+Trang đăng nhập web gửi người dùng hiện tại chưa được xác minh tới `/verify-email` trước khi nhập mật khẩu và duy trì sự tiếp tục của OIDC. Chính sách được hỗ trợ: trạng thái xác minh bị thiếu sẽ duy trì luồng đăng nhập hiện có trong quá trình triển khai độc lập. Xác thực vẫn thực thi xác minh.
+
+<a id="dependencies-and-affected-files"></a>
+
+## Các phần phụ thuộc và các tập tin bị ảnh hưởng
 
 ```mermaid
 flowchart LR
@@ -24,7 +26,9 @@ server/
 ../dev-in-future/apps/ui-server-auth/src/{modules/email-password.ts,pages/sign-in.vue}
 ```
 
-## Flow and verification
+<a id="flow-and-verification"></a>
+
+## Luồng và xác minh
 
 ```mermaid
 sequenceDiagram
@@ -33,4 +37,4 @@ sequenceDiagram
   AuthAPI-->>Client: exists, hasPassword, emailVerified
 ```
 
-Route tests cover unknown users, both verification states, credential presence, and invalid input. Deploy the service first; older clients ignore the added field. Password authentication remains authoritative. A Valibot response schema rejects malformed adapter output with a generic 500 error before serialization.
+Các thử nghiệm route bao gồm những người dùng không xác định, cả trạng thái xác minh, sự hiện diện thông tin xác thực và đầu vào không hợp lệ. Triển khai dịch vụ trước; khách hàng cũ bỏ qua trường được thêm vào. Xác thực mật khẩu vẫn có thẩm quyền. Lược đồ phản hồi Valibot từ chối đầu ra bộ điều hợp không đúng định dạng với lỗi chung 500 trước khi tuần tự hóa.

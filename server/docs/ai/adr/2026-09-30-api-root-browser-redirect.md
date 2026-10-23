@@ -1,24 +1,26 @@
-# API root browser redirect
+<a id="api-root-browser-redirect"></a>
 
-Status: accepted
+# Chuyển hướng trình duyệt gốc API
 
-## Decision
+Trạng thái: đã chấp nhận
 
-Browser GET and HEAD requests to the API root redirect to the configured `WEB_APP_URL` with status 302.
-The request must explicitly accept `text/html` with positive quality. Hono parses the media ranges; other clients retain the JSON service identity.
-The response varies by `Accept`. The existing no-store policy remains active.
-The target comes from server configuration, never from the request. Request queries are not forwarded.
+<a id="decision"></a>
 
-## Scope
+## Phán quyết
 
-An email verification link with `callbackURL=/` returns the browser to the API root.
-The current root returns JSON, leaving the user outside the product.
-This change defines the API root as a product entry point for browser visitors.
+Trình duyệt GET và HEAD yêu cầu chuyển hướng gốc API sang `WEB_APP_URL` đã định cấu hình với trạng thái 302. Yêu cầu phải chấp nhận rõ ràng `text/html` với chất lượng tích cực. Hono phân tích phạm vi phương tiện; các khách hàng khác giữ lại danh tính dịch vụ JSON. Phản hồi thay đổi tùy theo `Accept`. Chính sách no-store hiện tại vẫn hoạt động. Mục tiêu đến từ cấu hình máy chủ, không bao giờ đến từ yêu cầu. Truy vấn yêu cầu không được chuyển tiếp.
 
-Non-goals: email token handling, authentication callbacks, OIDC state, account mutations, and other API routes.
-The redirect does not establish or confirm a login session or email verification status.
+<a id="scope"></a>
 
-## Module dependencies
+## Phạm vi
+
+Liên kết xác minh email với `callbackURL=/` sẽ đưa trình duyệt về gốc API. Root hiện tại trả về JSON, khiến người dùng ở bên ngoài sản phẩm. Thay đổi này xác định gốc API làm điểm truy cập sản phẩm cho khách truy cập trình duyệt.
+
+ngoài phạm vi: xử lý email token, gọi lại xác thực, trạng thái OIDC, tài khoản các thay đổi trạng thái và API route khác. Chuyển hướng không thiết lập hoặc xác nhận phiên đăng nhập hoặc trạng thái xác minh email.
+
+<a id="module-dependencies"></a>
+
+## Phần phụ thuộc của mô-đun
 
 ```mermaid
 graph LR
@@ -27,7 +29,9 @@ graph LR
   Client[JSON client] --> API
 ```
 
-## Affected files
+<a id="affected-files"></a>
+
+## Các tập tin bị ảnh hưởng
 
 ```text
 server/apps/api/src/
@@ -35,7 +39,9 @@ server/apps/api/src/
   app.test.ts
 ```
 
-## Sequence
+<a id="sequence"></a>
+
+## Sự liên tiếp
 
 ```mermaid
 sequenceDiagram
@@ -50,9 +56,8 @@ sequenceDiagram
   Browser->>Product: GET /
 ```
 
-## Test plan
+<a id="test-plan"></a>
 
-Run the API app tests before and after the change.
-Check GET and HEAD redirects, configured destinations without forwarded queries, JSON responses, unknown paths, POST requests, and health routes.
-Run API typecheck, lint, and diff checks.
-Production acceptance requires deployment and a fresh email verification flow.
+## kế hoạch kiểm tra
+
+Chạy thử nghiệm ứng dụng API trước và sau khi thay đổi. Kiểm tra chuyển hướng GET và HEAD, đích được định cấu hình mà không có truy vấn được chuyển tiếp, JSON Responses, đường dẫn không xác định, yêu cầu POST và tình trạng route. Chạy API kiểm tra kiểu dữ liệu, kiểm tra lỗi mã nguồn và lỗi khác. Việc chấp nhận sản xuất yêu cầu triển khai và luồng xác minh email mới.

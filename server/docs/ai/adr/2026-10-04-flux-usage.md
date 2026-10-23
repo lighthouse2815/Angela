@@ -1,19 +1,18 @@
-# Flux usage records and pooled settlement
+<a id="flux-usage-records-and-pooled-settlement"></a>
 
-Status: accepted
+# Hồ sơ sử dụng Flux và giải quyết gộp
 
-## Decision
+Trạng thái: đã chấp nhận
 
-The wallet accepts `postFluxUsage({ userId, source: { type, id }, amountMicroFlux, detail? })`.
-The contract contains no model, turn, attempt, pricing, provider, or pending state.
-`flux_usage` stores one confirmed micro-Flux fee for each source. Rows are append-only.
-`flux_transaction` stores integer balance changes only. Its `pool` column names the bucket that the balance columns describe.
-`user_flux.unsettled_micro_flux` stores the shared outstanding pool.
-`user_flux` also holds a Capacitor that pays before purchased Flux. See [the Capacitor ADR](./2026-10-04-subscription-credits.md).
-One Flux equals 1,000,000 micro-Flux.
-A service puts its own evidence in `detail`. A new service needs a new `source.type` and no new table.
+<a id="decision"></a>
 
-## Boundary
+## Phán quyết
+
+Ví chấp nhận `postFluxUsage({ userId, source: { type, id }, amountMicroFlux, detail? })`. Hợp đồng không chứa mô hình, lượt, lần thử, giá cả, nhà cung cấp hoặc trạng thái chờ xử lý. `flux_usage` store một khoản phí micro-Flux được xác nhận cho mỗi nguồn. Các hàng chỉ được thêm vào. `flux_transaction` store chỉ thay đổi số dư số nguyên. Cột `pool` của nó đặt tên cho bucket mà các cột cân bằng mô tả. `user_flux.unsettled_micro_flux` store nhóm nổi bật được chia sẻ. `user_flux` cũng có Capacitor thanh toán trước khi mua Flux. Xem [the Capacitor ADR](./2026-10-04-subscription-credits.md). Một Flux bằng 1.000.000 micro-Flux. Một dịch vụ đưa bằng chứng của riêng mình vào `detail`. Một dịch vụ mới cần `source.type` mới và không có bảng mới.
+
+<a id="boundary"></a>
+
+## ranh giới
 
 ```text
 llm_request_attempt -> llm_request_log        evidence about what the provider did
@@ -26,40 +25,33 @@ llm_request_attempt -> llm_request_log        evidence about what the provider d
                        flux_transaction       integer balance changes
 ```
 
-The request log keeps the provider cost and never converts it to Flux.
-Billing converts a confirmed cost to micro-Flux with the price from the authorized policy.
-Billing does not read the request log. The route gives it the usage in memory.
-A failed log write cannot block billing. A failed billing write cannot block the log.
+Nhật ký yêu cầu giữ giá nhà cung cấp và không bao giờ chuyển đổi nó thành Flux. Thanh toán chuyển đổi chi phí đã xác nhận thành micro-Flux với giá từ chính sách được ủy quyền. Thanh toán không đọc nhật ký yêu cầu. route cung cấp cho nó khả năng sử dụng trong bộ nhớ. Việc ghi nhật ký không thành công không thể chặn việc thanh toán. Việc ghi hóa đơn không thành công không thể chặn nhật ký.
 
-## Scope
+<a id="scope"></a>
 
-Add `flux_usage` and `user_flux.unsettled_micro_flux`.
-Stop writing `llm_request_settlement`.
-Remove Redis speech character counters. Remove `FluxMeter`.
-LLM and speech billing post through the same command.
-Credits settle affordable outstanding fees. Admin adjustments preserve outstanding fees.
+## Phạm vi
+
+Thêm `flux_usage` và `user_flux.unsettled_micro_flux`. Dừng viết `llm_request_settlement`. Loại bỏ bộ đếm ký tự lời nói của Redis. Loại bỏ `FluxMeter`. LLM và bài phát biểu thanh toán thông qua cùng một lệnh. credit giải quyết các khoản phí còn tồn đọng phải chăng. Các điều chỉnh của quản trị viên sẽ bảo toàn các khoản phí chưa thanh toán.
 
 ## Non-goals
 
-Admission reservations, automatic reconciliation of unbilled requests, refunds, and historical repricing.
+Đặt trước vé vào cửa, tự động đối chiếu các yêu cầu chưa được lập hóa đơn, hoàn tiền và định giá lại lịch sử.
 
-## Invariants
+<a id="invariants"></a>
 
-Source identity is unique per wallet, including zero amounts.
-A duplicate source with a different amount fails. An identical replay never posts twice.
-One transaction writes the usage record, the integer debit, and the wallet snapshot.
-A debit reduces the pool by its integer amount times 1,000,000.
-The sum of all fees equals debited Flux times 1,000,000 plus the outstanding pool.
-Accounting does not depend on the request log. Replay reads only `flux_usage`.
+## Bất biến
 
-## Unbilled requests
+Danh tính nguồn là duy nhất cho mỗi ví, bao gồm số tiền bằng 0. Một nguồn trùng lặp với số lượng khác nhau không thành công. Một bản phát lại giống hệt nhau không bao giờ đăng hai lần. Một giao dịch ghi lại bản ghi sử dụng, ghi nợ số nguyên và ảnh chụp nhanh ví. Một khoản ghi nợ làm giảm nhóm theo số nguyên của nó nhân với 1.000.000. Tổng của tất cả các khoản phí bằng Flux được ghi nợ nhân với 1.000.000 cộng với số tiền chưa thanh toán. Kế toán không phụ thuộc vào nhật ký yêu cầu. Phát lại chỉ đọc `flux_usage`.
 
-A cost that is unknown posts no fee. The request log keeps the evidence.
-A request with a log row and no `flux_usage` row is unbilled.
-Join the two tables on the request ID to find these requests.
-The unknown cost is not priced later with the original price. Reconciliation uses the price at that time.
+<a id="unbilled-requests"></a>
 
-## Module graph
+## Yêu cầu chưa được thanh toán
+
+Một chi phí không xác định được đăng bài miễn phí. Nhật ký yêu cầu giữ bằng chứng. Yêu cầu có hàng nhật ký và không có hàng `flux_usage` sẽ không được lập hóa đơn. Nối hai bảng theo yêu cầu ID để tìm các yêu cầu này. Chi phí chưa biết sẽ không được định giá sau này bằng giá gốc. Hòa giải sử dụng giá tại thời điểm đó.
+
+<a id="module-graph"></a>
+
+## Biểu đồ mô-đun
 
 ```mermaid
 flowchart LR
@@ -71,7 +63,9 @@ flowchart LR
   Billing -->|after commit| Cache[Redis invalidation]
 ```
 
-## Affected files
+<a id="affected-files"></a>
+
+## Các tập tin bị ảnh hưởng
 
 ```text
 server/apps/api/
@@ -83,7 +77,9 @@ server/apps/api/
   src/app.ts
 ```
 
-## Posting sequence
+<a id="posting-sequence"></a>
+
+## Trình tự đăng bài
 
 ```mermaid
 sequenceDiagram
@@ -108,23 +104,14 @@ sequenceDiagram
   end
 ```
 
-## Migration and rollout
+<a id="migration-and-rollout"></a>
 
-Migration 0028 creates `flux_usage` and adds `user_flux.unsettled_micro_flux`.
-It does not change `flux_transaction` or `llm_request_settlement`. Historical rows stay as they are.
-Migration 0030 drops `llm_request_settlement` and `llm_request_log.flux_consumed`.
-The ledger column `flux_transaction.settlement_id` keeps its value. It no longer links to a row.
-Export the historical settlements before migration 0030 runs. The drop cannot be reversed.
-The request log no longer stores a Flux amount. The `flux_consumed` metric and span attribute report the fee in Flux.
-The API applies the migration at startup.
-Stop old API writers before the new version starts. Mixed old and new writers are unsupported.
-Redis speech counters are not imported. The old meter forgave a residual of less than one Flux per user.
-No production migration or deployment runs in this task.
+## Di chuyển và triển khai
 
-## Verification
+Migration 0028 tạo `flux_usage` và thêm `user_flux.unsettled_micro_flux`. Migration không thay đổi `flux_transaction` hoặc `llm_request_settlement`. Các bản ghi lịch sử được giữ nguyên. Migration 0030 xóa `llm_request_settlement` và `llm_request_log.flux_consumed`. Cột sổ cái `flux_transaction.settlement_id` giữ giá trị nhưng không còn liên kết đến bản ghi. Xuất dữ liệu quyết toán lịch sử trước khi chạy migration 0030. Không thể đảo ngược thao tác xóa. Nhật ký yêu cầu không còn lưu số Flux. Chỉ số và thuộc tính span `flux_consumed` báo phí bằng Flux. API áp dụng migration khi khởi động. Dừng các tiến trình API ghi dữ liệu cũ trước khi chạy phiên bản mới. Không hỗ trợ chạy đồng thời tiến trình ghi cũ và mới. Không nhập bộ đếm giọng nói Redis. Cơ chế tính phí cũ bỏ qua phần dư dưới một Flux cho mỗi người dùng. Tác vụ này không chạy migration hoặc triển khai trên môi trường production.
 
-Run service tests and the full API test suite.
-Run the concurrency test against a local PostgreSQL database with many connections and duplicate events.
-Run the migration test with the actual SQL files. It checks that historical rows are unchanged.
-Check the conservation invariant after mixed LLM, speech, credit, and admin operations.
-Run the API typecheck and root lint.
+<a id="verification"></a>
+
+## Xác minh
+
+Chạy thử nghiệm dịch vụ và bộ thử nghiệm API đầy đủ. Chạy thử nghiệm đồng thời dựa trên cơ sở dữ liệu PostgreSQL cục bộ có nhiều kết nối và sự kiện trùng lặp. Chạy thử nghiệm di chuyển với các tệp SQL thực tế. Nó kiểm tra xem các hàng lịch sử có thay đổi không. Kiểm tra tính bất biến bảo toàn sau các hoạt động hỗn hợp LLM, lời nói, credit và quản trị viên. Chạy API kiểm tra kiểu dữ liệu và root lint.

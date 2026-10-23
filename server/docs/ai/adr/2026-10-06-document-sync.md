@@ -1,151 +1,141 @@
-# Document synchronization by field
+<a id="document-synchronization-by-field"></a>
 
-Status: accepted
+# Đồng bộ hóa tài liệu theo trường
 
-## Context
+Trạng thái: đã chấp nhận
 
-A client keeps its character cards in local storage. A card does not reach the other devices of the user.
-Chat synchronization stores the local card id in each chat member.
-A second device receives the chats but has no card with that id.
-Other client data has the same need, so the conflict rules must be reusable.
-A shared table for all features does not fit. Each feature has its own limits, indexes, retention, and validation.
+<a id="context"></a>
 
-## Decision
+## Bối cảnh
 
-The server and the client share an algorithm, not a table.
-Each feature owns its tables and its routes. The server provides a store that works on the tables of any feature.
+Một khách hàng giữ thẻ nhân vật của mình trong bộ nhớ cục bộ. Thẻ không đến được các thiết bị khác của người dùng. Đồng bộ hóa trò chuyện store id thẻ cục bộ trong mỗi thành viên trò chuyện. Thiết bị thứ hai nhận được cuộc trò chuyện nhưng không có thẻ có id đó. Dữ liệu khách hàng khác có cùng nhu cầu, vì vậy các quy tắc xung đột phải có thể tái sử dụng được. Một bảng chia sẻ cho tất cả các tính năng không phù hợp. Mỗi tính năng có giới hạn, chỉ mục, lưu giữ và xác thực riêng.
 
-A document is a set of independent fields. The client mints the document id, and the server keeps it.
-The client of a feature selects its fields. The store does not read field keys or values.
-The feature validates the content before the store writes it.
+<a id="decision"></a>
 
-Each document has a `revision` counter. An accepted write increases it.
-A field table only appends rows. Each row is the value that a field had at one revision.
-A `null` value means that the revision removed the field. The current value of a field is its row with the highest revision.
-A push gives a `baseRevision` for each field. The store accepts the field if the stored revision of the current value is equal.
-The store accepts the other fields of the same push. It returns the keys that it did not accept.
-Devices that change different fields of one document do not conflict.
+## Phán quyết
 
-Because the field table keeps every past row, the store can also answer "what did this document look like at revision N" and "what changed at each revision". A feature turns this on by passing `history` limits to `createFieldSyncStore`. The store prunes old rows after every accepted write, inside the same transaction, so a feature needs no background job.
+Máy chủ và máy khách chia sẻ một thuật toán chứ không phải một bảng. Mỗi tính năng sở hữu các bảng và route của nó. Máy chủ cung cấp store hoạt động trên các bảng của bất kỳ tính năng nào.
 
-The design does not use a CRDT. A value is a selection or a full text, and a merge of two texts gives a result that no user wrote.
+Một tài liệu là một tập hợp các trường độc lập. Máy khách tạo id tài liệu và máy chủ giữ nó. Máy khách của một tính năng chọn các trường của nó. store không đọc khóa hoặc giá trị trường. Tính năng này xác thực nội dung trước khi store ghi nội dung đó.
 
-## Server modules
+Mỗi tài liệu có một bộ đếm `revision`. Một bài viết được chấp nhận sẽ làm tăng nó. Bảng trường chỉ nối thêm các hàng. Mỗi hàng là giá trị mà một trường có trong một lần sửa đổi. Giá trị `null` có nghĩa là bản sửa đổi đã xóa trường này. Giá trị hiện tại của một trường là hàng có phiên bản cao nhất. Một lần đẩy sẽ mang lại `baseRevision` cho mỗi trường. store chấp nhận trường nếu bản sửa đổi được lưu trữ của giá trị hiện tại bằng nhau. store chấp nhận các trường khác của cùng một lần đẩy. Nó trả về các khóa mà nó không chấp nhận. Các thiết bị thay đổi các trường khác nhau của một tài liệu sẽ không xung đột.
 
-| Module | Owner | Responsibility |
+Vì bảng trường giữ mọi hàng trước đây nên store cũng có thể trả lời "tài liệu này trông như thế nào ở bản sửa đổi N" và "điều gì đã thay đổi ở mỗi bản sửa đổi". Một tính năng bật tính năng này bằng cách chuyển giới hạn `history` sang `createFieldSyncStore`. store cắt bớt các hàng cũ sau mỗi lần ghi được chấp nhận, trong cùng một giao dịch, do đó, một tính năng không cần tác vụ nền.
+
+Thiết kế không sử dụng CRDT. Giá trị là một lựa chọn hoặc một văn bản đầy đủ và việc hợp nhất hai văn bản sẽ cho kết quả mà không có người dùng nào viết.
+
+<a id="server-modules"></a>
+
+## Mô-đun máy chủ
+
+| Mô-đun | Chủ sở hữu | Trách nhiệm |
 | --- | --- | --- |
-| `FieldSyncTables` | Shared | A type that lists the columns the store needs. The compiler rejects a table that misses one. |
-| `createFieldSyncStore(db, tables, { validate, limits, history })` | Shared | Locks a document, compares revisions, appends the accepted fields, keeps deletion markers, prunes history, answers `history` and `snapshot`, and removes the content of a deleted account. |
-| `parseDocumentId`, `parsePushRequest`, `parseDeleteRevision`, `parseHistoryQuery`, `parseRevisionParam` | Shared | Parse the five request shapes. |
-| Tables, service, routes, and `validate` of a feature | Feature | Declare the two tables by hand in its own schema file. Choose the route, the extra columns and tables, the limits, the authorization, and every rule about the content. |
+| `FieldSyncTables` | Đã chia sẻ | Loại liệt kê các cột mà store cần. Trình biên dịch từ chối một bảng bị thiếu. |
+| `createFieldSyncStore(db, tables, { validate, limits, history })` | Đã chia sẻ | Khóa tài liệu, so sánh các bản sửa đổi, nối thêm các trường được chấp nhận, giữ lại các điểm đánh dấu xóa, cắt bớt lịch sử, trả lời `history` và `snapshot`, đồng thời xóa nội dung của tài khoản đã xóa. |
+| `parseDocumentId`, `parsePushRequest`, `parseDeleteRevision`, `parseHistoryQuery`, `parseRevisionParam` | Đã chia sẻ | Phân tích năm hình dạng yêu cầu. |
+| Bảng, dịch vụ, route và `validate` của một tính năng | Tính năng | Khai báo hai bảng bằng tay trong tệp lược đồ riêng của nó. Chọn route, các cột và bảng bổ sung, giới hạn, ủy quyền và mọi quy tắc về nội dung. |
 
-A feature composes the store in its own route. The store gives no routes and no hooks other than `validate`.
-A feature can add other routes to the same path, for example a signed upload address for a file.
+Một tính năng tạo nên store trong route của chính nó. store không cung cấp route và không có các hook nào khác ngoài `validate`. Một tính năng có thể thêm route khác vào cùng một đường dẫn, ví dụ: địa chỉ tải lên đã ký cho một tệp.
 
-A feature can add columns and indexes to its tables. An added column must accept `null` or have a default.
-The store inserts a document row with only the two key columns, and the compiler does not catch a required column.
-For a required value, the feature uses a field, or another table with the key `(ownerId, documentId)`.
+Một tính năng có thể thêm cột và chỉ mục vào bảng của nó. Cột được thêm phải chấp nhận `null` hoặc có giá trị mặc định. store chèn một hàng tài liệu chỉ có hai cột chính và trình biên dịch không bắt được cột bắt buộc. Đối với giá trị bắt buộc, tính năng này sử dụng một trường hoặc bảng khác có khóa `(ownerId, documentId)`.
 
-## Conflict rules
+<a id="conflict-rules"></a>
 
-| Case | Result |
+## Quy tắc xung đột
+
+| Trường hợp | Kết quả |
 | --- | --- |
-| One side changed a field | That change applies. |
-| Both sides changed a field to the same value | No write. |
-| Both sides changed a field to different values | The remote value applies. The client keeps the local document as a new document. |
-| One side deleted the document, and the other side edited it | The edit applies, and the document stays. |
-| A document that each device creates with the same id | The device sends only the parts that differ from the built-in content, so an unedited document sends nothing. The other devices lay the received parts over their own built-in content. The conflict rules apply to the parts that both sides edited. |
+| Một bên thay đổi một lĩnh vực | Sự thay đổi đó được áp dụng. |
+| Cả hai bên đều thay đổi một trường thành cùng một giá trị | Không viết. |
+| Cả hai bên đã thay đổi một trường thành các giá trị khác nhau | Giá trị từ xa được áp dụng. Máy khách giữ tài liệu cục bộ như một tài liệu mới. |
+| Một bên xóa tài liệu, một bên chỉnh sửa | Việc chỉnh sửa được áp dụng và tài liệu vẫn được giữ nguyên. |
+| Một tài liệu mà mỗi thiết bị tạo có cùng id | Thiết bị chỉ gửi những phần khác với nội dung cài sẵn nên tài liệu chưa chỉnh sửa sẽ không gửi gì cả. Các thiết bị khác đặt các phần nhận được lên trên nội dung tích hợp sẵn của chúng. Quy tắc xung đột áp dụng cho những phần mà cả hai bên đã chỉnh sửa. |
 
-## Character cards
+<a id="character-cards"></a>
 
-The tables are `character_cards` and `character_cards_fields`. The route is `/api/v1/character-cards`.
-A field key is an RFC 6901 JSON Pointer into the card. The service rejects a key that does not start with `/`.
-The client makes one field for each first-level key of the card.
-It also makes one field for each key of `extensions`, `extensions.airi`, and `extensions.airi.modules`.
-The settings of one module stay in one field, so a provider and its voice change together.
-A card stores provider ids and no credentials.
-The selected card is not synchronized. Each device keeps its own selection.
-The `default` card is built in. Each device creates it in its own language, so a part that equals the built-in card never leaves the device. The device lays the received parts over its own built-in card.
-The service accepts a field when its key is a JSON Pointer. For the keys that the client reads without a further check, such as `/name`, `/tags`, and `/extensions/airi/wakeWords`, the value must also have the expected type. A value of another type would make the card fail on every device. Other keys accept any JSON, because cards from other applications carry their own extensions.
-A device that cannot read a card keeps the cards that it can read and does not delete the server copy of the unreadable card.
-An account can store 200 cards and 16 MiB of field values. A deleted card does not count. The limits come from the size of a card, which is a few kilobytes. A card with a large lorebook can reach a few hundred kilobytes.
-The card list shows the cloud state of each card: synced, waiting to upload, or refused by the server. A signed-in user also sees one line that tells that the cards sync to the account. A user without an account sees neither.
-Cloud sync is a client-owned experiment, off by default. The `character-card-sync` entry in `packages/stage-ui/src/libs/feature-flags.ts` is a `local`-availability flag, so the server has no policy for it and the choice never leaves the device. A signed-in user turns it on in Settings > System > Experimental Features. The card list and card detail pages show their cloud state and history UI only while the flag is on.
+## Thẻ nhân vật
 
-## History
+Các bảng là `character_cards` và `character_cards_fields`. route là `/api/v1/character-cards`. Khóa trường là Con trỏ RFC 6901 JSON vào thẻ. Dịch vụ từ chối khóa không bắt đầu bằng `/`. Khách hàng tạo một trường cho mỗi khóa cấp một của thẻ. Nó cũng tạo một trường cho mỗi khóa của `extensions`, `extensions.airi` và `extensions.airi.modules`. Cài đặt của một mô-đun nằm trong một trường, do đó nhà cung cấp và giọng nói của nó sẽ thay đổi cùng nhau. Thẻ store nhà cung cấp có id và không có thông tin xác thực. Thẻ đã chọn chưa được đồng bộ hóa. Mỗi thiết bị giữ lựa chọn riêng của mình. Thẻ `default` được tích hợp sẵn. Mỗi thiết bị tạo ra nó bằng ngôn ngữ riêng nên một phần tương đương với thẻ tích hợp sẽ không bao giờ rời khỏi thiết bị. Thiết bị đặt các bộ phận nhận được lên thẻ tích hợp của chính nó. Dịch vụ chấp nhận một trường khi khóa của nó là Con trỏ JSON. Đối với các khóa mà khách hàng đọc mà không cần kiểm tra thêm, chẳng hạn như `/name`, `/tags` và `/extensions/airi/wakeWords`, giá trị cũng phải có loại dự kiến. Giá trị thuộc loại khác sẽ khiến thẻ bị lỗi trên mọi thiết bị. Các khóa khác chấp nhận mọi JSON vì thẻ từ các ứng dụng khác có phần mở rộng riêng. Thiết bị không thể đọc được thẻ sẽ giữ lại những thẻ có thể đọc được và không xóa bản sao máy chủ của thẻ không đọc được. Một tài khoản có thể store 200 thẻ và 16 giá trị trường MiB. Thẻ bị xóa không được tính. Các giới hạn đến từ kích thước của thẻ, tức là vài kilobyte. Một thẻ có sách truyền thuyết lớn có thể đạt tới vài trăm kilobyte. Danh sách thẻ hiển thị trạng thái đám mây của từng thẻ: đã đồng bộ hóa, đang chờ tải lên hoặc bị máy chủ từ chối. Người dùng đã đăng nhập cũng nhìn thấy một dòng cho biết thẻ sẽ đồng bộ hóa với tài khoản. Người dùng không có tài khoản sẽ không thấy. Đồng bộ hóa đám mây là một thử nghiệm do khách hàng sở hữu, được tắt theo mặc định. Mục `character-card-sync` trong `packages/stage-ui/src/libs/feature-flags.ts` là cờ sẵn có `local`, do đó máy chủ không có chính sách nào cho nó và lựa chọn không bao giờ rời khỏi thiết bị. Người dùng đã đăng nhập sẽ bật tính năng này trong Cài đặt > Hệ thống > Tính năng thử nghiệm. Danh sách thẻ và trang chi tiết thẻ chỉ hiển thị trạng thái đám mây và lịch sử UI khi cờ đang bật.
 
-Cloud sync has no per-card switch, only the one account-wide experiment flag above, so history is still the user's way back from an unwanted overwrite or a conflict once sync is on. `createCharacterCardService` passes a `history` option to the store:
+<a id="history"></a>
 
-| Setting | Value | Reason |
+## Lịch sử
+
+Đồng bộ hóa đám mây không có nút chuyển đổi trên mỗi thẻ, chỉ có cờ thử nghiệm trên toàn tài khoản ở trên, vì vậy, lịch sử vẫn là cách giúp người dùng quay trở lại khỏi tình trạng ghi đè không mong muốn hoặc xung đột sau khi đồng bộ hóa được bật. `createCharacterCardService` chuyển tùy chọn `history` cho store:
+
+| Cài đặt | Giá trị | Lý do |
 | --- | --- | --- |
-| Revisions kept per field key | 100 | No usage data exists. The number is a round guess, not a measured need. |
-| Deleted card retention | 30 days | Gives a user time to notice a deletion and undo it. |
-| Account history byte cap | 64 MiB | Bounds one account's total storage, current content and history together. |
+| Các bản sửa đổi được lưu giữ trên mỗi khóa trường | 100 | Không có dữ liệu sử dụng tồn tại. Con số này chỉ là phỏng đoán tròn trịa chứ không phải là nhu cầu đo lường được. |
+| Lưu giữ thẻ đã xóa | 30 ngày | Cung cấp cho người dùng thời gian để thông báo việc xóa và hoàn tác việc đó. |
+| Giới hạn byte lịch sử tài khoản | 64 MiB | Liên kết tổng dung lượng lưu trữ, nội dung hiện tại và lịch sử của một tài khoản với nhau. |
 
-After every accepted push or deletion, inside the same transaction, the store:
+Sau mỗi lần đẩy hoặc xóa được chấp nhận, trong cùng một giao dịch, store:
 
-1. Collapses each field key's rows older than `revision - 100` into one row: the latest one at or below that cutoff, and only if it has a value. A key whose latest row there is a removal keeps nothing, because the key did not exist going forward from that point. This baseline keeps `snapshot` correct for the oldest revision the retention window still promises, even though an exact revision between the window and the baseline is not guaranteed to reconstruct every key.
-2. Removes the field rows of a document that has stayed deleted for more than 30 days. The document row itself, the deletion marker, stays.
-3. If the account's total field-row bytes exceed the cap, removes the oldest rows first, oldest revision first. The current value of a field never counts as removable, so a push never fails because of this cap, it only loses older history.
+1. Thu gọn các hàng của mỗi khóa trường cũ hơn `revision - 100` thành một hàng: hàng mới nhất ở hoặc dưới ngưỡng đó và chỉ khi nó có giá trị. Khóa có hàng mới nhất bị xóa sẽ không giữ được gì vì khóa đó không tồn tại kể từ thời điểm đó. Đường cơ sở này giữ cho `snapshot` chính xác đối với bản sửa đổi cũ nhất mà khoảng thời gian lưu giữ vẫn hứa hẹn, mặc dù bản sửa đổi chính xác giữa cửa sổ và đường cơ sở không đảm bảo sẽ tái tạo lại mọi khóa.
+2. Xóa các hàng trường của tài liệu đã bị xóa hơn 30 ngày. Bản thân hàng tài liệu, điểm đánh dấu xóa, vẫn giữ nguyên.
+3. Nếu tổng số byte hàng trường của tài khoản vượt quá giới hạn, trước tiên hãy xóa các hàng cũ nhất, bản sửa đổi cũ nhất trước. Giá trị hiện tại của một trường không bao giờ được tính là có thể xóa được, do đó, việc đẩy không bao giờ thất bại do giới hạn này, nó chỉ làm mất lịch sử cũ hơn.
 
-`history(ownerId, documentId, { before, limit })` lists past revisions, newest first, each with the keys it changed and the keys it removed.
-`snapshot(ownerId, documentId, revision)` returns the content of the document at that revision. It returns `null` when the document does not exist, the revision is newer than the document's current revision, or the retention rules above already removed that revision.
+`history(ownerId, documentId, { before, limit })` liệt kê các bản sửa đổi trước đây, bản mới nhất trước tiên, mỗi bản có các khóa mà nó đã thay đổi và các khóa mà nó đã xóa. `snapshot(ownerId, documentId, revision)` trả về nội dung của tài liệu tại lần sửa đổi đó. Nó trả về `null` khi tài liệu không tồn tại, bản sửa đổi mới hơn bản sửa đổi hiện tại của tài liệu hoặc các quy tắc lưu giữ ở trên đã xóa bản sửa đổi đó.
 
-A deleted field never takes part in a conflict check. Its stored revision in a history row has no effect on `baseRevision` comparisons, the same as before this change: a removed field is absent from the current state, so a push against it always starts from revision zero.
+Trường đã xóa không bao giờ tham gia kiểm tra xung đột. Bản sửa đổi được lưu trữ của nó trong một hàng lịch sử không ảnh hưởng đến các so sánh `baseRevision`, giống như trước khi thay đổi này: trường đã xóa không có ở trạng thái hiện tại, do đó, việc đẩy lùi trường đó luôn bắt đầu từ bản sửa đổi 0.
 
-## Scope
+<a id="scope"></a>
 
-- The shared store, the table contract, and the request parsers.
-- The character card tables, service, and routes.
-- Account deletion removes the card content and keeps the deletion markers.
-- A client module that compares, merges, and sends documents for any route of this shape.
-- The client runs after sign-in, after a card change, and when a window becomes visible. The `airi-card` store owns the runs, as the provider and chat stores own theirs. The synchronization leader executes one run at a time.
-- Before each request, a run checks that the account has not changed. A request reads the token when it starts, so an account change would otherwise send the documents of the old account to the new account.
+## Phạm vi
 
-## Known limits
+- store được chia sẻ, hợp đồng bảng và trình phân tích cú pháp yêu cầu.
+- Các bảng thẻ nhân vật, dịch vụ và route.
+- Xóa tài khoản sẽ xóa nội dung thẻ và giữ lại dấu xóa.
+- Một mô-đun máy khách so sánh, hợp nhất và gửi tài liệu cho bất kỳ route nào có hình dạng này.
+- Máy khách chạy sau khi đăng nhập, sau khi thay đổi thẻ và khi một cửa sổ hiển thị. `airi-card` store sở hữu các đường chạy, cũng như nhà cung cấp và chat store sở hữu đường chạy của họ. Người lãnh đạo đồng bộ hóa thực hiện một lần chạy tại một thời điểm.
+- Trước mỗi yêu cầu, một lần chạy sẽ kiểm tra xem tài khoản có thay đổi không. Một yêu cầu sẽ đọc token khi nó bắt đầu, do đó, thay đổi tài khoản sẽ gửi tài liệu của tài khoản cũ sang tài khoản mới.
 
-- A field value is plain JSON. A card from another application can carry any content in `extensions`, and the client uploads it so that an imported card keeps its extensions on every device. The client does not filter it. A user must not put a secret in a card.
-- The account deletion removes the content in one transaction. The store has no deletion gate, so a push that is already in flight can write content back before the account is gone. A gate needs a flag that every write checks and that the account deletion sets. That is a separate change.
-- A removed field is absent from the current state, so its base revision is zero again. A device with a field revision of zero has never seen the field, and its new value is a new field. A device that has seen the field sends the old revision, and the server reports a conflict. No sequence of requests lets a device overwrite a revision that it has seen.
-- The server has no rate limit for these routes, and the list is not paginated.
-- A snapshot for a revision below the 100-revision retention window is not guaranteed to reconstruct every key correctly, only the key whose own history happened to collapse to a baseline at or near that point. See [History](#history).
-- There is no conflict review dialog. The existing rule in [Conflict rules](#conflict-rules) still decides the winner, and the losing edit survives only as the client's local copy, because it never reached the server.
+<a id="known-limits"></a>
+
+## Giới hạn đã biết
+
+- Giá trị trường là JSON đơn giản. Thẻ từ một ứng dụng khác có thể mang bất kỳ nội dung nào trong `extensions` và khách hàng tải nội dung đó lên để thẻ đã nhập giữ các tiện ích mở rộng của nó trên mọi thiết bị. Khách hàng không lọc nó. Người dùng không được đặt bí mật vào thẻ.
+- Việc xóa tài khoản sẽ xóa nội dung trong một giao dịch. store không có tính năng xóa cổng kiểm tra, do đó, một cú đẩy đang hoạt động có thể ghi lại nội dung trước khi tài khoản biến mất. cổng kiểm tra cần một cờ mà mỗi lần ghi sẽ kiểm tra và bộ xóa tài khoản. Đó là một sự thay đổi riêng biệt.
+- Trường đã xóa không có ở trạng thái hiện tại, do đó, bản sửa đổi cơ sở của nó lại bằng 0. Một thiết bị có bản sửa đổi trường bằng 0 chưa bao giờ nhìn thấy trường này và giá trị mới của nó là một trường mới. Một thiết bị đã xem trường sẽ gửi bản sửa đổi cũ và máy chủ sẽ báo cáo xung đột. Không có chuỗi yêu cầu nào cho phép thiết bị ghi đè lên bản sửa đổi mà nó đã thấy.
+- Máy chủ không có giới hạn tốc độ cho những route này và danh sách không được phân trang.
+- Ảnh chụp nhanh cho bản sửa đổi bên dưới khoảng thời gian lưu giữ 100 bản sửa đổi không được đảm bảo để tái tạo lại mọi khóa một cách chính xác, chỉ có khóa có lịch sử của chính nó tình cờ thu gọn về đường cơ sở tại hoặc gần điểm đó. Xem [History](#history).
+- Không có hộp thoại xem xét xung đột. Quy tắc hiện có trong [Quy tắc xung đột](#conflict-rules) vẫn quyết định người chiến thắng và bản chỉnh sửa thua chỉ tồn tại dưới dạng bản sao cục bộ của khách hàng vì nó chưa bao giờ đến được máy chủ.
 
 ## Non-goals
 
-- Provider configurations and chat messages. Their current synchronization does not change.
-- Encrypted storage. A feature with secrets needs it first.
-- Display model files. A card synchronizes its `displayModelId` only. A later feature stores the files in object storage and uses this store for their descriptions.
-- Contacts, group chats, and the binding of a chat to a contact.
-- A read-only built-in card. When it exists, the built-in card leaves synchronization and its forks synchronize as ordinary cards.
-- A per-card switch for cloud sync, a server policy for the sync flag, and a first-time prompt before the first upload. The account-wide switch is a client-owned experiment flag. See [Character cards](#character-cards).
-- Branching or merging history. A card's history is one line: older revisions, not alternate ones.
-- Line-level diff highlighting for a long text field in the history UI. It needs a diff library, and library choices go through the user first.
-- Upload rate limiting and list pagination for these routes. Both stay open follow-up work.
-- A push channel. Another device receives a change on its next run.
-- Pagination. A run reads all documents of the feature.
-- The relational `characters` tables and their routes. They do not change.
-- Removal of old deletion markers.
+- Cấu hình nhà cung cấp và tin nhắn trò chuyện. Đồng bộ hóa hiện tại của họ không thay đổi.
+- Lưu trữ được mã hóa. Một tính năng có bí mật cần có nó trước tiên.
+- Hiển thị các tập tin mô hình. Thẻ chỉ đồng bộ hóa `displayModelId` của nó. Tính năng sau này của store là các tệp trong bộ lưu trữ đối tượng và sử dụng store này cho các mô tả của chúng.
+- Danh bạ, trò chuyện nhóm và liên kết cuộc trò chuyện với một liên hệ.
+- Thẻ tích hợp chỉ đọc. Khi nó tồn tại, thẻ tích hợp sẽ đồng bộ hóa và các nhánh của nó đồng bộ hóa như thẻ thông thường.
+- Công tắc trên mỗi thẻ để đồng bộ hóa trên đám mây, chính sách máy chủ cho cờ đồng bộ hóa và prompt lần đầu tiên trước lần tải lên đầu tiên. Chuyển đổi trên toàn tài khoản là cờ thử nghiệm do khách hàng sở hữu. Xem [Thẻ nhân vật](#character-cards).
+- Lịch sử phân nhánh hoặc hợp nhất. Lịch sử của thẻ là một dòng: các bản sửa đổi cũ hơn, không phải các bản thay thế.
+- Làm nổi bật khác biệt cấp dòng cho trường văn bản dài trong lịch sử UI. Nó cần một thư viện khác và các lựa chọn thư viện sẽ thông qua người dùng trước tiên.
+- Giới hạn tốc độ tải lên và phân trang danh sách cho các route này. Cả hai vẫn mở công việc tiếp theo.
+- Một kênh đẩy. Một thiết bị khác nhận được thay đổi trong lần chạy tiếp theo.
+- Phân trang. Một lần chạy sẽ đọc tất cả tài liệu của đối tượng địa lý.
+- Các bảng `characters` quan hệ và route của chúng. Họ không thay đổi.
+- Loại bỏ các dấu xóa cũ.
 
-## HTTP contract of a feature
+<a id="http-contract-of-a-feature"></a>
 
-The character card routes are the reference.
+## Hợp đồng HTTP của một tính năng
 
-| Request | Result |
+Thẻ nhân vật route là tài liệu tham khảo.
+
+| Yêu cầu | Kết quả |
 | --- | --- |
-| `GET /` | `{ documents }`. A deleted document has `deletedAt` and no fields. |
-| `PUT /:id` with `{ fields }` | `{ document, conflicts }`. A field is `{ key, baseRevision, value }` or `{ key, baseRevision, removed: true }`. |
-| `DELETE /:id?revision=N` | `204`. `409` if the document revision is not `N`. |
-| `GET /:id/history?before=N&limit=N` | `{ history }`, newest first. `limit` defaults to 50 and stops at 200. `404` if the document does not exist or belongs to another account. |
-| `GET /:id/history/:revision` | `{ revision, at, fields }`. `404` if the document does not exist, the revision is newer than current, or history already removed it. |
+| `GET /` | `{ documents }`. Tài liệu đã xóa có `deletedAt` và không có trường nào. |
+| `PUT /:id` với `{ fields }` | `{ document, conflicts }`. Một trường là `{ key, baseRevision, value }` hoặc `{ key, baseRevision, removed: true }`. |
+| `DELETE /:id?revision=N` | `204`. `409` nếu bản sửa đổi tài liệu không phải là `N`. |
+| `GET /:id/history?before=N&limit=N` | `{ history }`, mới nhất đầu tiên. `limit` mặc định là 50 và dừng ở 200. `404` nếu tài liệu không tồn tại hoặc thuộc về tài khoản khác. |
+| `GET /:id/history/:revision` | `{ revision, at, fields }`. `404` nếu tài liệu không tồn tại, bản sửa đổi mới hơn hiện tại hoặc lịch sử đã xóa nó. |
 
-A push to a deleted document restores the document when the store accepts a field.
-A push that changes nothing is valid, so a client can send a push again after a lost response.
-A store with limits answers 413 with the code `STORAGE_LIMIT_EXCEEDED` when a push makes the account grow past a limit, and it writes nothing of that push. A push that does not grow the account always passes, so an account over its limit can still delete and shrink. The check runs under a lock for the account, so two requests cannot both take the last free slot.
-A client treats 400 and 413 for one document as a refusal of that document. The run goes on with the other documents, and the next run sends the refused document again. Other failures stop the run.
-A value must not be `null`. A missing field row represents an absent value.
+Việc đẩy tới tài liệu đã xóa sẽ khôi phục tài liệu khi store chấp nhận một trường. Một lần đẩy không thay đổi gì là hợp lệ, vì vậy khách hàng có thể gửi lại lần đẩy sau khi bị mất phản hồi. store có giới hạn trả lời 413 với mã `STORAGE_LIMIT_EXCEEDED` khi một lần đẩy làm cho tài khoản phát triển vượt quá giới hạn và nó không ghi gì về lần đẩy đó. Một cú đẩy không phát triển tài khoản sẽ luôn trôi qua, vì vậy tài khoản vượt quá giới hạn vẫn có thể bị xóa và thu hẹp. Việc kiểm tra sẽ bị khóa đối với tài khoản, do đó, cả hai yêu cầu đều không thể chiếm được vị trí trống cuối cùng. Khách hàng coi 400 và 413 cho một tài liệu là từ chối tài liệu đó. Quá trình chạy tiếp tục với các tài liệu khác và lần chạy tiếp theo sẽ gửi lại tài liệu bị từ chối. Các lỗi khác sẽ dừng hoạt động. Giá trị không được là `null`. Một hàng trường bị thiếu biểu thị một giá trị vắng mặt.
 
-## Module graph
+<a id="module-graph"></a>
+
+## Biểu đồ mô-đun
 
 ```mermaid
 flowchart LR
@@ -162,7 +152,9 @@ flowchart LR
   Deletion[UserDeletionService] --> Service
 ```
 
-## Affected files
+<a id="affected-files"></a>
+
+## Các tập tin bị ảnh hưởng
 
 ```text
 server/apps/api
@@ -180,7 +172,9 @@ packages/stage-ui/src
 └── stores/modules/airi-card.ts         # starts the runs and applies the result
 ```
 
-## Sequence
+<a id="sequence"></a>
+
+## Sự liên tiếp
 
 ```mermaid
 sequenceDiagram
@@ -200,19 +194,20 @@ sequenceDiagram
   A->>A: take systemPrompt revision 3
 ```
 
-## Client state
+<a id="client-state"></a>
 
-The client stores the fields and revisions that it last merged, for each feature and account.
-A local field that differs from this state has a local change.
-A remote field whose revision differs from this state has a remote change.
-The local cards belong to the device. A second account on the device starts without sync history and uploads them.
+## Trạng thái khách hàng
 
-## Test plan
+Máy khách store các trường và bản sửa đổi được hợp nhất lần cuối cho từng tính năng và tài khoản. Trường cục bộ khác với trạng thái này có thay đổi cục bộ. Trường từ xa có bản sửa đổi khác với trạng thái này có thay đổi từ xa. Các thẻ cục bộ thuộc về thiết bị. Tài khoản thứ hai trên thiết bị khởi động mà không có lịch sử đồng bộ hóa và tải chúng lên.
 
-- Store tests on PGlite with tables that no feature owns, and with extra columns: field independence, conflicts, a repeated push, deletion, restoration, validation, account deletion, and the kept extra columns.
-- Store history tests: a past revision's content from `snapshot`, a removed field kept out of current content but visible in an old snapshot without taking part in a conflict, the content before a deletion, `null` for another account and a future or removed revision, paging with `before` and `limit`.
-- Store cleanup tests: a baseline revision stays correct after older revisions collapse, a deleted document's history clears after its retention window while the deletion marker stays, the current value of a field survives the account history byte cap, history bytes do not count toward the storage limit, and account deletion clears history rows.
-- Character card tests: the tables, the key check, and the routes with their status codes.
-- Character card route tests: history and snapshot for an owned card, paging, 400 for a bad query or revision, 404 for a missing card or revision, and 404 for another account's card.
-- Client unit tests: each conflict rule, the built-in document, the REST client, and the card split.
-- Browser test with two profiles of one account: create, edit, and delete a card.
+<a id="test-plan"></a>
+
+## kế hoạch kiểm tra
+
+- store kiểm tra trên PGlite với các bảng không có tính năng nào và có các cột bổ sung: độc lập trường, xung đột, đẩy lặp lại, xóa, khôi phục, xác thực, xóa tài khoản và các cột bổ sung được giữ lại.
+- Kiểm tra lịch sử store: nội dung của bản sửa đổi trước đây từ `snapshot`, trường đã xóa được giữ ngoài nội dung hiện tại nhưng hiển thị trong ảnh chụp nhanh cũ mà không tham gia vào xung đột, nội dung trước khi xóa, `null` cho tài khoản khác và bản sửa đổi trong tương lai hoặc đã bị xóa, phân trang với `before` và `limit`.
+- Kiểm tra dọn dẹp store: bản sửa đổi cơ sở vẫn chính xác sau khi các bản sửa đổi cũ bị sập, lịch sử của tài liệu đã xóa sẽ xóa sau cửa sổ lưu giữ trong khi dấu xóa vẫn giữ nguyên, giá trị hiện tại của trường vẫn tồn tại trong giới hạn byte lịch sử tài khoản, byte lịch sử không được tính vào giới hạn lưu trữ và việc xóa tài khoản sẽ xóa các hàng lịch sử.
+- Kiểm tra thẻ ký tự: bảng, kiểm tra khóa và route cùng với mã trạng thái của chúng.
+- Các bài kiểm tra route của thẻ ký tự: lịch sử và ảnh chụp nhanh của thẻ đã sở hữu, phân trang, 400 đối với truy vấn hoặc bản sửa đổi không hợp lệ, 404 đối với thẻ bị thiếu hoặc bản sửa đổi và 404 đối với thẻ của tài khoản khác.
+- Kiểm tra đơn vị khách hàng: từng quy tắc xung đột, tài liệu tích hợp, ứng dụng khách REST và phân chia thẻ.
+- Kiểm tra trình duyệt với hai hồ sơ của một tài khoản: tạo, chỉnh sửa và xóa thẻ.

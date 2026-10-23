@@ -1,136 +1,154 @@
-# Terminal Lane Status
+<a id="terminal-lane-status"></a>
 
-Scope: terminal lane work in `services/computer-use-mcp/**`.
+# Trạng thái thiết bị đầu cuối luồng
 
-This file is the handoff record for terminal lane work. It moved here from `AGENTS.md` without content changes.
+Phạm vi: thiết bị đầu cuối luồng hoạt động trong `services/computer-use-mcp/**`.
 
-## Current Status Snapshot
+Tệp này là bản ghi bàn giao cho công việc của thiết bị đầu cuối luồng. Nó được chuyển đến đây từ `AGENTS.md` mà không thay đổi nội dung.
 
-Updated for the current terminal-lane-v2 workstream.
+<a id="current-status-snapshot"></a>
 
-The important truth is:
+## Ảnh chụp nhanh trạng thái hiện tại
 
-- `exec` is already a real mainline surface.
-- `PTY` is no longer just a loose tool set; the workflow engine now has self-acquire support.
-- Service-layer terminal E2Es for the current lane are present and treated as the terminal proof line.
-- The Angela chat terminal demo is now aligned with terminal lane v2 and no longer pre-creates PTY.
-- The desktop shell now distinguishes `pty_session` from `terminal_and_apps`.
-- Angela chat self-acquire is now part of the strict release gate set, so PTY mainline support is no longer intentionally held back.
+Đã cập nhật cho luồng công việc terminal-luồng-v2 hiện tại.
 
-Do not rely on compressed chat summaries to resume this work. Use this file as the handoff source of truth and update it when terminal-lane behavior changes materially.
+Sự thật quan trọng là:
 
-For terminal-lane facts, treat this file in alignment with:
+- `exec` đã là một bề mặt đường chính thực sự.
+- `PTY` không còn chỉ là một bộ công cụ rời rạc; công cụ xử lý công việc hiện có hỗ trợ tự cấp phát.
+- Các E2E đầu cuối lớp dịch vụ cho luồng hiện tại hiện có và được coi là đường dây chứng minh đầu cuối.
+- Bản demo thiết bị đầu cuối trò chuyện Angela hiện đã được căn chỉnh với thiết bị đầu cuối luồng v2 và không còn tạo trước PTY nữa.
+- desktop shell hiện phân biệt `pty_session` với `terminal_and_apps`.
+- Trò chuyện Angela tự cấp phát hiện là một phần của bộ cổng kiểm tra phát hành nghiêm ngặt, vì vậy việc hỗ trợ tuyến chính PTY không còn bị hạn chế một cách có chủ ý nữa.
+
+Đừng dựa vào các bản tóm tắt trò chuyện đã nén để tiếp tục công việc này. Sử dụng tệp này làm nguồn chuyển giao sự thật và cập nhật nó khi hành vi của terminal-luồng thay đổi đáng kể.
+
+Đối với các dữ kiện của terminal-luồng, hãy xử lý tệp này phù hợp với:
 
 - `README.md`
 - `src/support-matrix.ts`
-- `package.json` scripts
-- implementation/tests for each referenced command or file
+- Tập lệnh `package.json`
+- implementation/tests cho mỗi lệnh hoặc tệp được tham chiếu
 
-## Terminal Lane v2: What Is Already Landed
+<a id="terminal-lane-v2-what-is-already-landed"></a>
 
-### 1. Terminal surface model exists
+## Terminal luồng v2: Những gì đã hạ cánh
 
-Terminal-capable workflow steps now have explicit terminal semantics instead of pure guesswork:
+<a id="1-terminal-surface-model-exists"></a>
+
+### 1. Bề mặt đầu cuối mô hình tồn tại
+
+Các bước quy trình làm việc có khả năng sử dụng thiết bị đầu cuối hiện có ngữ nghĩa thiết bị đầu cuối rõ ràng thay vì phỏng đoán thuần túy:
 
 - `mode: 'exec' | 'auto' | 'pty'`
 - `interaction: 'one_shot' | 'persistent'`
 
-The main implementation lives in:
+Việc thực hiện chính tồn tại trong:
 
 - `src/workflows/types.ts`
 - `src/workflows/surface-resolver.ts`
 - `src/terminal/interactive-patterns.ts`
 
-### 2. Auto surface resolution is fixed to a small rule set
+<a id="2-auto-surface-resolution-is-fixed-to-a-small-rule-set"></a>
 
-`auto` is intentionally narrow. It only upgrades to PTY when one of these is true:
+### 2. Độ phân giải bề mặt tự động được cố định theo một bộ quy tắc nhỏ
 
-1. The current `taskId + stepId` already has a bound PTY session.
-2. The step explicitly declares `interaction: 'persistent'`.
-3. The command matches `KNOWN_INTERACTIVE_COMMAND_PATTERNS`.
-4. A failed/timed-out exec attempt surfaces one of `INTERACTIVE_OUTPUT_MARKERS`.
+`auto` cố tình thu hẹp. Nó chỉ nâng cấp lên PTY khi một trong những điều sau là đúng:
 
-This rule set is covered by:
+1. `taskId + stepId` hiện tại đã có phiên PTY bị ràng buộc.
+2. Bước này khai báo rõ ràng `interaction: 'persistent'`.
+3. Lệnh khớp với `KNOWN_INTERACTIVE_COMMAND_PATTERNS`.
+4. Một nỗ lực thực thi failed/timed-out sẽ hiển thị một trong những `INTERACTIVE_OUTPUT_MARKERS`.
+
+Bộ quy tắc này được bao phủ bởi:
 
 - `src/workflows/surface-resolver.test.ts`
 - `src/terminal/interactive-patterns.test.ts`
 
-### 3. Workflow engine can self-acquire PTY
+<a id="3-workflow-engine-can-self-acquire-pty"></a>
 
-The engine already contains the v2 shape:
+### 3. Công cụ quy trình làm việc có thể tự cấp phát PTY
+
+Động cơ đã chứa hình dạng v2:
 
 - `AcquirePtyForStep`
 - `StepTerminalProgress`
-- suspension point `before_pty_acquire`
-- PTY step family support:
+- điểm treo `before_pty_acquire`
+- Hỗ trợ gia đình bước PTY:
   - `pty_send_input`
   - `pty_read_screen`
   - `pty_wait_for_output`
   - `pty_destroy_session`
 
-The main implementation lives in:
+Việc thực hiện chính tồn tại trong:
 
 - `src/workflows/engine.ts`
 
-The intended behavior is:
+Hành vi dự định là:
 
-- workflow resolves the terminal surface
-- if PTY is needed, workflow acquires/binds PTY itself
-- workflow continues inside the same workflow
-- outward terminal reroute is now secondary, not the mainline proof
+- quy trình làm việc giải quyết bề mặt đầu cuối
+- nếu cần PTY, hãy tự xử lý acquires/binds PTY
+- quy trình làm việc tiếp tục trong cùng một quy trình làm việc
+- định tuyến lại thiết bị đầu cuối bên ngoài hiện chỉ là thứ yếu, không phải là bằng chứng chính
 
-### 4. Service-layer PTY self-acquire E2E exists and is green
+<a id="4-service-layer-pty-self-acquire-e2e-exists-and-is-green"></a>
 
-The current real terminal E2E for v2 is:
+### 4. Lớp dịch vụ PTY tự cấp phát E2E tồn tại và có màu xanh
+
+Thiết bị đầu cuối thực E2E hiện tại cho v2 là:
 
 - `src/bin/e2e-terminal-self-acquire.ts`
 
-This script now proves:
+Kịch bản này bây giờ chứng minh:
 
-- **no pre-created PTY**
-- workflow detects an interactive command
-- engine self-acquires PTY
-- command executes on PTY
-- step succeeds without outward reroute
-- run-state / binding / audit stay consistent
+- **không có PTY được tạo trước**
+- quy trình làm việc phát hiện lệnh tương tác
+- động cơ tự thu được PTY
+- lệnh thực thi trên PTY
+- bước thành công mà không cần định tuyến lại bên ngoài
+- trạng thái chạy/ràng buộc/kiểm toán luôn nhất quán
 
-It currently uses:
+Nó hiện đang sử dụng:
 
 - `workflow_validate_workspace`
-- an interactive `checkCommand` of `vim --version`
+- `checkCommand` tương tác của `vim --version`
 
-This is the current service-level proof for terminal lane v2.
+Đây là bằng chứng cấp độ dịch vụ hiện tại cho thiết bị đầu cuối luồng v2.
 
-### 5. Angela chat self-acquire demo is now on the v2 path
+<a id="5-angela-chat-self-acquire-demo-is-now-on-the-v2-path"></a>
 
-`src/bin/e2e-angela-chat-terminal-self-acquire.ts` follows the same product story:
+### 5. Bản demo tự cấp phát của Angela chat hiện đã có trên đường dẫn v2
 
-- no harness-side `pty_create`
-- Angela calls the real workflow
-- the workflow self-acquires PTY for the interactive validation step
-- Angela finishes with a natural-language summary for demo use
+`src/bin/e2e-angela-chat-terminal-self-acquire.ts` tiếp nối câu chuyện sản phẩm tương tự:
 
-The latest successful reports live under:
+- Bộ kiểm thử không tạo sẵn PTY bằng `pty_create`
+- Angela gọi quy trình làm việc thực sự
+- quy trình làm việc tự thu được PTY cho bước xác thực tương tác
+- Angela kết thúc bằng bản tóm tắt bằng ngôn ngữ tự nhiên để sử dụng demo
+
+Các báo cáo thành công mới nhất của trực tiếp theo:
 
 - `.computer-use-mcp/reports/airi-chat-terminal-self-acquire-*`
 
-The current package commands are:
+Các lệnh gói hiện tại là:
 
 - `pnpm -F @angela/computer-use-mcp e2e:airi-chat-terminal-self-acquire`
 - `pnpm -F @angela/computer-use-mcp demo:terminal-self-acquire`
 
-### 6. Support matrix already reflects the new direction
+<a id="6-support-matrix-already-reflects-the-new-direction"></a>
 
-Relevant entries in `src/support-matrix.ts`:
+### 6. Ma trận hỗ trợ đã phản ánh hướng đi mới
+
+Các mục liên quan trong `src/support-matrix.ts`:
 
 - `terminal_exec` → `product-supported`
 - `terminal_pty` → `product-supported`
-- `terminal_exec_to_pty_reroute` → `covered` and explicitly labeled legacy fallback
+- `terminal_exec_to_pty_reroute` → `covered` và được gắn nhãn rõ ràng là phương án dự phòng kế thừa
 - `terminal_auto_surface_resolution` → `covered`
 - `terminal_pty_self_acquire` → `product-supported`
 - `terminal_pty_step_family` → `covered`
 
-The current strict release gates are:
+Bản phát hành nghiêm ngặt cổng kiểm tra hiện tại là:
 
 - `pnpm -F @angela/computer-use-mcp e2e:developer-workflow`
 - `pnpm -F @angela/computer-use-mcp e2e:terminal-exec`
@@ -138,30 +156,36 @@ The current strict release gates are:
 - `pnpm -F @angela/computer-use-mcp e2e:terminal-self-acquire`
 - `pnpm -F @angela/computer-use-mcp e2e:airi-chat-terminal-self-acquire`
 
-## What Is Still Not Finished
+<a id="what-is-still-not-finished"></a>
 
-These are the real gaps. Do not talk yourself into thinking terminal lane is fully shipped before they are closed.
+## Những gì vẫn chưa hoàn thành
 
-### 1. Desktop approval semantics are improved, but still need one more explicit review
+Đây là những khoảng trống thực sự. Đừng tự nhủ rằng thiết bị đầu cuối luồng đã được vận chuyển đầy đủ trước khi chúng đóng cửa.
 
-`apps/desktop/src/renderer/App.vue` now distinguishes:
+<a id="1-desktop-approval-semantics-are-improved-but-still-need-one-more-explicit-review"></a>
+
+### 1. Ngữ nghĩa phê duyệt desktop được cải thiện, nhưng vẫn cần thêm một đánh giá rõ ràng
+
+`apps/desktop/src/renderer/App.vue` hiện phân biệt:
 
 - `terminal_and_apps`
 - `pty_session`
 
-and it no longer pretends a PTY approval is the same thing as a generic terminal/app grant.
+và nó không còn giả vờ phê duyệt PTY giống như cấp terminal/app chung nữa.
 
-The current intended behavior is:
+Hành vi dự định hiện tại là:
 
-- `terminal_exec` / `open_app` / `focus_app` keep the old session-scoped auto-approve behavior
-- `pty_create` stores a `pty_session` grant scope
-- `pty_create` does **not** auto-approve future PTY creation requests
+- `terminal_exec` / `open_app` / `focus_app` giữ hành vi tự động phê duyệt trong phạm vi phiên cũ
+- `pty_create` lưu phạm vi cấp quyền `pty_session`
+- `pty_create` **không** tự động phê duyệt các yêu cầu tạo PTY trong tương lai
 
-This is much closer to the product model, but it is still worth reviewing whenever approval UX changes again.
+Điều này gần giống với sản phẩm mô hình hơn nhiều, nhưng vẫn đáng để xem xét bất cứ khi nào phê duyệt UX lại thay đổi.
 
-## Where To Look First
+<a id="where-to-look-first"></a>
 
-If you are continuing terminal lane work, read these first:
+## Nơi để tìm đầu tiên
+
+Nếu bạn đang tiếp tục công việc của thiết bị đầu cuối luồng, hãy đọc những điều này trước:
 
 1. `src/workflows/engine.ts`
 2. `src/workflows/surface-resolver.ts`
@@ -172,20 +196,26 @@ If you are continuing terminal lane work, read these first:
 7. `apps/desktop/src/renderer/App.vue`
 8. `apps/desktop/src/renderer/modules/computer-use-approval.ts`
 
-That set is enough to reconstruct the current terminal-lane-v2 state without rereading the entire repo.
+Bộ đó đủ để xây dựng lại trạng thái terminal-luồng-v2 hiện tại mà không cần đọc lại toàn bộ repo.
 
-## Validation Commands
+<a id="validation-commands"></a>
 
-Use these as the baseline checks for terminal lane work:
+## Lệnh xác thực
 
-### Service-level terminal lane
+Sử dụng những điều này làm kiểm tra cơ bản cho công việc của thiết bị đầu cuối luồng:
+
+<a id="service-level-terminal-lane"></a>
+
+### Thiết bị đầu cuối cấp dịch vụ luồng
 
 - `pnpm -F @angela/computer-use-mcp e2e:terminal-exec`
 - `pnpm -F @angela/computer-use-mcp e2e:terminal-pty`
 - `pnpm -F @angela/computer-use-mcp e2e:terminal-self-acquire`
 - `pnpm -F @angela/computer-use-mcp e2e:airi-chat-terminal-self-acquire`
 
-### Core test coverage
+<a id="core-test-coverage"></a>
+
+### Phạm vi kiểm tra cốt lõi
 
 - `pnpm -F @angela/computer-use-mcp exec vitest run --config ./vitest.config.ts`
 
@@ -194,20 +224,22 @@ Use these as the baseline checks for terminal lane work:
 - `pnpm -F @angela/computer-use-mcp typecheck`
 - `pnpm -F @angela/stage-ui typecheck`
 
-If `pnpm -F @angela/desktop typecheck` behaves oddly in the current environment, run the two underlying commands directly:
+Nếu `pnpm -F @angela/desktop typecheck` hoạt động kỳ lạ trong môi trường hiện tại, hãy chạy trực tiếp hai lệnh cơ bản:
 
 - `pnpm -F @angela/desktop run typecheck:node`
 - `pnpm -F @angela/desktop run typecheck:web`
 
-## Handoff Rules
+<a id="handoff-rules"></a>
 
-If you change terminal lane behavior, update this file before stopping.
+## Quy tắc bàn giao
 
-At minimum, always rewrite these four facts:
+Nếu bạn thay đổi hành vi của thiết bị đầu cuối luồng, hãy cập nhật tệp này trước khi dừng.
 
-1. Is PTY self-acquire the mainline, or does any path still depend on pre-created PTY?
-2. Is Angela chat E2E aligned with the service-level terminal lane, or still on an older path?
-3. Is desktop approval using real `pty_session` semantics, or still old `terminal_and_apps` semantics?
-4. Which terminal capabilities are `product-supported` vs only `covered` in `src/support-matrix.ts`?
+Ít nhất, hãy luôn viết lại bốn sự thật sau:
 
-If those four facts are stale, the next agent will lose time re-deriving context from code.
+1. PTY tự cấp phát là đường chính hay đường dẫn nào vẫn phụ thuộc vào PTY được tạo trước?
+2. Trò chuyện Angela E2E có được liên kết với thiết bị đầu cuối cấp dịch vụ luồng hay vẫn trên đường dẫn cũ hơn?
+3. Phê duyệt desktop có sử dụng ngữ nghĩa `pty_session` thực hay ngữ nghĩa `terminal_and_apps` cũ không?
+4. Những khả năng của thiết bị đầu cuối nào là `product-supported` so với chỉ `covered` trong `src/support-matrix.ts`?
+
+Nếu bốn dữ kiện đó đã cũ, agent tiếp theo sẽ mất thời gian để lấy lại bối cảnh từ mã.

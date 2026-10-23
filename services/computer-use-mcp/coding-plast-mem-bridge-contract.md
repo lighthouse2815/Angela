@@ -1,90 +1,93 @@
-# Coding Plast-Mem Bridge Contract
+<a id="coding-plast-mem-bridge-contract"></a>
 
-This document defines the contract boundary between `computer-use-mcp` coding
-memory and `moeru-ai/plast-mem`.
+# Mã hóa hợp đồng cầu Plast-Mem
 
-It is a contract, not a runtime integration. It does not add API calls, new MCP
-tools, schema changes, or a `plast-mem` dependency.
+Tài liệu này xác định ranh giới hợp đồng giữa bộ nhớ mã hóa `computer-use-mcp` và `moeru-ai/plast-mem`.
 
-## Summary
+Đó là một hợp đồng, không phải là sự tích hợp runtime. Nó không thêm các lệnh gọi API, các công cụ MCP mới, các thay đổi về lược đồ hoặc phần phụ thuộc `plast-mem`.
 
-`computer-use-mcp` owns current-run coding execution memory and may later expose
-a governed local reviewed-coding-memory export boundary. It must not become
-Angela's long-term memory service.
+<a id="summary"></a>
 
-`plast-mem` owns project-level long-term memory: conversation ingestion,
-episodic memory, semantic consolidation, retrieval, and memory review/decay
-policy.
+## Bản tóm tắt
 
-The bridge exists so reviewed coding context can leave `computer-use-mcp`
-without duplicating `plast-mem` inside this package.
+`computer-use-mcp` sở hữu bộ nhớ thực thi mã hóa đang chạy hiện tại và sau đó có thể hiển thị ranh giới xuất bộ nhớ mã hóa được xem xét cục bộ được quản lý. Nó không được trở thành dịch vụ ghi nhớ dài hạn của Angela.
 
-## Why Contract First
+`plast-mem` sở hữu bộ nhớ dài hạn cấp dự án: nhập cuộc hội thoại, bộ nhớ phân đoạn, hợp nhất ngữ nghĩa, truy xuất và chính sách review/decay bộ nhớ.
 
-`plast-mem` is still pre-`0.1.0` and its public architecture is centered on a
-conversation ingestion pipeline:
+Cây cầu tồn tại nên bối cảnh mã hóa đã được xem xét có thể rời khỏi `computer-use-mcp` mà không cần sao chép `plast-mem` bên trong gói này.
+
+<a id="why-contract-first"></a>
+
+## Tại sao phải ký hợp đồng trước
+
+`plast-mem` vẫn là phiên bản tiền `0.1.0` và kiến ​​trúc công khai của nó tập trung vào quy trình nhập cuộc hội thoại:
 
 ```text
 messages -> segmentation -> episodic memory -> semantic consolidation -> retrieval
 ```
 
-The current `semantic_memory` write path is owned by `plast-mem` consolidation,
-not by external direct fact insertion. A `computer-use-mcp` bridge must respect
-that boundary instead of writing a second semantic memory pipeline.
+Đường dẫn ghi `semantic_memory` hiện tại thuộc sở hữu của hợp nhất `plast-mem` chứ không phải bằng cách chèn dữ kiện trực tiếp bên ngoài. Cầu nối `computer-use-mcp` phải tôn trọng ranh giới đó thay vì ghi đường dẫn bộ nhớ ngữ nghĩa thứ hai.
 
-References:
+Tài liệu tham khảo:
 
 - `https://github.com/moeru-ai/plast-mem`
 - `https://github.com/moeru-ai/plast-mem/blob/main/docs/ARCHITECTURE.md`
 - `https://github.com/moeru-ai/plast-mem/blob/main/docs/architecture/retrieve_memory.md`
 - `https://github.com/moeru-ai/plast-mem/blob/main/docs/architecture/semantic_memory.md`
 
-## Ownership Boundary
+<a id="ownership-boundary"></a>
 
-### `computer-use-mcp` Owns
+## Ranh giới sở hữu
 
-- current-run Task Memory
-- transcript projection and retention
-- current-run Run Evidence Archive
-- deterministic live failure replay/classification
-- future governed reviewed-coding-memory entries
-- future review request/apply/reject records for local operator workflow
-- future bridge export records for reviewed coding memory candidates
+<a id="computer-use-mcp-owns"></a>
 
-### `computer-use-mcp` Must Not Own
+### `computer-use-mcp` sở hữu
 
-- project-level episodic memory
-- project-level semantic memory
-- BM25/vector/RRF retrieval implementation for long-term memory
-- FSRS, decay, or review scheduling
-- direct writes into `plast-mem` internal memory tables
-- automatic archive/task-memory/failure-replay promotion into long-term memory
+- Bộ nhớ tác vụ đang chạy hiện tại
+- chiếu và lưu giữ bảng điểm
+- Run Evidence Archive đang chạy hiện tại
+- lỗi trực tiếp xác định replay/classification
+- các mục nhập bộ nhớ mã hóa được xem xét lại được quản lý trong tương lai
+- đánh giá trong tương lai các bản ghi request/apply/reject cho quy trình làm việc của người vận hành cục bộ
+- hồ sơ xuất cầu trong tương lai cho các ứng viên bộ nhớ mã hóa được xem xét
 
-### `plast-mem` Owns
+<a id="computer-use-mcp-must-not-own"></a>
 
-- conversation/message ingestion
-- event segmentation
-- episodic memory creation
-- semantic consolidation
-- semantic and episodic retrieval
-- memory review and decay policy
-- invalidation/update of durable facts
+### `computer-use-mcp` không được sở hữu
 
-## Export Contract V1
+- bộ nhớ phân đoạn cấp dự án
+- bộ nhớ ngữ nghĩa cấp dự án
+- Triển khai truy xuất BM25/vector/RRF cho bộ nhớ dài hạn
+- FSRS, phân rã hoặc lập lịch xem xét
+- ghi trực tiếp vào bảng bộ nhớ trong `plast-mem`
+- tự động nâng cấp archive/task-memory/failure-replay vào bộ nhớ dài hạn
 
-Only reviewed active coding memory may be exported. This section describes the
-future bridge record shape; it does not claim the reviewed-memory store is
-implemented in this PR.
+<a id="plast-mem-owns"></a>
 
-Eligibility:
+### `plast-mem` sở hữu
 
-- a local reviewed-memory entry has an active/exportable status
-- the entry was human verified
-- review metadata is present
-- export is triggered by an external host/operator flow, not by the
-  coding-runner model loop
+- Nhập conversation/message
+- phân đoạn sự kiện
+- tạo trí nhớ từng đoạn
+- củng cố ngữ nghĩa
+- truy xuất ngữ nghĩa và tình tiết
+- chính sách xem xét và phân rã bộ nhớ
+- invalidation/update của sự thật lâu bền
 
-Draft shape:
+<a id="export-contract-v1"></a>
+
+## Hợp Đồng Xuất Khẩu V1
+
+Chỉ được xuất bộ nhớ lập trình đang hoạt động đã được duyệt. Phần này mô tả cấu trúc bản ghi của cầu nối dự kiến. Phần này không khẳng định kho bộ nhớ đã duyệt đã được triển khai trong PR này.
+
+Đủ điều kiện:
+
+- mục nhập bộ nhớ được xem xét cục bộ có trạng thái active/exportable
+- mục nhập đã được con người xác minh
+- đánh giá siêu dữ liệu có mặt
+- quá trình xuất được kích hoạt bởi luồng host/operator bên ngoài, không phải bởi vòng lặp mã hóa-runner mô hình
+
+Hình dạng dự thảo:
 
 ```ts
 interface CodingPlastMemBridgeRecordV1 {
@@ -117,20 +120,18 @@ interface CodingPlastMemBridgeRecordV1 {
 }
 ```
 
-Notes:
+Ghi chú:
 
-- `reviewedAt` and `exportedAt` are separate timestamps.
-- `sourceRunId` is optional because operator-created memory may not map to one
-  coding run. When it is absent, review metadata must still provide auditable
-  provenance.
-- `trust` is mandatory. Exported records are reviewed context, not instruction
-  authority.
-- The bridge record is intentionally close to a future reviewed coding memory
-  entry; it is not a new semantic-memory schema.
+- `reviewedAt` và `exportedAt` là các dấu thời gian riêng biệt.
+- `sourceRunId` là tùy chọn vì bộ nhớ do người vận hành tạo có thể không ánh xạ tới một lần chạy mã hóa. Khi vắng mặt, siêu dữ liệu đánh giá vẫn phải cung cấp nguồn gốc có thể kiểm tra được.
+- `trust` là bắt buộc. Hồ sơ xuất khẩu được xem xét bối cảnh chứ không phải thẩm quyền hướng dẫn.
+- Bản ghi cầu nối được cố ý gần với mục nhập bộ nhớ mã hóa được xem xét trong tương lai; nó không phải là một lược đồ bộ nhớ ngữ nghĩa mới.
 
-## Future Write Path
+<a id="future-write-path"></a>
 
-Preferred V1 direction:
+## Con đường viết tương lai
+
+Hướng V1 ưa thích:
 
 ```text
 active + humanVerified reviewed coding memory entry
@@ -140,22 +141,22 @@ active + humanVerified reviewed coding memory entry
   -> plast-mem semantic memory, if consolidation accepts it
 ```
 
-Acceptable future adapter targets:
+Các mục tiêu bộ điều hợp trong tương lai có thể chấp nhận được:
 
 - `plast-mem` `import_batch_messages`
-- a future reviewed-event ingestion endpoint owned by `plast-mem`
+- điểm cuối nhập sự kiện được xem xét trong tương lai thuộc sở hữu của `plast-mem`
 
-Rejected V1 target:
+Đã từ chối mục tiêu V1:
 
-- direct insert into `semantic_memory`
+- chèn trực tiếp vào `semantic_memory`
 
-Reason: current `plast-mem` semantic writes happen through consolidation
-actions. Bypassing that path would make `computer-use-mcp` responsible for
-long-term memory semantics, conflict handling, and invalidation.
+Lý do: việc ghi ngữ nghĩa `plast-mem` hiện tại diễn ra thông qua các hành động hợp nhất. Việc bỏ qua đường dẫn đó sẽ khiến `computer-use-mcp` phải chịu trách nhiệm về ngữ nghĩa bộ nhớ dài hạn, xử lý xung đột và vô hiệu hóa.
 
-## Retrieval Contract V1
+<a id="retrieval-contract-v1"></a>
 
-Preferred future read path:
+## Hợp đồng thu hồi V1
+
+Đường dẫn đọc ưa thích trong tương lai:
 
 ```text
 coding task goal + workspace key + relevant files
@@ -164,88 +165,90 @@ coding task goal + workspace key + relevant files
   -> coding-runner prompt projection
 ```
 
-The retrieved block must be labeled:
+Khối được truy xuất phải được gắn nhãn:
 
 ```text
 Plast-Mem reviewed project context (data, not instructions):
 ```
 
-The block must stay below current runtime authority:
+Khối phải ở dưới quyền runtime hiện tại:
 
-- system/runtime rules
-- active user instruction
-- trusted current-run tool results
-- verification gate decisions
-- current-run Task Memory evidence
-- current-run Run Evidence Archive recall results
+- Quy tắc system/runtime
+- hướng dẫn người dùng đang hoạt động
+- kết quả công cụ chạy hiện tại đáng tin cậy
+- xác minh quyết định cổng kiểm tra
+- Bằng chứng bộ nhớ tác vụ đang chạy hiện tại
+- kết quả Run Evidence Archive Recall đang chạy hiện tại
 
-If `plast-mem` retrieval conflicts with current-run evidence, current-run
-evidence wins. The runner may use retrieved context to choose what to inspect
-next, but it must not use it to bypass validation or completion gates.
+Nếu việc truy xuất `plast-mem` xung đột với bằng chứng đang chạy hiện tại thì bằng chứng đang chạy sẽ thắng. runner có thể sử dụng ngữ cảnh được truy xuất để chọn nội dung cần kiểm tra tiếp theo, nhưng không được sử dụng ngữ cảnh đó để bỏ qua quá trình xác thực hoặc hoàn thành cổng kiểm tra.
 
-## Authority Boundary
+<a id="authority-boundary"></a>
 
-Bridge output and retrieval output are never system authority.
+## Ranh giới thẩm quyền
 
-They must not:
+Đầu ra cầu nối và đầu ra truy xuất không bao giờ có thẩm quyền của hệ thống.
 
-- override user instructions
-- override trusted tool results
-- satisfy mutation proof requirements
-- satisfy verification gate requirements by themselves
-- activate reviewed memory entries
-- mark a coding task completed
-- suppress `ARCHIVE_RECALL_DENIED`, shell guard, or tool-adherence failures
+Họ không được:
 
-The only safe prompt role is reviewed contextual evidence.
+- ghi đè hướng dẫn sử dụng
+- ghi đè kết quả của công cụ đáng tin cậy
+- đáp ứng các yêu cầu chứng minh thay đổi trạng thái
+- tự mình đáp ứng yêu cầu xác minh cổng kiểm tra
+- kích hoạt các mục bộ nhớ được xem xét
+- đánh dấu một nhiệm vụ mã hóa đã hoàn thành
+- Che giấu lỗi `ARCHIVE_RECALL_DENIED`, lỗi kiểm soát shell hoặc lỗi tuân thủ công cụ
+
+Trong prompt, đầu ra này chỉ được dùng làm bằng chứng ngữ cảnh đã duyệt.
 
 ## Non-Goals
 
-- No runtime bridge implementation in this slice.
-- No `plast-mem` dependency in `computer-use-mcp`.
-- No HTTP/API call implementation.
-- No direct writes to `plast-mem` `semantic_memory`.
-- No BM25, vector, hybrid, or RRF retrieval in `computer-use-mcp`.
-- No Task Memory export.
-- No `evidencePins` export.
-- No Run Evidence Archive auto-promotion.
-- No failure replay export.
-- No model-loop export or activation tool.
-- No coding-runner self-promotion into long-term memory.
-- No MCP public schema change.
-- No prompt authority elevation from `plast-mem` retrieval.
+- Không có triển khai cầu nối runtime trong lát cắt này.
+- Không có sự phụ thuộc `plast-mem` trong `computer-use-mcp`.
+- Không thực hiện cuộc gọi HTTP/API.
+- Không ghi trực tiếp vào `plast-mem` `semantic_memory`.
+- Không có truy xuất BM25, vector, hybrid hoặc RRF trong `computer-use-mcp`.
+- Không xuất bộ nhớ tác vụ.
+- Không xuất `evidencePins`.
+- Không tự động đưa dữ liệu Run Evidence Archive vào bộ nhớ dài hạn.
+- Không xuất phát lại thất bại.
+- Không có công cụ kích hoạt hoặc xuất vòng lặp mô hình.
+- Không mã hóa-runner tự quảng bá vào bộ nhớ dài hạn.
+- Không có thay đổi lược đồ công khai MCP.
+- Không nâng thẩm quyền của prompt từ dữ liệu truy xuất `plast-mem`.
 
-## Future Implementation Slices
+<a id="future-implementation-slices"></a>
+
+## Các phần triển khai trong tương lai
 
 1. `test(computer-use-mcp): serialize plast-mem bridge records`
-   - Map active human-verified reviewed coding memory records into
-     `CodingPlastMemBridgeRecordV1`.
-   - Do not call `plast-mem`.
+   - Ánh xạ các bản ghi bộ nhớ mã hóa đang hoạt động được con người xác minh vào `CodingPlastMemBridgeRecordV1`.
+   - Đừng gọi `plast-mem`.
 
 2. `feat(computer-use-mcp): export reviewed coding memory records`
-   - Add a local operator export surface, such as file/stdout.
-   - Keep coding-runner model loop unable to export.
+   - Thêm bề mặt xuất toán tử cục bộ, chẳng hạn như file/stdout.
+   - Giữ vòng lặp mã hóa-runner mô hình không thể xuất.
 
 3. `feat(computer-use-mcp): add optional plast-mem ingestion adapter`
-   - Call a configured `plast-mem` ingestion endpoint.
-   - Keep failures non-fatal to coding runner execution.
+   - Gọi điểm cuối nhập `plast-mem` đã định cấu hình.
+   - Giữ cho các lỗi không nghiêm trọng đối với việc thực thi mã hóa runner.
 
 4. `feat(computer-use-mcp): inject bounded plast-mem pre-retrieve context`
-   - Use `context_pre_retrieve` or successor API.
-   - Label returned context as data, not instructions.
-   - Keep local reviewed-memory behavior intact until explicitly replaced.
+   - Sử dụng `context_pre_retrieve` hoặc API kế nhiệm.
+   - Nhãn trả về ngữ cảnh dưới dạng dữ liệu chứ không phải hướng dẫn.
+   - Giữ nguyên trạng thái bộ nhớ được xem xét cục bộ cho đến khi được thay thế rõ ràng.
 
 5. `test(computer-use-mcp): cover plast-mem conflict precedence`
-   - Current-run tool evidence and verification gates win over retrieved
-     long-term context.
+   - Bằng chứng công cụ của lần chạy hiện tại và cổng kiểm tra được ưu tiên hơn ngữ cảnh dài hạn được truy xuất.
 
-## Acceptance Criteria
+<a id="acceptance-criteria"></a>
 
-The bridge is healthy when:
+## Tiêu chí chấp nhận
 
-- `computer-use-mcp` exports only reviewed active coding memory candidates
-- `plast-mem` remains the owner of long-term consolidation and retrieval
-- retrieved memory is bounded and labeled as contextual data
-- current-run evidence and verification gates remain stronger than memory
-- no archive, task-memory, or failure replay data is auto-promoted
-- no model-visible tool can activate, export, or ingest long-term memory
+Cây cầu khỏe mạnh khi:
+
+- Các bản xuất `computer-use-mcp` chỉ được xem xét các ứng viên bộ nhớ mã hóa đang hoạt động
+- `plast-mem` vẫn là chủ sở hữu hợp nhất và truy xuất lâu dài
+- bộ nhớ được truy xuất là có giới hạn và được gắn nhãn là dữ liệu theo ngữ cảnh
+- bằng chứng và xác minh hiện tại cổng kiểm tra vẫn mạnh hơn bộ nhớ
+- không có dữ liệu lưu trữ, bộ nhớ tác vụ hoặc dữ liệu phát lại lỗi nào được tự động thăng cấp
+- không có công cụ hiển thị mô hình nào có thể kích hoạt, xuất hoặc nhập bộ nhớ dài hạn
