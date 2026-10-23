@@ -11,6 +11,12 @@ pnpm install
 pnpm dev:desktop
 ```
 
+Các lệnh kiểm tra cảnh báo khi dependency chưa đồng bộ. Chạy `pnpm install --frozen-lockfile` để cập nhật chúng.
+Các lệnh này không tự cài lại dependency hoặc chạy `postinstall`.
+
+Nếu Turbo báo `Exec format error` khi chạy pnpm, sửa bản cài pnpm bằng trình cài chính thức.
+Sau đó kiểm tra `pnpm --version` khớp trường `packageManager`.
+
 Giai đoạn hiện tại ưu tiên desktop/local AI. Các module tạm hoãn nằm trong
 [`../dev-in-future/`](../dev-in-future/README.md) và không tham gia workspace mặc định.
 Thư mục này nằm ngoài Git repository hiện tại và chỉ được lưu local.

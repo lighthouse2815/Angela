@@ -1,6 +1,7 @@
 packages:
   - .
 nodeLinker: hoisted
+verifyDepsBeforeRun: warn
 minimumReleaseAge: 4320
 allowBuilds:
   better-sqlite3: false

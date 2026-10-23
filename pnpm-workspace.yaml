@@ -27,6 +27,7 @@ minimumReleaseAgeExclude:
   - xsschema
 
 shellEmulator: true
+verifyDepsBeforeRun: warn
 packages:
   - apps/**
   - core/**
