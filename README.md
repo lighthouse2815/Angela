@@ -79,7 +79,9 @@ Runtime chung điều phối CLI, Telegram và các adapter khác. Memory V2 ghi
 
 Các tài liệu kiến trúc và audit nằm trong [`docs/ai`](./docs/ai/).
 
-## Repository
+<a id="repository"></a>
+
+## Kho lưu trữ
 
 https://github.com/lighthouse2815/Angela
 
