@@ -5,7 +5,7 @@ export default defineConfig({
     'index': 'src/index.ts',
     'client/crossws': 'src/client/crossws/index.ts',
     'server': 'src/server/index.ts',
-    'backend/h3': 'src/server/h3/index.ts',
+    'server/h3': 'src/server/h3/index.ts',
   },
   dts: true,
 })

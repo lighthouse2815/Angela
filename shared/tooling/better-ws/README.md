@@ -137,3 +137,9 @@ client.send('hello')
 ## Giấy phép
 
 [MIT](../../LICENSE)
+
+## Build
+
+Chạy `pnpm -F @angela/better-ws build` tại thư mục gốc.
+Adapter H3 được build tại `dist/server/h3.mjs`, khớp export `@angela/better-ws/server/h3`.
+Desktop và server runtime dùng export này.
