@@ -16,6 +16,8 @@ import { Tasks } from '@angela/companion/tasks'
 import { readConfig } from '@angela/host-sdk/config'
 import { errorMessageFrom } from '@moeru/std'
 
+import { unitArgument } from './systemd'
+
 const execute = promisify(execFile)
 const service = 'angela-reminders.service'
 
@@ -30,13 +32,6 @@ export class DesktopReminders implements ReminderNotifier {
     const text = tasks.map(task => `${taskPrompt(task, this.messages)}\n${formatTask(task, this.locale, this.messages)}`).join('\n\n').replace(/&/gu, '&amp;').replace(/</gu, '&lt;').replace(/>/gu, '&gt;')
     await execute('notify-send', ['--app-name=Angela', '--', overdue ? this.messages.overdue : this.messages.reminder, text], { env: this.env, signal, timeout: 10_000 })
   }
-}
-
-/** Quotes one systemd ExecStart argument. Unit specifiers and environment expansion must remain literal user data. */
-function unitArgument(value: string) {
-  if (/\p{Cc}/u.test(value))
-    throw new Error('Invalid service argument')
-  return `"${value.replace(/\\/gu, '\\\\').replace(/"/gu, '\\"').replace(/%/gu, '%%').replace(/\$/gu, '$$$$')}"`
 }
 
 /**

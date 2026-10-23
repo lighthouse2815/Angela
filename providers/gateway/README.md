@@ -41,8 +41,31 @@ angela
 
 ## Phạm vi trách nhiệm
 
-Gói này quản lý tài khoản nhà cung cấp cục bộ. Đây không phải API tài nguyên trên máy chủ hay kho bộ nhớ của Angela. Khi khởi động, gói không cấu hình công cụ AI khác, cài biểu tượng khay hệ thống hoặc cập nhật ứng dụng toàn cục. Khóa suy luận không có quyền quản lý tài khoản. Công khai dịch vụ ra mạng, TLS, cài dịch vụ và màn hình tài khoản desktop nằm ngoài phạm vi tích hợp ưu tiên CLI này.
+Gói này quản lý tài khoản nhà cung cấp cục bộ. Đây không phải API tài nguyên trên máy chủ hay kho bộ nhớ của Angela. Khi khởi động, gói không cấu hình công cụ AI khác, cài biểu tượng khay hệ thống hoặc cập nhật ứng dụng toàn cục. Khóa suy luận không có quyền quản lý tài khoản. Công khai dịch vụ ra mạng, TLS, màn hình tài khoản desktop nằm ngoài phạm vi tích hợp ưu tiên CLI này.
 
 Các yêu cầu về tính khả dụng, quyền truy cập đăng ký và xác thực của nhà cung cấp vẫn được kiểm soát bởi mỗi nhà cung cấp. Công cụ đi kèm không cấp quyền truy cập vào mô hình hoặc hạn ngạch mà tài khoản không có.
 
 Xem [xuất xứ và các thay đổi cục bộ](./vendor/README.angela.md) để biết chi tiết về bản quyền và upstream.
+
+## Gateway chạy nền trên Linux
+
+Bản CLI đã build có thể quản lý dịch vụ systemd của người dùng.
+
+```sh
+angela gateway start --background
+angela gateway service status
+angela gateway stop
+angela gateway restart
+angela gateway service disable
+```
+
+`start --background` cài dịch vụ và bật tự khởi động khi đăng nhập.
+`stop` dừng dịch vụ. `restart` khởi động lại dịch vụ đã cài.
+`service disable` dừng dịch vụ và tắt tự khởi động.
+Dịch vụ dùng cùng thư mục tài khoản và cổng của gateway.
+Nếu đổi thư mục dữ liệu hoặc cổng, giữ file dịch vụ hiện có và sửa cấu hình có chủ đích.
+Lệnh cài từ chối ghi đè một file dịch vụ có nội dung khác.
+
+`angela gateway start` vẫn chạy ở terminal. Dùng Ctrl+C để dừng chế độ này.
+Các lệnh dịch vụ không dừng tiến trình chạy riêng ở terminal.
+Xem log bằng `journalctl --user -u angela-gateway.service`.

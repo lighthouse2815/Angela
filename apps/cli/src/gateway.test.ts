@@ -71,7 +71,7 @@ it('inspects an absent gateway without creating configuration or printing secret
 })
 
 it('rejects invalid commands and ports without starting a host', async () => {
-  for (const args of [['stop'], ['use'], ['add'], ['enable'], ['accounts', 'unexpected'], ['status', '--port', '0'], ['status', '--port', '65536']])
+  for (const args of [['service', 'erase'], ['use'], ['add'], ['enable'], ['accounts', 'unexpected'], ['status', '--port', '0'], ['status', '--port', '65536']])
     await expect(runGateway([...args, '--data-dir', directory], {})).rejects.toThrow()
   expect(await readdir(directory)).toEqual([])
 })

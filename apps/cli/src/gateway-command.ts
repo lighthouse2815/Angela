@@ -11,6 +11,7 @@ import { resolveLocalConfigPath } from '@angela/local-config/node'
 import * as v from 'valibot'
 
 import { Gateway } from './gateway'
+import { GatewayService } from './gateway-service'
 
 /**
  * Controls the local engine without loading the chat runtime or changing other tools.
@@ -32,6 +33,7 @@ export async function runGateway(args: string[], env: NodeJS.ProcessEnv) {
     'name': { type: 'string' },
     'credentials-file': { type: 'string' },
     'show': { type: 'boolean' },
+    'background': { type: 'boolean' },
   } })
   const locale = v.parse(v.picklist(['en', 'vi']), values.locale ?? env.ANGELA_LOCALE ?? 'vi')
   const messages = cliMessages[locale].gateway
@@ -40,16 +42,25 @@ export async function runGateway(args: string[], env: NodeJS.ProcessEnv) {
     process.stdout.write(`${messages.usage}\n${messages.scope}\n`)
     return
   }
-  const oneArgument = ['login', 'enable', 'disable', 'test'].includes(action)
-  if (positionals.length > (oneArgument ? 2 : 1) || !['start', 'status', 'login', 'accounts', 'add', 'enable', 'disable', 'test', 'models', 'keys', 'key', 'password', 'use'].includes(action))
+  const oneArgument = ['login', 'enable', 'disable', 'test', 'service'].includes(action)
+  if (positionals.length > (oneArgument ? 2 : 1) || !['start', 'stop', 'restart', 'service', 'status', 'login', 'accounts', 'add', 'enable', 'disable', 'test', 'models', 'keys', 'key', 'password', 'use'].includes(action))
     throw new Error(messages.usage)
   if (['enable', 'disable', 'test'].includes(action) && !positionals[1])
     throw new Error(messages.usage)
   if ((action === 'use' && !values.model) || (action === 'add' && (!values.provider || !values.name)))
     throw new Error(messages.usage)
+  if (values.background && action !== 'start')
+    throw new Error(messages.usage)
   const directory = resolve(values['data-dir'] ?? env.ANGELA_GATEWAY_DATA_DIR ?? join(env.XDG_CONFIG_HOME ?? join(homedir(), '.config'), 'angela', 'gateway'))
   const gateway = new Gateway(directory, env, messages, values.port === undefined ? undefined : Number(values.port))
   const print = (value: unknown) => process.stdout.write(`${JSON.stringify(value, null, 2)}\n`)
+  if (action === 'service' || action === 'stop' || action === 'restart' || values.background) {
+    const service = new GatewayService(directory, env, messages, locale, values.port === undefined ? undefined : Number(values.port))
+    if (values.background)
+      await service.run('install')
+    await service.run(values.background ? 'start' : action === 'service' ? positionals[1] ?? 'status' : action)
+    return
+  }
   if (action === 'start') {
     const lifetime = new AbortController()
     const stop = () => lifetime.abort()

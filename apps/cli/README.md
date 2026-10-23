@@ -43,7 +43,7 @@ Tài khoản dựa trên khóa có thể sử dụng `angela gateway add --provi
 
 Điểm cuối mặc định là `http://127.0.0.1:1107/angela1/`. `--port` chọn một cổng khác. Áp dụng tùy chọn tương tự cho các lệnh truy cập vào phiên bản đó. `--data-dir` hoặc `ANGELA_GATEWAY_DATA_DIR` chọn thư mục tài khoản riêng tư khác. Thư mục mặc định là `$XDG_CONFIG_HOME/angela/gateway` hoặc `~/.config/angela/gateway` không có cấu hình XDG. Thư mục này tách biệt với bộ nhớ CLI và dữ liệu phiên. Không chia sẻ nó hoặc cam kết nó.
 
-`use --model` lưu khóa chia sẻ thông qua tệp cấu hình riêng hiện có. Nó bảo tồn các mục nhà cung cấp khác và hỗ trợ `--config PATH` hoặc `ANGELA_CONFIG`. Cờ trò chuyện rõ ràng và ghi đè môi trường vẫn được ưu tiên hơn cấu hình đã lưu. Khóa suy luận không thể quản lý tài khoản nhà cung cấp. Việc cài đặt dịch vụ nền và hiển thị từ xa không nằm trong quá trình tích hợp này.
+`use --model` lưu khóa chia sẻ thông qua tệp cấu hình riêng hiện có. Nó bảo tồn các mục nhà cung cấp khác và hỗ trợ `--config PATH` hoặc `ANGELA_CONFIG`. Cờ trò chuyện rõ ràng và ghi đè môi trường vẫn được ưu tiên hơn cấu hình đã lưu. Khóa suy luận không thể quản lý tài khoản nhà cung cấp. Gateway hỗ trợ dịch vụ nền systemd của người dùng. Truy cập từ xa cần cấu hình riêng.
 
 Xem [Angela Gateway](../../providers/gateway/README.md) để biết chi tiết bản dựng và xuất xứ nguồn.
 
@@ -884,3 +884,26 @@ mẫu kiểm thử này đo lường một tập hợp nhỏ các hành vi. Chú
 Luồng công việc `Angela CLI core` chạy trên các yêu cầu kéo vào `main`. Nó cài đặt các phần phụ thuộc cố định mà không cần cài đặt sau gốc, sau đó chỉ xây dựng các điều kiện tiên quyết CLI với một workspace worker. Các thử nghiệm, kiểm tra kiểu dữ liệu, bản dựng, gói lint và kiểm tra CLI kiểm tra nhanh được xây dựng sẽ chạy trong một công việc. Vitest sử dụng một worker và thử nghiệm 30 giây cũng như giới hạn hook. Node 26.11.1 và phiên bản trình quản lý gói trong tệp kê khai gốc xác định môi trường sao chép. cổng kiểm tra không bao gồm các bài kiểm tra monorepo đầy đủ. Các lỗi hiện tại không liên quan vẫn được ghi lại trong quá trình kiểm tra Bộ nhớ V2.
 
 Telegram sử dụng `AngelaRuntime.acquire` để giữ lại Recall sau mỗi tin nhắn. `RuntimeOptions.telegramSessions` nội bộ mặc định có 32 mục nhập không hoạt động và TTL dài 10 phút. Bộ đệm sử dụng bộ nhớ chính xác của người dùng, workspace, phiên và nhận dạng kênh. Các máy khách MCP và lệnh gọi lại yêu cầu sẽ đóng sau mỗi yêu cầu. Bối cảnh hoạt động giữ lại giới hạn đồng thời hiện có là tám. Đặt lại, loại bỏ và tắt host kết thúc phân đoạn phiên runtime. Cuộc trò chuyện và bộ nhớ dai dẳng vẫn tồn tại sau khi bị trục xuất và khởi động lại quá trình.
+
+## Gateway chạy nền trên Linux
+
+Bản CLI đã build có thể quản lý dịch vụ systemd của người dùng.
+
+```sh
+angela gateway start --background
+angela gateway service status
+angela gateway stop
+angela gateway restart
+angela gateway service disable
+```
+
+`start --background` cài dịch vụ và bật tự khởi động khi đăng nhập.
+`stop` dừng dịch vụ. `restart` khởi động lại dịch vụ đã cài.
+`service disable` dừng dịch vụ và tắt tự khởi động.
+Dịch vụ dùng cùng thư mục tài khoản và cổng của gateway.
+Nếu đổi thư mục dữ liệu hoặc cổng, giữ file dịch vụ hiện có và sửa cấu hình có chủ đích.
+Lệnh cài từ chối ghi đè một file dịch vụ có nội dung khác.
+
+`angela gateway start` vẫn chạy ở terminal. Dùng Ctrl+C để dừng chế độ này.
+Các lệnh dịch vụ không dừng tiến trình chạy riêng ở terminal.
+Xem log bằng `journalctl --user -u angela-gateway.service`.
