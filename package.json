@@ -48,7 +48,8 @@
     "dev:desktop:xwayland": "pnpm -rF @angela/desktop run dev:xwayland",
     "build:desktop": "pnpm -rF @angela/desktop run app:build",
     "test-desktop:run": "vitest run --config apps/desktop/vitest.config.ts --project browser",
-    "capture:desktop": "pnpm exec vishot capture --target electron ./packages/scenarios-desktop-electron/src/scenarios/demo-controls-settings-chat-websocket/index.ts --app-entrypoint ./apps/desktop/out/main/index.js --cwd . --output-dir ./packages/scenarios-desktop-browser/artifacts/raw --format avif"
+    "capture:desktop": "pnpm exec vishot capture --target electron ./packages/scenarios-desktop-electron/src/scenarios/demo-controls-settings-chat-websocket/index.ts --app-entrypoint ./apps/desktop/out/main/index.js --cwd . --output-dir ./packages/scenarios-desktop-browser/artifacts/raw --format avif",
+    "telegram": "pnpm cli telegram"
   },
   "devDependencies": {
     "@alint-js/cli": "catalog:",

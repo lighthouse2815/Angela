@@ -192,41 +192,18 @@ Trang tài liệu nằm trong [moeru-ai/airi-docs](https://github.com/moeru-ai/a
 
 ### Tích hợp bot Telegram
 
-Cần có cơ sở dữ liệu Postgres.
+Bot được hỗ trợ dùng runtime CLI và bộ nhớ cục bộ. Chạy từ thư mục gốc:
 
 ```shell
-cd integrations/telegram-bot
-docker compose up -d
+pnpm telegram
 ```
 
-Cấu hình `.env`
+Đặt token và danh sách người dùng được phép trong file môi trường Telegram riêng. Không commit thông tin xác thực.
+Để nối với desktop, dùng cùng `ANGELA_DATA_DIR`, `ANGELA_WORKSPACE` và đặt `ANGELA_TELEGRAM_SHARED_USER_ID`.
+Xem [hướng dẫn runtime chung](../packages/angela-cli/src/companion/README.md) để cấu hình nhân vật và bộ nhớ.
 
-```shell
-cp .env .env.local
-```
-
-Sửa thông tin xác thực trong `.env.local`.
-
-Cập nhật cấu trúc cơ sở dữ liệu
-
-```shell
-pnpm -F @angela/telegram-bot db:generate
-pnpm -F @angela/telegram-bot db:push
-```
-
-Chạy bot
-
-```shell
-pnpm -F @angela/telegram-bot start
-```
-
-> [!NOTE]
->
-> Nếu dùng [@antfu/ni](https://github.com/antfu-collective/ni), chạy:
->
-> ```shell
-> nr -F @angela/telegram-bot dev
-> ```
+Bản thử nghiệm Postgres/media trong `integrations/telegram-bot` đã được đưa ra khỏi workspace mặc định.
+Mã nguồn và dữ liệu cũ được giữ lại. Xem [ghi chú lưu trữ](../integrations/telegram-bot/ARCHIVED.md) trước khi dùng bản đó.
 
 ### Tích hợp bot Discord
 
