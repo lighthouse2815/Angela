@@ -293,3 +293,6 @@ providers/gateway/vendor/.data/
 # System/tool-specific ignores
 /capabilities/avatar/godot/addons/Godot-MToon-Shader/**/.DS_Store
 /capabilities/avatar/godot/addons/Godot-MToon-Shader/**/*~
+
+# Generated release media, source archives, and target manifests.
+/apps/desktop/resources/media/

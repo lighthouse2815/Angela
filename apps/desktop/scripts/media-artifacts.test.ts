@@ -31,3 +31,25 @@ it('checks release bytes and license artifacts before packaging', async () => {
 it('refuses a release without its manifest', async () => {
   await expect(checkMediaArtifacts(directory, false)).rejects.toThrow()
 })
+
+it('checks exact source and notice bytes, rejects missing sources and traversal paths', async () => {
+  const bytes = 'Release fixture'
+  const digest = createHash('sha256').update(bytes).digest('hex')
+  await mkdir(join(directory, 'licenses'))
+  await mkdir(join(directory, 'sources'))
+  await writeFile(join(directory, 'licenses', 'tool.txt'), bytes)
+  await writeFile(join(directory, 'sources', 'ffmpeg.tar.xz'), bytes)
+  for (const name of ['yt-dlp', 'ffmpeg'])
+    await writeFile(join(directory, name), bytes, { mode: 0o700 })
+  const artifact = { version: 'fixture', sha256: digest, license: 'licenses/tool.txt' }
+  const manifest = { 'yt-dlp': artifact, 'ffmpeg': artifact, 'supportingFiles': [{ path: 'sources/ffmpeg.tar.xz', sha256: digest }] }
+  await writeFile(join(directory, 'manifest.json'), JSON.stringify(manifest))
+  await expect(checkMediaArtifacts(directory, false)).resolves.toBeUndefined()
+  await writeFile(join(directory, 'sources', 'ffmpeg.tar.xz'), 'Altered source')
+  await expect(checkMediaArtifacts(directory, false)).rejects.toThrow('supporting artifact checksum mismatch')
+  await rm(join(directory, 'sources', 'ffmpeg.tar.xz'))
+  await expect(checkMediaArtifacts(directory, false)).rejects.toThrow()
+  manifest.supportingFiles[0].path = '../outside.txt'
+  await writeFile(join(directory, 'manifest.json'), JSON.stringify(manifest))
+  await expect(checkMediaArtifacts(directory, false)).rejects.toThrow()
+})

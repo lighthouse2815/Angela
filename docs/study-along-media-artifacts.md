@@ -92,3 +92,32 @@ The real preflight accepted the restricted extension and all three desktop outpu
 It rejected the missing `resources/media/linux-x64/manifest.json`, as required.
 An installer for a clean machine remains blocked until reviewed media binaries and their exact notices are staged.
 No substitute executable or fixture artifact counts as a release binary.
+
+## Staging reviewed media on Linux x64
+
+The release repository provides `pnpm -F @angela/desktop prepare:media` for the reviewed Linux x64 target.
+The command downloads only the URLs and SHA-256 values in `scripts/media/linux-x64.lock.json`.
+It stores downloads by digest under a private cache, writes partial files first, and reuses only a matching digest.
+
+The command verifies the FFmpeg release signature with the pinned FFmpeg public key before Docker builds it.
+Docker uses the Ubuntu image digest recorded in `scripts/media/Dockerfile`.
+The build runs without network access and records the configure log, compiler, package list, linked libraries, and source archives.
+The FFmpeg recipe disables network access and GPL or nonfree components.
+It enables only the file and pipe protocols, bounded audio demuxers, decoders, resampling filters, and WAV or AAC output needed by Study Along.
+
+The staged manifest includes the executable hashes, source archive hashes, license notices, build recipe, and build evidence.
+The preflight checks each executable and every supporting file before packaging.
+The target directory stays ignored by Git. Release jobs regenerate it from the reviewed lock file.
+
+Local result on 24 October 2026:
+
+- yt-dlp 2026.10.21 passed its version check.
+- FFmpeg 9.0.2 passed its version check.
+- FFmpeg source signature passed with fingerprint `FCF986EA15E6E293A5644F10B4322F04D67658D8`.
+- `pnpm -F @angela/desktop check:release` returned `ready: true`.
+- Artifact and download tests passed 23/23.
+- Electron built `dist/linux-unpacked` with the staged media and restricted extension.
+- `.deb` creation reached fpm but the current environment exceeded its temporary disk quota while fpm copied the payload.
+
+The package metadata now includes the maintainer email required by electron-builder.
+The remaining `.deb` failure is an environment quota limit. Run packaging on a clean runner with enough temporary space.

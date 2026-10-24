@@ -1,0 +1,29 @@
+{
+  "target": "linux-x64",
+  "ytDlp": {
+    "version": "2026.10.21",
+    "url": "https://github.com/yt-dlp/yt-dlp/releases/download/2026.10.21/yt-dlp_linux",
+    "sha256": "d8bd33fca9d5b23bd5b9952b3fca36db5c46331933fda9f598a3da14ce2c243f"
+  },
+  "ytDlpLicense": {
+    "url": "https://raw.githubusercontent.com/yt-dlp/yt-dlp/2026.10.21/LICENSE",
+    "sha256": "7e12e5df4bae12cb21581ba157ced20e1986a0508dd10d0e8a4ab9a4cf94e85c"
+  },
+  "ytDlpNotices": {
+    "url": "https://raw.githubusercontent.com/yt-dlp/yt-dlp/2026.10.21/THIRD_PARTY_LICENSES.txt",
+    "sha256": "472aefe951c7db35e1657c1d13fd337140511ed6f2b329205105ad441c5a02b7"
+  },
+  "ffmpeg": {
+    "version": "9.0.2",
+    "url": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz",
+    "sha256": "8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e"
+  },
+  "ffmpegSignature": {
+    "url": "https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz.asc",
+    "sha256": "d617fd94ea354dadd2a8bb16243d37c44e1e9729b06b6ad58fe30bfb0fa943f2"
+  },
+  "ffmpegKey": {
+    "url": "https://ffmpeg.org/ffmpeg-devel.asc",
+    "sha256": "397b3becedcd5a98769967ff1ff8501ddc89f8368b8f766e4701377d7dbaabe5"
+  }
+}
