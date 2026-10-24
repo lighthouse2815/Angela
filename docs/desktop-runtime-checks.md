@@ -172,3 +172,31 @@ Kết quả kiểm tra của phần sửa:
 - `NODE_OPTIONS=--max-old-space-size=4096 pnpm typecheck --concurrency=1`: 60 tác vụ đạt.
 - `pnpm lint`: không có lỗi, còn 603 cảnh báo ESLint hiện có.
 - `pnpm -F @angela/desktop build`: đạt.
+
+## Kiểm tra nói chen lặp lại với dịch vụ thật
+
+Lệnh sau chạy ba lượt với PipeWire, VAD, STT và TTS thật:
+
+```sh
+ANGELA_TEST_PIPEWIRE=1 ANGELA_VOICE_REPORT=/tmp/angela-voice-metrics.jsonl pnpm -F @angela/voice-client exec vitest run src/voice-pipewire.test.ts
+```
+
+Mỗi lượt dùng hai sink ảo riêng cho lời Angela và câu nói chen.
+Test chờ playback cũ xuất hiện trong PipeWire trước khi phát câu nói mới vào nguồn capture.
+Sau tín hiệu nói chen, test xác nhận playback cũ bị hủy và biến mất khỏi danh sách sink-input.
+Capture tiếp tục đến khi STT nhận được câu tiếng Việt mới. Cleanup chờ playback đóng trước khi xóa thiết bị.
+File JSONL chỉ chứa thời gian và số lượt, không chứa transcript hoặc credential.
+
+Kết quả ngày 24-10-2026, ba lượt đều đạt:
+
+| Lượt | Bắt đầu câu thử → VAD báo nói | VAD báo nói → playback cũ đóng | Bắt đầu câu thử → transcript |
+| --- | --- | --- | --- |
+| 1 | 1.642 ms | 5 ms | 14.649 ms |
+| 2 | 1.423 ms | 2 ms | 11.422 ms |
+| 3 | 1.860 ms | 3 ms | 11.635 ms |
+
+Thời gian đầu câu gồm cả tổng hợp TTS cho câu thử, không phải độ trễ VAD thuần.
+Đây là kiểm tra qua thiết bị ảo. Nó không đo đường truyền âm thanh trong phòng hoặc khử vọng mic/loa vật lý.
+
+`pnpm -F @angela/voice-client test` đạt 33 test, bỏ qua ba lượt dịch vụ thật theo cấu hình opt-in.
+`pnpm -F @angela/voice-client typecheck` và `pnpm -F @angela/voice-client build` đều đạt.
