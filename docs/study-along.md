@@ -110,3 +110,31 @@ YouTube restrictions can still prevent extraction. No fallback invents missing e
 Other social platforms remain outside this native provider. Existing browser research and Tavily retain their settings.
 
 See [the implementation report](./study-along-implementation.md), [dependency audit](./third-party-audit.md), and [notices](../THIRD_PARTY_NOTICES.md).
+
+## Ôn bài sau khi xem
+
+Nói “Hỏi mình ba câu để ôn năm phút vừa xem”. Angela dùng `study_along` với `action: review`.
+Có thể yêu cầu từ một đến năm câu và chọn ngôn ngữ, như `vi` hoặc `en`.
+Mặc định là ba câu tiếng Việt từ năm phút trước vị trí phát hiện tại.
+URL được chỉ định trực tiếp vẫn cần timestamp. `recentSeconds` chọn khoảng ôn, tối đa một giờ.
+
+Mỗi câu có đáp án tham khảo và mốc bắt đầu của một đoạn transcript hỗ trợ.
+Angela hỏi từng câu, chờ bạn trả lời rồi giải thích theo đáp án và mốc nguồn.
+Câu hỏi không bao gồm nội dung ngoài cửa sổ bằng chứng đã lấy.
+Nếu bằng chứng trống hoặc bị cắt, hãy chọn khoảng ngắn hơn hoặc vị trí khác.
+Đáp án được tạo bởi model, nên mốc nguồn hỗ trợ kiểm tra lại nội dung.
+
+Để lưu tiến độ, dùng memory học tập hiện có:
+
+1. Nói rõ chủ đề: “Ghi nhớ mình đang học AddScoped”.
+2. Chọn lịch: “Nhắc mình ôn AddScoped mỗi ba ngày”.
+3. Sau khi ôn, xác nhận: “Mình đã ôn xong AddScoped”.
+
+Memory lưu chủ đề bạn nêu, số lượt ôn hoàn tất và ngày ôn tiếp theo.
+Các mốc hỗ trợ là 1, 3, 7, 14 hoặc 30 ngày. Settings quản lý ghi nhớ và thông báo như trước.
+Tạo câu hỏi không tự lưu transcript, chấm hoàn thành hoặc bật thông báo.
+Chỉ xác nhận đã lưu sau khi công cụ memory trả thành công. Tắt memory ngăn lưu tiến độ mới.
+Lịch sử ghi nhớ tách theo nhân vật và workspace, vẫn tồn tại sau khi khởi động lại.
+
+Runtime kiểm tra JSON, số câu, độ dài, câu trùng và mốc trích dẫn trước khi trả quiz.
+Yêu cầu bị hủy không trả quiz cũ ngay cả khi model không dừng kịp.

@@ -228,3 +228,36 @@ The separate bridge acceptance case uses real authenticated loopback WebSockets 
 
 Verification passed: desktop typecheck, desktop build, and the controlled Chromium acceptance case.
 The internet suite passed 54 tests across eight files with `ANGELA_TEST_CHROME=1`.
+
+## Post-lesson reviews
+
+The desktop `review` action uses the saved chat model with a dedicated quiz system prompt.
+It sends only a complete bounded recent excerpt, a question count from one to five, and a language code.
+Valibot checks the result shape, exact count, bounded strings, distinct questions, and citations matching supplied segment starts.
+Output from cancelled requests is discarded. Quiz generation never changes personal memory.
+Existing companion learning tools own explicit topic saves, review schedules, and user-confirmed completion.
+A persistence test exercises those tools across independent stores and rejects completion evidence from a model answer.
+No new dependency, memory format, scheduler, or automatic transcript-to-memory projection is introduced.
+
+A public YouTube subtitle probe on 24 October 2026 returned HTTP 429 and a human-verification requirement.
+No browser cookies or login sessions were extracted. Public-video extraction remains unverified from this network.
+Controlled Chromium observation and authenticated bridge tests do not override that external limitation.
+
+Full extension verification now also passes with a real restricted extension in a full Chromium instance.
+It covers popup pairing, active-tab permission, fresh playback, summaries, stop sharing, tab closure, uninstall, and revocation.
+See [the browser verification commands and boundaries](./study-along-browser-checks.md).
+
+## Final verification for post-lesson reviews
+
+| Command | Result |
+| --- | --- |
+| Browser-enabled desktop group in [browser checks](./study-along-browser-checks.md) | 77 tests passed across 12 files |
+| `pnpm -F @angela/companion exec vitest run src/companion/records.test.ts` | 6 tests passed, including persisted review progress |
+| `NODE_OPTIONS=--max-old-space-size=4096 pnpm typecheck --concurrency=1` | All 60 tasks passed |
+| `pnpm -F @angela/desktop build` | Passed |
+| `pnpm lint` | No errors, 603 existing warnings |
+| `git diff --check` | Passed |
+
+Voice checks and real-service measurements are in [desktop runtime checks](./desktop-runtime-checks.md).
+Release preflight results and the missing release media blocker are in [media artifacts](./study-along-media-artifacts.md).
+No physical acoustic test, clean-machine installer certification, or live chat-model quiz evaluation is claimed.

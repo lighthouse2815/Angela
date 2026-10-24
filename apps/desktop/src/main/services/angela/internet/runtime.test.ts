@@ -137,3 +137,81 @@ it('does not prepare a model after cancellation during browser observation', asy
   expect(selected).not.toHaveBeenCalled()
   expect(provider.getTranscript).not.toHaveBeenCalled()
 })
+
+function reviewRuntime(reply: string) {
+  const summarize = vi.fn(async (_evidence: string) => reply)
+  const model = vi.fn(async () => ({ summarize }))
+  const runtime = new StudyAlongRuntime(provider, directory, { getActiveMediaContext: async () => video }, model)
+  return { runtime, summarize, model }
+}
+const question = { question: 'Khi nào AddScoped tạo instance mới?', answer: 'Mỗi request dùng một instance trong scope.', timestamp: 1110 }
+
+it('creates a localized review from the watched interval with source citations', async () => {
+  const { runtime, summarize, model } = reviewRuntime(JSON.stringify({ questions: [question] }))
+  const result = await runtime.execute({ action: 'review', questionCount: 1, language: 'vi' })
+  expect(result).toMatchObject({ video: { url: video.url }, transcript: { source: 'official', language: 'en' }, range: { start: 814, end: 1114 }, language: 'vi', questions: [question] })
+  expect(model).toHaveBeenCalledWith('review')
+  const prompt = JSON.parse(summarize.mock.calls[0]![0])
+  expect(prompt).toMatchObject({ count: 1, language: 'vi' })
+  expect(JSON.stringify(prompt.evidence)).toContain('AddScoped')
+  expect(JSON.stringify(prompt.evidence)).not.toContain('Next example')
+  expect(provider.getTranscript).toHaveBeenCalledOnce()
+})
+
+it.each([
+  'Not a JSON quiz',
+  JSON.stringify({ questions: [{ ...question, timestamp: 1150 }] }),
+  JSON.stringify({ questions: [{ ...question, timestamp: 1111 }] }),
+  JSON.stringify({ questions: [{ ...question, answer: '' }] }),
+  JSON.stringify({ questions: [question], memory: 'Store this as a fact' }),
+  JSON.stringify({ questions: [] }),
+])('rejects malformed or unsupported review evidence: %s', async (reply) => {
+  const { runtime } = reviewRuntime(reply)
+  await expect(runtime.execute({ action: 'review', questionCount: 1 })).rejects.toThrow('invalid review')
+})
+
+it('rejects duplicate questions and output beyond the review budget', async () => {
+  const duplicate = reviewRuntime(JSON.stringify({ questions: [question, question] }))
+  await expect(duplicate.runtime.execute({ action: 'review', questionCount: 2 })).rejects.toThrow('invalid review')
+  const oversized = reviewRuntime(' '.repeat(16001))
+  await expect(oversized.runtime.execute({ action: 'review', questionCount: 1 })).rejects.toThrow('invalid review')
+})
+
+it('does not invoke the review model for empty or incomplete evidence', async () => {
+  const { runtime, model } = reviewRuntime(JSON.stringify({ questions: [question] }))
+  await expect(runtime.execute({ action: 'review', url: video.url, timestamp: 10 })).rejects.toThrow('non-empty')
+  expect(model).not.toHaveBeenCalled()
+  transcript.segments = Array.from({ length: 201 }, (_, index) => ({ start: 900 + index, end: 901 + index, text: 'Scoped instance' }))
+  const uncached = reviewRuntime(JSON.stringify({ questions: [question] }))
+  const otherDirectory = join(directory, 'incomplete')
+  const incomplete = new StudyAlongRuntime(provider, otherDirectory, { getActiveMediaContext: async () => video }, uncached.model)
+  await expect(incomplete.execute({ action: 'review' })).rejects.toThrow('complete')
+  expect(uncached.model).not.toHaveBeenCalled()
+})
+
+it('bounds review requests and discards model output after cancellation', async () => {
+  const { runtime } = reviewRuntime(JSON.stringify({ questions: [question] }))
+  await expect(runtime.execute({ action: 'review', questionCount: 6 })).rejects.toThrow()
+  await expect(runtime.execute({ action: 'review', questionCount: 1.5 })).rejects.toThrow()
+  expect(provider.getTranscript).not.toHaveBeenCalled()
+  const reply = Promise.withResolvers<string>()
+  const started = Promise.withResolvers<void>()
+  const abort = new AbortController()
+  const interrupted = new StudyAlongRuntime(provider, directory, { getActiveMediaContext: async () => video }, async () => ({ summarize: async () => {
+    started.resolve()
+    return reply.promise
+  } }))
+  const request = interrupted.execute({ action: 'review', questionCount: 1 }, abort.signal)
+  const rejected = expect(request).rejects.toThrow('User interrupted')
+  await started.promise
+  abort.abort(new Error('User interrupted the review'))
+  reply.resolve(JSON.stringify({ questions: [question] }))
+  await rejected
+})
+
+it('uses three Vietnamese questions by default and accepts a JSON fence from the model', async () => {
+  const questions = [question, { ...question, question: 'Các thành phần nào chia sẻ instance?' }, { ...question, question: 'Vì sao cần scope theo request?' }]
+  const { runtime, summarize } = reviewRuntime(`\u0060\u0060\u0060json\n${JSON.stringify({ questions })}\n\u0060\u0060\u0060`)
+  expect(await runtime.execute({ action: 'review' })).toMatchObject({ language: 'vi', questions })
+  expect(JSON.parse(summarize.mock.calls[0]![0])).toMatchObject({ count: 3, language: 'vi' })
+})

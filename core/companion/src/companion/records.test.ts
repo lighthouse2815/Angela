@@ -101,3 +101,28 @@ it('rolls back nested Memory V2 writes and search projections on failure', async
   }
   finally { index.close() }
 })
+
+it('persists a confirmed lesson review through existing learning tools without storing model answers', async () => {
+  const { open } = await setup()
+  const store = await open()
+  const userText = 'Mình học AddScoped. Nhắc mình ôn mỗi 3 ngày.'
+  const [memory] = await store.tools(userText, requestPrivacy(userText))
+  const options = {} as Parameters<typeof memory.execute>[1]
+  const input = { action: 'learning.save', id: null, text: 'AddScoped', category: 'topic', kind: 'activity', status: 'completed', interval: 3, due_at: null, source_quote: 'Mình học AddScoped' }
+  const saved = await memory.execute(input, options)
+  expect(saved).toMatchObject({ status: 'saved', entry: { text: 'AddScoped' } })
+  const { snapshot } = await store.execute({ type: 'read' })
+  expect(snapshot.memories[0].review).toBeUndefined()
+  const id = snapshot.memories[0].id
+  expect(await memory.execute({ ...input, action: 'learning.schedule', id, source_quote: 'Nhắc mình ôn mỗi 3 ngày' }, options)).toMatchObject({ status: 'saved', entry: { review: { count: 0, intervalDays: 3 } } })
+  const restored = await open()
+  expect((await restored.execute({ type: 'read' })).snapshot.memories[0].review?.count).toBe(0)
+  const finished = 'Mình đã ôn xong AddScoped.'
+  const [review] = await restored.tools(finished, requestPrivacy(finished))
+  expect(await review.execute({ ...input, action: 'learning.review', id, source_quote: 'The model generated an answer' }, options)).toMatchObject({ status: 'rejected' })
+  expect(await review.execute({ ...input, action: 'learning.review', id, source_quote: finished }, options)).toMatchObject({ status: 'saved', entry: { review: { count: 1 } } })
+  const reloaded = (await (await open()).execute({ type: 'read' })).snapshot
+  expect(reloaded.memories).toHaveLength(1)
+  expect(reloaded.memories[0]).toMatchObject({ text: 'AddScoped', review: { count: 1, intervalDays: 3 } })
+  expect((await (await open('other')).execute({ type: 'read' })).snapshot.memories).toEqual([])
+})

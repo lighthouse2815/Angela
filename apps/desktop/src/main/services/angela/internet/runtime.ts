@@ -13,12 +13,14 @@ import { browserServerName } from '../../../../shared/browser-mcp'
 
 const windowSchema = v.pipe(secondsSchema, v.maxValue(3600))
 const requestSchema = v.object({
-  action: v.picklist(['around', 'recent', 'search', 'transcript', 'summarize', 'summarize-recent']),
+  action: v.picklist(['around', 'recent', 'search', 'transcript', 'summarize', 'summarize-recent', 'review']),
   url: v.optional(v.pipe(v.string(), v.maxLength(4096))),
   timestamp: v.optional(secondsSchema),
   beforeSeconds: v.optional(windowSchema),
   afterSeconds: v.optional(windowSchema),
   recentSeconds: v.optional(v.pipe(windowSchema, v.minValue(1))),
+  questionCount: v.optional(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(5)), 3),
+  language: v.optional(v.pipe(v.string(), v.regex(/^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/u), v.maxLength(35)), 'vi'),
   query: v.optional(v.pipe(v.string(), v.trim(), v.minLength(1), v.maxLength(200))),
 })
 
@@ -31,7 +33,7 @@ export class StudyAlongRuntime {
     provider: TranscriptProvider,
     cacheDirectory: string,
     private readonly browser: BrowserMediaContextProvider,
-    private readonly summarizer: () => Promise<VideoSummarizer>,
+    private readonly summarizer: (purpose?: 'summary' | 'review') => Promise<VideoSummarizer>,
     private readonly signal?: AbortSignal,
     ttlDays = () => 30,
   ) {
@@ -68,12 +70,40 @@ export class StudyAlongRuntime {
       return this.service.getTranscriptAround(url, timestamp ?? 0, 0, request.afterSeconds ?? 600, signal)
     if (timestamp === undefined)
       throw new InternetError('UNAVAILABLE', 'The lesson tab has no readable playback position. Provide an explicit timestamp.')
+    if (request.action === 'review')
+      return this.review(url, timestamp, request.recentSeconds ?? 300, request.questionCount, request.language, signal)
     if (request.action === 'summarize-recent') {
       return this.service.summarizeRecentVideoContext(url, timestamp, request.recentSeconds ?? 300, signal, await this.summarizer())
     }
     if (request.action === 'recent')
       return this.service.getTranscriptAround(url, timestamp, request.recentSeconds ?? 300, 0, signal)
     return this.service.getTranscriptAround(url, timestamp, request.beforeSeconds, request.afterSeconds, signal)
+  }
+
+  /** Generates a bounded review without changing personal memory or marking the lesson complete. */
+  private async review(url: string, timestamp: number, recentSeconds: number, count: number, language: string, signal?: AbortSignal) {
+    const evidence = await this.service.getTranscriptAround(url, timestamp, recentSeconds, 0, signal)
+    if (evidence.truncated || !evidence.recentSegments.length)
+      throw new InternetError('UNAVAILABLE', 'Review requires a complete, non-empty transcript window.')
+    const model = await this.summarizer('review')
+    signal?.throwIfAborted()
+    const output = await model.summarize(JSON.stringify({ count, language, evidence }), signal)
+    signal?.throwIfAborted()
+    const text = v.pipe(v.string(), v.trim(), v.minLength(1), v.maxLength(1000))
+    const schema = v.strictObject({ questions: v.pipe(v.array(v.strictObject({ question: text, answer: text, timestamp: secondsSchema })), v.length(count)) })
+    try {
+      if (output.length > 16000)
+        throw new Error('Review output exceeds its budget')
+      const review = v.parse(schema, JSON.parse(output.trim().replace(/^```(?:json)?\s*/iu, '').replace(/\s*```$/u, '')))
+      if (review.questions.some(question => !evidence.recentSegments.some(segment => segment.start === question.timestamp)))
+        throw new Error('Review citation is absent from the supplied evidence')
+      if (new Set(review.questions.map(question => question.question.toLocaleLowerCase())).size !== count)
+        throw new Error('Review questions must be distinct')
+      return { video: evidence.video, transcript: evidence.transcript, range: evidence.range, language, questions: review.questions }
+    }
+    catch {
+      throw new InternetError('PROVIDER_FAILED', 'The chat model returned an invalid review. Retry with fewer questions or another lesson interval.')
+    }
   }
 }
 

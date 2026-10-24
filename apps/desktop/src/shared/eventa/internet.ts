@@ -4,12 +4,14 @@ import { defineInvokeEventa } from '@moeru/eventa'
 
 /** Playback positions and windows use seconds. Omitted URLs select the connected current lesson tab. */
 export interface VideoResearchRequest {
-  action: 'around' | 'recent' | 'search' | 'transcript' | 'summarize' | 'summarize-recent'
+  action: 'around' | 'recent' | 'search' | 'transcript' | 'summarize' | 'summarize-recent' | 'review'
   url?: string
   timestamp?: number
   beforeSeconds?: number
   afterSeconds?: number
   recentSeconds?: number
+  questionCount?: number
+  language?: string
   query?: string
 }
 
