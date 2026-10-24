@@ -8,8 +8,11 @@ import { join } from 'node:path'
 
 import { describe, expect, it, vi } from 'vitest'
 
-import { parseYouTubeUrl } from './contracts'
+import { InternetService } from '../internet'
+import { FileTranscriptCache } from './cache'
+import { InternetError, parseYouTubeUrl } from './contracts'
 import { MediaProcess } from './process'
+import { TranscriptFallbackRouter } from './transcription-routing'
 import { parseCaptionJson, YouTubeTranscriptProvider } from './youtube'
 
 const video = parseYouTubeUrl('https://youtu.be/dQw4w9WgXcQ')
@@ -95,6 +98,53 @@ describe('youTube fallback policy', () => {
     expect(encodes[0]![1]).toEqual(expect.arrayContaining(['-ss', '0', '-t', '600']))
     expect(encodes[1]![1]).toEqual(expect.arrayContaining(['-ss', '600', '-t', '600']))
     await expect(access(temporary)).rejects.toThrow()
+  })
+
+  it('uses local transcription for a captionless lesson and caches the complete timestamped result', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'angela-local-cache-'))
+    const run = vi.fn<MediaProcess['run']>(async (executable, args, options = {}) => {
+      if (args.includes('--dump-single-json'))
+        return metadata()
+      if (args.includes('bestaudio'))
+        await writeFile(join(options.cwd!, 'source.webm'), 'fixture audio')
+      if (executable === 'ffmpeg')
+        await writeFile(args.at(-1)!, 'fixture encoded chunk')
+      return ''
+    })
+    const transcribe = vi.fn(async () => [{ start: 2, end: 8, text: 'Local evidence' }])
+    const local = vi.fn(async () => ({ transcribe }))
+    const cloud = vi.fn()
+    const router = new TranscriptFallbackRouter(async () => ({ enabled: true, transcriptionMode: 'auto', allowCloudAudioUpload: false }), local, cloud)
+    const cache = new FileTranscriptCache(directory)
+    const service = new InternetService(new YouTubeTranscriptProvider({ run }, router), cache)
+    try {
+      const result = await service.getTranscript(video.url)
+      expect(result.segments.map(segment => segment.start)).toEqual([2, 602])
+      expect(result.source).toBe('transcription')
+      await service.getTranscript(video.url)
+      expect(local).toHaveBeenCalledOnce()
+      expect(transcribe).toHaveBeenCalledTimes(2)
+      expect(cloud).not.toHaveBeenCalled()
+      // A later chunk failure leaves no partial reusable transcript.
+      await rm(directory, { recursive: true, force: true })
+      transcribe.mockResolvedValueOnce([{ start: 1, end: 2, text: 'First partial chunk' }]).mockRejectedValueOnce(new InternetError('PROVIDER_FAILED', 'Second chunk failed'))
+      await expect(service.getTranscript(video.url)).rejects.toThrow('Second chunk failed')
+      expect(await cache.get(video.videoId)).toBeUndefined()
+    }
+    finally {
+      await rm(directory, { recursive: true, force: true })
+    }
+  })
+
+  it('rejects missing local setup with cloud upload disabled before audio extraction', async () => {
+    const run = vi.fn<MediaProcess['run']>(async (_executable, args) => args.includes('--dump-single-json') ? metadata() : '')
+    const cloud = vi.fn()
+    const router = new TranscriptFallbackRouter(async () => ({ enabled: true, transcriptionMode: 'auto', allowCloudAudioUpload: false }), async () => {
+      throw new InternetError('NEED_SETUP', 'Install a local model')
+    }, cloud)
+    await expect(new YouTubeTranscriptProvider({ run }, router).getTranscript(video)).rejects.toThrow('upload is disabled')
+    expect(cloud).not.toHaveBeenCalled()
+    expect(run.mock.calls.some(call => call[1].includes('bestaudio'))).toBe(false)
   })
 
   it('rejects unknown audio duration before downloading or uploading', async () => {

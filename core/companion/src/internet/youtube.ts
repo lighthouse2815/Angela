@@ -149,7 +149,8 @@ export class YouTubeTranscriptProvider implements TranscriptProvider {
       }
       if (!this.transcription)
         throw new InternetError('NO_SUBTITLES', 'Subtitles are unavailable. Select an audio transcription provider for fallback.')
-      const segments = await this.transcribe(video, metadata.duration, directory, signal)
+      const transcription = this.transcription.prepare ? await this.transcription.prepare(signal) : this.transcription
+      const segments = await this.transcribe(video, metadata.duration, directory, transcription, signal)
       return { ...base, language: 'und', source: 'transcription', segments }
     }
     finally {
@@ -157,7 +158,7 @@ export class YouTubeTranscriptProvider implements TranscriptProvider {
     }
   }
 
-  private async transcribe(video: VideoContext, duration: number | null | undefined, directory: string, signal?: AbortSignal) {
+  private async transcribe(video: VideoContext, duration: number | null | undefined, directory: string, transcription: TranscriptionProvider, signal?: AbortSignal) {
     // Probe metadata before downloading. The four-hour ceiling bounds disk use and paid transcription requests.
     if (!duration || duration > 14400)
       throw new InternetError('LIMIT_EXCEEDED', 'Audio transcription requires a known duration of at most four hours.')
@@ -207,12 +208,13 @@ export class YouTubeTranscriptProvider implements TranscriptProvider {
       const size = (await stat(path)).size
       if (!size || size > 24 * 1024 * 1024)
         throw new InternetError('LIMIT_EXCEEDED', 'Audio chunk is empty or exceeds the upload budget.')
-      const result = await this.transcription!.transcribe(await readFile(path), signal)
+      const result = await transcription.transcribe(await readFile(path), signal)
       for (const segment of result) {
         if (segment.end > chunkDuration + 1)
           throw new InternetError('PROVIDER_FAILED', 'Transcription timestamps exceed the audio chunk.')
         segments.push(v.parse(segmentSchema, { ...segment, start: segment.start + offset, end: segment.end + offset }))
       }
+      await rm(path)
     }
     return segments
   }

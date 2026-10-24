@@ -10,11 +10,11 @@ import * as v from 'valibot'
 import { InternetError, transcriptSchema } from './contracts'
 
 /**
- * Owns at most 100 private transcript files with a 30-day TTL. Writes use atomic replacement.
+ * Owns at most 100 private transcript files with a configurable TTL. Writes use atomic replacement.
  * Corrupt, oversized, expired, or mismatched entries become misses. Transient audio never enters this store.
  */
 export class FileTranscriptCache implements TranscriptCache {
-  constructor(private readonly directory: string, private readonly now = Date.now) {}
+  constructor(private readonly directory: string, private readonly now = Date.now, private readonly ttlDays = () => 30) {}
 
   private path(videoId: string) {
     if (!/^[\w-]{11}$/u.test(videoId))
@@ -42,7 +42,8 @@ export class FileTranscriptCache implements TranscriptCache {
           return undefined
         const transcript = v.parse(transcriptSchema, JSON.parse(new TextDecoder().decode(buffer.subarray(0, size))))
         const age = this.now() - transcript.generatedAt
-        if (transcript.videoId === videoId && age >= 0 && age < 30 * 86400 * 1000)
+        const days = v.parse(v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(90)), this.ttlDays())
+        if (transcript.videoId === videoId && age >= 0 && age < days * 86400 * 1000)
           return transcript
       }
       finally {

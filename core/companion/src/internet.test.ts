@@ -138,6 +138,68 @@ describe('transcript cache and recovery', () => {
     expect(await cache.get('dQw4w9WgXcQ')).toBeUndefined()
   })
 
+  it('cancels one waiter without interrupting another video question', async () => {
+    let complete!: (value: Transcript) => void
+    let extractionSignal: AbortSignal | undefined
+    provider.getTranscript = vi.fn(async (_video, signal) => {
+      extractionSignal = signal
+      return new Promise<Transcript>((resolve) => {
+        complete = resolve
+      })
+    })
+    const service = new InternetService(provider, cache)
+    const abort = new AbortController()
+    const first = service.getTranscript(url, abort.signal)
+    const rejected = expect(first).rejects.toThrow('CANCELLED')
+    const second = service.getTranscript(url)
+    await vi.waitFor(() => expect(provider.getTranscript).toHaveBeenCalledOnce())
+    abort.abort()
+    await rejected
+    expect(extractionSignal?.aborted).toBe(false)
+    complete(transcript)
+    expect((await second).segments).toEqual(transcript.segments)
+    expect(await cache.get(transcript.videoId)).toBeDefined()
+  })
+
+  it('aborts extraction after its last waiter leaves and waits for file cleanup', async () => {
+    let cleanup!: () => void
+    let extractionSignal: AbortSignal | undefined
+    provider.getTranscript = vi.fn(async (_video, signal) => {
+      extractionSignal = signal
+      await new Promise<void>((resolve) => {
+        cleanup = resolve
+      })
+      signal?.throwIfAborted()
+      return transcript
+    })
+    const service = new InternetService(provider, cache)
+    const abort = new AbortController()
+    const first = service.getTranscript(url, abort.signal)
+    const rejected = expect(first).rejects.toThrow('CANCELLED')
+    await vi.waitFor(() => expect(provider.getTranscript).toHaveBeenCalledOnce())
+    abort.abort()
+    await rejected
+    expect(extractionSignal?.aborted).toBe(true)
+    let idle = false
+    const cleaned = service.whenIdle().then(() => {
+      idle = true
+    })
+    await Promise.resolve()
+    expect(idle).toBe(false)
+    cleanup()
+    await cleaned
+    expect(await cache.get(transcript.videoId)).toBeUndefined()
+  })
+
+  it('uses the configured TTL for existing complete cache entries', async () => {
+    await cache.set(transcript)
+    let days = 1
+    const configured = new FileTranscriptCache(directory, () => transcript.generatedAt + 2 * 86400000, () => days)
+    expect(await configured.get(transcript.videoId)).toBeUndefined()
+    days = 3
+    expect(await configured.get(transcript.videoId)).toBeDefined()
+  })
+
   it('expires stored evidence and treats corruption as a miss', async () => {
     await cache.set(transcript)
     expect(await new FileTranscriptCache(directory, () => transcript.generatedAt + 31 * 86400000).get(transcript.videoId)).toBeUndefined()

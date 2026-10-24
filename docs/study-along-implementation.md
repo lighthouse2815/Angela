@@ -144,3 +144,11 @@ Upstream URLs and package paths remain in documentation and notices. Derived cod
 - Both changed runtime owners build, and the executed tests pass.
 
 Setup details and API contracts are in [study-along.md](./study-along.md).
+
+## Native local transcription boundary
+
+`LocalWhisperTranscriptionProvider` decodes each bounded audio chunk with FFmpeg and executes whisper.cpp without Python. It accepts timestamped JSON only. Offsets remain fractional seconds and the extractor adds the source chunk offset once. Request-owned files are removed on success and failure.
+
+`TranscriptFallbackRouter` prepares one source before downloading audio. Local inference failure never silently changes the audio recipient. Cloud selection requires explicit upload permission, checked again before every chunk upload. Desktop settings wiring follows this core boundary.
+
+Concurrent questions share one extraction. Individual cancellation leaves other callers running. The last cancellation stops extraction, and `whenIdle()` waits for cleanup. Only a complete successful transcript enters the existing private cache. Its default TTL remains 30 days, with a host-configurable range of 1–90 days.

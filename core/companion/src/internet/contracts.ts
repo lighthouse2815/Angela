@@ -51,6 +51,8 @@ export interface TranscriptProvider {
 
 /** The host chooses one audio recipient. Implementations must not silently switch providers. */
 export interface TranscriptionProvider {
+  /** Binds one source for the whole video before downloading audio. Consent and setup errors must fail before media extraction. */
+  prepare?: (signal?: AbortSignal) => Promise<TranscriptionProvider>
   transcribe: (audio: Uint8Array, signal?: AbortSignal) => Promise<TranscriptSegment[]>
 }
 
