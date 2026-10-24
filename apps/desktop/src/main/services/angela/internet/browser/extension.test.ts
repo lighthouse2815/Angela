@@ -12,6 +12,7 @@ import { createContext } from '@moeru/eventa/adapters/websocket/native'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { extensionReadMedia } from '../../../../../shared/eventa/browser-media'
+import { StudyAlongRuntime } from '../runtime'
 import { ChromeExtensionBrowserProvider } from './extension'
 import { ActiveBrowserMediaProvider } from './provider'
 
@@ -105,4 +106,26 @@ describe('authenticated extension bridge over real loopback WebSockets', () => {
     }) }
     await expect(new ActiveBrowserMediaProvider(bridge, missing).getActiveMediaContext()).rejects.toThrow('No active lesson')
   })
+})
+
+it('routes shared playback through the authenticated bridge and rejects revoked context even with cached evidence', async () => {
+  await connect(await bridge.pair(extensionId))
+  const transcript = { version: 1 as const, videoId: 'dQw4w9WgXcQ', title: 'Scoped services', duration: 2000, language: 'en', source: 'official' as const, generatedAt: Date.now(), segments: [
+    { start: 1100, end: 1110, text: 'One instance per request.' },
+    { start: 1150, end: 1160, text: 'Future example.' },
+  ] }
+  const extraction = vi.fn(async () => transcript)
+  const summarize = vi.fn(async (evidence: string) => {
+    expect(evidence).toContain('One instance per request.')
+    expect(evidence).not.toContain('Future example.')
+    return 'Each request uses one scoped instance.'
+  })
+  const runtime = new StudyAlongRuntime({ getTranscript: extraction }, join(directory, 'transcripts'), bridge, async () => ({ summarize }))
+  expect(await runtime.execute({ action: 'recent' })).toMatchObject({ video: { currentTime: 1114 }, recentSegments: [{ text: 'One instance per request.' }] })
+  expect(await runtime.execute({ action: 'summarize-recent' })).toMatchObject({ summary: 'Each request uses one scoped instance.' })
+  expect(extraction).toHaveBeenCalledOnce()
+  await bridge.revoke()
+  await expect(runtime.execute({ action: 'around' })).rejects.toThrow('not connected')
+  expect(extraction).toHaveBeenCalledOnce()
+  await runtime.whenIdle()
 })

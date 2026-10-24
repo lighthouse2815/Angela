@@ -207,3 +207,24 @@ Application-source searches found no Agent-Reach imports, upstream runtime URL, 
 Git has no submodule entries. The original Agent-Reach MIT license remains present and packaged.
 New whisper.cpp and original Whisper model notices remain distinct from actual release artifact obligations.
 No executable, model weights, provider keys, environment credentials, or raw lesson audio are committed.
+
+## Acceptance verification: 24 October 2026
+
+Desktop checks now cover the complete authenticated loopback bridge → fresh playback → bounded transcript → recent summary path.
+Revoking pairing prevents implicit lesson reads even when the transcript is already cached.
+Cancelled requests stop before browser observation and recheck cancellation before model selection.
+
+Run the controlled Chromium acceptance case:
+
+```sh
+ANGELA_TEST_CHROME=1 pnpm exec vitest run --config apps/desktop/vitest.node.config.ts src/main/services/angela/internet/browser.chromium.test.ts
+```
+
+This case runs the production observation script in real Chromium against an intercepted YouTube-shaped video page.
+It checks a changed playback position, recent-only evidence, cache reuse, and a tab with no video.
+The MCP transport, public video response, extraction provider, and model are controlled boundaries.
+It does not certify toolbar sharing in a manually installed Chrome extension or public YouTube subtitle availability.
+The separate bridge acceptance case uses real authenticated loopback WebSockets and Eventa RPC.
+
+Verification passed: desktop typecheck, desktop build, and the controlled Chromium acceptance case.
+The internet suite passed 54 tests across eight files with `ANGELA_TEST_CHROME=1`.

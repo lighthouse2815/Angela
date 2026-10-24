@@ -32,7 +32,7 @@ export class StudyAlongRuntime {
     cacheDirectory: string,
     private readonly browser: BrowserMediaContextProvider,
     private readonly summarizer: () => Promise<VideoSummarizer>,
-    signal?: AbortSignal,
+    private readonly signal?: AbortSignal,
     ttlDays = () => 30,
   ) {
     this.cache = new FileTranscriptCache(cacheDirectory, Date.now, ttlDays)
@@ -44,11 +44,14 @@ export class StudyAlongRuntime {
   }
 
   async execute(input: unknown, signal?: AbortSignal) {
+    signal = signal && this.signal ? AbortSignal.any([signal, this.signal]) : signal ?? this.signal
+    signal?.throwIfAborted()
     const request = v.parse(requestSchema, input)
     let url = request.url
     let timestamp = request.timestamp
     if (!url) {
       const video = await this.browser.getActiveMediaContext()
+      signal?.throwIfAborted()
       url = video.url
       timestamp ??= video.currentTime ?? undefined
     }

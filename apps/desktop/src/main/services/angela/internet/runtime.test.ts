@@ -114,3 +114,26 @@ describe('native internet diagnostics', () => {
     expect(rows.filter(row => row.status === 'NEED_SETUP')).toHaveLength(4)
   })
 })
+
+it('does not observe the browser or prepare a model for an already cancelled request', async () => {
+  const { runtime, callTool, summarize } = createRuntime()
+  const cancelled = AbortSignal.abort(new Error('User interrupted the question'))
+  await expect(runtime.execute({ action: 'summarize' }, cancelled)).rejects.toThrow('User interrupted')
+  expect(callTool).not.toHaveBeenCalled()
+  expect(summarize).not.toHaveBeenCalled()
+  expect(provider.getTranscript).not.toHaveBeenCalled()
+})
+
+it('does not prepare a model after cancellation during browser observation', async () => {
+  const observed = Promise.withResolvers<typeof video>()
+  const selected = vi.fn(async () => ({ summarize: vi.fn() }))
+  const runtime = new StudyAlongRuntime(provider, directory, { getActiveMediaContext: () => observed.promise }, selected)
+  const cancellation = new AbortController()
+  const request = runtime.execute({ action: 'summarize' }, cancellation.signal)
+  const rejected = expect(request).rejects.toThrow('User interrupted')
+  cancellation.abort(new Error('User interrupted the question'))
+  observed.resolve(video)
+  await rejected
+  expect(selected).not.toHaveBeenCalled()
+  expect(provider.getTranscript).not.toHaveBeenCalled()
+})
