@@ -145,3 +145,30 @@ Gateway engine không cần build cho typecheck. Workflow CLI vẫn kiểm tra b
 
 Sandbox helper cần quyền `root:root`, `4755` trên runner Ubuntu này. Workflow cấu hình quyền trước khi mở Electron.
 Kiểm tra click và gõ native vẫn chờ host phù hợp. Kết quả Xvfb chỉ chứng nhận hiển thị cửa sổ.
+
+## Hồi quy nói chen ngày 24-10-2026
+
+VAD bỏ kết quả lọc tiếng vọng nếu người dùng đã mở lượt nhập khác hoặc tắt nghe tự động.
+Điều này giữ quyền sở hữu lượt nhập thủ công khi bộ lọc trả kết quả chậm.
+
+Chạy nhóm kiểm tra voice dùng chung:
+
+```sh
+pnpm exec vitest run --config shared/ui/stage/vitest.config.ts --project node src/libs/voice src/libs/speech src/services/speech/speech-client.test.ts
+```
+
+Test nói chen dùng controller, capture, VAD plugin và playback queue thật với provider và audio driver giả lập.
+Test xác nhận giữ đầu câu trong lúc fade, hủy synthesis cũ và gửi bản chép lời mới vào đúng phiên.
+Âm thanh synthesis cũ trả về muộn không được phát. Lượt trả lời mới vẫn phát bình thường.
+Hai test khác xác nhận kết quả lọc chậm không thay lượt nhập thủ công hoặc mở lượt sau khi tắt nghe.
+
+Nhóm này không đo độ trễ mic, loa vật lý hoặc khả năng khử vọng của thiết bị.
+Nói chen tự động vẫn cần khử vọng của nền tảng hoặc bộ phân loại tiếng vọng do host cung cấp.
+
+Kết quả kiểm tra của phần sửa:
+
+- Nhóm voice dùng chung theo lệnh trên: 13 file đạt, 66 test đạt.
+- `pnpm -F @angela/core-agent exec vitest run src/voice`: 3 file đạt, 29 test đạt.
+- `NODE_OPTIONS=--max-old-space-size=4096 pnpm typecheck --concurrency=1`: 60 tác vụ đạt.
+- `pnpm lint`: không có lỗi, còn 603 cảnh báo ESLint hiện có.
+- `pnpm -F @angela/desktop build`: đạt.

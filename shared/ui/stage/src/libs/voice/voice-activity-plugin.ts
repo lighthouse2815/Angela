@@ -70,6 +70,10 @@ export function createVoiceActivityPlugin(options: VoiceActivityOptions): VoiceP
           return
 
         ctx.signal.throwIfAborted()
+        // A manual input or a disabled listener supersedes an asynchronous echo decision.
+        if (ctx.controls.activeInput()?.id !== input?.id || (options.enabled && !options.enabled()))
+          return
+
         const target = wake ?? options.target()
         if (!target)
           return
