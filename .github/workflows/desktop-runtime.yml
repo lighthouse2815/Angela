@@ -1,44 +1,7 @@
 name: Angela desktop runtime
 
+# Automatic CI is paused to save Actions quota. Run checks manually when needed.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'apps/desktop/**'
-      - 'integrations/plugins/web-extension/**'
-      - 'core/**'
-      - 'providers/inference/**'
-      - 'capabilities/**'
-      - 'shared/**'
-      - 'backend/contracts/**'
-      - 'backend/channel/runtime/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - 'tsconfig.json'
-      - 'turbo.json'
-      - 'vitest.config.ts'
-      - 'eslint.config.ts'
-      - '.github/workflows/desktop-runtime.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'apps/desktop/**'
-      - 'integrations/plugins/web-extension/**'
-      - 'core/**'
-      - 'providers/inference/**'
-      - 'capabilities/**'
-      - 'shared/**'
-      - 'backend/contracts/**'
-      - 'backend/channel/runtime/**'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - 'tsconfig.json'
-      - 'turbo.json'
-      - 'vitest.config.ts'
-      - 'eslint.config.ts'
-      - '.github/workflows/desktop-runtime.yml'
   workflow_dispatch:
 
 permissions:

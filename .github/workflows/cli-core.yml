@@ -1,50 +1,7 @@
 name: Angela CLI core
 
+# Automatic CI is paused to save Actions quota. Run checks manually when needed.
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'apps/cli/**'
-      - 'core/**'
-      - 'providers/**'
-      - 'capabilities/voice/**'
-      - 'capabilities/vision/client/**'
-      - 'capabilities/computer-use/**'
-      - 'integrations/telegram/**'
-      - 'integrations/zalo/**'
-      - 'integrations/discord/**'
-      - 'shared/**'
-      - 'scripts/**'
-      - 'vitest.config.ts'
-      - 'eslint.config.ts'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - 'tsconfig.json'
-      - 'turbo.json'
-      - '.github/workflows/cli-core.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'apps/cli/**'
-      - 'core/**'
-      - 'providers/**'
-      - 'capabilities/voice/**'
-      - 'capabilities/vision/client/**'
-      - 'capabilities/computer-use/**'
-      - 'integrations/telegram/**'
-      - 'integrations/zalo/**'
-      - 'integrations/discord/**'
-      - 'shared/**'
-      - 'scripts/**'
-      - 'vitest.config.ts'
-      - 'eslint.config.ts'
-      - 'package.json'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
-      - 'tsconfig.json'
-      - 'turbo.json'
-      - '.github/workflows/cli-core.yml'
   workflow_dispatch:
 
 permissions:
