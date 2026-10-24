@@ -26,7 +26,7 @@ vi.mock('./builtin/widgets', () => ({
 }))
 
 describe('useTamagotchiBuiltinToolsStore', async () => {
-  const { useTamagotchiBuiltinToolsStore } = await import('./built-in')
+  const { computerUseToolReferences, studyAlongToolReferences, useTamagotchiBuiltinToolsStore } = await import('./built-in')
 
   beforeEach(() => {
     setActivePinia(createPinia())
@@ -73,5 +73,7 @@ describe('useTamagotchiBuiltinToolsStore', async () => {
       'internet_diagnostics',
     ])
     expect(toolsStore.getToolsByNames('get_weather')[0]?.function.name).toBe('get_weather')
+    expect(studyAlongToolReferences.map(tool => tool.name)).toEqual(['study_along', 'internet_diagnostics'])
+    expect(computerUseToolReferences.map(tool => tool.name)).not.toContain('study_along')
   })
 })

@@ -554,3 +554,51 @@ microphone-permission:
     description: Angela dùng micrô để nhập giọng nói và phiên âm. Lựa chọn này có hiệu lực cho đến khi bạn đặt lại trong Cài đặt.
     allow: Cho phép
     deny: Từ chối
+study-along:
+  title: Học cùng Angela
+  description: Hỏi về bài học YouTube đang xem. Angela dùng tab đã chia sẻ và thời điểm phát hiện tại.
+  enabled: Bật Học cùng Angela
+  subtitle-order: Ưu tiên phụ đề thủ công, rồi phụ đề tự động và khôi phục phụ đề. Chỉ nhận dạng audio khi không có phụ đề.
+  audio-source: Nhận dạng giọng nói trong video
+  mode-disabled: Tắt
+  mode-local: Chỉ nhận dạng trên máy
+  mode-cloud: Nhà cung cấp đám mây đã lưu
+  mode-auto: Ưu tiên trên máy, rồi đám mây nếu được phép
+  cloud-provider: Nhà cung cấp audio đã lưu
+  manage-providers: Quản lý nhà cung cấp đã lưu
+  model: Model hỗ trợ timestamp
+  model-help: Nhập mã model của nhà cung cấp tương thích. Endpoint phải trả verbose_json với các đoạn có timestamp.
+  allow-upload: Cho phép tải audio lên khi không có phụ đề
+  upload-help: Audio được chia đoạn và gửi tới nhà cung cấp đã chọn. Tắt quyền này sẽ hủy yêu cầu đang chạy và ngăn upload tiếp.
+  cache-days: Số ngày lưu cache transcript
+  cache-help: Chọn 1–90 ngày. Transcript hoàn chỉnh được tái sử dụng. Audio chỉ tồn tại tạm thời và không lưu trong cache này.
+  save: Lưu cài đặt
+  saved: Đã lưu. Yêu cầu bài học đang chạy đã được hủy để áp dụng lựa chọn mới.
+  action-error: Thao tác thất bại. Kiểm tra chẩn đoán Học cùng Angela.
+  local-title: Model trên máy
+  local-description: Nhập model GGML của whisper.cpp tối đa 2 GiB. Có thể dùng model tiny đa ngôn ngữ. Bản Angela cần có whisper-cli.
+  model-source: Mở trang nhà phát hành model
+  model-missing: Chưa cài model trên máy
+  model-importing: Đang xác minh và cài model đã chọn
+  model-ready: Đã cài model trên máy
+  model-error: Cần kiểm tra thiết lập model
+  model-progress: Tiến độ nhập model
+  checksum: Mã SHA-256 đáng tin cậy
+  checksum-help: Lấy mã SHA-256 gồm 64 ký tự từ thông tin artifact của nhà phát hành hoặc quản trị viên bản phát hành. Mã băm riêng lẻ không chứng minh độ tin cậy.
+  model-import: Chọn và nhập model đã xác minh
+  cancel: Hủy nhập
+  browser-title: Chrome và Chromium
+  browser-description: Cài extension Angela Study Along, ghép nối tại đây, rồi chọn Chia sẻ bài học hiện tại trong popup. Chỉ tab video hiện hoạt đã được cho phép mới được chia sẻ.
+  extension-install: Hướng dẫn cài extension
+  browser-connected: Đã kết nối extension
+  browser-waiting: Đã ghép nối, đang chờ extension kết nối
+  browser-unpaired: Chưa ghép nối extension. Vẫn có thể dùng Angela Browser qua Playwright MCP.
+  extension-id: Mã extension trong popup
+  pair: Tạo ghép nối
+  revoke: Thu hồi quyền extension
+  pairing-data: Dữ liệu ghép nối
+  pairing-help: Sao chép vào popup của extension. Quyền này chỉ dành cho ngữ cảnh video. Giữ bí mật token ghép nối.
+  diagnostics-title: Trạng thái sẵn sàng
+  check: Kiểm tra thiết lập trên máy
+  extension-files: Mở thư mục extension
+  advanced-overrides: Biến môi trường nâng cao đang chọn nhà cung cấp {cloudProviderId} và model {cloudModel}.

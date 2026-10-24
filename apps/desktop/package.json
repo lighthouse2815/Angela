@@ -23,11 +23,11 @@
     "dev:xwayland": "install-electron && electron-vite dev -- --ozone-platform=x11",
     "build": "electron-vite build",
     "postinstall": "electron-builder install-app-deps",
-    "build:unpack": "pnpm run build && electron-builder --dir",
+    "build:unpack": "pnpm run build:study-along-extension && pnpm run build && electron-builder --dir",
     "build:flatpak": "pnpm run build:unpack && flatpak-builder --user --install-deps-from=flathub ./flatpak io.github.lighthouse2815.angela.flatpak.yml --force-clean",
-    "build:win": "pnpm run build && electron-builder --win",
-    "build:mac": "pnpm run build && electron-builder --mac",
-    "build:linux": "pnpm run build && electron-builder --linux",
+    "build:win": "pnpm run build:study-along-extension && pnpm run build && electron-builder --win",
+    "build:mac": "pnpm run build:study-along-extension && pnpm run build && electron-builder --mac",
+    "build:linux": "pnpm run build:study-along-extension && pnpm run build && electron-builder --linux",
     "smoke:computer-use-input": "install-electron && electron scripts/fixtures/computer-use-input.cjs",
     "setup:browser": "tsx scripts/setup-browser.ts",
     "setup:computer-use": "tsx scripts/setup-computer-use.ts",
@@ -39,7 +39,8 @@
     "smoke:linux-window-render": "NODE_OPTIONS='--experimental-websocket' tsx scripts/linux-window-render-smoke.ts",
     "update-test:generate": "tsx scripts/update-test/generate-manifest.ts",
     "update-test:server": "tsx scripts/update-test/start-server.ts",
-    "update-test:matrix": "bash scripts/update-test/run-matrix.sh"
+    "update-test:matrix": "bash scripts/update-test/run-matrix.sh",
+    "build:study-along-extension": "pnpm -F @angela/plugin-web-extension build:study-along"
   },
   "dependencies": {
     "@angela/audio": "workspace:^",

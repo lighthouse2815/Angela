@@ -176,7 +176,9 @@ Sử dụng Dừng yêu cầu để loại bỏ một chủ đề. Sử dụng X
 
 ## Study Along
 
-Desktop có công cụ native `study_along` để đọc bài học YouTube trong tab Angela Browser đang kết nối.
+Desktop có công cụ native `study_along` để đọc bài học YouTube trong tab Chrome đã chia sẻ hoặc Angela Browser đang kết nối.
+Mở **Cài đặt → Học cùng Angela** để ghép nối extension, chọn local/cloud transcription và quản lý quyền upload.
+Bản phát hành cung cấp yt-dlp/FFmpeg. Người dùng không cài Python package. Cloud audio mặc định tắt.
 Công cụ giữ timestamp, cache transcript và lấy đoạn quanh vị trí đang xem hoặc 5 phút trước đó.
 `internet_diagnostics` kiểm tra cấu hình và công cụ media cục bộ mà không upload audio.
 Xem [hướng dẫn Study Along](../../docs/study-along.md) để cấu hình extraction, transcription và đọc giới hạn hỗ trợ.

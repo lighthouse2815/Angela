@@ -545,8 +545,24 @@ describe('interactive area synchronized state', () => {
         sessionId: 'session-b',
         text: 'My answer',
         replyToMessageId: 'reply-target',
+        tools: expect.arrayContaining([{ name: 'study_along' }, { name: 'internet_diagnostics' }]),
       }))
     })
+  })
+
+  it('keeps Study Along available when desktop input control is disabled', async () => {
+    const { chat, screen } = await renderArea()
+    const send = vi.spyOn(chat, 'send').mockResolvedValueOnce({ messages: [], sessionId: 'session-b' })
+    const inputControl = screen.getByTestId('computer-use-toggle')
+    await inputControl.click()
+    await expect.element(inputControl).toHaveAttribute('aria-pressed', 'false')
+    await submitDraft(screen, 'đoạn này thầy nói gì?')
+    await vi.waitFor(() => expect(send).toHaveBeenCalledWith(expect.objectContaining({
+      text: 'đoạn này thầy nói gì?',
+      tools: expect.arrayContaining([{ name: 'study_along' }, { name: 'internet_diagnostics' }]),
+    })))
+    const selected = send.mock.calls[0]?.[0].tools
+    expect(selected).not.toEqual(expect.arrayContaining([{ name: 'computer_use' }]))
   })
 
   it('keeps the draft and offers provider settings when no chat provider is configured', async () => {

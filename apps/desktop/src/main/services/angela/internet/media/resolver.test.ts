@@ -56,6 +56,12 @@ describe('managed media tool resolution', () => {
     await expect(resolver().require('yt-dlp')).rejects.toThrow('NEED_SETUP')
   })
 
+  it('rejects generic help output for the local runtime and accepts its timestamped JSON protocol', async () => {
+    const path = await executable(join(root, 'override'), 'whisper-cli')
+    expect(await resolver({ ANGELA_WHISPER_PATH: path }, false, vi.fn(async () => 'usage: unrelated command')).inspect('whisper-cli')).toMatchObject({ source: 'MISSING' })
+    expect(await resolver({ ANGELA_WHISPER_PATH: path }, false, vi.fn(async () => 'whisper-cli --output-json')).inspect('whisper-cli')).toMatchObject({ source: 'OVERRIDE', path })
+  })
+
   it.skipIf(process.platform === 'win32')('scenario D: executes the real bundled fixture when PATH contains no yt-dlp', async () => {
     await executable(join(root, 'media', 'linux-x64'))
     const paths = new MediaToolResolver({ packaged: true, resourcesPath: root, developmentResources: root, platform: 'linux', arch: 'x64', env: { PATH: '' } }, new MediaProcess())

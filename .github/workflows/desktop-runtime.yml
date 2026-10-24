@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - 'apps/desktop/**'
+      - 'integrations/plugins/web-extension/**'
       - 'core/**'
       - 'providers/inference/**'
       - 'capabilities/**'
@@ -23,6 +24,7 @@ on:
     branches: [main]
     paths:
       - 'apps/desktop/**'
+      - 'integrations/plugins/web-extension/**'
       - 'core/**'
       - 'providers/inference/**'
       - 'capabilities/**'
@@ -61,18 +63,18 @@ jobs:
           node-version: 26.11.1
           cache: pnpm
       - name: Install locked desktop and CLI dependencies
-        run: pnpm --filter @angela/desktop... --filter @angela/cli... install --frozen-lockfile --ignore-scripts
+        run: pnpm --filter @angela/desktop... --filter @angela/cli... --filter @angela/plugin-web-extension... install --frozen-lockfile --ignore-scripts
       # CLI typecheck needs its dependency declarations. The gateway engine has no TypeScript build output.
       - name: Build desktop and CLI typecheck prerequisites
         run: pnpm --filter '@angela/desktop^...' --filter '@angela/cli^...' --filter '!@angela/gateway' --workspace-concurrency=1 run build
       - name: Install Chromium
         run: pnpm exec playwright install --with-deps chromium
       - name: Shared companion runtime tests
-        run: pnpm -F @angela/companion exec vitest run --config vitest.config.ts src/companion src/runtime --maxWorkers=1 --no-file-parallelism --testTimeout=30000 --hookTimeout=30000
+        run: pnpm -F @angela/companion exec vitest run --config vitest.config.ts src/companion src/runtime src/internet.test.ts src/internet --maxWorkers=1 --no-file-parallelism --testTimeout=30000 --hookTimeout=30000
       - name: Desktop Node tests
         run: pnpm exec vitest run --config apps/desktop/vitest.node.config.ts --testTimeout=30000 --hookTimeout=30000
       - name: Desktop companion browser tests
-        run: pnpm -F @angela/desktop exec vitest run --config vitest.config.ts --project browser src/renderer/composables/use-companion-runtime.browser.test.ts src/renderer/composables/use-companion-follow-ups.browser.test.ts --maxWorkers=1 --no-file-parallelism --testTimeout=30000 --hookTimeout=30000
+        run: pnpm -F @angela/desktop exec vitest run --config vitest.config.ts --project browser src/renderer/composables/use-companion-runtime.browser.test.ts src/renderer/composables/use-companion-follow-ups.browser.test.ts src/renderer/pages/settings/study-along/index.browser.test.ts --maxWorkers=1 --no-file-parallelism --testTimeout=30000 --hookTimeout=30000
       - name: CLI typecheck
         run: pnpm -F @angela/cli typecheck
       - name: Desktop typecheck
@@ -81,6 +83,8 @@ jobs:
         run: pnpm exec tsc --ignoreConfig --noEmit --strict --skipLibCheck --target ESNext --module ESNext --moduleResolution Bundler --types node apps/desktop/scripts/desktop-overlay-live-window-smoke.ts apps/desktop/scripts/linux-window-render-smoke.ts
       - name: Desktop lint
         run: pnpm -F @angela/desktop lint
+      - name: Restricted Study Along extension build
+        run: pnpm -F @angela/plugin-web-extension build:study-along
       - name: Desktop build
         run: pnpm -F @angela/desktop build
       - name: Configure Electron sandbox helper

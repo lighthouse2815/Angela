@@ -47,3 +47,26 @@ A production distributor must complete the binary license audit before packaging
 The yt-dlp source license does not describe every standalone binary dependency.
 FFmpeg license obligations depend on its build flags. Preserve the exact corresponding notices and any required source offers.
 The original Agent-Reach MIT attribution remains separate from runtime binary licenses.
+
+
+## Restricted extension artifact
+
+Desktop `build:unpack`, `build:linux`, `build:mac`, and `build:win` first build the restricted WXT target.
+Install build dependencies for `@angela/plugin-web-extension` in release jobs as well as the desktop workspace.
+The installer copies `.output-study-along/chrome-mv3` to `resources/study-along-extension`.
+`beforePack` rejects a missing manifest, broader permissions, or implicit content collectors.
+The Settings button opens this fixed folder for Chrome's **Load unpacked** installation.
+The ordinary `build` command remains a source-only electron-vite build. It does not install executables or models.
+
+## Optional local inference
+
+Stage a pinned whisper.cpp `whisper-cli` executable and any required runtime libraries in the target directory.
+Use a self-contained CPU build or audit and ship every linked dependency. Preserve applicable platform signing and loader requirements.
+Its manifest entry follows the same version, SHA-256, and license contract as the required tools.
+No Python environment is required. Model files are separate from executable artifacts.
+
+Users import a publisher-verified GGML model through the native picker and trusted SHA-256 field in Study Along Settings.
+The imported file becomes an app-owned content-addressed model under `<userData>/internet/models`.
+A release can supply a separately licensed model file for the same explicit import flow. No background setup runs at startup.
+The recommended multilingual `tiny` model is about 75 MiB. Models above 2 GiB are rejected.
+Keep the model publisher's license separate from whisper.cpp and FFmpeg notices.

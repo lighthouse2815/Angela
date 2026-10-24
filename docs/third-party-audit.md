@@ -48,8 +48,10 @@ Angela does not download or bundle new executables in this change.
 | Dependency | License and primary evidence | Usage | Copied code? | Runtime dependency? | Required attribution |
 | --- | --- | --- | --- | --- | --- |
 | Agent-Reach | [MIT](../third_party/agent-reach/LICENSE) | Reference and derived policy | Yes, rewritten extraction policy | No | Full original MIT notice, kept |
-| yt-dlp | [Unlicense source](https://github.com/yt-dlp/yt-dlp/blob/master/LICENSE). Some packaged builds include GPL dependencies. | Execute user-installed binary | No | Yes, for YouTube extraction | Preserve applicable binary notices if distributing it. No new binary is bundled. |
-| FFmpeg | [LGPL-2.1-or-later, or GPL depending on build](https://ffmpeg.org/legal.html) | Execute user-installed binary | No | Optional, audio fallback only | Binary redistribution obligations depend on build. No binary is bundled. |
+| yt-dlp | [Unlicense source](https://github.com/yt-dlp/yt-dlp/blob/master/LICENSE). Some packaged builds include GPL dependencies. | Execute managed release artifact, explicit override, or development PATH binary | No | Yes, for YouTube extraction | Preserve applicable binary notices if distributing it. No bytes are committed. Release staging must preserve the exact binary notices. |
+| FFmpeg | [LGPL-2.1-or-later, or GPL depending on build](https://ffmpeg.org/legal.html) | Execute managed release artifact, explicit override, or development PATH binary | No | Optional, audio fallback only | Binary redistribution obligations depend on build. No bytes are committed. Release packaging requires audited artifacts. |
+| whisper.cpp | [MIT](../third_party/whisper.cpp/LICENSE), ggml authors 2023–2026 | Execute optional managed native CLI, no Python | No | Optional local transcription runtime, bundled by release staging | Original MIT text, plus actual linked binary dependencies |
+| Whisper model weights | [Original OpenAI MIT](../third_party/whisper/LICENSE), [GGML model card](https://huggingface.co/ggerganov/whisper.cpp) | Explicit manual import with trusted SHA-256, no automatic download | No | Optional app-data model artifact | Model publisher terms, separate from whisper.cpp. No weights distributed in this source change. |
 | GitHub CLI | [MIT](https://github.com/cli/cli/blob/trunk/LICENSE) | Evaluated upstream alternative | No | No | None added |
 | OpenCLI | [Apache-2.0](https://github.com/jackwener/opencli/blob/main/LICENSE) | Evaluated, not ported | No | No | None added |
 | bili-cli (`bilibili-cli`) | [Apache-2.0 metadata](https://pypi.org/pypi/bilibili-cli/json) | Evaluated, not ported | No | No | None added |
@@ -69,7 +71,8 @@ Only validated YouTube URLs reach media executables. Arguments never use a shell
 yt-dlp ignores user configuration and never receives browser cookies or account credentials.
 Audio uploads use one explicitly selected provider. Provider failure never switches recipients.
 Transcripts are untrusted reference data. They never become instructions or automatic personal memories.
-The browser adapter observes only the connected browser's current tab. It does not inspect other browser profiles.
+Browser context prefers the explicitly shared current Chrome tab through an authenticated loopback bridge, then the existing Playwright current tab. No browser profiles are inspected.
+Cloud audio upload is opt-in. Missing local setup can select a permitted cloud fallback. Local inference failure never changes recipients.
 
 ## Managed desktop executable artifacts
 
@@ -78,3 +81,16 @@ Release packaging verifies SHA-256 digests and required license files before cop
 No binaries or new Python packages are included in this source change.
 See [the release artifact contract](./study-along-media-artifacts.md).
 Bundled yt-dlp, FFmpeg, and optional whisper.cpp remain separate runtime dependencies, with their actual binary notices staged by the release pipeline.
+
+
+## Distribution classification
+
+- **Derived source:** existing native YouTube/transcription policy from Agent-Reach. Original MIT text is preserved.
+- **Runtime dependencies:** yt-dlp, FFmpeg, and optional whisper.cpp are executed through argument arrays. Their source is not copied.
+- **Bundled binaries:** release-only artifacts must supply versions, SHA-256 digests, applicable license files, and any required source offers.
+- **Imported model:** a user-selected GGML file is verified and copied into private app data. No download service or weights are bundled.
+- **Development tools:** existing WXT, Vite, Vue, Eventa, Crossws, Vitest, and electron-builder build and verify the integration. No new package is added.
+
+The restricted browser extension uses Angela's existing WXT workspace. It contains no upstream Agent-Reach code.
+Its release checker rejects cookie/history permissions, broad host access, and implicit page content collectors.
+No runtime executable is downloaded, updated, or checked against Agent-Reach.

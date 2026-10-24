@@ -71,7 +71,7 @@ export class MediaToolResolver {
       await access(path, constants.X_OK)
       const args = tool === 'ffmpeg' ? ['-version'] : tool === 'yt-dlp' ? [...extractorArgs, '--version'] : ['--help']
       const output = await this.process.run(path, args, { timeout: 5000, includeStderr: true })
-      const valid = tool === 'yt-dlp' ? /^\d{4}\.\d{2}\.\d{2}/u.test(output.trim()) : tool === 'ffmpeg' ? /ffmpeg version/iu.test(output) : /whisper|usage/iu.test(output)
+      const valid = tool === 'yt-dlp' ? /^\d{4}\.\d{2}\.\d{2}/u.test(output.trim()) : tool === 'ffmpeg' ? /ffmpeg version/iu.test(output) : /whisper|--output-json/iu.test(output)
       if (!valid)
         throw new InternetError('UNAVAILABLE', 'Unexpected executable version output.')
       return { tool, source, path, detail: `Validated ${source.toLowerCase()} executable.` }

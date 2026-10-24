@@ -16,7 +16,9 @@ This package does not start an application when imported. Personal data stays ou
 `@angela/companion/internet` owns transcript retrieval, bounded playback windows, search, and batched video summaries.
 `internet/youtube` derives public extraction policy from the audited MIT reference.
 `internet/transcription` accepts one explicitly selected compatible provider with timestamped JSON output.
-`internet/cache` stores complete transcripts privately for 30 days, with 100 files and 8 MiB per file.
+`internet/local-transcription` executes whisper.cpp with timestamped JSON and private chunk cleanup.
+`internet/transcription-routing` prepares a local-first or explicit cloud source. Cloud upload always requires consent.
+`internet/cache` stores complete transcripts privately for 1–90 days, with a 30-day default, 100 files and 8 MiB per file.
 
 Media executables are optional host boundaries. No Python repository is installed, imported, or fetched.
 Browser access and summary generation are injected by the host. Transcript evidence stays outside personal memory.
@@ -25,3 +27,5 @@ See [the source audit](../../docs/third-party-audit.md) and [third-party notices
 Audio chunks use explicit 600-second source intervals, so AAC padding cannot create a spurious final upload.
 Run `ANGELA_TEST_FFMPEG=/path/to/ffmpeg pnpm exec vitest run core/companion/src/internet/youtube.test.ts` for real encoder coverage.
 The default suite mocks external media and HTTP providers.
+
+Caller cancellation preserves other coalesced questions. The last caller stops extraction. Hosts await `whenIdle()` before shutdown.

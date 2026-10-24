@@ -5,6 +5,8 @@ import { createContext, defineInvoke } from '@moeru/eventa'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { internetDiagnostics, videoResearch } from '../../../../shared/eventa/internet'
+import { studyAlongCancelModel, studyAlongGetSettings, studyAlongImportModel, studyAlongOpenExtension, studyAlongSaveSettings } from '../../../../shared/eventa/study-along'
+import { defaultStudyAlongSettings } from '../../../../shared/study-along'
 import { setupInternet } from './index'
 
 const electron = vi.hoisted(() => ({ app: {}, BrowserWindow: { fromWebContents: vi.fn(() => ({})) } }))
@@ -16,8 +18,8 @@ function clients() {
   const context = createContext<ElectronMainContextExtensions, ElectronMainEmitOptions>()
   const execute = vi.fn(async () => ({ video: { ...parseYouTubeUrl('https://youtu.be/dQw4w9WgXcQ'), currentTime: 1114 }, transcript: { source: 'official' as const, language: 'en', generatedAt: Date.now() }, recentSegments: [{ start: 1110, end: 1114, text: 'AddScoped' }], range: { start: 1024, end: 1174 }, truncated: false, nextTimestamp: null }))
   const diagnostics = vi.fn(async () => [])
-  setupInternet(context, { execute, diagnostics, pairBrowser: vi.fn(), revokeBrowser: vi.fn(), browserStatus: () => ({ connected: false, paired: false, error: null }) })
-  return { video: defineInvoke(context, videoResearch), diagnostics: defineInvoke(context, internetDiagnostics), execute, diagnose: diagnostics }
+  setupInternet(context, { execute, diagnostics, pairBrowser: vi.fn(), revokeBrowser: vi.fn(), browserStatus: () => ({ connected: false, paired: false, error: null }), settings: vi.fn(), saveSettings: vi.fn(), importModel: vi.fn(), cancelModel: vi.fn(), openExtension: vi.fn() })
+  return { context, video: defineInvoke(context, videoResearch), diagnostics: defineInvoke(context, internetDiagnostics), execute, diagnose: diagnostics }
 }
 
 describe('research IPC authorization', () => {
@@ -27,7 +29,22 @@ describe('research IPC authorization', () => {
     const sender = { getURL: () => 'file:///angela/index.html', mainFrame: frame }
     const result = await Reflect.apply(client.video, undefined, [{ action: 'around' }, { raw: { ipcMainEvent: { sender, senderFrame: frame } } }])
     expect(result).toMatchObject({ video: { currentTime: 1114 }, recentSegments: [{ text: 'AddScoped' }] })
-    expect(client.execute).toHaveBeenCalledWith({ action: 'around' })
+    expect(client.execute).toHaveBeenCalledWith({ action: 'around' }, expect.any(AbortSignal))
+  })
+
+  it('applies the trusted main-frame boundary to settings, native model setup, and extension installation', async () => {
+    const { context } = clients()
+    const sender = { getURL: () => 'https://evil.test', mainFrame: {} }
+    const options = { raw: { ipcMainEvent: { sender } } }
+    const operations = [
+      () => Reflect.apply(defineInvoke(context, studyAlongGetSettings), undefined, [undefined, options]),
+      () => Reflect.apply(defineInvoke(context, studyAlongSaveSettings), undefined, [defaultStudyAlongSettings, options]),
+      () => Reflect.apply(defineInvoke(context, studyAlongImportModel), undefined, [{ sha256: 'a'.repeat(64) }, options]),
+      () => Reflect.apply(defineInvoke(context, studyAlongCancelModel), undefined, [undefined, options]),
+      () => Reflect.apply(defineInvoke(context, studyAlongOpenExtension), undefined, [undefined, options]),
+    ]
+    for (const invoke of operations)
+      await expect(invoke()).rejects.toThrow('trusted application')
   })
 
   it('rejects missing senders, remote pages, and subframes before browser or media access', async () => {

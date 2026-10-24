@@ -9,6 +9,7 @@ import { Arch } from 'electron-builder'
 import { isMacOS } from 'std-env'
 
 import { checkMediaArtifacts } from './scripts/media-artifacts'
+import { checkStudyExtension } from './scripts/study-extension-artifact'
 import { mediaTarget } from './src/main/services/angela/internet/media/resolver'
 
 function hasXcode26OrAbove() {
@@ -118,8 +119,14 @@ export default {
     '**/*.node',
     '**/node_modules/@auv-js/cli-*/bin/**',
   ],
-  beforePack: async context => checkMediaArtifacts(join(import.meta.dirname, 'resources', 'media', mediaTarget(context.electronPlatformName, Arch[context.arch])), context.electronPlatformName === 'win32'),
+  beforePack: async (context) => {
+    await checkMediaArtifacts(join(import.meta.dirname, 'resources', 'media', mediaTarget(context.electronPlatformName, Arch[context.arch])), context.electronPlatformName === 'win32')
+    await checkStudyExtension(join(import.meta.dirname, '../../integrations/plugins/web-extension/.output-study-along/chrome-mv3'))
+  },
   extraResources: [
+    { from: '../../integrations/plugins/web-extension/.output-study-along/chrome-mv3', to: 'study-along-extension', filter: ['**/*'] },
+    { from: '../../third_party/whisper.cpp/LICENSE', to: 'licenses/whisper-cpp-LICENSE.txt' },
+    { from: '../../third_party/whisper/LICENSE', to: 'licenses/whisper-model-LICENSE.txt' },
     { from: 'resources/media/${os}-${arch}', to: 'media/${os}-${arch}', filter: ['**/*'] },
     {
       from: '../../third_party/agent-reach/LICENSE',

@@ -22,6 +22,7 @@ export default defineConfig({
     '**/assets/js/**',
     '**/assets/live2d/models/**',
     'apps/desktop/out/**',
+    'integrations/plugins/web-extension/.output-study-along/**',
     'apps/desktop/src/bindings/**',
     '**/flatpak/**',
     '**/flatpak-repo/**',

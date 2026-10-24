@@ -45,6 +45,16 @@ describe('local whisper.cpp timestamp protocol', () => {
     await expect(access(directory)).rejects.toThrow()
   })
 
+  it.runIf(process.env.ANGELA_TEST_FFMPEG && process.env.ANGELA_TEST_WHISPER && process.env.ANGELA_TEST_WHISPER_MODEL && process.env.ANGELA_TEST_WHISPER_AUDIO)('transcribes a real speech fixture through the native whisper.cpp runtime', async () => {
+    const media = new MediaProcess()
+    const run: MediaProcess['run'] = (executable, args, options) => media.run(executable === 'ffmpeg' ? process.env.ANGELA_TEST_FFMPEG! : process.env.ANGELA_TEST_WHISPER!, args, options)
+    const result = await new LocalWhisperTranscriptionProvider({ run }, process.env.ANGELA_TEST_WHISPER_MODEL!).transcribe(await readFile(process.env.ANGELA_TEST_WHISPER_AUDIO!))
+    expect(result.length).toBeGreaterThan(0)
+    expect(result.every(segment => segment.end > segment.start && segment.start >= 0)).toBe(true)
+    expect(result.some(segment => segment.end > 1)).toBe(true)
+    expect(result.map(segment => segment.text).join(' ').toLowerCase()).toContain('country')
+  }, 120000)
+
   it.runIf(process.env.ANGELA_TEST_FFMPEG)('decodes a real M4A chunk through FFmpeg before local inference', async () => {
     const directory = await mkdtemp(join(tmpdir(), 'angela-local-audio-'))
     const media = new MediaProcess()

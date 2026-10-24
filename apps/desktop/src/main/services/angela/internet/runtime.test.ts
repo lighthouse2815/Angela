@@ -73,6 +73,13 @@ describe('study Along acceptance flow', () => {
     expect(await runtime.execute({ action: 'summarize', url: video.url })).toMatchObject({ summary: expect.any(String) })
   })
 
+  it('shares one extraction between a nearby question and a full summary', async () => {
+    const { runtime } = createRuntime()
+    await Promise.all([runtime.execute({ action: 'around' }), runtime.execute({ action: 'summarize' })])
+    expect(provider.getTranscript).toHaveBeenCalledOnce()
+    await runtime.whenIdle()
+  })
+
   it('does not read the browser when the URL and timestamp are explicit', async () => {
     const { runtime, callTool } = createRuntime()
     await runtime.execute({ action: 'around', url: video.url, timestamp: 1114 })

@@ -22,6 +22,10 @@ export const computerUseToolReferences = [
   { name: 'study_workspace_read' },
   { name: 'study_workspace_search' },
   { name: 'study_workspace_save_note' },
+] satisfies ChatToolReference[]
+
+/** Read-only lesson tools retain request selection and main-process consent, independently of desktop input control. */
+export const studyAlongToolReferences = [
   { name: 'study_along' },
   { name: 'internet_diagnostics' },
 ] satisfies ChatToolReference[]
@@ -60,7 +64,7 @@ export const useTamagotchiBuiltinToolsStore = defineStore('tamagotchi-builtin-to
     llmToolsStore.addTools(...tools.map(tool => ({
       ...tool,
       defaultActive: false,
-      requiresExplicitSelection: computerUseToolReferences.some(reference => reference.name === tool.function.name),
+      requiresExplicitSelection: [...computerUseToolReferences, ...studyAlongToolReferences].some(reference => reference.name === tool.function.name),
       id: `${toolIdPrefix}${tool.function.name}`,
     } satisfies ExecutableTool)))
   }

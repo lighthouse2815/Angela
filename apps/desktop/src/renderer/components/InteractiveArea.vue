@@ -30,7 +30,7 @@ import ChatViewportLayout from './chat-viewport-layout.vue'
 
 import { electronOpenSettings } from '../../shared/eventa'
 import { useHearingInputChannel } from '../composables/use-hearing-input-channel'
-import { artistryToolReferences, computerUseToolReferences, widgetToolReferences } from '../stores/tools'
+import { artistryToolReferences, computerUseToolReferences, studyAlongToolReferences, widgetToolReferences } from '../stores/tools'
 
 const props = withDefaults(defineProps<{
   /**
@@ -107,7 +107,7 @@ const composer = useChatComposer<ChatImageAttachment>({
       data: attachment.data,
       mimeType: attachment.mimeType,
     })),
-    tools: computerUseEnabled.value ? [...artistryToolReferences, ...computerUseToolReferences] : artistryToolReferences,
+    tools: [...artistryToolReferences, ...studyAlongToolReferences, ...(computerUseEnabled.value ? computerUseToolReferences : [])],
   }),
 })
 const {
@@ -259,7 +259,7 @@ async function handleRetryMessage(index: number) {
   await chatStore.retry({
     sessionId: chatSession.activeSessionId,
     index,
-    tools: computerUseEnabled.value ? [...widgetToolReferences, ...computerUseToolReferences] : widgetToolReferences,
+    tools: [...widgetToolReferences, ...studyAlongToolReferences, ...(computerUseEnabled.value ? computerUseToolReferences : [])],
   })
   trackChatMessageRetried({
     source: 'history',
@@ -279,7 +279,7 @@ async function handleToolCallRerun(payload: ChatToolCallRerunEvent) {
     invocationId: payload.invocationId,
     toolName: payload.toolName,
     args: payload.args,
-    tools: computerUseEnabled.value ? computerUseToolReferences : [],
+    tools: [...studyAlongToolReferences, ...(computerUseEnabled.value ? computerUseToolReferences : [])],
   })
 }
 
@@ -558,7 +558,7 @@ defineExpose({
               :attachment-element="voiceAttachment"
               :session-id="activeSessionId"
               :reply-to-message-id="replyTarget?.message.id"
-              :tools="computerUseEnabled ? [...artistryToolReferences, ...computerUseToolReferences] : artistryToolReferences"
+              :tools="[...artistryToolReferences, ...studyAlongToolReferences, ...(computerUseEnabled ? computerUseToolReferences : [])]"
               @recording-change="voiceActive = $event"
               @pending-change="voicePending = $event"
               @sent="composer.clearReply()"

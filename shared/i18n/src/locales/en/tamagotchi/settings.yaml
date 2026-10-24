@@ -556,3 +556,51 @@ screen-capture:
       step-1: Open "System Preferences", select "Privacy & Security" from the sidebar.
       step-2: In the "Screen & System Audio Recording" and "System Audio Recording Only" sections, turn on the switches for Angela.
       step-2-note: If Angela is not listed, please add it manually by clicking the "+" button and selecting Angela from the Applications folder.
+study-along:
+  title: Study Along
+  description: Ask about the YouTube lesson you are watching. Angela uses the shared tab and its current playback position.
+  enabled: Enable Study Along
+  subtitle-order: Manual subtitles first, then automatic captions and subtitle recovery. Audio fallback runs only when subtitles are unavailable.
+  audio-source: Audio transcription
+  mode-disabled: Disabled
+  mode-local: Local transcription only
+  mode-cloud: Saved cloud provider
+  mode-auto: Local first, then permitted cloud fallback
+  cloud-provider: Saved audio provider
+  manage-providers: Manage saved providers
+  model: Timestamp-capable model
+  model-help: Enter the compatible provider model ID. The endpoint must return verbose_json with timestamped segments.
+  allow-upload: Allow audio upload when subtitles are unavailable
+  upload-help: Audio chunks go to the selected saved provider. Turning this off cancels active requests and prevents further uploads.
+  cache-days: Transcript cache lifetime in days
+  cache-help: Choose 1–90 days. Complete transcripts are reused. Raw audio is temporary and is never stored in this cache.
+  save: Save settings
+  saved: Settings saved. Active lesson requests were cancelled so the new choices apply.
+  action-error: The action failed. Check Study Along diagnostics.
+  local-title: Local model
+  local-description: Import a whisper.cpp GGML model up to 2 GiB. Start with the multilingual tiny model. The Angela release also needs whisper-cli.
+  model-source: Open the model publisher page
+  model-missing: No local model installed
+  model-importing: Verifying and installing the selected model
+  model-ready: Local model installed
+  model-error: Model setup needs attention
+  model-progress: Model import progress
+  checksum: Trusted SHA-256 checksum
+  checksum-help: Copy the 64-character SHA-256 from the publisher artifact details or your release administrator. A file hash alone does not establish trust.
+  model-import: Choose and import verified model
+  cancel: Cancel import
+  browser-title: Chrome and Chromium
+  browser-description: Install the Angela Study Along extension, pair it here, then choose Share this video tab in its popup. Only that authorized active video tab is shared.
+  extension-install: Extension installation instructions
+  browser-connected: Extension connected
+  browser-waiting: Paired, waiting for extension connection
+  browser-unpaired: Extension not paired. Angela Browser remains available through Playwright MCP.
+  extension-id: Extension ID from the extension popup
+  pair: Create pairing
+  revoke: Revoke extension access
+  pairing-data: Pairing data
+  pairing-help: Copy this into the extension popup. This grants access only to media context. Keep the pairing token private.
+  diagnostics-title: Readiness
+  check: Check local setup
+  extension-files: Open extension files
+  advanced-overrides: Advanced environment overrides select provider {cloudProviderId} and model {cloudModel}.

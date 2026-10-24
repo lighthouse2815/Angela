@@ -40,3 +40,14 @@ No executable bytes are committed by this change.
 Electron-builder requires a checksum manifest and actual per-artifact license files before packaging.
 Those files are distributed beside the executable artifacts under `resources/media/<target>/licenses`.
 See [the release artifact contract](./docs/study-along-media-artifacts.md) for source-license and binary-license boundaries.
+
+## Local whisper.cpp transcription and model artifacts
+
+The native TypeScript adapter executes the public whisper.cpp CLI protocol. It copies no whisper.cpp implementation source.
+Optional `whisper-cli` release artifacts remain a separate runtime dependency.
+The original [whisper.cpp MIT license](./third_party/whisper.cpp/LICENSE) preserves `Copyright (c) 2023-2026 The ggml authors`.
+
+No model weights are committed or downloaded by Angela. Settings imports an explicitly selected, checksum-verified GGML model.
+The recommended original OpenAI Whisper weights have a separate [MIT notice](./third_party/whisper/LICENSE), `Copyright (c) 2022 OpenAI`.
+Converted or user-selected models retain their own publisher terms. The whisper.cpp license does not relicense model weights.
+Desktop packaging includes both reference notices under `resources/licenses`. Binary distributors also stage the actual artifact notices and corresponding obligations.

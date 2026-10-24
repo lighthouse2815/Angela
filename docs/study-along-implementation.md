@@ -1,154 +1,209 @@
-# Study Along implementation report
+# Study Along desktop implementation report
 
-This change integrates native lesson awareness into Angela's existing desktop and companion architecture.
-The inspected upstream source was Agent-Reach revision `beabda7486e9a666360b18cdb5c0e759c2c4d20f`.
-The temporary checkout was deleted before the final tests and live extraction check.
+This work continues the native implementation at `9e5e094`. Existing actions, subtitle recovery, browser timestamps, attribution, and cache remain supported.
 
-## Files Added
+## Files added
 
-- [apps/desktop/src/main/services/angela/internet/browser.test.ts](../apps/desktop/src/main/services/angela/internet/browser.test.ts)
-- [apps/desktop/src/main/services/angela/internet/browser.ts](../apps/desktop/src/main/services/angela/internet/browser.ts)
+- [apps/desktop/scripts/media-artifacts.test.ts](../apps/desktop/scripts/media-artifacts.test.ts)
+- [apps/desktop/scripts/media-artifacts.ts](../apps/desktop/scripts/media-artifacts.ts)
+- [apps/desktop/scripts/study-extension-artifact.test.ts](../apps/desktop/scripts/study-extension-artifact.test.ts)
+- [apps/desktop/scripts/study-extension-artifact.ts](../apps/desktop/scripts/study-extension-artifact.ts)
+- [apps/desktop/src/main/services/angela/internet/browser/extension.test.ts](../apps/desktop/src/main/services/angela/internet/browser/extension.test.ts)
+- [apps/desktop/src/main/services/angela/internet/browser/extension.ts](../apps/desktop/src/main/services/angela/internet/browser/extension.ts)
+- [apps/desktop/src/main/services/angela/internet/browser/provider.ts](../apps/desktop/src/main/services/angela/internet/browser/provider.ts)
+- [apps/desktop/src/main/services/angela/internet/media/resolver.test.ts](../apps/desktop/src/main/services/angela/internet/media/resolver.test.ts)
+- [apps/desktop/src/main/services/angela/internet/media/resolver.ts](../apps/desktop/src/main/services/angela/internet/media/resolver.ts)
+- [apps/desktop/src/main/services/angela/internet/settings/config.test.ts](../apps/desktop/src/main/services/angela/internet/settings/config.test.ts)
+- [apps/desktop/src/main/services/angela/internet/settings/config.ts](../apps/desktop/src/main/services/angela/internet/settings/config.ts)
+- [apps/desktop/src/main/services/angela/internet/settings/models.test.ts](../apps/desktop/src/main/services/angela/internet/settings/models.test.ts)
+- [apps/desktop/src/main/services/angela/internet/settings/models.ts](../apps/desktop/src/main/services/angela/internet/settings/models.ts)
+- [apps/desktop/src/renderer/pages/settings/study-along/components/browser-pairing.vue](../apps/desktop/src/renderer/pages/settings/study-along/components/browser-pairing.vue)
+- [apps/desktop/src/renderer/pages/settings/study-along/components/local-model.vue](../apps/desktop/src/renderer/pages/settings/study-along/components/local-model.vue)
+- [apps/desktop/src/renderer/pages/settings/study-along/index.browser.test.ts](../apps/desktop/src/renderer/pages/settings/study-along/index.browser.test.ts)
+- [apps/desktop/src/renderer/pages/settings/study-along/index.vue](../apps/desktop/src/renderer/pages/settings/study-along/index.vue)
+- [apps/desktop/src/shared/eventa/browser-media.ts](../apps/desktop/src/shared/eventa/browser-media.ts)
+- [apps/desktop/src/shared/eventa/study-along.ts](../apps/desktop/src/shared/eventa/study-along.ts)
+- [apps/desktop/src/shared/study-along.ts](../apps/desktop/src/shared/study-along.ts)
+- [core/companion/src/internet/local-transcription.test.ts](../core/companion/src/internet/local-transcription.test.ts)
+- [core/companion/src/internet/local-transcription.ts](../core/companion/src/internet/local-transcription.ts)
+- [core/companion/src/internet/transcription-routing.test.ts](../core/companion/src/internet/transcription-routing.test.ts)
+- [core/companion/src/internet/transcription-routing.ts](../core/companion/src/internet/transcription-routing.ts)
+- [docs/study-along-media-artifacts.md](../docs/study-along-media-artifacts.md)
+- [integrations/plugins/web-extension/.gitignore](../integrations/plugins/web-extension/.gitignore)
+- [integrations/plugins/web-extension/study-along/README.md](../integrations/plugins/web-extension/study-along/README.md)
+- [integrations/plugins/web-extension/study-along/contracts.ts](../integrations/plugins/web-extension/study-along/contracts.ts)
+- [integrations/plugins/web-extension/study-along/entrypoints/background.ts](../integrations/plugins/web-extension/study-along/entrypoints/background.ts)
+- [integrations/plugins/web-extension/study-along/entrypoints/popup/app.vue](../integrations/plugins/web-extension/study-along/entrypoints/popup/app.vue)
+- [integrations/plugins/web-extension/study-along/entrypoints/popup/index.html](../integrations/plugins/web-extension/study-along/entrypoints/popup/index.html)
+- [integrations/plugins/web-extension/study-along/entrypoints/popup/main.ts](../integrations/plugins/web-extension/study-along/entrypoints/popup/main.ts)
+- [integrations/plugins/web-extension/wxt.study-along.config.ts](../integrations/plugins/web-extension/wxt.study-along.config.ts)
+- [shared/i18n/src/locales/en/study-along-extension.json](../shared/i18n/src/locales/en/study-along-extension.json)
+- [shared/i18n/src/locales/vi/study-along-extension.json](../shared/i18n/src/locales/vi/study-along-extension.json)
+- [third_party/whisper.cpp/LICENSE](../third_party/whisper.cpp/LICENSE)
+- [third_party/whisper/LICENSE](../third_party/whisper/LICENSE)
+
+## Files modified
+
+- [.github/workflows/desktop-runtime.yml](../.github/workflows/desktop-runtime.yml)
+- [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md)
+- [apps/desktop/README.md](../apps/desktop/README.md)
+- [apps/desktop/electron-builder.config.ts](../apps/desktop/electron-builder.config.ts)
+- [apps/desktop/package.json](../apps/desktop/package.json)
 - [apps/desktop/src/main/services/angela/internet/index.test.ts](../apps/desktop/src/main/services/angela/internet/index.test.ts)
 - [apps/desktop/src/main/services/angela/internet/index.ts](../apps/desktop/src/main/services/angela/internet/index.ts)
 - [apps/desktop/src/main/services/angela/internet/runtime.test.ts](../apps/desktop/src/main/services/angela/internet/runtime.test.ts)
 - [apps/desktop/src/main/services/angela/internet/runtime.ts](../apps/desktop/src/main/services/angela/internet/runtime.ts)
+- [apps/desktop/src/renderer/components/InteractiveArea.browser.test.ts](../apps/desktop/src/renderer/components/InteractiveArea.browser.test.ts)
+- [apps/desktop/src/renderer/components/InteractiveArea.vue](../apps/desktop/src/renderer/components/InteractiveArea.vue)
+- [apps/desktop/src/renderer/stores/tools/built-in.test.ts](../apps/desktop/src/renderer/stores/tools/built-in.test.ts)
+- [apps/desktop/src/renderer/stores/tools/built-in.ts](../apps/desktop/src/renderer/stores/tools/built-in.ts)
 - [apps/desktop/src/renderer/stores/tools/builtin/internet.ts](../apps/desktop/src/renderer/stores/tools/builtin/internet.ts)
+- [apps/desktop/src/renderer/stores/tools/index.ts](../apps/desktop/src/renderer/stores/tools/index.ts)
 - [apps/desktop/src/shared/eventa/internet.ts](../apps/desktop/src/shared/eventa/internet.ts)
+- [core/companion/README.md](../core/companion/README.md)
 - [core/companion/src/internet.test.ts](../core/companion/src/internet.test.ts)
 - [core/companion/src/internet.ts](../core/companion/src/internet.ts)
 - [core/companion/src/internet/cache.ts](../core/companion/src/internet/cache.ts)
 - [core/companion/src/internet/contracts.ts](../core/companion/src/internet/contracts.ts)
-- [core/companion/src/internet/http.test.ts](../core/companion/src/internet/http.test.ts)
-- [core/companion/src/internet/http.ts](../core/companion/src/internet/http.ts)
-- [core/companion/src/internet/process.test.ts](../core/companion/src/internet/process.test.ts)
 - [core/companion/src/internet/process.ts](../core/companion/src/internet/process.ts)
-- [core/companion/src/internet/transcription.test.ts](../core/companion/src/internet/transcription.test.ts)
-- [core/companion/src/internet/transcription.ts](../core/companion/src/internet/transcription.ts)
 - [core/companion/src/internet/youtube.test.ts](../core/companion/src/internet/youtube.test.ts)
 - [core/companion/src/internet/youtube.ts](../core/companion/src/internet/youtube.ts)
 - [docs/study-along-implementation.md](../docs/study-along-implementation.md)
 - [docs/study-along.md](../docs/study-along.md)
 - [docs/third-party-audit.md](../docs/third-party-audit.md)
-- [third_party/agent-reach/LICENSE](../third_party/agent-reach/LICENSE)
+- [eslint.config.ts](../eslint.config.ts)
+- [integrations/plugins/web-extension/README.md](../integrations/plugins/web-extension/README.md)
+- [integrations/plugins/web-extension/package.json](../integrations/plugins/web-extension/package.json)
+- [shared/i18n/src/locales/en/tamagotchi/settings.yaml](../shared/i18n/src/locales/en/tamagotchi/settings.yaml)
+- [shared/i18n/src/locales/vi/tamagotchi/settings.yaml](../shared/i18n/src/locales/vi/tamagotchi/settings.yaml)
 
-## Files Modified
+## Architecture decisions
 
-- [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md)
-- [apps/desktop/README.md](../apps/desktop/README.md)
-- [apps/desktop/electron-builder.config.ts](../apps/desktop/electron-builder.config.ts)
-- [apps/desktop/src/main/index.ts](../apps/desktop/src/main/index.ts)
-- [apps/desktop/src/renderer/stores/tools/built-in.test.ts](../apps/desktop/src/renderer/stores/tools/built-in.test.ts)
-- [apps/desktop/src/renderer/stores/tools/built-in.ts](../apps/desktop/src/renderer/stores/tools/built-in.ts)
-- [core/companion/README.md](../core/companion/README.md)
+The existing Injeca internet module assembles providers. Companion owns transcript policy, bounded evidence, caching, and summaries.
+Eventa owns renderer IPC and extension RPC. The browser bridge implements the existing local server lifecycle interface.
+Feature settings and verified model metadata reuse private `MemoryFile` persistence. Provider credentials stay in existing `LocalConfigFile` storage.
+No new package, browser automation engine, Python runtime, or parallel provider registry is introduced.
 
-## Code Reused From Agent-Reach
+`StudyAlongRuntime` keeps one service for nearby questions and summaries, so both share extraction.
+Caller cancellation releases one waiter. The last waiter or host shutdown cancels extraction, and shutdown waits for cleanup.
+Only complete validated evidence reaches the transcript cache. The TTL defaults to 30 days and Settings accepts 1–90 days.
 
-| Upstream file or concept | Native adaptation |
-| --- | --- |
-| `channels/youtube.py` | Video URL validation, subtitle language preference, extractor arguments, and repeated-caption handling. |
-| `transcribe.py` | Explicit audio recipient, 600-second chunks, four-hour budget, 24 MiB uploads, mono 16 kHz/32 kbps encoding. |
-| `runtime/manage.py` diagnostics | Local readiness remains distinct from verified extraction. The implementation is new Angela code. |
+## Browser context flow
 
-No Python module was copied into the application.
-The extraction policies are rewritten in TypeScript, with conservative MIT attribution.
-No code from yt-dlp, FFmpeg, OpenCLI, or another upstream tool was copied.
+1. A user shares the active YouTube tab through the restricted Chrome extension.
+2. The extension connects to IPv4 loopback using a private pairing token and its exact registered extension origin.
+3. Desktop requests a fresh media snapshot through Eventa. Only URL, title, position, duration, and paused state are accepted.
+4. Without an authorized extension response, desktop falls back to the existing Playwright MCP current tab.
+5. An explicit URL and timestamp remain authoritative. Unknown current positions never become zero.
+6. The cached transcript supplies the requested timestamp window to the existing chat model as untrusted evidence.
 
-## Code Rewritten
+Study Along tools are included in desktop text and voice requests independently of mouse/keyboard tools.
+Their main-process enabled setting, trusted IPC boundary, and browser consent remain authoritative.
+Normal users no longer need the Computer use toggle for read-only lesson questions.
 
-The native service adds timestamped models, JSON3 cues, bounded windows, literal search, transcript caching, concurrent request coalescing, and batched summaries.
-The desktop adapter adds current-tab media observation, Eventa IPC authorization, Injeca assembly, tool registration, and diagnostics.
-Chat summaries use Angela's existing generation providers and runtime.
-API keys come from the existing private local provider config.
-Audio intervals use explicit FFmpeg seeks to avoid AAC padding creating a spurious final chunk.
-HTTP error handling cancels bodies before acquiring a reader, so failure recovery does not leave locked streams.
+The extension uses `activeTab`, `scripting`, `storage`, and loopback access only. No cookie, password, history, or profile access exists.
+A fixed script reads visible video metadata only. Sharing clears on stop, tab closure, or extension restart.
+Pairing persists across desktop restarts and can be revoked in Settings.
 
-## External Dependencies
+## Managed executables and packaging
 
-No npm dependency or lockfile changed.
-YouTube extraction executes an independent `yt-dlp` binary. Node is enabled as a supported JavaScript runtime.
-Audio fallback also executes FFmpeg and calls one explicitly selected compatible transcription endpoint.
-Browser observation uses the existing pinned Playwright MCP integration.
-Explicit summary actions use the saved chat model. Normal lesson questions use the current chat answer loop.
-GitHub, general web reading, and web search retain Angela's existing browser and Tavily implementations.
-The complete dependency and license decisions are in [third-party-audit.md](./third-party-audit.md).
+Resolution is absolute environment override → bundled artifact → development-only PATH → typed setup failure.
+A packaged app never silently selects PATH. Diagnostics show `OVERRIDE`, `BUNDLED`, `SYSTEM`, or `MISSING`.
 
-## License / Attribution
+The release pipeline stages reviewed binaries, versions, SHA-256 digests, and their actual notices under `resources/media/<target>`.
+Required tools are yt-dlp and FFmpeg. The optional local runtime is `whisper-cli`.
+Packaging fails before shipping missing artifacts, checksum mismatches, or absent notices. No runtime download or binary updater exists.
 
-The original notice remains `Copyright (c) 2025 Agent Eyes`.
-The full MIT text is stored in [third_party/agent-reach/LICENSE](../third_party/agent-reach/LICENSE).
-[THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) identifies the source revision and derived modules.
-Desktop packaging includes the full license as `resources/licenses/agent-reach-LICENSE.txt`.
-The packaging config was loaded and its source license checked for the original copyright and complete warranty clause.
+Installer scripts build and bundle the restricted extension. A release manifest check rejects broader permissions and implicit content scripts.
+Settings opens the fixed bundled extension folder for Chrome's manual installation flow.
+Source-only `electron-vite build` does not package an installer or supply executable artifacts.
 
-## Study Along Flow
+## Local and cloud selection
 
-```text
-Current chat, with Computer use enabled
-  -> study_along
-  -> authorized Eventa IPC
-  -> current tab in the connected Angela Browser
-  -> canonical YouTube URL and actual playback timestamp
-  -> native transcript service and private file cache
-  -> human captions, automatic captions, extractor recovery, or configured audio transcription
-  -> bounded timestamped evidence
-  -> existing chat model and timestamp citations
-```
+Manual subtitles → automatic captions → extractor subtitle recovery → configured audio source → helpful error.
 
-At 18:34, normal context covers 17:04–19:34.
-A preceding-five-minute request covers 13:34–18:34 and excludes future cues.
-The caller does not need to supply a URL when the connected tab exposes video playback.
-Full transcripts stay in application storage. Long-video summaries use bounded model batches.
+Audio defaults to disabled. Local-only and explicit cloud modes honor that source directly.
+Automatic mode prefers configured local inference. Missing local setup can select cloud only with explicit upload permission.
+Local inference failure never silently switches to a network recipient.
+The selected source is prepared before audio download, stays fixed per video, and checks cloud consent again before each upload.
+Saved providers are reused. Renderer receives redacted provider/model choices, never API keys or endpoints.
+Advanced environment overrides remain optional and are shown when they change the effective cloud selection.
 
-## Tests
+Local inference decodes bounded chunks to PCM WAV, invokes whisper.cpp, and accepts timestamped JSON only.
+Milliseconds become fractional seconds, then the source chunk offset is added once.
+Raw audio, encoded chunks, and decoded WAV files are request-owned and removed on success, failure, or cancellation.
 
-| Command or check | Result |
-| --- | --- |
-| `ANGELA_TEST_FFMPEG=/usr/bin/ffmpeg pnpm -F @angela/companion test --maxWorkers=2` | 677 tests passed across 46 files. Includes real FFmpeg encoding at the 600-second AAC boundary. |
-| `pnpm exec vitest run apps/desktop/src/main/services/angela/internet apps/desktop/src/renderer/stores/tools/built-in.test.ts` | 18 tests passed across four files. Covers scenarios A–C, browser mapping, tools, and IPC authorization. |
-| `NODE_OPTIONS=--max-old-space-size=6144 pnpm -F @angela/desktop typecheck` | Passed on the final desktop source. |
-| `pnpm -F @angela/companion typecheck` | Passed after the final HTTP cleanup change. |
-| `NODE_OPTIONS=--max-old-space-size=6144 pnpm typecheck --concurrency=1` | Passed. 60 workspace tasks succeeded. The first default-heap run exhausted memory. |
-| `pnpm lint` | Passed with existing repository warnings. Changed HTTP and packaging files also passed targeted ESLint checks. |
-| `pnpm -F @angela/companion build` | Passed. |
-| `NODE_OPTIONS=--max-old-space-size=6144 pnpm -F @angela/desktop build` | Passed. Vite reported existing asset and chunk warnings. |
-| Real `yt-dlp` argument check | Passed with version 2026.8.19 in a temporary verification environment. No reference package was installed. |
-| Live native YouTube extraction | Passed for public video `jNQXAC9IVRw`, after the reference checkout was deleted. Returned six official English subtitle segments. |
-| `git diff --check` | Passed. |
+Settings imports a manually obtained model through a native picker and trusted SHA-256 field.
+The manager verifies SHA-256 and the GGML header, publishes atomically, reports progress/errors, supports cancellation, and bounds storage.
+A failed import preserves the previous selected model. No background download blocks startup.
+The first inference after restart rechecks the installed model hash. No arbitrary renderer-supplied path enters inference.
 
-The final focused boundary run also passed 21 tests across five files.
-The default tests mock external HTTP and media providers. They require no internet or paid transcription account.
-The optional FFmpeg test uses a local generated audio fixture and a mocked transcription endpoint.
-Live subtitle extraction does not prove that every video or paid transcription account is accessible.
+## Security and licensing
 
-## Remaining Limitations
+Existing URL validation, argument arrays, yt-dlp config isolation, process timeouts, duration/size limits, HTTPS-only cloud upload, and redirect rejection remain.
+Transcript/video text never becomes a system instruction or automatic personal memory.
+Summary prompts continue to identify transcript content as untrusted evidence.
+The bridge rejects unauthenticated upgrades, wrong origins/tokens, unknown payload fields, stale connections, and unauthorized current tabs.
 
-- Study Along observes the current Playwright tab. Connect the user's lesson browser or select its tab through the existing browser tools.
-- The desktop host needs an independent yt-dlp installation or `ANGELA_YTDLP_PATH`.
-- Audio fallback needs FFmpeg and an explicitly selected timestamp-capable provider. No paid audio upload was run during verification.
-- Private, protected, and DRM videos, browser-cookie import, live-caption refresh, and cross-origin embedded players are excluded.
-- Native authenticated Reddit, Twitter/X, Bilibili, Xiaohongshu, and RSS providers were not added.
-- Full desktop installer packaging was not run. The Electron application build and license resource mapping were checked.
+Agent-Reach attribution remains in the existing derived files and original MIT license. No new upstream source is ported in this continuation.
+whisper.cpp is executed through its public protocol. Its implementation source is not copied.
+Original whisper.cpp and OpenAI Whisper notices are separate from binary build dependencies and model publisher terms.
+No executable or model weights are committed. See [the third-party audit](./third-party-audit.md).
+
+## Remaining limitations
+
+- Release jobs must stage audited yt-dlp/FFmpeg artifacts. Local inference also requires the managed whisper.cpp runtime.
+- Models use explicit manual import. No built-in model downloader or automatic update service is implemented.
+- Chrome installation uses Load unpacked. No browser store publication or silent installation is included.
+- The first captionless video request transcribes the complete bounded video before caching. Later questions reuse that result.
+- Public YouTube restrictions can prevent extraction. Private/DRM/login-cookie flows and live transcript refresh remain excluded.
+- The general extension workspace has existing compile errors outside the restricted target. Its restricted build succeeds.
 
 ## Verification
 
-The repository-wide audit scanned 5,796 application/config files.
-It found no forbidden upstream repository, package-import, installer, clone, or temporary-checkout references in application/config code.
-Upstream URLs and package paths remain in documentation and notices. Derived code retains short attribution headers.
+Installer packaging requires external release artifacts and is distinct from the source build.
 
-- No runtime dependency on the reference repository exists.
-- No separate reference-package installation is required.
-- No Git submodule or subtree was added.
-- No `agent_reach` import, reference CLI invocation, runtime checkout, update check, or source download was added.
-- The temporary reference directory is absent.
-- Required MIT attribution remains in source distribution and desktop packaging config.
-- Both changed runtime owners build, and the executed tests pass.
+| Command or check | Actual result |
+| --- | --- |
+| `pnpm -F @angela/companion test` | Earlier default run: 692 passed, 2 optional encoder tests skipped. |
+| `pnpm -F @angela/companion test --maxWorkers=1 --no-file-parallelism --testTimeout=30000 --hookTimeout=30000` | Final complete suite: 48 files, 692 passed, 3 optional native/encoder tests skipped. |
+| `pnpm -F @angela/companion typecheck` | Passed. |
+| `pnpm -F @angela/companion build` | Passed. |
+| `ANGELA_TEST_FFMPEG=/usr/bin/ffmpeg pnpm exec vitest run core/companion/src/internet.test.ts core/companion/src/internet --testTimeout=30000` | 65 passed, including real FFmpeg encoding and decode checks. |
+| Local native smoke test with all `ANGELA_TEST_WHISPER*` variables and FFmpeg | 5 passed, including real CPU whisper.cpp inference on the JFK speech fixture. |
+| `pnpm exec vitest run --config apps/desktop/vitest.node.config.ts --testTimeout=30000 --hookTimeout=30000` | 101 files, 739 passed, 2 unrelated optional tests skipped. |
+| Focused desktop internet, built-in tool, and release artifact checks | 10 files, 57 passed after the final source changes. |
+| Desktop Study Along Settings Chromium tests | 4 passed, covering source selection, opt-in upload, native model setup, and save errors. |
+| Desktop Settings and existing InteractiveArea Chromium suites | 44 passed. Existing layout tests logged ResizeObserver notifications. No error suppression was added. |
+| Focused desktop reply regression and Study Along with input control disabled | Both passed. The new regression confirms read-only lesson tools remain selected without computer input tools. |
+| `NODE_OPTIONS=--max-old-space-size=6144 pnpm typecheck --concurrency=1` | 60/60 workspace tasks passed. |
+| `NODE_OPTIONS=--max-old-space-size=6144 pnpm -F @angela/desktop typecheck` | Passed again for the final desktop source. |
+| `NODE_OPTIONS=--max-old-space-size=6144 pnpm -F @angela/desktop build` | Passed again for the final source build. |
+| `pnpm -F @angela/i18n build` | Passed with the English and Vietnamese Settings text. |
+| `pnpm -F @angela/plugin-web-extension build:study-along` | Passed. Restricted extension output is approximately 356 kB. |
+| Restricted built artifact manifest check | Passed against the generated artifact. |
+| `pnpm -F @angela/plugin-web-extension compile` | Fails on existing general-extension code and shared strictness issues listed below. |
+| `pnpm lint` | Passed with 0 errors and 603 existing warnings. Generated restricted extension output is excluded, like other build output. |
+| `git diff --check` | Passed. |
 
-Setup details and API contracts are in [study-along.md](./study-along.md).
+The native smoke used whisper.cpp revision `231638a0717b7822784297e5980965ffcec05810` outside the repository.
+The multilingual tiny model was verified against the publisher's LFS SHA-256: `be07e048e1e599ad46341c8d2a135645097a538221678b7acdd1b1919c6e1b21`.
+A partial download and an incorrect transport ETag were rejected before using the verified bytes.
+These artifacts are development verification only. Angela does not fetch them at runtime.
 
-## Native local transcription boundary
+During verification, overlapping heavy builds caused swap pressure and unrelated test timeouts.
+A concurrent i18n rebuild also briefly removed its generated CLI entry during a test import.
+After serial execution with the dependency build complete, the full companion suite passed.
+No test, validation, or timeout in repository code was disabled to obtain that result.
 
-`LocalWhisperTranscriptionProvider` decodes each bounded audio chunk with FFmpeg and executes whisper.cpp without Python. It accepts timestamped JSON only. Offsets remain fractional seconds and the extractor adds the source chunk offset once. Request-owned files are removed on success and failure.
+The general extension compile errors are in its existing popup Button variant, module identity field,
+shared combobox/select/file input strictness, and root UnoCSS optional values.
+They are outside the restricted extension source. The restricted build and desktop typecheck succeed.
+No tsconfig relaxation or unrelated repair was added.
 
-`TranscriptFallbackRouter` prepares one source before downloading audio. Local inference failure never silently changes the audio recipient. Cloud selection requires explicit upload permission, checked again before every chunk upload. Desktop settings wiring follows this core boundary.
+## Repository independence audit
 
-Concurrent questions share one extraction. Individual cancellation leaves other callers running. The last cancellation stops extraction, and `whenIdle()` waits for cleanup. Only a complete successful transcript enters the existing private cache. Its default TTL remains 30 days, with a host-configurable range of 1–90 days.
+Application-source searches found no Agent-Reach imports, upstream runtime URL, CLI invocation, installer, or checkout.
+Git has no submodule entries. The original Agent-Reach MIT license remains present and packaged.
+New whisper.cpp and original Whisper model notices remain distinct from actual release artifact obligations.
+No executable, model weights, provider keys, environment credentials, or raw lesson audio are committed.

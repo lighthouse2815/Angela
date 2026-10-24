@@ -28,17 +28,22 @@ export class StudyAlongRuntime {
   private readonly cache: FileTranscriptCache
 
   constructor(
-    private readonly provider: TranscriptProvider,
+    provider: TranscriptProvider,
     cacheDirectory: string,
     private readonly browser: BrowserMediaContextProvider,
     private readonly summarizer: () => Promise<VideoSummarizer>,
-    private readonly signal?: AbortSignal,
+    signal?: AbortSignal,
+    ttlDays = () => 30,
   ) {
-    this.cache = new FileTranscriptCache(cacheDirectory)
+    this.cache = new FileTranscriptCache(cacheDirectory, Date.now, ttlDays)
     this.service = new InternetService(provider, this.cache, browser, undefined, signal)
   }
 
-  async execute(input: unknown) {
+  async whenIdle() {
+    await this.service.whenIdle()
+  }
+
+  async execute(input: unknown, signal?: AbortSignal) {
     const request = v.parse(requestSchema, input)
     let url = request.url
     let timestamp = request.timestamp
@@ -50,24 +55,22 @@ export class StudyAlongRuntime {
     if (request.action === 'search') {
       if (!request.query)
         throw new InternetError('INVALID_URL', 'Provide a literal transcript search query.')
-      return this.service.searchTranscript(url, request.query)
+      return this.service.searchTranscript(url, request.query, signal)
     }
     if (request.action === 'summarize') {
-      const service = new InternetService(this.provider, this.cache, this.browser, await this.summarizer(), this.signal)
-      return service.summarizeVideo(url)
+      return this.service.summarizeVideo(url, signal, await this.summarizer())
     }
     // Full evidence stays on disk. Transcript reads expose bounded windows with continuation metadata.
     if (request.action === 'transcript')
-      return this.service.getTranscriptAround(url, timestamp ?? 0, 0, request.afterSeconds ?? 600)
+      return this.service.getTranscriptAround(url, timestamp ?? 0, 0, request.afterSeconds ?? 600, signal)
     if (timestamp === undefined)
       throw new InternetError('UNAVAILABLE', 'The lesson tab has no readable playback position. Provide an explicit timestamp.')
     if (request.action === 'summarize-recent') {
-      const service = new InternetService(this.provider, this.cache, this.browser, await this.summarizer(), this.signal)
-      return service.summarizeRecentVideoContext(url, timestamp, request.recentSeconds ?? 300)
+      return this.service.summarizeRecentVideoContext(url, timestamp, request.recentSeconds ?? 300, signal, await this.summarizer())
     }
     if (request.action === 'recent')
-      return this.service.getTranscriptAround(url, timestamp, request.recentSeconds ?? 300, 0)
-    return this.service.getTranscriptAround(url, timestamp, request.beforeSeconds, request.afterSeconds)
+      return this.service.getTranscriptAround(url, timestamp, request.recentSeconds ?? 300, 0, signal)
+    return this.service.getTranscriptAround(url, timestamp, request.beforeSeconds, request.afterSeconds, signal)
   }
 }
 
