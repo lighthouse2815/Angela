@@ -3,13 +3,17 @@ import { join } from 'node:path'
 
 import * as v from 'valibot'
 
-const manifestSchema = v.object({
+const manifestSchema = v.strictObject({
   manifest_version: v.literal(3),
   name: v.literal('Angela Study Along'),
+  version: v.optional(v.string()),
+  version_name: v.optional(v.string()),
+  description: v.optional(v.string()),
+  icons: v.optional(v.record(v.string(), v.string())),
   permissions: v.array(v.picklist(['activeTab', 'scripting', 'storage'])),
   host_permissions: v.array(v.literal('http://127.0.0.1/*')),
-  background: v.object({ service_worker: v.literal('background.js') }),
-  action: v.object({ default_popup: v.literal('popup.html') }),
+  background: v.strictObject({ service_worker: v.literal('background.js') }),
+  action: v.strictObject({ default_popup: v.literal('popup.html'), default_title: v.optional(v.string()) }),
   content_scripts: v.optional(v.pipe(v.array(v.unknown()), v.maxLength(0))),
 })
 

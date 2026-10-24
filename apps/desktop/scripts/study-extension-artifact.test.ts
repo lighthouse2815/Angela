@@ -22,6 +22,10 @@ describe('restricted extension release artifact', () => {
 
   it.each([
     { ...manifest, permissions: ['cookies'] },
+    { ...manifest, optional_permissions: ['cookies'] },
+    { ...manifest, optional_host_permissions: ['<all_urls>'] },
+    { ...manifest, externally_connectable: { matches: ['https://*/*'] } },
+    { ...manifest, background: { service_worker: 'background.js', scripts: ['collector.js'] } },
     { ...manifest, host_permissions: ['<all_urls>'] },
     { ...manifest, content_scripts: [{ matches: ['*://*/*'], js: ['collector.js'] }] },
   ])('rejects broader permissions and implicit content collectors', async (invalid) => {

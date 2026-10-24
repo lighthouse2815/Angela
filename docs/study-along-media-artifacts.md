@@ -70,3 +70,25 @@ The imported file becomes an app-owned content-addressed model under `<userData>
 A release can supply a separately licensed model file for the same explicit import flow. No background setup runs at startup.
 The recommended multilingual `tiny` model is about 75 MiB. Models above 2 GiB are rejected.
 Keep the model publisher's license separate from whisper.cpp and FFmpeg notices.
+
+## Local release preflight
+
+After the desktop and restricted extension builds, run:
+
+```sh
+pnpm -F @angela/desktop check:release
+pnpm -F @angela/desktop check:release win32 arm64
+```
+
+The optional arguments select the target platform and architecture. Defaults use the current host.
+The command reports media, restricted extension, main output, preload output, and renderer output independently as JSON.
+It exits with code 1 when a prerequisite fails. It never downloads binaries or reads provider credentials.
+
+The manifest validator now rejects optional permissions, optional host access, external connections, and unknown background fields.
+This prevents hidden capability expansion outside the explicit restricted manifest.
+
+Local verification on 24 October 2026 passed 17 artifact and resolver tests.
+The real preflight accepted the restricted extension and all three desktop outputs.
+It rejected the missing `resources/media/linux-x64/manifest.json`, as required.
+An installer for a clean machine remains blocked until reviewed media binaries and their exact notices are staged.
+No substitute executable or fixture artifact counts as a release binary.
