@@ -14,7 +14,6 @@ import { useAuthStore } from '@angela/stage-ui/stores/auth'
 import { useCharacterOrchestratorStore } from '@angela/stage-ui/stores/character'
 import { useChatStore } from '@angela/stage-ui/stores/chat'
 import { usePluginHostInspectorStore } from '@angela/stage-ui/stores/devtools/plugin-host-debug'
-import { useDisplayModelsStore } from '@angela/stage-ui/stores/display-models'
 import { useModsServerChannelStore } from '@angela/stage-ui/stores/mods/api/channel-server'
 import { useContextBridgeStore } from '@angela/stage-ui/stores/mods/api/context-bridge'
 import { useAngelaCardStore } from '@angela/stage-ui/stores/modules/angela-card'
@@ -27,7 +26,6 @@ import { useOnboardingStore } from '@angela/stage-ui/stores/onboarding'
 import { usePerfTracerBridgeStore } from '@angela/stage-ui/stores/perf-tracer-bridge'
 import { listProvidersForPluginHost, shouldPublishPluginHostCapabilities } from '@angela/stage-ui/stores/plugin-host-capabilities'
 import { useSettings, useSettingsAudioDevice } from '@angela/stage-ui/stores/settings'
-import { useSettingsStageModel } from '@angela/stage-ui/stores/settings/stage-model'
 import { useTheme } from '@angela/ui'
 import { defineInvokeHandler } from '@moeru/eventa'
 import { isEqual } from 'es-toolkit'
@@ -41,8 +39,6 @@ import ResizeHandler from './components/ResizeHandler.vue'
 
 import {
   electronGetServerChannelConfig,
-  electronGodotStageGetStatus,
-  electronGodotStageStatusChanged,
   electronSettingsNavigate,
   i18nGetLocale,
   i18nSetLocale,
@@ -69,7 +65,6 @@ import {
 import { electronPluginToolsChanged } from '../shared/eventa/plugin/tools'
 import { initializeElectronAuthCallbackBridge } from './bridges/electron-auth-callback'
 import { initializeIOTraceRecordingBridge } from './bridges/io-trace-recording'
-import { initializeStageThreeRuntimeTraceBridge } from './bridges/stage-three-runtime-trace'
 import { useCompanionFollowUps } from './composables/use-companion-follow-ups'
 import { useCompanionRuntime } from './composables/use-companion-runtime'
 import { useLanguage } from './composables/use-language'
@@ -86,6 +81,7 @@ import { resolveInitialRendererRoutePath, resolveRendererWindowContext } from '.
 
 const { isDark: dark } = useTheme()
 const settingsStore = useSettings()
+void settingsStore.initializeStageModel({ loadModel: false })
 const { language, themeColorsHue, themeColorsHueDynamic } = storeToRefs(settingsStore)
 const router = useRouter()
 const route = useRoute()
@@ -166,7 +162,6 @@ function createFullStageRuntime() {
   const authStore = useAuthStore()
   const onboardingStore = useOnboardingStore()
   const contextBridgeStore = useContextBridgeStore()
-  const displayModelsStore = useDisplayModelsStore()
   const serverChannelSettingsStore = useServerChannelSettingsStore()
   const cardStore = useAngelaCardStore()
   const serverChannelStore = useModsServerChannelStore()
@@ -179,7 +174,6 @@ function createFullStageRuntime() {
   useConsciousnessStore()
   useHearingStore()
   useSpeechStore()
-  useSettingsStageModel()
   useVisionStore()
 
   let localConfig: Awaited<ReturnType<typeof connectLocalProviderConfig>> | undefined
@@ -217,23 +211,10 @@ function createFullStageRuntime() {
   const unloadPlugin = useElectronEventaInvoke(electronPluginUnload)
   const inspectPluginHost = useElectronEventaInvoke(electronPluginInspect)
   const reportPluginCapability = useElectronEventaInvoke(electronPluginUpdateCapability)
-  const getGodotStageStatus = useElectronEventaInvoke(electronGodotStageGetStatus)
   const syncArtistryConfig = useElectronEventaInvoke(artistrySyncConfig)
-  const usesGodotStage = initialRoutePath === '/' || initialRoutePath.startsWith('/settings')
   const isWidgetsWindow = initialRoutePath === '/widgets'
 
-  function syncGodotStageRenderer(state: { state: 'stopped' | 'starting' | 'running' | 'stopping' | 'error' }) {
-    if (state.state === 'running') {
-      settingsStore.setStageModelRenderer('godot')
-      return
-    }
-
-    if ((state.state === 'stopped' || state.state === 'error') && settingsStore.stageModelRenderer === 'godot')
-      settingsStore.restoreBuiltInStageModelRenderer()
-  }
-
   usePerfTracerBridgeStore()
-  initializeStageThreeRuntimeTraceBridge()
   // The main process returns the callback only to the renderer that started
   // sign-in. Each login-capable window listens locally, while the synchronized
   // auth action still executes once in the main Stage leader.
@@ -293,14 +274,6 @@ function createFullStageRuntime() {
     void syncArtistryConfig(config)
   }, { deep: true, immediate: true })
 
-  context.value.on(electronGodotStageStatusChanged, (event) => {
-    if (!event.body) {
-      return
-    }
-
-    syncGodotStageRenderer(event.body)
-  })
-
   context.value.on(electronPluginToolsChanged, () => {
     void refreshPluginRuntimeTools()
   })
@@ -309,7 +282,6 @@ function createFullStageRuntime() {
     async initialize() {
       initializeAnalytics()
       await authStore.initialize()
-      await displayModelsStore.initialize()
       await cardStore.initialize()
       registerAuthenticatedSetup()
       if (!authStore.isAuthenticated)
@@ -319,18 +291,7 @@ function createFullStageRuntime() {
       localConfig = await connectLocalProviderConfig({ read: readLocalConfig, update: updateLocalConfig }, () => syncedPinia.isLeader(), () => {
         toast.error(t('stage.local-config-error'))
       })
-      await displayModelsStore.loadDisplayModelsFromIndexedDB()
-      await settingsStore.initializeStageModel()
       await settingsAudioDeviceStore.initialize()
-
-      if (usesGodotStage) {
-        try {
-          syncGodotStageRenderer(await getGodotStageStatus())
-        }
-        catch (error) {
-          console.warn('[App] Failed to fetch Godot stage status:', error)
-        }
-      }
 
       const serverChannelConfig = await getServerChannelConfig()
       serverChannelSettingsStore.tlsConfig = serverChannelConfig.tlsConfig ?? null

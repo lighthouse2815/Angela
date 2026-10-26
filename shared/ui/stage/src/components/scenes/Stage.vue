@@ -1,15 +1,14 @@
 <script setup lang="ts">
 import type { Live2DLipSync, Live2DLipSyncOptions } from '@angela/model-driver-lipsync'
 import type { Profile } from '@angela/model-driver-lipsync/shared/wlipsync'
-import type { CaptionChannelEvent, PresenceBubbleState } from '@angela/stage-shared'
+import type { PresenceBubbleState } from '@angela/stage-shared'
 import type { VrmInteractionTarget } from '@angela/stage-ui-three'
 
 import type { EmotionPayload } from '../../constants/emotions'
 
-import { BrowserPlayback } from '@angela/audio/browser'
 import { createLive2DLipSync } from '@angela/model-driver-lipsync'
 import { wlipsyncProfile } from '@angela/model-driver-lipsync/shared/wlipsync'
-import { normalizeActPayload, Playback } from '@angela/pipelines-audio'
+import { normalizeActPayload } from '@angela/pipelines-audio'
 import { presenceBubbleIdle, presenceBubbleThinking } from '@angela/stage-shared'
 import { defaultLive2DMotionControlDynamics, Live2DScene, useLive2DMotionControl, useLive2dParams, useSettingsLive2d } from '@angela/stage-ui-live2d'
 import { MMDScene } from '@angela/stage-ui-mmd'
@@ -19,9 +18,7 @@ import { ThreeScene } from '@angela/stage-ui-three'
 import { animations } from '@angela/stage-ui-three/assets/vrm'
 import { createQueue } from '@angela/stream-kit'
 import { Callout } from '@angela/ui'
-import { defineInvokeHandler } from '@moeru/eventa'
-import { errorMessageFrom, sleep } from '@moeru/std'
-import { useBroadcastChannel, useEventListener } from '@vueuse/core'
+import { errorMessageFrom } from '@moeru/std'
 // import { createTransformers } from '@xsai-transformers/embed'
 // import embedWorkerURL from '@xsai-transformers/embed/worker?worker&url'
 // import { embed } from '@xsai/embed'
@@ -30,21 +27,16 @@ import { computed, nextTick, onUnmounted, ref, shallowRef, watch } from 'vue'
 
 import StageRenderError from './stage-render-error.vue'
 
+import { useSpeechOutput } from '../../composables/use-speech-output'
 // import { useDuckDb } from '../../composables/use-duck-db'
 import { Emotion, EMOTION_EmotionMotionName_value, EMOTION_VRMExpressionName_value, EmotionThinkMotionName } from '../../constants/emotions'
 import { live2dMotionMagicProfiles, useLive2DMotionMagic, useLive2DMotionMagicSettings } from '../../features/motions/live2d'
-import { getSpeechBusContext, speechOutputGetPlaybackState, speechOutputPlaybackStateChangedEvent } from '../../services/speech/bus'
 import { useLlmStreamingControlStore } from '../../stores/ai/chat-llm/streaming-control'
-import { useAudioContext, useSpeakingStore } from '../../stores/audio'
+import { useSpeakingStore } from '../../stores/audio'
 import { useBackgroundStore } from '../../stores/background'
 import { useChatStore } from '../../stores/chat'
-import { useChatSessionStore } from '../../stores/chat/session-store'
-import { useAngelaCardStore } from '../../stores/modules/angela-card'
-import { useSpeechStore } from '../../stores/modules/speech'
 import { useSettingsPresenceBubble } from '../../stores/presence-bubble'
 import { useSettings } from '../../stores/settings'
-import { useSpeechOutputControlStore } from '../../stores/speech-output-control'
-import { useVoiceStore } from '../../stores/voice'
 
 const props = withDefaults(defineProps<{
   cursorPosition?: { x: number, y: number }
@@ -135,22 +127,6 @@ const {
   spineRenderScale,
 } = storeToRefs(settingsStore)
 const { mouthOpenSize, nowSpeaking } = storeToRefs(useSpeakingStore())
-/** `voicing` of `SpeechOutputPlaybackState` in the speech bus. The voice output below keeps it. */
-const speechVoicing = shallowRef(false)
-const disposePlaybackStateHandler = defineInvokeHandler(
-  getSpeechBusContext(),
-  speechOutputGetPlaybackState,
-  () => ({ speaking: nowSpeaking.value, voicing: speechVoicing.value }),
-)
-// Emitted at once too, so a window that kept the state of a reloaded stage
-// learns that the new stage voices nothing.
-watch([nowSpeaking, speechVoicing], ([speaking, voicing]) => {
-  getSpeechBusContext().emit(speechOutputPlaybackStateChangedEvent, { speaking, voicing })
-}, { immediate: true })
-const { audioContext } = useAudioContext()
-const currentAudioSource = ref<AudioBufferSourceNode>()
-const speechOutputControlStore = useSpeechOutputControlStore()
-const { speechMuted } = storeToRefs(speechOutputControlStore)
 const lastVrmInteractionAt = new Map<VrmInteractionTarget, number>()
 const VRM_INTERACTION_COOLDOWN_MS = 450
 
@@ -171,7 +147,7 @@ function onVRMInteract(target: VrmInteractionTarget) {
   vrmViewerRef.value?.setExpression(getVrmInteractionExpression(target), 1)
 }
 
-const { onBeforeMessageComposed, onBeforeSend, onTokenLiteral, onTokenSpecial, onStreamEnd, onAssistantResponseEnd } = useChatStore()
+const { onBeforeSend } = useChatStore()
 const chatHookCleanups: Array<() => void> = []
 // WORKAROUND: clear previous handlers on unmount to avoid duplicate calls when this component remounts.
 //             We keep per-hook disposers instead of wiping the global chat hooks to play nicely with
@@ -203,15 +179,6 @@ watch([stageModelRenderer, stageModelSelected, stageModelSelectedUrl], () => {
   stageRenderError.value = undefined
 })
 
-// Caption + Presentation broadcast channels
-const { post: postCaption } = useBroadcastChannel<CaptionChannelEvent, CaptionChannelEvent>({ name: 'airi-caption-overlay' })
-const assistantCaption = ref('')
-
-type PresentEvent
-  = | { type: 'assistant-reset' }
-    | { type: 'assistant-append', text: string }
-const { post: postPresent } = useBroadcastChannel<PresentEvent, PresentEvent>({ name: 'airi-chat-present' })
-
 viewUpdateCleanups.push(live2dStore.onShouldUpdateView(async () => {
   showStage.value = false
   await settingsStore.updateStageModel()
@@ -226,26 +193,6 @@ const lipSyncLoopId = ref<number>()
 const live2dLipSync = ref<Live2DLipSync>()
 const live2dLipSyncOptions: Live2DLipSyncOptions = { mouthUpdateIntervalMs: 50, mouthLerpWindowMs: 50 }
 
-function resetAssistantSpeechSurface(source: string) {
-  nowSpeaking.value = false
-  mouthOpenSize.value = 0
-  assistantCaption.value = ''
-
-  try {
-    postCaption({ type: 'caption-assistant', text: '' })
-  }
-  catch (error) {
-    console.warn(`[Stage] Failed to post caption reset for ${source} (channel may be closed)`, { error })
-  }
-
-  try {
-    postPresent({ type: 'assistant-reset' })
-  }
-  catch (error) {
-    console.warn(`[Stage] Failed to post present reset for ${source} (channel may be closed)`, { error })
-  }
-}
-
 const { sending: chatSending } = storeToRefs(useChatStore())
 const { presenceOverride } = storeToRefs(useSettingsPresenceBubble())
 
@@ -256,8 +203,6 @@ const { presenceOverride } = storeToRefs(useSettingsPresenceBubble())
 // there is no read cursor to count against.
 const chatPresence = computed<PresenceBubbleState>(() => chatSending.value ? presenceBubbleThinking : presenceBubbleIdle)
 const presenceBubble = computed<PresenceBubbleState>(() => presenceOverride.value ?? chatPresence.value)
-const speechStore = useSpeechStore()
-const chatSession = useChatSessionStore()
 const backgroundStore = useBackgroundStore()
 const { activeBackgroundUrl } = storeToRefs(backgroundStore)
 
@@ -333,91 +278,15 @@ chatHookCleanups.push(streamingControl.onSignal(async (signal) => {
       console.debug('emotion detected', emotion)
       emotionsQueue.enqueue(emotion)
     }
-    return
-  }
-
-  if (signal.type === 'delay') {
-    // eslint-disable-next-line no-console
-    console.debug('delay detected', signal.seconds)
-    await sleep(signal.seconds * 1000)
   }
 }))
 
-// Play special token: plugin CALL, delay, or emotion.
-async function playSpecialToken(
-  special: string,
-  options?: {
-    turnId?: string
-    intentId?: string
-    streamId?: string
-  },
-) {
-  await streamingControl.dispatchWith(special, {
-    turnId: options?.turnId,
-    intentId: options?.intentId,
-    streamId: options?.streamId,
-  })
-}
 const lipSyncNode = ref<AudioNode>()
-
-const voice = useVoiceStore()
-const speechDestination = audioContext.createGain()
-speechDestination.connect(audioContext.destination)
-const playback = new Playback(new BrowserPlayback(audioContext, {
-  destination: speechDestination,
-  onSource: (source) => { currentAudioSource.value = source },
-}))
-let playingCount = 0
-
-function resetSpeakingState() {
-  nowSpeaking.value = false
-  mouthOpenSize.value = 0
-}
-
-// A response leaves the active turns after its playback drains, or at once
-// when it is canceled or interrupted.
-watch(() => voice.activeTurns, (turns) => {
-  if (turns.length === 0)
-    speechVoicing.value = false
-})
-
-const cards = useAngelaCardStore()
-const disconnectVoiceOutput = voice.connectOutput((turn) => {
-  const output = {
-    playback,
-    onSpecial: (special: string) => void playSpecialToken(special, { turnId: turn.turnId }),
-    onPlaybackStart: ({ text }: { text: string }) => {
-      playingCount += 1
-      nowSpeaking.value = true
-      speechVoicing.value = true
-      assistantCaption.value += ` ${text}`
-      try {
-        postCaption({ type: 'caption-assistant', text })
-        postPresent({ type: 'assistant-append', text })
-      }
-      catch (error) {
-        console.error('Speech presentation channel failed', error)
-      }
-    },
-    onPlaybackEnd: () => {
-      playingCount -= 1
-      if (playingCount === 0)
-        resetSpeakingState()
-    },
-  }
-  if (speechMuted.value)
-    return { ...output, synthesize: async () => null }
-  try {
-    const characterId = chatSession.sessionMetas[turn.sessionId]?.characterId
-    if (!characterId)
-      throw new Error('The response session has no character')
-    return speechStore.createOutput(turn, cards.getModules(characterId).speech, output, audioContext)
-  }
-  catch (error) {
-    // Text replies remain available when optional speech output is not configured.
-    console.error('Speech output is unavailable', error)
-    return { ...output, synthesize: async () => null }
-  }
+const { audioContext, currentAudioSource, speechDestination } = useSpeechOutput({
+  beforeResponse: async () => {
+    setupAnalyser()
+    await setupLipSync()
+  },
 })
 
 function startLipSyncLoop() {
@@ -501,60 +370,9 @@ function setupAnalyser() {
   }
 }
 
-watch(speechMuted, (muted) => {
-  if (muted) {
-    for (const turn of voice.activeTurns)
-      voice.getSpeech(turn)?.cancel('Speech muted')
-  }
-})
-
-chatHookCleanups.push(onBeforeMessageComposed(async (_message, context) => {
-  voice.startResponse(context)
-  if (context.sessionId === chatSession.activeSessionId)
-    resetAssistantSpeechSurface('new-message')
-  setupAnalyser()
-  await setupLipSync()
-}))
-
 chatHookCleanups.push(onBeforeSend(async () => {
   currentMotion.value = { group: EmotionThinkMotionName }
 }))
-
-chatHookCleanups.push(onTokenLiteral(async (literal, context) => {
-  if (!speechMuted.value)
-    await voice.getSpeech(context)?.write(literal)
-}))
-
-chatHookCleanups.push(onTokenSpecial(async (special, context) => {
-  if (speechMuted.value)
-    await playSpecialToken(special, { turnId: context.turnId })
-  else
-    voice.getSpeech(context)?.special(special)
-}))
-
-chatHookCleanups.push(onStreamEnd(async (context) => {
-  void voice.finishResponse(context).catch(error => console.error('Speech response completion failed', error))
-}))
-
-chatHookCleanups.push(onAssistantResponseEnd(async (_message, context) => {
-  void voice.finishResponse(context).catch(error => console.error('Speech response completion failed', error))
-}))
-
-// Resume audio context on first user interaction (browser requirement)
-let audioContextResumed = false
-function resumeAudioContextOnInteraction() {
-  if (audioContextResumed || !audioContext)
-    return
-  audioContextResumed = true
-  audioContext.resume().catch(() => {
-    // Ignore errors - audio context will be resumed when needed
-  })
-}
-
-// The listeners close over this setup scope, so a listener that outlives the
-// stage keeps the whole unmounted stage alive, including its WebGL canvas.
-// `useEventListener` removes them on unmount if no interaction came first.
-useEventListener(['click', 'touchstart', 'keydown'], resumeAudioContextOnInteraction, { once: true, passive: true })
 
 // NOTICE:
 // DuckDB stays off until a separate layer owns it. Nothing reads it yet,
@@ -615,12 +433,9 @@ async function captureCharacterFrame() {
 }
 
 onUnmounted(() => {
-  disposePlaybackStateHandler()
   resetLive2dLipSync()
   chatHookCleanups.forEach(dispose => dispose?.())
   viewUpdateCleanups.forEach(dispose => dispose?.())
-  disconnectVoiceOutput()
-  speechDestination.disconnect()
 })
 
 defineExpose({

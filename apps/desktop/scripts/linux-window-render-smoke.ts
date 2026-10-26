@@ -173,6 +173,8 @@ interface RenderCheck {
   innerWidth: number
   innerHeight: number
   devicePixelRatio: number
+  chatComposerPresent: boolean
+  canvasCount: number
 }
 
 const renderCheckExpression = `(() => {
@@ -185,6 +187,8 @@ const renderCheckExpression = `(() => {
     innerWidth: window.innerWidth,
     innerHeight: window.innerHeight,
     devicePixelRatio: window.devicePixelRatio,
+    chatComposerPresent: !!root?.querySelector('textarea'),
+    canvasCount: root?.querySelectorAll('canvas').length ?? 0,
   }
 })()`
 
@@ -198,6 +202,10 @@ function renderCheckFailure(check: RenderCheck): string | undefined {
     return `document.readyState=${check.readyState}`
   if (check.appRootChildCount <= 0)
     return `#app root has no children (appRootChildCount=${check.appRootChildCount}). The window likely came up blank.`
+  if (!check.chatComposerPresent)
+    return 'The main window has no chat composer'
+  if (check.canvasCount !== 0)
+    return `The main window still mounts a rendering canvas (canvasCount=${check.canvasCount})`
   // A hidden window (ready-to-show never fired) still passes the DOM checks
   // over CDP, but Chromium reports it as visibilityState='hidden'. The
   // main-process BrowserWindow.isVisible() is unreachable: its inspector

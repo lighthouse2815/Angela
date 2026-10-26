@@ -2,7 +2,13 @@
 
 # stage Tamagotchi
 
-Ứng dụng Electron desktop chạy các công cụ nhân vật, trò chuyện, giọng nói và desktop của Angela. Hành vi ký tự được chia sẻ thuộc về `shared/ui/stage`. Sử dụng `stage-web` cho các tính năng chỉ dành cho trình duyệt.
+Ứng dụng Electron desktop cung cấp trò chuyện, giọng nói và các công cụ desktop của Angela.
+Cửa sổ chính mở trực tiếp cuộc trò chuyện, không dựng avatar hoặc chạy hiệu ứng ánh sáng màn hình.
+Desktop không khởi tạo model nhân vật và bộ tạo preview khi khởi động.
+Các trang cài đặt avatar và công cụ Live2D không nằm trong định tuyến desktop.
+Thanh tiêu đề giữ lựa chọn hồ sơ, lịch sử phiên, tắt giọng nói, ghim cửa sổ và cài đặt.
+Phần phát giọng nói dùng chung với web qua `useSpeechOutput`, độc lập với avatar.
+Mã và tài nguyên avatar dùng chung vẫn phục vụ web. Thay đổi này không loại bỏ toàn bộ dependency avatar khỏi bộ cài.
 
 <a id="shared-local-configuration"></a>
 
@@ -117,6 +123,15 @@ Bật lời nhắc đánh giá desktop trong cài đặt Bộ nhớ dài hạn. 
 <a id="verification"></a>
 
 ## Xác minh
+
+Kiểm tra phát giọng nói không cần avatar và điều khiển tắt tiếng:
+
+```sh
+pnpm exec vitest run --config shared/ui/stage/vitest.config.ts --project browser use-speech-output.browser.test.ts speech-output-control.browser.test.ts
+pnpm -F @angela/desktop smoke:linux-window-render
+```
+
+Smoke mở Electron thật, kiểm tra ô chat và xác nhận cửa sổ chính không có canvas avatar.
 
 Chạy bài đánh giá store, cài đặt, phân phối native và kiểm tra bộ đếm thời gian renderer từ thư mục gốc của kho lưu trữ:
 

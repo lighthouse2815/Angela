@@ -2,6 +2,14 @@
 
 Lõi chia sẻ cho stage
 
+## Phát giọng nói độc lập với avatar
+
+`useSpeechOutput` kết nối chat, tổng hợp giọng nói, phát âm thanh và caption trong một renderer.
+Scope sở hữu các hook và kết nối đầu ra. Khi scope đóng, chúng được giải phóng.
+Desktop dùng composable này trực tiếp. Stage trên web dùng thêm `beforeResponse` để chuẩn bị nhép miệng.
+Host chỉ dùng chat gọi `initializeStageModel({ loadModel: false })` trước khi khởi tạo hồ sơ.
+Chế độ này giữ lựa chọn model đã lưu nhưng không đọc model, tạo URL hoặc khởi tạo renderer.
+
 <a id="shared-local-provider-settings"></a>
 
 ## Cài đặt nhà cung cấp cục bộ được chia sẻ

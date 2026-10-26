@@ -38,6 +38,7 @@ export const useSettingsStageModel = defineStore('settings-stage-model', () => {
   const stageModelSelectionStore = useStageModelSelectionStore()
   const { selected: stageModelSelectedState } = storeToRefs(stageModelSelectionStore)
   let stageModelUpdateSequence = 0
+  let modelLoadingEnabled = true
   let legacyModelIdentityResetPromise: Promise<void> | undefined
   const defaultStageModelId = 'preset-live2d-1'
   const stageModelSelected = computed<string>({
@@ -106,6 +107,14 @@ export const useSettingsStageModel = defineStore('settings-stage-model', () => {
     const requestId = ++stageModelUpdateSequence
     const selectedModelId = stageModelSelectedState.value
 
+    if (!modelLoadingEnabled) {
+      replaceStageModelUrl(undefined)
+      stageModelSelectedDisplayModel.value = undefined
+      stageModelBuiltInRenderer.value = 'disabled'
+      stageModelRenderer.value = 'disabled'
+      return
+    }
+
     const legacyModelIdentityReset = resetLegacyModelIdentity()
     if (legacyModelIdentityReset) {
       await legacyModelIdentityReset
@@ -172,7 +181,9 @@ export const useSettingsStageModel = defineStore('settings-stage-model', () => {
     stageModelRenderer.value = stageModelBuiltInRenderer.value ?? 'disabled'
   }
 
-  async function initializeStageModel() {
+  /** Disables avatar IO for chat-only hosts without changing the saved model selection. Web hosts load models by default. */
+  async function initializeStageModel(options: { loadModel?: boolean } = {}) {
+    modelLoadingEnabled = options.loadModel ?? modelLoadingEnabled
     await updateStageModel()
   }
 

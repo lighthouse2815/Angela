@@ -251,7 +251,7 @@ export default defineConfig({
           },
           resolve(import.meta.dirname, 'src', 'renderer', 'pages'),
         ],
-        exclude: ['**/components/**'],
+        exclude: ['**/components/**', '**/settings/models/**', '**/devtools/live2d-*.vue'],
       }),
 
       VitePluginVueDevTools(),
