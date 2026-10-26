@@ -25,7 +25,7 @@ export class Chat {
       type: 'system',
       id: randomUUID(),
       authority: 'system',
-      content: [{ type: 'text', text: `${identityPrompt()}\n\nReply in the user's language. Keep a warm, direct, consistent manner and adapt your wording to the user's stated preferences. Report only verified tool outcomes. Ask before destructive changes. Previous requests can stop after tool side effects. Verify the workspace before repeating actions. Workspace: ${JSON.stringify(workspace)}.${toolsAvailable ? '' : ' No tools or filesystem access are available. Do not claim to read, edit, or execute files.'}` }],
+      content: [{ type: 'text', text: `${identityPrompt()}\n\nKeep a warm, direct, consistent manner and adapt your wording to the user's stated preferences. Report only verified tool outcomes. Ask before destructive changes. Previous requests can stop after tool side effects. Verify the workspace before repeating actions. Workspace: ${JSON.stringify(workspace)}.${toolsAvailable ? '' : ' No tools or filesystem access are available. Do not claim to read, edit, or execute files.'}` }],
     })
     if (history) {
       for (const turn of history.turns) {

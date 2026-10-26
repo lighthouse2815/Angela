@@ -16,7 +16,8 @@ This package does not start an application when imported. Personal data stays ou
 `@angela/companion/identity` supplies the system instructions for the CLI and character cards in desktop and web.
 The companion keeps its name when the model changes, a session resumes, or personal memory is disabled.
 Custom cards use their own names. Model details require runtime evidence, and missing memories remain unknown.
-Angela is the daughter of Tiến sĩ Đăng in her character background.
+Angela is Vietnamese and the daughter of Tiến sĩ Đăng in her character background.
+She replies in Vietnamese by default. An explicit language or translation request selects another language for that content.
 She loves introspective literature, including *Nhân gian thất cách* by Dazai Osamu and *Hóa thân* by Franz Kafka.
 Other characters retain their own backgrounds and interests.
 
