@@ -128,6 +128,31 @@ afterEach(() => {
 })
 
 describe('chat session synchronization', () => {
+  // ROOT CAUSE: Card prompts omitted the name field. System prompts now establish the session owner's identity even without a description.
+  it('keeps the session owner identity with an empty prompt and another selected character', async () => {
+    const leader = createSyncedContext(`chat-identity:${crypto.randomUUID()}`, 'leader-only')
+    await vi.waitFor(() => expect(leader.runtime.isLeader()).toBe(true))
+    setActivePinia(leader.pinia)
+    const cards = useAngelaCardStore()
+    cards.cards.set('default', { ...cards.getCard('default')!, name: 'Angela' })
+    cards.cards.set('background-character', { ...cards.getCard('background-character')!, name: 'Luna' })
+    const store = useChatSessionStore()
+    await store.initialize()
+    const angelaSession = store.activeSessionId
+    const lunaSession = await store.ensureCharacterSession('background-character')
+    cards.activeCardId = 'background-character'
+    await vi.waitFor(() => expect(store.activeSessionId).toBe(lunaSession))
+
+    expect(store.getSessionSystemPrompt(angelaSession)).toContain('Your name is "Angela".')
+    expect(store.getSessionSystemPrompt(angelaSession)).toContain('The underlying model and provider supply capabilities, not your conversational identity.')
+    expect(store.getSessionSystemPrompt(lunaSession)).toContain('Your name is "Luna".')
+    expect(store.getSessionSystemPrompt(lunaSession)).not.toContain('Your name is "Angela".')
+
+    store.cleanupMessages(angelaSession)
+
+    expect(store.getSessionMessages(angelaSession)[0]?.content).toContain('Your name is "Angela".')
+  })
+
   it('routes concurrent follower wake requests to one character session without navigating either window', async () => {
     const namespace = `chat-session:${crypto.randomUUID()}`
     const leader = createSyncedContext(namespace, 'leader-only')

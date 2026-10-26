@@ -1,5 +1,6 @@
 import type { AngelaCard } from './angela-card'
 
+import { identityPrompt } from '@angela/companion/identity'
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -552,6 +553,7 @@ describe('airi-card store', () => {
     await cardStore.activateCard(cardId)
 
     expect(cardStore.systemPrompt).toBe([
+      identityPrompt('Runtime context card'),
       'Follow the character rules.',
       'A patient field researcher.',
       'Curious and precise.',

@@ -6,6 +6,7 @@ import type { AngelaCard, AngelaExtension } from '../../types/angela-card'
 
 import localeMessages from '@angela/i18n/locales'
 
+import { identityPrompt } from '@angela/companion/identity'
 import { useLocalStorageManualReset } from '@angela/stage-shared/composables'
 import { errorMessageFrom } from '@moeru/std'
 import { StorageSerializers, useDocumentVisibility, watchDebounced } from '@vueuse/core'
@@ -75,6 +76,7 @@ function resolveSystemPrompt(card: AngelaCard | undefined): string {
   // Position-sensitive CCv3 fields are deliberately excluded until provider
   // message assembly owns their ordering and role semantics.
   const systemPromptParts = [
+    identityPrompt(card.name),
     card.systemPrompt,
     card.description,
     card.personality,

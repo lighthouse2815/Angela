@@ -15,6 +15,27 @@ function completion(text: string) {
 }
 
 describe('terminal conversation', () => {
+  // ROOT CAUSE: The old prompt named Angela without separating companion identity from the provider. Every request now carries that distinction.
+  it('sends the current companion identity after resuming with another model and personal memory disabled', async () => {
+    const fetch = vi.fn<typeof globalThis.fetch>().mockImplementation(async () => completion('Mình là Angela'))
+    const provider: GenerationProvider = {
+      generation: model => ({ protocol: 'chat-completions', config: { model, baseURL: 'https://provider.example/v1/', fetch } }),
+    }
+    const original = new Chat('old-model', provider, '/workspace')
+    await original.send('Bạn là ai?', {})
+    const resumed = new Chat('new-model', provider, '/workspace', original.conversation, false)
+    await resumed.send('Bạn vẫn nhớ mình là ai chứ?', {}, 'Personal memory is disabled.')
+
+    for (const [, init] of fetch.mock.calls) {
+      const body = JSON.parse(String(init?.body))
+      expect(body.messages[0].role).toBe('system')
+      expect(body.messages[0].content).toContain('Your name is "Angela".')
+      expect(body.messages[0].content).toContain('The underlying model and provider supply capabilities, not your conversational identity.')
+      expect(body.messages[0].content).toContain('If the user asks about the underlying model, distinguish it from your companion identity.')
+    }
+    expect(JSON.parse(String(fetch.mock.calls[1][1]?.body)).model).toBe('new-model')
+  })
+
   it('streams a real generation and sends the previous answer in the next request', async () => {
     const fetch = vi.fn<typeof globalThis.fetch>()
       .mockResolvedValueOnce(completion('Xin chào'))
@@ -100,6 +121,7 @@ it('compacts the outgoing request while retaining full history for session persi
   expect(chat.context.status.summarizedTurns).toBeGreaterThan(0)
   expect(requests.at(-1)).toContain('Keep this latest requirement')
   expect(requests.at(-1)).toContain('Fresh memory context')
+  expect(requests.at(-1)).toContain('The underlying model and provider supply capabilities, not your conversational identity.')
   expect(requests.at(-1)).toContain('Old requirement: preserve the API design')
   expect(requests.at(-1)).not.toContain('Unique historical detail 0')
   expect(JSON.stringify({ turns: chat.conversation.turns.slice(0, -2) })).toBe(original)

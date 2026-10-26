@@ -11,6 +11,12 @@ Run `pnpm -F @angela/companion build`, `typecheck`, or `test` from the repositor
 
 This package does not start an application when imported. Personal data stays outside the repository.
 
+## Companion identity
+
+`@angela/companion/identity` supplies the system instructions for the CLI and character cards in desktop and web.
+The companion keeps its name when the model changes, a session resumes, or personal memory is disabled.
+Custom cards use their own names. Model details require runtime evidence, and missing memories remain unknown.
+
 ## Internet and timestamped lessons
 
 `@angela/companion/internet` owns transcript retrieval, bounded playback windows, search, and batched video summaries.
