@@ -1,4 +1,5 @@
 import type { RecordsCommand, RecordsResponse } from '@angela/companion/companion-contracts'
+import type { TaskCommand, TaskResponse } from '@angela/companion/task-contracts'
 import type { StreamEvent } from '@angela/core-agent'
 import type { Tool } from '@xsai/shared-chat'
 
@@ -15,6 +16,7 @@ export interface CompanionBegin {
 export type CompanionReady = { kind: 'reply', text: string } | { kind: 'generate', context: string, tools: Pick<Tool, 'type' | 'function'>[] }
 
 export const companionRecords = defineInvokeEventa<RecordsResponse, { characterId: string, command: RecordsCommand }>('eventa:invoke:companion:records')
+export const companionTasks = defineInvokeEventa<TaskResponse, { characterId: string, command: TaskCommand }>('eventa:invoke:companion:tasks')
 export const companionBegin = defineInvokeEventa<CompanionReady, CompanionBegin>('eventa:invoke:companion:begin')
 export const companionTool = defineInvokeEventa<unknown, { requestId: string, name: string, input: unknown }>('eventa:invoke:companion:tool')
 export const companionObserve = defineInvokeEventa<void, { requestId: string, event: StreamEvent }>('eventa:invoke:companion:observe')

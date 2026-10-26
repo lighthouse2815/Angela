@@ -16,6 +16,30 @@ Mã và tài nguyên avatar dùng chung vẫn phục vụ web. Thay đổi này 
 
 desktop chia sẻ cài đặt nhà cung cấp trực tiếp và trò chuyện mô hình với CLI cũng như web được phục vụ cục bộ thông qua `~/.config/angela/config.json`. Đặt `ANGELA_CONFIG` trước khi khởi động ứng dụng để chọn tệp khác. Quá trình chính sở hữu quyền truy cập tệp thông qua Eventa IPC. Chỉ người lãnh đạo Pinia mới tiếp tục thực hiện các hành động cài đặt đã hoàn thành. Nhập nhà cung cấp trực tiếp hiện có một lần cho mỗi hồ sơ. Các chỉnh sửa bên ngoài được làm mới sau mỗi 1,5 giây. Phiên tài khoản và tùy chọn giao diện vẫn giữ nguyên với store hiện tại của họ. Xem [cấu hình cục bộ](../../shared/config/README.md) để biết hợp đồng tệp.
 
+## Việc và lời nhắc
+
+Mở biểu tượng danh sách trên thanh tiêu đề hoặc **Cài đặt → Việc và lời nhắc**.
+Trang hỗ trợ tạo, sửa, hoàn thành, hủy, báo lại và lọc lịch sử theo trạng thái.
+Lịch lặp hỗ trợ ngày, tuần, khoảng cách 1–52 và lựa chọn thứ trong tuần.
+Ngày và giờ được diễn giải theo múi giờ IANA trong biểu mẫu.
+Việc chỉ có ngày không có báo thức. Báo lại giữ lịch gốc và đặt giờ nhắc tạm thời.
+Hoàn thành việc lặp ghi nhận một lần thực hiện và giữ lịch tiếp theo.
+
+Electron main xác thực các lệnh qua Eventa và dùng `Tasks` của companion runtime.
+Các thao tác quản lý không gọi model. Mỗi hồ sơ dùng thư mục task của chính nó.
+Hồ sơ mặc định dùng chung task với CLI khi hai ứng dụng dùng cùng thư mục dữ liệu.
+Trang đọc lại mỗi 10 giây khi hiển thị để nhận thay đổi từ chat hoặc tiến trình khác.
+Lưu lỗi giữ nguyên bản nháp. Đổi hồ sơ bỏ qua các phản hồi thuộc hồ sơ trước.
+
+Lời nhắc xuất hiện trong ứng dụng khi cửa sổ chính hiển thị và người dùng ngừng tương tác một phút.
+Đồng hành chủ động và bộ nhớ không cần bật để nhận lời nhắc đã tạo rõ ràng.
+Thoát ứng dụng dừng phân phối. Dịch vụ nền của CLI vẫn là cơ chế riêng.
+
+```sh
+pnpm exec vitest run --config apps/desktop/vitest.node.config.ts src/main/services/angela/companion-runtime/runtime.test.ts
+pnpm -F @angela/desktop exec vitest run --project browser src/renderer/pages/settings/tasks/index.browser.test.ts
+```
+
 <a id="development"></a>
 
 ## Phát triển

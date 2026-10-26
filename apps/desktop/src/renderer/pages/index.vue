@@ -96,6 +96,13 @@ onMounted(() => {
         />
         <GhostButton
           size="sm"
+          icon="i-solar:checklist-minimalistic-bold-duotone"
+          :aria-label="t('settings.pages.tasks.title')"
+          :title="t('settings.pages.tasks.title')"
+          @click="openSettings({ route: '/settings/tasks' })"
+        />
+        <GhostButton
+          size="sm"
           icon="i-solar:settings-linear"
           :aria-label="t('tamagotchi.stage.controls-island.open-settings')"
           :title="t('tamagotchi.stage.controls-island.open-settings')"

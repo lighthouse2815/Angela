@@ -3,7 +3,7 @@ import type { createContext } from '@moeru/eventa/adapters/electron/main'
 import { defineInvokeHandler } from '@moeru/eventa'
 import { BrowserWindow } from 'electron'
 
-import { companionBegin, companionFinish, companionObserve, companionRecords, companionReminders, companionTool } from '../../../../shared/eventa/companion-runtime'
+import { companionBegin, companionFinish, companionObserve, companionRecords, companionReminders, companionTasks, companionTool } from '../../../../shared/eventa/companion-runtime'
 import { onAppBeforeQuit } from '../../../libs/bootkit/lifecycle'
 import { isLocalAppURL } from '../../../libs/electron/url'
 import { DesktopCompanionRuntime } from './runtime'
@@ -28,6 +28,10 @@ export function setupCompanionRuntime(context: ReturnType<typeof createContext>[
   defineInvokeHandler(context, companionRecords, (input, options) => {
     authorize(options?.raw?.ipcMainEvent)
     return host.records(input.characterId, input.command)
+  })
+  defineInvokeHandler(context, companionTasks, (input, options) => {
+    authorize(options?.raw?.ipcMainEvent)
+    return host.tasks(input.characterId, input.command)
   })
   defineInvokeHandler(context, companionBegin, (input, options) => host.begin(authorize(options?.raw?.ipcMainEvent), input))
   defineInvokeHandler(context, companionTool, (input, options) => host.executeTool(authorize(options?.raw?.ipcMainEvent), input.requestId, input.name, input.input))

@@ -39,3 +39,10 @@ Run `ANGELA_TEST_FFMPEG=/path/to/ffmpeg pnpm exec vitest run core/companion/src/
 The default suite mocks external media and HTTP providers.
 
 Caller cancellation preserves other coalesced questions. The last caller stops extraction. Hosts await `whenIdle()` before shutdown.
+
+## Lệnh quản lý task cho desktop
+
+`task-contracts` cung cấp schema Valibot và kiểu lệnh tạo, sửa, liệt kê, hoàn thành, hủy và báo lại.
+Desktop xác thực lệnh ở Electron main trước khi gọi `Tasks` của runtime.
+Contract không nhận dữ liệu lease phân phối hoặc quyền ghi memory từ renderer.
+Kết quả trả snapshot sau khi lưu và múi giờ dùng cho lịch.

@@ -1,4 +1,5 @@
 import type { OpenLoop, RuntimeChat, RuntimeSession, Task } from '@angela/companion/runtime'
+import type { TaskCommand, TaskResponse } from '@angela/companion/task-contracts'
 import type { StreamEvent, StreamOptions } from '@angela/core-agent'
 import type { Tool } from '@xsai/shared-chat'
 
@@ -13,6 +14,7 @@ import { join, resolve } from 'node:path'
 
 import { characterDataDir, CompanionRecords } from '@angela/companion/companion'
 import { AngelaRuntime, ReminderNotifications, requestPrivacy } from '@angela/companion/runtime'
+import { taskCommandSchema } from '@angela/companion/task-contracts'
 import { chatMessagesToTurns } from '@angela/core-agent'
 import { cliMessages } from '@angela/i18n/cli'
 
@@ -83,6 +85,37 @@ export class DesktopCompanionRuntime {
       return await records.execute(command)
     }
     finally { records.close() }
+  }
+
+  /** Explicit UI actions use the same atomic task store as chat, without invoking a model. */
+  async tasks(characterId: string, command: TaskCommand): Promise<TaskResponse> {
+    v.parse(id, characterId)
+    const parsed = v.parse(taskCommandSchema, command)
+    const root = this.root(characterId)
+    const tasks = await this.runtime.tasks(root)
+    let task: Task | undefined
+    switch (parsed.type) {
+      case 'list': break
+      case 'create':
+        task = await tasks.create(parsed.input)
+        break
+      case 'update':
+        task = await tasks.update(parsed.id, parsed.changes)
+        break
+      case 'complete':
+        task = await tasks.complete(parsed.id)
+        break
+      case 'cancel':
+        task = await tasks.cancel(parsed.id)
+        break
+      case 'snooze':
+        task = await tasks.snooze(parsed.id, parsed.until)
+        break
+    }
+    const route = this.notifications.get(root)
+    if (task && route)
+      void route.scheduler.then(scheduler => scheduler.refresh()).catch(error => console.error('Task scheduler refresh failed', error))
+    return { task, tasks: await tasks.list({ status: 'all' }), timezone: tasks.timezone }
   }
 
   async begin(owner: number, input: CompanionBegin) {
@@ -246,12 +279,16 @@ export class DesktopCompanionRuntime {
     }
     route.sessionId = input.sessionId
     route.availableUntil = input.available ? Date.now() + 20000 : 0
-    const current = await this.records(input.characterId, { type: 'read' })
-    if (!current.snapshot.enabled || !current.snapshot.companion.enabled)
-      route.availableUntil = 0
     const pending = route.pending
     if (!pending || pending.presented)
       return null
+    if (pending.loop) {
+      const current = await this.records(input.characterId, { type: 'read' })
+      if (!current.snapshot.enabled || !current.snapshot.companion.enabled) {
+        pending.finish(false)
+        return null
+      }
+    }
     if (!route.availableUntil || [...this.requests.values()].some(request => request.owner === owner)) {
       pending.finish(false)
       return null

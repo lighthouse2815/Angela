@@ -563,6 +563,50 @@ pages:
     import_invalid_file: Card package file is invalid
     upload: Upload
     upload_desc: Click or drag an Angela card package to import
+  tasks:
+    title: 'Tasks and reminders'
+    description: 'Manage everyday tasks, reminders, and routines'
+    createTitle: 'Add a task or reminder'
+    editTitle: 'Edit task'
+    titleLabel: 'Title'
+    typeLabel: 'Task type'
+    date: 'Date'
+    time: 'Time (optional)'
+    timezone: 'Timezone'
+    repeat: 'Repeat'
+    interval: 'Every (days or weeks, 1–52)'
+    notes: 'Notes'
+    create: 'Add task'
+    save: 'Save changes'
+    discard: 'Discard edits'
+    edit: 'Edit'
+    filter: 'Show'
+    refresh: 'Refresh'
+    complete: 'Complete'
+    cancel: 'Cancel task'
+    snooze: 'Snooze'
+    snoozeMinutes: 'Snooze duration (minutes)'
+    empty: 'No tasks in this view.'
+    noDue: 'No due date'
+    saved: 'Changes saved.'
+    failed: 'Task request failed. Try again.'
+    repeatRequired: 'Repeating tasks require a date, time, and repeat schedule.'
+    delivery: 'Reminders appear while Angela is open, visible, and idle. Date-only tasks have no alarm. Closing the app stops delivery.'
+    types:
+      todo: 'To-do'
+      reminder: 'Reminder'
+      deadline: 'Deadline'
+      routine: 'Routine'
+      follow_up: 'Follow-up'
+    statuses:
+      pending: 'Pending'
+      completed: 'Completed'
+      cancelled: 'Cancelled'
+      all: 'All tasks'
+    repeats:
+      none: 'Does not repeat'
+      daily: 'Daily'
+      weekly: 'Weekly'
   memory:
     description: Where memories got stored, and organized
     title: Memory

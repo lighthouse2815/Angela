@@ -533,6 +533,50 @@ pages:
       title: Một cách phát âm từ đánh thức dùng chung cần có nhân vật | {count} cách phát âm từ đánh thức dùng chung cần có nhân vật
       description: Hai thẻ dùng cùng cách phát âm. Không nhân vật nào trả lời cho đến khi bạn chọn một nhân vật.
       action: Chọn nhân vật trả lời
+  tasks:
+    title: 'Việc và lời nhắc'
+    description: 'Quản lý việc cần làm, lời nhắc và thói quen'
+    createTitle: 'Thêm việc hoặc lời nhắc'
+    editTitle: 'Sửa việc'
+    titleLabel: 'Tiêu đề'
+    typeLabel: 'Loại việc'
+    date: 'Ngày'
+    time: 'Giờ (không bắt buộc)'
+    timezone: 'Múi giờ'
+    repeat: 'Lặp lại'
+    interval: 'Mỗi (ngày hoặc tuần, 1–52)'
+    notes: 'Ghi chú'
+    create: 'Thêm việc'
+    save: 'Lưu thay đổi'
+    discard: 'Bỏ chỉnh sửa'
+    edit: 'Sửa'
+    filter: 'Hiển thị'
+    refresh: 'Làm mới'
+    complete: 'Hoàn thành'
+    cancel: 'Hủy việc'
+    snooze: 'Báo lại'
+    snoozeMinutes: 'Báo lại sau (phút)'
+    empty: 'Không có việc trong danh sách này.'
+    noDue: 'Không có hạn'
+    saved: 'Đã lưu thay đổi.'
+    failed: 'Không thể xử lý việc. Hãy thử lại.'
+    repeatRequired: 'Việc lặp lại cần ngày, giờ và lịch lặp.'
+    delivery: 'Lời nhắc xuất hiện khi Angela đang mở, hiển thị và không tương tác. Việc chỉ có ngày không có báo thức. Thoát ứng dụng sẽ dừng nhắc.'
+    types:
+      todo: 'Việc cần làm'
+      reminder: 'Lời nhắc'
+      deadline: 'Hạn chót'
+      routine: 'Thói quen'
+      follow_up: 'Theo dõi lại'
+    statuses:
+      pending: 'Đang chờ'
+      completed: 'Đã hoàn thành'
+      cancelled: 'Đã hủy'
+      all: 'Tất cả'
+    repeats:
+      none: 'Không lặp'
+      daily: 'Hàng ngày'
+      weekly: 'Hàng tuần'
   memory:
     description: Nơi lưu trữ và tổ chức ký ức
     title: Bộ nhớ

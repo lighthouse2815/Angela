@@ -126,7 +126,7 @@ export function useCompanionRuntime() {
       await companion.refresh(characterId)
       if (!sessions.activeSessionId)
         return
-      const available = visibility.value === 'visible' && idle.value && !chat.sending && !speaking.nowSpeaking && learning.enabled && companion.state.enabled
+      const available = visibility.value === 'visible' && idle.value && !chat.sending && !speaking.nowSpeaking
       const notification = await reminders({ characterId, sessionId: sessions.activeSessionId, available })
       if (notification) {
         let shown = false
