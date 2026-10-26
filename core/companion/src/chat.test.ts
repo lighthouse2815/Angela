@@ -30,6 +30,9 @@ describe('terminal conversation', () => {
       const body = JSON.parse(String(init?.body))
       expect(body.messages[0].role).toBe('system')
       expect(body.messages[0].content).toContain('Your name is "Angela".')
+      expect(body.messages[0].content).toContain('daughter of Tiến sĩ Đăng (Dr. Đăng)')
+      expect(body.messages[0].content).toContain('Nhân gian thất cách (No Longer Human) by Dazai Osamu')
+      expect(body.messages[0].content).toContain('Hóa thân (The Metamorphosis) by Franz Kafka')
       expect(body.messages[0].content).toContain('The underlying model and provider supply capabilities, not your conversational identity.')
       expect(body.messages[0].content).toContain('If the user asks about the underlying model, distinguish it from your companion identity.')
     }
