@@ -64,6 +64,16 @@ Upstream unit tests remain in `tests/unit/` and use `tests/vitest.config.js`.
 Kimchi and Cline authentication tests use the same Vitest runner.
 Registry checks retain Windsurf's hidden state and its current Codeium endpoint.
 CommandCode image checks require both `mimeType` and `mediaType`.
+Local OAuth callbacks use the dashboard origin, including its hostname, protocol, and port.
+This lets Antigravity relay authorization results when the dashboard uses `127.0.0.1` or `localhost`.
+The callback browser tests run an isolated standalone server and replace Google's authorization and token exchange with fixtures.
+After a gateway build, run them from the repository root:
+
+```sh
+pnpm exec vitest run --config providers/gateway/vendor/tests/vitest.config.js providers/gateway/vendor/tests/browser/oauth-callback.test.js
+```
+
+The tests use Playwright Chromium. Set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to use an existing Chrome or Chromium executable.
 The certificate utilities in `src/mitm/cert/` are source code and ship with the vendor workspace.
 Git tracks only the three JavaScript utilities there. Generated certificates and private keys stay ignored.
 
